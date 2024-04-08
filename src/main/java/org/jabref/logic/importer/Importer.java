@@ -169,22 +169,6 @@ public abstract class Importer implements Comparable<Importer> {
     }
 
     /**
-     * Returns the name of this import format.
-     *
-     * <p>The name must be unique.</p>
-     *
-     * @return format name, must be unique and not <code>null</code>
-     */
-    public abstract String getName();
-
-    /**
-     * Returns the type of files that this importer can read
-     *
-     * @return {@link FileType} corresponding to the importer
-     */
-    public abstract FileType getFileType();
-
-    /**
      * Returns a one-word ID which identifies this importer. Used for example, to identify the importer when used from
      * the command line.
      *
@@ -203,6 +187,15 @@ public abstract class Importer implements Comparable<Importer> {
     }
 
     /**
+     * Returns the name of this import format.
+     *
+     * <p>The name must be unique.</p>
+     *
+     * @return format name, must be unique and not <code>null</code>
+     */
+    public abstract String getName();
+
+    /**
      * Returns the description of the import format.
      * <p>
      * The description should specify
@@ -215,6 +208,13 @@ public abstract class Importer implements Comparable<Importer> {
      * @return description of the import format
      */
     public abstract String getDescription();
+
+    /**
+     * Returns the type of files that this importer can read
+     *
+     * @return {@link FileType} corresponding to the importer
+     */
+    public abstract FileType getFileType();
 
     @Override
     public int hashCode() {

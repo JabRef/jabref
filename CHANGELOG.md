@@ -12,11 +12,16 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a new keyboard shortcut  <kbd>ctrl</kbd> + <kbd>,</kbd> to open the preferences. [#11154](https://github.com/JabRef/jabref/pull/11154)
-- We added value selection(like for month) for content selectors in custom entry types. [#11109](https://github.com/JabRef/jabref/issues/11109)
+- We added value selection (such as for month) for content selectors in custom entry types. [#11109](https://github.com/JabRef/jabref/issues/11109)
+- We added support for offline extracting refereferences from PDFs following the IEEE format. [#11156](https://github.com/JabRef/jabref/pull/11156)
 
 ### Changed
 
+- We replaced the word "Key bindings" with "Keyboard shortcuts" in the Preferences tab. [#11153](https://github.com/JabRef/jabref/pull/11153)
+
 ### Fixed
+
+- We fixed an issue where entry type with duplicate fields prevented opening existing libraries with custom entry types [#11127](https://github.com/JabRef/jabref/issues/11127)
 
 ### Removed
 

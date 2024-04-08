@@ -11,6 +11,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Similar tests are available in {@link org.jabref.model.entry.AuthorListTest}
+ */
 class AuthorListParserTest {
 
     AuthorListParser parser = new AuthorListParser();
@@ -50,7 +53,15 @@ class AuthorListParserTest {
                                 new Author("Alexander", "A.", null, "Artemenko", null),
                                 Author.OTHERS
                         ),
-                        "Alexander Artemenko and others")
+                        "Alexander Artemenko and others"),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("I.", "I.", null, "Podadera", null),
+                                new Author("J. M.", "J. M.", null, "Carmona", null),
+                                new Author("A.", "A.", null, "Ibarra", null),
+                                new Author("J.", "J.", null, "Molla", null)
+                        ),
+                        "I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla")
         );
     }
 

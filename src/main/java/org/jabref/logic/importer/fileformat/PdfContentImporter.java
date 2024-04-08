@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -183,15 +184,8 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(String data) throws IOException {
-        Objects.requireNonNull(data);
-        throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(String data)."
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
-    }
-
-    @Override
     public ParserResult importDatabase(Path filePath) {
-        final ArrayList<BibEntry> result = new ArrayList<>(1);
+        List<BibEntry> result = new ArrayList<>(1);
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
             Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);

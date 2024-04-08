@@ -66,6 +66,10 @@ public class MetaDataParser {
                 // Important fields are optional fields, but displayed first. Thus, they do not need to be separated by "/".
                 // See org.jabref.model.entry.field.FieldPriority for details on important optional fields.
                 .withImportantFields(FieldFactory.parseFieldList(optFields));
+        if (entryTypeBuilder.hasWarnings()) {
+            LOGGER.warn("Following custom entry type definition has duplicate fields: {}", comment);
+            return Optional.empty();
+        }
         return Optional.of(entryTypeBuilder.build());
     }
 

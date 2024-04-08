@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -33,6 +36,9 @@ public class AuthorListParser {
     // Constant HashSet containing names of TeX special characters
     private static final Set<String> TEX_NAMES = Set.of(
             "aa", "ae", "l", "o", "oe", "i", "AA", "AE", "L", "O", "OE", "j");
+
+    private static final Pattern STARTS_WITH_CAPITAL_LETTER_DOT = Pattern.compile("^[A-Z]\\. ");
+
     /**
      * the raw bibtex author/editor field
      */
@@ -108,6 +114,8 @@ public class AuthorListParser {
             andOthersPresent = false;
         }
 
+        listOfNames = checkNamesCommaSeparated(listOfNames);
+
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
         final boolean authorsContainAND = listOfNames.toUpperCase(Locale.ENGLISH).contains(" AND ");
@@ -168,6 +176,29 @@ public class AuthorListParser {
         }
 
         return AuthorList.of(authors);
+    }
+
+    /**
+     * Handle cases names in order Firstname Lastname, separated by <code>","</code> and a final <code>", and "</code>
+     * E.g, <code>"I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla"</code>
+     *
+     * @return the original or patched version of listOfNames
+     */
+    private static String checkNamesCommaSeparated(String listOfNames) {
+        int commandAndPos = listOfNames.lastIndexOf(", and ");
+        if (commandAndPos >= 0) {
+            String lastContainedName = listOfNames.substring(commandAndPos + ", and ".length());
+            Matcher matcher = STARTS_WITH_CAPITAL_LETTER_DOT.matcher(lastContainedName);
+            if (matcher.find()) {
+                String namesBeforeAndString = listOfNames.substring(0, commandAndPos);
+                String[] namesBeforeAnd = namesBeforeAndString.split(", ");
+                if (Arrays.stream(namesBeforeAnd).allMatch(name -> STARTS_WITH_CAPITAL_LETTER_DOT.matcher(name).find())) {
+                    // Format found
+                    listOfNames = Arrays.stream(namesBeforeAnd).collect(Collectors.joining(" and ", "", " and " + lastContainedName));
+                }
+            }
+        }
+        return listOfNames;
     }
 
     /**
