@@ -82,21 +82,25 @@ public class EntryEditor extends BorderPane {
     private final BibDatabaseContext databaseContext;
     private final EntryEditorPreferences entryEditorPreferences;
     private final ExternalFilesEntryLinker fileLinker;
-    /*
-    * Tabs which can apply filter, but seems non-sense
-    * */
-    private final List<EntryEditorTab> tabs;
+
     private Subscription typeSubscription;
+
     /*
-    * A reference to the entry this editor works on.
-    * */
+     * Reference to the entry this editor works on.
+     */
     private BibEntry entry;
+
     private SourceTab sourceTab;
 
     /*
-    * tabs to be showed in GUI
-    * */
+     * tabs to be shown in GUI
+     */
     @FXML private TabPane tabbed;
+
+    /*
+     * Tabs which can apply filter, but seems non-sense
+     */
+    private final List<EntryEditorTab> tabs;
 
     @FXML private Button typeChangeButton;
     @FXML private Button fetcherButton;
