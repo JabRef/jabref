@@ -8,16 +8,20 @@ import java.util.Optional;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.backup.BackupResolverDialog;
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
+import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -34,6 +38,9 @@ import org.slf4j.LoggerFactory;
  */
 public class BackupUIManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
+
+    private static StateManager stateManager;
+    private static final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
 
     private BackupUIManager() {
     }
@@ -91,7 +98,15 @@ public class BackupUIManager {
                         originalDatabase, "Review Backup"
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
+                LibraryTab saveState = stateManager.activeTabProperty().get().get();
+                changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
+                ce.end();
                 if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
+                    if(reviewBackupDialog.areAllChangesDenied()){
+                        saveState.resetChangeMonitor();
+                    }else{
+                        saveState.markBaseChanged();
+                    }
                     // In case not all changes are resolved, start from scratch
                     return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor);
                 }
