@@ -73,10 +73,12 @@ public class EndnoteXmlExporter extends Exporter {
                                                                                             entry -> Integer.toString(EXPORT_ITEM_TYPE_ORDER.indexOf(entry.getValue()) + 1)));
 
     private final AuthorListParser authorListParser;
+    private final DocumentBuilderFactory dbFactory;
 
     public EndnoteXmlExporter() {
         super("endnote", "EndNote XML", StandardFileType.XML);
         this.authorListParser = new AuthorListParser();
+        this.dbFactory = DocumentBuilderFactory.newInstance();
     }
 
     @Override
@@ -90,7 +92,6 @@ public class EndnoteXmlExporter extends Exporter {
         }
 
         try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document document = dBuilder.newDocument();
 
@@ -139,18 +140,18 @@ public class EndnoteXmlExporter extends Exporter {
         writeField(document, recordElement, "ref-type", EXPORT_REF_NUMBER.getOrDefault(entry.getType(), "Generic"), Map.of("name", EXPORT_ITEM_TYPE.getOrDefault(entry.getType(), "Generic")));
 
         writeContributors(entry, document, recordElement);
-        writeField(document, recordElement, "titles", null, Map.of(), entry.getField(StandardField.TITLE).orElse(""), "title");
-        writeField(document, recordElement, "periodical", null, Map.of(), entry.getField(StandardField.JOURNAL).orElse(""), "full-title");
+        writeField(document, recordElement, "titles", Map.of(), entry.getField(StandardField.TITLE).orElse(""), "title");
+        writeField(document, recordElement, "periodical", Map.of(), entry.getField(StandardField.JOURNAL).orElse(""), "full-title");
         writeField(document, recordElement, "tertiary-title", entry.getField(StandardField.BOOKTITLE).orElse(""), null);
         writeField(document, recordElement, "pages", entry.getField(StandardField.PAGES).orElse(""), null);
         writeField(document, recordElement, "volume", entry.getField(StandardField.VOLUME).orElse(""), null);
         writeField(document, recordElement, "number", entry.getField(StandardField.NUMBER).orElse(""), null);
-        writeField(document, recordElement, "dates", null, Map.of(), entry.getField(StandardField.YEAR).orElse(""), "year");
+        writeField(document, recordElement, "dates", Map.of(), entry.getField(StandardField.YEAR).orElse(""), "year");
         writePublisher(entry, document, recordElement);
         writeField(document, recordElement, "isbn", entry.getField(StandardField.ISBN).orElse(""), null);
         writeField(document, recordElement, "abstract", entry.getField(StandardField.ABSTRACT).orElse(""), null);
         writeField(document, recordElement, "notes", entry.getField(StandardField.NOTE).orElse(""), null);
-        writeField(document, recordElement, "urls", null, Map.of(), entry.getField(StandardField.URL).orElse(""), "web-urls");
+        writeField(document, recordElement, "urls", Map.of(), entry.getField(StandardField.URL).orElse(""), "web-urls");
         writeField(document, recordElement, "electronic-resource-num", entry.getField(StandardField.DOI).orElse(""), null);
 
         return recordElement;
@@ -164,17 +165,12 @@ public class EndnoteXmlExporter extends Exporter {
                     fieldElement.setAttribute(attribute.getKey(), attribute.getValue());
                 }
             }
-            Element styleElement = document.createElement("style");
-            styleElement.setAttribute("face", "normal");
-            styleElement.setAttribute("font", "default");
-            styleElement.setAttribute("size", "100%");
-            styleElement.appendChild(document.createTextNode(value));
-            fieldElement.appendChild(styleElement);
+            createStyleElement(document, fieldElement, value);
             parentElement.appendChild(fieldElement);
         }
     }
 
-    private void writeField(Document document, Element parentElement, String name, String value, Map<String, String> attributes, String childValue, String childElementName) {
+    private void writeField(Document document, Element parentElement, String name, Map<String, String> attributes, String childValue, String childElementName) {
         Element fieldElement = document.createElement(name);
         if (attributes != null) {
             for (Map.Entry<String, String> attribute : attributes.entrySet()) {
@@ -183,15 +179,19 @@ public class EndnoteXmlExporter extends Exporter {
         }
         if (childValue != null && !childValue.isEmpty()) {
             Element childElement = document.createElement(childElementName);
-            Element styleElement = document.createElement("style");
-            styleElement.setAttribute("face", "normal");
-            styleElement.setAttribute("font", "default");
-            styleElement.setAttribute("size", "100%");
-            styleElement.appendChild(document.createTextNode(childValue));
-            childElement.appendChild(styleElement);
+            createStyleElement(document, childElement, childValue);
             fieldElement.appendChild(childElement);
         }
         parentElement.appendChild(fieldElement);
+    }
+
+    private void createStyleElement(Document document, Element parentElement, String value) {
+        Element styleElement = document.createElement("style");
+        styleElement.setAttribute("face", "normal");
+        styleElement.setAttribute("font", "default");
+        styleElement.setAttribute("size", "100%");
+        styleElement.appendChild(document.createTextNode(value));
+        parentElement.appendChild(styleElement);
     }
 
     private void writeContributors(BibEntry entry, Document document, Element parentElement) {
