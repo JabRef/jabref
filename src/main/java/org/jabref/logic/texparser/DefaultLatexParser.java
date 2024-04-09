@@ -48,7 +48,12 @@ public class DefaultLatexParser implements LatexParser {
     private static final String INCLUDE_GROUP = "file";
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(
             "\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}".formatted(INCLUDE_GROUP));
-    private final LatexParserResults latexParserResults = new LatexParserResults();
+
+    private final LatexParserResults latexParserResults;
+
+    public DefaultLatexParser() {
+        this.latexParserResults = new LatexParserResults();
+    }
 
     @Override
     public LatexParserResult parse(String citeString) {
@@ -56,27 +61,6 @@ public class DefaultLatexParser implements LatexParser {
         LatexParserResult latexParserResult = new LatexParserResult(path);
         matchCitation(path, 1, citeString, latexParserResult);
         return latexParserResult;
-    }
-
-    @Override
-    public LatexParserResults parse(List<Path> latexFiles) {
-        for (Path latexFile : latexFiles) {
-            if (!latexParserResults.isParsed(latexFile)) {
-                LatexParserResult parsedTex = parse(latexFile);
-                if (parsedTex != null) {
-                    latexParserResults.add(latexFile, parsedTex);
-                }
-            }
-        }
-
-        Set<Path> nonParsedNestedFiles = latexParserResults.getNonParsedNestedFiles();
-        // Parse all files "non-parsed" referenced by TEX files, recursively.
-        if (!nonParsedNestedFiles.isEmpty()) {
-            // modifies class variable latexParserResults
-            parse(nonParsedNestedFiles.stream().toList());
-        }
-
-        return latexParserResults;
     }
 
     @Override
@@ -110,6 +94,27 @@ public class DefaultLatexParser implements LatexParser {
         }
 
         return latexParserResult;
+    }
+
+    @Override
+    public LatexParserResults parse(List<Path> latexFiles) {
+        for (Path latexFile : latexFiles) {
+            if (!latexParserResults.isParsed(latexFile)) {
+                LatexParserResult parsedTex = parse(latexFile);
+                if (parsedTex != null) {
+                    latexParserResults.add(latexFile, parsedTex);
+                }
+            }
+        }
+
+        Set<Path> nonParsedNestedFiles = latexParserResults.getNonParsedNestedFiles();
+        // Parse all "non-parsed" files referenced by TEX files, recursively.
+        if (!nonParsedNestedFiles.isEmpty()) {
+            // modifies class variable latexParserResults
+            parse(nonParsedNestedFiles.stream().toList());
+        }
+
+        return latexParserResults;
     }
 
     /**
