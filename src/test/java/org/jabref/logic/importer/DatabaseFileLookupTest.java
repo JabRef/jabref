@@ -2,7 +2,6 @@ package org.jabref.logic.importer;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +21,7 @@ import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,21 +33,17 @@ import static org.mockito.Mockito.when;
 
 class DatabaseFileLookupTest {
 
+    @TempDir
+    Path tempDir;
     private BibDatabase database;
     private Collection<BibEntry> entries;
 
     private BibEntry entry1;
     private BibEntry entry2;
-    private Path tempDir;
     private Path txtFileDir;
     private FilePreferences filePreferences;
     private DatabaseFileLookup fileLookup;
 
-    /**
-     * Sets up the test environment before each test case.
-     *
-     * @throws Exception if an error occurs during setup
-     */
     @BeforeEach
     void setUp() throws Exception {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
@@ -58,21 +54,19 @@ class DatabaseFileLookupTest {
 
         tempDir = Files.createTempDirectory("testDir");
         txtFileDir = tempDir.resolve("x.txt");
+        Files.write(txtFileDir, Collections.singleton("x.txt file contents for test"));
 
-        entry1 = database.getEntryByCitationKey("entry1").get();
-        entry2 = database.getEntryByCitationKey("entry2").get();
+        entry1 = database.getEntryByCitationKey("entry1")
+                .orElseThrow(() -> new Exception("Entry with citation key 'entry1' not found"));
+
+        entry2 = database.getEntryByCitationKey("entry2")
+                .orElseThrow(() -> new Exception("Entry with citation key 'entry2' not found"));
 
         BibEntry entry3 = new BibEntry().withField(StandardField.FILE, txtFileDir.toAbsolutePath().toString());
         BibEntry entry4 = new BibEntry().withField(StandardField.FILE, "");
 
-//        List<BibEntry> entries = new ArrayList<>(Arrays.asList(entry1, entry2, entry3, entry4));
-        List<BibEntry> entries = Arrays.asList(entry1, entry2, entry3, entry4);
-        ObservableList<BibEntry> observableEntryList = FXCollections
-                .synchronizedObservableList(FXCollections.observableArrayList(entries));
-        BibDatabase databaseMock = mock(BibDatabase.class);
-        when(databaseMock.getEntries()).thenReturn(observableEntryList);
-
-        Files.write(txtFileDir, Collections.singleton("x.txt file contents for test"));
+        List<BibEntry> entries = List.of(entry1, entry2, entry3, entry4);
+        BibDatabase database = new BibDatabase(entries);
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(txtFileDir.toAbsolutePath()));
@@ -80,9 +74,9 @@ class DatabaseFileLookupTest {
         BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getFileDirectories(filePreferences))
                 .thenReturn(Collections.singletonList(txtFileDir));
-        when(databaseContext.getDatabase()).thenReturn(databaseMock);
-        when(databaseContext.getDatabase().getEntries()).thenReturn(observableEntryList);
+        when(databaseContext.getDatabase()).thenReturn(database);
         when(databaseContext.getDatabasePath()).thenReturn(Optional.of(txtFileDir.toAbsolutePath()));
+
         fileLookup = new DatabaseFileLookup(databaseContext, filePreferences);
     }
 
@@ -103,13 +97,12 @@ class DatabaseFileLookupTest {
     @Test
     void fileShouldBeFound() {
         assertTrue(fileLookup.lookupDatabase(txtFileDir));
-        assertEquals(filePreferences.getMainFileDirectory().orElse(Path.of("")).toString(),
-                txtFileDir.toAbsolutePath().toString());
+        assertEquals(filePreferences.getMainFileDirectory(), Optional.of(txtFileDir.toAbsolutePath()));
         assertNotNull(fileLookup.getPathOfDatabase());
     }
 
     /**
-     * y.txt should not be found in the any directory.
+     * y.txt should not be found in any directory.
      */
     @Test
     void fileShouldNotBeFound() {
