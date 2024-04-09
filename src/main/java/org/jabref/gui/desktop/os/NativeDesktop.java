@@ -52,14 +52,14 @@ public abstract class NativeDesktop {
     /**
      * Returns the path to the system's applications folder.
      *
-     * @return the path to the applications folder.
+     * @return the path
      */
     public abstract Path getApplicationDirectory();
 
     /**
      * Get the user's default file chooser directory
      *
-     * @return The path to the directory
+     * @return the path
      */
     public Path getDefaultFileChooserDirectory() {
          Path userDirectory = getUserDirectory();
@@ -73,7 +73,7 @@ public abstract class NativeDesktop {
     /**
      * Returns the path to the system's user directory.
      *
-     * @return the path to the user directory.
+     * @return the path
      */
     public Path getUserDirectory() {
         return Path.of(System.getProperty("user.home"));

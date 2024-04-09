@@ -33,17 +33,21 @@ import org.apache.pdfbox.text.PDFTextStripper;
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
  * <p>
- * Currently, Springer and IEEE formats are supported.
+ * Currently, Springer, and IEEE formats are supported.
  * <p>
  */
 public class PdfContentImporter extends Importer {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
+
     // input lines into several lines
     private String[] lines;
+
     // current index in lines
     private int lineIndex;
+
     private String curString;
+
     private String year;
 
     /**
