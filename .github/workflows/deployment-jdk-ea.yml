@@ -132,7 +132,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.jdk }}
-          distribution: 'temurin'
+          distribution: 'adoptium'
       - name: 'Set JDK${{ matrix.jdk }} env var'
         shell: bash
         run: echo "JDK${{ matrix.jdk }}=$JAVA_HOME" >> $GITHUB_ENV
@@ -167,7 +167,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'temurin'
+          distribution: 'adoptium'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Prepare merged jars and modules dir
