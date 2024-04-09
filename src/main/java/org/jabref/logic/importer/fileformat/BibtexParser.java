@@ -92,6 +92,7 @@ public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
     private static final Integer LOOKAHEAD = 1024;
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private final FieldContentFormatter fieldContentFormatter;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
@@ -105,7 +106,6 @@ public class BibtexParser implements Parser {
     private final Map<String, String> parsedBibdeskGroups;
 
     private GroupTreeNode bibDeskGroupTreeNode;
-    private final DocumentBuilderFactory builder = DocumentBuilderFactory.newInstance();
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
@@ -268,7 +268,7 @@ public class BibtexParser implements Parser {
                     importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
             if (bibDeskGroupTreeNode != null) {
                 metaData.getGroups().ifPresentOrElse(existingGroupTree -> {
-                          var existingGroups = meta.get(MetaData.GROUPSTREE);
+                            var existingGroups = meta.get(MetaData.GROUPSTREE);
                             // We only have one Group BibDeskGroup with n children
                             // instead of iterating through the whole group structure every time we just search in the metadata for the group name
                             var groupsToAdd = bibDeskGroupTreeNode.getChildren()
@@ -419,7 +419,7 @@ public class BibtexParser implements Parser {
         String xml = comment.substring(MetaData.BIBDESK_STATIC_FLAG.length() + 1, comment.length() - 1);
         try {
             // Build a document to handle the xml tags
-            Document doc = builder.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
+            Document doc = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
             doc.getDocumentElement().normalize();
 
             NodeList dictList = doc.getElementsByTagName("dict");
@@ -745,17 +745,23 @@ public class BibtexParser implements Parser {
             } else {
                 // If a BibDesk File Field is encountered
                 if (field.getName().length() > 10 && field.getName().startsWith("bdsk-file-")) {
-                    byte[] decodedBytes = Base64.getDecoder().decode(content);
                     try {
+                        byte[] decodedBytes = Base64.getDecoder().decode(content);
+
                         // Parse the base64 encoded binary plist to get the relative (to the .bib file) path
                         NSDictionary plist = (NSDictionary) BinaryPropertyListParser.parse(decodedBytes);
-                        NSString relativePath = (NSString) plist.objectForKey("relativePath");
-                        Path path = Path.of(relativePath.getContent());
 
-                        LinkedFile file = new LinkedFile("", path, "");
-                        entry.addFile(file);
+                        if (plist.containsKey("relativePath")) {
+                            NSString relativePath = (NSString) plist.objectForKey("relativePath");
+                            Path path = Path.of(relativePath.getContent());
+
+                            LinkedFile file = new LinkedFile("", path, "");
+                            entry.addFile(file);
+                        } else {
+                            LOGGER.error("Could not find attribute 'relativePath' for entry {} in decoded BibDesk field bdsk-file...) ", entry);
+                        }
                     } catch (Exception e) {
-                        throw new IOException();
+                        LOGGER.error("Could not parse Bibdesk files content (field: bdsk-file...) for entry {}", entry, e);
                     }
                 } else {
                     entry.setField(field, content);

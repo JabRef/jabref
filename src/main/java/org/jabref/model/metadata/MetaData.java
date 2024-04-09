@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SortedSet;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -144,7 +145,7 @@ public class MetaData {
 
         // Set new value if it is not a default value
         for (Map.Entry<EntryType, List<String>> pattern : nonDefaultPatterns.entrySet()) {
-            citeKeyPatterns.put(pattern.getKey(), pattern.getValue().get(0));
+            citeKeyPatterns.put(pattern.getKey(), pattern.getValue().getFirst());
         }
 
         // Store default pattern
@@ -187,7 +188,7 @@ public class MetaData {
         return contentSelectors;
     }
 
-    public List<ContentSelector> getContentSelectorList() {
+    public SortedSet<ContentSelector> getContentSelectorsSorted() {
         return contentSelectors.getContentSelectors();
     }
 

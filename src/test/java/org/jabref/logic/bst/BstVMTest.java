@@ -63,7 +63,7 @@ public class BstVMTest {
         assertEquals(2, vm.latestContext.strings().size());
         assertEquals(7, vm.latestContext.integers().size());
         assertEquals(1, vm.latestContext.entries().size());
-        assertEquals(5, vm.latestContext.entries().get(0).fields.size());
+        assertEquals(5, vm.latestContext.entries().getFirst().fields.size());
         assertEquals(38, vm.latestContext.functions().size());
     }
 

@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jabref.Launcher;
 import org.jabref.gui.DialogService;
@@ -16,6 +19,8 @@ import com.sun.jna.platform.win32.KnownFolders;
 import com.sun.jna.platform.win32.Shell32Util;
 import com.sun.jna.platform.win32.ShlObj;
 import com.sun.jna.platform.win32.Win32Exception;
+import mslinks.ShellLink;
+import mslinks.ShellLinkException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -43,6 +48,20 @@ public class Windows extends NativeDesktop {
 
     @Override
     public String detectProgramPath(String programName, String directoryName) {
+        if (Objects.equals(programName, "texworks")) {
+            Path texworksLinkPath = Path.of(System.getenv("APPDATA") + "\\Microsoft\\Windows\\Start Menu\\Programs\\MiKTeX\\TeXworks.lnk");
+            if (Files.exists(texworksLinkPath)) {
+                try {
+                    ShellLink link = new ShellLink(texworksLinkPath);
+                    return link.resolveTarget();
+                } catch (IOException | ShellLinkException e) {
+                    // Static logger instance cannot be used. See the class comment.
+                    Logger logger = Logger.getLogger(Windows.class.getName());
+                    logger.log(Level.WARNING, "Had an error while reading .lnk file for TeXworks", e);
+                }
+            }
+        }
+
         String progFiles = System.getenv("ProgramFiles(x86)");
         String programPath;
         if (progFiles != null) {

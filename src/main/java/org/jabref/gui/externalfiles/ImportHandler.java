@@ -372,7 +372,9 @@ public class ImportHandler {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     preferencesService.getImporterPreferences(),
                     preferencesService.getImportFormatPreferences(),
-                    fileUpdateMonitor);
+                    preferencesService.getCitationKeyPatternPreferences(),
+                    fileUpdateMonitor
+            );
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
             return unknownFormatImport.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized

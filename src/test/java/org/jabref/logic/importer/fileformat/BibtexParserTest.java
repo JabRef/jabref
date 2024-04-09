@@ -1387,7 +1387,7 @@ class BibtexParserTest {
         assertEquals(3, root.getNumberOfChildren());
         assertEquals(
                 new RegexKeywordGroup("Fréchet", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "FrechetSpace", false),
-                root.getChildren().get(0).getGroup());
+                root.getChildren().getFirst().getGroup());
         assertEquals(
                 new WordKeywordGroup("Invariant theory", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, "GIT", false, ',', false),
                 root.getChildren().get(1).getGroup());
@@ -1572,7 +1572,7 @@ class BibtexParserTest {
         assertEquals(2, root.getNumberOfChildren());
         ExplicitGroup firstTestGroupExpected = new ExplicitGroup("article", GroupHierarchyType.INDEPENDENT, ',');
         firstTestGroupExpected.setExpanded(false);
-        assertEquals(firstTestGroupExpected, root.getChildren().get(0).getGroup());
+        assertEquals(firstTestGroupExpected, root.getChildren().getFirst().getGroup());
         ExplicitGroup secondTestGroupExpected = new ExplicitGroup("Swain", GroupHierarchyType.INDEPENDENT, ',');
         secondTestGroupExpected.setExpanded(false);
         assertEquals(secondTestGroupExpected, root.getChildren().get(1).getGroup());
@@ -1581,7 +1581,7 @@ class BibtexParserTest {
         List<BibEntry> firstTestGroupEntriesExpected = new ArrayList<>();
         firstTestGroupEntriesExpected.add(db.getEntryByCitationKey("Kraljic:2023aa").get());
         firstTestGroupEntriesExpected.add(db.getEntryByCitationKey("Swain:2023aa").get());
-        assertTrue(root.getChildren().get(0).getGroup().containsAll(firstTestGroupEntriesExpected));
+        assertTrue(root.getChildren().getFirst().getGroup().containsAll(firstTestGroupEntriesExpected));
         assertFalse(root.getChildren().get(1).getGroup().contains(db.getEntryByCitationKey("Swain:2023aa").get()));
     }
 
@@ -1687,17 +1687,17 @@ class BibtexParserTest {
         assertEquals(2, root.getNumberOfChildren());
         ExplicitGroup firstTestGroupExpected = new ExplicitGroup("firstTestGroup", GroupHierarchyType.INDEPENDENT, ',');
         firstTestGroupExpected.setExpanded(false);
-        assertEquals(firstTestGroupExpected, root.getChildren().get(0).getGroup());
+        assertEquals(firstTestGroupExpected, root.getChildren().getFirst().getGroup());
         ExplicitGroup secondTestGroupExpected = new ExplicitGroup("article", GroupHierarchyType.INDEPENDENT, ',');
         secondTestGroupExpected.setExpanded(false);
         assertEquals(secondTestGroupExpected, root.getChildren().get(1).getGroup());
 
         BibDatabase db = result.getDatabase();
-        assertTrue(root.getChildren().get(0).getGroup().containsAll(db.getEntries()));
+        assertTrue(root.getChildren().getFirst().getGroup().containsAll(db.getEntries()));
         List<BibEntry> smartGroupEntriesExpected = new ArrayList<>();
         smartGroupEntriesExpected.add(db.getEntryByCitationKey("Kraljic:2023aa").get());
         smartGroupEntriesExpected.add(db.getEntryByCitationKey("Swain:2023aa").get());
-        assertTrue(root.getChildren().get(0).getGroup().containsAll(smartGroupEntriesExpected));
+        assertTrue(root.getChildren().getFirst().getGroup().containsAll(smartGroupEntriesExpected));
     }
 
     /**
@@ -1724,7 +1724,7 @@ class BibtexParserTest {
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
-        assertEquals(((TexGroup) root.getChildren().get(0).getGroup()).getFilePath(),
+        assertEquals(((TexGroup) root.getChildren().getFirst().getGroup()).getFilePath(),
                 Path.of("src/test/resources/org/jabref/model/groups/paper.aux"));
     }
 
@@ -2217,5 +2217,27 @@ class BibtexParserTest {
         BibDatabase database = result.getDatabase();
 
         assertEquals(Collections.singletonList(expectedEntry), database.getEntries());
+    }
+
+    @Test
+    void parseInvalidBibDeskFilesResultsInWarnings() throws IOException {
+        // the first entry is invalid base 64, the second entry is correct plist format but does not contain the key
+        String entries = """
+                @Article{Test2017,
+                    bdsk-file-1 = {////=},
+                }
+
+                @Article{Test2,
+                   bdsk-file-1 = {YnBsaXN0MDDUAQIDBAUGJCVYJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoKgHCBMUFRYaIVUkbnVsbNMJCgsMDxJXTlMua2V5c1pOUy5vYmplY3RzViRjbGFzc6INDoACgAOiEBGABIAFgAdccmVsYXRpdmVQYXRoWWFsaWFzRGF0YV8QVi4uLy4uLy4uL1BhcGVycy9Bc2hlaW0yMDA1IFRoZSBHZW9ncmFwaHkgb2YgSW5ub3ZhdGlvbiBSZWdpb25hbCBJbm5vdmF0aW9uIFN5c3RlbXMucGRm0hcLGBlXTlMuZGF0YU8RAkoAAAAAAkoAAgAADE1hY2ludG9zaCBIRAAAAAAAAAAAAAAAAAAAAM6T/wtIKwAAACI+9B9Bc2hlaW0yMDA1IFRoZSBHZW9nciMyMjQ4QzkucGRmAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIkjJw6jvRAAAAAAAAAAAAAMAAgAACSAAAAAAAAAAAAAAAAAAAAAGUGFwZXJzABAACAAAzpPw+wAAABEACAAAw6jhNAAAAAEAEAAiPvQAIjTXACHV2wAHw2AAAgBQTWFjaW50b3NoIEhEOlVzZXJzOgBpbGlwcGVydDoARG9jdW1lbnRzOgBQYXBlcnM6AEFzaGVpbTIwMDUgVGhlIEdlb2dyIzIyNDhDOS5wZGYADgCOAEYAQQBzAGgAZQBpAG0AMgAwADAANQAgAFQAaABlACAARwBlAG8AZwByAGEAcABoAHkAIABvAGYAIABJAG4AbgBvAHYAYQB0AGkAbwBuACAAUgBlAGcAaQBvAG4AYQBsACAASQBuAG4AbwB2AGEAdABpAG8AbgAgAFMAeQBzAHQAZQBtAHMALgBwAGQAZgAPABoADABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAASAGZVc2Vycy9pbGlwcGVydC9Eb2N1bWVudHMvUGFwZXJzL0FzaGVpbTIwMDUgVGhlIEdlb2dyYXBoeSBvZiBJbm5vdmF0aW9uIFJlZ2lvbmFsIElubm92YXRpb24gU3lzdGVtcy5wZGYAEwABLwAAFQACAA///wAAgAbSGxwdHlokY2xhc3NuYW1lWCRjbGFzc2VzXU5TTXV0YWJsZURhdGGjHR8gVk5TRGF0YVhOU09iamVjdNIbHCIjXE5TRGljdGlvbmFyeaIiIF8QD05TS2V5ZWRBcmNoaXZlctEmJ1Ryb290gAEACAARABoAIwAtADIANwBAAEYATQBVAGAAZwBqAGwAbgBxAHMAdQB3AIQAjgDnAOwA9ANCA0QDSQNUA10DawNvA3YDfwOEA5EDlAOmA6kDrgAAAAAAAAIBAAAAAAAAACgAAAAAAAAAAAAAAAAAAAOw},
+                },
+                """;
+        ParserResult result = parser.parse(new StringReader(entries));
+
+        BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Test2017");
+        BibEntry secondEntry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Test2");
+
+        assertEquals(List.of(firstEntry, secondEntry), result.getDatabase().getEntries());
     }
 }
