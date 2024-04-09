@@ -185,9 +185,10 @@ dependencies {
     implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
     implementation 'org.fxmisc.flowless:flowless:0.7.2'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.6.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.7.4') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
+        exclude group: 'org.openjfx'
         exclude group: 'org.apache.logging.log4j'
     }
 
@@ -233,17 +234,17 @@ dependencies {
     // API
     implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.1.0'
     // Implementation of the API
-    implementation 'org.glassfish.jersey.core:jersey-server:3.1.5'
+    implementation 'org.glassfish.jersey.core:jersey-server:3.1.6'
     // injection framework
-    implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.5'
+    implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.6'
     implementation 'org.glassfish.hk2:hk2-api:3.1.0'
     // testImplementation 'org.glassfish.hk2:hk2-testing:3.0.4'
     // implementation 'org.glassfish.hk2:hk2-testing-jersey:3.0.4'
     // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
     // HTTP server
     // implementation 'org.glassfish.jersey.containers:jersey-container-netty-http:3.1.1'
-    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.5'
-    testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.5'
+    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.6'
+    testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.6'
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
 
@@ -259,7 +260,7 @@ dependencies {
     // YAML formatting
     implementation 'org.yaml:snakeyaml:2.2'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.168'
+    testImplementation 'io.github.classgraph:classgraph:4.8.170'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
 
@@ -277,7 +278,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.8.1"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.9.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
