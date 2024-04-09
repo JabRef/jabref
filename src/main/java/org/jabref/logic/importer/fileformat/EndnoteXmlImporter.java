@@ -158,6 +158,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     case "number" -> {
                         parseStyleContent(reader, fields, StandardField.NUMBER, elementName);
                     }
+                    case "secondary-title" -> {
+                        parseStyleContent(reader, fields, StandardField.SERIES, elementName);
+                    }
                     case "tertiary-title" -> {
                         parseStyleContent(reader, fields, StandardField.BOOKTITLE, elementName);
                     }

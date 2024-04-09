@@ -26,21 +26,23 @@ public class EndnoteXmlExporterTest {
     public void setUp() {
         exporter = new EndnoteXmlExporter();
 
-        entry = new BibEntry(StandardEntryType.Article);
-        entry.setCitationKey("Tural2020");
-        entry.setField(StandardField.AUTHOR, "Tural, Eray and Tural, Hale");
-        entry.setField(StandardField.TITLE, "An overview of research on Big Data");
-        entry.setField(StandardField.JOURNAL, "Journal of Big Data Analytics");
-        entry.setField(StandardField.YEAR, "2020");
-        entry.setField(StandardField.VOLUME, "7");
-        entry.setField(StandardField.NUMBER, "1");
-        entry.setField(StandardField.PAGES, "123-456");
-        entry.setField(StandardField.DOI, "10.1186/s41044-020-00047-z");
-        entry.setField(StandardField.URL, "https://doi.org/10.1186/s41044-020-00047-z");
-        entry.setField(StandardField.ABSTRACT, "This is the abstract of the article.");
-        entry.setField(StandardField.MONTH, "7");
-        entry.setField(StandardField.DAY, "15");
-        entry.setField(StandardField.PAGETOTAL, "334");
+        entry = new BibEntry(StandardEntryType.Conference);
+        entry.setCitationKey("Dai2018");
+        entry.setField(StandardField.AUTHOR, "Dai, H. K.");
+        entry.setField(StandardField.TITLE, "Episode-Rule Mining with Minimal Occurrences via First Local Maximization in Confidence");
+        entry.setField(StandardField.BOOKTITLE, "Proceedings of the 9th International Symposium on Information and Communication Technology");
+        entry.setField(StandardField.YEAR, "2018");
+        entry.setField(StandardField.MONTH, "12");
+        entry.setField(StandardField.DAY, "6");
+        entry.setField(StandardField.SERIES, "SoICT '18");
+        entry.setField(StandardField.PAGES, "130--136");
+        entry.setField(StandardField.ADDRESS, "New York, NY, USA");
+        entry.setField(StandardField.PUBLISHER, "Association for Computing Machinery");
+        entry.setField(StandardField.PAGETOTAL, "7");
+        entry.setField(StandardField.DOI, "10.1145/3287921.3287982");
+        entry.setField(StandardField.ISBN, "9781450365390");
+        entry.setField(StandardField.ABSTRACT, "An episode rule of associating two episodes represents a temporal implication of the antecedent episode to the consequent episode. Episode-rule mining is a task of extracting useful patterns/episodes from large event databases. We present an episode-rule mining algorithm for finding frequent and confident serial-episode rules via first local-maximum confidence in yielding ideal window widths, if exist, in event sequences based on minimal occurrences constrained by a constant maximum gap. Results from our preliminary empirical study confirm the applicability of the episode-rule mining algorithm for Web-site traversal-pattern discovery, and show that the first local maximization yielding ideal window widths exists in real data but rarely in synthetic random data sets.");
+        entry.setField(StandardField.URL, "https://doi.org/10.1145/3287921.3287982");
     }
 
     @Test
@@ -68,62 +70,63 @@ public class EndnoteXmlExporterTest {
                 "      <foreign-keys>",
                 "        <key app=\"EN\">" + entry.getId() + "</key>",
                 "      </foreign-keys>",
-                "      <ref-type name=\"Journal Article\">",
-                "        <style face=\"normal\" font=\"default\" size=\"100%\">1</style>",
+                "      <ref-type name=\"Conference Proceedings\">",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">10</style>",
                 "      </ref-type>",
                 "      <contributors>",
                 "        <authors>",
                 "          <author>",
-                "            <style face=\"normal\" font=\"default\" size=\"100%\">Tural, Eray</style>",
-                "          </author>",
-                "          <author>",
-                "            <style face=\"normal\" font=\"default\" size=\"100%\">Tural, Hale</style>",
+                "            <style face=\"normal\" font=\"default\" size=\"100%\">Dai, H. K.</style>",
                 "          </author>",
                 "        </authors>",
                 "      </contributors>",
                 "      <titles>",
                 "        <title>",
-                "          <style face=\"normal\" font=\"default\" size=\"100%\">An overview of research on Big Data</style>",
+                "          <style face=\"normal\" font=\"default\" size=\"100%\">Episode-Rule Mining with Minimal Occurrences via First Local Maximization in Confidence</style>",
                 "        </title>",
                 "      </titles>",
-                "      <periodical>",
-                "        <full-title>",
-                "          <style face=\"normal\" font=\"default\" size=\"100%\">Journal of Big Data Analytics</style>",
-                "        </full-title>",
-                "      </periodical>",
+                "      <periodical/>",
+                "      <secondary-title>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">SoICT '18</style>",
+                "      </secondary-title>",
                 "      <pages>",
-                "        <style face=\"normal\" font=\"default\" size=\"100%\">123-456</style>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">130--136</style>",
                 "      </pages>",
-                "      <volume>",
-                "        <style face=\"normal\" font=\"default\" size=\"100%\">7</style>",
-                "      </volume>",
-                "      <number>",
-                "        <style face=\"normal\" font=\"default\" size=\"100%\">1</style>",
-                "      </number>",
                 "      <dates>",
                 "        <year>",
-                "          <style face=\"normal\" font=\"default\" size=\"100%\">2020</style>",
+                "          <style face=\"normal\" font=\"default\" size=\"100%\">2018</style>",
                 "        </year>",
                 "      </dates>",
+                "      <publisher>",
+                "        <publisher>",
+                "          <style face=\"normal\" font=\"default\" size=\"100%\">Association for Computing Machinery</style>",
+                "        </publisher>",
+                "        <address>",
+                "          <style face=\"normal\" font=\"default\" size=\"100%\">New York, NY, USA</style>",
+                "        </address>",
+                "      </publisher>",
+                "      <isbn>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">9781450365390</style>",
+                "      </isbn>",
                 "      <abstract>",
-                "        <style face=\"normal\" font=\"default\" size=\"100%\">This is the abstract of the article.</style>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">An episode rule of associating two episodes represents a temporal implication of the antecedent episode to the consequent episode. Episode-rule mining is a task of extracting useful patterns/episodes from large event databases. We present an episode-rule mining algorithm for finding frequent and confident serial-episode rules via first local-maximum confidence in yielding ideal window widths, if exist, in event sequences based on minimal occurrences constrained by a constant maximum gap. Results from our preliminary empirical study confirm the applicability of the episode-rule mining algorithm for Web-site traversal-pattern discovery, and show that the first local maximization yielding ideal window widths exists in real data but rarely in synthetic random data sets.</style>",
                 "      </abstract>",
                 "      <urls>",
                 "        <related-urls>",
-                "          <style face=\"normal\" font=\"default\" size=\"100%\">https://doi.org/10.1186/s41044-020-00047-z</style>",
+                "          <style face=\"normal\" font=\"default\" size=\"100%\">https://doi.org/10.1145/3287921.3287982</style>",
                 "        </related-urls>",
                 "      </urls>",
                 "      <electronic-resource-num>",
-                "        <style face=\"normal\" font=\"default\" size=\"100%\">10.1186/s41044-020-00047-z</style>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">10.1145/3287921.3287982</style>",
                 "      </electronic-resource-num>",
                 "      <month>",
-                "        <style face=\"normal\" font=\"default\" size=\"100%\">7</style>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">12</style>",
                 "      </month>",
                 "      <day>",
-                "        <style face=\"normal\" font=\"default\" size=\"100%\">15</style>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">6</style>",
                 "      </day>",
                 "      <pagetotal>",
-                "        <style face=\"normal\" font=\"default\" size=\"100%\">334</style>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">7</style>",
                 "      </pagetotal>",
                 "    </record>",
                 "  </records>",
