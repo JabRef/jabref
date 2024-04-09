@@ -224,10 +224,10 @@ jobs:
             mv "$file" "${base}-jdk${{ matrix.jdk }}-javafx${{ matrix.javafx }}.${ext}"
           done
       - name: Setup rsync (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main')
         run: brew install rsync
       - name: Setup rsync (Windows)
-        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main')
         # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
