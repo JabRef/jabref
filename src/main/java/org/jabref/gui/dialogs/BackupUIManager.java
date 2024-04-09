@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 public class BackupUIManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
 
-    private static StateManager stateManager;
     private static final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
 
     private BackupUIManager() {
@@ -48,7 +47,8 @@ public class BackupUIManager {
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
                                                                  Path originalPath,
                                                                  PreferencesService preferencesService,
-                                                                 FileUpdateMonitor fileUpdateMonitor) {
+                                                                 FileUpdateMonitor fileUpdateMonitor,
+                                                                 StateManager stateManager) {
         var actionOpt = showBackupResolverDialog(
                 dialogService,
                 preferencesService.getExternalApplicationsPreferences(),
@@ -59,7 +59,7 @@ public class BackupUIManager {
                 BackupManager.restoreBackup(originalPath, preferencesService.getFilePreferences().getBackupDirectory());
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor);
+                return showReviewBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, stateManager);
             }
             return Optional.empty();
         });
@@ -77,7 +77,8 @@ public class BackupUIManager {
             DialogService dialogService,
             Path originalPath,
             PreferencesService preferencesService,
-            FileUpdateMonitor fileUpdateMonitor) {
+            FileUpdateMonitor fileUpdateMonitor,
+            StateManager stateManager) {
         try {
             ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
 
@@ -102,13 +103,13 @@ public class BackupUIManager {
                 changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
                 ce.end();
                 if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
-                    if(reviewBackupDialog.areAllChangesDenied()){
+                    if (reviewBackupDialog.areAllChangesDenied()) {
                         saveState.resetChangeMonitor();
-                    }else{
+                    } else {
                         saveState.markBaseChanged();
                     }
                     // In case not all changes are resolved, start from scratch
-                    return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor);
+                    return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, stateManager);
                 }
 
                 // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected

@@ -91,11 +91,11 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
         });
     }
 
-    public boolean areAllChangesAccepted(){
+    public boolean areAllChangesAccepted() {
         return areAllChangesAccepted;
     }
 
-    public boolean areAllChangesDenied(){
+    public boolean areAllChangesDenied() {
         return areAllChangesDenied;
     }
 
