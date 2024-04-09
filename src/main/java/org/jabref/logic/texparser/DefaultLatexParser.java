@@ -10,10 +10,13 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.model.texparser.LatexParserResult;
+import org.jabref.model.texparser.LatexParserResults;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,7 @@ public class DefaultLatexParser implements LatexParser {
     private static final String INCLUDE_GROUP = "file";
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(
             "\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}".formatted(INCLUDE_GROUP));
+    private final LatexParserResults latexParserResults = new LatexParserResults();
 
     @Override
     public LatexParserResult parse(String citeString) {
@@ -55,12 +59,33 @@ public class DefaultLatexParser implements LatexParser {
     }
 
     @Override
+    public LatexParserResults parse(List<Path> latexFiles) {
+        for (Path latexFile : latexFiles) {
+            if (!latexParserResults.isParsed(latexFile)) {
+                LatexParserResult parsedTex = parse(latexFile);
+                if (parsedTex != null) {
+                    latexParserResults.add(latexFile, parsedTex);
+                }
+            }
+        }
+
+        Set<Path> nonParsedNestedFiles = latexParserResults.getNonParsedNestedFiles();
+        // Parse all files "non-parsed" referenced by TEX files, recursively.
+        if (!nonParsedNestedFiles.isEmpty()) {
+            // modifies class variable latexParserResults
+            parse(nonParsedNestedFiles.stream().toList());
+        }
+
+        return latexParserResults;
+    }
+
+    @Override
     public LatexParserResult parse(Path latexFile) {
         if (!Files.exists(latexFile)) {
             LOGGER.error("File does not exist: {}", latexFile);
             return null;
         }
-        LatexParserResult result = new LatexParserResult(latexFile);
+        LatexParserResult latexParserResult = new LatexParserResult(latexFile);
 
         try (InputStream inputStream = Files.newInputStream(latexFile);
              Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
@@ -70,9 +95,9 @@ public class DefaultLatexParser implements LatexParser {
                 if (line.trim().isEmpty() || line.trim().charAt(0) == '%') {
                     continue;
                 }
-                matchCitation(latexFile, lineNumberReader.getLineNumber(), line, result);
-                matchBibFile(latexFile, line, result);
-                matchNestedFile(latexFile, line, result);
+                matchCitation(latexFile, lineNumberReader.getLineNumber(), line, latexParserResult);
+                matchBibFile(latexFile, line, latexParserResult);
+                matchNestedFile(latexFile, line, latexParserResult);
             }
         } catch (ClosedChannelException e) {
             // User changed the underlying LaTeX file
@@ -84,18 +109,18 @@ public class DefaultLatexParser implements LatexParser {
             LOGGER.info("Error while parsing file {}", latexFile, e);
         }
 
-        return result;
+        return latexParserResult;
     }
 
     /**
      * Find cites along a specific line and store them.
      */
-    private void matchCitation(Path file, int lineNumber, String line, LatexParserResult result) {
+    private void matchCitation(Path file, int lineNumber, String line, LatexParserResult latexParserResult) {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
             for (String key : citeMatch.group(CITE_GROUP).split(",")) {
-                result.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line);
+                latexParserResult.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line);
             }
         }
     }
@@ -103,7 +128,7 @@ public class DefaultLatexParser implements LatexParser {
     /**
      * Find BIB files along a specific line and store them.
      */
-    private void matchBibFile(Path file, String line, LatexParserResult result) {
+    private void matchBibFile(Path file, String line, LatexParserResult latexParserResult) {
         Matcher bibliographyMatch = BIBLIOGRAPHY_PATTERN.matcher(line);
 
         while (bibliographyMatch.find()) {
@@ -115,7 +140,7 @@ public class DefaultLatexParser implements LatexParser {
                                 : "%s%s".formatted(bibString, BIB_EXT));
 
                 if (Files.exists(bibFile)) {
-                    result.addBibFile(bibFile);
+                    latexParserResult.addBibFile(bibFile);
                 }
             }
         }
@@ -124,7 +149,7 @@ public class DefaultLatexParser implements LatexParser {
     /**
      * Find inputs and includes along a specific line and store them for parsing later.
      */
-    private void matchNestedFile(Path texFile, String line, LatexParserResult result) {
+    private void matchNestedFile(Path texFile, String line, LatexParserResult latexParserResult) {
         Matcher includeMatch = INCLUDE_PATTERN.matcher(line);
 
         while (includeMatch.find()) {
@@ -134,7 +159,7 @@ public class DefaultLatexParser implements LatexParser {
                     : "%s%s".formatted(filenamePassedToInclude, TEX_EXT);
             Path nestedFile = texFile.getParent().resolve(texFileName);
             if (Files.exists(nestedFile)) {
-                result.addNestedFile(nestedFile);
+                latexParserResult.addNestedFile(nestedFile);
             }
         }
     }

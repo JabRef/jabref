@@ -28,10 +28,10 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.texparser.DefaultLatexParser;
 import org.jabref.logic.texparser.TexBibEntriesResolver;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.texparser.LatexParserResults;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -207,7 +207,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
                 preferencesService.getImportFormatPreferences(),
                 fileMonitor);
 
-        BackgroundTask.wrap(() -> entriesResolver.resolve(new LatexParserResults(fileList)))
+        BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
                       .onSuccess(result -> dialogService.showCustomDialogAndWait(

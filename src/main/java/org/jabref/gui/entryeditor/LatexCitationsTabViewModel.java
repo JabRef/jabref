@@ -23,6 +23,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.texparser.DefaultLatexParser;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -138,7 +139,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
             List<Path> texFiles = searchDirectory(newDirectory);
             LOGGER.debug("Found tex files: {}", texFiles);
-            latexParserResults = new LatexParserResults(texFiles);
+            latexParserResults = new DefaultLatexParser().parse(texFiles);
         }
 
         return latexParserResults.getCitationsByKey(citeKey);

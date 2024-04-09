@@ -1,8 +1,10 @@
 package org.jabref.logic.texparser;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import org.jabref.model.texparser.LatexParserResult;
+import org.jabref.model.texparser.LatexParserResults;
 
 /**
  * Parses a LaTeX file
@@ -24,4 +26,12 @@ public interface LatexParser {
      * @return a LatexParserResult, which contains all data related to the bibliographic entries
      */
     LatexParserResult parse(Path latexFile);
+
+    /**
+     * Parse a list of LaTeX files.
+     *
+     * @param latexFiles List of Path objects linked to a LaTeX file
+     * @return a LatexParserResults, which contains all data related to the bibliographic entries
+     */
+    LatexParserResults parse(List<Path> latexFiles);
 }

@@ -5,70 +5,64 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-
-import org.jabref.logic.texparser.DefaultLatexParser;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 public class LatexParserResults {
-    private static final DefaultLatexParser LATEX_PARSER = new DefaultLatexParser();
-    private final Map<Path, LatexParserResult> parsedTex;
+    private final Map<Path, LatexParserResult> parsedTexFiles;
 
     public LatexParserResults() {
-        this.parsedTex = new HashMap<>();
-    }
-
-    public LatexParserResults(List<Path> latexFiles) {
-        this();
-        latexFiles.forEach(this::parse);
+        this.parsedTexFiles = new HashMap<>();
     }
 
     /**
-     * Constructor for testing purposes
+     * For testing purposes
      */
-    public LatexParserResults(Path... latexFiles) {
+    public LatexParserResults(LatexParserResult... parsedFiles) {
         this();
-        parse(List.of(latexFiles));
+        for (LatexParserResult parsedFile : parsedFiles) {
+            add(parsedFile.getPath(), parsedFile);
+        }
     }
 
-    /**
-     * Constructor for testing purposes
-     */
-    public LatexParserResults(LatexParserResult... results) {
-        this();
-        List.of(results).forEach(result -> parsedTex.put(result.getPath(), result));
+    public boolean isParsed(Path texFile) {
+        return parsedTexFiles.containsKey(texFile);
     }
 
-    public void parse(Path latexFile) {
-        Optional.ofNullable(LATEX_PARSER.parse(latexFile))
-                .ifPresent(result -> parsedTex.put(latexFile, result));
-    }
-
-    public void parse(List<Path> latexFiles) {
-        latexFiles.forEach(this::parse);
+    public void add(Path texFile, LatexParserResult parsedFile) {
+        parsedTexFiles.put(texFile, parsedFile);
     }
 
     public Set<Path> getBibFiles() {
         Set<Path> bibFiles = new HashSet<>();
-        parsedTex.values().forEach(result -> bibFiles.addAll(result.getBibFiles()));
+        parsedTexFiles.values().forEach(result -> bibFiles.addAll(result.getBibFiles()));
         return bibFiles;
+    }
+
+    public Set<Path> getNonParsedNestedFiles() {
+        Set<Path> nonParsedNestedFiles = new HashSet<>();
+        for (LatexParserResult result : parsedTexFiles.values()) {
+            nonParsedNestedFiles.addAll(result.getNestedFiles()
+                                            .stream()
+                                            .filter(nestedFile -> !parsedTexFiles.containsKey(nestedFile))
+                                            .toList());
+        }
+        return nonParsedNestedFiles;
     }
 
     public Multimap<String, Citation> getCitations() {
         Multimap<String, Citation> citations = HashMultimap.create();
-        parsedTex.forEach((path, result) -> citations.putAll(result.getCitations()));
+        parsedTexFiles.forEach((path, result) -> citations.putAll(result.getCitations()));
         return citations;
     }
 
     public Collection<Citation> getCitationsByKey(String key) {
         Collection<Citation> citations = new ArrayList<>();
-        parsedTex.values().forEach(result -> citations.addAll(result.getCitationsByKey(key)));
+        parsedTexFiles.values().forEach(result -> citations.addAll(result.getCitationsByKey(key)));
         return citations;
     }
 
@@ -84,11 +78,11 @@ public class LatexParserResults {
 
         LatexParserResults that = (LatexParserResults) obj;
 
-        return Objects.equals(parsedTex, that.parsedTex);
+        return Objects.equals(parsedTexFiles, that.parsedTexFiles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(parsedTex, LATEX_PARSER);
+        return Objects.hash(parsedTexFiles);
     }
 }
