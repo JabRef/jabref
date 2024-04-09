@@ -141,6 +141,7 @@ public class EndnoteXmlExporter extends Exporter {
 
         writeContributors(entry, document, recordElement);
         writeField(document, recordElement, "titles", Map.of(), entry.getField(StandardField.TITLE).orElse(""), "title");
+        writeField(document, recordElement, "secondary-title", entry.getField(StandardField.SERIES).orElse(""), null);
         writeField(document, recordElement, "periodical", Map.of(), entry.getField(StandardField.JOURNAL).orElse(""), "full-title");
         writeField(document, recordElement, "tertiary-title", entry.getField(StandardField.BOOKTITLE).orElse(""), null);
         writeField(document, recordElement, "pages", entry.getField(StandardField.PAGES).orElse(""), null);
