@@ -188,6 +188,18 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     case "label" -> {
                         parseStyleContent(reader, fields, new UnknownField("endnote-label"), elementName);
                     }
+                    case "month" -> {
+                        parseStyleContent(reader, fields, StandardField.MONTH, elementName);
+                    }
+                    case "day" -> {
+                        parseStyleContent(reader, fields, StandardField.DAY, elementName);
+                    }
+                    case "address" -> {
+                        parseStyleContent(reader, fields, StandardField.ADDRESS, elementName);
+                    }
+                    case "pagetotal" -> {
+                        parseStyleContent(reader, fields, new UnknownField("pagetotal"), elementName);
+                    }
                 }
             }
             if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {

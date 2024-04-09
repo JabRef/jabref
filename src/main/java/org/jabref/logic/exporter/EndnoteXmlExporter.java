@@ -151,8 +151,11 @@ public class EndnoteXmlExporter extends Exporter {
         writeField(document, recordElement, "isbn", entry.getField(StandardField.ISBN).orElse(""), null);
         writeField(document, recordElement, "abstract", entry.getField(StandardField.ABSTRACT).orElse(""), null);
         writeField(document, recordElement, "notes", entry.getField(StandardField.NOTE).orElse(""), null);
-        writeField(document, recordElement, "urls", Map.of(), entry.getField(StandardField.URL).orElse(""), "web-urls");
+        writeField(document, recordElement, "urls", Map.of(), entry.getField(StandardField.URL).orElse(""), "related-urls");
         writeField(document, recordElement, "electronic-resource-num", entry.getField(StandardField.DOI).orElse(""), null);
+        writeField(document, recordElement, "month", entry.getField(StandardField.MONTH).orElse(""), null);
+        writeField(document, recordElement, "day", entry.getField(StandardField.DAY).orElse(""), null);
+        writeField(document, recordElement, "pagetotal", entry.getField(StandardField.PAGETOTAL).orElse(""), null);
 
         return recordElement;
     }
@@ -165,7 +168,15 @@ public class EndnoteXmlExporter extends Exporter {
                     fieldElement.setAttribute(attribute.getKey(), attribute.getValue());
                 }
             }
-            createStyleElement(document, fieldElement, value);
+            if ("url".equals(name)) {
+                Element urlsElement = document.createElement("urls");
+                Element webUrlsElement = document.createElement("web-urls");
+                createStyleElement(document, webUrlsElement, value);
+                urlsElement.appendChild(webUrlsElement);
+                fieldElement.appendChild(urlsElement);
+            } else {
+                createStyleElement(document, fieldElement, value);
+            }
             parentElement.appendChild(fieldElement);
         }
     }
@@ -228,14 +239,7 @@ public class EndnoteXmlExporter extends Exporter {
                 writeField(document, publisherElement, "publisher", publisher, null);
             }
             if (!address.isEmpty()) {
-                Element placeElement = document.createElement("place");
-                Element styleElement = document.createElement("style");
-                styleElement.setAttribute("face", "normal");
-                styleElement.setAttribute("font", "default");
-                styleElement.setAttribute("size", "100%");
-                styleElement.appendChild(document.createTextNode(address));
-                placeElement.appendChild(styleElement);
-                publisherElement.appendChild(placeElement);
+                writeField(document, publisherElement, "address", address, null);
             }
             parentElement.appendChild(publisherElement);
         }

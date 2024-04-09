@@ -34,7 +34,13 @@ public class EndnoteXmlExporterTest {
         entry.setField(StandardField.YEAR, "2020");
         entry.setField(StandardField.VOLUME, "7");
         entry.setField(StandardField.NUMBER, "1");
+        entry.setField(StandardField.PAGES, "123-456");
         entry.setField(StandardField.DOI, "10.1186/s41044-020-00047-z");
+        entry.setField(StandardField.URL, "https://doi.org/10.1186/s41044-020-00047-z");
+        entry.setField(StandardField.ABSTRACT, "This is the abstract of the article.");
+        entry.setField(StandardField.MONTH, "7");
+        entry.setField(StandardField.DAY, "15");
+        entry.setField(StandardField.PAGETOTAL, "334");
     }
 
     @Test
@@ -85,6 +91,9 @@ public class EndnoteXmlExporterTest {
                 "          <style face=\"normal\" font=\"default\" size=\"100%\">Journal of Big Data Analytics</style>",
                 "        </full-title>",
                 "      </periodical>",
+                "      <pages>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">123-456</style>",
+                "      </pages>",
                 "      <volume>",
                 "        <style face=\"normal\" font=\"default\" size=\"100%\">7</style>",
                 "      </volume>",
@@ -96,10 +105,26 @@ public class EndnoteXmlExporterTest {
                 "          <style face=\"normal\" font=\"default\" size=\"100%\">2020</style>",
                 "        </year>",
                 "      </dates>",
-                "      <urls/>",
+                "      <abstract>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">This is the abstract of the article.</style>",
+                "      </abstract>",
+                "      <urls>",
+                "        <related-urls>",
+                "          <style face=\"normal\" font=\"default\" size=\"100%\">https://doi.org/10.1186/s41044-020-00047-z</style>",
+                "        </related-urls>",
+                "      </urls>",
                 "      <electronic-resource-num>",
                 "        <style face=\"normal\" font=\"default\" size=\"100%\">10.1186/s41044-020-00047-z</style>",
                 "      </electronic-resource-num>",
+                "      <month>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">7</style>",
+                "      </month>",
+                "      <day>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">15</style>",
+                "      </day>",
+                "      <pagetotal>",
+                "        <style face=\"normal\" font=\"default\" size=\"100%\">334</style>",
+                "      </pagetotal>",
                 "    </record>",
                 "  </records>",
                 "</xml>"
