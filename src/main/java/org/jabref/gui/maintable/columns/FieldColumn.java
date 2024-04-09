@@ -1,6 +1,7 @@
 package org.jabref.gui.maintable.columns;
 
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
@@ -32,7 +33,7 @@ public class FieldColumn extends MainTableColumn<String> {
 
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
-                .withTooltip(this::createTooltip)
+                .graphicTooltip(this::createTooltip)
                 .install(this);
 
         if (fields.hasExactlyOne()) {
@@ -65,7 +66,7 @@ public class FieldColumn extends MainTableColumn<String> {
         }
     }
 
-    private String createTooltip(BibEntryTableViewModel entry, String fieldValue) {
+    private Tooltip createTooltip(BibEntryTableViewModel entry, String fieldValue) {
         return tooltip.createTooltip(entry.getEntry(), fieldValue);
     }
 }
