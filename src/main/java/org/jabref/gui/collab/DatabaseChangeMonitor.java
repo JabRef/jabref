@@ -70,7 +70,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                             saveState = stateManager.activeTabProperty().get().get();
                             changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
                             ce.end();
-                            if (areAllChangesResolved.get() || areAllChangesResolved.isPresent()) {
+                            if (areAllChangesResolved.get()) {
                                 if (areAllChangesAccepted) {
                                     saveState.resetChangedProperties();
                                 } else {

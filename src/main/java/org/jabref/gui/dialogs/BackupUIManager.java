@@ -102,18 +102,18 @@ public class BackupUIManager {
                 LibraryTab saveState = stateManager.activeTabProperty().get().get();
                 changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
                 ce.end();
-                if (allChangesResolved.isEmpty() || !allChangesResolved.get()) {
+                if (allChangesResolved.get()) {
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         saveState.resetChangeMonitor();
                     } else {
                         saveState.markBaseChanged();
                     }
-                    // In case not all changes are resolved, start from scratch
-                    return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, stateManager);
+                    // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
+                    return Optional.of(originalParserResult);
                 }
 
-                // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected
-                return Optional.of(originalParserResult);
+                // In case not all changes are resolved, start from scratch
+                return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, stateManager);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);
