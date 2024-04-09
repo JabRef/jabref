@@ -22,7 +22,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -33,6 +32,7 @@ import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -68,6 +68,7 @@ public class MainTableColumnFactory {
                                   ColumnPreferences abstractColumnPrefs,
                                   UndoManager undoManager,
                                   DialogService dialogService,
+                                  ThemeManager themeManager,
                                   StateManager stateManager,
                                   TaskExecutor taskExecutor) {
         this.database = Objects.requireNonNull(database);
@@ -79,7 +80,7 @@ public class MainTableColumnFactory {
         this.undoManager = undoManager;
         this.stateManager = stateManager;
         this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager,
-                JabRefGUI.getThemeManager(), taskExecutor);
+                themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {

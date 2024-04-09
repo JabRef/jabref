@@ -51,6 +51,7 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -100,6 +101,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<BibDatabaseContext> openDatabaseList;
 
     private final Stage mainStage;
+    private final ThemeManager themeManager;
     private final StateManager stateManager;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
@@ -116,11 +118,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
-                       PreferencesService preferencesService) {
+                       PreferencesService preferencesService,
+                       ThemeManager themeManager) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.prefs = preferencesService;
+        this.themeManager = themeManager;
 
         this.stateManager = Globals.stateManager;
         this.undoManager = Globals.undoManager;
@@ -275,6 +279,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 Globals.journalAbbreviationRepository,
                 taskExecutor,
                 dialogService,
+                themeManager,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -285,6 +290,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 pushToApplicationCommand,
                 globalSearchBar,
                 dialogService,
+                themeManager,
                 stateManager,
                 prefs,
                 fileUpdateMonitor,
@@ -501,6 +507,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 this,
                 dialogService,
                 prefs,
+                themeManager,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -591,6 +598,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 this,
                 prefs,
                 dialogService,
+                themeManager,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -641,6 +649,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                             this,
                             dialogService,
                             prefs,
+                            themeManager,
                             stateManager,
                             entryTypesManager,
                             fileUpdateMonitor,

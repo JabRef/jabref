@@ -22,6 +22,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -58,6 +59,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;
+    private final ThemeManager themeManager;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
@@ -68,6 +70,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
                               PreferencesService preferencesService,
                               DialogService dialogService,
+                              ThemeManager themeManager,
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
                               BibEntryTypesManager entryTypesManager,
@@ -76,6 +79,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.tabContainer = tabContainer;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
+        this.themeManager = themeManager;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -197,6 +201,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 file,
                 dialogService,
                 preferencesService,
+                themeManager,
                 stateManager,
                 tabContainer,
                 fileUpdateMonitor,
@@ -248,6 +253,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                  tabContainer,
                                  dialogService,
                                  preferencesService,
+                                 themeManager,
                                  stateManager,
                                  entryTypesManager,
                                  fileUpdateMonitor,
@@ -268,6 +274,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           LibraryTabContainer tabContainer,
                                           DialogService dialogService,
                                           PreferencesService preferencesService,
+                                          ThemeManager themeManager,
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
@@ -279,6 +286,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                     tabContainer,
                     dialogService,
                     preferencesService,
+                    themeManager,
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,

@@ -10,6 +10,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -22,6 +23,7 @@ public class SidePaneContentFactory {
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
+    private final ThemeManager themeManager;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -32,6 +34,7 @@ public class SidePaneContentFactory {
                                   JournalAbbreviationRepository abbreviationRepository,
                                   TaskExecutor taskExecutor,
                                   DialogService dialogService,
+                                  ThemeManager themeManager,
                                   StateManager stateManager,
                                   FileUpdateMonitor fileUpdateMonitor,
                                   BibEntryTypesManager entryTypesManager,
@@ -41,6 +44,7 @@ public class SidePaneContentFactory {
         this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
+        this.themeManager = themeManager;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -61,6 +65,7 @@ public class SidePaneContentFactory {
                     abbreviationRepository,
                     taskExecutor,
                     dialogService,
+                    themeManager,
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,

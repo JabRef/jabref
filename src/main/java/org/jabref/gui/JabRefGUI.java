@@ -73,7 +73,8 @@ public class JabRefGUI extends Application {
                 mainStage,
                 dialogService,
                 fileUpdateMonitor,
-                preferencesService);
+                preferencesService,
+                themeManager);
 
         openWindow();
 

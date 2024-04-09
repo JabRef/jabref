@@ -18,6 +18,7 @@ import org.jabref.gui.maintable.PersistenceVisualStateTable;
 import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
@@ -29,6 +30,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                               PreferencesService preferencesService,
                               UndoManager undoManager,
                               DialogService dialogService,
+                              ThemeManager themeManager,
                               StateManager stateManager,
                               TaskExecutor taskExecutor) {
         super();
@@ -41,6 +43,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                 preferencesService.getSearchDialogColumnPreferences(),
                 undoManager,
                 dialogService,
+                themeManager,
                 stateManager,
                 taskExecutor).createColumns();
 
