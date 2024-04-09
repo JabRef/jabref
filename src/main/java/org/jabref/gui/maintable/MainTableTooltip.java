@@ -30,7 +30,7 @@ public class MainTableTooltip extends Tooltip {
         preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
         preview.setEntry(entry);
         this.setShowDelay(Duration.seconds(1));
-        Label label = new Label(fieldValue);
+        Label label = new Label(fieldValue + "\n ");
 
         if (preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip()) {
             VBox vBox = new VBox();
