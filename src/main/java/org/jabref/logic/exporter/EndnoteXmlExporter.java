@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -52,18 +51,31 @@ public class EndnoteXmlExporter extends Exporter {
             Map.entry(StandardEntryType.Misc, "Generic")
     );
 
-    private static final Map<EntryType, String> EXPORT_REF_NUMBER = EXPORT_ITEM_TYPE.entrySet().stream()
-                                                                                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> Integer.toString(EXPORT_ITEM_TYPE.entrySet().stream()
-                                                                                                                                                                           .map(Map.Entry::getValue)
-                                                                                                                                                                           .collect(Collectors.toList())
-                                                                                                                                                                           .indexOf(entry.getValue()) + 1)));
+    private static final List<String> EXPORT_ITEM_TYPE_ORDER = List.of(
+            "Journal Article",
+            "Book",
+            "Book Section",
+            "Conference Paper",
+            "Conference",
+            "Thesis",
+            "Conference Proceedings",
+            "Report",
+            "Manuscript",
+            "Patent",
+            "Web Page",
+            "Electronic Article",
+            "Generic"
+    );
 
-    private final XMLOutputFactory xmlOutputFactory;
+    private static final Map<EntryType, String> EXPORT_REF_NUMBER = EXPORT_ITEM_TYPE.entrySet().stream()
+                                                                                    .collect(Collectors.toMap(
+                                                                                            Map.Entry::getKey,
+                                                                                            entry -> Integer.toString(EXPORT_ITEM_TYPE_ORDER.indexOf(entry.getValue()) + 1)));
+
     private final AuthorListParser authorListParser;
 
     public EndnoteXmlExporter() {
         super("endnote", "EndNote XML", StandardFileType.XML);
-        this.xmlOutputFactory = XMLOutputFactory.newFactory();
         this.authorListParser = new AuthorListParser();
     }
 
