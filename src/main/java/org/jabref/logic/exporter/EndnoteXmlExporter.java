@@ -52,16 +52,11 @@ public class EndnoteXmlExporter extends Exporter {
             Map.entry(StandardEntryType.Misc, "Generic")
     ));
 
-    private static final Map<EntryType, String> EXPORT_REF_NUMBER = EXPORT_ITEM_TYPE.entrySet()
+    private static final Map<EntryType, String> EXPORT_REF_NUMBER = EXPORT_ITEM_TYPE.keySet()
                                                                                     .stream()
                                                                                     .collect(Collectors.toMap(
-                                                                                            Map.Entry::getKey,
-                                                                                            entry -> Integer.toString(EXPORT_ITEM_TYPE.entrySet().stream()
-                                                                                                                                      .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (e1, e2) -> e1, LinkedHashMap::new))
-                                                                                                                                      .keySet()
-                                                                                                                                      .stream()
-                                                                                                                                      .toList()
-                                                                                                                                      .indexOf(entry.getValue()) + 1),
+                                                                                            entryType -> entryType,
+                                                                                            entryType -> Integer.toString(EXPORT_ITEM_TYPE.keySet().stream().toList().indexOf(entryType) + 1),
                                                                                             (e1, e2) -> e1,
                                                                                             LinkedHashMap::new
                                                                                     ));
