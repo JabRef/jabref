@@ -298,6 +298,7 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(openGlobalSearchButton);
         openGlobalSearchButton.setOnAction(evt -> {
             globalSearchActive.setValue(true);
+            stateManager.activeGlobalSearchQueryProperty().setValue(searchQueryProperty.get());
             if (globalSearchResultDialog == null) {
                 globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
             }
