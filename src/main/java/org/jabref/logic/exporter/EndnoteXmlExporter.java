@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 public class EndnoteXmlExporter extends Exporter {
 
     private static final String ENDNOTE_XML_VERSION = "20.1";
-    private static final Map<EntryType, String> EXPORT_ITEM_TYPE = Map.ofEntries(
+    private static final Map<EntryType, String> EXPORT_ITEM_TYPE = new LinkedHashMap<>(Map.ofEntries(
             Map.entry(StandardEntryType.Article, "Journal Article"),
             Map.entry(StandardEntryType.Book, "Book"),
             Map.entry(StandardEntryType.InBook, "Book Section"),
@@ -50,7 +50,7 @@ public class EndnoteXmlExporter extends Exporter {
             Map.entry(StandardEntryType.Online, "Web Page"),
             Map.entry(IEEETranEntryType.Electronic, "Electronic Article"),
             Map.entry(StandardEntryType.Misc, "Generic")
-    );
+    ));
 
     private static final Map<EntryType, String> EXPORT_REF_NUMBER = EXPORT_ITEM_TYPE.entrySet()
                                                                                     .stream()
