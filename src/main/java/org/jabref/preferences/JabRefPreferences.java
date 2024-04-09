@@ -379,6 +379,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
     public static final String CYCLE_PREVIEW = "cyclePreview";
     public static final String PREVIEW_AS_TAB = "previewAsTab";
+    public static final String PREVIEW_IN_ENTRY_TABLE_TOOLTIP = "previewInEntryTableTooltip";
 
     // UI
     private static final String FONT_FAMILY = "fontFamily";
@@ -800,6 +801,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
         defaults.put(CYCLE_PREVIEW_POS, 0);
         defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
+        defaults.put(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, Boolean.FALSE);
         defaults.put(PREVIEW_STYLE,
                 "<font face=\"sans-serif\">" +
                         "<b>\\bibtextype</b><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>\\end{citationkey}__NEWLINE__" +
@@ -2420,12 +2422,14 @@ public class JabRefPreferences implements PreferencesService {
                 getPreviewCyclePosition(layouts),
                 new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(), Globals.journalAbbreviationRepository),
                 (String) defaults.get(PREVIEW_STYLE),
-                getBoolean(PREVIEW_AS_TAB));
+                getBoolean(PREVIEW_AS_TAB),
+                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP));
 
         previewPreferences.getLayoutCycle().addListener((InvalidationListener) c -> storePreviewLayouts(previewPreferences.getLayoutCycle()));
         EasyBind.listen(previewPreferences.layoutCyclePositionProperty(), (obs, oldValue, newValue) -> putInt(CYCLE_PREVIEW_POS, newValue));
         EasyBind.listen(previewPreferences.customPreviewLayoutProperty(), (obs, oldValue, newValue) -> put(PREVIEW_STYLE, newValue.getText()));
         EasyBind.listen(previewPreferences.showPreviewAsExtraTabProperty(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_AS_TAB, newValue));
+        EasyBind.listen(previewPreferences.showPreviewEntryTableTooltip(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, newValue));
 
         return this.previewPreferences;
     }

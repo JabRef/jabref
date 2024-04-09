@@ -22,6 +22,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -60,6 +61,7 @@ public class MainTableColumnFactory {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final StateManager stateManager;
+    private final MainTableTooltip tooltip;
 
     public MainTableColumnFactory(BibDatabaseContext database,
                                   PreferencesService preferencesService,
@@ -76,6 +78,8 @@ public class MainTableColumnFactory {
         this.cellFactory = new CellFactory(preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
+        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager,
+                JabRefGUI.getThemeManager(), taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
@@ -111,14 +115,14 @@ public class MainTableColumnFactory {
                         returnColumn = createSpecialFieldColumn(column);
                     } else {
                         LOGGER.warn("Special field type '{}' is unknown. Using normal column type.", column.getQualifier());
-                        returnColumn = createFieldColumn(column);
+                        returnColumn = createFieldColumn(column, tooltip);
                     }
                 }
                 break;
             default:
             case NORMALFIELD:
                 if (!column.getQualifier().isBlank()) {
-                    returnColumn = createFieldColumn(column);
+                    returnColumn = createFieldColumn(column, tooltip);
                 }
                 break;
         }
@@ -263,8 +267,8 @@ public class MainTableColumnFactory {
     /**
      * Creates a text column to display any standard field.
      */
-    private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel) {
-        return new FieldColumn(columnModel);
+    private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel, MainTableTooltip tooltip) {
+        return new FieldColumn(columnModel, tooltip);
     }
 
     /**
