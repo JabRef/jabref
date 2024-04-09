@@ -164,13 +164,13 @@ jobs:
         if: (matrix.os != 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
         run: |
           sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' build.gradle
-          sed -i "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#' build.gradle
+          sed -i "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#" build.gradle
           cat build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
         if: (matrix.os == 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
         run: |
           sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' build.gradle
-          sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#' build.gradle
+          sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#" build.gradle
           cat build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (linux-arm)'
         if: (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
