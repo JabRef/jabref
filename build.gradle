@@ -572,7 +572,7 @@ tasks.register('deleteInstallerTemp', Delete) {
 
 jpackage.dependsOn deleteInstallerTemp
 jlinkZip.dependsOn jpackage
-jlink {
+jlink { addExtraModulePath ''
     addOptions('--strip-debug', '--compress', 'zip-6', '--no-header-files', '--no-man-pages')
     launcher {
         name = 'JabRef'

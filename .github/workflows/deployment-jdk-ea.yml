@@ -75,6 +75,43 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
+      - name: Install pigz and cache (linux)
+        if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
+        uses: awalsh128/cache-apt-pkgs-action@master
+        with:
+          packages: pigz
+          version: 1.0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1.1.1
+        with:
+          versionSpec: "5.x"
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v1.1.1
+
+      # JDK
+      - name: 'Set up JDK ${{ matrix.jdk }}'
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.jdk }}
+          distribution: 'zulu'
+      - name: 'Set JDK${{ matrix.jdk }} env var'
+        shell: bash
+        run: echo "JDK${{ matrix.jdk }}=$JAVA_HOME" >> $GITHUB_ENV
+      - name: 'Set JDK${{ matrix.jdk }} in toolchain (linux, Windows)'
+        if: (matrix.os != 'macos-latest')
+        shell: bash
+        run: |
+          sed -i 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+          sed -i 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
+      - name: 'Set JDK${{ matrix.jdk }} in toolchain (macOS)'
+        if: (matrix.os == 'macos-latest')
+        shell: bash
+        run: |
+          sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+          sed -i'.bak' 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
+
+      # JavaFX
       - name: Download and extract JavaFX ${{ matrix.javafx }}
         if: (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
         shell: bash
@@ -111,46 +148,28 @@ jobs:
               ;;
           esac
           echo "OS set to $OS"
-          URL=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
-          echo "Downloading $URL..."
-          curl -OJ --no-progress-meter $URL
+
+          URL_SDK=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
+          echo "Downloading $URL_SDK..."
+          curl -OJ --no-progress-meter $URL_SDK
+
+          URL_JMODS=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-jmods.${EXT}" javafx.html | head -n 1)
+          echo "Downloading $URL_JMODS..."
+          curl -OJ --no-progress-meter $URL_JMODS
+
           $EXTRACT
-      - name: Install pigz and cache (linux)
-        if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
-        uses: awalsh128/cache-apt-pkgs-action@master
-        with:
-          packages: pigz
-          version: 1.0
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v1.1.1
-        with:
-          versionSpec: "5.x"
-      - name: Run GitVersion
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v1.1.1
-      - name: 'Set up JDK ${{ matrix.jdk }}'
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ matrix.jdk }}
-          distribution: 'zulu'
-      - name: 'Set JDK${{ matrix.jdk }} env var'
-        shell: bash
-        run: echo "JDK${{ matrix.jdk }}=$JAVA_HOME" >> $GITHUB_ENV
-      - name: 'Set JDK${{ matrix.jdk }} in toolchain (linux, Windows)'
-        if: (matrix.os != 'macos-latest')
-        shell: bash
-        run: |
-          sed -i 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
-          sed -i 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
-      - name: 'Set JDK${{ matrix.jdk }} in toolchain (macOS)'
-        if: (matrix.os == 'macos-latest')
-        shell: bash
-        run: |
-          sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
-          sed -i'.bak' 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (linux, Windows)'
         if: (matrix.os != 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
-        run: sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' build.gradle
+        run: |
+          sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' build.gradle
+          sed -i "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#' build.gradle
+          cat build.gradle
+      - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
+        if: (matrix.os == 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
+        run: |
+          sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' build.gradle
+          sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#' build.gradle
+          cat build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (linux-arm)'
         if: (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
         # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/, therefore using Maven Central artifact
@@ -160,9 +179,8 @@ jobs:
           JAVAFX=$(jq -r '.[-1].version' /tmp/versions-latest.json)
           echo "Using JavaFX ${JAVAFX}"
           sed -i "/javafx {/{n;s#version = \".*\"#version = \"${JAVAFX}\"#}" build.gradle && cat build.gradle
-      - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
-        if: (matrix.os == 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
-        run: sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' build.gradle
+
+      # Gradle
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -223,6 +241,8 @@ jobs:
             ext=${file##*.}
             mv "$file" "${base}-jdk${{ matrix.jdk }}-javafx${{ matrix.javafx }}.${ext}"
           done
+
+      # Upload
       - name: Set up rsync (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main')
         run: brew install rsync
