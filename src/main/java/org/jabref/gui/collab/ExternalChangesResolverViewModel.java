@@ -117,5 +117,4 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
             getVisibleChanges().remove(oldChange);
         });
     }
-
 }
