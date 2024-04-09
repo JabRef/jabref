@@ -2,6 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -51,26 +52,19 @@ public class EndnoteXmlExporter extends Exporter {
             Map.entry(StandardEntryType.Misc, "Generic")
     );
 
-    private static final List<String> EXPORT_ITEM_TYPE_ORDER = List.of(
-            "Journal Article",
-            "Book",
-            "Book Section",
-            "Conference Paper",
-            "Conference",
-            "Thesis",
-            "Conference Proceedings",
-            "Report",
-            "Manuscript",
-            "Patent",
-            "Web Page",
-            "Electronic Article",
-            "Generic"
-    );
-
-    private static final Map<EntryType, String> EXPORT_REF_NUMBER = EXPORT_ITEM_TYPE.entrySet().stream()
+    private static final Map<EntryType, String> EXPORT_REF_NUMBER = EXPORT_ITEM_TYPE.entrySet()
+                                                                                    .stream()
                                                                                     .collect(Collectors.toMap(
                                                                                             Map.Entry::getKey,
-                                                                                            entry -> Integer.toString(EXPORT_ITEM_TYPE_ORDER.indexOf(entry.getValue()) + 1)));
+                                                                                            entry -> Integer.toString(EXPORT_ITEM_TYPE.entrySet().stream()
+                                                                                                                                      .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey, (e1, e2) -> e1, LinkedHashMap::new))
+                                                                                                                                      .keySet()
+                                                                                                                                      .stream()
+                                                                                                                                      .toList()
+                                                                                                                                      .indexOf(entry.getValue()) + 1),
+                                                                                            (e1, e2) -> e1,
+                                                                                            LinkedHashMap::new
+                                                                                    ));
 
     private final AuthorListParser authorListParser;
     private final DocumentBuilderFactory dbFactory;
