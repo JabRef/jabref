@@ -152,12 +152,14 @@ jobs:
           URL_SDK=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
           echo "Downloading $URL_SDK..."
           curl -OJ --no-progress-meter $URL_SDK
+          $EXTRACT
+          rm "*.$EXT"
 
           URL_JMODS=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-jmods.${EXT}" javafx.html | head -n 1)
           echo "Downloading $URL_JMODS..."
           curl -OJ --no-progress-meter $URL_JMODS
-
           $EXTRACT
+          rm "*.$EXT"
       - name: 'Set JavaFX ${{ matrix.javafx }} (linux, Windows)'
         if: (matrix.os != 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
         run: |
