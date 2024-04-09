@@ -13,6 +13,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 
@@ -33,11 +34,14 @@ class DatabaseFileLookupTest {
     @TempDir
     Path tempDir;
     private BibDatabase database;
+    private String txtFileDirPath;
     private Collection<BibEntry> entries;
 
     private BibEntry entry1;
     private BibEntry entry2;
     private Path txtFileDir;
+    private MetaData metaData;
+    private BibDatabaseContext databaseContext;
     private FilePreferences filePreferences;
     private DatabaseFileLookup fileLookup;
 
@@ -51,6 +55,7 @@ class DatabaseFileLookupTest {
 
         tempDir = Files.createTempDirectory("testDir");
         txtFileDir = tempDir.resolve("x.txt");
+        txtFileDirPath = txtFileDir.toAbsolutePath().toString();
         Files.write(txtFileDir, Collections.singleton("x.txt file contents for test"));
 
         entry1 = database.getEntryByCitationKey("entry1")
@@ -59,20 +64,22 @@ class DatabaseFileLookupTest {
         entry2 = database.getEntryByCitationKey("entry2")
                 .orElseThrow(() -> new Exception("Entry with citation key 'entry2' not found"));
 
-        BibEntry entry3 = new BibEntry().withField(StandardField.FILE, txtFileDir.toAbsolutePath().toString());
+        BibEntry entry3 = new BibEntry().withField(StandardField.FILE, txtFileDirPath);
         BibEntry entry4 = new BibEntry().withField(StandardField.FILE, "");
 
         List<BibEntry> entries = List.of(entry1, entry2, entry3, entry4);
-        BibDatabase database = new BibDatabase(entries);
+        database = new BibDatabase(entries);
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(txtFileDir.toAbsolutePath()));
+        when(filePreferences.getUserAndHost()).thenReturn("User124");
 
-        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
-        when(databaseContext.getFileDirectories(filePreferences))
-                .thenReturn(Collections.singletonList(txtFileDir));
-        when(databaseContext.getDatabase()).thenReturn(database);
-        when(databaseContext.getDatabasePath()).thenReturn(Optional.of(txtFileDir.toAbsolutePath()));
+        metaData = new MetaData();
+        metaData.setDefaultFileDirectory(txtFileDirPath);
+        metaData.setUserFileDirectory("User124", txtFileDirPath);
+
+        databaseContext = new BibDatabaseContext(database, metaData, txtFileDir.toAbsolutePath());
+        databaseContext.setDatabasePath(txtFileDir);
 
         fileLookup = new DatabaseFileLookup(databaseContext, filePreferences);
     }
@@ -82,7 +89,7 @@ class DatabaseFileLookupTest {
      */
     @Test
     void prerequisitesFulfilled() {
-        assertEquals(2, database.getEntryCount());
+        assertEquals(4, database.getEntryCount());
         assertEquals(2, entries.size());
         assertNotNull(entry1);
         assertNotNull(entry2);
@@ -94,7 +101,6 @@ class DatabaseFileLookupTest {
     @Test
     void fileShouldBeFound() {
         assertTrue(fileLookup.lookupDatabase(txtFileDir));
-        assertEquals(filePreferences.getMainFileDirectory(), Optional.of(txtFileDir.toAbsolutePath()));
         assertNotNull(fileLookup.getPathOfDatabase());
     }
 
@@ -104,5 +110,37 @@ class DatabaseFileLookupTest {
     @Test
     void fileShouldNotBeFound() {
         assertFalse(fileLookup.lookupDatabase(tempDir.resolve("y.txt")));
+    }
+
+    /**
+     * x.txt should be found in the user-specific directory
+     */
+    @Test
+    void userSpecificDirectory() {
+        assertEquals(metaData.getUserFileDirectory(filePreferences.getUserAndHost()), Optional.of(txtFileDirPath));
+    }
+
+    /**
+     * x.txt should be found in the general directory
+     */
+    @Test
+    void defaultFileDirectory() {
+        assertEquals(metaData.getDefaultFileDirectory(), Optional.of(txtFileDirPath));
+    }
+
+    /**
+     * x.txt should be found in the main file directory
+     */
+    @Test
+    void mainFileDirectory() {
+        assertEquals(filePreferences.getMainFileDirectory(), Optional.of(txtFileDir.toAbsolutePath()));
+    }
+
+    /**
+     * x.txt should be found in the database file directory
+     */
+    @Test
+    void bibFileDirectory() {
+        assertEquals(databaseContext.getDatabasePath(), Optional.of(txtFileDir.toAbsolutePath()));
     }
 }
