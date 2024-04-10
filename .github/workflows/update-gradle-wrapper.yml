@@ -8,7 +8,7 @@ on:
 jobs:
   update-gradle-wrapper:
     runs-on: ubuntu-latest
-   
+
     steps:
       - uses: actions/checkout@v4
       - name: Setup JDK
