@@ -1,6 +1,8 @@
 package org.jabref.gui.theme;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -44,8 +46,8 @@ abstract class StyleSheet {
 
         if (styleSheetUrl.isEmpty()) {
             try {
-                return Optional.of(new StyleSheetDataUrl(new URL(EMPTY_WEBENGINE_CSS)));
-            } catch (MalformedURLException e) {
+                return Optional.of(new StyleSheetDataUrl(new URI(EMPTY_WEBENGINE_CSS).toURL()));
+            } catch (URISyntaxException | MalformedURLException e) {
                 return Optional.empty();
             }
         } else if ("file".equals(styleSheetUrl.get().getProtocol())) {
