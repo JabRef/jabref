@@ -589,7 +589,6 @@ jlink {
     // but it was removed in the newer releases.
     // The pom.xml associated with such a non-modular artifact does not mention that the artifact depends on the removed code
     // (because the artifact was published when this code was still available in the JDK).
-    forceMerge "javafx"
     forceMerge "controlsfx", "bcprov", "jaxb", "istack", "stax", "log4j"
 
     // TODO: Remove the following correction to the merged module
