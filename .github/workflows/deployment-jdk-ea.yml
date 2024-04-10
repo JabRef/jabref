@@ -64,8 +64,10 @@ jobs:
         run: |
           if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
+            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
+            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -75,6 +77,43 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
+      - name: Install pigz and cache (linux)
+        if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
+        uses: awalsh128/cache-apt-pkgs-action@master
+        with:
+          packages: pigz
+          version: 1.0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1.1.1
+        with:
+          versionSpec: "5.x"
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v1.1.1
+
+      # JDK
+      - name: 'Set up JDK ${{ matrix.jdk }}'
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.jdk }}
+          distribution: 'liberica'
+      - name: 'Set JDK${{ matrix.jdk }} env var'
+        shell: bash
+        run: echo "JDK${{ matrix.jdk }}=$JAVA_HOME" >> $GITHUB_ENV
+      - name: 'Set JDK${{ matrix.jdk }} in toolchain (linux, Windows)'
+        if: (matrix.os != 'macos-latest')
+        shell: bash
+        run: |
+          sed -i 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+          sed -i 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
+      - name: 'Set JDK${{ matrix.jdk }} in toolchain (macOS)'
+        if: (matrix.os == 'macos-latest')
+        shell: bash
+        run: |
+          sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
+          sed -i'.bak' 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
+
+      # JavaFX
       - name: Download and extract JavaFX ${{ matrix.javafx }}
         if: (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
         shell: bash
@@ -111,46 +150,30 @@ jobs:
               ;;
           esac
           echo "OS set to $OS"
-          URL=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
-          echo "Downloading $URL..."
-          curl -OJ --no-progress-meter $URL
+
+          URL_SDK=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
+          echo "Downloading $URL_SDK..."
+          curl -OJ --no-progress-meter $URL_SDK
           $EXTRACT
-      - name: Install pigz and cache (linux)
-        if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
-        uses: awalsh128/cache-apt-pkgs-action@master
-        with:
-          packages: pigz
-          version: 1.0
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v1.1.1
-        with:
-          versionSpec: "5.x"
-      - name: Run GitVersion
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v1.1.1
-      - name: 'Set up JDK ${{ matrix.jdk }}'
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ matrix.jdk }}
-          distribution: 'temurin'
-      - name: 'Set JDK${{ matrix.jdk }} env var'
-        shell: bash
-        run: echo "JDK${{ matrix.jdk }}=$JAVA_HOME" >> $GITHUB_ENV
-      - name: 'Set JDK${{ matrix.jdk }} in toolchain (linux, Windows)'
-        if: (matrix.os != 'macos-latest')
-        shell: bash
-        run: |
-          sed -i 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
-          sed -i 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
-      - name: 'Set JDK${{ matrix.jdk }} in toolchain (macOS)'
-        if: (matrix.os == 'macos-latest')
-        shell: bash
-        run: |
-          sed -i'.bak' 's/JavaLanguageVersion.of(.*)/JavaLanguageVersion.of(${{ matrix.jdk }})/' build.gradle
-          sed -i'.bak' 's/JavaVersion.VERSION_(.*)/JavaVersion.VERSION_(${{ matrix.jdk }})/' build.gradle
+          rm *.$EXT
+
+          URL_JMODS=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-jmods.${EXT}" javafx.html | head -n 1)
+          echo "Downloading $URL_JMODS..."
+          curl -OJ --no-progress-meter $URL_JMODS
+          $EXTRACT
+          rm *.$EXT
       - name: 'Set JavaFX ${{ matrix.javafx }} (linux, Windows)'
         if: (matrix.os != 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
-        run: sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' build.gradle
+        run: |
+          sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' build.gradle
+          sed -i "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#" build.gradle
+          cat build.gradle
+      - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
+        if: (matrix.os == 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
+        run: |
+          sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' build.gradle
+          sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#" build.gradle
+          cat build.gradle
       - name: 'Set JavaFX ${{ matrix.javafx }} (linux-arm)'
         if: (matrix.os == 'buildjet-4vcpu-ubuntu-2204-arm')
         # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/, therefore using Maven Central artifact
@@ -160,28 +183,27 @@ jobs:
           JAVAFX=$(jq -r '.[-1].version' /tmp/versions-latest.json)
           echo "Using JavaFX ${JAVAFX}"
           sed -i "/javafx {/{n;s#version = \".*\"#version = \"${JAVAFX}\"#}" build.gradle && cat build.gradle
-      - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
-        if: (matrix.os == 'macos-latest') && (matrix.os != 'buildjet-4vcpu-ubuntu-2204-arm')
-        run: sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' build.gradle
-      - name: Setup JDK
+
+      # Gradle
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: 21
           distribution: 'temurin'
-      - name: Setup Gradle
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (steps.checksecrets.outputs.secretspresent == 'NO')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
-      - name: Setup macOS key chain
+      - name: Set up macOS key chain
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
-      - name: Setup macOS key chain for app id cert
+      - name: Set up macOS key chain for app id cert
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
         with:
@@ -223,17 +245,19 @@ jobs:
             ext=${file##*.}
             mv "$file" "${base}-jdk${{ matrix.jdk }}-javafx${{ matrix.javafx }}.${ext}"
           done
-      - name: Setup rsync (macOS)
-        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+
+      # Upload
+      - name: Set up rsync (macOS)
+        if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main')
         run: brew install rsync
-      - name: Setup rsync (Windows)
-        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+      - name: Set up rsync (Windows)
+        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main')
         # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
         # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
         run: choco install --no-progress rsync
-      - name: Setup SSH key
+      - name: Set up SSH key
         if: (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main')
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
@@ -250,7 +274,7 @@ jobs:
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/
       - name: Upload to GitHub workflow artifacts store
-        if: (steps.checksecrets.outputs.secretspresent != 'YES')
+        if: (steps.checksecrets.outputs.secretspresent != 'YES') || (github.ref != 'refs/heads/main')
         uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}
