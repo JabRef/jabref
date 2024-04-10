@@ -36,9 +36,9 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     private final LibraryTabContainer libraryTabContainer;
 
     @Inject private PreferencesService preferencesService;
-    @Inject private ThemeManager themeManager;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
+    @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;
 
     private GlobalSearchResultDialogViewModel viewModel;
@@ -66,7 +66,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
-        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, themeManager, stateManager, taskExecutor);
+        SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, taskExecutor);
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
 

@@ -18,7 +18,6 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ParserResult;
@@ -48,7 +47,6 @@ public class SharedDatabaseUIManager {
     private DatabaseSynchronizer dbmsSynchronizer;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final ThemeManager themeManager;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -58,7 +56,6 @@ public class SharedDatabaseUIManager {
     public SharedDatabaseUIManager(LibraryTabContainer tabContainer,
                                    DialogService dialogService,
                                    PreferencesService preferencesService,
-                                   ThemeManager themeManager,
                                    StateManager stateManager,
                                    BibEntryTypesManager entryTypesManager,
                                    FileUpdateMonitor fileUpdateMonitor,
@@ -67,7 +64,6 @@ public class SharedDatabaseUIManager {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.themeManager = themeManager;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -172,7 +168,6 @@ public class SharedDatabaseUIManager {
                 tabContainer,
                 dialogService,
                 preferencesService,
-                themeManager,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,

@@ -14,7 +14,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -35,7 +34,6 @@ public class SidePane extends VBox {
                     JournalAbbreviationRepository abbreviationRepository,
                     TaskExecutor taskExecutor,
                     DialogService dialogService,
-                    ThemeManager themeManager,
                     StateManager stateManager,
                     FileUpdateMonitor fileUpdateMonitor,
                     BibEntryTypesManager entryTypesManager,
@@ -46,7 +44,6 @@ public class SidePane extends VBox {
                 tabContainer,
                 preferencesService,
                 abbreviationRepository,
-                themeManager,
                 stateManager,
                 taskExecutor,
                 dialogService,

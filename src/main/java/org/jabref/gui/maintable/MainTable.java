@@ -38,7 +38,6 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -85,7 +84,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      BibDatabaseContext database,
                      PreferencesService preferencesService,
                      DialogService dialogService,
-                     ThemeManager themeManager,
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,
                      ClipBoardManager clipBoardManager,
@@ -126,7 +124,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         preferencesService.getMainTableColumnPreferences(),
                         undoManager,
                         dialogService,
-                        themeManager,
                         stateManager,
                         taskExecutor).createColumns());
 
@@ -201,7 +198,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 preferencesService.getMainTableColumnPreferences(),
                 undoManager,
                 dialogService,
-                themeManager,
                 stateManager,
                 taskExecutor);
 

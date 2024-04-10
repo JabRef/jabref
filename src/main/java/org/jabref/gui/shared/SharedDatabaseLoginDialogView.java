@@ -15,7 +15,6 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -51,7 +50,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
-    @Inject private ThemeManager themeManager;
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
@@ -94,7 +92,6 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 tabContainer,
                 dialogService,
                 preferencesService,
-                themeManager,
                 stateManager,
                 entryTypesManager,
                 fileUpdateMonitor,

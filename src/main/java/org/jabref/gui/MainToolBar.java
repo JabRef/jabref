@@ -29,7 +29,6 @@ import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
@@ -49,7 +48,6 @@ public class MainToolBar extends ToolBar {
     private final PushToApplicationCommand pushToApplicationCommand;
     private final GlobalSearchBar globalSearchBar;
     private final DialogService dialogService;
-    private final ThemeManager themeManager;
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -64,7 +62,6 @@ public class MainToolBar extends ToolBar {
                        PushToApplicationCommand pushToApplicationCommand,
                        GlobalSearchBar globalSearchBar,
                        DialogService dialogService,
-                       ThemeManager themeManager,
                        StateManager stateManager,
                        PreferencesService preferencesService,
                        FileUpdateMonitor fileUpdateMonitor,
@@ -75,7 +72,6 @@ public class MainToolBar extends ToolBar {
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
         this.dialogService = dialogService;
-        this.themeManager = themeManager;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -100,7 +96,7 @@ public class MainToolBar extends ToolBar {
         getItems().addAll(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, themeManager, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, taskExecutor)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, taskExecutor)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager))),
 
                 leftSpacer,

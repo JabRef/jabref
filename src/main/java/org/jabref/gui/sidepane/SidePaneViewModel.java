@@ -18,7 +18,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -42,7 +41,6 @@ public class SidePaneViewModel extends AbstractViewModel {
     public SidePaneViewModel(LibraryTabContainer tabContainer,
                              PreferencesService preferencesService,
                              JournalAbbreviationRepository abbreviationRepository,
-                             ThemeManager themeManager,
                              StateManager stateManager,
                              TaskExecutor taskExecutor,
                              DialogService dialogService,
@@ -58,7 +56,6 @@ public class SidePaneViewModel extends AbstractViewModel {
                 abbreviationRepository,
                 taskExecutor,
                 dialogService,
-                themeManager,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,

@@ -12,7 +12,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
@@ -38,7 +37,6 @@ class SidePaneViewModelTest {
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
     PreferencesService preferencesService = mock(PreferencesService.class);
     JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
-    ThemeManager themeManager = mock(ThemeManager.class);
     StateManager stateManager = mock(StateManager.class);
     TaskExecutor taskExecutor = mock(TaskExecutor.class);
     DialogService dialogService = mock(DialogService.class);
@@ -66,7 +64,6 @@ class SidePaneViewModelTest {
                 tabContainer,
                 preferencesService,
                 abbreviationRepository,
-                themeManager,
                 stateManager,
                 taskExecutor,
                 dialogService,

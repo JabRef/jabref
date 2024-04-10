@@ -35,7 +35,6 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
@@ -90,7 +89,6 @@ public class OpenOfficePanel {
     private final VBox vbox = new VBox();
 
     private final PreferencesService preferencesService;
-    private final ThemeManager themeManager;
     private final StateManager stateManager;
     private final UndoManager undoManager;
     private final TaskExecutor taskExecutor;
@@ -107,7 +105,6 @@ public class OpenOfficePanel {
                            JournalAbbreviationRepository abbreviationRepository,
                            TaskExecutor taskExecutor,
                            DialogService dialogService,
-                           ThemeManager themeManager,
                            StateManager stateManager,
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
@@ -119,7 +116,6 @@ public class OpenOfficePanel {
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
-        this.themeManager = themeManager;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
 
@@ -280,7 +276,6 @@ public class OpenOfficePanel {
                     tabContainer,
                     dialogService,
                     preferencesService,
-                    themeManager,
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,

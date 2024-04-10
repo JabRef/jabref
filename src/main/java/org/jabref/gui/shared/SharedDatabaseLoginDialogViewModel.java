@@ -29,7 +29,6 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.TaskExecutor;
@@ -82,7 +81,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
-    private final ThemeManager themeManager;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -100,7 +98,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
-                                              ThemeManager themeManager,
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -109,7 +106,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.themeManager = themeManager;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -188,7 +184,6 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     tabContainer,
                     dialogService,
                     preferencesService,
-                    themeManager,
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,

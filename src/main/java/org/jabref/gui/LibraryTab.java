@@ -49,7 +49,6 @@ import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -111,7 +110,6 @@ public class LibraryTab extends Tab {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final ThemeManager themeManager;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
@@ -158,7 +156,6 @@ public class LibraryTab extends Tab {
                       LibraryTabContainer tabContainer,
                       DialogService dialogService,
                       PreferencesService preferencesService,
-                      ThemeManager themeManager,
                       StateManager stateManager,
                       FileUpdateMonitor fileUpdateMonitor,
                       BibEntryTypesManager entryTypesManager,
@@ -169,7 +166,6 @@ public class LibraryTab extends Tab {
         this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.preferencesService = Objects.requireNonNull(preferencesService);
-        this.themeManager = themeManager;
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -546,7 +542,6 @@ public class LibraryTab extends Tab {
                 bibDatabaseContext,
                 preferencesService,
                 dialogService,
-                themeManager,
                 stateManager,
                 Globals.getKeyPrefs(),
                 Globals.getClipboardManager(),
@@ -962,7 +957,6 @@ public class LibraryTab extends Tab {
                                               Path file,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
-                                              ThemeManager themeManager,
                                               StateManager stateManager,
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -977,7 +971,6 @@ public class LibraryTab extends Tab {
                 tabContainer,
                 dialogService,
                 preferencesService,
-                themeManager,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -997,7 +990,6 @@ public class LibraryTab extends Tab {
                                               LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
-                                              ThemeManager themeManager,
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
@@ -1010,7 +1002,6 @@ public class LibraryTab extends Tab {
                 tabContainer,
                 dialogService,
                 preferencesService,
-                themeManager,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
