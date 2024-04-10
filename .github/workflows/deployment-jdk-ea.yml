@@ -185,7 +185,7 @@ jobs:
           sed -i "/javafx {/{n;s#version = \".*\"#version = \"${JAVAFX}\"#}" build.gradle && cat build.gradle
 
       # Gradle
-      - run: find / ! -readable -prune -o -name "javafx-controls-20-linux.jar" -print || true
+      - run: find / -name "javafx-controls-20-linux.jar" 2>/dev/null|| true
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -196,7 +196,7 @@ jobs:
         with:
           # The cache has some older JavaFX versions. We cannot get rid easily of them. Therefore, the cache is disabled.
           cache-disabled: true
-      - run: find / ! -readable -prune -o -name "javafx-controls-20-linux.jar" -print || true
+      - run: find / -name "javafx-controls-20-linux.jar" 2>/dev/null|| true
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (steps.checksecrets.outputs.secretspresent == 'NO')
@@ -220,7 +220,7 @@ jobs:
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip || true
-      - run: find / ! -readable -prune -o -name "javafx-controls-20-linux.jar" -print || true
+      - run: find / -name "javafx-controls-20-linux.jar" 2>/dev/null|| true
       - name: Package application image
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
