@@ -18,13 +18,13 @@ public class UnoNamed {
      *                <p>
      *                Passed to this.asXMultiServiceFactory().createInstance(service) The result is expected to support the XNamed and XTextContent interfaces.
      * @return The XNamed interface, in case we need to check the actual name.
-     * @param documentAnnotation The DocumentAnnotation object
+     * @param documentAnnotation The DocumentAnnotation object that contains information about the document
      */
     static XNamed insertNamedTextContent(String service,DocumentAnnotation documentAnnotation)
             throws
             CreationException {
 
-        XMultiServiceFactory msf = UnoCast.cast(XMultiServiceFactory.class, documentAnnotation.getDoc()).get();
+        XMultiServiceFactory msf = UnoCast.cast(XMultiServiceFactory.class, documentAnnotation.doc()).get();
 
         Object xObject;
         try {
@@ -35,12 +35,12 @@ public class UnoNamed {
 
         XNamed xNamed = UnoCast.cast(XNamed.class, xObject)
                                 .orElseThrow(() -> new IllegalArgumentException("Service is not an XNamed"));
-        xNamed.setName(documentAnnotation.getName());
+        xNamed.setName(documentAnnotation.name());
 
         // get XTextContent interface
         XTextContent xTextContent = UnoCast.cast(XTextContent.class, xObject)
                                             .orElseThrow(() -> new IllegalArgumentException("Service is not an XTextContent"));
-        documentAnnotation.getRange().getText().insertTextContent(documentAnnotation.getRange(), xTextContent, documentAnnotation.getAbsorb());
+        documentAnnotation.range().getText().insertTextContent(documentAnnotation.range(), xTextContent, documentAnnotation.absorb());
         return xNamed;
     }
 }
