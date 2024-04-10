@@ -26,7 +26,7 @@ public class OpenConsoleAction extends SimpleCommand {
     /**
      * Creates a command that opens the console at the path of the supplied database,
      * or defaults to the active database. Use
-     * {@link #OpenConsoleAction(StateManager, PreferencesService)} if not supplying
+     * {@link OpenConsoleAction(StateManager, PreferencesService)} if not supplying
      * another database.
      */
     public OpenConsoleAction(Supplier<BibDatabaseContext> databaseContext, StateManager stateManager, PreferencesService preferencesService, DialogService dialogService) {

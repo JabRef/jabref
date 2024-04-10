@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.frame;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
