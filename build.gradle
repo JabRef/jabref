@@ -11,8 +11,6 @@ plugins {
 
     id 'org.javamodularity.moduleplugin' version '1.8.15'
 
-    id 'org.openjfx.javafxplugin' version '0.1.0'
-
     id 'org.beryx.jlink' version '3.0.1'
 
     // nicer test outputs during running and completion
@@ -100,11 +98,6 @@ configurations {
 
 dependencyLocking {
     lockAllConfigurations()
-}
-
-javafx {
-    version = "22"
-    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
 jacoco {
@@ -589,7 +582,6 @@ jlink {
     // but it was removed in the newer releases.
     // The pom.xml associated with such a non-modular artifact does not mention that the artifact depends on the removed code
     // (because the artifact was published when this code was still available in the JDK).
-    forceMerge "javafx"
     forceMerge "controlsfx", "bcprov", "jaxb", "istack", "stax", "log4j"
 
     // TODO: Remove the following correction to the merged module
