@@ -1,4 +1,4 @@
-name: Deployment for Arm64
+name: Deployment for macOS/ARM64
 on:
   push:
     branches:
@@ -39,7 +39,7 @@ jobs:
       matrix:
         include:
           - os: macos-14
-            displayName: macOS (Arm64)
+            displayName: macOS (ARM64)
             suffix: '_arm64'
     runs-on: ${{ matrix.os }}
     outputs:
