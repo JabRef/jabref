@@ -213,7 +213,7 @@ jobs:
         if: (matrix.os != 'windows-latest')
         run: |
           rm -rf /home/runner/.gradle/caches/modules-2/files-2.1/org.openjfx
-          find / - name "javafx-swing-20-linux.jar"
+          find / -name "javafx-swing-20-linux.jar"
       - name: Purge JavaFX from gradle cache (Windows)
         if: (matrix.os == 'windows-latest')
         shell: powershell
