@@ -100,16 +100,19 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
-                       PreferencesService preferencesService) {
+                       PreferencesService preferencesService,
+                       StateManager stateManager,
+                       CountingUndoManager undoManager,
+                       BibEntryTypesManager entryTypesManager,
+                       TaskExecutor taskExecutor) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.prefs = preferencesService;
-
-        this.stateManager = Globals.stateManager;
-        this.undoManager = Globals.undoManager;
-        this.entryTypesManager = Globals.entryTypesManager;
-        this.taskExecutor = Globals.TASK_EXECUTOR;
+        this.stateManager = stateManager;
+        this.undoManager = undoManager;
+        this.entryTypesManager = entryTypesManager;
+        this.taskExecutor = taskExecutor;
 
         this.viewModel = new JabRefFrameViewModel(
                 preferencesService,
