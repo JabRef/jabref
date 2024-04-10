@@ -592,13 +592,6 @@ jlink {
     // This is based on ./gradlew suggestMergedModuleInfo, sort, strip ";"", comment non-used modules, and include the suggested directives here.
     //   However, we need to fine-tune this manually (non-alphabetic order)
     mergedModule {
-        requires 'javafx.base';
-        requires 'javafx.controls';
-        requires 'javafx.fxml';
-        requires 'javafx.graphics';
-        requires 'javafx.media';
-        requires 'javafx.swing';
-
         requires 'java.compiler'
         requires 'java.datatransfer'
         requires 'java.desktop'
