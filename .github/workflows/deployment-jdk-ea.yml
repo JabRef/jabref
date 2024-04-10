@@ -64,8 +64,10 @@ jobs:
         run: |
           if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
+            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
+            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -183,7 +185,7 @@ jobs:
           sed -i "/javafx {/{n;s#version = \".*\"#version = \"${JAVAFX}\"#}" build.gradle && cat build.gradle
 
       # Gradle
-      - run: find / -name "javafx-controls-20-linux.jar" || true
+      - run: find / ! -readable -prune -o -name "javafx-controls-20-linux.jar" -print || true
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -197,7 +199,7 @@ jobs:
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (steps.checksecrets.outputs.secretspresent == 'NO')
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir || true
       - name: Set up macOS key chain
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: apple-actions/import-codesign-certs@v2
@@ -217,7 +219,7 @@ jobs:
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip || true
-      - run: find / -name "javafx-controls-20-linux.jar" || true
+      - run: find / ! -readable -prune -o -name "javafx-controls-20-linux.jar" -print || true
       - name: Package application image
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
