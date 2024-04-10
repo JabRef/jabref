@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -22,9 +23,11 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -210,14 +213,15 @@ public class CitationRelationsTab extends EntryEditorTab {
                     VBox vContainer = new VBox();
 
                     if (entry.isLocal()) {
+                        hContainer.setBackground(Background.fill(Color.LIGHTGREEN));
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(event -> {
-                            libraryTab.showAndEdit(entry.entry());
-                            libraryTab.clearAndSelect(entry.entry());
                             citingTask.cancel();
                             citedByTask.cancel();
+                            libraryTab.showAndEdit(entry.localEntry());
+                            libraryTab.clearAndSelect(entry.localEntry());
                         });
                         vContainer.getChildren().add(jumpTo);
                     } else {
@@ -384,8 +388,21 @@ public class CitationRelationsTab extends EntryEditorTab {
                                              ObservableList<CitationRelationItem> observableList) {
         hideNodes(abortButton, progress);
 
-        observableList.setAll(fetchedList.stream().map(entr -> new CitationRelationItem(entr, false))
-                                         .collect(Collectors.toList()));
+        observableList.setAll(fetchedList.stream().map(entr -> {
+            for (BibEntry databaseEntry : databaseContext.getDatabase().getEntries()) {
+                Optional<String> title1Optional = databaseEntry.getTitle();
+                Optional<String> title2Optional = entr.getTitle();
+                if (title1Optional.isPresent() && title2Optional.isPresent()) {
+                    String title1 = title1Optional.get().replaceAll("[{}]", "").toLowerCase();
+                    String title2 = title2Optional.get().replaceAll("[{}]", "").toLowerCase();
+
+                    if (title1.equals(title2)) {
+                        return new CitationRelationItem(entr, databaseEntry, true);
+                    }
+                }
+            }
+            return new CitationRelationItem(entr, null, false);
+        }).collect(Collectors.toList()));
 
         if (!observableList.isEmpty()) {
             listView.refresh();

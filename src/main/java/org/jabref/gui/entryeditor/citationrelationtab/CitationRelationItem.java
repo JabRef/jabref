@@ -7,5 +7,6 @@ import org.jabref.model.entry.BibEntry;
  */
 public record CitationRelationItem(
         BibEntry entry,
+        BibEntry localEntry,
         boolean isLocal) {
 }
