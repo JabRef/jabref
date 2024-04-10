@@ -76,7 +76,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21.0.2
-          distribution: 'adopt'
+          distribution: 'liberica'
       - name: Clean up keychain
         run: |
          security delete-keychain signing_temp.keychain ${{runner.temp}}/keychain/notarization.keychain || true

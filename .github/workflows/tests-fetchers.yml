@@ -49,7 +49,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21.0.2
-          distribution: 'adopt'
+          distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Run fetcher tests
