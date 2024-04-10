@@ -24,7 +24,7 @@ public class Telemetry {
         });
     }
 
-    static void initTrackingNotification(DialogService dialogService, TelemetryPreferences preferences) {
+    public static void initTrackingNotification(DialogService dialogService, TelemetryPreferences preferences) {
         if (preferences.shouldAskToCollectTelemetry()) {
             JabRefExecutorService.INSTANCE.submit(new TimerTask() {
                 @Override

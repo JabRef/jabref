@@ -1,4 +1,4 @@
-package org.jabref.gui.menus;
+package org.jabref.gui.frame;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -7,7 +7,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.frame.JabRefFrame;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
