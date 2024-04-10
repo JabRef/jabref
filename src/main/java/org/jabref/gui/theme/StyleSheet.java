@@ -7,7 +7,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.gui.frame.JabRefFrame;
+import org.jabref.gui.JabRefGUI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ abstract class StyleSheet {
     abstract void reload();
 
     static Optional<StyleSheet> create(String name) {
-        Optional<URL> styleSheetUrl = Optional.ofNullable(JabRefFrame.class.getResource(name));
+        Optional<URL> styleSheetUrl = Optional.ofNullable(JabRefGUI.class.getResource(name));
 
         if (styleSheetUrl.isEmpty()) {
             try {
