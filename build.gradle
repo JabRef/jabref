@@ -98,6 +98,10 @@ configurations {
     antlr4
 }
 
+configurations.configureEach {
+    exclude group: 'org.openjfx'
+}
+
 dependencyLocking {
     lockAllConfigurations()
 }
