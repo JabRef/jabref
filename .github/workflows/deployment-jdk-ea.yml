@@ -190,6 +190,9 @@ jobs:
           distribution: 'zulu'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          # The cache has some older JavaFX versions. We cannot get rid easily of them. Therefore, the cache is disabled.
+          cache-disabled: true
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (steps.checksecrets.outputs.secretspresent == 'NO')
@@ -209,19 +212,6 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Purge JavaFX from gradle cache (linux, macOS)
-        if: (matrix.os != 'windows-latest')
-        run: |
-          rm -rf /home/runner/.gradle/caches/modules-2/files-2.1/org.openjfx
-          find / -name "javafx-swing-20-linux.jar"
-      - name: Purge JavaFX from gradle cache (Windows)
-        if: (matrix.os == 'windows-latest')
-        shell: powershell
-        run: |
-          $path = Join-Path $Env:USERPROFILE "\.gradle\caches\modules-2\files-2.1\org.openjfx"
-          if (Test-Path $path) {
-              Remove-Item -Path $path -Recurse -Force
-          }
       - name: Build runtime image and installer
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
