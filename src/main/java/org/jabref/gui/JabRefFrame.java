@@ -509,13 +509,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return viewModel.close();
     }
 
-    public boolean closeTab(@NonNull LibraryTab libraryTab) {
-        if (libraryTab.requestClose()) {
-            tabbedPane.getTabs().remove(libraryTab);
-            Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
-            return true;
-        }
-        return false;
+    public boolean closeTab(LibraryTab tab) {
+        return closeTabs(List.of(tab));
     }
 
     public boolean closeTabs(List<LibraryTab> tabs) {
@@ -524,6 +519,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 .distinct()
                 .filter(getLibraryTabs()::contains)
                 .toList();
+
+        if (toClose.isEmpty()) {
+            // Nothing to do
+            return true;
+        }
 
         // Ask before closing any tab, if any tab has changes
         for (LibraryTab libraryTab : toClose) {
@@ -538,14 +538,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
         }
         return true;
-    }
-
-    public boolean closeTabs() {
-        return closeTabs(getLibraryTabs());
-    }
-
-    public boolean closeCurrentTab() {
-        return closeTab(getCurrentLibraryTab());
     }
 
     private OpenDatabaseAction getOpenDatabaseAction() {
@@ -835,7 +827,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                         LOGGER.error("No library tab to close");
                         return;
                     }
-                    tabContainer.closeCurrentTab();
+                    tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
                 } else {
                     tabContainer.closeTab(libraryTab);
                 }

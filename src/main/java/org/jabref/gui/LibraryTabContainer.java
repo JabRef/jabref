@@ -4,10 +4,8 @@ import java.util.List;
 
 import org.jabref.model.database.BibDatabaseContext;
 
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-@NullMarked
 public interface LibraryTabContainer {
     List<LibraryTab> getLibraryTabs();
 
@@ -23,19 +21,12 @@ public interface LibraryTabContainer {
     /**
      * Closes a designated libraryTab
      *
-     * @param libraryTab to be closed.
+     * @param tab to be closed.
      * @return true if closing the tab was successful
      */
-    boolean closeTab(LibraryTab libraryTab);
+    boolean closeTab(LibraryTab tab);
 
-    boolean closeTabs();
-
-    /**
-     * Closes the currently viewed libraryTab
-     *
-     * @return true if closing the tab was successful
-     */
-    boolean closeCurrentTab();
+    boolean closeTabs(List<LibraryTab> tabs);
 
     /**
      * Refreshes the ui after changes to the preferences

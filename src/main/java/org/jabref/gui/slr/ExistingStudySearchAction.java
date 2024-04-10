@@ -147,6 +147,6 @@ public class ExistingStudySearchAction extends SimpleCommand {
         // The user focused an SLR
         // We hard close the tab
         // Future work: Properly close the tab (with saving, ...)
-        tabContainer.closeCurrentTab();
+        tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
     }
 }
