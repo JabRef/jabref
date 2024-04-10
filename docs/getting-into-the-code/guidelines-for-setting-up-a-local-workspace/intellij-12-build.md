@@ -4,7 +4,7 @@ grand_parent: Getting into the code
 nav_order: 12
 ---
 
-# Step 2: Setup the build system: JDK and Gradle
+# Step 2: Set up the build system: JDK and Gradle
 
 ## Ensure that JDK 21 is available to IntelliJ
 
