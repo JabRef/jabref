@@ -210,8 +210,10 @@ jobs:
           create-keychain: false
           keychain-password: jabref
       - name: Purge JavaFX from gradle cache (linux, macOS)
+        if: (matrix.os != 'windows-latest')
         run: rm -rf /home/runner/.gradle/caches/modules-2/files-2.1/org.openjfx
       - name: Purge JavaFX from gradle cache (Windows)
+        if: (matrix.os == 'windows-latest')
         shell: powershell
         run: |
           $path = Join-Path $Env:USERPROFILE "\.gradle\caches\modules-2\files-2.1\org.openjfx"
