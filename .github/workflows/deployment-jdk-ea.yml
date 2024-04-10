@@ -183,6 +183,7 @@ jobs:
           sed -i "/javafx {/{n;s#version = \".*\"#version = \"${JAVAFX}\"#}" build.gradle && cat build.gradle
 
       # Gradle
+      - run: find / -name "javafx-controls-20-linux.jar" || true
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -215,7 +216,8 @@ jobs:
       - name: Build runtime image and installer
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip || true
+      - run: find / -name "javafx-controls-20-linux.jar" || true
       - name: Package application image
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
