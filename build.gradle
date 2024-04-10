@@ -54,7 +54,7 @@ java {
         // - .github/workflows/deployment-jdk-ea.yml#L53
         languageVersion = JavaLanguageVersion.of(21)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
-        vendor = JvmVendorSpec.AMAZON
+        // vendor = JvmVendorSpec.AMAZON
     }
 }
 
