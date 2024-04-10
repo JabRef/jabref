@@ -578,8 +578,8 @@ tasks.register('deleteInstallerTemp', Delete) {
 jpackage.dependsOn deleteInstallerTemp
 jlinkZip.dependsOn jpackage
 jlink {
-	// https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
-	addExtraDependencies("javafx")
+    // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
+    addExtraDependencies("javafx")
 
     addOptions('--strip-debug', '--compress', 'zip-6', '--no-header-files', '--no-man-pages')
     launcher {
