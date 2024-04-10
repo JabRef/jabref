@@ -2,24 +2,17 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
@@ -37,9 +30,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.NewEntryAction;
-import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -51,21 +42,13 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.UiCommand;
-import org.jabref.logic.importer.ImportCleanup;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -104,14 +87,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
+    private final TaskExecutor taskExecutor;
+
     private final PushToApplicationCommand pushToApplicationCommand;
     private SidePane sidePane;
     private final TabPane tabbedPane = new TabPane();
 
     private Subscription dividerSubscription;
-    private JabRefFrameViewModel viewModel;
 
-    private final TaskExecutor taskExecutor;
+    private final JabRefFrameViewModel viewModel;
 
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
@@ -127,7 +111,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         this.entryTypesManager = Globals.entryTypesManager;
         this.taskExecutor = Globals.TASK_EXECUTOR;
 
-        this.viewModel = new JabRefFrameViewModel(preferencesService, stateManager, dialogService, this);
+        this.viewModel = new JabRefFrameViewModel(
+                preferencesService,
+                stateManager,
+                dialogService,
+                this,
+                entryTypesManager,
+                fileUpdateMonitor,
+                undoManager,
+                taskExecutor);
 
         this.frameDndHandler = new FrameDndHandler(tabbedPane, mainStage::getScene, this::getOpenDatabaseAction, stateManager);
 
@@ -457,54 +449,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         addTab(libraryTab, raisePanel);
     }
 
-    /**
-     * Should be called when a user asks JabRef at the command line
-     * i) to import a file or
-     * ii) to open a .bib file
-     */
-    public void addTab(ParserResult parserResult, boolean raisePanel) {
-        if (parserResult.toOpenTab()) {
-            LOGGER.trace("Adding the entries to the open tab.");
-            LibraryTab libraryTab = getCurrentLibraryTab();
-            if (libraryTab == null) {
-                LOGGER.debug("No open tab found to add entries to. Creating a new tab.");
-                addTab(parserResult.getDatabaseContext(), raisePanel);
-            } else {
-                addImportedEntries(libraryTab, parserResult);
-            }
-        } else {
-            // only add tab if library is not already open
-            Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
-                                                              .filter(p -> p.getBibDatabaseContext()
-                                                                            .getDatabasePath()
-                                                                            .equals(parserResult.getPath()))
-                                                              .findFirst();
-
-            if (libraryTab.isPresent()) {
-                tabbedPane.getSelectionModel().select(libraryTab.get());
-            } else {
-                // On this place, a tab is added after loading using the command line
-                // This takes a different execution path than loading a library using the GUI
-                addTab(parserResult.getDatabaseContext(), raisePanel);
-            }
-        }
-    }
-
-    /**
-     * Opens the import inspection dialog to let the user decide which of the given entries to import.
-     *
-     * @param panel        The BasePanel to add to.
-     * @param parserResult The entries to add.
-     */
-    private void addImportedEntries(final LibraryTab panel, final ParserResult parserResult) {
-        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
-        ImportCleanup cleanup = ImportCleanup.targeting(panel.getBibDatabaseContext().getMode());
-        cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
-        ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
-        dialog.setTitle(Localization.lang("Import"));
-        dialogService.showCustomDialogAndWait(dialog);
-    }
-
     public boolean close() {
         return viewModel.close();
     }
@@ -561,100 +505,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         getLibraryTabs().forEach(tab -> tab.getMainTable().getTableModel().resetFieldFormatter());
     }
 
-    void openDatabases(List<ParserResult> parserResults) {
-        final List<ParserResult> failed = new ArrayList<>();
-        final List<ParserResult> toOpenTab = new ArrayList<>();
-
-        // Remove invalid databases
-        List<ParserResult> invalidDatabases = parserResults.stream()
-                                                           .filter(ParserResult::isInvalid)
-                                                           .toList();
-        failed.addAll(invalidDatabases);
-        parserResults.removeAll(invalidDatabases);
-
-        // passed file (we take the first one) should be focused
-        Path focusedFile = parserResults.stream()
-                                        .findFirst()
-                                        .flatMap(ParserResult::getPath)
-                                        .orElse(prefs.getGuiPreferences()
-                                                     .getLastFocusedFile())
-                                        .toAbsolutePath();
-
-        // Add all bibDatabases databases to the frame:
-        boolean first = false;
-        for (ParserResult parserResult : parserResults) {
-            // Define focused tab
-            if (parserResult.getPath().filter(path -> path.toAbsolutePath().equals(focusedFile)).isPresent()) {
-                first = true;
-            }
-
-            if (parserResult.getDatabase().isShared()) {
-                try {
-                    OpenDatabaseAction.openSharedDatabase(
-                            parserResult,
-                            this,
-                            dialogService,
-                            prefs,
-                            stateManager,
-                            entryTypesManager,
-                            fileUpdateMonitor,
-                            undoManager,
-                            taskExecutor);
-                } catch (SQLException |
-                         DatabaseNotSupportedException |
-                         InvalidDBMSConnectionPropertiesException |
-                         NotASharedDatabaseException e) {
-                    LOGGER.error("Connection error", e);
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("Connection error"),
-                            Localization.lang("A local copy will be opened."),
-                            e);
-                    toOpenTab.add(parserResult);
-                }
-            } else if (parserResult.toOpenTab()) {
-                // things to be appended to an opened tab should be done after opening all tabs
-                // add them to the list
-                toOpenTab.add(parserResult);
-            } else {
-                addTab(parserResult, first);
-                first = false;
-            }
-        }
-
-        // finally add things to the currently opened tab
-        for (ParserResult parserResult : toOpenTab) {
-            addTab(parserResult, first);
-            first = false;
-        }
-
-        for (ParserResult parserResult : failed) {
-            String message = Localization.lang("Error opening file '%0'",
-                    parserResult.getPath().map(Path::toString).orElse("(File name unknown)")) + "\n" +
-                    parserResult.getErrorMessage();
-            dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
-        }
-
-        // Display warnings, if any
-        for (ParserResult parserResult : parserResults) {
-            if (parserResult.hasWarnings()) {
-                ParserResultWarningDialog.showParserResultWarningDialog(parserResult, dialogService);
-                getLibraryTabs().stream()
-                                .filter(tab -> parserResult.getDatabase().equals(tab.getDatabase()))
-                                .findAny()
-                                .ifPresent(this::showLibraryTab);
-            }
-        }
-
-        // After adding the databases, go through each and see if
-        // any post open actions need to be done. For instance, checking
-        // if we found new entry types that can be imported, or checking
-        // if the database contents should be modified due to new features
-        // in this version of JabRef.
-        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, dialogService));
-
-        LOGGER.debug("Finished adding panels");
-    }
-
     public void openLastEditedDatabases() {
         List<Path> lastFiles = prefs.getGuiPreferences().getLastFilesOpened();
         if (lastFiles.isEmpty()) {
@@ -672,114 +522,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return mainStage;
     }
 
-    /**
-     * Handles commands submitted by the command line or by the remote host to be executed in the ui
-     * Needs to run in a certain order. E.g. databases have to be loaded before selecting an entry.
-     *
-     * @param uiCommands to be handled
-     */
     public void handleUiCommands(List<UiCommand> uiCommands) {
-        LOGGER.debug("Handling UI commands {}", uiCommands);
-        if (uiCommands.isEmpty()) {
-            return;
-        }
-
-        // Handle blank workspace
-        boolean blank = uiCommands.stream().anyMatch(UiCommand.BlankWorkspace.class::isInstance);
-
-        // Handle OpenDatabases
-        if (!blank) {
-            uiCommands.stream()
-                    .filter(UiCommand.OpenDatabases.class::isInstance)
-                    .map(UiCommand.OpenDatabases.class::cast)
-                    .forEach(command -> openDatabases(command.parserResults()));
-        }
-
-        // Handle jumpToEntry
-        uiCommands.stream()
-                  .filter(UiCommand.JumpToEntryKey.class::isInstance)
-                  .map(UiCommand.JumpToEntryKey.class::cast)
-                  .map(UiCommand.JumpToEntryKey::citationKey)
-                  .filter(Objects::nonNull)
-                  .findAny().ifPresent(entryKey -> {
-                      LOGGER.debug("Jump to entry {} requested", entryKey);
-                      // tabs must be present and contents async loaded for an entry to be selected
-                      waitForLoadingFinished(() -> jumpToEntry(entryKey));
-                  });
-    }
-
-    private void jumpToEntry(String entryKey) {
-        // check current library tab first
-        LibraryTab currentLibraryTab = getCurrentLibraryTab();
-        List<LibraryTab> sortedTabs = getLibraryTabs().stream()
-                                                .sorted(Comparator.comparing(tab -> tab != currentLibraryTab))
-                                                .toList();
-        for (LibraryTab libraryTab : sortedTabs) {
-            Optional<BibEntry> bibEntry = libraryTab.getDatabase()
-                                                    .getEntries().stream()
-                                                    .filter(entry -> entry.getCitationKey().orElse("")
-                                                                          .equals(entryKey))
-                                                    .findAny();
-            if (bibEntry.isPresent()) {
-                LOGGER.debug("Found entry {} in library tab {}", entryKey, libraryTab);
-                libraryTab.clearAndSelect(bibEntry.get());
-                showLibraryTab(libraryTab);
-                break;
-            }
-        }
-
-        LOGGER.trace("End of loop");
-
-        if (stateManager.getSelectedEntries().isEmpty()) {
-            dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", entryKey));
-        }
-    }
-
-    private void waitForLoadingFinished(Runnable runnable) {
-        LOGGER.trace("Waiting for all tabs being loaded");
-
-        CompletableFuture<Void> future = new CompletableFuture<>();
-
-        List<ObservableBooleanValue> loadings = getLibraryTabs().stream()
-                                                                .map(LibraryTab::getLoading)
-                                                                .collect(Collectors.toList());
-
-        // Create a listener for each observable
-        ChangeListener<Boolean> listener = (observable, oldValue, newValue) -> {
-            if (observable != null) {
-                loadings.remove(observable);
-            }
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("Count of loading tabs: {}", loadings.size());
-                LOGGER.trace("Count of loading tabs really true: {}", loadings.stream().filter(ObservableBooleanValue::get).count());
-            }
-            for (ObservableBooleanValue obs : loadings) {
-                if (obs.get()) {
-                    // Exit the listener if any of the observables is still true
-                    return;
-                }
-            }
-            // All observables are false, complete the future
-            LOGGER.trace("Future completed");
-            future.complete(null);
-        };
-
-        for (ObservableBooleanValue obs : loadings) {
-            obs.addListener(listener);
-        }
-
-        LOGGER.trace("Fire once");
-        // Due to concurrency, it might be that the observables are already false, so we trigger one evaluation
-        listener.changed(null, null, false);
-        LOGGER.trace("Waiting for state changes...");
-
-        future.thenRun(() -> {
-            LOGGER.debug("All tabs loaded. Jumping to entry.");
-            for (ObservableBooleanValue obs : loadings) {
-                obs.removeListener(listener);
-            }
-            runnable.run();
-        });
+        viewModel.handleUiCommands(uiCommands);
     }
 
     /**
