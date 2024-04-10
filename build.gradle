@@ -53,7 +53,8 @@ java {
         // - .devcontainer/devcontainer.json#L34 and
         // - .github/workflows/deployment-jdk-ea.yml#L53
         languageVersion = JavaLanguageVersion.of(21)
-        vendor = JvmVendorSpec.BELLSOFT
+        // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
+        // vendor = JvmVendorSpec.AMAZON
     }
 }
 
