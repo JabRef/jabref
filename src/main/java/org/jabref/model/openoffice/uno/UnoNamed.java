@@ -3,8 +3,6 @@ package org.jabref.model.openoffice.uno;
 import com.sun.star.container.XNamed;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XTextContent;
-import com.sun.star.text.XTextDocument;
-import com.sun.star.text.XTextRange;
 
 public class UnoNamed {
 
@@ -20,7 +18,7 @@ public class UnoNamed {
      * @return The XNamed interface, in case we need to check the actual name.
      * @param documentAnnotation The DocumentAnnotation object that contains information about the document
      */
-    static XNamed insertNamedTextContent(String service,DocumentAnnotation documentAnnotation)
+    static XNamed insertNamedTextContent(String service, DocumentAnnotation documentAnnotation)
             throws
             CreationException {
 

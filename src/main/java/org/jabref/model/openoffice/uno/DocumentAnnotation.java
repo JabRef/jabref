@@ -6,12 +6,12 @@ import com.sun.star.text.XTextRange;
 /**
  * Represents a document annotation.
  * <p>
+ * 
  *  @param doc    The document.
  *  @param name   For the bookmark.
  *  @param range  Cursor marking the location or range for the bookmark.
  *  @param absorb whether to incorporate the range
  */
-public record DocumentAnnotation(XTextDocument doc, String name, XTextRange range, boolean absorb) {
-   
+public record DocumentAnnotation(XTextDocument doc, String name, XTextRange range, boolean absorb) {  
 }
 

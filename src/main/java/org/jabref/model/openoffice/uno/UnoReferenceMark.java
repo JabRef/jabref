@@ -114,6 +114,6 @@ public class UnoReferenceMark {
     public static XNamed create(DocumentAnnotation documentAnnotation)
             throws
             CreationException {
-        return UnoNamed.insertNamedTextContent( "com.sun.star.text.ReferenceMark", documentAnnotation);
+        return UnoNamed.insertNamedTextContent("com.sun.star.text.ReferenceMark", documentAnnotation);
     }
 }
