@@ -94,7 +94,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.jdk }}
-          distribution: 'zulu'
+          distribution: 'adopt'
       - name: 'Set JDK${{ matrix.jdk }} env var'
         shell: bash
         run: echo "JDK${{ matrix.jdk }}=$JAVA_HOME" >> $GITHUB_ENV
@@ -187,7 +187,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'zulu'
+          distribution: 'adopt'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
