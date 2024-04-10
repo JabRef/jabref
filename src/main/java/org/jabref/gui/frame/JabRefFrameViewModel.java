@@ -261,9 +261,6 @@ public class JabRefFrameViewModel {
      * Should be called when a user asks JabRef at the command line
      * i) to import a file or
      * ii) to open a .bib file
-     *
-     * @param parserResult
-     * @param raisePanel
      */
     private void addParserResult(ParserResult parserResult, boolean raisePanel) {
         if (parserResult.toOpenTab()) {
@@ -370,14 +367,14 @@ public class JabRefFrameViewModel {
     /**
      * Opens the import inspection dialog to let the user decide which of the given entries to import.
      *
-     * @param panel        The BasePanel to add to.
+     * @param tab        The LibraryTab to add to.
      * @param parserResult The entries to add.
      */
-    void addImportedEntries(final LibraryTab panel, final ParserResult parserResult) {
+    void addImportedEntries(final LibraryTab tab, final ParserResult parserResult) {
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
-        ImportCleanup cleanup = ImportCleanup.targeting(panel.getBibDatabaseContext().getMode());
+        ImportCleanup cleanup = ImportCleanup.targeting(tab.getBibDatabaseContext().getMode());
         cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
-        ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
+        ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));
         dialogService.showCustomDialogAndWait(dialog);
     }
