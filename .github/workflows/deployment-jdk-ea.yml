@@ -209,7 +209,15 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - run: find / -name "javafx-base-20-linux.jar"
+      - name: Purge JavaFX from gradle cache (linux, macOS)
+        run: rm -rf /home/runner/.gradle/caches/modules-2/files-2.1/org.openjfx
+      - name: Purge JavaFX from gradle cache (Windows)
+        shell: powershell
+        run: |
+          $path = Join-Path $Env:USERPROFILE "\.gradle\caches\modules-2\files-2.1\org.openjfx"
+          if (Test-Path $path) {
+              Remove-Item -Path $path -Recurse -Force
+          }
       - name: Build runtime image and installer
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
