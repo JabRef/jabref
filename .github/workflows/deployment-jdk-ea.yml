@@ -189,7 +189,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21
-          distribution: 'liberica'
+          distribution: 'temurin'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Prepare merged jars and modules dir
