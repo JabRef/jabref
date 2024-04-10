@@ -8,6 +8,7 @@ import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.style.CitedKeys;
 import org.jabref.model.openoffice.uno.CreationException;
+import org.jabref.model.openoffice.uno.DocumentAnnotation;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoBookmark;
 import org.jabref.model.openoffice.uno.UnoTextSection;
@@ -67,7 +68,8 @@ public class UpdateBibliography {
         // Alternatively, we could receive a cursor.
         XTextCursor textCursor = doc.getText().createTextCursor();
         textCursor.gotoEnd(false);
-        UnoTextSection.create(doc, BIB_SECTION_NAME, textCursor, false);
+        DocumentAnnotation annotation = new DocumentAnnotation(doc, BIB_SECTION_NAME, textCursor, false);
+        UnoTextSection.create(annotation);
     }
 
     /**
@@ -129,7 +131,8 @@ public class UpdateBibliography {
         initialParagraph.setString("");
 
         UnoBookmark.removeIfExists(doc, BIB_SECTION_END_NAME);
-        UnoBookmark.create(doc, BIB_SECTION_END_NAME, cursor, true);
+        DocumentAnnotation annotation = new DocumentAnnotation(doc, BIB_SECTION_END_NAME, cursor, true);
+        UnoBookmark.create(annotation);
 
         cursor.collapseToEnd();
     }

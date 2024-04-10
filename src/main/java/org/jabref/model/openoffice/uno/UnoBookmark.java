@@ -52,16 +52,14 @@ public class UnoBookmark {
      * <p>
      * In LibreOffice the another name is in "{name}{number}" format.
      *
-     * @param name   For the bookmark.
-     * @param range  Cursor marking the location or range for the bookmark.
-     * @param absorb Shall we incorporate range?
      * @return The XNamed interface of the bookmark.
      * result.getName() should be checked by the caller, because its name may differ from the one requested.
+     * @param documentAnnotation The DocumentAnnotation object
      */
-    public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
+    public static XNamed create(DocumentAnnotation documentAnnotation)
             throws
             CreationException {
-        return UnoNamed.insertNamedTextContent(doc, "com.sun.star.text.Bookmark", name, range, absorb);
+        return UnoNamed.insertNamedTextContent( "com.sun.star.text.Bookmark",documentAnnotation);
     }
 
     /**
