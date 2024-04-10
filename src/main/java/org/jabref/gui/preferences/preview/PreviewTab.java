@@ -48,6 +48,7 @@ import org.fxmisc.richtext.LineNumberFactory;
 public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox showAsTabCheckBox;
+    @FXML private CheckBox showPreviewTooltipCheckBox;
     @FXML private ListView<PreviewLayout> availableListView;
     @FXML private ListView<PreviewLayout> chosenListView;
     @FXML private Button toRightButton;
@@ -108,6 +109,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         lastKeyPressTime = System.currentTimeMillis();
 
         showAsTabCheckBox.selectedProperty().bindBidirectional(viewModel.showAsExtraTabProperty());
+        showPreviewTooltipCheckBox.selectedProperty().bindBidirectional(viewModel.showPreviewInEntryTableTooltip());
 
         searchBox.setPromptText(Localization.lang("Search") + "...");
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
