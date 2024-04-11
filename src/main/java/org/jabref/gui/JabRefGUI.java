@@ -27,7 +27,6 @@ import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
-import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,12 +158,7 @@ public class JabRefGUI extends Application {
         }
         debugLogWindowState(mainStage);
 
-        // We create a decoration pane ourselves for performance reasons
-        // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
-        DecorationPane root = new DecorationPane();
-        root.getChildren().add(JabRefGUI.mainFrame);
-
-        Scene scene = new Scene(root, 800, 800);
+        Scene scene = new Scene(JabRefGUI.mainFrame);
         themeManager.installCss(scene);
 
         // Handle TextEditor key bindings
