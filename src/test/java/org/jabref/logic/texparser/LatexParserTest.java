@@ -90,7 +90,7 @@ public class LatexParserTest {
     public void sameFileDifferentDatabases() throws URISyntaxException {
         Path texFile = Path.of(LatexParserTest.class.getResource("paper.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
 
         LatexParserResult expectedParserResult = new LatexParserResult(texFile);
         expectedParserResult.addBibFile(texFile.getParent().resolve("origin.bib"));

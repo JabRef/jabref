@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,10 +65,10 @@ public class DefaultLatexParser implements LatexParser {
     }
 
     @Override
-    public LatexParserResult parse(Path latexFile) {
+    public Optional<LatexParserResult> parse(Path latexFile) {
         if (!Files.exists(latexFile)) {
             LOGGER.error("File does not exist: {}", latexFile);
-            return null;
+            return Optional.empty();
         }
         LatexParserResult latexParserResult = new LatexParserResult(latexFile);
 
@@ -93,17 +94,14 @@ public class DefaultLatexParser implements LatexParser {
             LOGGER.info("Error while parsing file {}", latexFile, e);
         }
 
-        return latexParserResult;
+        return Optional.of(latexParserResult);
     }
 
     @Override
     public LatexParserResults parse(List<Path> latexFiles) {
         for (Path latexFile : latexFiles) {
             if (!latexParserResults.isParsed(latexFile)) {
-                LatexParserResult parsedTex = parse(latexFile);
-                if (parsedTex != null) {
-                    latexParserResults.add(latexFile, parsedTex);
-                }
+                parse(latexFile).ifPresent(parsedTex -> latexParserResults.add(latexFile, parsedTex));
             }
         }
 

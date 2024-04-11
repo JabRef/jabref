@@ -100,7 +100,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     private void startSearch(String citeKey) {
         // we need to check whether the user meanwhile set the LaTeX file directory or the database changed locations
-        checkDirectory();
+        checkAndUpdateDirectory();
 
         searchTask = BackgroundTask.wrap(() -> citationFinder.searchAndParse(citeKey))
                                    .onRunning(() -> status.set(Status.IN_PROGRESS))
@@ -124,7 +124,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         searchTask.cancel(true);
     }
 
-    public void checkDirectory() {
+    public void checkAndUpdateDirectory() {
         Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
                                            .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()));
 

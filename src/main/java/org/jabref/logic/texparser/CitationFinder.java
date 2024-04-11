@@ -27,7 +27,7 @@ public class CitationFinder {
 
     public Collection<Citation> searchAndParse(String citeKey) throws IOException {
         if (latexParserResults == null) {
-            if (!directory.toFile().exists()) {
+            if (!Files.exists(directory)) {
                 throw new IOException("Current search directory does not exist: %s".formatted(directory));
             }
 

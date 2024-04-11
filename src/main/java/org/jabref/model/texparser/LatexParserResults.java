@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -19,9 +20,7 @@ public class LatexParserResults {
         this.parsedTexFiles = new HashMap<>();
     }
 
-    /**
-     * For testing purposes
-     */
+    @VisibleForTesting
     public LatexParserResults(LatexParserResult... parsedFiles) {
         this();
         for (LatexParserResult parsedFile : parsedFiles) {

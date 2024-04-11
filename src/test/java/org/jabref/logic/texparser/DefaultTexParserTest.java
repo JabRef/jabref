@@ -3,6 +3,7 @@ package org.jabref.logic.texparser;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.texparser.LatexParserResults;
@@ -10,7 +11,6 @@ import org.jabref.model.texparser.LatexParserResults;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class DefaultTexParserTest {
 
@@ -75,7 +75,7 @@ public class DefaultTexParserTest {
     public void fileEncodingUtf8() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("utf-8.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
         LatexParserResult expectedParserResult = new LatexParserResult(texFile);
 
         expectedParserResult.addKey("anykey", texFile, 1, 32, 45, "Danach wir anschließend mittels \\cite{anykey}.");
@@ -87,7 +87,7 @@ public class DefaultTexParserTest {
     public void fileEncodingIso88591() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
         LatexParserResult expectedParserResult = new LatexParserResult(texFile);
 
         // The character � is on purpose - we cannot use Apache Tika's CharsetDetector - see ADR-0005
@@ -100,7 +100,7 @@ public class DefaultTexParserTest {
     public void fileEncodingIso885915() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
         LatexParserResult expectedParserResult = new LatexParserResult(texFile);
 
         // The character � is on purpose - we cannot use Apache Tika's CharsetDetector - see ADR-0005
@@ -133,7 +133,7 @@ public class DefaultTexParserTest {
     public void singleFile() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("paper.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
         LatexParserResult expectedParserResult = new LatexParserResult(texFile);
 
         expectedParserResult.addBibFile(texFile.getParent().resolve("origin.bib"));
@@ -193,7 +193,7 @@ public class DefaultTexParserTest {
     public void unknownKey() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("unknown_key.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
         LatexParserResult expectedParserResult = new LatexParserResult(texFile);
 
         expectedParserResult.addBibFile(texFile.getParent().resolve("origin.bib"));
@@ -207,15 +207,15 @@ public class DefaultTexParserTest {
     @Test
     public void fileNotFound() {
         Path texFile = Path.of("file_not_found.tex");
-        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
-        assertNull(parserResult);
+        Optional<LatexParserResult> parserResult = new DefaultLatexParser().parse(texFile);
+        assertEquals(Optional.empty(), parserResult);
     }
 
     @Test
     public void nestedFiles() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("nested.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
         LatexParserResult expectedParserResult = new LatexParserResult(texFile);
 
         expectedParserResult.addBibFile(texFile.getParent().resolve("origin.bib"));
