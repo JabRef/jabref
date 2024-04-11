@@ -146,6 +146,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     public void refreshLatexDirectory() {
         init(currentEntry);
+        citationFinder = new CitationFinder(directory.get());
     }
 
     public boolean shouldShow() {
