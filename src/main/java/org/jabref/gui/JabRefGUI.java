@@ -176,13 +176,12 @@ public class JabRefGUI extends Application {
     }
 
     public void onShowing(WindowEvent event) {
+        Platform.runLater(() -> mainFrame.updateDividerPosition());
+
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
             && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
-            Platform.runLater(() -> {
-                mainFrame.updateDividerPosition();
-                mainFrame.openLastEditedDatabases();
-            });
+            mainFrame.openLastEditedDatabases();
         }
 
         Telemetry.initTrackingNotification(dialogService, preferencesService.getTelemetryPreferences());
