@@ -184,6 +184,8 @@ public class JabRefGUI extends Application {
                 mainFrame.openLastEditedDatabases();
             });
         }
+
+        Telemetry.initTrackingNotification(dialogService, preferencesService.getTelemetryPreferences());
     }
 
     public void onCloseRequest(WindowEvent event) {

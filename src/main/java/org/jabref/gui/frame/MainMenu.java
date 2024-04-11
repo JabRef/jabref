@@ -82,6 +82,7 @@ import org.jabref.preferences.PreferencesService;
 
 public class MainMenu extends MenuBar {
     private final JabRefFrame frame;
+    private final FileHistoryMenu fileHistoryMenu;
     private final SidePane sidePane;
     private final PushToApplicationCommand pushToApplicationCommand;
     private final PreferencesService preferencesService;
@@ -96,6 +97,7 @@ public class MainMenu extends MenuBar {
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
 
     public MainMenu(JabRefFrame frame,
+                    FileHistoryMenu fileHistoryMenu,
                     SidePane sidePane,
                     PushToApplicationCommand pushToApplicationCommand,
                     PreferencesService preferencesService,
@@ -109,6 +111,7 @@ public class MainMenu extends MenuBar {
                     ClipBoardManager clipBoardManager,
                     Supplier<OpenDatabaseAction> openDatabaseActionSupplier) {
         this.frame = frame;
+        this.fileHistoryMenu = fileHistoryMenu;
         this.sidePane = sidePane;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.preferencesService = preferencesService;
@@ -139,7 +142,7 @@ public class MainMenu extends MenuBar {
         file.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
                 factory.createMenuItem(StandardActions.OPEN_LIBRARY, openDatabaseActionSupplier.get()),
-                frame.getFileHistory(),
+                fileHistoryMenu,
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferencesService, dialogService)),

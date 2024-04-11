@@ -14,9 +14,9 @@ public interface LibraryTabContainer {
 
     void showLibraryTab(LibraryTab libraryTab);
 
-    void addTab(LibraryTab libraryTab, boolean raisePanel);
-
     void addTab(BibDatabaseContext bibDatabaseContext, boolean raisePanel);
+
+    void addTab(LibraryTab libraryTab, boolean raisePanel);
 
     /**
      * Closes a designated libraryTab
