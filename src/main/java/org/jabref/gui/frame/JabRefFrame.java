@@ -399,7 +399,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     }
 
     /**
-     * Returns the currently viewed BasePanel.
+     * Returns the currently viewed LibraryTab.
      */
     public LibraryTab getCurrentLibraryTab() {
         if (tabbedPane.getSelectionModel().getSelectedItem() == null) {
