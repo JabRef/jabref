@@ -23,17 +23,20 @@ public class PreviewPreferences {
     private final ObjectProperty<TextBasedPreviewLayout> customPreviewLayout;
     private final StringProperty defaultCustomPreviewLayout;
     private final BooleanProperty showPreviewAsExtraTab;
+    private final BooleanProperty showPreviewEntryTableTooltip;
 
     public PreviewPreferences(List<PreviewLayout> layoutCycle,
                               int layoutCyclePosition,
                               TextBasedPreviewLayout customPreviewLayout,
                               String defaultCustomPreviewLayout,
-                              boolean showPreviewAsExtraTab) {
+                              boolean showPreviewAsExtraTab,
+                              boolean showPreviewEntryTableTooltip) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
         this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
         this.customPreviewLayout = new SimpleObjectProperty<>(customPreviewLayout);
         this.defaultCustomPreviewLayout = new SimpleStringProperty(defaultCustomPreviewLayout);
         this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
+        this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
     }
 
     public ObservableList<PreviewLayout> getLayoutCycle() {
@@ -90,11 +93,23 @@ public class PreviewPreferences {
         return showPreviewAsExtraTab.getValue();
     }
 
+    public void setShowPreviewAsExtraTab(boolean showPreviewAsExtraTab) {
+        this.showPreviewAsExtraTab.set(showPreviewAsExtraTab);
+    }
+
     public BooleanProperty showPreviewAsExtraTabProperty() {
         return showPreviewAsExtraTab;
     }
 
-    public void setShowPreviewAsExtraTab(boolean showPreviewAsExtraTab) {
-        this.showPreviewAsExtraTab.set(showPreviewAsExtraTab);
+    public boolean shouldShowPreviewEntryTableTooltip() {
+        return showPreviewEntryTableTooltip.getValue();
+    }
+
+    public void setShowPreviewEntryTableTooltip(boolean showPreviewEntryTableTooltip) {
+        this.showPreviewEntryTableTooltip.set(showPreviewEntryTableTooltip);
+    }
+
+    public BooleanProperty showPreviewEntryTableTooltip() {
+        return showPreviewEntryTableTooltip;
     }
 }
