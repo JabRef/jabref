@@ -3,7 +3,6 @@ package org.jabref.logic.texparser;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
@@ -46,7 +45,7 @@ public class TexBibEntriesResolver {
                         LOGGER.error("Error opening file '{}'", path, e);
                         return ParserResult.fromError(e).getDatabase();
                     }
-                }).collect(Collectors.toList());
+                }).toList();
 
         // Add all new entries to the newEntries set.
         List<BibEntry> newEntries = findNewEntries(bibDatabases, latexParserResults.getCitations().keySet());

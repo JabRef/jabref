@@ -17,16 +17,11 @@ public class CitationFinder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationFinder.class);
     private static final String TEX_EXT = ".tex";
-    private Path directory;
+    private final Path directory;
 
     private LatexParserResults latexParserResults;
 
     public CitationFinder(Path directory) {
-        this.directory = directory;
-    }
-
-    public void setDirectory(Path directory) {
-        latexParserResults = null;
         this.directory = directory;
     }
 

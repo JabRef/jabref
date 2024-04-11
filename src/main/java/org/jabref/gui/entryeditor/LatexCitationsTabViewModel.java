@@ -44,7 +44,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final ObjectProperty<Path> directory;
-    private final CitationFinder citationFinder;
+    private CitationFinder citationFinder;
     private final ObservableList<Citation> citationList;
     private final ObjectProperty<Status> status;
     private final StringProperty searchError;
@@ -61,6 +61,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.dialogService = dialogService;
         this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
                                                                    .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory())));
+
         this.citationFinder = new CitationFinder(directory.get());
         this.citationList = FXCollections.observableArrayList();
         this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
@@ -114,16 +115,6 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                                    .executeWith(taskExecutor);
     }
 
-    public void checkDirectory() {
-        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
-                                           .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()));
-
-        if (!newDirectory.equals(directory.get())) {
-            directory.set(newDirectory);
-            citationFinder.setDirectory(newDirectory);
-        }
-    }
-
     private void cancelSearch() {
         if (searchTask == null || searchTask.isCancelled() || searchTask.isDone()) {
             return;
@@ -131,6 +122,16 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         status.set(Status.IN_PROGRESS);
         searchTask.cancel(true);
+    }
+
+    public void checkDirectory() {
+        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
+                                           .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()));
+
+        if (!newDirectory.equals(directory.get())) {
+            directory.set(newDirectory);
+            citationFinder = new CitationFinder(newDirectory);
+        }
     }
 
     public void setLatexDirectory() {
