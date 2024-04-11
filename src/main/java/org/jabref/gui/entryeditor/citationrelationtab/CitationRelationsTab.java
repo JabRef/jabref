@@ -43,9 +43,12 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
@@ -78,6 +81,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
+    private final DuplicateCheck duplicateCheck;
 
     public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService,
                                 BibDatabaseContext databaseContext, UndoManager undoManager,
@@ -95,6 +99,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
+        this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferencesService.getImporterPreferences()),
                 new BibEntryRelationsCache());
         citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService, fileUpdateMonitor, Globals.TASK_EXECUTOR);
@@ -389,17 +394,13 @@ public class CitationRelationsTab extends EntryEditorTab {
         hideNodes(abortButton, progress);
 
         observableList.setAll(fetchedList.stream().map(entr -> {
-            for (BibEntry databaseEntry : databaseContext.getDatabase().getEntries()) {
-                Optional<String> title1Optional = databaseEntry.getTitle();
-                Optional<String> title2Optional = entr.getTitle();
-                if (title1Optional.isPresent() && title2Optional.isPresent()) {
-                    String title1 = title1Optional.get().replaceAll("[{}]", "").toLowerCase();
-                    String title2 = title2Optional.get().replaceAll("[{}]", "").toLowerCase();
+            Optional<BibEntry> duplicate = duplicateCheck.containsDuplicate(
+                    databaseContext.getDatabase(),
+                    entr,
+                    BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()));
 
-                    if (title1.equals(title2)) {
-                        return new CitationRelationItem(entr, databaseEntry, true);
-                    }
-                }
+            if (duplicate.isPresent()) {
+                return new CitationRelationItem(entr, duplicate.get(), true);
             }
             return new CitationRelationItem(entr, null, false);
         }).collect(Collectors.toList()));
