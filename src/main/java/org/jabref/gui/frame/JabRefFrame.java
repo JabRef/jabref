@@ -9,8 +9,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
@@ -259,22 +257,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         splitPane.getItems().addAll(tabbedPane);
         SplitPane.setResizableWithParent(sidePane, false);
-
-        sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
-        updateSidePane();
-
-        // We need to wait with setting the divider since it gets reset a few times during the initial set-up
-        mainStage.showingProperty().addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                if (mainStage.isShowing()) {
-                    Platform.runLater(() -> {
-                        setDividerPosition();
-                        observable.removeListener(this);
-                    });
-                }
-            }
-        });
+        EasyBind.subscribe(sidePane.widthProperty(), c -> updateSidePane());
 
         setCenter(splitPane);
     }
@@ -288,15 +271,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         } else {
             if (!splitPane.getItems().contains(sidePane)) {
                 splitPane.getItems().addFirst(sidePane);
-                setDividerPosition();
+                updateDividerPosition();
             }
         }
     }
 
-    private void setDividerPosition() {
+    public void updateDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
             splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth() / splitPane.getWidth());
-            dividerSubscription = EasyBind.subscribe(sidePane.widthProperty(), width -> prefs.getGuiPreferences().setSidePaneWidth(width.doubleValue()));
+            dividerSubscription = EasyBind.listen(sidePane.widthProperty(), (obs, old, newVal) -> prefs.getGuiPreferences().setSidePaneWidth(newVal.doubleValue()));
         }
     }
 

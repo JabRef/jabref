@@ -185,7 +185,10 @@ public class JabRefGUI extends Application {
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
             && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
-            mainFrame.openLastEditedDatabases();
+            Platform.runLater(() -> {
+                mainFrame.updateDividerPosition();
+                mainFrame.openLastEditedDatabases();
+            });
         }
     }
 
