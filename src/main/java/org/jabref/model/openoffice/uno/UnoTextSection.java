@@ -70,7 +70,7 @@ public class UnoTextSection {
             throws
             CreationException {
 
-        return UnoNamed.insertNamedTextContent( "com.sun.star.text.TextSection",documentAnnotation);
+        return UnoNamed.insertNamedTextContent("com.sun.star.text.TextSection", documentAnnotation);
     }
 }
 

@@ -59,7 +59,7 @@ public class UnoBookmark {
     public static XNamed create(DocumentAnnotation documentAnnotation)
             throws
             CreationException {
-        return UnoNamed.insertNamedTextContent( "com.sun.star.text.Bookmark",documentAnnotation);
+        return UnoNamed.insertNamedTextContent("com.sun.star.text.Bookmark", documentAnnotation);
     }
 
     /**
