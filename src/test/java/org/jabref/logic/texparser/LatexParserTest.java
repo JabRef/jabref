@@ -2,7 +2,7 @@ package org.jabref.logic.texparser;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -11,9 +11,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 import org.jabref.model.texparser.LatexParserResult;
+import org.jabref.model.texparser.LatexParserResults;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.LibraryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,14 +31,12 @@ public class LatexParserTest {
     private final static String EINSTEIN_C = "Einstein1920c";
 
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
-    private LibraryPreferences libraryPreferences;
     private ImportFormatPreferences importFormatPreferences;
     private BibDatabase database;
     private BibDatabase database2;
 
     @BeforeEach
     void setUp() {
-        libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
         database = new BibDatabase();
@@ -92,23 +90,22 @@ public class LatexParserTest {
     public void sameFileDifferentDatabases() throws URISyntaxException {
         Path texFile = Path.of(LatexParserTest.class.getResource("paper.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
-        LatexParserResult expectedParserResult = new LatexParserResult();
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
 
-        expectedParserResult.getFileList().add(texFile);
-        expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
+        LatexParserResult expectedParserResult = new LatexParserResult(texFile);
+        expectedParserResult.addBibFile(texFile.getParent().resolve("origin.bib"));
         expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
         expectedParserResult.addKey(DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.");
         expectedParserResult.addKey(EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.");
         expectedParserResult.addKey(DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}");
 
-        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, libraryPreferences, importFormatPreferences, fileMonitor).resolve(parserResult);
-        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(expectedParserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(new LatexParserResults(parserResult));
+        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(new LatexParserResults(expectedParserResult));
 
         assertEquals(expectedCrossingResult, crossingResult);
 
-        LatexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, libraryPreferences, importFormatPreferences, fileMonitor).resolve(parserResult);
-        LatexBibEntriesResolverResult expectedCrossingResult2 = new LatexBibEntriesResolverResult(expectedParserResult);
+        LatexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, importFormatPreferences, fileMonitor).resolve(new LatexParserResults(parserResult));
+        LatexBibEntriesResolverResult expectedCrossingResult2 = new LatexBibEntriesResolverResult(new LatexParserResults(expectedParserResult));
 
         expectedCrossingResult2.addEntry(database.getEntryByCitationKey(EINSTEIN).get());
         expectedCrossingResult2.addEntry(database.getEntryByCitationKey(DARWIN).get());
@@ -121,27 +118,30 @@ public class LatexParserTest {
         Path texFile = Path.of(LatexParserTest.class.getResource("paper.tex").toURI());
         Path texFile2 = Path.of(LatexParserTest.class.getResource("paper2.tex").toURI());
 
-        LatexParserResult parserResult = new DefaultLatexParser().parse(Arrays.asList(texFile, texFile2));
-        LatexParserResult expectedParserResult = new LatexParserResult();
+        LatexParserResults parserResults = new DefaultLatexParser().parse(List.of(texFile, texFile2));
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResults);
 
-        expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2));
-        expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
-        expectedParserResult.addBibFile(texFile2, texFile2.getParent().resolve("origin.bib"));
+        LatexParserResult expectedParserResult = new LatexParserResult(texFile);
+        expectedParserResult.addBibFile(texFile.getParent().resolve("origin.bib"));
         expectedParserResult.addKey(EINSTEIN, texFile, 4, 0, 19, "\\cite{Einstein1920}");
         expectedParserResult.addKey(DARWIN, texFile, 5, 0, 17, "\\cite{Darwin1888}.");
         expectedParserResult.addKey(EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.");
         expectedParserResult.addKey(DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}");
-        expectedParserResult.addKey(DARWIN, texFile2, 4, 48, 65, "This is some content trying to cite a bib file: \\cite{Darwin1888}");
-        expectedParserResult.addKey(EINSTEIN, texFile2, 5, 48, 67, "This is some content trying to cite a bib file: \\cite{Einstein1920}");
-        expectedParserResult.addKey(NEWTON, texFile2, 6, 48, 65, "This is some content trying to cite a bib file: \\cite{Newton1999}");
 
-        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, libraryPreferences, importFormatPreferences, fileMonitor).resolve(parserResult);
-        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(expectedParserResult);
+        LatexParserResult expectedParserResult2 = new LatexParserResult(texFile2);
+        expectedParserResult2.addBibFile(texFile2.getParent().resolve("origin.bib"));
+        expectedParserResult2.addKey(DARWIN, texFile2, 4, 48, 65, "This is some content trying to cite a bib file: \\cite{Darwin1888}");
+        expectedParserResult2.addKey(EINSTEIN, texFile2, 5, 48, 67, "This is some content trying to cite a bib file: \\cite{Einstein1920}");
+        expectedParserResult2.addKey(NEWTON, texFile2, 6, 48, 65, "This is some content trying to cite a bib file: \\cite{Newton1999}");
+
+        LatexParserResults expectedParserResults = new LatexParserResults(expectedParserResult, expectedParserResult2);
+
+        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(expectedParserResults);
 
         assertEquals(expectedCrossingResult, crossingResult);
 
-        LatexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, libraryPreferences, importFormatPreferences, fileMonitor).resolve(parserResult);
-        LatexBibEntriesResolverResult expectedCrossingResult2 = new LatexBibEntriesResolverResult(expectedParserResult);
+        LatexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, importFormatPreferences, fileMonitor).resolve(parserResults);
+        LatexBibEntriesResolverResult expectedCrossingResult2 = new LatexBibEntriesResolverResult(expectedParserResults);
 
         expectedCrossingResult2.addEntry(database.getEntryByCitationKey(EINSTEIN).get());
         expectedCrossingResult2.addEntry(database.getEntryByCitationKey(DARWIN).get());
