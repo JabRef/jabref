@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -23,11 +21,9 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -218,7 +214,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     VBox vContainer = new VBox();
 
                     if (entry.isLocal()) {
-                        hContainer.setBackground(Background.fill(Color.LIGHTGREEN));
+                        hContainer.getStyleClass().add("duplicate-entry");
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
                         jumpTo.getStyleClass().add("addEntryButton");
@@ -393,17 +389,16 @@ public class CitationRelationsTab extends EntryEditorTab {
                                              ObservableList<CitationRelationItem> observableList) {
         hideNodes(abortButton, progress);
 
-        observableList.setAll(fetchedList.stream().map(entr -> {
-            Optional<BibEntry> duplicate = duplicateCheck.containsDuplicate(
+        observableList.setAll(
+        fetchedList.stream()
+            .map(entr -> duplicateCheck.containsDuplicate(
                     databaseContext.getDatabase(),
                     entr,
-                    BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()));
-
-            if (duplicate.isPresent()) {
-                return new CitationRelationItem(entr, duplicate.get(), true);
-            }
-            return new CitationRelationItem(entr, null, false);
-        }).collect(Collectors.toList()));
+                    BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()))
+                .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
+                .orElseGet(() -> new CitationRelationItem(entr, null, false)))
+            .toList()
+    );
 
         if (!observableList.isEmpty()) {
             listView.refresh();

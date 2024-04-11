@@ -739,6 +739,10 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -jr-warn;
 }
 
+.duplicate-entry {
+    -fx-background-color: -jr-light-green;
+}
+
 .file-row-text {
     -fx-fill: -jr-search-text;
 }
