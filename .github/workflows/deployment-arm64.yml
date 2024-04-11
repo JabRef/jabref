@@ -1,4 +1,4 @@
-name: Deployment for macOS/ARM64
+name: Deployment (macOS/ARM64)
 on:
   push:
     branches:
