@@ -66,7 +66,7 @@ public class UnoTextSection {
      *
      * @param documentAnnotation The DocumentAnnotation object
      */
-    public static XNamed create(org.jabref.model.openoffice.uno.DocumentAnnotation documentAnnotation)
+    public static XNamed create(DocumentAnnotation documentAnnotation)
             throws
             CreationException {
 
