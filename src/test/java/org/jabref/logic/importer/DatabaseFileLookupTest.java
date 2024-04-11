@@ -53,7 +53,6 @@ class DatabaseFileLookupTest {
         database = result.getDatabase();
         entries = database.getEntries();
 
-        tempDir = Files.createTempDirectory("testDir");
         txtFileDir = tempDir.resolve("x.txt");
         txtFileDirPath = txtFileDir.toAbsolutePath().toString();
         Files.write(txtFileDir, Collections.singleton("x.txt file contents for test"));
