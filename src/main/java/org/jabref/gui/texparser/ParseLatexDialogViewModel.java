@@ -170,7 +170,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         List<Path> files = fileListPartition.get(false)
                                             .stream()
                                             .filter(path -> path.toString().endsWith(TEX_EXT))
-                                            .collect(Collectors.toList());
+                                            .toList();
         int fileCount = 0;
 
         for (Path subDirectory : subDirectories) {
@@ -185,7 +185,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         parent.setFileCount(files.size() + fileCount);
         parent.getChildren().addAll(files.stream()
                                          .map(FileNodeViewModel::new)
-                                         .collect(Collectors.toList()));
+                                         .toList());
         return parent;
     }
 
@@ -196,7 +196,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         List<Path> fileList = checkedFileList.stream()
                                              .map(item -> item.getValue().getPath())
                                              .filter(path -> path.toFile().isFile())
-                                             .collect(Collectors.toList());
+                                             .toList();
         if (fileList.isEmpty()) {
             LOGGER.warn("There are no valid files checked");
             return;
@@ -204,7 +204,6 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(
                 databaseContext.getDatabase(),
-                preferencesService.getLibraryPreferences(),
                 preferencesService.getImportFormatPreferences(),
                 fileMonitor);
 
