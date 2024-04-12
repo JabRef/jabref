@@ -9,4 +9,7 @@ public record CitationRelationItem(
         BibEntry entry,
         BibEntry localEntry,
         boolean isLocal) {
+    public CitationRelationItem(BibEntry entry, boolean isLocal) {
+        this(entry, null, isLocal);
+    }
 }

@@ -396,7 +396,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     entr,
                     BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()))
                 .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
-                .orElseGet(() -> new CitationRelationItem(entr, null, false)))
+                .orElseGet(() -> new CitationRelationItem(entr, false)))
             .toList()
     );
 
