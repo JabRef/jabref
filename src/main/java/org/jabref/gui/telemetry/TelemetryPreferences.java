@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.gui.telemetry;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

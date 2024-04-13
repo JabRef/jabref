@@ -16,6 +16,7 @@ import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
