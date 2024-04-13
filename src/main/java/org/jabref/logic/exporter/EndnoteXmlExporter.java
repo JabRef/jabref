@@ -2,27 +2,23 @@ package org.jabref.logic.exporter;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
@@ -32,42 +28,57 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class EndnoteXmlExporter extends Exporter {
-
-    private static final String ENDNOTE_XML_VERSION = "20.1";
-    private static final Map<EntryType, String> EXPORT_ITEM_TYPE = new LinkedHashMap<>(Map.ofEntries(
+    private static final Map<EntryType, String> ENTRY_TYPE_MAPPING = Map.ofEntries(
             Map.entry(StandardEntryType.Article, "Journal Article"),
             Map.entry(StandardEntryType.Book, "Book"),
             Map.entry(StandardEntryType.InBook, "Book Section"),
             Map.entry(StandardEntryType.InCollection, "Book Section"),
-            Map.entry(StandardEntryType.InProceedings, "Conference Paper"),
-            Map.entry(StandardEntryType.Conference, "Conference"),
+            Map.entry(StandardEntryType.Proceedings, "Conference Proceedings"),
             Map.entry(StandardEntryType.MastersThesis, "Thesis"),
             Map.entry(StandardEntryType.PhdThesis, "Thesis"),
-            Map.entry(StandardEntryType.Proceedings, "Conference Proceedings"),
             Map.entry(StandardEntryType.TechReport, "Report"),
             Map.entry(StandardEntryType.Unpublished, "Manuscript"),
+            Map.entry(StandardEntryType.InProceedings, "Conference Paper"),
+            Map.entry(StandardEntryType.Conference, "Conference"),
             Map.entry(IEEETranEntryType.Patent, "Patent"),
             Map.entry(StandardEntryType.Online, "Web Page"),
             Map.entry(IEEETranEntryType.Electronic, "Electronic Article"),
             Map.entry(StandardEntryType.Misc, "Generic")
-    ));
+    );
 
-    private static final Map<EntryType, String> EXPORT_REF_NUMBER = EXPORT_ITEM_TYPE.keySet()
-                                                                                    .stream()
-                                                                                    .collect(Collectors.toMap(
-                                                                                            entryType -> entryType,
-                                                                                            entryType -> Integer.toString(EXPORT_ITEM_TYPE.keySet().stream().toList().indexOf(entryType) + 1),
-                                                                                            (e1, e2) -> e1,
-                                                                                            LinkedHashMap::new
-                                                                                    ));
-
-    private final AuthorListParser authorListParser;
-    private final DocumentBuilderFactory dbFactory;
+    private static final Map<Field, String> FIELD_MAPPING = Map.ofEntries(
+            Map.entry(StandardField.TITLE, "title"),
+            Map.entry(StandardField.AUTHOR, "authors"),
+            Map.entry(StandardField.EDITOR, "secondary-authors"),
+            Map.entry(StandardField.YEAR, "year"),
+            Map.entry(StandardField.MONTH, "pub-dates"),
+            Map.entry(StandardField.JOURNAL, "full-title"),
+            Map.entry(StandardField.JOURNALTITLE, "full-title"),
+            Map.entry(StandardField.BOOKTITLE, "secondary-title"),
+            Map.entry(StandardField.EDITION, "edition"),
+            Map.entry(StandardField.SERIES, "tertiary-title"),
+            Map.entry(StandardField.VOLUME, "volume"),
+            Map.entry(StandardField.NUMBER, "number"),
+            Map.entry(StandardField.ISSUE, "issue"),
+            Map.entry(StandardField.PAGES, "pages"),
+            Map.entry(StandardField.PUBLISHER, "publisher"),
+            Map.entry(StandardField.ADDRESS, "pub-location"),
+            Map.entry(StandardField.CHAPTER, "section"),
+            Map.entry(StandardField.HOWPUBLISHED, "work-type"),
+            Map.entry(StandardField.INSTITUTION, "publisher"),
+            Map.entry(StandardField.ORGANIZATION, "publisher"),
+            Map.entry(StandardField.SCHOOL, "publisher"),
+            Map.entry(StandardField.ISBN, "isbn"),
+            Map.entry(StandardField.ISSN, "isbn"),
+            Map.entry(StandardField.DOI, "electronic-resource-num"),
+            Map.entry(StandardField.URL, "web-urls"),
+            Map.entry(StandardField.FILE, "pdf-urls"),
+            Map.entry(StandardField.ABSTRACT, "abstract"),
+            Map.entry(StandardField.KEYWORDS, "keywords")
+    );
 
     public EndnoteXmlExporter() {
         super("endnote", "EndNote XML", StandardFileType.XML);
-        this.authorListParser = new AuthorListParser();
-        this.dbFactory = DocumentBuilderFactory.newInstance();
     }
 
     @Override
@@ -80,158 +91,68 @@ public class EndnoteXmlExporter extends Exporter {
             return;
         }
 
-        try {
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document document = dBuilder.newDocument();
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document document = dBuilder.newDocument();
 
-            Element rootElement = document.createElement("xml");
-            document.appendChild(rootElement);
+        Element rootElement = document.createElement("xml");
+        document.appendChild(rootElement);
 
-            Element recordsElement = document.createElement("records");
-            rootElement.appendChild(recordsElement);
+        Element recordsElement = document.createElement("records");
+        rootElement.appendChild(recordsElement);
 
-            for (BibEntry entry : entries) {
-                Element recordElement = writeEntry(entry, document);
-                recordsElement.appendChild(recordElement);
-            }
+        for (BibEntry entry : entries) {
+            Element recordElement = document.createElement("record");
+            recordsElement.appendChild(recordElement);
 
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            // Map entry type
+            EntryType entryType = entry.getType();
+            String refType = ENTRY_TYPE_MAPPING.getOrDefault(entryType, "Generic");
+            Element refTypeElement = document.createElement("ref-type");
+            refTypeElement.setAttribute("name", refType);
+            refTypeElement.setTextContent(String.valueOf(new ArrayList<>(ENTRY_TYPE_MAPPING.values()).indexOf(refType)));
+            recordElement.appendChild(refTypeElement);
 
-            DOMSource source = new DOMSource(document);
-            StreamResult result = new StreamResult(file.toFile());
-            transformer.transform(source, result);
-        } catch (
-                ParserConfigurationException |
-                TransformerException e) {
-            throw new SaveException(e);
-        }
-    }
+            // Map authors and editors
+            entry.getField(StandardField.AUTHOR).ifPresent(authors -> {
+                Element authorsElement = document.createElement("contributors");
+                Element authorsNameElement = document.createElement("authors");
+                authorsNameElement.setTextContent(authors);
+                authorsElement.appendChild(authorsNameElement);
+                recordElement.appendChild(authorsElement);
+            });
 
-    private Element writeEntry(BibEntry entry, Document document) {
-        Element recordElement = document.createElement("record");
+            entry.getField(StandardField.EDITOR).ifPresent(editors -> {
+                Element contributorsElement = document.createElement("contributors");
+                Element editorsElement = document.createElement("secondary-authors");
+                editorsElement.setTextContent(editors);
+                contributorsElement.appendChild(editorsElement);
+                recordElement.appendChild(contributorsElement);
+            });
 
-        // Write the necessary fields and elements
-        writeField(document, recordElement, "database", "endnote.enl", Map.of("name", "My EndNote Library.enl", "path", "/path/to/My EndNote Library.enl"));
-        writeField(document, recordElement, "source-app", "JabRef", Map.of("name", "JabRef", "version", ENDNOTE_XML_VERSION));
-        writeField(document, recordElement, "rec-number", entry.getId(), null);
+            // Map fields
+            for (Map.Entry<Field, String> fieldMapping : FIELD_MAPPING.entrySet()) {
+                Field field = fieldMapping.getKey();
+                String xmlElement = fieldMapping.getValue();
 
-        Element foreignKeysElement = document.createElement("foreign-keys");
-        Element keyElement = document.createElement("key");
-        keyElement.setAttribute("app", "EN");
-        keyElement.appendChild(document.createTextNode(entry.getId()));
-        foreignKeysElement.appendChild(keyElement);
-        recordElement.appendChild(foreignKeysElement);
-
-        writeField(document, recordElement, "ref-type", EXPORT_REF_NUMBER.getOrDefault(entry.getType(), "Generic"), Map.of("name", EXPORT_ITEM_TYPE.getOrDefault(entry.getType(), "Generic")));
-
-        writeContributors(entry, document, recordElement);
-        writeField(document, recordElement, "titles", Map.of(), entry.getField(StandardField.TITLE).orElse(""), "title");
-        writeField(document, recordElement, "secondary-title", entry.getField(StandardField.SERIES).orElse(""), null);
-        writeField(document, recordElement, "periodical", Map.of(), entry.getField(StandardField.JOURNAL).orElse(""), "full-title");
-        writeField(document, recordElement, "tertiary-title", entry.getField(StandardField.BOOKTITLE).orElse(""), null);
-        writeField(document, recordElement, "pages", entry.getField(StandardField.PAGES).orElse(""), null);
-        writeField(document, recordElement, "volume", entry.getField(StandardField.VOLUME).orElse(""), null);
-        writeField(document, recordElement, "number", entry.getField(StandardField.NUMBER).orElse(""), null);
-        writeField(document, recordElement, "dates", Map.of(), entry.getField(StandardField.YEAR).orElse(""), "year");
-        writePublisher(entry, document, recordElement);
-        writeField(document, recordElement, "isbn", entry.getField(StandardField.ISBN).orElse(""), null);
-        writeField(document, recordElement, "abstract", entry.getField(StandardField.ABSTRACT).orElse(""), null);
-        writeField(document, recordElement, "notes", entry.getField(StandardField.NOTE).orElse(""), null);
-        writeField(document, recordElement, "urls", Map.of(), entry.getField(StandardField.URL).orElse(""), "related-urls");
-        writeField(document, recordElement, "electronic-resource-num", entry.getField(StandardField.DOI).orElse(""), null);
-        writeField(document, recordElement, "month", entry.getField(StandardField.MONTH).orElse(""), null);
-        writeField(document, recordElement, "day", entry.getField(StandardField.DAY).orElse(""), null);
-        writeField(document, recordElement, "pagetotal", entry.getField(StandardField.PAGETOTAL).orElse(""), null);
-
-        return recordElement;
-    }
-
-    private void writeField(Document document, Element parentElement, String name, String value, Map<String, String> attributes) {
-        if (value != null && !value.isEmpty()) {
-            Element fieldElement = document.createElement(name);
-            if (attributes != null) {
-                for (Map.Entry<String, String> attribute : attributes.entrySet()) {
-                    fieldElement.setAttribute(attribute.getKey(), attribute.getValue());
+                if (field != StandardField.AUTHOR && field != StandardField.EDITOR) {
+                    entry.getField(field).ifPresent(value -> {
+                        Element fieldElement = document.createElement(xmlElement);
+                        fieldElement.setTextContent(value);
+                        recordElement.appendChild(fieldElement);
+                    });
                 }
             }
-            if ("url".equals(name)) {
-                Element urlsElement = document.createElement("urls");
-                Element webUrlsElement = document.createElement("web-urls");
-                createStyleElement(document, webUrlsElement, value);
-                urlsElement.appendChild(webUrlsElement);
-                fieldElement.appendChild(urlsElement);
-            } else {
-                createStyleElement(document, fieldElement, value);
-            }
-            parentElement.appendChild(fieldElement);
         }
-    }
 
-    private void writeField(Document document, Element parentElement, String name, Map<String, String> attributes, String childValue, String childElementName) {
-        Element fieldElement = document.createElement(name);
-        if (attributes != null) {
-            for (Map.Entry<String, String> attribute : attributes.entrySet()) {
-                fieldElement.setAttribute(attribute.getKey(), attribute.getValue());
-            }
-        }
-        if (childValue != null && !childValue.isEmpty()) {
-            Element childElement = document.createElement(childElementName);
-            createStyleElement(document, childElement, childValue);
-            fieldElement.appendChild(childElement);
-        }
-        parentElement.appendChild(fieldElement);
-    }
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
-    private void createStyleElement(Document document, Element parentElement, String value) {
-        Element styleElement = document.createElement("style");
-        styleElement.setAttribute("face", "normal");
-        styleElement.setAttribute("font", "default");
-        styleElement.setAttribute("size", "100%");
-        styleElement.appendChild(document.createTextNode(value));
-        parentElement.appendChild(styleElement);
-    }
-
-    private void writeContributors(BibEntry entry, Document document, Element parentElement) {
-        entry.getField(StandardField.AUTHOR).ifPresent(authors -> {
-            Element contributorsElement = document.createElement("contributors");
-            Element authorsElement = document.createElement("authors");
-
-            // Parse the authors string and get the list of Author objects
-            List<Author> authorList = authorListParser.parse(authors).getAuthors();
-
-            // Iterate over each Author object and create the corresponding XML elements
-            for (Author author : authorList) {
-                Element authorElement = document.createElement("author");
-                Element styleElement = document.createElement("style");
-                styleElement.setAttribute("face", "normal");
-                styleElement.setAttribute("font", "default");
-                styleElement.setAttribute("size", "100%");
-                styleElement.appendChild(document.createTextNode(author.getFamilyGiven(false)));
-                authorElement.appendChild(styleElement);
-                authorsElement.appendChild(authorElement);
-            }
-
-            contributorsElement.appendChild(authorsElement);
-            parentElement.appendChild(contributorsElement);
-        });
-    }
-
-    private void writePublisher(BibEntry entry, Document document, Element parentElement) {
-        String publisher = entry.getField(StandardField.PUBLISHER).orElse("");
-        String address = entry.getField(StandardField.ADDRESS).orElse("");
-        if (!publisher.isEmpty() || !address.isEmpty()) {
-            Element publisherElement = document.createElement("publisher");
-            if (!publisher.isEmpty()) {
-                writeField(document, publisherElement, "publisher", publisher, null);
-            }
-            if (!address.isEmpty()) {
-                writeField(document, publisherElement, "address", address, null);
-            }
-            parentElement.appendChild(publisherElement);
-        }
+        DOMSource source = new DOMSource(document);
+        StreamResult result = new StreamResult(file.toFile());
+        transformer.transform(source, result);
     }
 }

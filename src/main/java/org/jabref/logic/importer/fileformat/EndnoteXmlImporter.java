@@ -4,12 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -27,43 +24,72 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.KeywordList;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 
-import com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Importer for the Endnote XML format.
- * <p>
- * Based on dtd scheme downloaded from Article #122577 in http://kbportal.thomson.com.
- */
 public class EndnoteXmlImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EndnoteXmlImporter.class);
+    private static final Map<EntryType, String> ENTRY_TYPE_MAPPING = Map.ofEntries(
+            Map.entry(StandardEntryType.Article, "Journal Article"),
+            Map.entry(StandardEntryType.Book, "Book"),
+            Map.entry(StandardEntryType.InBook, "Book Section"),
+            Map.entry(StandardEntryType.InCollection, "Book Section"),
+            Map.entry(StandardEntryType.Proceedings, "Conference Proceedings"),
+            Map.entry(StandardEntryType.MastersThesis, "Thesis"),
+            Map.entry(StandardEntryType.PhdThesis, "Thesis"),
+            Map.entry(StandardEntryType.TechReport, "Report"),
+            Map.entry(StandardEntryType.Unpublished, "Manuscript"),
+            Map.entry(StandardEntryType.InProceedings, "Conference Paper"),
+            Map.entry(StandardEntryType.Conference, "Conference"),
+            Map.entry(IEEETranEntryType.Patent, "Patent"),
+            Map.entry(StandardEntryType.Online, "Web Page"),
+            Map.entry(IEEETranEntryType.Electronic, "Electronic Article"),
+            Map.entry(StandardEntryType.Misc, "Generic")
+    );
+
+    private static final Map<Field, String> FIELD_MAPPING = Map.ofEntries(
+            Map.entry(StandardField.TITLE, "title"),
+            Map.entry(StandardField.AUTHOR, "authors"),
+            Map.entry(StandardField.EDITOR, "secondary-authors"),
+            Map.entry(StandardField.YEAR, "year"),
+            Map.entry(StandardField.MONTH, "pub-dates"),
+            Map.entry(StandardField.JOURNAL, "full-title"),
+            Map.entry(StandardField.JOURNALTITLE, "full-title"),
+            Map.entry(StandardField.BOOKTITLE, "secondary-title"),
+            Map.entry(StandardField.EDITION, "edition"),
+            Map.entry(StandardField.SERIES, "tertiary-title"),
+            Map.entry(StandardField.VOLUME, "volume"),
+            Map.entry(StandardField.NUMBER, "number"),
+            Map.entry(StandardField.ISSUE, "issue"),
+            Map.entry(StandardField.PAGES, "pages"),
+            Map.entry(StandardField.PUBLISHER, "publisher"),
+            Map.entry(StandardField.ADDRESS, "pub-location"),
+            Map.entry(StandardField.CHAPTER, "section"),
+            Map.entry(StandardField.HOWPUBLISHED, "work-type"),
+            Map.entry(StandardField.INSTITUTION, "publisher"),
+            Map.entry(StandardField.ORGANIZATION, "publisher"),
+            Map.entry(StandardField.SCHOOL, "publisher"),
+            Map.entry(StandardField.ISBN, "isbn"),
+            Map.entry(StandardField.ISSN, "isbn"),
+            Map.entry(StandardField.DOI, "electronic-resource-num"),
+            Map.entry(StandardField.URL, "web-urls"),
+            Map.entry(StandardField.FILE, "pdf-urls"),
+            Map.entry(StandardField.ABSTRACT, "abstract"),
+            Map.entry(StandardField.KEYWORDS, "keywords")
+    );
     private final ImportFormatPreferences preferences;
     private final XMLInputFactory xmlInputFactory;
 
     public EndnoteXmlImporter(ImportFormatPreferences preferences) {
         this.preferences = preferences;
         xmlInputFactory = XMLInputFactory.newInstance();
-        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-        // not suported by aalto-xml
-        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        // required for reading Unicode characters such as &#xf6;
-        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
-    }
-
-    private static String join(List<String> list, String string) {
-        return Joiner.on(string).join(list);
     }
 
     @Override
@@ -94,7 +120,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             if (str.toLowerCase(Locale.ENGLISH).contains("<records>")) {
                 return true;
             }
-
             i++;
         }
         return false;
@@ -111,11 +136,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
             while (reader.hasNext()) {
                 reader.next();
-                if (isStartXMLEvent(reader)) {
-                    String elementName = reader.getName().getLocalPart();
-                    if ("record".equals(elementName)) {
-                        parseRecord(reader, bibItems, elementName);
-                    }
+                if (isStartElement(reader, "record")) {
+                    BibEntry entry = parseRecord(reader);
+                    bibItems.add(entry);
                 }
             }
         } catch (XMLStreamException e) {
@@ -125,386 +148,81 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         return new ParserResult(bibItems);
     }
 
-    private void parseRecord(XMLStreamReader reader, List<BibEntry> bibItems, String startElement)
-            throws XMLStreamException {
-
-        Map<Field, String> fields = new HashMap<>();
-        EntryType entryType = StandardEntryType.Article;
-
-        KeywordList keywordList = new KeywordList();
-        List<LinkedFile> linkedFiles = new ArrayList<>();
+    private BibEntry parseRecord(XMLStreamReader reader) throws XMLStreamException {
+        BibEntry entry = new BibEntry();
 
         while (reader.hasNext()) {
             reader.next();
-            if (isStartXMLEvent(reader)) {
+            if (isEndElement(reader, "record")) {
+                break;
+            }
+
+            if (isStartElement(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
                     case "ref-type" -> {
-                        String type = reader.getAttributeValue(null, "name");
-                        entryType = convertRefNameToType(type);
+                        String refType = reader.getAttributeValue(null, "name");
+                        EntryType entryType = ENTRY_TYPE_MAPPING.entrySet().stream()
+                                                                .filter(e -> e.getValue().equals(refType))
+                                                                .map(Map.Entry::getKey)
+                                                                .findFirst()
+                                                                .orElse(StandardEntryType.Misc);
+                        entry.setType(entryType);
                     }
                     case "contributors" -> {
-                        handleAuthorList(reader, fields, elementName);
+                        parseContributors(reader, entry);
                     }
-                    case "titles" -> {
-                        handleTitles(reader, fields, elementName);
-                    }
-                    case "pages" -> {
-                        parseStyleContent(reader, fields, StandardField.PAGES, elementName);
-                    }
-                    case "volume" -> {
-                        parseStyleContent(reader, fields, StandardField.VOLUME, elementName);
-                    }
-                    case "number" -> {
-                        parseStyleContent(reader, fields, StandardField.NUMBER, elementName);
-                    }
-                    case "secondary-title" -> {
-                        parseStyleContent(reader, fields, StandardField.SERIES, elementName);
-                    }
-                    case "tertiary-title" -> {
-                        parseStyleContent(reader, fields, StandardField.BOOKTITLE, elementName);
-                    }
-                    case "dates" -> {
-                        parseYear(reader, fields);
-                    }
-                    case "notes" -> {
-                        parseStyleContent(reader, fields, StandardField.NOTE, elementName);
-                    }
-                    case "urls" -> {
-                        handleUrlList(reader, fields, linkedFiles);
-                    }
-                    case "keywords" -> {
-                        handleKeywordsList(reader, keywordList, elementName);
-                    }
-                    case "abstract" -> {
-                        parseStyleContent(reader, fields, StandardField.ABSTRACT, elementName);
-                    }
-                    case "isbn" -> {
-                        parseStyleContent(reader, fields, StandardField.ISBN, elementName);
-                    }
-                    case "electronic-resource-num" -> {
-                        parseStyleContent(reader, fields, StandardField.DOI, elementName);
-                    }
-                    case "publisher" -> {
-                        parseStyleContent(reader, fields, StandardField.PUBLISHER, elementName);
-                    }
-                    case "label" -> {
-                        parseStyleContent(reader, fields, new UnknownField("endnote-label"), elementName);
-                    }
-                    case "month" -> {
-                        parseStyleContent(reader, fields, StandardField.MONTH, elementName);
-                    }
-                    case "day" -> {
-                        parseStyleContent(reader, fields, StandardField.DAY, elementName);
-                    }
-                    case "address" -> {
-                        parseStyleContent(reader, fields, StandardField.ADDRESS, elementName);
-                    }
-                    case "pagetotal" -> {
-                        parseStyleContent(reader, fields, new UnknownField("pagetotal"), elementName);
-                    }
-                }
-            }
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
-                break;
-            }
-        }
-
-        BibEntry entry = new BibEntry(entryType);
-        entry.putKeywords(keywordList, preferences.bibEntryPreferences().getKeywordSeparator());
-
-        entry.setField(fields);
-        entry.setFiles(linkedFiles);
-        bibItems.add(entry);
-    }
-
-    private static EntryType convertRefNameToType(String refName) {
-        return switch (refName.toLowerCase().trim()) {
-            case "artwork", "generic" -> StandardEntryType.Misc;
-            case "electronic article" -> IEEETranEntryType.Electronic;
-            case "book section" -> StandardEntryType.InBook;
-            case "book" -> StandardEntryType.Book;
-            case "report" -> StandardEntryType.Report;
-            case "conference paper" -> StandardEntryType.InProceedings;
-            case "conference" -> StandardEntryType.Conference;
-            case "conference proceedings" -> StandardEntryType.Proceedings;
-            default -> StandardEntryType.Article;
-        };
-    }
-
-    private void handleAuthorList(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
-        List<String> authorNames = new ArrayList<>();
-
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                switch (elementName) {
-                    case "author" -> {
-                        parseAuthor(reader, authorNames);
-                    }
-                }
-            }
-
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
-                break;
-            }
-        }
-        fields.put(StandardField.AUTHOR, join(authorNames, " and "));
-    }
-
-    private void parseAuthor(XMLStreamReader reader, List<String> authorNames) throws XMLStreamException {
-
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                switch (elementName) {
-                    case "style" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            authorNames.add(reader.getText());
+                    default -> {
+                        Field field = FIELD_MAPPING.entrySet().stream()
+                                                   .filter(e -> e.getValue().equals(elementName))
+                                                   .map(Map.Entry::getKey)
+                                                   .findFirst()
+                                                   .orElse(null);
+                        if (field != null) {
+                            entry.setField(field, reader.getElementText());
                         }
                     }
                 }
             }
-
-            if (isEndXMLEvent(reader) && "author".equals(reader.getName().getLocalPart())) {
-                break;
-            }
         }
+
+        return entry;
     }
 
-    private void parseStyleContent(XMLStreamReader reader, Map<Field, String> fields, Field field, String elementName) throws XMLStreamException {
+    private void parseContributors(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
-            if (isStartXMLEvent(reader)) {
-                String tag = reader.getName().getLocalPart();
-                if ("style".equals(tag)) {
-                    reader.next();
-                    if (isCharacterXMLEvent(reader)) {
-                        if ("abstract".equals(elementName) || "electronic-resource-num".equals(elementName) || "notes".equals(elementName)) {
-                            putIfValueNotNull(fields, field, reader.getText().trim());
-                        } else if ("isbn".equals(elementName) || "secondary-title".equals(elementName)) {
-                            putIfValueNotNull(fields, field, clean(reader.getText()));
-                        } else {
-                            putIfValueNotNull(fields, field, reader.getText());
-                        }
-                    }
-                }
-            }
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(elementName)) {
+            if (isEndElement(reader, "contributors")) {
                 break;
             }
-        }
-    }
 
-    private void parseYear(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
+            if (isStartElement(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
-                    case "style" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            putIfValueNotNull(fields, StandardField.YEAR, reader.getText());
-                        }
+                    case "authors" -> {
+                        entry.setField(StandardField.AUTHOR, reader.getElementText());
+                    }
+                    case "secondary-authors" -> {
+                        entry.setField(StandardField.EDITOR, reader.getElementText());
                     }
                 }
-            }
-
-            if (isEndXMLEvent(reader) && "year".equals(reader.getName().getLocalPart())) {
-                break;
             }
         }
     }
 
-    private void handleKeywordsList(XMLStreamReader reader, KeywordList keywordList, String startElement) throws XMLStreamException {
-
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                switch (elementName) {
-                    case "keyword" -> {
-                        parseKeyword(reader, keywordList);
-                    }
-                }
-            }
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
-                break;
-            }
-        }
+    private boolean isStartElement(XMLStreamReader reader, String elementName) {
+        return isStartElement(reader) && reader.getName().getLocalPart().equals(elementName);
     }
 
-    private void parseKeyword(XMLStreamReader reader, KeywordList keywordList) throws XMLStreamException {
-
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                switch (elementName) {
-                    case "style" -> {
-                        reader.next();
-                        if (isCharacterXMLEvent(reader)) {
-                            if (reader.getText() != null) {
-                                keywordList.add(reader.getText());
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (isEndXMLEvent(reader) && "keyword".equals(reader.getName().getLocalPart())) {
-                break;
-            }
-        }
-    }
-
-    private void handleTitles(XMLStreamReader reader, Map<Field, String> fields, String startElement) throws XMLStreamException {
-
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                switch (elementName) {
-                    case "title" -> {
-                        List<String> titleStyleContent = new ArrayList<>();
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isStartXMLEvent(reader)) {
-                                String tag = reader.getName().getLocalPart();
-                                if ("style".equals(tag)) {
-                                    reader.next();
-                                    if (isCharacterXMLEvent(reader)) {
-                                        if (reader.getText() != null) {
-                                            titleStyleContent.add((reader.getText()));
-                                        }
-                                    }
-                                }
-                            }
-                            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(elementName)) {
-                                break;
-                            }
-                        }
-                        putIfValueNotNull(fields, StandardField.TITLE, clean(join(titleStyleContent, "")));
-                    }
-                    case "secondary-title" -> {
-                        parseStyleContent(reader, fields, StandardField.JOURNAL, elementName);
-                    }
-                }
-            }
-
-            if (isEndXMLEvent(reader) && reader.getName().getLocalPart().equals(startElement)) {
-                break;
-            }
-        }
-    }
-
-    private void handleUrlList(XMLStreamReader reader, Map<Field, String> fields, List<LinkedFile> linkedFiles) throws XMLStreamException {
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                switch (elementName) {
-                    case "related-urls" -> {
-                        parseRelatedUrls(reader, fields);
-                    }
-                    case "pdf-urls" -> {
-                        parsePdfUrls(reader, fields, linkedFiles);
-                    }
-                }
-            }
-
-            if (isEndXMLEvent(reader) && "urls".equals(reader.getName().getLocalPart())) {
-                break;
-            }
-        }
-    }
-
-    private void parseRelatedUrls(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
-
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                if ("style".equals(elementName)) {
-                    reader.next();
-                    if (isCharacterXMLEvent(reader)) {
-                        putIfValueNotNull(fields, StandardField.URL, reader.getText());
-                    }
-                }
-            } else if (isCharacterXMLEvent(reader)) {
-                String value = clean(reader.getText());
-                if (value.length() > 0) {
-                    putIfValueNotNull(fields, StandardField.URL, clean(value));
-                }
-            }
-
-            if (isEndXMLEvent(reader) && "related-urls".equals(reader.getName().getLocalPart())) {
-                break;
-            }
-        }
-    }
-
-    private void parsePdfUrls(XMLStreamReader reader, Map<Field, String> fields, List<LinkedFile> linkedFiles) throws XMLStreamException {
-
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartXMLEvent(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                if ("url".equals(elementName)) {
-                    reader.next();
-                    if (isStartXMLEvent(reader)) {
-                        String tagName = reader.getName().getLocalPart();
-                        if ("style".equals(tagName)) {
-                            reader.next();
-                            if (isCharacterXMLEvent(reader)) {
-                                try {
-                                    linkedFiles.add(new LinkedFile(new URL(reader.getText()), "PDF"));
-                                } catch (MalformedURLException e) {
-                                    LOGGER.info("Unable to parse {}", reader.getText());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (isCharacterXMLEvent(reader)) {
-                try {
-                    linkedFiles.add(new LinkedFile(new URL(reader.getText()), "PDF"));
-                } catch (MalformedURLException e) {
-                    LOGGER.info("Unable to parse {}", reader.getText());
-                }
-            }
-            if (isEndXMLEvent(reader) && "pdf-urls".equals(reader.getName().getLocalPart())) {
-                break;
-            }
-        }
-    }
-
-    private String clean(String input) {
-        return StringUtil.unifyLineBreaks(input, " ")
-                         .trim()
-                         .replaceAll(" +", " ");
-    }
-
-    private void putIfValueNotNull(Map<Field, String> fields, Field field, String value) {
-        if (value != null) {
-            fields.put(field, value);
-        }
-    }
-
-    private boolean isCharacterXMLEvent(XMLStreamReader reader) {
-        return reader.getEventType() == XMLEvent.CHARACTERS;
-    }
-
-    private boolean isStartXMLEvent(XMLStreamReader reader) {
+    private boolean isStartElement(XMLStreamReader reader) {
         return reader.getEventType() == XMLEvent.START_ELEMENT;
     }
 
-    private boolean isEndXMLEvent(XMLStreamReader reader) {
+    private boolean isEndElement(XMLStreamReader reader, String elementName) {
+        return isEndElement(reader) && reader.getName().getLocalPart().equals(elementName);
+    }
+
+    private boolean isEndElement(XMLStreamReader reader) {
         return reader.getEventType() == XMLEvent.END_ELEMENT;
     }
 
@@ -519,8 +237,3 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         return Collections.emptyList();
     }
 }
-
-
-
-
-
