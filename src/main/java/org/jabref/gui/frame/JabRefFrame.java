@@ -468,7 +468,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return closeTabs(List.of(tab));
     }
 
-    public boolean closeTabs(List<LibraryTab> tabs) {
+    public boolean closeTabs(@NonNull List<LibraryTab> tabs) {
         // Only accept library tabs that are shown in the tab container
         List<LibraryTab> toClose = tabs.stream()
                 .distinct()

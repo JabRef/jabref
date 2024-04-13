@@ -21,7 +21,6 @@ import org.jabref.gui.Telemetry;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
-import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
@@ -181,7 +180,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     /**
      * This is the real file opening. Should be called via {@link #openFile(Path)}
      *
-     * Similar method: {@link JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
+     * Similar method: {@link org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
      *
      * @param file the file, may be NOT null, but may not be existing
      */
