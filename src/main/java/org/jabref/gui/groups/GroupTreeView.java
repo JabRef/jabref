@@ -49,6 +49,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -121,11 +122,11 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void createNodes() {
-        searchField = new CustomTextField();
-
-        searchField.setPromptText(Localization.lang("Filter groups"));
+        searchField = SearchTextField.create();
+        searchField.setPromptText(Localization.lang("Filter groups..."));
         searchField.setId("searchField");
         HBox.setHgrow(searchField, Priority.ALWAYS);
+
         HBox groupFilterBar = new HBox(searchField);
         groupFilterBar.setId("groupFilterBar");
         this.setTop(groupFilterBar);
