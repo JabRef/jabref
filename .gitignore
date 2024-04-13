@@ -6,6 +6,7 @@ src-gen/
 .lycheecache
 
 javafx/javafx-sdk-*
+javafx/javafx-jmods-*
 javafx/javafx.html
 javafx/*.tar.gz
 javafx/*.zip

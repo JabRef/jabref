@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -40,9 +39,12 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
@@ -75,6 +77,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
+    private final DuplicateCheck duplicateCheck;
 
     public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService,
                                 BibDatabaseContext databaseContext, UndoManager undoManager,
@@ -92,6 +95,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
+        this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferencesService.getImporterPreferences()),
                 new BibEntryRelationsCache());
         citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService, fileUpdateMonitor, Globals.TASK_EXECUTOR);
@@ -210,14 +214,15 @@ public class CitationRelationsTab extends EntryEditorTab {
                     VBox vContainer = new VBox();
 
                     if (entry.isLocal()) {
+                        hContainer.getStyleClass().add("duplicate-entry");
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(event -> {
-                            libraryTab.showAndEdit(entry.entry());
-                            libraryTab.clearAndSelect(entry.entry());
                             citingTask.cancel();
                             citedByTask.cancel();
+                            libraryTab.showAndEdit(entry.localEntry());
+                            libraryTab.clearAndSelect(entry.localEntry());
                         });
                         vContainer.getChildren().add(jumpTo);
                     } else {
@@ -384,8 +389,16 @@ public class CitationRelationsTab extends EntryEditorTab {
                                              ObservableList<CitationRelationItem> observableList) {
         hideNodes(abortButton, progress);
 
-        observableList.setAll(fetchedList.stream().map(entr -> new CitationRelationItem(entr, false))
-                                         .collect(Collectors.toList()));
+        observableList.setAll(
+        fetchedList.stream()
+            .map(entr -> duplicateCheck.containsDuplicate(
+                    databaseContext.getDatabase(),
+                    entr,
+                    BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()))
+                .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
+                .orElseGet(() -> new CitationRelationItem(entr, false)))
+            .toList()
+    );
 
         if (!observableList.isEmpty()) {
             listView.refresh();

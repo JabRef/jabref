@@ -1,9 +1,11 @@
 package org.jabref.gui.maintable.columns;
 
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.maintable.MainTableTooltip;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.comparator.NumericFieldComparator;
 import org.jabref.model.entry.field.Field;
@@ -19,16 +21,19 @@ import com.google.common.collect.MoreCollectors;
 public class FieldColumn extends MainTableColumn<String> {
 
     private final OrFields fields;
+    private final MainTableTooltip tooltip;
 
-    public FieldColumn(MainTableColumnModel model) {
+    public FieldColumn(MainTableColumnModel model, MainTableTooltip tooltip) {
         super(model);
         this.fields = FieldFactory.parseOrFields(model.getQualifier());
+        this.tooltip = tooltip;
 
         setText(getDisplayName());
         setCellValueFactory(param -> getFieldValue(param.getValue()));
 
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
+                .graphicTooltip(this::createTooltip)
                 .install(this);
 
         if (fields.hasExactlyOne()) {
@@ -59,5 +64,9 @@ public class FieldColumn extends MainTableColumn<String> {
         } else {
             return entry.getFields(fields);
         }
+    }
+
+    private Tooltip createTooltip(BibEntryTableViewModel entry, String fieldValue) {
+        return tooltip.createTooltip(entry.getEntry(), fieldValue);
     }
 }

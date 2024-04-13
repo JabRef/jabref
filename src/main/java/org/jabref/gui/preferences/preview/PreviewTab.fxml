@@ -20,6 +20,7 @@
          fx:controller="org.jabref.gui.preferences.preview.PreviewTab">
     <Label text="%Current Preview" styleClass="titleHeader"/>
     <CheckBox fx:id="showAsTabCheckBox" text="%Show preview as a tab in entry editor"/>
+    <CheckBox fx:id="showPreviewTooltipCheckBox" text="Show preview in entry table tooltip"/>
     <HBox spacing="4.0">
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
             <Label text="%Available" styleClass="sectionHeader"/>
