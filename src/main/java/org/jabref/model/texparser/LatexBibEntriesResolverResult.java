@@ -1,6 +1,5 @@
 package org.jabref.model.texparser;
 
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -11,16 +10,12 @@ import com.google.common.collect.Multimap;
 
 public class LatexBibEntriesResolverResult {
 
-    private final LatexParserResult latexParserResult;
+    private final LatexParserResults latexParserResults;
     private final Set<BibEntry> newEntries;
 
-    public LatexBibEntriesResolverResult(LatexParserResult latexParserResult) {
-        this.latexParserResult = latexParserResult;
+    public LatexBibEntriesResolverResult(LatexParserResults latexParserResults) {
+        this.latexParserResults = latexParserResults;
         this.newEntries = new HashSet<>();
-    }
-
-    public LatexParserResult getLatexParserResult() {
-        return latexParserResult;
     }
 
     public Set<BibEntry> getNewEntries() {
@@ -31,24 +26,14 @@ public class LatexBibEntriesResolverResult {
         newEntries.add(entry);
     }
 
-    /**
-     * @return the BIB files multimap from the LatexParserResult object.
-     */
-    public Multimap<Path, Path> getBibFiles() {
-        return latexParserResult.getBibFiles();
-    }
-
-    /**
-     * @return the citations multimap from the LatexParserResult object.
-     */
     public Multimap<String, Citation> getCitations() {
-        return latexParserResult.getCitations();
+        return latexParserResults.getCitations();
     }
 
     @Override
     public String toString() {
-        return "TexBibEntriesResolverResult{texParserResult=%s, newEntries=%s}".formatted(
-                this.latexParserResult,
+        return "TexBibEntriesResolverResult{latexParserResults=%s, newEntries=%s}".formatted(
+                this.latexParserResults,
                 this.newEntries);
     }
 
@@ -64,12 +49,12 @@ public class LatexBibEntriesResolverResult {
 
         LatexBibEntriesResolverResult that = (LatexBibEntriesResolverResult) obj;
 
-        return Objects.equals(latexParserResult, that.latexParserResult)
+        return Objects.equals(latexParserResults, that.latexParserResults)
                 && Objects.equals(newEntries, that.newEntries);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(latexParserResult, newEntries);
+        return Objects.hash(latexParserResults, newEntries);
     }
 }

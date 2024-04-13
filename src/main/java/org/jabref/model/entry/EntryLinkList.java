@@ -9,7 +9,7 @@ import org.jabref.model.strings.StringUtil;
 
 public class EntryLinkList {
 
-    private static String SEPARATOR = ",";
+    public static final String SEPARATOR = ",";
 
     private EntryLinkList() {
     }
@@ -26,6 +26,6 @@ public class EntryLinkList {
     }
 
     public static String serialize(List<ParsedEntryLink> list) {
-        return String.join(SEPARATOR, list.stream().map(ParsedEntryLink::getKey).collect(Collectors.toList()));
+        return list.stream().map(ParsedEntryLink::getKey).collect(Collectors.joining(SEPARATOR));
     }
 }
