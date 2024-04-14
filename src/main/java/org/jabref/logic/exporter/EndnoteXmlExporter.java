@@ -49,39 +49,43 @@ public class EndnoteXmlExporter extends Exporter {
     private static final Map<EntryType, String> ENTRY_TYPE_MAPPING = ORDERED_ENTRY_TYPES.stream()
                                                                                         .collect(Collectors.toMap(
                                                                                                 entryType -> entryType,
-                                                                                                entryType -> {
-                                                                                                    switch (entryType) {
-                                                                                                        case StandardEntryType.Article:
-                                                                                                            return "Journal Article";
-                                                                                                        case StandardEntryType.Book:
-                                                                                                            return "Book";
-                                                                                                        case StandardEntryType.InBook, StandardEntryType.InCollection:
-                                                                                                            return "Book Section";
-                                                                                                        case StandardEntryType.Proceedings:
-                                                                                                            return "Conference Proceedings";
-                                                                                                        case StandardEntryType.MastersThesis, StandardEntryType.PhdThesis:
-                                                                                                            return "Thesis";
-                                                                                                        case StandardEntryType.TechReport:
-                                                                                                            return "Report";
-                                                                                                        case StandardEntryType.Unpublished:
-                                                                                                            return "Manuscript";
-                                                                                                        case StandardEntryType.InProceedings:
-                                                                                                            return "Conference Paper";
-                                                                                                        case StandardEntryType.Conference:
-                                                                                                            return "Conference";
-                                                                                                        case IEEETranEntryType.Patent:
-                                                                                                            return "Patent";
-                                                                                                        case StandardEntryType.Online:
-                                                                                                            return "Web Page";
-                                                                                                        case IEEETranEntryType.Electronic:
-                                                                                                            return "Electronic Article";
-                                                                                                        case StandardEntryType.Misc:
-                                                                                                            return "Generic";
-                                                                                                        default:
-                                                                                                            throw new IllegalArgumentException("Unsupported entry type: " + entryType);
-                                                                                                    }
-                                                                                                }
+                                                                                                EndnoteXmlExporter::getEndnoteEntryType
                                                                                         ));
+
+    private static String getEndnoteEntryType(EntryType entryType) {
+        return switch (entryType) {
+            case StandardEntryType.Article ->
+                    "Journal Article";
+            case StandardEntryType.Book ->
+                    "Book";
+            case StandardEntryType.InBook,
+                 StandardEntryType.InCollection ->
+                    "Book Section";
+            case StandardEntryType.Proceedings ->
+                    "Conference Proceedings";
+            case StandardEntryType.MastersThesis,
+                 StandardEntryType.PhdThesis ->
+                    "Thesis";
+            case StandardEntryType.TechReport ->
+                    "Report";
+            case StandardEntryType.Unpublished ->
+                    "Manuscript";
+            case StandardEntryType.InProceedings ->
+                    "Conference Paper";
+            case StandardEntryType.Conference ->
+                    "Conference";
+            case IEEETranEntryType.Patent ->
+                    "Patent";
+            case StandardEntryType.Online ->
+                    "Web Page";
+            case IEEETranEntryType.Electronic ->
+                    "Electronic Article";
+            case StandardEntryType.Misc ->
+                    "Generic";
+            default ->
+                    throw new IllegalArgumentException("Unsupported entry type: " + entryType);
+        };
+    }
 
     private static final Map<EntryType, String> EXPORT_REF_NUMBER = ORDERED_ENTRY_TYPES.stream()
                                                                                        .collect(Collectors.toMap(
