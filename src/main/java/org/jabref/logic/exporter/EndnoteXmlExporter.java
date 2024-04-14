@@ -2,7 +2,6 @@ package org.jabref.logic.exporter;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,26 +28,66 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class EndnoteXmlExporter extends Exporter {
-    private static final Map<EntryType, String> ENTRY_TYPE_MAPPING = new LinkedHashMap<>(Map.ofEntries(
-            Map.entry(StandardEntryType.Article, "Journal Article"),
-            Map.entry(StandardEntryType.Book, "Book"),
-            Map.entry(StandardEntryType.InBook, "Book Section"),
-            Map.entry(StandardEntryType.InCollection, "Book Section"),
-            Map.entry(StandardEntryType.Proceedings, "Conference Proceedings"),
-            Map.entry(StandardEntryType.MastersThesis, "Thesis"),
-            Map.entry(StandardEntryType.PhdThesis, "Thesis"),
-            Map.entry(StandardEntryType.TechReport, "Report"),
-            Map.entry(StandardEntryType.Unpublished, "Manuscript"),
-            Map.entry(StandardEntryType.InProceedings, "Conference Paper"),
-            Map.entry(StandardEntryType.Conference, "Conference"),
-            Map.entry(IEEETranEntryType.Patent, "Patent"),
-            Map.entry(StandardEntryType.Online, "Web Page"),
-            Map.entry(IEEETranEntryType.Electronic, "Electronic Article"),
-            Map.entry(StandardEntryType.Misc, "Generic")
-    ));
+    private static final List<EntryType> ORDERED_ENTRY_TYPES = List.of(
+            StandardEntryType.Article,
+            StandardEntryType.Book,
+            StandardEntryType.InBook,
+            StandardEntryType.InCollection,
+            StandardEntryType.Proceedings,
+            StandardEntryType.MastersThesis,
+            StandardEntryType.PhdThesis,
+            StandardEntryType.TechReport,
+            StandardEntryType.Unpublished,
+            StandardEntryType.InProceedings,
+            StandardEntryType.Conference,
+            IEEETranEntryType.Patent,
+            StandardEntryType.Online,
+            IEEETranEntryType.Electronic,
+            StandardEntryType.Misc
+    );
 
-    private static final Map<EntryType, String> EXPORT_REF_NUMBER = ENTRY_TYPE_MAPPING.keySet().stream().collect(
-            Collectors.toMap(entryType -> entryType, entryType -> Integer.toString(ENTRY_TYPE_MAPPING.keySet().stream().toList().indexOf(entryType) + 1), (e1, e2) -> e1, LinkedHashMap::new));
+    private static final Map<EntryType, String> ENTRY_TYPE_MAPPING = ORDERED_ENTRY_TYPES.stream()
+                                                                                        .collect(Collectors.toMap(
+                                                                                                entryType -> entryType,
+                                                                                                entryType -> {
+                                                                                                    switch (entryType) {
+                                                                                                        case StandardEntryType.Article:
+                                                                                                            return "Journal Article";
+                                                                                                        case StandardEntryType.Book:
+                                                                                                            return "Book";
+                                                                                                        case StandardEntryType.InBook, StandardEntryType.InCollection:
+                                                                                                            return "Book Section";
+                                                                                                        case StandardEntryType.Proceedings:
+                                                                                                            return "Conference Proceedings";
+                                                                                                        case StandardEntryType.MastersThesis, StandardEntryType.PhdThesis:
+                                                                                                            return "Thesis";
+                                                                                                        case StandardEntryType.TechReport:
+                                                                                                            return "Report";
+                                                                                                        case StandardEntryType.Unpublished:
+                                                                                                            return "Manuscript";
+                                                                                                        case StandardEntryType.InProceedings:
+                                                                                                            return "Conference Paper";
+                                                                                                        case StandardEntryType.Conference:
+                                                                                                            return "Conference";
+                                                                                                        case IEEETranEntryType.Patent:
+                                                                                                            return "Patent";
+                                                                                                        case StandardEntryType.Online:
+                                                                                                            return "Web Page";
+                                                                                                        case IEEETranEntryType.Electronic:
+                                                                                                            return "Electronic Article";
+                                                                                                        case StandardEntryType.Misc:
+                                                                                                            return "Generic";
+                                                                                                        default:
+                                                                                                            throw new IllegalArgumentException("Unsupported entry type: " + entryType);
+                                                                                                    }
+                                                                                                }
+                                                                                        ));
+
+    private static final Map<EntryType, String> EXPORT_REF_NUMBER = ORDERED_ENTRY_TYPES.stream()
+                                                                                       .collect(Collectors.toMap(
+                                                                                               entryType -> entryType,
+                                                                                               entryType -> Integer.toString(ORDERED_ENTRY_TYPES.indexOf(entryType) + 1)
+                                                                                       ));
 
     private static final Map<Field, String> FIELD_MAPPING = Map.ofEntries(
             Map.entry(StandardField.TITLE, "title"),
