@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xml>
+    <records>
+        <record>
+            <ref-type name="Book">2</ref-type>
+            <contributors>
+                <secondary-authors>Bhattacharyya, R. and McCormick, M. E.</secondary-authors>
+            </contributors>
+            <title>Wave Energy Conversion</title>
+            <publisher>Elsevier Science</publisher>
+            <pdf-urls>/home/mfg/acad/ext/arts/waves/water/[R._Bhattacharyya_and_M.E._McCormick_(Eds.)]_Wave_(z-lib.org).pdf</pdf-urls>
+            <isbn>9780080442129</isbn>
+            <year>2013</year>
+            <keywords>waves, agua</keywords>
+        </record>
+    </records>
+</xml>
