@@ -10,7 +10,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -382,13 +381,13 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void twoEntriesWithSameISBNButDifferentTypesAreDuplicates() {
+    public void twoEntriesWithSameISBNButDifferentTypesAreNotDuplicates() {
         simpleArticle.setField(StandardField.ISBN, "0-123456-47-9");
         unrelatedArticle.setField(StandardField.ISBN, "0-123456-47-9");
         BibEntry duplicateWithDifferentType = unrelatedArticle;
         duplicateWithDifferentType.setType(StandardEntryType.InCollection);
 
-        assertTrue(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
+        assertFalse(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
     }
 
     public static Stream<Arguments> twoEntriesWithDifferentSpecificFieldsAreNotDuplicates() {
@@ -525,7 +524,9 @@ public class DuplicateCheckTest {
         assertTrue(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
 
-    @Disabled("Book entries can have the same ISBN due to different chapters. The Test fails as crossref identifies both entries as the same.")
+    /**
+     *     Book entries can have the same ISBN due to different chapters. The Test fails as crossref identifies both entries as the same.
+     */
     @Test
     void differentArticlesFromTheSameBookAreNotDuplicates() {
         BibEntry entryOne = new BibEntry(StandardEntryType.Article)
