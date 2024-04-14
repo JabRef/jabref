@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -48,37 +47,37 @@ public class EndnoteXmlExporter extends Exporter {
 
     private static final List<Map.Entry<EntryType, String>> EXPORT_REF_NUMBER_LIST = ENTRY_TYPE_MAPPING_LIST.stream()
                                                                                                             .map(entry -> Map.entry(entry.getKey(), Integer.toString(ENTRY_TYPE_MAPPING_LIST.indexOf(entry) + 1)))
-                                                                                                            .collect(Collectors.toList());
+                                                                                                            .toList();
 
     private static final List<Map.Entry<Field, String>> FIELD_MAPPING_LIST = List.of(
             Map.entry(StandardField.TITLE, "title"),
             Map.entry(StandardField.AUTHOR, "authors"),
             Map.entry(StandardField.EDITOR, "secondary-authors"),
-            Map.entry(StandardField.YEAR, "year"),
-            Map.entry(StandardField.MONTH, "pub-dates"),
+            Map.entry(StandardField.PAGES, "pages"),
+            Map.entry(StandardField.VOLUME, "volume"),
+            Map.entry(StandardField.KEYWORDS, "keywords"),
+            // Map.entry(StandardField.YEAR, "year"),
+            // Map.entry(StandardField.MONTH, "pub-dates"),
+            Map.entry(StandardField.PUBLISHER, "publisher"),
+            Map.entry(StandardField.ISBN, "isbn"),
+            Map.entry(StandardField.DOI, "electronic-resource-num"),
+            Map.entry(StandardField.ABSTRACT, "abstract"),
+            Map.entry(StandardField.URL, "web-urls"),
+            Map.entry(StandardField.FILE, "pdf-urls"),
             Map.entry(StandardField.JOURNAL, "full-title"),
             Map.entry(StandardField.JOURNALTITLE, "full-title"),
             Map.entry(StandardField.BOOKTITLE, "secondary-title"),
             Map.entry(StandardField.EDITION, "edition"),
             Map.entry(StandardField.SERIES, "tertiary-title"),
-            Map.entry(StandardField.VOLUME, "volume"),
             Map.entry(StandardField.NUMBER, "number"),
             Map.entry(StandardField.ISSUE, "issue"),
-            Map.entry(StandardField.PAGES, "pages"),
-            Map.entry(StandardField.PUBLISHER, "publisher"),
             Map.entry(StandardField.ADDRESS, "pub-location"),
             Map.entry(StandardField.CHAPTER, "section"),
             Map.entry(StandardField.HOWPUBLISHED, "work-type"),
             Map.entry(StandardField.INSTITUTION, "publisher"),
             Map.entry(StandardField.ORGANIZATION, "publisher"),
             Map.entry(StandardField.SCHOOL, "publisher"),
-            Map.entry(StandardField.ISBN, "isbn"),
-            Map.entry(StandardField.ISSN, "isbn"),
-            Map.entry(StandardField.DOI, "electronic-resource-num"),
-            Map.entry(StandardField.URL, "web-urls"),
-            Map.entry(StandardField.FILE, "pdf-urls"),
-            Map.entry(StandardField.ABSTRACT, "abstract"),
-            Map.entry(StandardField.KEYWORDS, "keywords")
+            Map.entry(StandardField.ISSN, "isbn")
     );
 
     public EndnoteXmlExporter() {
@@ -110,7 +109,6 @@ public class EndnoteXmlExporter extends Exporter {
             recordsElement.appendChild(recordElement);
 
             // Map entry type
-            // Map entry type
             EntryType entryType = entry.getType();
             String refType = ENTRY_TYPE_MAPPING_LIST.stream()
                                                     .filter(mapping -> mapping.getKey().equals(entryType))
@@ -129,35 +127,133 @@ public class EndnoteXmlExporter extends Exporter {
             refTypeElement.setTextContent(refNumber);
             recordElement.appendChild(refTypeElement);
 
-            // Map authors and editors
+            // Map database and source-app
+            Element databaseElement = document.createElement("database");
+            databaseElement.setAttribute("name", "MyLibrary");
+            databaseElement.setTextContent("MyLibrary");
+            recordElement.appendChild(databaseElement);
+
+            Element sourceAppElement = document.createElement("source-app");
+            sourceAppElement.setAttribute("name", "JabRef");
+            sourceAppElement.setTextContent("JabRef");
+            recordElement.appendChild(sourceAppElement);
+
+            // Map contributors (authors and editors)
+            Element contributorsElement = document.createElement("contributors");
             entry.getField(StandardField.AUTHOR).ifPresent(authors -> {
-                Element authorsElement = document.createElement("contributors");
-                Element authorsNameElement = document.createElement("authors");
-                authorsNameElement.setTextContent(authors);
-                authorsElement.appendChild(authorsNameElement);
-                recordElement.appendChild(authorsElement);
+                Element authorsElement = document.createElement("authors");
+                String[] authorArray = authors.split("\\s+and\\s+");
+                for (String author : authorArray) {
+                    Element authorElement = document.createElement("author");
+                    authorElement.setTextContent(author);
+                    authorsElement.appendChild(authorElement);
+                }
+                contributorsElement.appendChild(authorsElement);
             });
 
             entry.getField(StandardField.EDITOR).ifPresent(editors -> {
-                Element contributorsElement = document.createElement("contributors");
-                Element editorsElement = document.createElement("secondary-authors");
-                editorsElement.setTextContent(editors);
-                contributorsElement.appendChild(editorsElement);
-                recordElement.appendChild(contributorsElement);
+                Element secondaryAuthorsElement = document.createElement("secondary-authors");
+                secondaryAuthorsElement.setTextContent(editors);
+                contributorsElement.appendChild(secondaryAuthorsElement);
             });
 
-            // Map fields
+            if (contributorsElement.hasChildNodes()) {
+                recordElement.appendChild(contributorsElement);
+            }
+
+            // Map titles
+            Element titlesElement = document.createElement("titles");
+            entry.getField(StandardField.TITLE).ifPresent(title -> {
+                Element titleElement = document.createElement("title");
+                titleElement.setTextContent(title);
+                titlesElement.appendChild(titleElement);
+            });
+
+            entry.getField(StandardField.JOURNAL).ifPresent(journal -> {
+                Element secondaryTitleElement = document.createElement("secondary-title");
+                secondaryTitleElement.setTextContent(journal);
+                titlesElement.appendChild(secondaryTitleElement);
+            });
+
+            if (titlesElement.hasChildNodes()) {
+                recordElement.appendChild(titlesElement);
+            }
+
+            // Map periodical and full-title
+            entry.getField(StandardField.JOURNALTITLE).ifPresent(journalTitle -> {
+                Element periodicalElement = document.createElement("periodical");
+                Element fullTitleElement = document.createElement("full-title");
+                fullTitleElement.setTextContent(journalTitle);
+                periodicalElement.appendChild(fullTitleElement);
+                recordElement.appendChild(periodicalElement);
+            });
+
+            // Map keywords
+            entry.getField(StandardField.KEYWORDS).ifPresent(keywords -> {
+                Element keywordsElement = document.createElement("keywords");
+                String[] keywordArray = keywords.split(",\\s*");
+                for (String keyword : keywordArray) {
+                    Element keywordElement = document.createElement("keyword");
+                    keywordElement.setTextContent(keyword);
+                    keywordsElement.appendChild(keywordElement);
+                }
+                recordElement.appendChild(keywordsElement);
+            });
+
+            // Map other fields
             for (Map.Entry<Field, String> fieldMapping : FIELD_MAPPING_LIST) {
                 Field field = fieldMapping.getKey();
                 String xmlElement = fieldMapping.getValue();
 
-                if (field != StandardField.AUTHOR && field != StandardField.EDITOR) {
+                if (field != StandardField.AUTHOR && field != StandardField.EDITOR &&
+                        field != StandardField.TITLE && field != StandardField.JOURNAL &&
+                        field != StandardField.JOURNALTITLE && field != StandardField.KEYWORDS && field != StandardField.YEAR && field != StandardField.DATE) {
                     entry.getField(field).ifPresent(value -> {
                         Element fieldElement = document.createElement(xmlElement);
                         fieldElement.setTextContent(value);
                         recordElement.appendChild(fieldElement);
                     });
                 }
+            }
+
+            // Map dates
+            Element datesElement = document.createElement("dates");
+            entry.getField(StandardField.YEAR).ifPresent(year -> {
+                Element yearElement = document.createElement("year");
+                yearElement.setTextContent(year);
+                datesElement.appendChild(yearElement);
+            });
+            entry.getField(StandardField.DATE).ifPresent(date -> {
+                Element pubDatesElement = document.createElement("pub-dates");
+                Element dateElement = document.createElement("date");
+                dateElement.setTextContent(date);
+                pubDatesElement.appendChild(dateElement);
+                datesElement.appendChild(pubDatesElement);
+            });
+            if (datesElement.hasChildNodes()) {
+                recordElement.appendChild(datesElement);
+            }
+
+            // Map URLs
+            Element urlsElement = document.createElement("urls");
+            entry.getField(StandardField.FILE).ifPresent(fileField -> {
+                Element pdfUrlsElement = document.createElement("pdf-urls");
+                Element urlElement = document.createElement("url");
+                urlElement.setTextContent(fileField);
+                pdfUrlsElement.appendChild(urlElement);
+                urlsElement.appendChild(pdfUrlsElement);
+            });
+
+            entry.getField(StandardField.URL).ifPresent(url -> {
+                Element webUrlsElement = document.createElement("web-urls");
+                Element urlElement = document.createElement("url");
+                urlElement.setTextContent(url);
+                webUrlsElement.appendChild(urlElement);
+                urlsElement.appendChild(webUrlsElement);
+            });
+
+            if (urlsElement.hasChildNodes()) {
+                recordElement.appendChild(urlsElement);
             }
         }
 
