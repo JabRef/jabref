@@ -70,18 +70,18 @@ public class EndnoteXmlExporterTest {
                 "      <contributors>",
                 "        <authors>Dai, H. K.</authors>",
                 "      </contributors>",
-                "      <pub-location>New York, NY, USA</pub-location>",
-                "      <abstract>An episode rule of associating two episodes represents a temporal implication of the antecedent episode to the consequent episode. Episode-rule mining is a task of extracting useful patterns/episodes from large event databases. We present an episode-rule mining algorithm for finding frequent and confident serial-episode rules via first local-maximum confidence in yielding ideal window widths, if exist, in event sequences based on minimal occurrences constrained by a constant maximum gap. Results from our preliminary empirical study confirm the applicability of the episode-rule mining algorithm for Web-site traversal-pattern discovery, and show that the first local maximization yielding ideal window widths exists in real data but rarely in synthetic random data sets.</abstract>",
-                "      <pages>130--136</pages>",
-                "      <title>Episode-Rule Mining with Minimal Occurrences via First Local Maximization in Confidence</title>",
-                "      <secondary-title>Proceedings of the 9th International Symposium on Information and Communication Technology</secondary-title>",
-                "      <electronic-resource-num>10.1145/3287921.3287982</electronic-resource-num>",
-                "      <year>2018</year>",
                 "      <pub-dates>12</pub-dates>",
+                "      <electronic-resource-num>10.1145/3287921.3287982</electronic-resource-num>",
+                "      <secondary-title>Proceedings of the 9th International Symposium on Information and Communication Technology</secondary-title>",
+                "      <title>Episode-Rule Mining with Minimal Occurrences via First Local Maximization in Confidence</title>",
                 "      <tertiary-title>SoICT '18</tertiary-title>",
                 "      <publisher>Association for Computing Machinery</publisher>",
+                "      <pub-location>New York, NY, USA</pub-location>",
                 "      <isbn>9781450365390</isbn>",
                 "      <keywords>Web-site traversal pattern, episode-rule mining, first local maximization</keywords>",
+                "      <pages>130--136</pages>",
+                "      <year>2018</year>",
+                "      <abstract>An episode rule of associating two episodes represents a temporal implication of the antecedent episode to the consequent episode. Episode-rule mining is a task of extracting useful patterns/episodes from large event databases. We present an episode-rule mining algorithm for finding frequent and confident serial-episode rules via first local-maximum confidence in yielding ideal window widths, if exist, in event sequences based on minimal occurrences constrained by a constant maximum gap. Results from our preliminary empirical study confirm the applicability of the episode-rule mining algorithm for Web-site traversal-pattern discovery, and show that the first local maximization yielding ideal window widths exists in real data but rarely in synthetic random data sets.</abstract>",
                 "    </record>",
                 "  </records>",
                 "</xml>"
@@ -107,10 +107,10 @@ public class EndnoteXmlExporterTest {
                 "      </contributors>",
                 "      <pdf-urls>/home/mfg/acad/ext/arts/waves/water/[R._Bhattacharyya_and_M.E._McCormick_(Eds.)]_Wave_(z-lib.org).pdf</pdf-urls>",
                 "      <title>Wave Energy Conversion</title>",
-                "      <year>2013</year>",
                 "      <publisher>Elsevier Science</publisher>",
                 "      <isbn>9780080442129</isbn>",
                 "      <keywords>waves, agua</keywords>",
+                "      <year>2013</year>",
                 "    </record>",
                 "  </records>",
                 "</xml>"
@@ -134,18 +134,18 @@ public class EndnoteXmlExporterTest {
                 "      <contributors>",
                 "        <authors>Dai, H. K.</authors>",
                 "      </contributors>",
-                "      <pub-location>New York, NY, USA</pub-location>",
-                "      <abstract>An episode rule of associating two episodes represents a temporal implication of the antecedent episode to the consequent episode. Episode-rule mining is a task of extracting useful patterns/episodes from large event databases. We present an episode-rule mining algorithm for finding frequent and confident serial-episode rules via first local-maximum confidence in yielding ideal window widths, if exist, in event sequences based on minimal occurrences constrained by a constant maximum gap. Results from our preliminary empirical study confirm the applicability of the episode-rule mining algorithm for Web-site traversal-pattern discovery, and show that the first local maximization yielding ideal window widths exists in real data but rarely in synthetic random data sets.</abstract>",
-                "      <pages>130--136</pages>",
-                "      <title>Episode-Rule Mining with Minimal Occurrences via First Local Maximization in Confidence</title>",
-                "      <secondary-title>Proceedings of the 9th International Symposium on Information and Communication Technology</secondary-title>",
-                "      <electronic-resource-num>10.1145/3287921.3287982</electronic-resource-num>",
-                "      <year>2018</year>",
                 "      <pub-dates>12</pub-dates>",
+                "      <electronic-resource-num>10.1145/3287921.3287982</electronic-resource-num>",
+                "      <secondary-title>Proceedings of the 9th International Symposium on Information and Communication Technology</secondary-title>",
+                "      <title>Episode-Rule Mining with Minimal Occurrences via First Local Maximization in Confidence</title>",
                 "      <tertiary-title>SoICT '18</tertiary-title>",
                 "      <publisher>Association for Computing Machinery</publisher>",
+                "      <pub-location>New York, NY, USA</pub-location>",
                 "      <isbn>9781450365390</isbn>",
                 "      <keywords>Web-site traversal pattern, episode-rule mining, first local maximization</keywords>",
+                "      <pages>130--136</pages>",
+                "      <year>2018</year>",
+                "      <abstract>An episode rule of associating two episodes represents a temporal implication of the antecedent episode to the consequent episode. Episode-rule mining is a task of extracting useful patterns/episodes from large event databases. We present an episode-rule mining algorithm for finding frequent and confident serial-episode rules via first local-maximum confidence in yielding ideal window widths, if exist, in event sequences based on minimal occurrences constrained by a constant maximum gap. Results from our preliminary empirical study confirm the applicability of the episode-rule mining algorithm for Web-site traversal-pattern discovery, and show that the first local maximization yielding ideal window widths exists in real data but rarely in synthetic random data sets.</abstract>",
                 "    </record>",
                 "    <record>",
                 "      <ref-type name=\"Book\">2</ref-type>",
@@ -154,10 +154,10 @@ public class EndnoteXmlExporterTest {
                 "      </contributors>",
                 "      <pdf-urls>/home/mfg/acad/ext/arts/waves/water/[R._Bhattacharyya_and_M.E._McCormick_(Eds.)]_Wave_(z-lib.org).pdf</pdf-urls>",
                 "      <title>Wave Energy Conversion</title>",
-                "      <year>2013</year>",
                 "      <publisher>Elsevier Science</publisher>",
                 "      <isbn>9780080442129</isbn>",
                 "      <keywords>waves, agua</keywords>",
+                "      <year>2013</year>",
                 "    </record>",
                 "  </records>",
                 "</xml>"
@@ -167,11 +167,12 @@ public class EndnoteXmlExporterTest {
 
     @Test
     public void exportForEmptyEntryList(@TempDir Path tempDir) throws Exception {
-        Path file = tempDir.resolve("EmptyFile");
+        Path file = tempDir.resolve("EmptyFile.xml");
 
         exporter.export(databaseContext, file, Collections.emptyList());
 
-        assertEquals(Collections.emptyList(), Files.readAllLines(file));
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<xml>\n  <records/>\n</xml>",
+                Files.readString(file));
     }
 
     @Test
