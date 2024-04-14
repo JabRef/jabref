@@ -2,7 +2,6 @@ package org.jabref.logic.exporter;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,8 @@ public class EndnoteXmlExporter extends Exporter {
             Map.entry(StandardEntryType.Misc, "Generic")
     ));
 
-    private static final Map<EntryType, String> EXPORT_REF_NUMBER = ENTRY_TYPE_MAPPING.keySet() .stream() .collect(Collectors.toMap(entryType -> entryType, entryType -> Integer.toString(ENTRY_TYPE_MAPPING.keySet().stream().toList().indexOf(entryType) + 1), (e1, e2) -> e1, LinkedHashMap::new));
+    private static final Map<EntryType, String> EXPORT_REF_NUMBER = ENTRY_TYPE_MAPPING.keySet().stream().collect(
+            Collectors.toMap(entryType -> entryType, entryType -> Integer.toString(ENTRY_TYPE_MAPPING.keySet().stream().toList().indexOf(entryType) + 1), (e1, e2) -> e1, LinkedHashMap::new));
 
     private static final Map<Field, String> FIELD_MAPPING = Map.ofEntries(
             Map.entry(StandardField.TITLE, "title"),
@@ -111,10 +111,10 @@ public class EndnoteXmlExporter extends Exporter {
 
             // Map entry type
             EntryType entryType = entry.getType();
-            String refType = EXPORT_REF_NUMBER.getOrDefault(entry.getType(), "Generic");
+            String refType = ENTRY_TYPE_MAPPING.getOrDefault(entryType, "Generic");
             Element refTypeElement = document.createElement("ref-type");
             refTypeElement.setAttribute("name", refType);
-            refTypeElement.setTextContent(String.valueOf(new ArrayList<>(ENTRY_TYPE_MAPPING.values()).indexOf(refType)));
+            refTypeElement.setTextContent(String.valueOf(EXPORT_REF_NUMBER.getOrDefault(entryType, "Generic")));
             recordElement.appendChild(refTypeElement);
 
             // Map authors and editors
