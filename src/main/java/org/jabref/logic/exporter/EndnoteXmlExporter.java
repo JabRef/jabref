@@ -28,68 +28,29 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class EndnoteXmlExporter extends Exporter {
-    private static final List<EntryType> ORDERED_ENTRY_TYPES = List.of(
-            StandardEntryType.Article, // Journal Article -1
-            StandardEntryType.Book, // Book -2
-            StandardEntryType.InBook, // Book Section -3
-            StandardEntryType.InCollection, // Book Section -4
-            StandardEntryType.Proceedings, // Conference Proceedings -5
-            StandardEntryType.MastersThesis, // Thesis -6
-            StandardEntryType.PhdThesis, // Thesis -7
-            StandardEntryType.TechReport, // Report -8
-            StandardEntryType.Unpublished, // Manuscript -9
-            StandardEntryType.InProceedings, // Conference Paper -10
-            StandardEntryType.Conference, // Conference -11
-            IEEETranEntryType.Patent, // Patent -12
-            StandardEntryType.Online, // Web Page -13
-            IEEETranEntryType.Electronic, // Electronic Article -14
-            StandardEntryType.Misc // Generic -15
+    private static final List<Map.Entry<EntryType, String>> ENTRY_TYPE_MAPPING_LIST = List.of(
+            Map.entry(StandardEntryType.Article, "Journal Article"),
+            Map.entry(StandardEntryType.Book, "Book"),
+            Map.entry(StandardEntryType.InBook, "Book Section"),
+            Map.entry(StandardEntryType.InCollection, "Book Section"),
+            Map.entry(StandardEntryType.Proceedings, "Conference Proceedings"),
+            Map.entry(StandardEntryType.MastersThesis, "Thesis"),
+            Map.entry(StandardEntryType.PhdThesis, "Thesis"),
+            Map.entry(StandardEntryType.TechReport, "Report"),
+            Map.entry(StandardEntryType.Unpublished, "Manuscript"),
+            Map.entry(StandardEntryType.InProceedings, "Conference Paper"),
+            Map.entry(StandardEntryType.Conference, "Conference"),
+            Map.entry(IEEETranEntryType.Patent, "Patent"),
+            Map.entry(StandardEntryType.Online, "Web Page"),
+            Map.entry(IEEETranEntryType.Electronic, "Electronic Article"),
+            Map.entry(StandardEntryType.Misc, "Generic")
     );
 
-    private static final Map<EntryType, String> ENTRY_TYPE_MAPPING = ORDERED_ENTRY_TYPES.stream()
-                                                                                        .collect(Collectors.toMap(
-                                                                                                entryType -> entryType,
-                                                                                                entryType -> {
-                                                                                                    switch (entryType) {
-                                                                                                        case StandardEntryType.Article:
-                                                                                                            return "Journal Article";
-                                                                                                        case StandardEntryType.Book:
-                                                                                                            return "Book";
-                                                                                                        case StandardEntryType.InBook, StandardEntryType.InCollection:
-                                                                                                            return "Book Section";
-                                                                                                        case StandardEntryType.Proceedings:
-                                                                                                            return "Conference Proceedings";
-                                                                                                        case StandardEntryType.MastersThesis, StandardEntryType.PhdThesis:
-                                                                                                            return "Thesis";
-                                                                                                        case StandardEntryType.TechReport:
-                                                                                                            return "Report";
-                                                                                                        case StandardEntryType.Unpublished:
-                                                                                                            return "Manuscript";
-                                                                                                        case StandardEntryType.InProceedings:
-                                                                                                            return "Conference Paper";
-                                                                                                        case StandardEntryType.Conference:
-                                                                                                            return "Conference";
-                                                                                                        case IEEETranEntryType.Patent:
-                                                                                                            return "Patent";
-                                                                                                        case StandardEntryType.Online:
-                                                                                                            return "Web Page";
-                                                                                                        case IEEETranEntryType.Electronic:
-                                                                                                            return "Electronic Article";
-                                                                                                        case StandardEntryType.Misc:
-                                                                                                            return "Generic";
-                                                                                                        default:
-                                                                                                            throw new IllegalArgumentException("Unsupported entry type: " + entryType);
-                                                                                                    }
-                                                                                                }
-                                                                                        ));
+    private static final List<Map.Entry<EntryType, String>> EXPORT_REF_NUMBER_LIST = ENTRY_TYPE_MAPPING_LIST.stream()
+                                                                                                            .map(entry -> Map.entry(entry.getKey(), Integer.toString(ENTRY_TYPE_MAPPING_LIST.indexOf(entry) + 1)))
+                                                                                                            .collect(Collectors.toList());
 
-    private static final Map<EntryType, String> EXPORT_REF_NUMBER = ORDERED_ENTRY_TYPES.stream()
-                                                                                       .collect(Collectors.toMap(
-                                                                                               entryType -> entryType,
-                                                                                               entryType -> Integer.toString(ORDERED_ENTRY_TYPES.indexOf(entryType) + 1)
-                                                                                       ));
-
-    private static final Map<Field, String> FIELD_MAPPING = Map.ofEntries(
+    private static final List<Map.Entry<Field, String>> FIELD_MAPPING_LIST = List.of(
             Map.entry(StandardField.TITLE, "title"),
             Map.entry(StandardField.AUTHOR, "authors"),
             Map.entry(StandardField.EDITOR, "secondary-authors"),
@@ -149,11 +110,23 @@ public class EndnoteXmlExporter extends Exporter {
             recordsElement.appendChild(recordElement);
 
             // Map entry type
+            // Map entry type
             EntryType entryType = entry.getType();
-            String refType = ENTRY_TYPE_MAPPING.getOrDefault(entryType, "Generic");
+            String refType = ENTRY_TYPE_MAPPING_LIST.stream()
+                                                    .filter(mapping -> mapping.getKey().equals(entryType))
+                                                    .map(Map.Entry::getValue)
+                                                    .findFirst()
+                                                    .orElse("Generic");
+
+            String refNumber = EXPORT_REF_NUMBER_LIST.stream()
+                                                     .filter(mapping -> mapping.getKey().equals(entryType))
+                                                     .map(Map.Entry::getValue)
+                                                     .findFirst()
+                                                     .orElse("15");
+
             Element refTypeElement = document.createElement("ref-type");
             refTypeElement.setAttribute("name", refType);
-            refTypeElement.setTextContent(EXPORT_REF_NUMBER.getOrDefault(entryType, "Generic"));
+            refTypeElement.setTextContent(refNumber);
             recordElement.appendChild(refTypeElement);
 
             // Map authors and editors
@@ -174,7 +147,7 @@ public class EndnoteXmlExporter extends Exporter {
             });
 
             // Map fields
-            for (Map.Entry<Field, String> fieldMapping : FIELD_MAPPING.entrySet()) {
+            for (Map.Entry<Field, String> fieldMapping : FIELD_MAPPING_LIST) {
                 Field field = fieldMapping.getKey();
                 String xmlElement = fieldMapping.getValue();
 
