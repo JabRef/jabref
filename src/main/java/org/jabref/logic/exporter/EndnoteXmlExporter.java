@@ -29,21 +29,21 @@ import org.w3c.dom.Element;
 
 public class EndnoteXmlExporter extends Exporter {
     private static final List<EntryType> ORDERED_ENTRY_TYPES = List.of(
-            StandardEntryType.Article,
-            StandardEntryType.Book,
-            StandardEntryType.InBook,
-            StandardEntryType.InCollection,
-            StandardEntryType.Proceedings,
-            StandardEntryType.MastersThesis,
-            StandardEntryType.PhdThesis,
-            StandardEntryType.TechReport,
-            StandardEntryType.Unpublished,
-            StandardEntryType.InProceedings,
-            StandardEntryType.Conference,
-            IEEETranEntryType.Patent,
-            StandardEntryType.Online,
-            IEEETranEntryType.Electronic,
-            StandardEntryType.Misc
+            StandardEntryType.Article, // Journal Article -1
+            StandardEntryType.Book, // Book -2
+            StandardEntryType.InBook, // Book Section -3
+            StandardEntryType.InCollection, // Book Section -4
+            StandardEntryType.Proceedings, // Conference Proceedings -5
+            StandardEntryType.MastersThesis, // Thesis -6
+            StandardEntryType.PhdThesis, // Thesis -7
+            StandardEntryType.TechReport, // Report -8
+            StandardEntryType.Unpublished, // Manuscript -9
+            StandardEntryType.InProceedings, // Conference Paper -10
+            StandardEntryType.Conference, // Conference -11
+            IEEETranEntryType.Patent, // Patent -12
+            StandardEntryType.Online, // Web Page -13
+            IEEETranEntryType.Electronic, // Electronic Article -14
+            StandardEntryType.Misc // Generic -15
     );
 
     private static final Map<EntryType, String> ENTRY_TYPE_MAPPING = ORDERED_ENTRY_TYPES.stream()
