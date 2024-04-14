@@ -114,7 +114,7 @@ public class EndnoteXmlExporter extends Exporter {
             String refType = ENTRY_TYPE_MAPPING.getOrDefault(entryType, "Generic");
             Element refTypeElement = document.createElement("ref-type");
             refTypeElement.setAttribute("name", refType);
-            refTypeElement.setTextContent(String.valueOf(EXPORT_REF_NUMBER.getOrDefault(entryType, "Generic")));
+            refTypeElement.setTextContent(EXPORT_REF_NUMBER.getOrDefault(entryType, "Generic"));
             recordElement.appendChild(refTypeElement);
 
             // Map authors and editors
