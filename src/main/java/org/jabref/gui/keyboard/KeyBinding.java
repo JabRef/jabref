@@ -2,6 +2,9 @@ package org.jabref.gui.keyboard;
 
 import org.jabref.logic.l10n.Localization;
 
+/**
+ * @implNote Cannot be sorted alphabetically, as {@link KeyBindingRepository#getKeyCombination(KeyBinding)} iterates over the enum in order and returns the first match.
+ */
 public enum KeyBinding {
     EDITOR_DELETE("Delete", Localization.lang("Delete text"), "", KeyBindingCategory.EDITOR),
     // DELETE BACKWARDS = Rubout
@@ -46,7 +49,7 @@ public enum KeyBinding {
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE", KeyBindingCategory.BIBTEX),
     DEFAULT_DIALOG_ACTION("Execute default action in dialog", Localization.lang("Execute default action in dialog"), "ctrl+ENTER", KeyBindingCategory.VIEW),
     DOWNLOAD_FULL_TEXT("Download full text documents", Localization.lang("Download full text documents"), "alt+F7", KeyBindingCategory.QUALITY),
-    EDIT_ENTRY("Open / close entry editor", Localization.lang("Open / close entry editor"), "ctrl+E", KeyBindingCategory.VIEW),
+    OPEN_CLOSE_ENTRY_EDITOR("Open / close entry editor", Localization.lang("Open / close entry editor"), "ctrl+E", KeyBindingCategory.VIEW),
     EXPORT("Export", Localization.lang("Export"), "ctrl+alt+e", KeyBindingCategory.FILE),
     EXPORT_SELECTED("Export Selected", Localization.lang("Export selected entries"), "ctrl+shift+e", KeyBindingCategory.FILE),
     EDIT_STRINGS("Edit strings", Localization.lang("Edit strings"), "ctrl+T", KeyBindingCategory.BIBTEX),
