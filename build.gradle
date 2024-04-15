@@ -68,12 +68,10 @@ application {
         // Fix for https://github.com/JabRef/jabref/issues/11188
         '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
         '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
-        '--add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref.merged.module',
 
         // Fix for https://github.com/JabRef/jabref/issues/11198
         '--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module',
         '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
-        '--add-opens=org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref.merged.module',
         '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module'
     ]
 }
@@ -421,8 +419,7 @@ run {
         // On a change here, also adapt "application > applicationDefaultJvmArgs"
         addExports = [
                 'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
-                'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+                'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref'
 
                 // We need to restate the ControlsFX exports, because we get following error otherwise:
                 //   java.lang.IllegalAccessError:
@@ -444,7 +441,6 @@ run {
 
         addOpens = [
                 'javafx.controls/javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
 
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
@@ -465,8 +461,7 @@ javadoc {
         version = false
         author = false
         addMultilineStringsOption("-add-exports").setValue([
-            'javafx.controls/com.sun.javafx.scene.control=org.jabref',
-            'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
+            'javafx.controls/com.sun.javafx.scene.control=org.jabref'
         ])
     }
 }
