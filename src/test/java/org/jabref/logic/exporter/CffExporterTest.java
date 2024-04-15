@@ -243,7 +243,7 @@ public class CffExporterTest {
                 CitationKeyPatternPreferences.class,
                 Answers.RETURNS_SMART_NULLS
         );
-        when(citationKeyPatternPreferences.getKeyPattern())
+        when(citationKeyPatternPreferences.getKeyPatterns())
                 .thenReturn(GlobalCitationKeyPatterns.fromPattern("[auth][year]"));
 
         // First, import the file which will be parsed as two entries

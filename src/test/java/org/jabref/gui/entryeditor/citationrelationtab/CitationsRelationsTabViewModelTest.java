@@ -67,8 +67,8 @@ class CitationsRelationsTabViewModelTest {
         when(preferencesService.getTimestampPreferences()).thenReturn(mock(TimestampPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
-        GlobalCitationKeyPatterns pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
-        when(citationKeyPatternPreferences.getKeyPattern()).thenReturn(pattern);
+        GlobalCitationKeyPatterns patterns = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+        when(citationKeyPatternPreferences.getKeyPatterns()).thenReturn(patterns);
         when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
 
         bibDatabaseContext = new BibDatabaseContext(new BibDatabase());

@@ -116,15 +116,15 @@ public class MetaData {
     /**
      * @return the stored label patterns
      */
-    public AbstractCitationKeyPatterns getCiteKeyPattern(GlobalCitationKeyPatterns globalPattern) {
-        Objects.requireNonNull(globalPattern);
-        AbstractCitationKeyPatterns bibtexKeyPattern = new DatabaseCitationKeyPatterns(globalPattern);
+    public AbstractCitationKeyPatterns getCiteKeyPatterns(GlobalCitationKeyPatterns globalPatterns) {
+        Objects.requireNonNull(globalPatterns);
+        AbstractCitationKeyPatterns bibtexKeyPatterns = new DatabaseCitationKeyPatterns(globalPatterns);
 
         // Add stored key patterns
-        citeKeyPatterns.forEach(bibtexKeyPattern::addCitationKeyPattern);
-        getDefaultCiteKeyPattern().ifPresent(bibtexKeyPattern::setDefaultValue);
+        citeKeyPatterns.forEach(bibtexKeyPatterns::addCitationKeyPattern);
+        getDefaultCiteKeyPattern().ifPresent(bibtexKeyPatterns::setDefaultValue);
 
-        return bibtexKeyPattern;
+        return bibtexKeyPatterns;
     }
 
     /**

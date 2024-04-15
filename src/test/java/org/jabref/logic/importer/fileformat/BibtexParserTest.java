@@ -1353,12 +1353,12 @@ class BibtexParserTest {
                         + "@comment{jabref-meta: keypatterndefault:test;}"));
 
         GlobalCitationKeyPatterns pattern = mock(GlobalCitationKeyPatterns.class);
-        AbstractCitationKeyPatterns bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
-        AbstractCitationKeyPatterns expectedPattern = new DatabaseCitationKeyPatterns(pattern);
-        expectedPattern.setDefaultValue("test");
-        expectedPattern.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
+        AbstractCitationKeyPatterns bibtexKeyPatterns = result.getMetaData().getCiteKeyPatterns(pattern);
+        AbstractCitationKeyPatterns expectedPatterns = new DatabaseCitationKeyPatterns(pattern);
+        expectedPatterns.setDefaultValue("test");
+        expectedPatterns.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
 
-        assertEquals(expectedPattern, bibtexKeyPattern);
+        assertEquals(expectedPatterns, bibtexKeyPatterns);
     }
 
     @Test

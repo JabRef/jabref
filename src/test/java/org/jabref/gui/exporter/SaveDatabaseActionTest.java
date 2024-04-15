@@ -110,8 +110,8 @@ class SaveDatabaseActionTest {
         MetaData metaData = mock(MetaData.class);
         when(saveConfiguration.withSaveType(any(BibDatabaseWriter.SaveType.class))).thenReturn(saveConfiguration);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        GlobalCitationKeyPatterns emptyGlobalCitationKeyPattern = GlobalCitationKeyPatterns.fromPattern("");
-        when(metaData.getCiteKeyPattern(any(GlobalCitationKeyPatterns.class))).thenReturn(emptyGlobalCitationKeyPattern);
+        GlobalCitationKeyPatterns emptyGlobalCitationKeyPatterns = GlobalCitationKeyPatterns.fromPattern("");
+        when(metaData.getCiteKeyPatterns(any(GlobalCitationKeyPatterns.class))).thenReturn(emptyGlobalCitationKeyPatterns);
         when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(dbContext.getDatabase()).thenReturn(database);
@@ -120,7 +120,7 @@ class SaveDatabaseActionTest {
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class));
-        when(preferences.getCitationKeyPatternPreferences().getKeyPattern()).thenReturn(emptyGlobalCitationKeyPattern);
+        when(preferences.getCitationKeyPatternPreferences().getKeyPatterns()).thenReturn(emptyGlobalCitationKeyPatterns);
         when(preferences.getFieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         when(preferences.getLibraryPreferences()).thenReturn(mock(LibraryPreferences.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);

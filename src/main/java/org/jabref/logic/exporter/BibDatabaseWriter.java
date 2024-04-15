@@ -207,7 +207,7 @@ public abstract class BibDatabaseWriter {
 
         if (saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData(), keyPatternPreferences.getKeyPattern());
+            writeMetaData(bibDatabaseContext.getMetaData(), keyPatternPreferences.getKeyPatterns());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);

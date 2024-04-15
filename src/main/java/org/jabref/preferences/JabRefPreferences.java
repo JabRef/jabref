@@ -1721,7 +1721,7 @@ public class JabRefPreferences implements PreferencesService {
     private void clearCitationKeyPatterns() throws BackingStoreException {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
-        getCitationKeyPatternPreferences().setKeyPattern(getGlobalCitationKeyPattern());
+        getCitationKeyPatternPreferences().setKeyPatterns(getGlobalCitationKeyPattern());
     }
 
     @Override
@@ -1758,7 +1758,7 @@ public class JabRefPreferences implements PreferencesService {
                 (obs, oldValue, newValue) -> put(KEY_PATTERN_REPLACEMENT, newValue));
         EasyBind.listen(citationKeyPatternPreferences.unwantedCharactersProperty(),
                 (obs, oldValue, newValue) -> put(UNWANTED_CITATION_KEY_CHARACTERS, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keyPatternProperty(),
+        EasyBind.listen(citationKeyPatternPreferences.keyPatternsProperty(),
                 (obs, oldValue, newValue) -> storeGlobalCitationKeyPattern(newValue));
 
         return citationKeyPatternPreferences;

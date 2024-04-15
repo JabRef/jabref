@@ -35,7 +35,7 @@ public class MetaDataSerializer {
      * Writes all data in the format &lt;key, serialized data>.
      */
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
-                                                             GlobalCitationKeyPatterns globalCiteKeyPattern) {
+                                                             GlobalCitationKeyPatterns globalCiteKeyPatterns) {
 
         // metadata-key, list of contents
         //  - contents to be separated by OS.NEWLINE
@@ -50,7 +50,7 @@ public class MetaDataSerializer {
         if (metaData.isProtected()) {
             stringyMetaData.put(MetaData.PROTECTED_FLAG_META, Collections.singletonList("true"));
         }
-        stringyMetaData.putAll(serializeCiteKeyPattern(metaData, globalCiteKeyPattern));
+        stringyMetaData.putAll(serializeCiteKeyPatterns(metaData, globalCiteKeyPatterns));
         metaData.getMode().ifPresent(
                 mode -> stringyMetaData.put(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getAsString())));
         metaData.getDefaultFileDirectory().ifPresent(
@@ -123,9 +123,9 @@ public class MetaDataSerializer {
         return serializedMetaData;
     }
 
-    private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalCitationKeyPatterns globalCitationKeyPattern) {
+    private static Map<String, List<String>> serializeCiteKeyPatterns(MetaData metaData, GlobalCitationKeyPatterns globalCitationKeyPatterns) {
         Map<String, List<String>> stringyPattern = new HashMap<>();
-        AbstractCitationKeyPatterns citationKeyPattern = metaData.getCiteKeyPattern(globalCitationKeyPattern);
+        AbstractCitationKeyPatterns citationKeyPattern = metaData.getCiteKeyPatterns(globalCitationKeyPatterns);
         for (EntryType key : citationKeyPattern.getAllKeys()) {
             if (!citationKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();

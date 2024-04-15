@@ -27,15 +27,15 @@ public class CitationKeyDeviationCheckerTest {
     private final BibDatabase bibDatabase = mock(BibDatabase.class);
     private final MetaData metaData = mock(MetaData.class);
     private final AbstractCitationKeyPatterns abstractCitationKeyPatterns = mock(AbstractCitationKeyPatterns.class);
-    private final GlobalCitationKeyPatterns globalCitationKeyPattern = mock(GlobalCitationKeyPatterns.class);
+    private final GlobalCitationKeyPatterns globalCitationKeyPatterns = mock(GlobalCitationKeyPatterns.class);
     private final CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
     private final CitationKeyDeviationChecker checker = new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences);
 
     @BeforeEach
     void setUp() {
         when(bibDatabaseContext.getMetaData()).thenReturn(metaData);
-        when(citationKeyPatternPreferences.getKeyPattern()).thenReturn(globalCitationKeyPattern);
-        when(metaData.getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern())).thenReturn(abstractCitationKeyPatterns);
+        when(citationKeyPatternPreferences.getKeyPatterns()).thenReturn(globalCitationKeyPatterns);
+        when(metaData.getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns())).thenReturn(abstractCitationKeyPatterns);
         when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
     }
 

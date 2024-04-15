@@ -44,7 +44,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     private final String unwantedCharacters;
 
     public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
-        this(bibDatabaseContext.getMetaData().getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern()),
+        this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),
                 bibDatabaseContext.getDatabase(),
                 citationKeyPatternPreferences);
     }

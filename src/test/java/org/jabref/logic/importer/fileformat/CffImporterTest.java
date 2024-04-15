@@ -35,7 +35,7 @@ public class CffImporterTest {
                 CitationKeyPatternPreferences.class,
                 Answers.RETURNS_SMART_NULLS
         );
-        when(citationKeyPatternPreferences.getKeyPattern())
+        when(citationKeyPatternPreferences.getKeyPatterns())
                 .thenReturn(GlobalCitationKeyPatterns.fromPattern("[auth][year]"));
         importer = new CffImporter(citationKeyPatternPreferences);
     }

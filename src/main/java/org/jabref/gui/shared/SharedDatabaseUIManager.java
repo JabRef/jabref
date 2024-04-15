@@ -209,7 +209,7 @@ public class SharedDatabaseUIManager {
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(
                 bibDatabaseContext,
                 preferencesService.getBibEntryPreferences().getKeywordSeparator(),
-                preferencesService.getCitationKeyPatternPreferences().getKeyPattern(),
+                preferencesService.getCitationKeyPatternPreferences().getKeyPatterns(),
                 fileUpdateMonitor);
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
         return bibDatabaseContext;
