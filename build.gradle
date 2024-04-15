@@ -71,6 +71,7 @@ application {
         '--add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref.merged.module',
 
         // Fix for https://github.com/JabRef/jabref/issues/11198
+        '--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module',
         '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
         '--add-opens=org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref.merged.module',
         '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module'
