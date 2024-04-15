@@ -25,6 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where entry type with duplicate fields prevented opening existing libraries with custom entry types [#11127](https://github.com/JabRef/jabref/issues/11127)
+- We fixed an issue where Markdown rendering removed braces from the text. [#10928](https://github.com/JabRef/jabref/issues/10928)
 
 ### Removed
 
