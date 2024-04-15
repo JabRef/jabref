@@ -9,7 +9,6 @@ import org.jabref.logic.l10n.Localization;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.slf4j.LoggerFactory;
 
 public class SearchTextField {
 
@@ -23,9 +22,6 @@ public class SearchTextField {
             // Other key bindings are handled at org.jabref.gui.keyboard.TextInputKeyBindings
             // We need to handle clear search here to have the code "more clean"
             // Otherwise, we would have to add a new class for this and handle the case hitting that class in TextInputKeyBindings
-
-            LoggerFactory.getLogger(SearchTextField.class).warn("event: {}", event);
-            LoggerFactory.getLogger(SearchTextField.class).warn("bindings: {}", Globals.getKeyPrefs().mapToKeyBindings(event));
 
             // Per default ESC is bound to both CLOSE_DIALGUE and CLEAR_SEARcH
             Globals.getKeyPrefs().mapToKeyBindings(event)
