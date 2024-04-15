@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -129,30 +130,30 @@ public class MetaData {
     /**
      * Updates the stored key patterns to the given key patterns.
      *
-     * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
+     * @param bibtexKeyPatterns the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
      */
-    public void setCiteKeyPattern(AbstractCitationKeyPatterns bibtexKeyPattern) {
-        Objects.requireNonNull(bibtexKeyPattern);
+    public void setCiteKeyPattern(AbstractCitationKeyPatterns bibtexKeyPatterns) {
+        Objects.requireNonNull(bibtexKeyPatterns);
 
-        List<String> defaultValue = bibtexKeyPattern.getDefaultValue();
-        Map<EntryType, List<String>> nonDefaultPatterns = bibtexKeyPattern.getPatterns();
+        CitationKeyPattern defaultValue = bibtexKeyPatterns.getDefaultValue();
+        Map<EntryType, CitationKeyPattern> nonDefaultPatterns = bibtexKeyPatterns.getPatterns();
         setCiteKeyPattern(defaultValue, nonDefaultPatterns);
     }
 
-    public void setCiteKeyPattern(List<String> defaultValue, Map<EntryType, List<String>> nonDefaultPatterns) {
+    public void setCiteKeyPattern(CitationKeyPattern defaultValue, Map<EntryType, CitationKeyPattern> nonDefaultPatterns) {
         // Remove all patterns from metadata
         citeKeyPatterns.clear();
 
         // Set new value if it is not a default value
-        for (Map.Entry<EntryType, List<String>> pattern : nonDefaultPatterns.entrySet()) {
-            citeKeyPatterns.put(pattern.getKey(), pattern.getValue().getFirst());
+        for (Map.Entry<EntryType, CitationKeyPattern> pattern : nonDefaultPatterns.entrySet()) {
+            citeKeyPatterns.put(pattern.getKey(), pattern.getValue().stringRepresentation());
         }
 
         // Store default pattern
-        if (defaultValue.isEmpty()) {
+        if (defaultValue.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
             defaultCiteKeyPattern = null;
         } else {
-            defaultCiteKeyPattern = defaultValue.getFirst();
+            defaultCiteKeyPattern = defaultValue.stringRepresentation();
         }
 
         postChange();

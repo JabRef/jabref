@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryType;
@@ -45,10 +46,10 @@ public class CitationKeyPatternPanelViewModel {
 
     public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPatterns initialKeyPattern) {
         String defaultPattern;
-        if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().isEmpty()) {
+        if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
             defaultPattern = "";
         } else {
-            defaultPattern = initialKeyPattern.getDefaultValue().getFirst();
+            defaultPattern = initialKeyPattern.getDefaultValue().stringRepresentation();
         }
 
         defaultItemProperty.setValue(new CitationKeyPatternPanelItemModel(new DefaultEntryType(), defaultPattern));
@@ -62,7 +63,7 @@ public class CitationKeyPatternPanelViewModel {
                          if (initialKeyPattern.isDefaultValue(entryType)) {
                              pattern = "";
                          } else {
-                             pattern = initialKeyPattern.getPatterns().get(entryType).getFirst();
+                             pattern = initialKeyPattern.getPatterns().get(entryType).stringRepresentation();
                          }
                          patternListProperty.add(new CitationKeyPatternPanelItemModel(entryType, pattern));
                      });

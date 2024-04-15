@@ -1,7 +1,5 @@
 package org.jabref.logic.citationkeypattern;
 
-import java.util.List;
-
 import org.jabref.model.entry.types.EntryType;
 
 public class DatabaseCitationKeyPatterns extends AbstractCitationKeyPatterns {
@@ -13,7 +11,7 @@ public class DatabaseCitationKeyPatterns extends AbstractCitationKeyPatterns {
     }
 
     @Override
-    public List<String> getLastLevelCitationKeyPattern(EntryType entryType) {
+    public CitationKeyPattern getLastLevelCitationKeyPattern(EntryType entryType) {
         return globalCitationKeyPattern.getValue(entryType);
     }
 }

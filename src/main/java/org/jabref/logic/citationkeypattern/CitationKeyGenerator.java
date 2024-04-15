@@ -172,12 +172,11 @@ public class CitationKeyGenerator extends BracketedPattern {
     private String createCitationKeyFromPattern(BibEntry entry) {
         // get the type of entry
         EntryType entryType = entry.getType();
-        // Get the arrayList corresponding to the type
-        List<String> citationKeyPattern = citeKeyPattern.getValue(entryType);
-        if (citationKeyPattern.isEmpty()) {
+        CitationKeyPattern citationKeyPattern = citeKeyPattern.getValue(entryType);
+        if (citationKeyPattern.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
             return "";
         }
-        return expandBrackets(citationKeyPattern.getFirst(), expandBracketContent(entry));
+        return expandBrackets(citationKeyPattern.stringRepresentation(), expandBracketContent(entry));
     }
 
     /**
