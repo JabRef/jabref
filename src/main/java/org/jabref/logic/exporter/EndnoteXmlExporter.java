@@ -56,28 +56,25 @@ public class EndnoteXmlExporter extends Exporter {
             Map.entry(StandardField.PAGES, "pages"),
             Map.entry(StandardField.VOLUME, "volume"),
             Map.entry(StandardField.KEYWORDS, "keywords"),
-            // Map.entry(StandardField.YEAR, "year"),
-            // Map.entry(StandardField.MONTH, "pub-dates"),
             Map.entry(StandardField.PUBLISHER, "publisher"),
             Map.entry(StandardField.ISBN, "isbn"),
             Map.entry(StandardField.DOI, "electronic-resource-num"),
             Map.entry(StandardField.ABSTRACT, "abstract"),
             Map.entry(StandardField.URL, "web-urls"),
             Map.entry(StandardField.FILE, "pdf-urls"),
-            Map.entry(StandardField.JOURNAL, "full-title"),
             Map.entry(StandardField.JOURNALTITLE, "full-title"),
             Map.entry(StandardField.BOOKTITLE, "secondary-title"),
             Map.entry(StandardField.EDITION, "edition"),
             Map.entry(StandardField.SERIES, "tertiary-title"),
             Map.entry(StandardField.NUMBER, "number"),
             Map.entry(StandardField.ISSUE, "issue"),
-            Map.entry(StandardField.ADDRESS, "pub-location"),
+            Map.entry(StandardField.LOCATION, "pub-location"),
             Map.entry(StandardField.CHAPTER, "section"),
             Map.entry(StandardField.HOWPUBLISHED, "work-type"),
-            Map.entry(StandardField.INSTITUTION, "publisher"),
-            Map.entry(StandardField.ORGANIZATION, "publisher"),
-            Map.entry(StandardField.SCHOOL, "publisher"),
-            Map.entry(StandardField.ISSN, "isbn")
+            Map.entry(StandardField.PUBLISHER, "publisher"),
+            Map.entry(StandardField.ISSN, "issn"),
+            Map.entry(StandardField.ADDRESS, "auth-address"),
+            Map.entry(StandardField.PAGETOTAL, "page-total")
     );
 
     public EndnoteXmlExporter() {
@@ -140,6 +137,7 @@ public class EndnoteXmlExporter extends Exporter {
 
             // Map contributors (authors and editors)
             Element contributorsElement = document.createElement("contributors");
+
             entry.getField(StandardField.AUTHOR).ifPresent(authors -> {
                 Element authorsElement = document.createElement("authors");
                 String[] authorArray = authors.split("\\s+and\\s+");
@@ -153,7 +151,12 @@ public class EndnoteXmlExporter extends Exporter {
 
             entry.getField(StandardField.EDITOR).ifPresent(editors -> {
                 Element secondaryAuthorsElement = document.createElement("secondary-authors");
-                secondaryAuthorsElement.setTextContent(editors);
+                String[] editorArray = editors.split("\\s+and\\s+");
+                for (String editor : editorArray) {
+                    Element editorElement = document.createElement("author");
+                    editorElement.setTextContent(editor);
+                    secondaryAuthorsElement.appendChild(editorElement);
+                }
                 contributorsElement.appendChild(secondaryAuthorsElement);
             });
 
@@ -200,27 +203,21 @@ public class EndnoteXmlExporter extends Exporter {
                 recordElement.appendChild(keywordsElement);
             });
 
-            // Map other fields
-            for (Map.Entry<Field, String> fieldMapping : FIELD_MAPPING_LIST) {
-                Field field = fieldMapping.getKey();
-                String xmlElement = fieldMapping.getValue();
-
-                if (field != StandardField.AUTHOR && field != StandardField.EDITOR &&
-                        field != StandardField.TITLE && field != StandardField.JOURNAL &&
-                        field != StandardField.JOURNALTITLE && field != StandardField.KEYWORDS && field != StandardField.YEAR && field != StandardField.DATE) {
-                    entry.getField(field).ifPresent(value -> {
-                        Element fieldElement = document.createElement(xmlElement);
-                        fieldElement.setTextContent(value);
-                        recordElement.appendChild(fieldElement);
-                    });
-                }
-            }
-
             // Map dates
             Element datesElement = document.createElement("dates");
             entry.getField(StandardField.YEAR).ifPresent(year -> {
                 Element yearElement = document.createElement("year");
                 yearElement.setTextContent(year);
+                datesElement.appendChild(yearElement);
+            });
+            entry.getField(StandardField.MONTH).ifPresent(month -> {
+                Element yearElement = document.createElement("month");
+                yearElement.setTextContent(month);
+                datesElement.appendChild(yearElement);
+            });
+            entry.getField(StandardField.DAY).ifPresent(day -> {
+                Element yearElement = document.createElement("day");
+                yearElement.setTextContent(day);
                 datesElement.appendChild(yearElement);
             });
             entry.getField(StandardField.DATE).ifPresent(date -> {
@@ -254,6 +251,22 @@ public class EndnoteXmlExporter extends Exporter {
 
             if (urlsElement.hasChildNodes()) {
                 recordElement.appendChild(urlsElement);
+            }
+
+            // Map other fields
+            for (Map.Entry<Field, String> fieldMapping : FIELD_MAPPING_LIST) {
+                Field field = fieldMapping.getKey();
+                String xmlElement = fieldMapping.getValue();
+
+                if (field != StandardField.AUTHOR && field != StandardField.EDITOR &&
+                        field != StandardField.TITLE && field != StandardField.JOURNAL &&
+                        field != StandardField.JOURNALTITLE && field != StandardField.KEYWORDS && field != StandardField.YEAR && field != StandardField.MONTH && field != StandardField.DAY && field != StandardField.DATE && field != StandardField.FILE && field != StandardField.URL) {
+                    entry.getField(field).ifPresent(value -> {
+                        Element fieldElement = document.createElement(xmlElement);
+                        fieldElement.setTextContent(value);
+                        recordElement.appendChild(fieldElement);
+                    });
+                }
             }
         }
 

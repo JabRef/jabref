@@ -4,13 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -26,11 +24,8 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.KeywordList;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -41,48 +36,50 @@ import org.slf4j.LoggerFactory;
 public class EndnoteXmlImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EndnoteXmlImporter.class);
-    private static final Map<String, EntryType> ENTRY_TYPE_MAPPING = Map.ofEntries(
-            Map.entry("Journal Article", StandardEntryType.Article),
-            Map.entry("Book", StandardEntryType.Book),
-            Map.entry("Book Section", StandardEntryType.InBook),
-            Map.entry("Conference Proceedings", StandardEntryType.Proceedings),
-            Map.entry("Thesis", StandardEntryType.Thesis),
-            Map.entry("Report", StandardEntryType.Report),
-            Map.entry("Manuscript", StandardEntryType.Unpublished),
-            Map.entry("Conference Paper", StandardEntryType.InProceedings),
-            Map.entry("Conference", StandardEntryType.Conference),
-            Map.entry("Patent", IEEETranEntryType.Patent),
-            Map.entry("Web Page", StandardEntryType.Online),
-            Map.entry("Electronic Article", IEEETranEntryType.Electronic),
-            Map.entry("Generic", StandardEntryType.Misc)
+    private static final Map<EntryType, String> ENTRY_TYPE_MAPPING = Map.ofEntries(
+            Map.entry(StandardEntryType.Article, "Journal Article"),
+            Map.entry(StandardEntryType.Book, "Book"),
+            Map.entry(StandardEntryType.InBook, "Book Section"),
+            Map.entry(StandardEntryType.InCollection, "Book Section"),
+            Map.entry(StandardEntryType.Proceedings, "Conference Proceedings"),
+            Map.entry(StandardEntryType.MastersThesis, "Thesis"),
+            Map.entry(StandardEntryType.PhdThesis, "Thesis"),
+            Map.entry(StandardEntryType.TechReport, "Report"),
+            Map.entry(StandardEntryType.Unpublished, "Manuscript"),
+            Map.entry(StandardEntryType.InProceedings, "Conference Paper"),
+            Map.entry(StandardEntryType.Conference, "Conference"),
+            Map.entry(IEEETranEntryType.Patent, "Patent"),
+            Map.entry(StandardEntryType.Online, "Web Page"),
+            Map.entry(IEEETranEntryType.Electronic, "Electronic Article"),
+            Map.entry(StandardEntryType.Misc, "Generic")
     );
 
-    private static final Map<String, Field> FIELD_MAPPING = Map.ofEntries(
-            Map.entry("title", StandardField.TITLE),
-            Map.entry("authors", StandardField.AUTHOR),
-            Map.entry("secondary-authors", StandardField.EDITOR),
-            Map.entry("pages", StandardField.PAGES),
-            Map.entry("volume", StandardField.VOLUME),
-            Map.entry("keywords", StandardField.KEYWORDS),
-            Map.entry("year", StandardField.YEAR),
-            Map.entry("pub-dates", StandardField.DATE),
-            Map.entry("publisher", StandardField.PUBLISHER),
-            Map.entry("isbn", StandardField.ISBN),
-            Map.entry("electronic-resource-num", StandardField.DOI),
-            Map.entry("abstract", StandardField.ABSTRACT),
-            Map.entry("web-urls", StandardField.URL),
-            Map.entry("pdf-urls", StandardField.FILE),
-            Map.entry("full-title", StandardField.JOURNAL),
-            Map.entry("secondary-title", StandardField.BOOKTITLE),
-            Map.entry("edition", StandardField.EDITION),
-            Map.entry("tertiary-title", StandardField.SERIES),
-            Map.entry("number", StandardField.NUMBER),
-            Map.entry("issue", StandardField.ISSUE),
-            Map.entry("pub-location", StandardField.ADDRESS),
-            Map.entry("section", StandardField.CHAPTER),
-            Map.entry("work-type", StandardField.HOWPUBLISHED)
+    private static final Map<Field, String> FIELD_MAPPING = Map.ofEntries(
+            Map.entry(StandardField.TITLE, "title"),
+            Map.entry(StandardField.AUTHOR, "authors"),
+            Map.entry(StandardField.EDITOR, "secondary-authors"),
+            Map.entry(StandardField.JOURNALTITLE, "full-title"),
+            Map.entry(StandardField.BOOKTITLE, "secondary-title"),
+            Map.entry(StandardField.EDITION, "edition"),
+            Map.entry(StandardField.SERIES, "tertiary-title"),
+            Map.entry(StandardField.VOLUME, "volume"),
+            Map.entry(StandardField.NUMBER, "number"),
+            Map.entry(StandardField.ISSUE, "issue"),
+            Map.entry(StandardField.PAGES, "pages"),
+            Map.entry(StandardField.LOCATION, "pub-location"),
+            Map.entry(StandardField.CHAPTER, "section"),
+            Map.entry(StandardField.HOWPUBLISHED, "work-type"),
+            Map.entry(StandardField.PUBLISHER, "publisher"),
+            Map.entry(StandardField.ISBN, "isbn"),
+            Map.entry(StandardField.ISSN, "issn"),
+            Map.entry(StandardField.DOI, "electronic-resource-num"),
+            Map.entry(StandardField.URL, "web-urls"),
+            Map.entry(StandardField.FILE, "pdf-urls"),
+            Map.entry(StandardField.ABSTRACT, "abstract"),
+            Map.entry(StandardField.KEYWORDS, "keywords"),
+            Map.entry(StandardField.ADDRESS, "auth-address"),
+            Map.entry(StandardField.PAGETOTAL, "page-total")
     );
-
     private final ImportFormatPreferences preferences;
     private final XMLInputFactory xmlInputFactory;
 
@@ -113,11 +110,13 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (line.trim().startsWith("<xml>") && line.trim().contains("<records>")) {
+        String str;
+        int i = 0;
+        while (((str = reader.readLine()) != null) && (i < 50)) {
+            if (str.toLowerCase(Locale.ENGLISH).contains("<records>")) {
                 return true;
             }
+            i++;
         }
         return false;
     }
@@ -139,7 +138,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 }
             }
         } catch (XMLStreamException e) {
-            LOGGER.debug("Could not parse document", e);
+            LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);
@@ -147,9 +146,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     private BibEntry parseRecord(XMLStreamReader reader) throws XMLStreamException {
         BibEntry entry = new BibEntry();
-        Map<Field, String> fields = new HashMap<>();
-        KeywordList keywordList = new KeywordList();
-        List<LinkedFile> linkedFiles = new ArrayList<>();
 
         while (reader.hasNext()) {
             reader.next();
@@ -162,42 +158,50 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 switch (elementName) {
                     case "ref-type" -> {
                         String refType = reader.getAttributeValue(null, "name");
-                        EntryType entryType = ENTRY_TYPE_MAPPING.get(refType);
-                        if (entryType != null) {
-                            entry.setType(entryType);
-                        }
+                        EntryType entryType = ENTRY_TYPE_MAPPING.entrySet().stream()
+                                                                .filter(e -> e.getValue().equals(refType))
+                                                                .map(Map.Entry::getKey)
+                                                                .findFirst()
+                                                                .orElse(StandardEntryType.Misc);
+                        entry.setType(entryType);
                     }
                     case "contributors" -> {
-                        parseContributors(reader, fields);
+                        parseContributors(reader, entry);
                     }
                     case "titles" -> {
-                        parseTitles(reader, fields);
+                        parseTitles(reader, entry);
+                    }
+                    case "periodical" -> {
+                        parsePeriodical(reader, entry);
                     }
                     case "keywords" -> {
-                        parseKeywords(reader, keywordList);
+                        parseKeywords(reader, entry);
                     }
                     case "urls" -> {
-                        parseUrls(reader, fields, linkedFiles);
+                        parseUrls(reader, entry);
+                    }
+                    case "dates" -> {
+                        parseDates(reader, entry);
                     }
                     default -> {
-                        Field field = FIELD_MAPPING.get(elementName);
+                        Field field = FIELD_MAPPING.entrySet().stream()
+                                                   .filter(e -> e.getValue().equals(elementName))
+                                                   .map(Map.Entry::getKey)
+                                                   .findFirst()
+                                                   .orElse(null);
                         if (field != null) {
-                            fields.put(field, reader.getElementText());
-                        } else {
-                            fields.put(new UnknownField(elementName), reader.getElementText());
+                            entry.setField(field, reader.getElementText());
                         }
                     }
                 }
             }
         }
 
-        entry.setField(fields);
-        entry.putKeywords(keywordList, preferences.bibEntryPreferences().getKeywordSeparator());
-        entry.setFiles(linkedFiles);
         return entry;
     }
 
-    private void parseContributors(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void parseContributors(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
+        StringBuilder authors = new StringBuilder();
         while (reader.hasNext()) {
             reader.next();
             if (isEndElement(reader, "contributors")) {
@@ -208,34 +212,43 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
                     case "authors" -> {
-                        fields.put(StandardField.AUTHOR, parseAuthors(reader));
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isEndElement(reader, "authors")) {
+                                break;
+                            }
+                            if (isStartElement(reader, "author")) {
+                                String author = reader.getElementText();
+                                if (!authors.isEmpty()) {
+                                    authors.append(" and ");
+                                }
+                                authors.append(author);
+                            }
+                        }
+                        entry.setField(StandardField.AUTHOR, authors.toString());
                     }
                     case "secondary-authors" -> {
-                        fields.put(StandardField.EDITOR, parseAuthors(reader));
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isEndElement(reader, "secondary-authors")) {
+                                break;
+                            }
+                            if (isStartElement(reader, "author")) {
+                                String editor = reader.getElementText();
+                                if (!authors.isEmpty()) {
+                                    authors.append(" and ");
+                                }
+                                authors.append(editor);
+                            }
+                        }
+                        entry.setField(StandardField.EDITOR, authors.toString());
                     }
                 }
             }
         }
     }
 
-    private String parseAuthors(XMLStreamReader reader) throws XMLStreamException {
-        StringBuilder authors = new StringBuilder();
-        while (reader.hasNext()) {
-            reader.next();
-            if (isStartElement(reader, "author")) {
-                authors.append(reader.getElementText());
-                authors.append(" and ");
-            } else if (isEndElement(reader) && reader.getName().getLocalPart().equals("authors")) {
-                break;
-            }
-        }
-        if (authors.length() > 0) {
-            authors.delete(authors.length() - 5, authors.length()); // Remove trailing " and "
-        }
-        return authors.toString();
-    }
-
-    private void parseTitles(XMLStreamReader reader, Map<Field, String> fields) throws XMLStreamException {
+    private void parseTitles(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isEndElement(reader, "titles")) {
@@ -246,17 +259,36 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
                     case "title" -> {
-                        fields.put(StandardField.TITLE, reader.getElementText());
+                        entry.setField(StandardField.TITLE, reader.getElementText());
                     }
                     case "secondary-title" -> {
-                        fields.put(StandardField.JOURNAL, reader.getElementText());
+                        entry.setField(StandardField.JOURNAL, reader.getElementText());
                     }
                 }
             }
         }
     }
 
-    private void parseKeywords(XMLStreamReader reader, KeywordList keywordList) throws XMLStreamException {
+    private void parsePeriodical(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
+        while (reader.hasNext()) {
+            reader.next();
+            if (isEndElement(reader, "periodical")) {
+                break;
+            }
+
+            if (isStartElement(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "full-title" -> {
+                        entry.setField(StandardField.JOURNALTITLE, reader.getElementText());
+                    }
+                }
+            }
+        }
+    }
+
+    private void parseKeywords(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
+        StringBuilder keywords = new StringBuilder();
         while (reader.hasNext()) {
             reader.next();
             if (isEndElement(reader, "keywords")) {
@@ -264,12 +296,17 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             }
 
             if (isStartElement(reader, "keyword")) {
-                keywordList.add(reader.getElementText());
+                String keyword = reader.getElementText();
+                if (keywords.length() > 0) {
+                    keywords.append(", ");
+                }
+                keywords.append(keyword);
             }
         }
+        entry.setField(StandardField.KEYWORDS, keywords.toString());
     }
 
-    private void parseUrls(XMLStreamReader reader, Map<Field, String> fields, List<LinkedFile> linkedFiles) throws XMLStreamException {
+    private void parseUrls(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
             if (isEndElement(reader, "urls")) {
@@ -280,20 +317,67 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
                     case "web-urls" -> {
-                        fields.put(StandardField.URL, reader.getElementText());
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isEndElement(reader, "web-urls")) {
+                                break;
+                            }
+                            if (isStartElement(reader, "url")) {
+                                entry.setField(StandardField.URL, reader.getElementText());
+                            }
+                        }
                     }
                     case "pdf-urls" -> {
-                        String urlText = reader.getElementText();
-                        try {
-                            linkedFiles.add(new LinkedFile(new URL(urlText), "PDF"));
-                        } catch (MalformedURLException e) {
-                            LOGGER.info("Unable to parse URL: {}", urlText);
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isEndElement(reader, "pdf-urls")) {
+                                break;
+                            }
+                            if (isStartElement(reader, "url")) {
+                                entry.setField(StandardField.FILE, reader.getElementText());
+                            }
                         }
                     }
                 }
             }
         }
     }
+
+    private void parseDates(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
+        while (reader.hasNext()) {
+            reader.next();
+            if (isEndElement(reader, "dates")) {
+                break;
+            }
+
+            if (isStartElement(reader)) {
+                String elementName = reader.getName().getLocalPart();
+                switch (elementName) {
+                    case "year" -> {
+                        entry.setField(StandardField.YEAR, reader.getElementText());
+                    }
+                    case "month" -> {
+                        entry.setField(StandardField.MONTH, reader.getElementText());
+                    }
+                    case "day" -> {
+                        entry.setField(StandardField.DAY, reader.getElementText());
+                    }
+                    case "pub-dates" -> {
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isEndElement(reader, "pub-dates")) {
+                                break;
+                            }
+                            if (isStartElement(reader, "date")) {
+                                String date = reader.getElementText();
+                                entry.setField(StandardField.DATE, date);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
     private boolean isStartElement(XMLStreamReader reader, String elementName) {
         return isStartElement(reader) && reader.getName().getLocalPart().equals(elementName);
@@ -314,7 +398,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
-            return importDatabase(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
+            return importDatabase(
+                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
         } catch (IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
