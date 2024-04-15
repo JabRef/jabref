@@ -23,15 +23,10 @@ public class SearchTextField {
             // We need to handle clear search here to have the code "more clean"
             // Otherwise, we would have to add a new class for this and handle the case hitting that class in TextInputKeyBindings
 
-            // As default, ESC is bound to both CLOSE_DIALOGUE and CLEAR_SEARCH
-            Globals.getKeyPrefs().mapToKeyBindings(event)
-                   .stream()
-                   .filter(binding -> binding == KeyBinding.CLEAR_SEARCH)
-                   .findFirst()
-                   .ifPresent(binding -> {
+            if (Globals.getKeyPrefs().matches(event, KeyBinding.CLEAR_SEARCH)) {
                        textField.clear();
                        event.consume();
-                   });
+            }
         });
         return textField;
     }

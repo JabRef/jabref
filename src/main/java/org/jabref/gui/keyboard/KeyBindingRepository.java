@@ -15,6 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
+import org.jabref.gui.Globals;
 import org.jabref.logic.util.OS;
 
 public class KeyBindingRepository {
@@ -128,10 +129,23 @@ public class KeyBindingRepository {
     /**
      * Used if the same key could be used by multiple actions
      */
-    public Set<KeyBinding> mapToKeyBindings(KeyEvent keyEvent) {
+    private Set<KeyBinding> mapToKeyBindings(KeyEvent keyEvent) {
         return Arrays.stream(KeyBinding.values())
                      .filter(binding -> checkKeyCombinationEquality(binding, keyEvent))
                      .collect(Collectors.toSet());
+    }
+
+    /**
+     * Checks if the given KeyEvent matches the given KeyBinding.
+     * <p>
+     * Used if a keyboard shortcut leads to multiple actions (e.g., ESC for closing a dialog and clearing the search).
+     */
+    public boolean matches(KeyEvent event, KeyBinding keyBinding) {
+        return Globals.getKeyPrefs().mapToKeyBindings(event)
+                      .stream()
+                      .filter(binding -> binding == keyBinding)
+                      .findFirst()
+                      .isPresent();
     }
 
     public Optional<KeyCombination> getKeyCombination(KeyBinding bindName) {

@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -43,6 +42,7 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
@@ -142,16 +142,13 @@ public class GlobalSearchBar extends HBox {
 
         KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
-            if (keyBinding.isPresent()) {
-                if (keyBinding.get() == KeyBinding.CLOSE) {
-                    // Clear search and select first entry, if available
-                    searchField.setText("");
-                    if (searchType == SearchType.NORMAL_SEARCH) {
-                        tabContainer.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();
-                    }
-                    event.consume();
+            if (Globals.getKeyPrefs().matches(event, KeyBinding.CLEAR_SEARCH)) {
+                // Clear search and select first entry, if available
+                searchField.clear();
+                if (searchType == SearchType.NORMAL_SEARCH) {
+                    tabContainer.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();
                 }
+                event.consume();
             }
         });
 
