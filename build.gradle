@@ -63,7 +63,10 @@ application {
     mainModule.set('org.jabref')
 
     applicationDefaultJvmArgs = [
-        // On a change here, also adapt "run > moduleOptions"
+        // On a change here, also adapt
+        //   1. "run > moduleOptions"
+        //   2. "deployment.yml" (macOS part)
+        //   3. "deployment-arm64.yml"
 
         // Fix for https://github.com/JabRef/jabref/issues/11188
         '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
