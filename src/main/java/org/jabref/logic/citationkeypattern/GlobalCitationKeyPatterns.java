@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.jabref.model.entry.types.EntryType;
 
-public class GlobalCitationKeyPattern extends AbstractCitationKeyPattern {
+public class GlobalCitationKeyPatterns extends AbstractCitationKeyPatterns {
 
-    public GlobalCitationKeyPattern(List<String> bibtexKeyPattern) {
+    public GlobalCitationKeyPatterns(List<String> bibtexKeyPattern) {
         defaultPattern = bibtexKeyPattern;
     }
 
-    public static GlobalCitationKeyPattern fromPattern(String pattern) {
-        return new GlobalCitationKeyPattern(split(pattern));
+    public static GlobalCitationKeyPatterns fromPattern(String pattern) {
+        return new GlobalCitationKeyPatterns(split(pattern));
     }
 
     @Override

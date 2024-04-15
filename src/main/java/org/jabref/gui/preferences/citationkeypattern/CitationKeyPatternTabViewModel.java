@@ -14,7 +14,7 @@ import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelItemModel;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
@@ -69,8 +69,8 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        GlobalCitationKeyPattern newKeyPattern =
-                new GlobalCitationKeyPattern(keyPatternPreferences.getKeyPattern().getDefaultValue());
+        GlobalCitationKeyPatterns newKeyPattern =
+                new GlobalCitationKeyPatterns(keyPatternPreferences.getKeyPattern().getDefaultValue());
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
             if (!item.getEntryType().getName().equals("default")) {

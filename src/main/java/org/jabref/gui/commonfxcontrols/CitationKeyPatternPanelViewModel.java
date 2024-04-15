@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryType;
@@ -43,7 +43,7 @@ public class CitationKeyPatternPanelViewModel {
         this.keyPatternPreferences = keyPatternPreferences;
     }
 
-    public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern initialKeyPattern) {
+    public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPatterns initialKeyPattern) {
         String defaultPattern;
         if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().isEmpty()) {
             defaultPattern = "";

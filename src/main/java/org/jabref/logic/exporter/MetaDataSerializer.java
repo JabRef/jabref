@@ -9,8 +9,8 @@ import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntryType;
@@ -34,7 +34,7 @@ public class MetaDataSerializer {
      * Writes all data in the format &lt;key, serialized data>.
      */
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
-                                                             GlobalCitationKeyPattern globalCiteKeyPattern) {
+                                                             GlobalCitationKeyPatterns globalCiteKeyPattern) {
 
         // metadata-key, list of contents
         //  - contents to be separated by OS.NEWLINE
@@ -122,9 +122,9 @@ public class MetaDataSerializer {
         return serializedMetaData;
     }
 
-    private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalCitationKeyPattern globalCitationKeyPattern) {
+    private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalCitationKeyPatterns globalCitationKeyPattern) {
         Map<String, List<String>> stringyPattern = new HashMap<>();
-        AbstractCitationKeyPattern citationKeyPattern = metaData.getCiteKeyPattern(globalCitationKeyPattern);
+        AbstractCitationKeyPatterns citationKeyPattern = metaData.getCiteKeyPattern(globalCitationKeyPattern);
         for (EntryType key : citationKeyPattern.getAllKeys()) {
             if (!citationKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();

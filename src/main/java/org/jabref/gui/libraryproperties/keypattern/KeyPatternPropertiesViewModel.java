@@ -9,7 +9,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelItemModel;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
-import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
@@ -37,7 +37,7 @@ public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
 
     @Override
     public void storeSettings() {
-        DatabaseCitationKeyPattern newKeyPattern = new DatabaseCitationKeyPattern(preferencesService.getCitationKeyPatternPreferences().getKeyPattern());
+        DatabaseCitationKeyPatterns newKeyPattern = new DatabaseCitationKeyPatterns(preferencesService.getCitationKeyPatternPreferences().getKeyPattern());
 
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();

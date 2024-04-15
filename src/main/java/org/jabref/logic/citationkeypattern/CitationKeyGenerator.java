@@ -38,7 +38,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
     private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
 
-    private final AbstractCitationKeyPattern citeKeyPattern;
+    private final AbstractCitationKeyPatterns citeKeyPattern;
     private final BibDatabase database;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final String unwantedCharacters;
@@ -49,7 +49,7 @@ public class CitationKeyGenerator extends BracketedPattern {
                 citationKeyPatternPreferences);
     }
 
-    public CitationKeyGenerator(AbstractCitationKeyPattern citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+    public CitationKeyGenerator(AbstractCitationKeyPatterns citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);
         this.database = Objects.requireNonNull(database);
         this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);

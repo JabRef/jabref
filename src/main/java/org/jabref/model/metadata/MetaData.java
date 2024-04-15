@@ -14,9 +14,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
@@ -115,9 +115,9 @@ public class MetaData {
     /**
      * @return the stored label patterns
      */
-    public AbstractCitationKeyPattern getCiteKeyPattern(GlobalCitationKeyPattern globalPattern) {
+    public AbstractCitationKeyPatterns getCiteKeyPattern(GlobalCitationKeyPatterns globalPattern) {
         Objects.requireNonNull(globalPattern);
-        AbstractCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(globalPattern);
+        AbstractCitationKeyPatterns bibtexKeyPattern = new DatabaseCitationKeyPatterns(globalPattern);
 
         // Add stored key patterns
         citeKeyPatterns.forEach(bibtexKeyPattern::addCitationKeyPattern);
@@ -131,7 +131,7 @@ public class MetaData {
      *
      * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
      */
-    public void setCiteKeyPattern(AbstractCitationKeyPattern bibtexKeyPattern) {
+    public void setCiteKeyPattern(AbstractCitationKeyPatterns bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
 
         List<String> defaultValue = bibtexKeyPattern.getDefaultValue();

@@ -25,7 +25,7 @@ public class CitationKeyPatternPreferences {
     private final StringProperty keyPatternRegex = new SimpleStringProperty();
     private final StringProperty keyPatternReplacement = new SimpleStringProperty();
     private final StringProperty unwantedCharacters = new SimpleStringProperty();
-    private final ObjectProperty<GlobalCitationKeyPattern> keyPattern = new SimpleObjectProperty<>();
+    private final ObjectProperty<GlobalCitationKeyPatterns> keyPattern = new SimpleObjectProperty<>();
     private final String defaultPattern;
     private final ReadOnlyObjectProperty<Character> keywordDelimiter;
 
@@ -36,7 +36,7 @@ public class CitationKeyPatternPreferences {
                                          String keyPatternRegex,
                                          String keyPatternReplacement,
                                          String unwantedCharacters,
-                                         GlobalCitationKeyPattern keyPattern,
+                                         GlobalCitationKeyPatterns keyPattern,
                                          String defaultPattern,
                                          ReadOnlyObjectProperty<Character> keywordDelimiter) {
 
@@ -61,7 +61,7 @@ public class CitationKeyPatternPreferences {
                                          String keyPatternRegex,
                                          String keyPatternReplacement,
                                          String unwantedCharacters,
-                                         GlobalCitationKeyPattern keyPattern,
+                                         GlobalCitationKeyPatterns keyPattern,
                                          String defaultPattern,
                                          Character keywordDelimiter) {
 
@@ -161,15 +161,15 @@ public class CitationKeyPatternPreferences {
         this.unwantedCharacters.set(unwantedCharacters);
     }
 
-    public GlobalCitationKeyPattern getKeyPattern() {
+    public GlobalCitationKeyPatterns getKeyPattern() {
         return keyPattern.get();
     }
 
-    public ObjectProperty<GlobalCitationKeyPattern> keyPatternProperty() {
+    public ObjectProperty<GlobalCitationKeyPatterns> keyPatternProperty() {
         return keyPattern;
     }
 
-    public void setKeyPattern(GlobalCitationKeyPattern keyPattern) {
+    public void setKeyPattern(GlobalCitationKeyPatterns keyPattern) {
         this.keyPattern.set(keyPattern);
     }
 

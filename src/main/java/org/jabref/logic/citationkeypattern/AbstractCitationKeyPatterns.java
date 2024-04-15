@@ -15,7 +15,7 @@ import org.jabref.model.entry.types.EntryType;
  * A small table, where an entry type is associated with a Bibtex key pattern (an
  * <code>ArrayList</code>). A parent CitationKeyPattern can be set.
  */
-public abstract class AbstractCitationKeyPattern {
+public abstract class AbstractCitationKeyPatterns {
 
     protected List<String> defaultPattern = new ArrayList<>();
 
@@ -44,7 +44,7 @@ public abstract class AbstractCitationKeyPattern {
     }
 
     public void addCitationKeyPattern(EntryType type, String pattern) {
-        data.put(type, AbstractCitationKeyPattern.split(pattern));
+        data.put(type, AbstractCitationKeyPatterns.split(pattern));
     }
 
     @Override
@@ -64,7 +64,7 @@ public abstract class AbstractCitationKeyPattern {
         if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
-        AbstractCitationKeyPattern that = (AbstractCitationKeyPattern) o;
+        AbstractCitationKeyPatterns that = (AbstractCitationKeyPatterns) o;
         return Objects.equals(defaultPattern, that.defaultPattern) && Objects.equals(data, that.data);
     }
 
@@ -120,7 +120,7 @@ public abstract class AbstractCitationKeyPattern {
      */
     public void setDefaultValue(String bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
-        this.defaultPattern = AbstractCitationKeyPattern.split(bibtexKeyPattern);
+        this.defaultPattern = AbstractCitationKeyPatterns.split(bibtexKeyPattern);
     }
 
     public Set<EntryType> getAllKeys() {

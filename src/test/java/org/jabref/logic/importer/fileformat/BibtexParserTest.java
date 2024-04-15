@@ -14,9 +14,9 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SaveConfiguration;
@@ -1352,9 +1352,9 @@ class BibtexParserTest {
                 .parse(new StringReader("@comment{jabref-meta: keypattern_article:articleTest;}" + OS.NEWLINE
                         + "@comment{jabref-meta: keypatterndefault:test;}"));
 
-        GlobalCitationKeyPattern pattern = mock(GlobalCitationKeyPattern.class);
-        AbstractCitationKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
-        AbstractCitationKeyPattern expectedPattern = new DatabaseCitationKeyPattern(pattern);
+        GlobalCitationKeyPatterns pattern = mock(GlobalCitationKeyPatterns.class);
+        AbstractCitationKeyPatterns bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
+        AbstractCitationKeyPatterns expectedPattern = new DatabaseCitationKeyPatterns(pattern);
         expectedPattern.setDefaultValue("test");
         expectedPattern.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
 

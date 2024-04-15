@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.jabref.model.entry.types.EntryType;
 
-public class DatabaseCitationKeyPattern extends AbstractCitationKeyPattern {
+public class DatabaseCitationKeyPatterns extends AbstractCitationKeyPatterns {
 
-    private final GlobalCitationKeyPattern globalCitationKeyPattern;
+    private final GlobalCitationKeyPatterns globalCitationKeyPattern;
 
-    public DatabaseCitationKeyPattern(GlobalCitationKeyPattern globalCitationKeyPattern) {
+    public DatabaseCitationKeyPatterns(GlobalCitationKeyPatterns globalCitationKeyPattern) {
         this.globalCitationKeyPattern = globalCitationKeyPattern;
     }
 

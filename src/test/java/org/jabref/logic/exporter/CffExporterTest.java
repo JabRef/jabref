@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.importer.fileformat.CffImporter;
 import org.jabref.logic.importer.fileformat.CffImporterTest;
 import org.jabref.model.database.BibDatabase;
@@ -244,7 +244,7 @@ public class CffExporterTest {
                 Answers.RETURNS_SMART_NULLS
         );
         when(citationKeyPatternPreferences.getKeyPattern())
-                .thenReturn(GlobalCitationKeyPattern.fromPattern("[auth][year]"));
+                .thenReturn(GlobalCitationKeyPatterns.fromPattern("[auth][year]"));
 
         // First, import the file which will be parsed as two entries
         CffImporter importer = new CffImporter(citationKeyPatternPreferences);

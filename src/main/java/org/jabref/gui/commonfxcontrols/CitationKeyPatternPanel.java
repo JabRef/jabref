@@ -13,7 +13,7 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
@@ -83,7 +83,7 @@ public class CitationKeyPatternPanel extends TableView<CitationKeyPatternPanelIt
         this.itemsProperty().bindBidirectional(viewModel.patternListProperty());
     }
 
-    public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern keyPattern) {
+    public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPatterns keyPattern) {
         viewModel.setValues(entryTypeList, keyPattern);
     }
 

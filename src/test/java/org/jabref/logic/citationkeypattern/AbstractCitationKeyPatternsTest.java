@@ -11,11 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 @Execution(ExecutionMode.CONCURRENT)
-class AbstractCitationKeyPatternTest {
+class AbstractCitationKeyPatternsTest {
 
     @Test
     void AbstractCitationKeyPatternParse() throws Exception {
-        AbstractCitationKeyPattern pattern = mock(AbstractCitationKeyPattern.class, Mockito.CALLS_REAL_METHODS);
+        AbstractCitationKeyPatterns pattern = mock(AbstractCitationKeyPatterns.class, Mockito.CALLS_REAL_METHODS);
 
         pattern.setDefaultValue("[field1]spacer1[field2]spacer2[field3]");
         List<String> expectedPattern = List.of(
@@ -37,7 +37,7 @@ class AbstractCitationKeyPatternTest {
 
     @Test
     void AbstractCitationKeyPatternParseEmptySpacer() throws Exception {
-        AbstractCitationKeyPattern pattern = mock(AbstractCitationKeyPattern.class, Mockito.CALLS_REAL_METHODS);
+        AbstractCitationKeyPatterns pattern = mock(AbstractCitationKeyPatterns.class, Mockito.CALLS_REAL_METHODS);
 
         pattern.setDefaultValue("[field1][field2]spacer2[field3]");
         List<String> expectedPattern = List.of(
