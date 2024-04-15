@@ -1,5 +1,6 @@
 package org.jabref.gui.search;
 
+import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.Globals;
@@ -15,8 +16,12 @@ public class SearchTextField {
     public static CustomTextField create() {
         CustomTextField textField = (CustomTextField) TextFields.createClearableTextField();
         textField.setPromptText(Localization.lang("Search..."));
-        textField.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
         textField.setId("searchField");
+        textField.getStyleClass().add("search-field");
+
+        Node graphicNode = IconTheme.JabRefIcons.SEARCH.getGraphicNode();
+        graphicNode.getStyleClass().add("search-field-icon");
+        textField.setLeft(graphicNode);
 
         textField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             // Other key bindings are handled at org.jabref.gui.keyboard.TextInputKeyBindings
@@ -28,6 +33,7 @@ public class SearchTextField {
                        event.consume();
             }
         });
+
         return textField;
     }
 }

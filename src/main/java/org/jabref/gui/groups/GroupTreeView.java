@@ -124,12 +124,7 @@ public class GroupTreeView extends BorderPane {
     private void createNodes() {
         searchField = SearchTextField.create();
         searchField.setPromptText(Localization.lang("Filter groups..."));
-        searchField.setId("searchField");
-        HBox.setHgrow(searchField, Priority.ALWAYS);
-
-        HBox groupFilterBar = new HBox(searchField);
-        groupFilterBar.setId("groupFilterBar");
-        this.setTop(groupFilterBar);
+        this.setTop(searchField);
 
         mainColumn = new TreeTableColumn<>();
         mainColumn.setId("mainColumn");
