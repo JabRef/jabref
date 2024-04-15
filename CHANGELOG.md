@@ -25,6 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where entry type with duplicate fields prevented opening existing libraries with custom entry types [#11127](https://github.com/JabRef/jabref/issues/11127)
+- We fixed crash on opening the entry editor when auto completion is enabled. [#11188](https://github.com/JabRef/jabref/issues/11188)
 
 ### Removed
 
