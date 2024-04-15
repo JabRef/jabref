@@ -125,7 +125,7 @@ jobs:
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
+          --jlink-options --bind-services --add-options="--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module"
       - name: Build pkg (macOS)
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -150,7 +150,7 @@ jobs:
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
+          --jlink-options --bind-services --add-options="--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module"
       - name: Rename files with arm64 suffix as well
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
