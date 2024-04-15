@@ -419,7 +419,7 @@ run {
         // On a change here, also adapt "application > applicationDefaultJvmArgs"
         addExports = [
                 'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
-                'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref'
+                'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
 
                 // We need to restate the ControlsFX exports, because we get following error otherwise:
                 //   java.lang.IllegalAccessError:
