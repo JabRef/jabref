@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -28,6 +29,7 @@ import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +46,10 @@ public class GlobalSearchBarTest {
         when(searchPreferences.getSearchFlags()).thenReturn(EnumSet.noneOf(SearchRules.SearchFlags.class));
         PreferencesService prefs = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         when(prefs.getSearchPreferences()).thenReturn(searchPreferences);
+
+        KeyBindingRepository keyBindingRepository = mock(KeyBindingRepository.class);
+        when(keyBindingRepository.matches(any(), any())).thenReturn(false);
+        when(prefs.getKeyBindingRepository()).thenReturn(keyBindingRepository);
 
         stateManager = new StateManager();
         // Need for active database, otherwise the searchField will be disabled
