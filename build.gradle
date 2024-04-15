@@ -397,9 +397,7 @@ compileJava {
         // TODO: Remove access to internal api
         addExports = [
                 // Fix for https://github.com/JabRef/jabref/issues/11188
-                'javafx.base/com.sun.javafx.event' : 'org.controlsfx.controls',
                 'javafx.base/com.sun.javafx.event' : 'org.jabref',
-                'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
 
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
@@ -411,7 +409,6 @@ run {
     // TODO: Remove access to internal api
     moduleOptions {
         addExports = [
-                'javafx.base/com.sun.javafx.event' : 'org.jabref',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
@@ -430,7 +427,6 @@ run {
         ]
 
         addOpens = [
-                'javafx.base/com.sun.javafx.event' : 'org.jabref',
                 'javafx.controls/javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
