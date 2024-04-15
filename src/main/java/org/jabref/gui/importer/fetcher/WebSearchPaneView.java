@@ -53,7 +53,7 @@ public class WebSearchPaneView extends VBox {
 
         StackPane helpButtonContainer = createHelpButtonContainer();
         HBox fetcherContainer = new HBox(fetchers, helpButtonContainer);
-        TextField query = SearchTextField.create();
+        TextField query = SearchTextField.create(preferences.getKeyBindingRepository());
         getChildren().addAll(fetcherContainer, query, createSearchButton());
 
         viewModel.queryProperty().bind(query.textProperty());

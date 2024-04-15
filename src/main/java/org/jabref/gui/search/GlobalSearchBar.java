@@ -42,7 +42,6 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
@@ -88,7 +87,7 @@ public class GlobalSearchBar extends HBox {
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
 
-    private final CustomTextField searchField = SearchTextField.create();
+    private final CustomTextField searchField;
     private final ToggleButton caseSensitiveButton;
     private final ToggleButton regularExpressionButton;
     private final ToggleButton fulltextButton;
@@ -130,6 +129,9 @@ public class GlobalSearchBar extends HBox {
             searchQueryProperty = stateManager.activeGlobalSearchQueryProperty();
         }
 
+        KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
+
+        searchField = SearchTextField.create(keyBindingRepository);
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the tabContainer width is too small
@@ -140,9 +142,8 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
-        KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (Globals.getKeyPrefs().matches(event, KeyBinding.CLEAR_SEARCH)) {
+            if (keyBindingRepository.matches(event, KeyBinding.CLEAR_SEARCH)) {
                 // Clear search and select first entry, if available
                 searchField.clear();
                 if (searchType == SearchType.NORMAL_SEARCH) {

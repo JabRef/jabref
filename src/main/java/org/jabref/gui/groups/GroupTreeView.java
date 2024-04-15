@@ -122,7 +122,7 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void createNodes() {
-        searchField = SearchTextField.create();
+        searchField = SearchTextField.create(preferencesService.getKeyBindingRepository());
         searchField.setPromptText(Localization.lang("Filter groups..."));
         this.setTop(searchField);
 
