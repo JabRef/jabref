@@ -9,7 +9,7 @@ import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * This formatter escapes characters so they are suitable for HTML.
+ * This formatter escapes characters so that they are suitable for HTML.
  */
 public class HTMLChars implements LayoutFormatter {
 
@@ -49,8 +49,6 @@ public class HTMLChars implements LayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuilder();
-            } else if (!incommand && ((c == '{') || (c == '}'))) {
-                // Swallow the brace.
             } else if (Character.isLetter(c) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
@@ -73,7 +71,7 @@ public class HTMLChars implements LayoutFormatter {
                         String commandBody;
                         if (c == '{') {
                             String part = StringUtil.getPart(field, i, false);
-                            i += part.length();
+                            i += part.length() + 1;
                             commandBody = part;
                         } else {
                             commandBody = field.substring(i, i + 1);
@@ -83,7 +81,6 @@ public class HTMLChars implements LayoutFormatter {
                         sb.append(Objects.requireNonNullElse(result, commandBody));
 
                         incommand = false;
-                        escaped = false;
                     } else {
                         // Are we already at the end of the string?
                         if ((i + 1) == field.length()) {
@@ -109,11 +106,11 @@ public class HTMLChars implements LayoutFormatter {
                     String tag = getHTMLTag(command);
                     if (!tag.isEmpty()) {
                         String part = StringUtil.getPart(field, i, true);
-                        i += part.length();
+                        i += part.length() + 1;
                         sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
                     } else if (c == '{') {
                         String argument = StringUtil.getPart(field, i, true);
-                        i += argument.length();
+                        i += argument.length() + 1;
                         // handle common case of general latex command
                         String result = HTML_CHARS.get(command + argument);
                         // If found, then use translated version. If not, then keep
@@ -170,7 +167,7 @@ public class HTMLChars implements LayoutFormatter {
                                   .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
                                   .replace("\n", "<br>") // Replace single line breaks with <br>
                                   .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                                  .replaceAll("\\$([^$]*)\\$", "\\{$1\\}");
+                                  .replaceAll("\\$([^$]*)\\$", "$1}");
     }
 
     private String getHTMLTag(String latexCommand) {
