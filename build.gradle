@@ -62,9 +62,19 @@ application {
     mainClass.set('org.jabref.Launcher')
     mainModule.set('org.jabref')
 
-    applicationDefaultJvmArgs =
+    applicationDefaultJvmArgs = [
+        // On a change here, also adapt "run > moduleOptions"
+
         // Fix for https://github.com/JabRef/jabref/issues/11188
-        ['--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module']
+        '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
+        '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
+        '--add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref.merged.module',
+
+        // Fix for https://github.com/JabRef/jabref/issues/11198
+        '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
+        '--add-opens=org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref.merged.module',
+        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module'
+    ]
 }
 
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
@@ -403,14 +413,21 @@ compileJava {
     }
 }
 
+// Configures "application > run" task
 run {
     // TODO: Remove access to internal api
     moduleOptions {
+        // On a change here, also adapt "application > applicationDefaultJvmArgs"
         addExports = [
+                'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
-                // Not sure why we need to restate the controlfx exports
+                // We need to restate the ControlsFX exports, because we get following error otherwise:
+                //   java.lang.IllegalAccessError:
+                //     class org.controlsfx.control.textfield.AutoCompletionBinding (in module org.controlsfx.controls)
+                //     cannot access class com.sun.javafx.event.EventHandlerManager (in module javafx.base) because
+                //     module javafx.base does not export com.sun.javafx.event to module org.controlsfx.controls
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
                 'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
                 'javafx.graphics/com.sun.javafx.scene.traversal' : 'org.controlsfx.controls',
