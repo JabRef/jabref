@@ -63,6 +63,7 @@ application {
     mainModule.set('org.jabref')
 
     applicationDefaultJvmArgs =
+        // Fix for https://github.com/JabRef/jabref/issues/11188
         ['--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module']
 }
 
