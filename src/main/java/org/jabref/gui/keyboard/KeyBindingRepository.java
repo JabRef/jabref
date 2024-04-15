@@ -111,6 +111,11 @@ public class KeyBindingRepository {
         return this.bindings.size();
     }
 
+    /**
+     * Searches the key bindings for the given KeyEvent. Only the first matching key binding is returned.
+     * <p>
+     * If you need all matching key bindings, use {@link #mapToKeyBindings(KeyEvent)} instead.
+     */
     public Optional<KeyBinding> mapToKeyBinding(KeyEvent keyEvent) {
         for (KeyBinding binding : KeyBinding.values()) {
             if (checkKeyCombinationEquality(binding, keyEvent)) {
