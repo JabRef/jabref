@@ -121,7 +121,7 @@ public enum StandardActions implements Action {
     SHOW_PREFS(Localization.lang("Preferences"), IconTheme.JabRefIcons.PREFERENCES, KeyBinding.SHOW_PREFS),
     MANAGE_JOURNALS(Localization.lang("Manage journal abbreviations")),
     CUSTOMIZE_KEYBINDING(Localization.lang("Customize keyboard shortcuts"), IconTheme.JabRefIcons.KEY_BINDINGS),
-    EDIT_ENTRY(Localization.lang("Open entry editor"), IconTheme.JabRefIcons.EDIT_ENTRY, KeyBinding.EDIT_ENTRY),
+    EDIT_ENTRY(Localization.lang("Open entry editor"), IconTheme.JabRefIcons.EDIT_ENTRY, KeyBinding.OPEN_CLOSE_ENTRY_EDITOR),
     SHOW_PDF_VIEWER(Localization.lang("Open document viewer"), IconTheme.JabRefIcons.PDF_FILE),
     NEXT_PREVIEW_STYLE(Localization.lang("Next preview style"), KeyBinding.NEXT_PREVIEW_LAYOUT),
     PREVIOUS_PREVIEW_STYLE(Localization.lang("Previous preview style"), KeyBinding.PREVIOUS_PREVIEW_LAYOUT),
@@ -149,7 +149,7 @@ public enum StandardActions implements Action {
     CLEANUP_ENTRIES(Localization.lang("Cleanup entries"), IconTheme.JabRefIcons.CLEANUP_ENTRIES, KeyBinding.CLEANUP),
     SET_FILE_LINKS(Localization.lang("Automatically set file links"), KeyBinding.AUTOMATICALLY_LINK_FILES),
 
-    EDIT_FILE_LINK(Localization.lang("Edit"), IconTheme.JabRefIcons.EDIT, KeyBinding.EDIT_ENTRY),
+    EDIT_FILE_LINK(Localization.lang("Edit"), IconTheme.JabRefIcons.EDIT, KeyBinding.OPEN_CLOSE_ENTRY_EDITOR),
     DOWNLOAD_FILE(Localization.lang("Download file"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
     REDOWNLOAD_FILE(Localization.lang("Redownload file"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
     RENAME_FILE_TO_PATTERN(Localization.lang("Rename file to defined pattern"), IconTheme.JabRefIcons.AUTO_RENAME),
