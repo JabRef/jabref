@@ -140,7 +140,6 @@ if (os.contains("win")) {
 
 javafx {
     sdk = javafxSdkPath
-    addExtraModulePath javafxJmodsPath
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -620,6 +619,8 @@ tasks.register('deleteInstallerTemp', Delete) {
 jpackage.dependsOn deleteInstallerTemp
 jlinkZip.dependsOn jpackage
 jlink {
+    addExtraModulePath javafxJmodsPath
+
     // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
     addExtraDependencies("javafx")
 
