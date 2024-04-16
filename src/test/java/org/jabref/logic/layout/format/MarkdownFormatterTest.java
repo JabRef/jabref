@@ -36,4 +36,9 @@ class MarkdownFormatterTest {
         Exception exception = assertThrows(NullPointerException.class, () -> markdownFormatter.format(null));
         assertEquals("Field Text should not be null, when handed to formatter", exception.getMessage());
     }
+
+    @Test
+    void formatWhenFormattingStringWithBracesThenKeepBraces() {
+        assertEquals("<p>{Hello World}</p>", markdownFormatter.format("{Hello World}"));
+    }
 }
