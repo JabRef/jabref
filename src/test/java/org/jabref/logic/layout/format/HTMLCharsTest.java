@@ -27,14 +27,16 @@ public class HTMLCharsTest {
                 Arguments.of("hallo", "hallo"),
                 Arguments.of("Réflexions sur le timing de la quantité", "Réflexions sur le timing de la quantité"),
                 Arguments.of("%%%", "\\%\\%\\%"),
+                Arguments.of("{{People remember 10%, 20%…Oh Really?}}", "{{People remember 10\\%, 20\\%…Oh Really?}}"),
                 Arguments.of("h&aacute;llo", "h\\'allo"),
                 Arguments.of("&imath; &imath;", "\\i \\i"),
                 Arguments.of("&imath;", "\\i"),
                 Arguments.of("&imath;", "\\{i}"),
                 Arguments.of("&imath;&imath;", "\\i\\i"),
-                Arguments.of("&auml;", "\\\"{a}"),
+                Arguments.of("{&auml;}", "{\\\"{a}}"),
+                Arguments.of("{&auml;}", "{\\\"a}"),
                 Arguments.of("&auml;", "\\\"a"),
-                Arguments.of("&auml;", "\\\"a"),
+                Arguments.of("{&Ccedil;}", "{\\c{C}}"),
                 Arguments.of("&Ccedil;", "\\c{C}"),
                 Arguments.of("&Oogon;&imath;", "\\k{O}\\i"),
                 Arguments.of("&ntilde; &ntilde; &iacute; &imath; &imath;", "\\~{n} \\~n \\'i \\i \\i")
@@ -50,12 +52,16 @@ public class HTMLCharsTest {
     private static Stream<Arguments> provideLaTeXHighlightingFormattingData() {
         return Stream.of(
                 Arguments.of("<em>hallo</em>", "\\emph{hallo}"),
+                Arguments.of("{<em>hallo</em>}", "{\\emph hallo}"),
                 Arguments.of("<em>hallo</em>", "\\em hallo"),
 
                 Arguments.of("<i>hallo</i>", "\\textit{hallo}"),
+                Arguments.of("{<i>hallo</i>}", "{\\textit hallo}"),
                 Arguments.of("<i>hallo</i>", "\\it hallo"),
 
                 Arguments.of("<b>hallo</b>", "\\textbf{hallo}"),
+                Arguments.of("{<b>hallo</b>}", "{\\textbf hallo}"),
+                Arguments.of("{<b>hallo</b>}", "{\\bf hallo}"),
                 Arguments.of("<b>hallo</b>", "\\bf hallo"),
 
                 Arguments.of("<sup>hallo</sup>", "\\textsuperscript{hallo}"),
