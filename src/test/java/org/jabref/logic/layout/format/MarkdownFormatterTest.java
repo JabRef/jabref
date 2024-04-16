@@ -22,6 +22,41 @@ class MarkdownFormatterTest {
     }
 
     @Test
+    void formatWhenFormattingHeaderThenReturnsHeaderInHtml() {
+        assertEquals("<h1>Hello World</h1>", markdownFormatter.format("# Hello World"));
+    }
+
+    @Test
+    void formatWhenFormattingBoldTextThenReturnsBoldTextInHtml() {
+        assertEquals("<p><strong>Hello World</strong></p>", markdownFormatter.format("**Hello World**"));
+    }
+
+    @Test
+    void formatWhenFormattingItalicTextThenReturnsItalicTextInHtml() {
+        assertEquals("<p><em>Hello World</em></p>", markdownFormatter.format("*Hello World*"));
+    }
+
+    @Test
+    void formatWhenFormattingLinkThenReturnsLinkInHtml() {
+        assertEquals("<p><a href=\"https://example.com\">Example</a></p>", markdownFormatter.format("[Example](https://example.com)"));
+    }
+
+    @Test
+    void formatWhenFormattingImageThenReturnsImageInHtml() {
+        assertEquals("<p><img src=\"https://example.com/image.jpg\" alt=\"Example Image\" /></p>", markdownFormatter.format("![Example Image](https://example.com/image.jpg)"));
+    }
+
+    @Test
+    void formatWhenFormattingBlockquoteThenReturnsBlockquoteInHtml() {
+        assertEquals("<blockquote> <p>Hello World</p> </blockquote>", markdownFormatter.format("> Hello World"));
+    }
+
+    @Test
+    void formatWhenFormattingCodeBlockThenReturnsCodeBlockInHtml() {
+        assertEquals("<pre><code>Hello World </code></pre>", markdownFormatter.format("```\nHello World\n```"));
+    }
+
+    @Test
     void formatWhenFormattingComplexMarkupThenReturnsOnlyOneLine() {
         assertFalse(markdownFormatter.format("Markup\n\n* list item one\n* list item 2\n\n rest").contains("\n"));
     }
