@@ -11,10 +11,12 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
@@ -26,7 +28,6 @@ import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
-import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +74,11 @@ public class JabRefGUI extends Application {
                 mainStage,
                 dialogService,
                 fileUpdateMonitor,
-                preferencesService);
+                preferencesService,
+                Globals.stateManager,
+                Globals.undoManager,
+                Globals.entryTypesManager,
+                Globals.TASK_EXECUTOR);
 
         openWindow();
 
@@ -154,12 +159,7 @@ public class JabRefGUI extends Application {
         }
         debugLogWindowState(mainStage);
 
-        // We create a decoration pane ourselves for performance reasons
-        // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
-        DecorationPane root = new DecorationPane();
-        root.getChildren().add(JabRefGUI.mainFrame);
-
-        Scene scene = new Scene(root, 800, 800);
+        Scene scene = new Scene(JabRefGUI.mainFrame);
         themeManager.installCss(scene);
 
         // Handle TextEditor key bindings
@@ -177,11 +177,15 @@ public class JabRefGUI extends Application {
     }
 
     public void onShowing(WindowEvent event) {
+        Platform.runLater(() -> mainFrame.updateDividerPosition());
+
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
             && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
             mainFrame.openLastEditedDatabases();
         }
+
+        Telemetry.initTrackingNotification(dialogService, preferencesService.getTelemetryPreferences());
     }
 
     public void onCloseRequest(WindowEvent event) {
