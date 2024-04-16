@@ -1,8 +1,11 @@
-package org.jabref.gui;
+package org.jabref.gui.frame;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -13,8 +16,12 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
+import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 
@@ -53,7 +60,7 @@ public class FrameDndHandler {
                 // drag'n'drop on tabs covered dnd on tabbedPane, so dnd on tabs should contain all dnds on tabbedPane
                 for (Node destinationTabNode : tabPane.lookupAll(".tab")) {
                     destinationTabNode.setOnDragOver(tabDragEvent -> onTabDragOver(event, tabDragEvent, dndIndicator));
-                    destinationTabNode.setOnDragExited(event1 -> tabPane.getTabs().remove(dndIndicator));
+                    destinationTabNode.setOnDragExited(tabDragEvent -> tabPane.getTabs().remove(dndIndicator));
                     destinationTabNode.setOnDragDropped(tabDragEvent -> onTabDragDropped(destinationTabNode, tabDragEvent, dndIndicator));
                 }
                 event.consume();
@@ -63,12 +70,12 @@ public class FrameDndHandler {
         });
     }
 
-    void onTabDragDropped(Node destinationTabNode, DragEvent tabDragEvent, Tab dndIndicator) {
+    private void onTabDragDropped(Node destinationTabNode, DragEvent tabDragEvent, Tab dndIndicator) {
         Dragboard dragboard = tabDragEvent.getDragboard();
 
-        if (DragAndDropHelper.hasBibFiles(dragboard)) {
+        if (hasBibFiles(dragboard)) {
             tabPane.getTabs().remove(dndIndicator);
-            List<Path> bibFiles = DragAndDropHelper.getBibFiles(dragboard);
+            List<Path> bibFiles = getBibFiles(dragboard);
             OpenDatabaseAction openDatabaseAction = this.openDatabaseAction.get();
             openDatabaseAction.openFiles(bibFiles);
             tabDragEvent.setDropCompleted(true);
@@ -83,8 +90,8 @@ public class FrameDndHandler {
                 if (libraryTab.getId().equals(destinationTabNode.getId()) &&
                         !tabPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
                     LibraryTab destinationLibraryTab = (LibraryTab) libraryTab;
-                    if (DragAndDropHelper.hasGroups(dragboard)) {
-                        List<String> groupPathToSources = DragAndDropHelper.getGroups(dragboard);
+                    if (hasGroups(dragboard)) {
+                        List<String> groupPathToSources = getGroups(dragboard);
 
                         copyRootNode(destinationLibraryTab);
 
@@ -113,8 +120,8 @@ public class FrameDndHandler {
         }
     }
 
-    void onTabDragOver(DragEvent event, DragEvent tabDragEvent, Tab dndIndicator) {
-        if (DragAndDropHelper.hasBibFiles(tabDragEvent.getDragboard()) || DragAndDropHelper.hasGroups(tabDragEvent.getDragboard())) {
+    private void onTabDragOver(DragEvent event, DragEvent tabDragEvent, Tab dndIndicator) {
+        if (hasBibFiles(tabDragEvent.getDragboard()) || hasGroups(tabDragEvent.getDragboard())) {
             tabDragEvent.acceptTransferModes(TransferMode.ANY);
             if (!tabPane.getTabs().contains(dndIndicator)) {
                 tabPane.getTabs().add(dndIndicator);
@@ -130,8 +137,8 @@ public class FrameDndHandler {
         }
     }
 
-    void onSceneDragOver(DragEvent event, Tab dndIndicator) {
-        if (DragAndDropHelper.hasBibFiles(event.getDragboard())) {
+    private void onSceneDragOver(DragEvent event, Tab dndIndicator) {
+        if (hasBibFiles(event.getDragboard())) {
             event.acceptTransferModes(TransferMode.ANY);
             if (!tabPane.getTabs().contains(dndIndicator)) {
                 tabPane.getTabs().add(dndIndicator);
@@ -149,7 +156,7 @@ public class FrameDndHandler {
 
     private void onSceneDragDropped(DragEvent event, Tab dndIndicator) {
         tabPane.getTabs().remove(dndIndicator);
-        List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
+        List<Path> bibFiles = getBibFiles(event.getDragboard());
         OpenDatabaseAction openDatabaseAction = this.openDatabaseAction.get();
         openDatabaseAction.openFiles(bibFiles);
         event.setDropCompleted(true);
@@ -193,6 +200,30 @@ public class FrameDndHandler {
             for (GroupTreeNode child : children) {
                 copyGroupTreeNode(destinationLibraryTab, copiedNode, child);
             }
+        }
+    }
+
+    private boolean hasBibFiles(Dragboard dragboard) {
+        return !getBibFiles(dragboard).isEmpty();
+    }
+
+    private List<Path> getBibFiles(Dragboard dragboard) {
+        if (!dragboard.hasFiles()) {
+            return Collections.emptyList();
+        } else {
+            return dragboard.getFiles().stream().map(File::toPath).filter(FileUtil::isBibFile).collect(Collectors.toList());
+        }
+    }
+
+    private boolean hasGroups(Dragboard dragboard) {
+        return !getGroups(dragboard).isEmpty();
+    }
+
+    private List<String> getGroups(Dragboard dragboard) {
+        if (!dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
+            return Collections.emptyList();
+        } else {
+            return (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
         }
     }
 }
