@@ -344,8 +344,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                 break;
                             }
                             if (isStartElement(reader, "url")) {
-                                StringBuilder url = parseElementContent(reader, "url");
-                                entry.setField(StandardField.URL, clean(url.toString()));
+                                String url = parseElementContent(reader, "url").toString().trim();
+                                entry.setField(StandardField.URL, url);
                             }
                         }
                     }
@@ -356,8 +356,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                 break;
                             }
                             if (isStartElement(reader, "url")) {
-                                StringBuilder file = parseElementContent(reader, "url");
-                                entry.setField(StandardField.FILE, clean(file.toString()));
+                                String file = parseElementContent(reader, "url").toString().trim();
+                                entry.setField(StandardField.FILE, ":" + file + ":PDF");
                             }
                         }
                     }
@@ -368,8 +368,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                 break;
                             }
                             if (isStartElement(reader, "url")) {
-                                StringBuilder file = parseElementContent(reader, "url");
-                                entry.setField(StandardField.URL, clean(file.toString()));
+                                String url = parseElementContent(reader, "url").toString().trim();
+                                entry.setField(StandardField.URL, url);
                             }
                         }
                     }
@@ -422,7 +422,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 content.append(reader.getText());
             }
         }
-        return new StringBuilder(content.toString().trim().replaceAll("\\s+", " "));
+        return new StringBuilder(content.toString().trim().replaceAll("\\s+", " ").trim());
     }
 
     private String clean(String input) {
