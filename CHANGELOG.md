@@ -26,6 +26,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We fixed an issue where entry type with duplicate fields prevented opening existing libraries with custom entry types [#11127](https://github.com/JabRef/jabref/issues/11127)
 - We fixed an issue where Markdown rendering removed braces from the text. [#10928](https://github.com/JabRef/jabref/issues/10928)
+- We fixed crash on opening the entry editor when auto completion is enabled. [#11188](https://github.com/JabRef/jabref/issues/11188)
+- We fixed the usage of the key binding for "Clear search" (default: <kbd>Escape</kbd>). [#10764](https://github.com/JabRef/jabref/issues/10764).
 
 ### Removed
 
