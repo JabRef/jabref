@@ -119,8 +119,28 @@ dependencyLocking {
     lockAllConfigurations()
 }
 
+def osName = DefaultNativePlatform.current().getOperatingSystem().getName().toLowerCase()
+
+// Set JavaFX SDK and JMODS path based on OS
+def javafxSdkPath
+def javafxJmodsPath
+
+if (osName.contains("windows")) {
+    javafxSdkPath = 'javafx/javafx-sdk-windows'
+    javafxJmodsPath = 'javafx/javafx-jmods-windows'
+} else if (osName.contains("mac os")) {
+    javafxSdkPath = 'javafx/javafx-sdk-macos'
+    javafxJmodsPath = 'javafx/javafx-jmods-macos'
+} else if (osName.contains("linux")) {
+    javafxSdkPath = 'javafx/javafx-sdk-linux'
+    javafxJmodsPath = 'javafx/javafx-jmods-linux'
+} else {
+    throw new GradleException("Unsupported operating system")
+}
+
 javafx {
-    version = "22"
+    sdk = javafxSdkPath
+    addExtraModulePath javafxJmodsPath
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
