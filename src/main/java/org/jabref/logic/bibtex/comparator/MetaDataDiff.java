@@ -21,7 +21,7 @@ public class MetaDataDiff {
         PROTECTED,
         SAVE_ACTIONS,
         SAVE_SORT_ORDER,
-        USER_FILE_DIRECTORY;
+        USER_FILE_DIRECTORY
     }
 
     public record Difference(DifferenceType differenceType, Object originalObject, Object newObject) {
