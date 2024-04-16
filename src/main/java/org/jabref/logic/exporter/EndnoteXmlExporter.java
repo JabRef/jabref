@@ -19,6 +19,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -77,7 +78,8 @@ public class EndnoteXmlExporter extends Exporter {
             Map.entry(StandardField.NOTE, "notes"),
             Map.entry(StandardField.LABEL, "label"),
             Map.entry(StandardField.LANGUAGE, "language"),
-            Map.entry(StandardField.KEY, "foreign-keys")
+            Map.entry(StandardField.KEY, "foreign-keys"),
+            Map.entry(new UnknownField("accession-num"), "accession-num")
     );
 
     public EndnoteXmlExporter() {

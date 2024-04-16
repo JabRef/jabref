@@ -27,6 +27,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -188,10 +189,10 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     case "dates" -> {
                         parseDates(reader, entry);
                     }
-//                    case "accession-num" -> {
-//                        StringBuilder accessionNumber = parseElementContent(reader, "accession-num");
-//                        entry.setField(StandardField.NUMBER, accessionNumber.toString());
-//                    }
+                    case "accession-num" -> {
+                        StringBuilder accessionNumber = parseElementContent(reader, "accession-num");
+                        entry.setField(new UnknownField("accession-num"), accessionNumber.toString());
+                    }
                     default -> {
                         Field field = FIELD_MAPPING.entrySet().stream()
                                                    .filter(e -> e.getValue().equals(elementName))
@@ -277,6 +278,10 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     case "secondary-title" -> {
                         StringBuilder secondaryTitle = parseElementContent(reader, "secondary-title");
                         entry.setField(StandardField.JOURNAL, secondaryTitle.toString());
+                    }
+                    case "alt-title" -> {
+                        StringBuilder title = parseElementContent(reader, "alt-title");
+                        entry.setField(new UnknownField("alt-title"), title.toString());
                     }
                 }
             }
