@@ -2,11 +2,15 @@ package org.jabref.logic.bibtex.comparator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.PreferencesService;
 
 public class MetaDataDiff {
     public enum DifferenceType {
@@ -41,8 +45,41 @@ public class MetaDataDiff {
         if (originalMetaData.equals(newMetaData)) {
             return Optional.empty();
         } else {
-            return Optional.of(new MetaDataDiff(originalMetaData, newMetaData));
+            MetaDataDiff diff = new MetaDataDiff(originalMetaData, newMetaData);
+            if (isDefaultContentSelectorDiff(diff)) {
+                return Optional.empty();
+            }
+            return Optional.of(diff);
         }
+    }
+
+    private static boolean isDefaultContentSelectorDiff(MetaDataDiff diff) {
+        GlobalCitationKeyPatterns globalCitationKeyPatterns = new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN);
+        List<Difference> differences = diff.getDifferences(globalCitationKeyPatterns);
+        if (differences.size() != 1) {
+            return false;
+        }
+        Difference onlyDifference = differences.getFirst();
+        if (onlyDifference.differenceType() != DifferenceType.CONTENT_SELECTOR) {
+            return false;
+        }
+        ContentSelectors originalContentSelectors = (ContentSelectors) onlyDifference.originalObject();
+        ContentSelectors newContentSelectors = (ContentSelectors) onlyDifference.newObject();
+        if (isDefaultContentSelectorDiff(originalContentSelectors) && isDefaultContentSelectorDiff(newContentSelectors)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if given content selectors are empty or default
+     */
+    private static boolean isDefaultContentSelectorDiff(ContentSelectors contentSelectors) {
+        if (contentSelectors.getContentSelectors().isEmpty()) {
+            return true;
+        }
+        Map<Field, List<String>> fieldKeywordsMap = ContentSelectors.getFieldKeywordsMap(contentSelectors.getContentSelectors());
+        return ContentSelectors.isDefaultMap(fieldKeywordsMap);
     }
 
     private void addToListIfDiff(List<Difference> changes, DifferenceType differenceType, Object originalObject, Object newObject) {
@@ -54,15 +91,15 @@ public class MetaDataDiff {
     /**
      * Should be kept in sync with {@link MetaData#equals(Object)}
      */
-    public List<Difference> getDifferences(PreferencesService preferences) {
+    public List<Difference> getDifferences(GlobalCitationKeyPatterns globalCitationKeyPatterns) {
         List<Difference> changes = new ArrayList<>();
         addToListIfDiff(changes, DifferenceType.PROTECTED, originalMetaData.isProtected(), newMetaData.isProtected());
         addToListIfDiff(changes, DifferenceType.GROUPS_ALTERED, originalMetaData.getGroups(), newMetaData.getGroups());
         addToListIfDiff(changes, DifferenceType.ENCODING, originalMetaData.getEncoding(), newMetaData.getEncoding());
         addToListIfDiff(changes, DifferenceType.SAVE_SORT_ORDER, originalMetaData.getSaveOrder(), newMetaData.getSaveOrder());
         addToListIfDiff(changes, DifferenceType.KEY_PATTERNS,
-                originalMetaData.getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences().getKeyPatterns()),
-                newMetaData.getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences().getKeyPatterns()));
+                originalMetaData.getCiteKeyPatterns(globalCitationKeyPatterns),
+                newMetaData.getCiteKeyPatterns(globalCitationKeyPatterns));
         addToListIfDiff(changes, DifferenceType.USER_FILE_DIRECTORY, originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories());
         addToListIfDiff(changes, DifferenceType.LATEX_FILE_DIRECTORY, originalMetaData.getLatexFileDirectories(), newMetaData.getLatexFileDirectories());
         addToListIfDiff(changes, DifferenceType.DEFAULT_KEY_PATTERN, originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern());

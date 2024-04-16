@@ -4,15 +4,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.StandardField;
 
 public class ContentSelectors {
+
+    public static final List<Field> DEFAULT_FIELD_NAMES = List.of(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
 
     private final SortedSet<ContentSelector> contentSelectors;
 
@@ -112,5 +117,31 @@ public class ContentSelectors {
                 "contentSelectors=" + contentSelectors +
                 ", fieldsWithSelectors=" + getFieldsWithSelectors() +
                 '}';
+    }
+
+    /**
+     * Checks whether the given map is the default map, i.e. contains only the default field names and no associated keywords.
+     */
+    public static boolean isDefaultMap(Map<Field, List<String>> fieldKeywordsMap) {
+        if (fieldKeywordsMap.size() != ContentSelectors.DEFAULT_FIELD_NAMES.size()) {
+            return false;
+        }
+        for (Field field : ContentSelectors.DEFAULT_FIELD_NAMES) {
+            if (!fieldKeywordsMap.containsKey(field)) {
+                return false;
+            }
+            if (!fieldKeywordsMap.get(field).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Map<Field, List<String>> getFieldKeywordsMap(SortedSet<ContentSelector> contentSelectors) {
+        final Map<Field, List<String>> fieldKeywordsMap = new HashMap<>();
+        contentSelectors.forEach(
+                existingContentSelector -> fieldKeywordsMap.put(existingContentSelector.getField(), new ArrayList<>(existingContentSelector.getValues()))
+        );
+        return fieldKeywordsMap;
     }
 }

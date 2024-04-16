@@ -7,7 +7,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,10 +23,9 @@ public class MetaDataDiffTest {
     }
 
     @Test
-    @Disabled
     public void defaultSettingEqualsEmptySetting() {
         MetaData one = new MetaData();
-        // Field list is from {@link org.jabref.gui.libraryproperties.contentselectors.ContentSelectorViewModel.DEFAULT_FIELD_NAMES}
+        // Field list is from {@link org.jabref.model.metadata.ContentSelectors.DEFAULT_FIELD_NAMES}
         one.addContentSelector(new ContentSelector(StandardField.AUTHOR, List.of()));
         one.addContentSelector(new ContentSelector(StandardField.JOURNAL, List.of()));
         one.addContentSelector(new ContentSelector(StandardField.PUBLISHER, List.of()));
