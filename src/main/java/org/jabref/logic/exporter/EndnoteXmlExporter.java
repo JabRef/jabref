@@ -71,10 +71,13 @@ public class EndnoteXmlExporter extends Exporter {
             Map.entry(StandardField.LOCATION, "pub-location"),
             Map.entry(StandardField.CHAPTER, "section"),
             Map.entry(StandardField.HOWPUBLISHED, "work-type"),
-            Map.entry(StandardField.PUBLISHER, "publisher"),
             Map.entry(StandardField.ISSN, "issn"),
             Map.entry(StandardField.ADDRESS, "auth-address"),
-            Map.entry(StandardField.PAGETOTAL, "page-total")
+            Map.entry(StandardField.PAGETOTAL, "page-total"),
+            Map.entry(StandardField.NOTE, "notes"),
+            Map.entry(StandardField.LABEL, "label"),
+            Map.entry(StandardField.LANGUAGE, "language"),
+            Map.entry(StandardField.KEY, "foreign-keys")
     );
 
     public EndnoteXmlExporter() {

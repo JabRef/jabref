@@ -24,6 +24,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
@@ -77,8 +78,12 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             Map.entry(StandardField.FILE, "pdf-urls"),
             Map.entry(StandardField.ABSTRACT, "abstract"),
             Map.entry(StandardField.KEYWORDS, "keywords"),
-            Map.entry(StandardField.ADDRESS, "auth-address"),
-            Map.entry(StandardField.PAGETOTAL, "page-total")
+            Map.entry(StandardField.PAGETOTAL, "page-total"),
+            Map.entry(StandardField.NOTE, "notes"),
+            Map.entry(StandardField.LABEL, "label"),
+            Map.entry(StandardField.LANGUAGE, "language"),
+            Map.entry(StandardField.KEY, "foreign-keys"),
+            Map.entry(StandardField.ADDRESS, "auth-address")
     );
     private final ImportFormatPreferences preferences;
     private final XMLInputFactory xmlInputFactory;
@@ -164,24 +169,37 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                                                 .findFirst()
                                                                 .orElse(StandardEntryType.Misc);
                         entry.setType(entryType);
+                        System.out.println("Successful ENTRYTYPE SET");
                     }
                     case "contributors" -> {
+                        System.out.println("CONTRIBS ENTERED");
                         parseContributors(reader, entry);
+                        System.out.println("Successful CONTRIBS SET");
                     }
                     case "titles" -> {
                         parseTitles(reader, entry);
+                        System.out.println("Successful TITLES SET");
                     }
                     case "periodical" -> {
                         parsePeriodical(reader, entry);
+                        System.out.println("Successful PERIODICAL SET");
                     }
                     case "keywords" -> {
                         parseKeywords(reader, entry);
+                        System.out.println("Successful KEYW SET");
                     }
                     case "urls" -> {
                         parseUrls(reader, entry);
+                        System.out.println("Successful URLS SET");
                     }
                     case "dates" -> {
                         parseDates(reader, entry);
+                        System.out.println("Successful DATES SET");
+                    }
+                    case "accession-num" -> {
+                        StringBuilder accessionNumber = parseElementContent(reader, "accession-num");
+                        entry.setField(StandardField.NUMBER, accessionNumber.toString());
+                        System.out.println("Successful ACCESSION SET");
                     }
                     default -> {
                         Field field = FIELD_MAPPING.entrySet().stream()
@@ -190,7 +208,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                                    .findFirst()
                                                    .orElse(null);
                         if (field != null) {
-                            entry.setField(field, reader.getElementText());
+                            StringBuilder value = parseElementContent(reader, elementName);
+                            entry.setField(field, value.toString());
+                            System.out.println("SETTING" + field);
                         }
                     }
                 }
@@ -202,48 +222,50 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     private void parseContributors(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
         StringBuilder authors = new StringBuilder();
+        StringBuilder editors = new StringBuilder();
+
         while (reader.hasNext()) {
             reader.next();
             if (isEndElement(reader, "contributors")) {
                 break;
             }
 
-            if (isStartElement(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                switch (elementName) {
-                    case "authors" -> {
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isEndElement(reader, "authors")) {
-                                break;
-                            }
-                            if (isStartElement(reader, "author")) {
-                                String author = reader.getElementText();
-                                if (!authors.isEmpty()) {
-                                    authors.append(" and ");
-                                }
-                                authors.append(author);
-                            }
-                        }
-                        entry.setField(StandardField.AUTHOR, authors.toString());
+            if (isStartElement(reader, "authors")) {
+                while (reader.hasNext()) {
+                    reader.next();
+                    if (isEndElement(reader, "authors")) {
+                        break;
                     }
-                    case "secondary-authors" -> {
-                        while (reader.hasNext()) {
-                            reader.next();
-                            if (isEndElement(reader, "secondary-authors")) {
-                                break;
+                    if (isStartElement(reader, "author")) {
+                        StringBuilder author = parseElementContent(reader, "author");
+                        if (!author.isEmpty()) {
+                            if (!authors.isEmpty()) {
+                                authors.append(" and ");
                             }
-                            if (isStartElement(reader, "author")) {
-                                String editor = reader.getElementText();
-                                if (!authors.isEmpty()) {
-                                    authors.append(" and ");
-                                }
-                                authors.append(editor);
-                            }
+                            authors.append(author);
                         }
-                        entry.setField(StandardField.EDITOR, authors.toString());
                     }
                 }
+                entry.setField(StandardField.AUTHOR, authors.toString());
+            }
+
+            if (isStartElement(reader, "secondary-authors")) {
+                while (reader.hasNext()) {
+                    reader.next();
+                    if (isEndElement(reader, "secondary-authors")) {
+                        break;
+                    }
+                    if (isStartElement(reader, "author")) {
+                        StringBuilder editor = parseElementContent(reader, "author");
+                        if (!editor.isEmpty()) {
+                            if (!editors.isEmpty()) {
+                                editors.append(" and ");
+                            }
+                            editors.append(editor);
+                        }
+                    }
+                }
+                entry.setField(StandardField.EDITOR, editors.toString());
             }
         }
     }
@@ -258,11 +280,13 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             if (isStartElement(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
-                    case "title" -> {
-                        entry.setField(StandardField.TITLE, reader.getElementText());
+                    case "title", "alt-title" -> {
+                        StringBuilder title = parseElementContent(reader, elementName);
+                        entry.setField(StandardField.TITLE, title.toString());
                     }
                     case "secondary-title" -> {
-                        entry.setField(StandardField.JOURNAL, reader.getElementText());
+                        StringBuilder secondaryTitle = parseElementContent(reader, "secondary-title");
+                        entry.setField(StandardField.JOURNAL, secondaryTitle.toString());
                     }
                 }
             }
@@ -279,8 +303,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             if (isStartElement(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
-                    case "full-title" -> {
-                        entry.setField(StandardField.JOURNALTITLE, reader.getElementText());
+                    case "full-title", "abbr-2", "abbr-1", "abbr-3" -> {
+                        StringBuilder journalTitle = parseElementContent(reader, elementName);
+                        entry.setField(StandardField.JOURNALTITLE, journalTitle.toString());
                     }
                 }
             }
@@ -288,7 +313,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     private void parseKeywords(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
-        StringBuilder keywords = new StringBuilder();
+        KeywordList keywordList = new KeywordList();
         while (reader.hasNext()) {
             reader.next();
             if (isEndElement(reader, "keywords")) {
@@ -296,14 +321,15 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             }
 
             if (isStartElement(reader, "keyword")) {
-                String keyword = reader.getElementText();
-                if (keywords.length() > 0) {
-                    keywords.append(", ");
+                StringBuilder keyword = parseElementContent(reader, "keyword");
+                if (!keyword.isEmpty()) {
+                    keywordList.add(keyword.toString());
                 }
-                keywords.append(keyword);
             }
         }
-        entry.setField(StandardField.KEYWORDS, keywords.toString());
+        if (!keywordList.isEmpty()) {
+            entry.putKeywords(keywordList, preferences.bibEntryPreferences().getKeywordSeparator());
+        }
     }
 
     private void parseUrls(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
@@ -323,7 +349,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                 break;
                             }
                             if (isStartElement(reader, "url")) {
-                                entry.setField(StandardField.URL, reader.getElementText());
+                                StringBuilder url = parseElementContent(reader, "url");
+                                entry.setField(StandardField.URL, url.toString());
                             }
                         }
                     }
@@ -334,7 +361,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                 break;
                             }
                             if (isStartElement(reader, "url")) {
-                                entry.setField(StandardField.FILE, reader.getElementText());
+                                StringBuilder file = parseElementContent(reader, "url");
+                                entry.setField(StandardField.FILE, file.toString());
                             }
                         }
                     }
@@ -353,14 +381,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             if (isStartElement(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
-                    case "year" -> {
-                        entry.setField(StandardField.YEAR, reader.getElementText());
-                    }
-                    case "month" -> {
-                        entry.setField(StandardField.MONTH, reader.getElementText());
-                    }
-                    case "day" -> {
-                        entry.setField(StandardField.DAY, reader.getElementText());
+                    case "year", "month", "day" -> {
+                        StringBuilder date = parseElementContent(reader, elementName);
+                        entry.setField(StandardField.valueOf(elementName.toUpperCase()), date.toString());
                     }
                     case "pub-dates" -> {
                         while (reader.hasNext()) {
@@ -369,15 +392,31 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                 break;
                             }
                             if (isStartElement(reader, "date")) {
-                                String date = reader.getElementText();
-                                entry.setField(StandardField.DATE, date);
-                                }
+                                StringBuilder pubDate = parseElementContent(reader, "date");
+                                entry.setField(StandardField.DATE, pubDate.toString());
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    private StringBuilder parseElementContent(XMLStreamReader reader, String elementName) throws XMLStreamException {
+        StringBuilder content = new StringBuilder();
+        while (reader.hasNext()) {
+            reader.next();
+            if (isEndElement(reader, elementName)) {
+                break;
+            }
+            if (isStartElement(reader, "style")) {
+                content = new StringBuilder(reader.getElementText());
+            } else if (reader.getEventType() == XMLEvent.CHARACTERS) {
+                content.append(reader.getText().trim());
+            }
+        }
+        return content;
+    }
 
     private boolean isStartElement(XMLStreamReader reader, String elementName) {
         return isStartElement(reader) && reader.getName().getLocalPart().equals(elementName);
