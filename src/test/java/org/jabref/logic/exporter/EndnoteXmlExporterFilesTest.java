@@ -29,7 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 
-public class EndnoteXmlExporterTestFiles {
+public class EndnoteXmlExporterFilesTest {
 
     private Exporter exporter;
     private BibDatabaseContext databaseContext;
@@ -56,7 +56,7 @@ public class EndnoteXmlExporterTestFiles {
 
     static Stream<String> fileNames() throws IOException, URISyntaxException {
         // we have to point it to one existing file, otherwise it will return the default class path
-        Path resourceDir = Path.of(EndnoteXmlExporterTestFiles.class.getResource("EndnoteXmlExportTestSingleBookEntry.bib").toURI()).getParent();
+        Path resourceDir = Path.of(EndnoteXmlExporterFilesTest.class.getResource("EndnoteXmlExportTestSingleBookEntry.bib").toURI()).getParent();
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString())
                          .filter(n -> n.endsWith(".bib"))
@@ -69,7 +69,7 @@ public class EndnoteXmlExporterTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void performExport(String filename) throws Exception {
-        importFile = Path.of(EndnoteXmlExporterTestFiles.class.getResource(filename).toURI());
+        importFile = Path.of(EndnoteXmlExporterFilesTest.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile).getDatabase().getEntries();
         Path expectedFile = Path.of(ModsExportFormatFilesTest.class.getResource(xmlFileName).toURI());
@@ -91,7 +91,7 @@ public class EndnoteXmlExporterTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void exportAsEndnoteAndThenImportAsEndnote(String filename) throws Exception {
-        importFile = Path.of(EndnoteXmlExporterTestFiles.class.getResource(filename).toURI());
+        importFile = Path.of(EndnoteXmlExporterFilesTest.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile).getDatabase().getEntries();
 
         exporter.export(databaseContext, exportedFile, entries);
