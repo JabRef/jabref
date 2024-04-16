@@ -64,7 +64,6 @@ public class DuplicateCheck {
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.NOTE, 0.1);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.COMMENT, 0.1);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.DOI, 3.);
-        DuplicateCheck.FIELD_WEIGHTS.put(StandardField.ISBN, 2.5);
     }
 
     private final BibEntryTypesManager entryTypesManager;
