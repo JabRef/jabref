@@ -173,7 +173,7 @@ public class CitationKeyGenerator extends BracketedPattern {
         // get the type of entry
         EntryType entryType = entry.getType();
         CitationKeyPattern citationKeyPattern = citeKeyPattern.getValue(entryType);
-        if (citationKeyPattern.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
+        if (citationKeyPattern == null || CitationKeyPattern.NULL_CITATION_KEY_PATTERN.equals(citationKeyPattern)) {
             return "";
         }
         return expandBrackets(citationKeyPattern.stringRepresentation(), expandBracketContent(entry));
