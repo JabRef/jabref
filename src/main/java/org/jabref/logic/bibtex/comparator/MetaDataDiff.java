@@ -95,10 +95,7 @@ public class MetaDataDiff {
         if (!groupRoot.getChildren().isEmpty()) {
             return false;
         }
-        if (groupRoot.getGroup().equals(DefaultGroupsFactory.getAllEntriesGroup())) {
-            return true;
-        }
-        return false;
+        return groupRoot.getGroup().equals(DefaultGroupsFactory.getAllEntriesGroup());
     }
 
     /**
