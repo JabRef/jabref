@@ -356,6 +356,18 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                             }
                         }
                     }
+                    case "related-urls" -> {
+                        while (reader.hasNext()) {
+                            reader.next();
+                            if (isEndElement(reader, "related-urls")) {
+                                break;
+                            }
+                            if (isStartElement(reader, "url")) {
+                                StringBuilder file = parseElementContent(reader, "url");
+                                entry.setField(StandardField.URL, file.toString());
+                            }
+                        }
+                    }
                 }
             }
         }
