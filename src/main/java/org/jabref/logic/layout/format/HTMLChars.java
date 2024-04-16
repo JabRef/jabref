@@ -106,10 +106,10 @@ public class HTMLChars implements LayoutFormatter {
                     String tag = getHTMLTag(command);
                     if (!tag.isEmpty()) {
                         String part = StringUtil.getPart(field, i, true);
-                        if ((c == '{' || (c == '}'))) {
+                        if (c == '{' || (c == '}')) {
                             i++;
                         }
-                        i += part.length() ;
+                        i += part.length();
                         sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
                     } else if (c == '{') {
                         String argument = StringUtil.getPart(field, i, true);
