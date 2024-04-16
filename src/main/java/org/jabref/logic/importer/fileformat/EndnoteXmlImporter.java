@@ -188,10 +188,10 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     case "dates" -> {
                         parseDates(reader, entry);
                     }
-                    case "accession-num" -> {
-                        StringBuilder accessionNumber = parseElementContent(reader, "accession-num");
-                        entry.setField(StandardField.NUMBER, accessionNumber.toString());
-                    }
+//                    case "accession-num" -> {
+//                        StringBuilder accessionNumber = parseElementContent(reader, "accession-num");
+//                        entry.setField(StandardField.NUMBER, accessionNumber.toString());
+//                    }
                     default -> {
                         Field field = FIELD_MAPPING.entrySet().stream()
                                                    .filter(e -> e.getValue().equals(elementName))
@@ -270,8 +270,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             if (isStartElement(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
-                    case "title", "alt-title" -> {
-                        StringBuilder title = parseElementContent(reader, elementName);
+                    case "title" -> {
+                        StringBuilder title = parseElementContent(reader, "title");
                         entry.setField(StandardField.TITLE, title.toString());
                     }
                     case "secondary-title" -> {
