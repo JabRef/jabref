@@ -6,22 +6,21 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
-import javafx.application.ColorScheme;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
-import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.WorkspacePreferences;
 
-import com.google.common.annotations.VisibleForTesting;
+import com.jthemedetecor.OsThemeDetector;
+import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +48,8 @@ public class ThemeManager {
     private final StyleSheet baseStyleSheet;
     private Theme theme;
 
+    private OsThemeDetector detector;
+
     private Scene mainWindowScene;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
@@ -67,19 +68,25 @@ public class ThemeManager {
         addStylesheetToWatchlist(this.baseStyleSheet, this::baseCssLiveUpdate);
         baseCssLiveUpdate();
 
-        BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), theme -> updateThemeSettings());
-        BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), theme -> updateThemeSettings());
-        BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), should -> updateFontSettings());
-        BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), size -> updateFontSettings());
-        BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), colorScheme -> updateThemeSettings());
-        updateThemeSettings();
+        EasyBind.subscribe(workspacePreferences.themeProperty(), theme -> updateThemeSettings());
+        EasyBind.subscribe(workspacePreferences.themeSyncOsProperty(), theme -> updateThemeSettings());
+        EasyBind.subscribe(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), should -> updateFontSettings());
+        EasyBind.subscribe(workspacePreferences.mainFontSizeProperty(), size -> updateFontSettings());
+
+        try {
+            detector = OsThemeDetector.getDetector();
+            detector.registerListener(isDark -> updateThemeSettings());
+        } catch (Exception ex) {
+            LOGGER.error("Could not initialize Theme detector!", ex);
+            workspacePreferences.setThemeSyncOs(false);
+        }
     }
 
     private void updateThemeSettings() {
         Theme newTheme = Objects.requireNonNull(workspacePreferences.getTheme());
 
-        if (workspacePreferences.themeSyncOsProperty().getValue()) {
-            if (Platform.getPreferences().getColorScheme() == ColorScheme.DARK) {
+        if (workspacePreferences.themeSyncOsProperty().getValue() && detector != null) {
+            if (detector.isDark()) {
                 newTheme = Theme.dark();
             } else {
                 newTheme = Theme.light();
@@ -102,7 +109,7 @@ public class ThemeManager {
     }
 
     private void updateFontSettings() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(() -> updateFontStyle(mainWindowScene)));
+        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(() -> getMainWindowScene().ifPresent(this::updateFontStyle)));
     }
 
     private void removeStylesheetFromWatchList(StyleSheet styleSheet) {
@@ -160,24 +167,18 @@ public class ThemeManager {
     }
 
     private void updateBaseCss() {
-        if (mainWindowScene == null) {
-            return;
-        }
+        getMainWindowScene().ifPresent(scene -> {
+            List<String> stylesheets = scene.getStylesheets();
+            if (!stylesheets.isEmpty()) {
+                stylesheets.removeFirst();
+            }
 
-        List<String> stylesheets = mainWindowScene.getStylesheets();
-        if (!stylesheets.isEmpty()) {
-            stylesheets.removeFirst();
-        }
-
-        stylesheets.addFirst(baseStyleSheet.getSceneStylesheet().toExternalForm());
+            stylesheets.addFirst(baseStyleSheet.getSceneStylesheet().toExternalForm());
+        });
     }
 
     private void updateAdditionalCss() {
-        if (mainWindowScene == null) {
-            return;
-        }
-
-        mainWindowScene.getStylesheets().setAll(List.of(
+        getMainWindowScene().ifPresent(scene -> scene.getStylesheets().setAll(List.of(
                 baseStyleSheet.getSceneStylesheet().toExternalForm(),
                 theme.getAdditionalStylesheet().map(styleSheet -> {
                          URL stylesheetUrl = styleSheet.getSceneStylesheet();
@@ -188,7 +189,7 @@ public class ThemeManager {
                          }
                      })
                      .orElse("")
-        ));
+        )));
     }
 
     /**
@@ -228,10 +229,6 @@ public class ThemeManager {
      * @param scene is the scene, the font size should be applied to
      */
     public void updateFontStyle(Scene scene) {
-        if (scene == null) {
-            return;
-        }
-
         if (workspacePreferences.shouldOverrideDefaultFontSize()) {
             scene.getRoot().setStyle("-fx-font-size: " + workspacePreferences.getMainFontSize() + "pt;");
         } else {
@@ -242,8 +239,11 @@ public class ThemeManager {
     /**
      * @return the currently active theme
      */
-    @VisibleForTesting
-    Theme getActiveTheme() {
+    public Theme getActiveTheme() {
         return this.theme;
+    }
+
+    public Optional<Scene> getMainWindowScene() {
+        return Optional.ofNullable(mainWindowScene);
     }
 }
