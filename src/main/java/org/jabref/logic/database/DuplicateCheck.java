@@ -25,7 +25,6 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.collect.Sets;
@@ -330,12 +329,6 @@ public class DuplicateCheck {
         Optional<DOI> twoDOI = two.getDOI();
         if (oneDOI.isPresent() && twoDOI.isPresent()) {
             return Objects.equals(oneDOI, twoDOI);
-        }
-        // check ISBN
-        Optional<ISBN> oneISBN = one.getISBN();
-        Optional<ISBN> twoISBN = two.getISBN();
-        if (oneISBN.isPresent() && twoISBN.isPresent()) {
-            return Objects.equals(oneISBN, twoISBN);
         }
 
         if (haveDifferentEntryType(one, two) ||
