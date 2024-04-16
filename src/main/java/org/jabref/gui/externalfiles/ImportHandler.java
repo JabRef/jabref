@@ -304,8 +304,8 @@ public class ImportHandler {
             return;
         }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
-                                                                                     .getKeyPattern()),
+                bibDatabaseContext.getMetaData().getCiteKeyPatterns(preferencesService.getCitationKeyPatternPreferences()
+                                                                                      .getKeyPatterns()),
                 bibDatabaseContext.getDatabase(),
                 preferencesService.getCitationKeyPatternPreferences());
         entries.forEach(keyGenerator::generateAndSetKey);

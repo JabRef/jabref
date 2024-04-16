@@ -12,7 +12,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
@@ -76,7 +76,7 @@ class StudyRepositoryTest {
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
-                GlobalCitationKeyPattern.fromPattern("[auth][year]"),
+                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
                 "",
                 ',');
         when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
