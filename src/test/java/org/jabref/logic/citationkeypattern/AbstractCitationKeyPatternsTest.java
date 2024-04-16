@@ -1,7 +1,5 @@
 package org.jabref.logic.citationkeypattern;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -18,20 +16,7 @@ class AbstractCitationKeyPatternsTest {
         AbstractCitationKeyPatterns pattern = mock(AbstractCitationKeyPatterns.class, Mockito.CALLS_REAL_METHODS);
 
         pattern.setDefaultValue("[field1]spacer1[field2]spacer2[field3]");
-        List<String> expectedPattern = List.of(
-            "[field1]spacer1[field2]spacer2[field3]",
-            "[",
-            "field1",
-            "]",
-            "spacer1",
-            "[",
-            "field2",
-            "]",
-            "spacer2",
-            "[",
-            "field3",
-            "]"
-        );
+        CitationKeyPattern expectedPattern = new CitationKeyPattern("[field1]spacer1[field2]spacer2[field3]");
         assertEquals(expectedPattern, pattern.getDefaultValue());
     }
 
@@ -40,19 +25,7 @@ class AbstractCitationKeyPatternsTest {
         AbstractCitationKeyPatterns pattern = mock(AbstractCitationKeyPatterns.class, Mockito.CALLS_REAL_METHODS);
 
         pattern.setDefaultValue("[field1][field2]spacer2[field3]");
-        List<String> expectedPattern = List.of(
-            "[field1][field2]spacer2[field3]",
-            "[",
-            "field1",
-            "]",
-            "[",
-            "field2",
-            "]",
-            "spacer2",
-            "[",
-            "field3",
-            "]"
-        );
+        CitationKeyPattern expectedPattern = new CitationKeyPattern("[field1][field2]spacer2[field3]");
         assertEquals(expectedPattern, pattern.getDefaultValue());
     }
 }
