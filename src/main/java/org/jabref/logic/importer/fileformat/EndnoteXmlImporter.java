@@ -169,37 +169,28 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                                                 .findFirst()
                                                                 .orElse(StandardEntryType.Misc);
                         entry.setType(entryType);
-                        System.out.println("Successful ENTRYTYPE SET");
                     }
                     case "contributors" -> {
-                        System.out.println("CONTRIBS ENTERED");
                         parseContributors(reader, entry);
-                        System.out.println("Successful CONTRIBS SET");
                     }
                     case "titles" -> {
                         parseTitles(reader, entry);
-                        System.out.println("Successful TITLES SET");
                     }
                     case "periodical" -> {
                         parsePeriodical(reader, entry);
-                        System.out.println("Successful PERIODICAL SET");
                     }
                     case "keywords" -> {
                         parseKeywords(reader, entry);
-                        System.out.println("Successful KEYW SET");
                     }
                     case "urls" -> {
                         parseUrls(reader, entry);
-                        System.out.println("Successful URLS SET");
                     }
                     case "dates" -> {
                         parseDates(reader, entry);
-                        System.out.println("Successful DATES SET");
                     }
                     case "accession-num" -> {
                         StringBuilder accessionNumber = parseElementContent(reader, "accession-num");
                         entry.setField(StandardField.NUMBER, accessionNumber.toString());
-                        System.out.println("Successful ACCESSION SET");
                     }
                     default -> {
                         Field field = FIELD_MAPPING.entrySet().stream()
@@ -210,7 +201,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                         if (field != null) {
                             StringBuilder value = parseElementContent(reader, elementName);
                             entry.setField(field, value.toString());
-                            System.out.println("SETTING" + field);
                         }
                     }
                 }
