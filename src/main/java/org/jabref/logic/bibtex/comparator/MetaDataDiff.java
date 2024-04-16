@@ -8,7 +8,9 @@ import java.util.Optional;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 
@@ -18,7 +20,7 @@ public class MetaDataDiff {
         DEFAULT_KEY_PATTERN,
         ENCODING,
         GENERAL_FILE_DIRECTORY,
-        GROUPS_ALTERED,
+        GROUPS,
         KEY_PATTERNS,
         LATEX_FILE_DIRECTORY,
         MODE,
@@ -46,35 +48,18 @@ public class MetaDataDiff {
             return Optional.empty();
         } else {
             MetaDataDiff diff = new MetaDataDiff(originalMetaData, newMetaData);
-            if (isDefaultContentSelectorDiff(diff)) {
+            List<Difference> differences = diff.getDifferences(new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN));
+            if (differences.isEmpty()) {
                 return Optional.empty();
             }
             return Optional.of(diff);
         }
     }
 
-    private static boolean isDefaultContentSelectorDiff(MetaDataDiff diff) {
-        GlobalCitationKeyPatterns globalCitationKeyPatterns = new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN);
-        List<Difference> differences = diff.getDifferences(globalCitationKeyPatterns);
-        if (differences.size() != 1) {
-            return false;
-        }
-        Difference onlyDifference = differences.getFirst();
-        if (onlyDifference.differenceType() != DifferenceType.CONTENT_SELECTOR) {
-            return false;
-        }
-        ContentSelectors originalContentSelectors = (ContentSelectors) onlyDifference.originalObject();
-        ContentSelectors newContentSelectors = (ContentSelectors) onlyDifference.newObject();
-        if (isDefaultContentSelectorDiff(originalContentSelectors) && isDefaultContentSelectorDiff(newContentSelectors)) {
-            return true;
-        }
-        return false;
-    }
-
     /**
      * Checks if given content selectors are empty or default
      */
-    private static boolean isDefaultContentSelectorDiff(ContentSelectors contentSelectors) {
+    private static boolean isDefaultContentSelectors(ContentSelectors contentSelectors) {
         if (contentSelectors.getContentSelectors().isEmpty()) {
             return true;
         }
@@ -84,8 +69,36 @@ public class MetaDataDiff {
 
     private void addToListIfDiff(List<Difference> changes, DifferenceType differenceType, Object originalObject, Object newObject) {
         if (!Objects.equals(originalObject, newObject)) {
+            if (differenceType == DifferenceType.CONTENT_SELECTOR) {
+                ContentSelectors originalContentSelectors = (ContentSelectors) originalObject;
+                ContentSelectors newContentSelectors = (ContentSelectors) newObject;
+                if (isDefaultContentSelectors(originalContentSelectors) && isDefaultContentSelectors(newContentSelectors)) {
+                    return;
+                }
+            }
+            if (differenceType == DifferenceType.GROUPS) {
+                Optional<GroupTreeNode> originalGroups = (Optional<GroupTreeNode>) originalObject;
+                Optional<GroupTreeNode> newGroups = (Optional<GroupTreeNode>) newObject;
+                if (isDefaultGroup(originalGroups) && isDefaultGroup(newGroups)) {
+                    return;
+                }
+            }
             changes.add(new Difference(differenceType, originalObject, newObject));
         }
+    }
+
+    private boolean isDefaultGroup(Optional<GroupTreeNode> groups) {
+        if (groups.isEmpty()) {
+            return true;
+        }
+        GroupTreeNode groupRoot = groups.get();
+        if (!groupRoot.getChildren().isEmpty()) {
+            return false;
+        }
+        if (groupRoot.getGroup().equals(DefaultGroupsFactory.getAllEntriesGroup())) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -94,7 +107,7 @@ public class MetaDataDiff {
     public List<Difference> getDifferences(GlobalCitationKeyPatterns globalCitationKeyPatterns) {
         List<Difference> changes = new ArrayList<>();
         addToListIfDiff(changes, DifferenceType.PROTECTED, originalMetaData.isProtected(), newMetaData.isProtected());
-        addToListIfDiff(changes, DifferenceType.GROUPS_ALTERED, originalMetaData.getGroups(), newMetaData.getGroups());
+        addToListIfDiff(changes, DifferenceType.GROUPS, originalMetaData.getGroups(), newMetaData.getGroups());
         addToListIfDiff(changes, DifferenceType.ENCODING, originalMetaData.getEncoding(), newMetaData.getEncoding());
         addToListIfDiff(changes, DifferenceType.SAVE_SORT_ORDER, originalMetaData.getSaveOrder(), newMetaData.getSaveOrder());
         addToListIfDiff(changes, DifferenceType.KEY_PATTERNS,
@@ -114,6 +127,9 @@ public class MetaDataDiff {
         return newMetaData;
     }
 
+    /**
+     * Currently, the groups diff is contained here - and as entry in {@link #getDifferences(GlobalCitationKeyPatterns)}
+     */
     public Optional<GroupDiff> getGroupDifferences() {
         return groupDiff;
     }

@@ -38,7 +38,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         return switch (changeType) {
             case PROTECTED ->
                     Localization.lang("Library protection");
-            case GROUPS_ALTERED ->
+            case GROUPS ->
                     Localization.lang("Modified groups tree");
             case ENCODING ->
                     Localization.lang("Library encoding");
