@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -87,7 +87,7 @@ class BibliographyFromPdfImporterTest {
 
     @BeforeEach
     void setup() {
-        GlobalCitationKeyPattern globalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
+        GlobalCitationKeyPatterns globalCitationKeyPattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         CitationKeyPatternPreferences citationKeyPatternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,

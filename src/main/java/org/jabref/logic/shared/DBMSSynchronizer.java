@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
@@ -52,12 +52,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final EventBus eventBus;
     private Connection currentConnection;
     private final Character keywordSeparator;
-    private final GlobalCitationKeyPattern globalCiteKeyPattern;
+    private final GlobalCitationKeyPatterns globalCiteKeyPattern;
     private final FileUpdateMonitor fileMonitor;
     private Optional<BibEntry> lastEntryChanged;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
-                            GlobalCitationKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
+                            GlobalCitationKeyPatterns globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -273,7 +273,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /**
      * Synchronizes all shared meta data.
      */
-    private void synchronizeSharedMetaData(MetaData data, GlobalCitationKeyPattern globalCiteKeyPattern) {
+    private void synchronizeSharedMetaData(MetaData data, GlobalCitationKeyPatterns globalCiteKeyPattern) {
         if (!checkCurrentConnection()) {
             return;
         }

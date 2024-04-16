@@ -9,8 +9,9 @@ import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntryType;
@@ -34,7 +35,7 @@ public class MetaDataSerializer {
      * Writes all data in the format &lt;key, serialized data>.
      */
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
-                                                             GlobalCitationKeyPattern globalCiteKeyPattern) {
+                                                             GlobalCitationKeyPatterns globalCiteKeyPatterns) {
 
         // metadata-key, list of contents
         //  - contents to be separated by OS.NEWLINE
@@ -49,7 +50,7 @@ public class MetaDataSerializer {
         if (metaData.isProtected()) {
             stringyMetaData.put(MetaData.PROTECTED_FLAG_META, Collections.singletonList("true"));
         }
-        stringyMetaData.putAll(serializeCiteKeyPattern(metaData, globalCiteKeyPattern));
+        stringyMetaData.putAll(serializeCiteKeyPatterns(metaData, globalCiteKeyPatterns));
         metaData.getMode().ifPresent(
                 mode -> stringyMetaData.put(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getAsString())));
         metaData.getDefaultFileDirectory().ifPresent(
@@ -122,20 +123,20 @@ public class MetaDataSerializer {
         return serializedMetaData;
     }
 
-    private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalCitationKeyPattern globalCitationKeyPattern) {
+    private static Map<String, List<String>> serializeCiteKeyPatterns(MetaData metaData, GlobalCitationKeyPatterns globalCitationKeyPatterns) {
         Map<String, List<String>> stringyPattern = new HashMap<>();
-        AbstractCitationKeyPattern citationKeyPattern = metaData.getCiteKeyPattern(globalCitationKeyPattern);
+        AbstractCitationKeyPatterns citationKeyPattern = metaData.getCiteKeyPatterns(globalCitationKeyPatterns);
         for (EntryType key : citationKeyPattern.getAllKeys()) {
             if (!citationKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
-                data.add(citationKeyPattern.getValue(key).getFirst());
+                data.add(citationKeyPattern.getValue(key).stringRepresentation());
                 String metaDataKey = MetaData.PREFIX_KEYPATTERN + key.getName();
                 stringyPattern.put(metaDataKey, data);
             }
         }
-        if ((citationKeyPattern.getDefaultValue() != null) && !citationKeyPattern.getDefaultValue().isEmpty()) {
+        if ((citationKeyPattern.getDefaultValue() != null) && !citationKeyPattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
             List<String> data = new ArrayList<>();
-            data.add(citationKeyPattern.getDefaultValue().getFirst());
+            data.add(citationKeyPattern.getDefaultValue().stringRepresentation());
             stringyPattern.put(MetaData.KEYPATTERNDEFAULT, data);
         }
         return stringyPattern;

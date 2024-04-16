@@ -92,7 +92,7 @@ class CitationKeyGeneratorTest {
     }
 
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
-        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(pattern);
+        GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(pattern);
         CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -1013,7 +1013,7 @@ class CitationKeyGeneratorTest {
     @Test
     void generateKeyDoesNotModifyTheKeyWithIncorrectRegexReplacement() {
         String pattern = "[title]";
-        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(pattern);
+        GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(pattern);
         CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,
