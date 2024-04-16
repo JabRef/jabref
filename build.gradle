@@ -119,19 +119,19 @@ dependencyLocking {
     lockAllConfigurations()
 }
 
-def osName = DefaultNativePlatform.current().getOperatingSystem().getName().toLowerCase()
+def os = System.getProperty('os.name').toLowerCase()
 
 // Set JavaFX SDK and JMODS path based on OS
 def javafxSdkPath
 def javafxJmodsPath
 
-if (osName.contains("windows")) {
+if (os.contains("win")) {
     javafxSdkPath = 'javafx/javafx-sdk-windows'
     javafxJmodsPath = 'javafx/javafx-jmods-windows'
-} else if (osName.contains("mac os")) {
+} else if (os.contains("mac")) {
     javafxSdkPath = 'javafx/javafx-sdk-macos'
     javafxJmodsPath = 'javafx/javafx-jmods-macos'
-} else if (osName.contains("linux")) {
+} else if (os.contains("linux")) {
     javafxSdkPath = 'javafx/javafx-sdk-linux'
     javafxJmodsPath = 'javafx/javafx-jmods-linux'
 } else {
