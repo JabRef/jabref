@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.BiblatexSoftwareField;
@@ -35,8 +35,8 @@ public class CffImporterTest {
                 CitationKeyPatternPreferences.class,
                 Answers.RETURNS_SMART_NULLS
         );
-        when(citationKeyPatternPreferences.getKeyPattern())
-                .thenReturn(GlobalCitationKeyPattern.fromPattern("[auth][year]"));
+        when(citationKeyPatternPreferences.getKeyPatterns())
+                .thenReturn(GlobalCitationKeyPatterns.fromPattern("[auth][year]"));
         importer = new CffImporter(citationKeyPatternPreferences);
     }
 

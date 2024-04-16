@@ -10,18 +10,18 @@ import org.jabref.preferences.PreferencesService;
 
 public class MetaDataDiff {
     public enum DifferenceType {
-        PROTECTED,
-        GROUPS_ALTERED,
-        ENCODING,
-        SAVE_SORT_ORDER,
-        KEY_PATTERNS,
-        USER_FILE_DIRECTORY,
-        LATEX_FILE_DIRECTORY,
+        CONTENT_SELECTOR,
         DEFAULT_KEY_PATTERN,
-        SAVE_ACTIONS,
-        MODE,
+        ENCODING,
         GENERAL_FILE_DIRECTORY,
-        CONTENT_SELECTOR
+        GROUPS_ALTERED,
+        KEY_PATTERNS,
+        LATEX_FILE_DIRECTORY,
+        MODE,
+        PROTECTED,
+        SAVE_ACTIONS,
+        SAVE_SORT_ORDER,
+        USER_FILE_DIRECTORY
     }
 
     public record Difference(DifferenceType differenceType, Object originalObject, Object newObject) {
@@ -61,8 +61,8 @@ public class MetaDataDiff {
         addToListIfDiff(changes, DifferenceType.ENCODING, originalMetaData.getEncoding(), newMetaData.getEncoding());
         addToListIfDiff(changes, DifferenceType.SAVE_SORT_ORDER, originalMetaData.getSaveOrder(), newMetaData.getSaveOrder());
         addToListIfDiff(changes, DifferenceType.KEY_PATTERNS,
-                originalMetaData.getCiteKeyPattern(preferences.getCitationKeyPatternPreferences().getKeyPattern()),
-                newMetaData.getCiteKeyPattern(preferences.getCitationKeyPatternPreferences().getKeyPattern()));
+                originalMetaData.getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences().getKeyPatterns()),
+                newMetaData.getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences().getKeyPatterns()));
         addToListIfDiff(changes, DifferenceType.USER_FILE_DIRECTORY, originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories());
         addToListIfDiff(changes, DifferenceType.LATEX_FILE_DIRECTORY, originalMetaData.getLatexFileDirectories(), newMetaData.getLatexFileDirectories());
         addToListIfDiff(changes, DifferenceType.DEFAULT_KEY_PATTERN, originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern());
@@ -79,5 +79,14 @@ public class MetaDataDiff {
 
     public Optional<GroupDiff> getGroupDifferences() {
         return groupDiff;
+    }
+
+    @Override
+    public String toString() {
+        return "MetaDataDiff{" +
+                "groupDiff=" + groupDiff +
+                ", originalMetaData=" + originalMetaData +
+                ", newMetaData=" + getNewMetaData() +
+                '}';
     }
 }
