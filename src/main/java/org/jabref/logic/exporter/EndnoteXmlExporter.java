@@ -2,6 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,59 +29,65 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class EndnoteXmlExporter extends Exporter {
-    private static final List<Map.Entry<EntryType, String>> ENTRY_TYPE_MAPPING_LIST = List.of(
-            Map.entry(StandardEntryType.Article, "Journal Article"),
-            Map.entry(StandardEntryType.Book, "Book"),
-            Map.entry(StandardEntryType.InBook, "Book Section"),
-            Map.entry(StandardEntryType.InCollection, "Book Section"),
-            Map.entry(StandardEntryType.Proceedings, "Conference Proceedings"),
-            Map.entry(StandardEntryType.MastersThesis, "Thesis"),
-            Map.entry(StandardEntryType.PhdThesis, "Thesis"),
-            Map.entry(StandardEntryType.TechReport, "Report"),
-            Map.entry(StandardEntryType.Unpublished, "Manuscript"),
-            Map.entry(StandardEntryType.InProceedings, "Conference Paper"),
-            Map.entry(StandardEntryType.Conference, "Conference"),
-            Map.entry(IEEETranEntryType.Patent, "Patent"),
-            Map.entry(StandardEntryType.Online, "Web Page"),
-            Map.entry(IEEETranEntryType.Electronic, "Electronic Article"),
-            Map.entry(StandardEntryType.Misc, "Generic")
-    );
 
-    private static final List<Map.Entry<EntryType, String>> EXPORT_REF_NUMBER_LIST = ENTRY_TYPE_MAPPING_LIST.stream()
-                                                                                                            .map(entry -> Map.entry(entry.getKey(), Integer.toString(ENTRY_TYPE_MAPPING_LIST.indexOf(entry) + 1)))
-                                                                                                            .toList();
+    private record EndNoteType(String name, Integer number) {
+    }
 
-    private static final List<Map.Entry<Field, String>> FIELD_MAPPING_LIST = List.of(
-            Map.entry(StandardField.TITLE, "title"),
-            Map.entry(StandardField.AUTHOR, "authors"),
-            Map.entry(StandardField.EDITOR, "secondary-authors"),
-            Map.entry(StandardField.PAGES, "pages"),
-            Map.entry(StandardField.VOLUME, "volume"),
-            Map.entry(StandardField.KEYWORDS, "keywords"),
-            Map.entry(StandardField.PUBLISHER, "publisher"),
-            Map.entry(StandardField.ISBN, "isbn"),
-            Map.entry(StandardField.DOI, "electronic-resource-num"),
-            Map.entry(StandardField.ABSTRACT, "abstract"),
-            Map.entry(StandardField.URL, "web-urls"),
-            Map.entry(StandardField.FILE, "pdf-urls"),
-            Map.entry(StandardField.JOURNALTITLE, "full-title"),
-            Map.entry(StandardField.BOOKTITLE, "secondary-title"),
-            Map.entry(StandardField.EDITION, "edition"),
-            Map.entry(StandardField.SERIES, "tertiary-title"),
-            Map.entry(StandardField.NUMBER, "number"),
-            Map.entry(StandardField.ISSUE, "issue"),
-            Map.entry(StandardField.LOCATION, "pub-location"),
-            Map.entry(StandardField.CHAPTER, "section"),
-            Map.entry(StandardField.HOWPUBLISHED, "work-type"),
-            Map.entry(StandardField.ISSN, "issn"),
-            Map.entry(StandardField.ADDRESS, "auth-address"),
-            Map.entry(StandardField.PAGETOTAL, "page-total"),
-            Map.entry(StandardField.NOTE, "notes"),
-            Map.entry(StandardField.LABEL, "label"),
-            Map.entry(StandardField.LANGUAGE, "language"),
-            Map.entry(StandardField.KEY, "foreign-keys"),
-            Map.entry(new UnknownField("accession-num"), "accession-num")
-    );
+    private static final Map<EntryType, EndNoteType> ENTRY_TYPE_MAPPING = new HashMap<>();
+
+    static {
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.Article, new EndNoteType("Journal Article", 1));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.Book, new EndNoteType("Book", 2));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.InBook, new EndNoteType("Book Section", 3));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.InCollection, new EndNoteType("Book Section", 4));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.Proceedings, new EndNoteType("Conference Proceedings", 5));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.MastersThesis, new EndNoteType("Thesis", 6));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.PhdThesis, new EndNoteType("Thesis", 7));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.TechReport, new EndNoteType("Report", 8));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.Unpublished, new EndNoteType("Manuscript", 9));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.InProceedings, new EndNoteType("Conference Paper", 10));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.Conference, new EndNoteType("Conference", 11));
+        ENTRY_TYPE_MAPPING.put(IEEETranEntryType.Patent, new EndNoteType("Patent", 12));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.Online, new EndNoteType("Web Page", 13));
+        ENTRY_TYPE_MAPPING.put(IEEETranEntryType.Electronic, new EndNoteType("Electronic Article", 14));
+        ENTRY_TYPE_MAPPING.put(StandardEntryType.Misc, new EndNoteType("Generic", 15));
+    }
+
+    private static final Map<Field, String> FIELD_MAPPING = new HashMap<>();
+
+    static {
+        FIELD_MAPPING.put(StandardField.TITLE, "title");
+        FIELD_MAPPING.put(StandardField.AUTHOR, "authors");
+        FIELD_MAPPING.put(StandardField.EDITOR, "secondary-authors");
+        FIELD_MAPPING.put(StandardField.PAGES, "pages");
+        FIELD_MAPPING.put(StandardField.VOLUME, "volume");
+        FIELD_MAPPING.put(StandardField.KEYWORDS, "keywords");
+        FIELD_MAPPING.put(StandardField.PUBLISHER, "publisher");
+        FIELD_MAPPING.put(StandardField.ISBN, "isbn");
+        FIELD_MAPPING.put(StandardField.DOI, "electronic-resource-num");
+        FIELD_MAPPING.put(StandardField.ABSTRACT, "abstract");
+        FIELD_MAPPING.put(StandardField.URL, "web-urls");
+        FIELD_MAPPING.put(StandardField.FILE, "pdf-urls");
+        FIELD_MAPPING.put(StandardField.JOURNALTITLE, "full-title");
+        FIELD_MAPPING.put(StandardField.BOOKTITLE, "secondary-title");
+        FIELD_MAPPING.put(StandardField.EDITION, "edition");
+        FIELD_MAPPING.put(StandardField.SERIES, "tertiary-title");
+        FIELD_MAPPING.put(StandardField.NUMBER, "number");
+        FIELD_MAPPING.put(StandardField.ISSUE, "issue");
+        FIELD_MAPPING.put(StandardField.LOCATION, "pub-location");
+        FIELD_MAPPING.put(StandardField.CHAPTER, "section");
+        FIELD_MAPPING.put(StandardField.HOWPUBLISHED, "work-type");
+        FIELD_MAPPING.put(StandardField.ISSN, "issn");
+        FIELD_MAPPING.put(StandardField.ADDRESS, "auth-address");
+        FIELD_MAPPING.put(StandardField.PAGETOTAL, "page-total");
+        FIELD_MAPPING.put(StandardField.NOTE, "notes");
+        FIELD_MAPPING.put(StandardField.LABEL, "label");
+        FIELD_MAPPING.put(StandardField.LANGUAGE, "language");
+        FIELD_MAPPING.put(StandardField.KEY, "foreign-keys");
+        FIELD_MAPPING.put(new UnknownField("accession-num"), "accession-num");
+    }
+
+    private static final EndNoteType DEFAULT_TYPE = new EndNoteType("Generic", 15);
 
     public EndnoteXmlExporter() {
         super("endnote", "EndNote XML", StandardFileType.XML);
@@ -112,21 +119,10 @@ public class EndnoteXmlExporter extends Exporter {
 
             // Map entry type
             EntryType entryType = entry.getType();
-            String refType = ENTRY_TYPE_MAPPING_LIST.stream()
-                                                    .filter(mapping -> mapping.getKey().equals(entryType))
-                                                    .map(Map.Entry::getValue)
-                                                    .findFirst()
-                                                    .orElse("Generic");
-
-            String refNumber = EXPORT_REF_NUMBER_LIST.stream()
-                                                     .filter(mapping -> mapping.getKey().equals(entryType))
-                                                     .map(Map.Entry::getValue)
-                                                     .findFirst()
-                                                     .orElse("15");
-
+            EndNoteType endNoteType = ENTRY_TYPE_MAPPING.getOrDefault(entryType, DEFAULT_TYPE);
             Element refTypeElement = document.createElement("ref-type");
-            refTypeElement.setAttribute("name", refType);
-            refTypeElement.setTextContent(refNumber);
+            refTypeElement.setAttribute("name", endNoteType.name());
+            refTypeElement.setTextContent(endNoteType.number().toString());
             recordElement.appendChild(refTypeElement);
 
             // Map database and source-app
@@ -259,7 +255,7 @@ public class EndnoteXmlExporter extends Exporter {
             }
 
             // Map other fields
-            for (Map.Entry<Field, String> fieldMapping : FIELD_MAPPING_LIST) {
+            for (Map.Entry<Field, String> fieldMapping : FIELD_MAPPING.entrySet()) {
                 Field field = fieldMapping.getKey();
                 String xmlElement = fieldMapping.getValue();
 
