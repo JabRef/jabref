@@ -28,6 +28,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -264,10 +265,10 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                         entry.setField(StandardField.JOURNAL, secondaryTitle);
                     }
                     // TODO: Left for future work -- test files need to be adpated
-                    // case "alt-title" -> {
-                    //    String altTitle = parseElementContent(reader, "alt-title");
-                    //    entry.setField(new UnknownField("alt-title"), altTitle);
-                    // }
+                     case "alt-title" -> {
+                        String altTitle = parseElementContent(reader, "alt-title");
+                        entry.setField(new UnknownField("alt-title"), altTitle);
+                     }
                 }
             }
         }
