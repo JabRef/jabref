@@ -164,6 +164,12 @@ public class EndnoteXmlExporter extends Exporter {
                 titlesElement.appendChild(altTitleElement);
             });
 
+            entry.getField(StandardField.BOOKTITLE).ifPresent(secondaryTitle -> {
+                Element secondaryTitleElement = document.createElement("secondary-title");
+                secondaryTitleElement.setTextContent(secondaryTitle);
+                titlesElement.appendChild(secondaryTitleElement);
+            });
+
             recordElement.appendChild(titlesElement);
         });
     }

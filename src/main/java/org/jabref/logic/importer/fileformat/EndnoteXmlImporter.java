@@ -219,6 +219,15 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             }
         }
 
+        // Cleanup: Remove alt-title if it matches the journal
+        if (entry.hasField(StandardField.JOURNAL) && entry.hasField(new UnknownField("alt-title"))) {
+            String journal = entry.getField(StandardField.JOURNAL).orElse("");
+            String altTitle = entry.getField(new UnknownField("alt-title")).orElse("");
+            if (journal.equals(altTitle)) {
+                entry.clearField(new UnknownField("alt-title"));
+            }
+        }
+
         return entry;
     }
 
@@ -268,7 +277,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     }
                     case "secondary-title" -> {
                         String secondaryTitle = parseElementContent(reader, "secondary-title");
-                        entry.setField(StandardField.JOURNAL, secondaryTitle);
+                        entry.setField(StandardField.BOOKTITLE, secondaryTitle);
                     }
                      case "alt-title" -> {
                         String altTitle = parseElementContent(reader, "alt-title");
