@@ -76,4 +76,19 @@ class MarkdownFormatterTest {
     void formatWhenFormattingStringWithBracesThenKeepBraces() {
         assertEquals("<p>{Hello World}</p>", markdownFormatter.format("{Hello World}"));
     }
+
+    @Test
+    void formatWhenFormattingQuotesRemovesNewLines() {
+        assertEquals(
+                "<pre><code class=\"language-javascript\">function foo() {     return 'bar'; } </code></pre>",
+                markdownFormatter.format(
+                """
+                ```javascript
+                function foo() {
+                    return 'bar';
+                }
+                ```"""
+                )
+        );
+    }
 }
