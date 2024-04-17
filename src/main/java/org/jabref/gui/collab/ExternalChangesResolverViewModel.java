@@ -14,8 +14,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.undo.NamedCompound;
-import org.jabref.logic.l10n.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +22,6 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverViewModel.class);
 
-    private final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
     private final ObservableList<DatabaseChange> visibleChanges = FXCollections.observableArrayList();
 
     /**
@@ -36,6 +33,10 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
     private final ObjectProperty<DatabaseChange> selectedChange = new SimpleObjectProperty<>();
 
     private final BooleanBinding areAllChangesResolved;
+
+    private BooleanBinding areAllChangesAccepted;
+
+    private BooleanBinding areAllChangesDenied;
 
     private final BooleanBinding canAskUserToResolveChange;
 
@@ -50,6 +51,8 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
         this.undoManager = undoManager;
 
         areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);
+        areAllChangesAccepted = Bindings.createBooleanBinding(() -> changes.stream().allMatch(DatabaseChange::isAccepted));
+        areAllChangesDenied = Bindings.createBooleanBinding(() -> changes.stream().noneMatch(DatabaseChange::isAccepted));
         canAskUserToResolveChange = Bindings.createBooleanBinding(() -> selectedChange.isNotNull().get() && selectedChange.get().getExternalChangeResolver().isPresent(), selectedChange);
     }
 
@@ -71,6 +74,22 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
 
     public boolean areAllChangesResolved() {
         return areAllChangesResolvedProperty().get();
+    }
+
+    public BooleanBinding areAllChangesAcceptedProperty() {
+        return areAllChangesAccepted;
+    }
+
+    public boolean areAllChangesAccepted() {
+        return areAllChangesAcceptedProperty().get();
+    }
+
+    public BooleanBinding areAllChangesDeniedProperty() {
+        return areAllChangesDenied;
+    }
+
+    public boolean areAllChangesDenied() {
+        return areAllChangesDeniedProperty().get();
     }
 
     public BooleanBinding canAskUserToResolveChangeProperty() {
@@ -97,11 +116,5 @@ public class ExternalChangesResolverViewModel extends AbstractViewModel {
             databaseChange.accept();
             getVisibleChanges().remove(oldChange);
         });
-    }
-
-    public void applyChanges() {
-        changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
-        ce.end();
-        undoManager.addEdit(ce);
     }
 }

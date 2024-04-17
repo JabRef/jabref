@@ -6,19 +6,19 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
 
-    public MetadataChangeDetailsView(MetadataChange metadataChange, PreferencesService preferencesService) {
+    public MetadataChangeDetailsView(MetadataChange metadataChange, GlobalCitationKeyPatterns globalCitationKeyPatterns) {
         VBox container = new VBox(15);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
         header.getStyleClass().add("sectionHeader");
         container.getChildren().add(header);
 
-        for (MetaDataDiff.Difference diff : metadataChange.getMetaDataDiff().getDifferences(preferencesService)) {
+        for (MetaDataDiff.Difference diff : metadataChange.getMetaDataDiff().getDifferences(globalCitationKeyPatterns)) {
             container.getChildren().add(new Label(getDifferenceString(diff.differenceType())));
             container.getChildren().add(new Label(diff.originalObject().toString()));
             container.getChildren().add(new Label(diff.newObject().toString()));
@@ -38,7 +38,7 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         return switch (changeType) {
             case PROTECTED ->
                     Localization.lang("Library protection");
-            case GROUPS_ALTERED ->
+            case GROUPS ->
                     Localization.lang("Modified groups tree");
             case ENCODING ->
                     Localization.lang("Library encoding");
