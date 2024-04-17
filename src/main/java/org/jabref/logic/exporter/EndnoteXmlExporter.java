@@ -153,9 +153,17 @@ public class EndnoteXmlExporter extends Exporter {
     private static void mapTitle(BibEntry entry, Document document, Element recordElement) {
         entry.getFieldOrAlias(StandardField.TITLE).ifPresent(title -> {
             Element titlesElement = document.createElement("titles");
+
             Element titleElement = document.createElement("title");
             titleElement.setTextContent(title);
             titlesElement.appendChild(titleElement);
+
+            entry.getField(new UnknownField("alt-title")).ifPresent(altTitle -> {
+                Element altTitleElement = document.createElement("alt-title");
+                altTitleElement.setTextContent(altTitle);
+                titlesElement.appendChild(altTitleElement);
+            });
+
             recordElement.appendChild(titlesElement);
         });
     }
