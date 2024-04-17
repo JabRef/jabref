@@ -17,6 +17,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -25,6 +26,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.BibEntryPreferences;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -88,8 +90,11 @@ public class EndnoteXmlExporter extends Exporter {
 
     private static final EndNoteType DEFAULT_TYPE = new EndNoteType("Generic", 15);
 
-    public EndnoteXmlExporter() {
+    private final BibEntryPreferences bibEntryPreferences;
+
+    public EndnoteXmlExporter(BibEntryPreferences bibEntryPreferences) {
         super("endnote", "EndNote XML", StandardFileType.XML);
+        this.bibEntryPreferences = bibEntryPreferences;
     }
 
     @Override
@@ -120,7 +125,7 @@ public class EndnoteXmlExporter extends Exporter {
             mapAuthorAndEditor(entry, document, recordElement);
             mapTitle(entry, document, recordElement);
             mapJournalTitle(entry, document, recordElement);
-            mapKeywords(entry, document, recordElement);
+            mapKeywords(databaseContext.getDatabase(), entry, document, recordElement);
             mapDates(entry, document, recordElement);
             mapUrls(entry, document, recordElement);
 
@@ -171,15 +176,15 @@ public class EndnoteXmlExporter extends Exporter {
         });
     }
 
-    private static void mapKeywords(BibEntry entry, Document document, Element recordElement) {
+    private void mapKeywords(BibDatabase bibDatabase, BibEntry entry, Document document, Element recordElement) {
         entry.getFieldOrAlias(StandardField.KEYWORDS).ifPresent(keywords -> {
             Element keywordsElement = document.createElement("keywords");
-            String[] keywordArray = keywords.split(",\\s*");
-            for (String keyword : keywordArray) {
+            entry.getResolvedKeywords(bibEntryPreferences.getKeywordSeparator(), bibDatabase).forEach(keyword -> {
                 Element keywordElement = document.createElement("keyword");
-                keywordElement.setTextContent(keyword);
+                // Hierarchical keywords are separated by the '>' character. See {@link } for details.
+                keywordElement.setTextContent(keyword.get().toString());
                 keywordsElement.appendChild(keywordElement);
-            }
+            });
             recordElement.appendChild(keywordsElement);
         });
     }
@@ -225,7 +230,8 @@ public class EndnoteXmlExporter extends Exporter {
             yearElement.setTextContent(day);
             datesElement.appendChild(yearElement);
         });
-        entry.getFieldOrAlias(StandardField.DATE).ifPresent(date -> {
+        // We need to use getField here - getFieldOrAlias for Date tries to convert year, month, and day to a date, which we do not want
+        entry.getField(StandardField.DATE).ifPresent(date -> {
             Element pubDatesElement = document.createElement("pub-dates");
             Element dateElement = document.createElement("date");
             dateElement.setTextContent(date);

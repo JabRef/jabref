@@ -28,13 +28,13 @@ public class EndnoteXmlExporterTest {
     private BibEntry bookEntry;
 
     @BeforeEach
-    public void setUp(@TempDir Path testFolder) throws Exception {
+    public void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         databaseContext = new BibDatabaseContext();
-        exporter = new EndnoteXmlExporter();
+        exporter = new EndnoteXmlExporter(new BibEntryPreferences(','));
 
         bookEntry = new BibEntry(StandardEntryType.Book)
                 .withCitationKey("Bhattacharyya2013")
