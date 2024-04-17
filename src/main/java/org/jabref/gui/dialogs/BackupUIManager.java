@@ -99,7 +99,8 @@ public class BackupUIManager {
                         originalDatabase, "Review Backup"
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
-                // In case all changes of the file on disk are merged into the current in-memory file, the file on disk does not differ from the in-memory file
+                // Here the case of a backup file is handled. If no changes of the backup are merged in, the file stays the same
+                // In case any change of the backup is accepted, this means, the in-memory file differs from the file on disk (which is not the backup file)
                 LibraryTab saveState = stateManager.activeTabProperty().get().get();
                 final NamedCompound CE = new NamedCompound(Localization.lang("Merged external changes"));
                 changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(CE));
