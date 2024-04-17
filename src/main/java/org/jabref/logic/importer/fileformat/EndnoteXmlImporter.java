@@ -270,7 +270,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                         String secondaryTitle = parseElementContent(reader, "secondary-title");
                         entry.setField(StandardField.JOURNAL, secondaryTitle);
                     }
-                    // TODO: Left for future work -- test files need to be adpated
                      case "alt-title" -> {
                         String altTitle = parseElementContent(reader, "alt-title");
                         entry.setField(new UnknownField("alt-title"), altTitle);
