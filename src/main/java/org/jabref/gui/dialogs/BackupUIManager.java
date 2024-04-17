@@ -99,8 +99,6 @@ public class BackupUIManager {
                         originalDatabase, "Review Backup"
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
-                // Here the case of a backup file is handled. If no changes of the backup are merged in, the file stays the same
-                // In case any change of the backup is accepted, this means, the in-memory file differs from the file on disk (which is not the backup file)
                 LibraryTab saveState = stateManager.activeTabProperty().get().get();
                 final NamedCompound CE = new NamedCompound(Localization.lang("Merged external changes"));
                 changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(CE));
@@ -108,8 +106,10 @@ public class BackupUIManager {
                 undoManager.addEdit(CE);
                 if (allChangesResolved.get()) {
                     if (reviewBackupDialog.areAllChangesDenied()) {
+                        // Here the case of a backup file is handled: If no changes of the backup are merged in, the file stays the same
                         saveState.resetChangeMonitor();
                     } else {
+                        // In case any change of the backup is accepted, this means, the in-memory file differs from the file on disk (which is not the backup file)
                         saveState.markBaseChanged();
                     }
                     // This does NOT return the original ParserResult, but a modified version with all changes accepted or rejected

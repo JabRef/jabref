@@ -67,15 +67,14 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                         new Action(Localization.lang("Review changes"), event -> {
                             DatabaseChangesResolverDialog databaseChangesResolverDialog = new DatabaseChangesResolverDialog(changes, database, Localization.lang("External Changes Resolver"));
                             var areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
-                            // In case all changes of the file on disk are merged into the current in-memory file, the file on disk does not differ from the in-memory file
-                            boolean areAllChangesAccepted = databaseChangesResolverDialog.areAllChangesAccepted();
                             saveState = stateManager.activeTabProperty().get().get();
                             final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                             changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
                             ce.end();
                             undoManager.addEdit(ce);
                             if (areAllChangesResolved.get()) {
-                                if (areAllChangesAccepted) {
+                                if (databaseChangesResolverDialog.areAllChangesAccepted()) {
+                                    // In case all changes of the file on disk are merged into the current in-memory file, the file on disk does not differ from the in-memory file
                                     saveState.resetChangedProperties();
                                 } else {
                                     saveState.markBaseChanged();
