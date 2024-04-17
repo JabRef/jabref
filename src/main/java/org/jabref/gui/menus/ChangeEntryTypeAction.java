@@ -4,9 +4,6 @@ import java.util.List;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
-
-import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
@@ -19,13 +16,11 @@ public class ChangeEntryTypeAction extends SimpleCommand {
     private final EntryType type;
     private final List<BibEntry> entries;
     private final UndoManager undoManager;
-    private final ReadOnlyStringWrapper statusMessageProperty;
 
     public ChangeEntryTypeAction(EntryType type, List<BibEntry> entries, UndoManager undoManager) {
         this.type = type;
         this.entries = entries;
         this.undoManager = undoManager;
-        this.statusMessageProperty = new ReadOnlyStringWrapper(EntryTypeView.getDescription(type));
     }
 
     @Override

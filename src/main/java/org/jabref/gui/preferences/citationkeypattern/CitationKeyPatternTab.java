@@ -9,7 +9,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanel;
+import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -30,7 +30,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     @FXML private TextField keyPatternReplacement;
     @FXML private TextField unwantedCharacters;
     @FXML private Button keyPatternHelp;
-    @FXML private CitationKeyPatternPanel bibtexKeyPatternTable;
+    @FXML private CitationKeyPatternsPanel bibtexKeyPatternTable;
 
     public CitationKeyPatternTab() {
         ViewLoader.view(this)
@@ -68,7 +68,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
         viewModel.setValues();
         bibtexKeyPatternTable.setValues(
                 Globals.entryTypesManager.getAllTypes(preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode()),
-                preferencesService.getCitationKeyPatternPreferences().getKeyPattern());
+                preferencesService.getCitationKeyPatternPreferences().getKeyPatterns());
     }
 
     @Override
