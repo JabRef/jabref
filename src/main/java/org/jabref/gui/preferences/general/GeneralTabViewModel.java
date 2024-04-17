@@ -24,6 +24,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.remote.CLIMessageHandler;
+import org.jabref.gui.telemetry.TelemetryPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -43,7 +44,6 @@ import org.jabref.preferences.InternalPreferences;
 import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.MergeDialogPreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.TelemetryPreferences;
 import org.jabref.preferences.WorkspacePreferences;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;

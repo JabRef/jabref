@@ -206,7 +206,11 @@ public class EntryEditor extends BorderPane {
                         event.consume();
                         break;
                     case CLOSE:
-                    case EDIT_ENTRY:
+                        // We do not want to close the entry editor as such
+                        // We just want to unfocus the field
+                        tabbed.requestFocus();
+                        break;
+                    case OPEN_CLOSE_ENTRY_EDITOR:
                         close();
                         event.consume();
                         break;

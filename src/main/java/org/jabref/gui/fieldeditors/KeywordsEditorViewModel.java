@@ -90,4 +90,8 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
 
         return suggestions;
     }
+
+    public Character getKeywordSeparator() {
+        return keywordSeparator;
+    }
 }

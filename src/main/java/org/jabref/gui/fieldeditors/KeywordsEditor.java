@@ -78,6 +78,14 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         keywordTagsField.getEditor().getStyleClass().clear();
         keywordTagsField.getEditor().getStyleClass().add("tags-field-editor");
 
+        String keywordSeparator = String.valueOf(viewModel.getKeywordSeparator());
+        keywordTagsField.getEditor().setOnKeyReleased(event -> {
+            if (event.getText().equals(keywordSeparator)) {
+                keywordTagsField.commit();
+                event.consume();
+            }
+        });
+
         Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());
     }
 

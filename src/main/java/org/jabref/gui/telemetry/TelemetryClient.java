@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.telemetry;
 
 import java.util.Map;
 

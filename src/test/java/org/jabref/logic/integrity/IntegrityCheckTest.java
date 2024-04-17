@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -204,7 +204,7 @@ class IntegrityCheckTest {
                 "",
                 "",
                 CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
-                GlobalCitationKeyPattern.fromPattern("[auth][year]"),
+                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
                 "",
                 ',');
     }

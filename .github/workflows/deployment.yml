@@ -89,9 +89,11 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 21.0.2
-          distribution: 'liberica'
+          distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-home-cache-cleanup: true
       - name: Prepare merged jars and modules dir (macOS)
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (matrix.os == 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'NO')
@@ -135,7 +137,12 @@ jobs:
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
+          --jlink-options --bind-services \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module
       - name: Build pkg (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -160,7 +167,12 @@ jobs:
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
+          --jlink-options --bind-services \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash

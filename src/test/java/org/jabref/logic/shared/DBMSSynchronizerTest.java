@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.MetaDataSerializer;
@@ -37,7 +37,7 @@ public class DBMSSynchronizerTest {
 
     private DBMSSynchronizer dbmsSynchronizer;
     private BibDatabase bibDatabase;
-    private final GlobalCitationKeyPattern pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
+    private final GlobalCitationKeyPatterns pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
     private DBMSType dbmsType;
