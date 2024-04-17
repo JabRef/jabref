@@ -176,7 +176,7 @@ public class EndnoteXmlExporter extends Exporter {
             entry.getResolvedKeywords(bibEntryPreferences.getKeywordSeparator(), bibDatabase).forEach(keyword -> {
                 Element keywordElement = document.createElement("keyword");
                 // Hierarchical keywords are separated by the '>' character. See {@link } for details.
-                keywordElement.setTextContent(keyword.get().toString());
+                keywordElement.setTextContent(keyword.get());
                 keywordsElement.appendChild(keywordElement);
             });
             recordElement.appendChild(keywordsElement);

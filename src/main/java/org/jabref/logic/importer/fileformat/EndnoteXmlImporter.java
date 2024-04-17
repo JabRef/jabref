@@ -303,7 +303,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             if (isStartElement(reader, "keyword")) {
                 String keyword = parseElementContent(reader, "keyword");
                 if (!keyword.isEmpty()) {
-                    keywordList.add(keyword.toString());
+                    keywordList.add(keyword);
                 }
             }
         }
