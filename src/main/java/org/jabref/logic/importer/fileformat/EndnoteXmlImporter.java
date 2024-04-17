@@ -356,7 +356,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                             }
                             if (isStartElement(reader, "url")) {
                                 String file = parseElementContent(reader, "url").toString().trim();
-                                entry.setField(StandardField.FILE, ":" + file);
+                                entry.setField(StandardField.FILE, file);
                             }
                         }
                     }
