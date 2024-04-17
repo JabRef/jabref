@@ -103,10 +103,10 @@ public class BackupUIManager {
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 // In case all changes of the file on disk are merged into the current in-memory file, the file on disk does not differ from the in-memory file
                 LibraryTab saveState = stateManager.activeTabProperty().get().get();
-                final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
-                changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
-                ce.end();
-                undoManager.addEdit(ce);
+                final NamedCompound CE = new NamedCompound(Localization.lang("Merged external changes"));
+                changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(CE));
+                CE.end();
+                undoManager.addEdit(CE);
                 if (allChangesResolved.get()) {
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         saveState.resetChangeMonitor();
