@@ -277,7 +277,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     }
                     case "secondary-title" -> {
                         String secondaryTitle = parseElementContent(reader, "secondary-title");
-                        entry.setField(StandardField.BOOKTITLE, secondaryTitle);
+                        if (entry.getType().equals(StandardEntryType.Article)) {
+                            entry.setField(StandardField.JOURNAL, secondaryTitle);
+                        } else {
+                            entry.setField(StandardField.BOOKTITLE, secondaryTitle);
+                        }
                     }
                      case "alt-title" -> {
                         String altTitle = parseElementContent(reader, "alt-title");
@@ -300,7 +304,11 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 switch (elementName) {
                     case "full-title", "abbr-2", "abbr-1", "abbr-3" -> {
                         String journalTitle = parseElementContent(reader, elementName);
-                        entry.setField(StandardField.JOURNAL, journalTitle);
+                        if (entry.getType().equals(StandardEntryType.Article)) {
+                            entry.setField(StandardField.JOURNAL, journalTitle);
+                        } else {
+                            entry.setField(StandardField.BOOKTITLE, journalTitle);
+                        }
                     }
                 }
             }
