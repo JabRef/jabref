@@ -41,8 +41,6 @@ import static org.jabref.gui.Globals.undoManager;
 public class BackupUIManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupUIManager.class);
 
-    private static final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
-
     private BackupUIManager() {
     }
 
