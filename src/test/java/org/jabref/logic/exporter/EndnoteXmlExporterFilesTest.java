@@ -78,7 +78,7 @@ public class EndnoteXmlExporterFilesTest {
         // The order of the XML elements changes
         // The order does not really matter, so we ignore it.
         // Source: https://stackoverflow.com/a/16540679/873282
-        assertThat(expected, isSimilarTo(actual)
+        assertThat(actual, isSimilarTo(expected)
                 .ignoreWhitespace()
                 .normalizeWhitespace()
                 .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));

@@ -3,9 +3,11 @@ package org.jabref.logic.exporter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SequencedMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -19,6 +21,8 @@ import javax.xml.transform.stream.StreamResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -59,7 +63,8 @@ public class EndnoteXmlExporter extends Exporter {
     }
 
     // Contains the mapping of all fields not explicitly handled by mapX methods
-    private static final Map<Field, String> STANDARD_FIELD_MAPPING = new HashMap<>();
+    // We need a fixed order here, so we use a SequencedMap
+    private static final SequencedMap<Field, String> STANDARD_FIELD_MAPPING = new LinkedHashMap<>();
 
     static {
         STANDARD_FIELD_MAPPING.put(StandardField.PAGES, "pages");
@@ -68,8 +73,6 @@ public class EndnoteXmlExporter extends Exporter {
         STANDARD_FIELD_MAPPING.put(StandardField.ISBN, "isbn");
         STANDARD_FIELD_MAPPING.put(StandardField.DOI, "electronic-resource-num");
         STANDARD_FIELD_MAPPING.put(StandardField.ABSTRACT, "abstract");
-        STANDARD_FIELD_MAPPING.put(StandardField.URL, "web-urls");
-        STANDARD_FIELD_MAPPING.put(StandardField.FILE, "pdf-urls");
         STANDARD_FIELD_MAPPING.put(StandardField.BOOKTITLE, "secondary-title");
         STANDARD_FIELD_MAPPING.put(StandardField.EDITION, "edition");
         STANDARD_FIELD_MAPPING.put(StandardField.SERIES, "tertiary-title");
@@ -147,15 +150,6 @@ public class EndnoteXmlExporter extends Exporter {
         transformer.transform(source, result);
     }
 
-    private static Transformer createTransformer() throws TransformerConfigurationException {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-        return transformer;
-    }
-
     private static void mapTitle(BibEntry entry, Document document, Element recordElement) {
         entry.getFieldOrAlias(StandardField.TITLE).ifPresent(title -> {
             Element titlesElement = document.createElement("titles");
@@ -167,7 +161,7 @@ public class EndnoteXmlExporter extends Exporter {
     }
 
     private static void mapJournalTitle(BibEntry entry, Document document, Element recordElement) {
-        entry.getFieldOrAlias(StandardField.JOURNALTITLE).ifPresent(journalTitle -> {
+        entry.getFieldOrAlias(StandardField.JOURNAL).ifPresent(journalTitle -> {
             Element periodicalElement = document.createElement("periodical");
             Element fullTitleElement = document.createElement("full-title");
             fullTitleElement.setTextContent(journalTitle);
@@ -267,31 +261,34 @@ public class EndnoteXmlExporter extends Exporter {
 
     private static void mapAuthorAndEditor(BibEntry entry, Document document, Element recordElement) {
         Element contributorsElement = document.createElement("contributors");
-
         entry.getField(StandardField.AUTHOR).ifPresent(authors -> {
-            Element authorsElement = document.createElement("authors");
-            String[] authorArray = authors.split("\\s+and\\s+");
-            for (String author : authorArray) {
-                Element authorElement = document.createElement("author");
-                authorElement.setTextContent(author);
-                authorsElement.appendChild(authorElement);
-            }
-            contributorsElement.appendChild(authorsElement);
+            addPersons(authors, document, contributorsElement, "authors");
         });
-
         entry.getField(StandardField.EDITOR).ifPresent(editors -> {
-            Element secondaryAuthorsElement = document.createElement("secondary-authors");
-            String[] editorArray = editors.split("\\s+and\\s+");
-            for (String editor : editorArray) {
-                Element editorElement = document.createElement("author");
-                editorElement.setTextContent(editor);
-                secondaryAuthorsElement.appendChild(editorElement);
-            }
-            contributorsElement.appendChild(secondaryAuthorsElement);
+            addPersons(editors, document, contributorsElement, "secondary-authors");
         });
-
         if (contributorsElement.hasChildNodes()) {
             recordElement.appendChild(contributorsElement);
         }
+    }
+
+    private static void addPersons(String authors, Document document, Element contributorsElement, String wrapTagName) {
+        Element container = document.createElement(wrapTagName);
+        AuthorList parsedPersons = AuthorList.parse(authors).latexFree();
+        for (Author person : parsedPersons) {
+            Element authorElement = document.createElement("author");
+            authorElement.setTextContent(person.getFamilyGiven(false));
+            container.appendChild(authorElement);
+        }
+        contributorsElement.appendChild(container);
+    }
+
+    private static Transformer createTransformer() throws TransformerConfigurationException {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        return transformer;
     }
 }
