@@ -17,7 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a duplicate checker for the Citation Relations tab. [#10414](https://github.com/JabRef/jabref/issues/10414)
 - We added tooltip on main table cells that shows cell content or cell content and entry preview if set in preferences. [10925](https://github.com/JabRef/jabref/issues/10925)
 - We added the ability to add a keyword/crossref when typing the separator character (e.g., comma) in the keywords/crossref fields. [#11178](https://github.com/JabRef/jabref/issues/11178)
-- We added an exporter for Endnote XML format. [#11137](https://github.com/JabRef/jabref/issues/11137)
+- We added an exporter and improved the importer for Endnote XML format. [#11137](https://github.com/JabRef/jabref/issues/11137)
 
 ### Changed
 
