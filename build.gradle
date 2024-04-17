@@ -53,12 +53,32 @@ java {
         // - .devcontainer/devcontainer.json#L34 and
         // - .github/workflows/deployment-jdk-ea.yml#L53
         languageVersion = JavaLanguageVersion.of(21)
+        // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
+        // vendor = JvmVendorSpec.AMAZON
     }
 }
 
 application {
     mainClass.set('org.jabref.Launcher')
     mainModule.set('org.jabref')
+
+    applicationDefaultJvmArgs = [
+        // On a change here, also adapt
+        //   1. "run > moduleOptions"
+        //   2. "deployment.yml" (macOS part)
+        //   3. "deployment-arm64.yml"
+
+        // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+
+        // Fix for https://github.com/JabRef/jabref/issues/11188
+        '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
+        '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
+
+        // Fix for https://github.com/JabRef/jabref/issues/11198
+        '--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module',
+        '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
+        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module'
+    ]
 }
 
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
@@ -139,7 +159,7 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:2.2.224'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.78'
 
     implementation 'commons-cli:commons-cli:1.6.0'
 
@@ -177,15 +197,19 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
-    implementation('org.jabref:afterburner.fx:2.0.0')
+    implementation('org.jabref:afterburner.fx:2.0.0') {
+        exclude group: 'org.openjfx'
+    }
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
+    implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT') {
+        exclude group: 'org.openjfx'
+    }
     implementation 'org.fxmisc.flowless:flowless:0.7.2'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.7.4') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.8.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.openjfx'
@@ -203,7 +227,7 @@ dependencies {
     implementation "org.tinylog:tinylog-impl:2.7.0"
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation 'org.slf4j:jul-to-slf4j:2.0.12'
+    implementation 'org.slf4j:jul-to-slf4j:2.0.13'
     // route all requests to log4j to SLF4J
     implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.23.1'
 
@@ -267,8 +291,8 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.11.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.9.1'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.2.1'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.2.1'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.3.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.3.0'
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
@@ -393,14 +417,25 @@ compileJava {
     }
 }
 
+// Configures "application > run" task
 run {
+    doFirst {
+        // Clear the default JVM arguments, to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+        application.applicationDefaultJvmArgs = []
+    }
+
     // TODO: Remove access to internal api
     moduleOptions {
+        // On a change here, also adapt "application > applicationDefaultJvmArgs"
         addExports = [
+                'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
-                // Not sure why we need to restate the controlfx exports
+                // We need to restate the ControlsFX exports, because we get following error otherwise:
+                //   java.lang.IllegalAccessError:
+                //     class org.controlsfx.control.textfield.AutoCompletionBinding (in module org.controlsfx.controls)
+                //     cannot access class com.sun.javafx.event.EventHandlerManager (in module javafx.base) because
+                //     module javafx.base does not export com.sun.javafx.event to module org.controlsfx.controls
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
                 'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
                 'javafx.graphics/com.sun.javafx.scene.traversal' : 'org.controlsfx.controls',
@@ -416,8 +451,9 @@ run {
 
         addOpens = [
                 'javafx.controls/javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
 
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
                 'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
@@ -437,8 +473,7 @@ javadoc {
         version = false
         author = false
         addMultilineStringsOption("-add-exports").setValue([
-            'javafx.controls/com.sun.javafx.scene.control=org.jabref',
-            'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
+            'javafx.controls/com.sun.javafx.scene.control=org.jabref'
         ])
     }
 }
@@ -572,6 +607,9 @@ tasks.register('deleteInstallerTemp', Delete) {
 jpackage.dependsOn deleteInstallerTemp
 jlinkZip.dependsOn jpackage
 jlink {
+    // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
+    addExtraDependencies("javafx")
+
     addOptions('--strip-debug', '--compress', 'zip-6', '--no-header-files', '--no-man-pages')
     launcher {
         name = 'JabRef'
@@ -584,7 +622,6 @@ jlink {
     // but it was removed in the newer releases.
     // The pom.xml associated with such a non-modular artifact does not mention that the artifact depends on the removed code
     // (because the artifact was published when this code was still available in the JDK).
-    forceMerge "javafx"
     forceMerge "controlsfx", "bcprov", "jaxb", "istack", "stax", "log4j"
 
     // TODO: Remove the following correction to the merged module
@@ -592,6 +629,13 @@ jlink {
     // This is based on ./gradlew suggestMergedModuleInfo, sort, strip ";"", comment non-used modules, and include the suggested directives here.
     //   However, we need to fine-tune this manually (non-alphabetic order)
     mergedModule {
+        requires 'javafx.base'
+        requires 'javafx.controls'
+        requires 'javafx.fxml'
+        requires 'javafx.graphics'
+        requires 'javafx.media'
+        requires 'javafx.swing'
+
         requires 'java.compiler'
         requires 'java.datatransfer'
         requires 'java.desktop'

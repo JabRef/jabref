@@ -11,17 +11,23 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added support for offline extracting refereferences from PDFs following the IEEE format. [#11156](https://github.com/JabRef/jabref/pull/11156)
+- We added support for offline extracting references from PDFs following the IEEE format. [#11156](https://github.com/JabRef/jabref/pull/11156)
 - We added a new keyboard shortcut  <kbd>ctrl</kbd> + <kbd>,</kbd> to open the preferences. [#11154](https://github.com/JabRef/jabref/pull/11154)
 - We added value selection (such as for month) for content selectors in custom entry types. [#11109](https://github.com/JabRef/jabref/issues/11109)
+- We added a duplicate checker for the Citation Relations tab. [#10414](https://github.com/JabRef/jabref/issues/10414)
+- We added tooltip on main table cells that shows cell content or cell content and entry preview if set in preferences. [10925](https://github.com/JabRef/jabref/issues/10925)
+- We added the ability to add a keyword/crossref when typing the separator character (e.g., comma) in the keywords/crossref fields. [#11178](https://github.com/JabRef/jabref/issues/11178)
 
 ### Changed
 
 - We replaced the word "Key bindings" with "Keyboard shortcuts" in the Preferences tab. [#11153](https://github.com/JabRef/jabref/pull/11153)
+- We slightly improved the duplicate check if ISBN numbers are present. [#8885](https://github.com/JabRef/jabref/issues/8885)
 
 ### Fixed
 
 - We fixed an issue where entry type with duplicate fields prevented opening existing libraries with custom entry types [#11127](https://github.com/JabRef/jabref/issues/11127)
+- We fixed crash on opening the entry editor when auto completion is enabled. [#11188](https://github.com/JabRef/jabref/issues/11188)
+- We fixed the usage of the key binding for "Clear search" (default: <kbd>Escape</kbd>). [#10764](https://github.com/JabRef/jabref/issues/10764).
 
 ### Removed
 

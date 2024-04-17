@@ -3,7 +3,7 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -31,7 +31,7 @@ public class SynchronizationSimulatorTest {
     private BibDatabaseContext clientContextA;
     private BibDatabaseContext clientContextB;
     private SynchronizationEventListenerTest eventListenerB; // used to monitor occurring events
-    private final GlobalCitationKeyPattern pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
+    private final GlobalCitationKeyPatterns pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
 
     private BibEntry getBibEntryExample(int index) {
         return new BibEntry(StandardEntryType.InProceedings)

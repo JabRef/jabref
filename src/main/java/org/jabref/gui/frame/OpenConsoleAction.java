@@ -1,9 +1,11 @@
-package org.jabref.gui;
+package org.jabref.gui.frame;
 
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -24,7 +26,7 @@ public class OpenConsoleAction extends SimpleCommand {
     /**
      * Creates a command that opens the console at the path of the supplied database,
      * or defaults to the active database. Use
-     * {@link #OpenConsoleAction(StateManager, PreferencesService)} if not supplying
+     * {@link #OpenConsoleAction(StateManager, PreferencesService, DialogService)} if not supplying
      * another database.
      */
     public OpenConsoleAction(Supplier<BibDatabaseContext> databaseContext, StateManager stateManager, PreferencesService preferencesService, DialogService dialogService) {

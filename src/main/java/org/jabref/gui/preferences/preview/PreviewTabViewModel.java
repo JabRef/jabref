@@ -62,6 +62,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
 
     private final BooleanProperty showAsExtraTabProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty showPreviewInEntryTableTooltip = new SimpleBooleanProperty(false);
 
     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
@@ -113,6 +114,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         showAsExtraTabProperty.set(previewPreferences.shouldShowPreviewAsExtraTab());
+        showPreviewInEntryTableTooltip.set(previewPreferences.shouldShowPreviewEntryTableTooltip());
         chosenListProperty().getValue().clear();
         chosenListProperty.getValue().addAll(previewPreferences.getLayoutCycle());
 
@@ -190,6 +192,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         previewPreferences.getLayoutCycle().clear();
         previewPreferences.getLayoutCycle().addAll(chosenListProperty);
         previewPreferences.setShowPreviewAsExtraTab(showAsExtraTabProperty.getValue());
+        previewPreferences.setShowPreviewEntryTableTooltip(showPreviewInEntryTableTooltip.getValue());
         previewPreferences.setCustomPreviewLayout((TextBasedPreviewLayout) customLayout);
 
         if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
@@ -437,6 +440,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty showAsExtraTabProperty() {
         return showAsExtraTabProperty;
+    }
+
+    public BooleanProperty showPreviewInEntryTableTooltip() {
+        return showPreviewInEntryTableTooltip;
     }
 
     public ListProperty<PreviewLayout> availableListProperty() {

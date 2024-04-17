@@ -3,6 +3,7 @@ package org.jabref.gui.menus;
 import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.frame.FileHistoryMenu;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.util.io.FileHistory;
 
