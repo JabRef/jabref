@@ -62,7 +62,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             Map.entry(StandardField.TITLE, "title"),
             Map.entry(StandardField.AUTHOR, "authors"),
             Map.entry(StandardField.EDITOR, "secondary-authors"),
-            Map.entry(StandardField.JOURNAL, "full-title"),
             Map.entry(StandardField.BOOKTITLE, "secondary-title"),
             Map.entry(StandardField.EDITION, "edition"),
             Map.entry(StandardField.SERIES, "tertiary-title"),
@@ -88,6 +87,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             // Map.entry(StandardField.KEY, "foreign-keys"),  // We omit this field
             Map.entry(StandardField.ADDRESS, "auth-address")
     );
+    private static final UnknownField FIELD_ALT_TITLE = new UnknownField("alt-title");
 
     private final ImportFormatPreferences preferences;
 
@@ -187,8 +187,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     case "titles" -> {
                         parseTitles(reader, entry);
                     }
-                    case "periodical", "alt-periodical" -> {
-                        parsePeriodical(reader, entry, elementName);
+                    case "periodical" -> {
+                        parsePeriodical(reader, entry);
                     }
                     case "keywords" -> {
                         parseKeywords(reader, entry);
@@ -221,10 +221,10 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
         // Cleanup: Remove alt-title if it matches the journal
         String journalOrBooktitle = entry.getField(StandardField.JOURNAL).or(() -> entry.getField(StandardField.BOOKTITLE)).orElse("");
-        if (entry.hasField(new UnknownField("alt-title"))) {
-            String altTitle = entry.getField(new UnknownField("alt-title")).orElse("");
+        if (entry.hasField(FIELD_ALT_TITLE)) {
+            String altTitle = entry.getField(FIELD_ALT_TITLE).orElse("");
             if (journalOrBooktitle.equals(altTitle)) {
-                entry.clearField(new UnknownField("alt-title"));
+                entry.clearField(FIELD_ALT_TITLE);
             }
         }
 
@@ -285,17 +285,17 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     }
                      case "alt-title" -> {
                         String altTitle = parseElementContent(reader, "alt-title");
-                        entry.setField(new UnknownField("alt-title"), altTitle);
+                        entry.setField(FIELD_ALT_TITLE, altTitle);
                      }
                 }
             }
         }
     }
 
-    private void parsePeriodical(XMLStreamReader reader, BibEntry entry, String elementName) throws XMLStreamException {
+    private void parsePeriodical(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
-            if (isEndElement(reader, elementName)) {
+            if (isEndElement(reader, "periodical")) {
                 break;
             }
 
