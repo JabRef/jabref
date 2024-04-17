@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -135,15 +136,19 @@ public class EndnoteXmlExporter extends Exporter {
             }
         }
 
+        Transformer transformer = createTransformer();
+        DOMSource source = new DOMSource(document);
+        StreamResult result = new StreamResult(file.toFile());
+        transformer.transform(source, result);
+    }
+
+    private static Transformer createTransformer() throws TransformerConfigurationException {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-
-        DOMSource source = new DOMSource(document);
-        StreamResult result = new StreamResult(file.toFile());
-        transformer.transform(source, result);
+        return transformer;
     }
 
     private static void mapTitle(BibEntry entry, Document document, Element recordElement) {
