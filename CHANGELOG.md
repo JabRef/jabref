@@ -113,7 +113,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where an exception occurred when selecting entries in the web search results. [#11081](https://github.com/JabRef/jabref/issues/11081)
 - When a new library is unsaved, there is now no warning when fetching entries with PDFs. [#11075](https://github.com/JabRef/jabref/issues/11075)
 - We fixed an issue where the message "The libary has been modified by another program" occurred when editing library metadata and saving the library. [#4877](https://github.com/JabRef/jabref/issues/4877)
-- We fixed an issue where library shown as unsaved and marked (*) after accepting changes made externally to the file. [#11027](https://github.com/JabRef/jabref/issues/11027)
 
 ### Removed
 

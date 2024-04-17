@@ -33,6 +33,8 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.Globals.undoManager;
+
 /**
  * Stores all user dialogs related to {@link BackupManager}.
  */
@@ -99,9 +101,12 @@ public class BackupUIManager {
                         originalDatabase, "Review Backup"
                 );
                 var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
+                // In case all changes of the file on disk are merged into the current in-memory file, the file on disk does not differ from the in-memory file
                 LibraryTab saveState = stateManager.activeTabProperty().get().get();
+                final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                 changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
                 ce.end();
+                undoManager.addEdit(ce);
                 if (allChangesResolved.get()) {
                     if (reviewBackupDialog.areAllChangesDenied()) {
                         saveState.resetChangeMonitor();
