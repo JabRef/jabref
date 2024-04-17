@@ -187,8 +187,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                     case "titles" -> {
                         parseTitles(reader, entry);
                     }
-                    case "periodical" -> {
-                        parsePeriodical(reader, entry);
+                    case "periodical", "alt-periodical" -> {
+                        parsePeriodical(reader, entry, elementName);
                     }
                     case "keywords" -> {
                         parseKeywords(reader, entry);
@@ -292,24 +292,28 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         }
     }
 
-    private void parsePeriodical(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
+    private void parsePeriodical(XMLStreamReader reader, BibEntry entry, String elementName) throws XMLStreamException {
         while (reader.hasNext()) {
             reader.next();
-            if (isEndElement(reader, "periodical")) {
+            if (isEndElement(reader, elementName)) {
                 break;
             }
 
             if (isStartElement(reader)) {
-                String elementName = reader.getName().getLocalPart();
-                switch (elementName) {
-                    case "full-title", "abbr-2", "abbr-1", "abbr-3" -> {
-                        String journalTitle = parseElementContent(reader, elementName);
-                        if (entry.getType().equals(StandardEntryType.Article)) {
-                            entry.setField(StandardField.JOURNAL, journalTitle);
-                        } else {
-                            entry.setField(StandardField.BOOKTITLE, journalTitle);
-                        }
-                    }
+                parseJournalOrBookTitle(reader, entry);
+            }
+        }
+    }
+
+    private void parseJournalOrBookTitle(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
+        String elementName = reader.getName().getLocalPart();
+        switch (elementName) {
+            case "full-title", "abbr-2", "abbr-1", "abbr-3" -> {
+                String title = parseElementContent(reader, elementName);
+                if (entry.getType().equals(StandardEntryType.Article)) {
+                    entry.setField(StandardField.JOURNAL, title);
+                } else {
+                    entry.setField(StandardField.BOOKTITLE, title);
                 }
             }
         }
