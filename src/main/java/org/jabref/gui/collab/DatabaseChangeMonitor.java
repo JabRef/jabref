@@ -23,11 +23,12 @@ import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.Globals.undoManager;
+
 public class DatabaseChangeMonitor implements FileUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
 
-    private final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
     private final BibDatabaseContext database;
     private final FileUpdateMonitor fileMonitor;
     private final List<DatabaseChangeListener> listeners;
@@ -66,10 +67,14 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                         new Action(Localization.lang("Review changes"), event -> {
                             DatabaseChangesResolverDialog databaseChangesResolverDialog = new DatabaseChangesResolverDialog(changes, database, Localization.lang("External Changes Resolver"));
                             var areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
+                            // Here the case of a backup file is handled. If no changes of the backup are merged in, the file stays the same
+                            // In case any change of the backup is accepted, this means, the in-memory file differs from the file on disk (which is not the backup file)
                             boolean areAllChangesAccepted = databaseChangesResolverDialog.areAllChangesAccepted();
                             saveState = stateManager.activeTabProperty().get().get();
+                            final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                             changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
                             ce.end();
+                            undoManager.addEdit(ce);
                             if (areAllChangesResolved.get()) {
                                 if (areAllChangesAccepted) {
                                     saveState.resetChangedProperties();
