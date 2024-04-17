@@ -3,13 +3,12 @@ package org.jabref.model.entry.field;
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
 
 import org.jabref.model.strings.StringUtil;
 
 public class UnknownField implements Field {
     private String name;
-    private final Set<FieldProperty> properties;
+    private final EnumSet<FieldProperty> properties;
     private final String displayName;
 
     public UnknownField(String name) {
@@ -33,11 +32,11 @@ public class UnknownField implements Field {
     }
 
     public static UnknownField fromDisplayName(String displayName) {
-        return new UnknownField(displayName.toLowerCase(Locale.ROOT), displayName);
+        return new UnknownField(displayName.toLowerCase(Locale.ROOT), displayName, FieldProperty.CUSTOM_FIELD);
     }
 
     @Override
-    public Set<FieldProperty> getProperties() {
+    public EnumSet<FieldProperty> getProperties() {
         return properties;
     }
 

@@ -282,7 +282,7 @@ public class LibraryTab extends Tab {
             return;
         }
         if (tabPane.getSelectionModel().selectedItemProperty().get().equals(this)) {
-            LOGGER.warn("This case should not happen.");
+            LOGGER.debug("This case should not happen.");
             stateManager.setActiveDatabase(bibDatabaseContext);
             stateManager.activeTabProperty().set(Optional.of(this));
         }
@@ -423,7 +423,6 @@ public class LibraryTab extends Tab {
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-
         this.changedProperty.setValue(true);
     }
 
@@ -911,7 +910,8 @@ public class LibraryTab extends Tab {
                 taskExecutor,
                 dialogService,
                 preferencesService,
-                databaseNotificationPane));
+                databaseNotificationPane,
+                stateManager));
     }
 
     public void copy() {

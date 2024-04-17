@@ -91,6 +91,7 @@ open module org.jabref {
     requires org.apache.commons.cli;
     requires org.apache.commons.csv;
     requires org.apache.commons.lang3;
+    requires org.apache.commons.text;
     requires com.google.common;
     requires io.github.javadiffutils;
     requires java.string.similarity;
@@ -143,6 +144,7 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires de.saxsys.mvvmfx.validation;
-    requires com.jthemedetector;
     requires dd.plist;
+    requires mslinks;
+    requires org.yaml.snakeyaml;
 }

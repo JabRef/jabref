@@ -15,12 +15,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -54,6 +52,9 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
     private final BibDatabaseContext database;
 
     private ExternalChangesResolverViewModel viewModel;
+
+    private boolean areAllChangesAccepted;
+    private boolean areAllChangesDenied;
 
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
@@ -90,6 +91,14 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
         });
     }
 
+    public boolean areAllChangesAccepted() {
+        return areAllChangesAccepted;
+    }
+
+    public boolean areAllChangesDenied() {
+        return areAllChangesDenied;
+    }
+
     @FXML
     private void initialize() {
         PreviewViewer previewViewer = new PreviewViewer(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
@@ -115,7 +124,8 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
         EasyBind.subscribe(viewModel.areAllChangesResolvedProperty(), isResolved -> {
             if (isResolved) {
-                viewModel.applyChanges();
+                areAllChangesAccepted = viewModel.areAllChangesAccepted();
+                areAllChangesDenied = viewModel.areAllChangesDenied();
                 close();
             }
         });

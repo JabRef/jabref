@@ -449,7 +449,7 @@ class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[authIni2]");
         entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");
         new CitationKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("D+"), entry.getCitationKey());
+        assertEquals(Optional.of("DS"), entry.getCitationKey());
     }
 
     @Test

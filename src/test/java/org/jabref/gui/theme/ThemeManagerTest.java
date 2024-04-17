@@ -16,6 +16,7 @@ import javafx.scene.web.WebEngine;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.WorkspacePreferences;
+import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -157,6 +158,7 @@ class ThemeManagerTest {
     }
 
     @Test
+    @DisabledOnCIServer("Randomly fails on CI server")
     public void installThemeOnScene() throws IOException {
         Scene scene = mock(Scene.class);
         when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());

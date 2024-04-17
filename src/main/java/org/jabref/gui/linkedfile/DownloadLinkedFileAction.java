@@ -100,7 +100,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
         Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
         if (targetDirectory.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("File directory is not set or does not exist!"));
+            LOGGER.warn("File directory not available while downloading {}. Storing as URL in file field.", downloadUrl);
             return;
         }
 
@@ -137,8 +137,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         boolean isHtml;
         try {
             isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory, destination.getFileName(), dialogService);
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             LOGGER.error("FileNameUniqueness.isDuplicatedFile failed", e);
             return;
         }
@@ -160,7 +159,11 @@ public class DownloadLinkedFileAction extends SimpleCommand {
             if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
                 newLinkedFile.setDescription((linkedFile.getDescription()));
             }
-            newLinkedFile.setSourceURL(linkedFile.getLink());
+            if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink())) {
+                newLinkedFile.setSourceURL(linkedFile.getLink());
+            } else {
+                newLinkedFile.setSourceURL(linkedFile.getSourceUrl());
+            }
             entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
             isHtml = newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName());
         }

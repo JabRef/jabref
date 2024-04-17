@@ -61,7 +61,7 @@ public class MetaDataSerializer {
         metaData.getVersionDBStructure().ifPresent(
                 versionDBStructure -> stringyMetaData.put(MetaData.VERSION_DB_STRUCT, Collections.singletonList(versionDBStructure.trim())));
 
-        for (ContentSelector selector : metaData.getContentSelectorList()) {
+        for (ContentSelector selector : metaData.getContentSelectorsSorted()) {
             stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());
         }
 
@@ -128,14 +128,14 @@ public class MetaDataSerializer {
         for (EntryType key : citationKeyPattern.getAllKeys()) {
             if (!citationKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
-                data.add(citationKeyPattern.getValue(key).get(0));
+                data.add(citationKeyPattern.getValue(key).getFirst());
                 String metaDataKey = MetaData.PREFIX_KEYPATTERN + key.getName();
                 stringyPattern.put(metaDataKey, data);
             }
         }
         if ((citationKeyPattern.getDefaultValue() != null) && !citationKeyPattern.getDefaultValue().isEmpty()) {
             List<String> data = new ArrayList<>();
-            data.add(citationKeyPattern.getDefaultValue().get(0));
+            data.add(citationKeyPattern.getDefaultValue().getFirst());
             stringyPattern.put(MetaData.KEYPATTERNDEFAULT, data);
         }
         return stringyPattern;

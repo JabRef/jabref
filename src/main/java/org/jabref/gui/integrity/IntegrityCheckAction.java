@@ -15,7 +15,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -31,23 +30,19 @@ public class IntegrityCheckAction extends SimpleCommand {
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
     private final JournalAbbreviationRepository abbreviationRepository;
-    private final PredatoryJournalRepository predatoryJournalRepository;
 
     public IntegrityCheckAction(Supplier<LibraryTab> tabSupplier,
                                 PreferencesService preferencesService,
                                 DialogService dialogService,
                                 StateManager stateManager,
                                 TaskExecutor taskExecutor,
-                                JournalAbbreviationRepository abbreviationRepository,
-                                PredatoryJournalRepository predatoryJournalRepository) {
+                                JournalAbbreviationRepository abbreviationRepository) {
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.abbreviationRepository = abbreviationRepository;
-        this.predatoryJournalRepository = predatoryJournalRepository;
-
         this.executable.bind(needsDatabase(this.stateManager));
     }
 
@@ -58,7 +53,6 @@ public class IntegrityCheckAction extends SimpleCommand {
                 preferencesService.getFilePreferences(),
                 preferencesService.getCitationKeyPatternPreferences(),
                 abbreviationRepository,
-                predatoryJournalRepository,
                 preferencesService.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
 
         Task<List<IntegrityMessage>> task = new Task<>() {

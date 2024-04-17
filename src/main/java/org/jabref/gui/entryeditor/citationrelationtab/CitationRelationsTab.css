@@ -10,11 +10,3 @@
 .entry-container {
     -fx-padding: 0.5em 0em 0.5em 0em;
 }
-
-.list-cell:default {
-    -fx-padding: 0.5em 0.1em 0.5em 0em;
-}
-
-.list-cell:selected {
-    -fx-background-color: derive(-jr-selected, 60%);
-}
