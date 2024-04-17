@@ -96,6 +96,12 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     public EndnoteXmlImporter(ImportFormatPreferences preferences) {
         this.preferences = preferences;
         xmlInputFactory = XMLInputFactory.newInstance();
+
+        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
+        // not suported by aalto-xml
+        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        // required for reading Unicode characters such as &#xf6;
+        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
     }
 
     @Override
