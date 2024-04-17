@@ -166,7 +166,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private void cleanup() {
         try {
-            if (temporaryFileLock != null && temporaryFileLock.isValid() ) {
+            if (temporaryFileLock != null && temporaryFileLock.isValid()) {
                 temporaryFileLock.release();
             }
         } catch (IOException exception) {
