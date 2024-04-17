@@ -220,11 +220,18 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         }
 
         // Cleanup: Remove alt-title if it matches the journal
-        if (entry.hasField(StandardField.JOURNAL) && entry.hasField(new UnknownField("alt-title"))) {
-            String journal = entry.getField(StandardField.JOURNAL).orElse("");
+        if (entry.hasField(new UnknownField("alt-title"))) {
             String altTitle = entry.getField(new UnknownField("alt-title")).orElse("");
-            if (journal.equals(altTitle)) {
-                entry.clearField(new UnknownField("alt-title"));
+            if (entry.hasField(StandardField.JOURNAL)) {
+                String journal = entry.getField(StandardField.JOURNAL).orElse("");
+                if (journal.equals(altTitle)) {
+                    entry.clearField(new UnknownField("alt-title"));
+                }
+            } else if (entry.hasField(StandardField.BOOKTITLE)) {
+                String booktitle = entry.getField(StandardField.BOOKTITLE).orElse("");
+                if (booktitle.equals(altTitle)) {
+                    entry.clearField(new UnknownField("alt-title"));
+                }
             }
         }
 
