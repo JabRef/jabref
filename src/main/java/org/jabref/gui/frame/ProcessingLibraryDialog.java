@@ -1,9 +1,11 @@
-package org.jabref.gui;
+package org.jabref.gui.frame;
 
 import java.util.List;
 
 import javafx.concurrent.Task;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 

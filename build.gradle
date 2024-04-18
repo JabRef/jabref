@@ -68,6 +68,8 @@ application {
         //   2. "deployment.yml" (macOS part)
         //   3. "deployment-arm64.yml"
 
+        // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+
         // Fix for https://github.com/JabRef/jabref/issues/11188
         '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
         '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
@@ -436,6 +438,11 @@ compileJava {
 
 // Configures "application > run" task
 run {
+    doFirst {
+        // Clear the default JVM arguments, to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+        application.applicationDefaultJvmArgs = []
+    }
+
     // TODO: Remove access to internal api
     moduleOptions {
         // On a change here, also adapt "application > applicationDefaultJvmArgs"

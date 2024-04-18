@@ -38,18 +38,18 @@ public class CitationKeyGenerator extends BracketedPattern {
     // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
     private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
 
-    private final AbstractCitationKeyPattern citeKeyPattern;
+    private final AbstractCitationKeyPatterns citeKeyPattern;
     private final BibDatabase database;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final String unwantedCharacters;
 
     public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
-        this(bibDatabaseContext.getMetaData().getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern()),
+        this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),
                 bibDatabaseContext.getDatabase(),
                 citationKeyPatternPreferences);
     }
 
-    public CitationKeyGenerator(AbstractCitationKeyPattern citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+    public CitationKeyGenerator(AbstractCitationKeyPatterns citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);
         this.database = Objects.requireNonNull(database);
         this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
@@ -172,12 +172,11 @@ public class CitationKeyGenerator extends BracketedPattern {
     private String createCitationKeyFromPattern(BibEntry entry) {
         // get the type of entry
         EntryType entryType = entry.getType();
-        // Get the arrayList corresponding to the type
-        List<String> citationKeyPattern = citeKeyPattern.getValue(entryType);
-        if (citationKeyPattern.isEmpty()) {
+        CitationKeyPattern citationKeyPattern = citeKeyPattern.getValue(entryType);
+        if (citationKeyPattern == null || CitationKeyPattern.NULL_CITATION_KEY_PATTERN.equals(citationKeyPattern)) {
             return "";
         }
-        return expandBrackets(citationKeyPattern.getFirst(), expandBracketContent(entry));
+        return expandBrackets(citationKeyPattern.stringRepresentation(), expandBracketContent(entry));
     }
 
     /**

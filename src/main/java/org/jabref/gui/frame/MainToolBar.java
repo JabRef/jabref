@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.frame;
 
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
@@ -13,6 +13,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;

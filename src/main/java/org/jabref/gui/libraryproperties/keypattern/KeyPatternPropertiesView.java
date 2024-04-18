@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanel;
+import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
@@ -22,7 +22,7 @@ import jakarta.inject.Inject;
 public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatternPropertiesViewModel> implements PropertiesTab {
 
     @FXML private Button keyPatternHelp;
-    @FXML private CitationKeyPatternPanel bibtexKeyPatternTable;
+    @FXML private CitationKeyPatternsPanel bibtexKeyPatternTable;
 
     @Inject private PreferencesService preferencesService;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
@@ -57,7 +57,7 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
                 bibEntryTypesManager.getAllTypes(databaseContext.getMetaData().getMode()
                                                                 .orElse(preferencesService.getLibraryPreferences()
                                                                                           .getDefaultBibDatabaseMode())),
-                databaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences().getKeyPattern()));
+                databaseContext.getMetaData().getCiteKeyPatterns(preferencesService.getCitationKeyPatternPreferences().getKeyPatterns()));
     }
 
     @FXML

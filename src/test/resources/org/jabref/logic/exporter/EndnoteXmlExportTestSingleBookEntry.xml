@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xml>
+    <records>
+        <record>
+            <ref-type name="Book">2</ref-type>
+            <database name="MyLibrary">MyLibrary</database>
+            <source-app name="JabRef">JabRef</source-app>
+            <contributors>
+                <secondary-authors>
+                    <author>Bhattacharyya, R.</author>
+                    <author>McCormick, M. E.</author>
+                </secondary-authors>
+            </contributors>
+            <titles>
+                <title>Wave Energy Conversion</title>
+            </titles>
+            <keywords>
+                <keyword>waves</keyword>
+                <keyword>agua</keyword>
+            </keywords>
+            <dates>
+                <year>2013</year>
+            </dates>
+            <urls>
+                <pdf-urls>
+                    <url>/home/mfg/acad/ext/arts/waves/water/[R._Bhattacharyya_and_M.E._McCormick_(Eds.)]_Wave_(z-lib.org).pdf</url>
+                </pdf-urls>
+            </urls>
+            <publisher>Elsevier Science</publisher>
+            <isbn>9780080442129</isbn>
+        </record>
+    </records>
+</xml>
