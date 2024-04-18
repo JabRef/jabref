@@ -555,4 +555,30 @@ public class DuplicateCheckTest {
 
         assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
     }
+
+    @Test
+    void differentInbooksWithTheSameISBNAreNotDuplicates() {
+        BibEntry entryOne = new BibEntry(StandardEntryType.InBook)
+                .withField(StandardField.TITLE, "Performance on a Signal")
+                .withField(StandardField.ISBN, "978-1-4684-8585-1");
+
+        BibEntry entryTwo = new BibEntry(StandardEntryType.InBook)
+                .withField(StandardField.TITLE, "Rest in Treatment")
+                .withField(StandardField.ISBN, "978-1-4684-8585-1");
+
+        assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void differentInCollectionWithTheSameISBNAreNotDuplicates() {
+        BibEntry entryOne = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Performance on a Signal")
+                .withField(StandardField.ISBN, "978-1-4684-8585-1");
+
+        BibEntry entryTwo = new BibEntry(StandardEntryType.InCollection)
+                .withField(StandardField.TITLE, "Rest in Treatment")
+                .withField(StandardField.ISBN, "978-1-4684-8585-1");
+
+        assertFalse(duplicateChecker.isDuplicate(entryOne, entryTwo, BibDatabaseMode.BIBTEX));
+    }
 }

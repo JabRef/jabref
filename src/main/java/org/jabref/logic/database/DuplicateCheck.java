@@ -25,6 +25,8 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.collect.Sets;
@@ -335,6 +337,16 @@ public class DuplicateCheck {
                 haveDifferentEditions(one, two) ||
                 haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
             return false;
+        }
+
+        // check ISBN only if the entry is not of type InBook or InCollection or Article
+        Optional<ISBN> oneISBN = one.getISBN();
+        Optional<ISBN> twoISBN = two.getISBN();
+        if (oneISBN.isPresent() && twoISBN.isPresent()
+                && !one.getType().equals(StandardEntryType.InCollection)
+                && !one.getType().equals(StandardEntryType.InBook)
+                && !one.getType().equals(StandardEntryType.Article)) {
+            return Objects.equals(oneISBN, twoISBN);
         }
 
         final Optional<BibEntryType> type = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
