@@ -3,6 +3,7 @@ package org.jabref.logic.database;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -339,14 +340,14 @@ public class DuplicateCheck {
             return false;
         }
 
-        // check ISBN only if the entry is not of type InBook or InCollection or Article
+        // In case an ISBN is present, it is a strong indicator that the entries are equal.
+        // Only in InBook, InCollection, or Article the ISBN may be equal and the puplication on different pages (and thus not equal)
         Optional<ISBN> oneISBN = one.getISBN();
         Optional<ISBN> twoISBN = two.getISBN();
         if (oneISBN.isPresent() && twoISBN.isPresent()
-                && !one.getType().equals(StandardEntryType.InCollection)
-                && !one.getType().equals(StandardEntryType.InBook)
-                && !one.getType().equals(StandardEntryType.Article)) {
-            return Objects.equals(oneISBN, twoISBN);
+                && !List.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection).contains(one.getType())
+                && Objects.equals(oneISBN, twoISBN)) {
+            return true;
         }
 
         final Optional<BibEntryType> type = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
