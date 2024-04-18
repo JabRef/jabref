@@ -345,8 +345,8 @@ public class DuplicateCheck {
         Optional<ISBN> oneISBN = one.getISBN();
         Optional<ISBN> twoISBN = two.getISBN();
         if (oneISBN.isPresent() && twoISBN.isPresent()
-                && !List.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection).contains(one.getType())
-                && Objects.equals(oneISBN, twoISBN)) {
+                && Objects.equals(oneISBN, twoISBN)
+                && !List.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection).contains(one.getType())) {
             return true;
         }
 
