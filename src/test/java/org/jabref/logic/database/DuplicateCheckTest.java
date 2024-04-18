@@ -525,7 +525,7 @@ public class DuplicateCheckTest {
     }
 
     /**
-     * Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundrets of different articles.
+     * Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundreds of different articles.
      */
     @Test
     void differentArticlesFromTheSameBookAreNotDuplicates() {
