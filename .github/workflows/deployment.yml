@@ -70,6 +70,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          lfs: 'true'
           submodules: 'true'
           show-progress: 'false'
       - name: Install pigz and cache (linux)
@@ -113,6 +114,10 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
+      - name: Setup JavaFX
+        run: |
+          cd javafx
+          unzip javafx.zip
       - name: Build dmg (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
