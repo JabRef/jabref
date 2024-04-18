@@ -25,20 +25,18 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.ContentSelector;
+import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 
 public class ContentSelectorViewModel implements PropertiesTabViewModel {
-
-    private static final List<Field> DEFAULT_FIELD_NAMES = List.of(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
 
     private final MetaData metaData;
 
     private final DialogService dialogService;
 
     // The map from each field to its predefined strings ("keywords") that can be selected
-    private final Map<Field, List<String>> fieldKeywordsMap = new HashMap<>();
+    private Map<Field, List<String>> fieldKeywordsMap = new HashMap<>();
 
     private final ListProperty<Field> fields = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<String> keywords = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -53,16 +51,14 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     @Override
     public void setValues() {
         // Populate field names keyword map
-        metaData.getContentSelectors().getContentSelectors().forEach(
-                existingContentSelector -> fieldKeywordsMap.put(existingContentSelector.getField(), new ArrayList<>(existingContentSelector.getValues()))
-        );
+        fieldKeywordsMap = ContentSelectors.getFieldKeywordsMap(metaData.getContentSelectors().getContentSelectors());
 
         // Populate Field names list
         List<Field> existingFields = new ArrayList<>(fieldKeywordsMap.keySet());
         fields.addAll(existingFields);
 
         if (fields.isEmpty()) {
-            DEFAULT_FIELD_NAMES.forEach(this::addFieldIfUnique);
+            ContentSelectors.DEFAULT_FIELD_NAMES.forEach(this::addFieldIfUnique);
         }
     }
 
@@ -71,7 +67,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
         List<Field> metaDataFields = metaData.getContentSelectors().getFieldsWithSelectors();
         List<Field> fieldNamesToRemove;
 
-        if (isDefaultMap(fieldKeywordsMap)) {
+        if (ContentSelectors.isDefaultMap(fieldKeywordsMap)) {
             // Remove all fields of the content selector
             fieldNamesToRemove = metaData.getContentSelectorsSorted().stream().map(ContentSelector::getField).toList();
         } else {
@@ -80,24 +76,6 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
         fieldKeywordsMap.forEach((field, keywords) -> updateMetaDataContentSelector(metaDataFields, field, keywords));
         fieldNamesToRemove.forEach(metaData::clearContentSelectors);
-    }
-
-    /**
-     * Checks whether the given map is the default map, i.e. contains only the default field names and no associated keywords.
-     */
-    private boolean isDefaultMap(Map<Field, List<String>> fieldKeywordsMap) {
-        if (fieldKeywordsMap.size() != DEFAULT_FIELD_NAMES.size()) {
-            return false;
-        }
-        for (Field field : DEFAULT_FIELD_NAMES) {
-            if (!fieldKeywordsMap.containsKey(field)) {
-                return false;
-            }
-            if (!fieldKeywordsMap.get(field).isEmpty()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public ListProperty<Field> getFieldNamesBackingList() {
@@ -225,7 +203,7 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
         // Remove all unset default fields
         result.addAll(fieldKeywordsMap.entrySet()
                                       .stream()
-                                      .filter(entry -> DEFAULT_FIELD_NAMES.contains(entry.getKey()) && entry.getValue().isEmpty()).map(Map.Entry::getKey)
+                                      .filter(entry -> ContentSelectors.DEFAULT_FIELD_NAMES.contains(entry.getKey()) && entry.getValue().isEmpty()).map(Map.Entry::getKey)
                                       .toList());
 
         return result;

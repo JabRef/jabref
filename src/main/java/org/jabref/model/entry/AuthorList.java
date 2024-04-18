@@ -1,6 +1,7 @@
 package org.jabref.model.entry;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -117,7 +118,7 @@ import org.jspecify.annotations.NonNull;
  * </ol>
  */
 @AllowedToUseLogic("because it needs access to AuthorList parser")
-public class AuthorList {
+public class AuthorList implements Iterable<Author> {
 
     private static final Map<String, AuthorList> AUTHOR_CACHE = Collections.synchronizedMap(new WeakHashMap<>());
     private final List<Author> authors;
@@ -279,7 +280,7 @@ public class AuthorList {
     }
 
     /**
-     * Returns the a list of <CODE>Author</CODE> objects.
+     * Returns the list of <CODE>Author</CODE> objects.
      *
      * @return the <CODE>List&lt;Author></CODE> object.
      */
@@ -483,5 +484,10 @@ public class AuthorList {
         return getAuthors().stream()
                            .map(Author::getNameForAlphabetization)
                            .collect(Collectors.joining(" and "));
+    }
+
+    @Override
+    public Iterator<Author> iterator() {
+        return authors.iterator();
     }
 }

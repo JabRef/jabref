@@ -392,6 +392,9 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
+    /**
+     * If not present, {@link BibEntry#getAuthorTitleYear(int)} can be used
+     */
     public Optional<String> getCitationKey() {
         String key = fields.get(InternalField.KEY_FIELD);
         if (StringUtil.isBlank(key)) {

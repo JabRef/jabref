@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xml>
+    <records>
+        <record>
+            <ref-type name="Conference">11</ref-type>
+            <database name="MyLibrary">MyLibrary</database>
+            <source-app name="JabRef">JabRef</source-app>
+            <contributors>
+                <authors>
+                    <author>Dai, H. K.</author>
+                </authors>
+            </contributors>
+            <titles>
+                <title>Episode-Rule Mining with Minimal Occurrences via First Local Maximization in Confidence</title>
+                <secondary-title>Proceedings of the 9th International Symposium on Information and Communication Technology</secondary-title>
+            </titles>
+            <keywords>
+                <keyword>Web-site traversal pattern</keyword>
+                <keyword>episode-rule mining</keyword>
+                <keyword>first local maximization</keyword>
+            </keywords>
+            <dates>
+                <year>2018</year>
+                <month>12</month>
+            </dates>
+            <pages>130--136</pages>
+            <publisher>Association for Computing Machinery</publisher>
+            <isbn>9781450365390</isbn>
+            <electronic-resource-num>10.1145/3287921.3287982</electronic-resource-num>
+            <abstract>An episode rule of associating two episodes represents a temporal implication of the antecedent episode to the consequent episode. Episode-rule mining is a task of extracting useful patterns/episodes from large event databases. We present an episode-rule mining algorithm for finding frequent and confident serial-episode rules via first local-maximum confidence in yielding ideal window widths, if exist, in event sequences based on minimal occurrences constrained by a constant maximum gap. Results from our preliminary empirical study confirm the applicability of the episode-rule mining algorithm for Web-site traversal-pattern discovery, and show that the first local maximization yielding ideal window widths exists in real data but rarely in synthetic random data sets.</abstract>
+            <secondary-title>Proceedings of the 9th International Symposium on Information and Communication Technology</secondary-title>
+            <tertiary-title>SoICT '18</tertiary-title>
+            <auth-address>New York, NY, USA</auth-address>
+        </record>
+        <record>
+            <ref-type name="Book">2</ref-type>
+            <database name="MyLibrary">MyLibrary</database>
+            <source-app name="JabRef">JabRef</source-app>
+            <contributors>
+                <secondary-authors>
+                    <author>Bhattacharyya, R.</author>
+                    <author>McCormick, M. E.</author>
+                </secondary-authors>
+            </contributors>
+            <titles>
+                <title>Wave Energy Conversion</title>
+            </titles>
+            <keywords>
+                <keyword>waves</keyword>
+                <keyword>agua</keyword>
+            </keywords>
+            <dates>
+                <year>2013</year>
+            </dates>
+            <urls>
+                <pdf-urls>
+                    <url>/home/mfg/acad/ext/arts/waves/water/[R._Bhattacharyya_and_M.E._McCormick_(Eds.)]_Wave_(z-lib.org).pdf</url>
+                </pdf-urls>
+            </urls>
+            <publisher>Elsevier Science</publisher>
+            <isbn>9780080442129</isbn>
+        </record>
+    </records>
+</xml>
