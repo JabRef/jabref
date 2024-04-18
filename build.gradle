@@ -1,7 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
-import org.openjfx.gradle.JavaFXPlatform
 
 plugins {
     id 'application'
@@ -29,8 +28,6 @@ plugins {
     id 'idea'
 
     id 'org.openrewrite.rewrite' version '6.11.2'
-
-    id("com.google.osdetector") version "1.7.3"
 }
 
 // Enable following for debugging
@@ -322,8 +319,8 @@ dependencies {
             .configureEach {
                 attributes {
                     attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
-                    attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily, JavaFXPlatform.detect(osdetector).osFamily))
-                    attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture, JavaFXPlatform.detect(osdetector).arch))
+                    attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily, OperatingSystem.getName()))
+                    attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture, Architecture.getName()))
                 }
             }
 }
