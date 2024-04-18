@@ -525,7 +525,7 @@ public class DuplicateCheckTest {
     }
 
     /**
-     * Book entries can have the same ISBN due to different chapters. The Test fails as crossref identifies both entries as the same.
+     * Journal articles can have the same ISBN due to the journal has one unique ISBN, but hundrets of different articles.
      */
     @Test
     void differentArticlesFromTheSameBookAreNotDuplicates() {
