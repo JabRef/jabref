@@ -5,7 +5,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.database.BibDatabaseMode;
@@ -86,8 +86,8 @@ public class MetaDataParser {
      * @return the given metaData instance (which is modified, too)
      */
     public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
-        List<String> defaultCiteKeyPattern = new ArrayList<>();
-        Map<EntryType, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
+        CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;
+        Map<EntryType, CitationKeyPattern> nonDefaultCiteKeyPatterns = new HashMap<>();
 
         // process groups (GROUPSTREE and GROUPSTREE_LEGACY) at the very end (otherwise it can happen that not all dependent data are set)
         List<Map.Entry<String, String>> entryList = new ArrayList<>(data.entrySet());
@@ -98,7 +98,7 @@ public class MetaDataParser {
 
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 EntryType entryType = EntryTypeFactory.parse(entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length()));
-                nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(values)));
+                nonDefaultCiteKeyPatterns.put(entryType, new CitationKeyPattern(getSingleItem(values)));
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 // edge case, it might be one special field e.g. article from biblatex-apa, but we can't distinguish this from any other field and rather prefer to handle it as UnknownField
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
@@ -118,7 +118,7 @@ public class MetaDataParser {
             } else if (entry.getKey().equals(MetaData.DATABASE_TYPE)) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
             } else if (entry.getKey().equals(MetaData.KEYPATTERNDEFAULT)) {
-                defaultCiteKeyPattern = Collections.singletonList(getSingleItem(values));
+                defaultCiteKeyPattern = new CitationKeyPattern(getSingleItem(values));
             } else if (entry.getKey().equals(MetaData.PROTECTED_FLAG_META)) {
                 if (Boolean.parseBoolean(getSingleItem(values))) {
                     metaData.markAsProtected();
@@ -137,7 +137,7 @@ public class MetaDataParser {
             }
         }
 
-        if (!defaultCiteKeyPattern.isEmpty() || !nonDefaultCiteKeyPatterns.isEmpty()) {
+        if (!defaultCiteKeyPattern.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN) || !nonDefaultCiteKeyPatterns.isEmpty()) {
             metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);
         }
 

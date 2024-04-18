@@ -739,6 +739,10 @@ TextFlow > .tooltip-text-monospaced {
     -fx-background-color: -jr-warn;
 }
 
+.duplicate-entry {
+    -fx-background-color: -jr-light-green;
+}
+
 .file-row-text {
     -fx-fill: -jr-search-text;
 }
@@ -1044,7 +1048,7 @@ TextFlow > .tooltip-text-monospaced {
     -fx-icon-color: -jr-theme-text;
 }
 
-.mainToolbar .search-field {
+.search-field {
     -fx-background-color: -jr-search-background;
     -fx-border-width: 1;
     -fx-border-color: -jr-separator;
@@ -1052,16 +1056,19 @@ TextFlow > .tooltip-text-monospaced {
     -fx-fill: -jr-search-text;
 }
 
-.mainToolbar .search-field .button .glyph-icon {
+.search-field .button .glyph-icon {
     -fx-fill: -jr-search-text;
     -fx-text-fill: -jr-search-text;
     -fx-icon-color: -jr-search-text;
 }
 
-/* magnifier glass */
-.mainToolbar .search-field .glyph-icon {
-    -fx-fill: -jr-search-text;
-    -fx-text-fill: -jr-search-text;
+/*
+ * The magnifying glass icon left of the search text field.
+ * Currently, hits "Web search" and "Groups" only (not the searchbar on the top).
+*/
+.search-field-icon {
+    -fx-icon-color: -jr-search-text;
+    -fx-font-size: 1.7em;
 }
 
 /* search modifier buttons */

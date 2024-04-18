@@ -40,7 +40,7 @@ public class CitationsDisplay extends ListView<Citation> {
 
     private Node getDisplayGraphic(Citation item) {
         if (basePath.get() == null) {
-            basePath.set(item.getPath().getRoot());
+            basePath.set(item.path().getRoot());
         }
 
         Node citationIcon = IconTheme.JabRefIcons.LATEX_COMMENT.getGraphicNode();
@@ -49,9 +49,9 @@ public class CitationsDisplay extends ListView<Citation> {
         HBox contextBox = new HBox(8, citationIcon, contextText);
         contextBox.getStyleClass().add("contextBox");
 
-        Label fileNameLabel = new Label(String.format("%s", basePath.get().relativize(item.getPath())));
+        Label fileNameLabel = new Label(String.format("%s", basePath.get().relativize(item.path())));
         fileNameLabel.setGraphic(IconTheme.JabRefIcons.LATEX_FILE.getGraphicNode());
-        Label positionLabel = new Label("(%s:%s-%s)".formatted(item.getLine(), item.getColStart(), item.getColEnd()));
+        Label positionLabel = new Label("(%s:%s-%s)".formatted(item.line(), item.colStart(), item.colEnd()));
         positionLabel.setGraphic(IconTheme.JabRefIcons.LATEX_LINE.getGraphicNode());
         HBox dataBox = new HBox(5, fileNameLabel, positionLabel);
 
@@ -59,9 +59,9 @@ public class CitationsDisplay extends ListView<Citation> {
     }
 
     private Tooltip getDisplayTooltip(Citation item) {
-        String line = item.getLineText();
-        int start = item.getColStart();
-        int end = item.getColEnd();
+        String line = item.lineText();
+        int start = item.colStart();
+        int end = item.colEnd();
 
         List<Text> texts = new ArrayList<>(3);
 
