@@ -159,7 +159,7 @@ public class HTMLCharsTest {
             Arguments.of("{<em>hallo</em>}", "{\\emph hallo}"),
             Arguments.of("{<b>hallo</b>}", "{\\textbf hallo}"),
             Arguments.of("{<b>hallo</b>}", "{\\bf hallo}"),
-            Arguments.of("{&#39;}","{\\textquotesingle}"),
+            Arguments.of("{&#39;}", "{\\textquotesingle}"),
             Arguments.of("{{ test }}", "{{ test }}")
         );
     }

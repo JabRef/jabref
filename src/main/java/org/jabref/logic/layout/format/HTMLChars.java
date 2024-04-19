@@ -27,7 +27,7 @@ public class HTMLChars implements ParamLayoutFormatter {
 
     @Override
     public void setArgument(String arg) {
-        if (arg.equals("keep") || arg.equals("KEEP")) {
+        if ("keep".equals(arg)) {
             this.keep = true;
         }
     }
@@ -59,7 +59,7 @@ public class HTMLChars implements ParamLayoutFormatter {
                 incommand = true;
                 currentCommand = new StringBuilder();
             } else if (!this.keep && !incommand && ((c == '{') || (c == '}'))) {
-                assert true; // Swallow the brace.
+                // Swallow the brace.
             } else if (Character.isLetter(c) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
