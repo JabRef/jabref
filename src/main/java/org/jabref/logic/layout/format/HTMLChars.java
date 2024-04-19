@@ -4,14 +4,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.model.strings.StringUtil;
 
 /**
  * This formatter escapes characters so that they are suitable for HTML.
  */
-public class HTMLChars implements LayoutFormatter {
+public class HTMLChars implements ParamLayoutFormatter {
 
     private static final Map<String, String> HTML_CHARS = HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;
     /**
@@ -22,6 +22,15 @@ public class HTMLChars implements LayoutFormatter {
      * <b>&</b>Hey <b>Matched</b>
      * */
     private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile("&(?!(?:[a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});)");
+
+    private boolean keep = false;
+
+    @Override
+    public void setArgument(String arg) {
+        if (arg.equals("keep") || arg.equals("KEEP")) {
+            this.keep = true;
+        }
+    }
 
     @Override
     public String format(String inField) {
@@ -49,6 +58,8 @@ public class HTMLChars implements LayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuilder();
+            } else if (!this.keep && !incommand && ((c == '{') || (c == '}'))) {
+                assert true; // Swallow the brace.
             } else if (Character.isLetter(c) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
@@ -71,7 +82,7 @@ public class HTMLChars implements LayoutFormatter {
                         String commandBody;
                         if (c == '{') {
                             String part = StringUtil.getPart(field, i, false);
-                            i += part.length() + 1;
+                            i += this.keep ? part.length() + 1 : part.length();
                             commandBody = part;
                         } else {
                             commandBody = field.substring(i, i + 1);
@@ -106,14 +117,14 @@ public class HTMLChars implements LayoutFormatter {
                     String tag = getHTMLTag(command);
                     if (!tag.isEmpty()) {
                         String part = StringUtil.getPart(field, i, true);
-                        if (c == '{' || (c == '}')) {
+                        if (this.keep && (c == '{' || (c == '}'))) {
                             i++;
                         }
                         i += part.length();
                         sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
                     } else if (c == '{') {
                         String argument = StringUtil.getPart(field, i, true);
-                        i += argument.length() + 1;
+                        i += this.keep ? argument.length() + 1 : argument.length();
                         // handle common case of general latex command
                         String result = HTML_CHARS.get(command + argument);
                         // If found, then use translated version. If not, then keep
@@ -133,10 +144,14 @@ public class HTMLChars implements LayoutFormatter {
                     } else if (c == '}') {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
-                        // substitute the evaluated command and swallow the brace:
+                        // substitute the evaluated command.
                         String result = HTML_CHARS.get(command);
                         // If the command is unknown, just print it:
                         sb.append(Objects.requireNonNullElse(result, command));
+                        // We only keep the brace if we are in 'KEEP' mode.
+                        if (this.keep) {
+                            sb.append(c);
+                        }
                     } else {
                         String result = HTML_CHARS.get(command);
                         sb.append(Objects.requireNonNullElse(result, command));
@@ -170,7 +185,7 @@ public class HTMLChars implements LayoutFormatter {
                                   .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
                                   .replace("\n", "<br>") // Replace single line breaks with <br>
                                   .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                                  .replaceAll("\\$([^$]*)\\$", "$1}");
+                                  .replaceAll("\\$([^$]*)\\$", this.keep ? "\\\\{$1\\\\}" : "$1}");
     }
 
     private String getHTMLTag(String latexCommand) {
