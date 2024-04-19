@@ -3,6 +3,7 @@ package org.jabref.logic.database;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +26,8 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.collect.Sets;
@@ -335,6 +338,16 @@ public class DuplicateCheck {
                 haveDifferentEditions(one, two) ||
                 haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
             return false;
+        }
+
+        // In case an ISBN is present, it is a strong indicator that the entries are equal.
+        // Only in InBook, InCollection, or Article the ISBN may be equal and the puplication on different pages (and thus not equal)
+        Optional<ISBN> oneISBN = one.getISBN();
+        Optional<ISBN> twoISBN = two.getISBN();
+        if (oneISBN.isPresent() && twoISBN.isPresent()
+                && Objects.equals(oneISBN, twoISBN)
+                && !List.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection).contains(one.getType())) {
+            return true;
         }
 
         final Optional<BibEntryType> type = entryTypesManager.enrich(one.getType(), bibDatabaseMode);
