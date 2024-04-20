@@ -196,37 +196,7 @@ class LinkedFileViewModelTest {
 
         viewModel.download();
 
-        verify(dialogService, atLeastOnce()).notify("Downloaded website as an HTML file.");
-    }
-
-    @FetcherTest
-    @Test
-    void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException {
-        // use google as test url, wiley is protected by CloudFlare
-        String url = "https://google.com";
-        String fileType = StandardExternalFileType.URL.getName();
-        linkedFile = new LinkedFile(new URL(url), fileType);
-
-        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
-
-        databaseContext.setDatabasePath(tempFile);
-
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
-
-        viewModel.download();
-
-        List<LinkedFile> linkedFiles = entry.getFiles();
-
-        for (LinkedFile file: linkedFiles) {
-            if ("Misc/asdf.html".equalsIgnoreCase(file.getLink())) {
-                assertEquals("URL", file.getFileType());
-                return;
-            }
-        }
-        // If the file was not found among the linked files to the entry
-        fail();
+        verify(dialogService, atLeastOnce()).notify("Download was a HTML file. Not adding it.");
     }
 
     @Test
