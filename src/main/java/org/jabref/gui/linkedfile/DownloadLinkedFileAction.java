@@ -6,6 +6,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.net.ssl.HostnameVerifier;
@@ -93,7 +95,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        LOGGER.info("Downloading file from " + downloadUrl);
+        LOGGER.info("Downloading file from {}", downloadUrl);
         if (downloadUrl.isEmpty() || !LinkedFile.isOnlineLink(downloadUrl)) {
             throw new UnsupportedOperationException("In order to download the file, the url has to be an online link");
         }
@@ -164,19 +166,22 @@ public class DownloadLinkedFileAction extends SimpleCommand {
             } else {
                 newLinkedFile.setSourceURL(linkedFile.getSourceUrl());
             }
-            entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
             isHtml = newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName());
+            if (!isHtml) {
+                entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
+            }
         }
-
         // Notify in bar when the file type is HTML.
         if (isHtml) {
-            dialogService.notify(Localization.lang("Downloaded website as an HTML file."));
-            LOGGER.debug("Downloaded website {} as an HTML file at {}", linkedFile.getLink(), destination);
+            dialogService.notify(Localization.lang("Download was a HTML file. Not adding it."));
+            List<LinkedFile> newFiles = new ArrayList<>(entry.getFiles());
+            newFiles.remove(linkedFile);
+            entry.setFiles(newFiles);
         }
     }
 
     private void onFailure(URLDownload urlDownload, Exception ex) {
-        LOGGER.error("Error downloading from URL: " + urlDownload, ex);
+        LOGGER.error("Error downloading from URL: {}", urlDownload, ex);
         String fetcherExceptionMessage = ex.getMessage();
         String failedTitle = Localization.lang("Failed to download from URL");
         int statusCode;
@@ -261,7 +266,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         String mimeType = urlDownload.getMimeType();
 
         if (mimeType != null) {
-            LOGGER.debug("MIME Type suggested: " + mimeType);
+            LOGGER.debug("MIME Type suggested: {}", mimeType);
             return ExternalFileTypes.getExternalFileTypeByMimeType(mimeType, filePreferences);
         } else {
             return Optional.empty();
