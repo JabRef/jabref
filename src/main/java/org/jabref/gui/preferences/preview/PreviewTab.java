@@ -1,10 +1,13 @@
 package org.jabref.gui.preferences.preview;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -18,6 +21,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.stage.FileChooser;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
@@ -32,6 +36,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.TestEntry;
@@ -104,6 +109,21 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         return Localization.lang("Entry preview");
     }
 
+    @FXML
+    private void selectBstFile(ActionEvent event) {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Select BST File");
+    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("BST Files", "*.bst"));
+
+    File selectedFile = fileChooser.showOpenDialog(null);
+    if (selectedFile != null) {
+        String filePath = selectedFile.getAbsolutePath();
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(filePath));
+        viewModel.availableListProperty().add(bstPreviewLayout);
+        previewViewer.setEntry(TestEntry.getTestEntry());
+    }
+}
+    
     public void initialize() {
         this.viewModel = new PreviewTabViewModel(dialogService, preferencesService.getPreviewPreferences(), taskExecutor, stateManager);
         lastKeyPressTime = System.currentTimeMillis();
