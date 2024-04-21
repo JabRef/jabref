@@ -157,8 +157,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             sourceTextProperty.setValue(layout.getText().replace("__NEWLINE__", "\n"));
             selectedIsEditableProperty.setValue(true);
         } else {
-            sourceTextProperty.setValue(((CitationStylePreviewLayout) selectedLayout).getSource());
-            selectedIsEditableProperty.setValue(false);
+            if (selectedLayout instanceof CitationStylePreviewLayout) {
+                sourceTextProperty.setValue(((CitationStylePreviewLayout) selectedLayout).getSource());
+                selectedIsEditableProperty.setValue(false);
+            }
         }
     }
 
