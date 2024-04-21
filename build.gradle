@@ -590,9 +590,7 @@ checkstyle {
 }
 
 rewrite {
-    activeRecipe(
-        'org.jabref.config.rewrite.cleanup'
-    )
+    activeRecipes = ['org.jabref.config.rewrite.cleanup','org.openrewrite.staticanalysis.InstanceOfPatternMatch']
     exclusion (
         "build.gradle",
         "buildSrc/build.gradle",
