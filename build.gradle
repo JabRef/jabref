@@ -78,7 +78,15 @@ application {
         // Fix for https://github.com/JabRef/jabref/issues/11198
         '--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module',
         '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
-        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module'
+        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
+
+        // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
+        '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
+        '--add-exports=javafx.base/com.sun.javafx.event=org.jabref',
+        '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref',
+        '--add-opens=javafx.graphics/javafx.scene=org.jabref',
+        '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
+        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref'
     ]
 }
 
