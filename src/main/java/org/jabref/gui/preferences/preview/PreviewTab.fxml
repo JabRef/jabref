@@ -22,6 +22,7 @@
     <CheckBox fx:id="showAsTabCheckBox" text="%Show preview as a tab in entry editor"/>
     <CheckBox fx:id="showPreviewTooltipCheckBox" text="Show preview in entry table tooltip"/>
     <HBox spacing="4.0">
+        <Button fx:id="bstFileButton" text="Select BST File" onAction="#selectBstFile" />
         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
             <Label text="%Available" styleClass="sectionHeader"/>
             <CustomTextField fx:id="searchBox" promptText="%Filter" VBox.vgrow="NEVER" prefHeight="20.0"/>
