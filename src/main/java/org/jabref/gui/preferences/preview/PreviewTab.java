@@ -120,7 +120,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         String filePath = selectedFile.getAbsolutePath();
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(filePath));
         viewModel.availableListProperty().add(bstPreviewLayout);
-        previewViewer.setEntry(TestEntry.getTestEntry());
     }
 }
     
