@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.util.TestEntry;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -33,6 +34,20 @@ public class BstVMTest {
     public void abbrv() throws RecognitionException, IOException {
         BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> testEntries = List.of(defaultTestEntry());
+
+        String expected = "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
+        String result = vm.render(testEntries);
+
+        assertEquals(
+                expected.replaceAll("\\s", ""),
+                result.replaceAll("\\s", ""));
+    }
+
+
+    @Test
+    public void ieeetran() throws RecognitionException, IOException {
+        BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/IEEEtran.bst"));
+        List<BibEntry> testEntries = List.of(TestEntry.getTestEntry());
 
         String expected = "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
         String result = vm.render(testEntries);
