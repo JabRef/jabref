@@ -43,7 +43,6 @@ public class BstVMTest {
                 result.replaceAll("\\s", ""));
     }
 
-
     @Test
     public void ieeetran() throws RecognitionException, IOException {
         BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/IEEEtran.bst"));
