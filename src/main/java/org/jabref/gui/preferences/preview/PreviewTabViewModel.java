@@ -153,11 +153,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
         }
 
-        if (selectedLayout instanceof TextBasedPreviewLayout layout) {
-            sourceTextProperty.setValue(layout.getText().replace("__NEWLINE__", "\n"));
-            selectedIsEditableProperty.setValue(true);
+        if (selectedLayout instanceof BstPreviewLayout) {
+            // needs implementation of getSource() for bst layout otherwise throwing runtime error.
         } else {
-            if (selectedLayout instanceof CitationStylePreviewLayout) {
+            if (selectedLayout instanceof TextBasedPreviewLayout layout) {
+                sourceTextProperty.setValue(layout.getText().replace("__NEWLINE__", "\n"));
+                selectedIsEditableProperty.setValue(true);
+            } else {
                 sourceTextProperty.setValue(((CitationStylePreviewLayout) selectedLayout).getSource());
                 selectedIsEditableProperty.setValue(false);
             }
