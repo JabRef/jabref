@@ -1,5 +1,6 @@
 package org.jabref.logic.bst;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -17,16 +18,23 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BstPreviewLayout implements PreviewLayout {
+public final class BstPreviewLayout implements PreviewLayout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BstPreviewLayout.class);
 
     private final String name;
-
+    private String source;
     private BstVM bstVM;
     private String error;
 
     public BstPreviewLayout(Path path) {
+        try {
+            this.source = String.join("\n", Files.readAllLines(path));
+        } catch (IOException e) {
+            LOGGER.error("Error reading file", e);
+            this.source = "";
+        }
+
         name = path.getFileName().toString();
         if (!Files.exists(path)) {
             LOGGER.error("File {} not found", path.toAbsolutePath());
@@ -84,5 +92,10 @@ public class BstPreviewLayout implements PreviewLayout {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getText() {
+        return source;
     }
 }

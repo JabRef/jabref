@@ -33,7 +33,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
@@ -53,11 +52,11 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is Preferences -> Entry Preview tab model
  * <p>
- *     {@link PreviewTab} is the controller of Entry Preview tab
+ * {@link PreviewTab} is the controller of Entry Preview tab
  * </p>
  *
  * @see PreviewTab
- * */
+ */
 public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
@@ -104,10 +103,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 chosenListProperty,
                 input -> !chosenListProperty.getValue().isEmpty(),
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
-                        Localization.lang("Entry preview"),
-                        Localization.lang("Selected"),
-                        Localization.lang("Selected Layouts can not be empty")
-                )
+                                Localization.lang("Entry preview"),
+                                Localization.lang("Selected"),
+                                Localization.lang("Selected Layouts can not be empty")
+                        )
                 )
         );
     }
@@ -154,17 +153,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
         }
 
-        if (selectedLayout instanceof BstPreviewLayout) {
-            // needs implementation of getSource() for bst layout otherwise throwing runtime error.
-        } else {
-            if (selectedLayout instanceof TextBasedPreviewLayout layout) {
-                sourceTextProperty.setValue(layout.getText().replace("__NEWLINE__", "\n"));
-                selectedIsEditableProperty.setValue(true);
-            } else {
-                sourceTextProperty.setValue(((CitationStylePreviewLayout) selectedLayout).getSource());
-                selectedIsEditableProperty.setValue(false);
-            }
-        }
+        boolean isEditingAllowed = selectedLayout instanceof TextBasedPreviewLayout;
+        setContentForPreview(selectedLayout.getText(), isEditingAllowed);
+    }
+
+    private void setContentForPreview(String text, boolean editable) {
+        sourceTextProperty.setValue(text);
+        selectedIsEditableProperty.setValue(editable);
     }
 
     public void refreshPreview() {
