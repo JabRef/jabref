@@ -23,12 +23,12 @@ public class HTMLChars implements ParamLayoutFormatter {
      * */
     private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile("&(?!(?:[a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});)");
 
-    private boolean keep = false;
+    private boolean keepCurlyBraces = false;
 
     @Override
     public void setArgument(String arg) {
-        if ("keep".equals(arg)) {
-            this.keep = true;
+        if ("keepCurlyBraces".equals(arg)) {
+            this.keepCurlyBraces = true;
         }
     }
 
@@ -58,7 +58,7 @@ public class HTMLChars implements ParamLayoutFormatter {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuilder();
-            } else if (!this.keep && !incommand && ((c == '{') || (c == '}'))) {
+            } else if (!this.keepCurlyBraces && !incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
@@ -82,7 +82,7 @@ public class HTMLChars implements ParamLayoutFormatter {
                         String commandBody;
                         if (c == '{') {
                             String part = StringUtil.getPart(field, i, false);
-                            i += this.keep ? part.length() + 1 : part.length();
+                            i += this.keepCurlyBraces ? part.length() + 1 : part.length();
                             commandBody = part;
                         } else {
                             commandBody = field.substring(i, i + 1);
@@ -117,14 +117,14 @@ public class HTMLChars implements ParamLayoutFormatter {
                     String tag = getHTMLTag(command);
                     if (!tag.isEmpty()) {
                         String part = StringUtil.getPart(field, i, true);
-                        if (this.keep && (c == '{' || (c == '}'))) {
+                        if (this.keepCurlyBraces && (c == '{' || (c == '}'))) {
                             i++;
                         }
                         i += part.length();
                         sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
                     } else if (c == '{') {
                         String argument = StringUtil.getPart(field, i, true);
-                        i += this.keep ? argument.length() + 1 : argument.length();
+                        i += this.keepCurlyBraces ? argument.length() + 1 : argument.length();
                         // handle common case of general latex command
                         String result = HTML_CHARS.get(command + argument);
                         // If found, then use translated version. If not, then keep
@@ -149,7 +149,7 @@ public class HTMLChars implements ParamLayoutFormatter {
                         // If the command is unknown, just print it:
                         sb.append(Objects.requireNonNullElse(result, command));
                         // We only keep the brace if we are in 'KEEP' mode.
-                        if (this.keep) {
+                        if (this.keepCurlyBraces) {
                             sb.append(c);
                         }
                     } else {
@@ -185,7 +185,7 @@ public class HTMLChars implements ParamLayoutFormatter {
                                   .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
                                   .replace("\n", "<br>") // Replace single line breaks with <br>
                                   .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                                  .replaceAll("\\$([^$]*)\\$", this.keep ? "\\\\{$1\\\\}" : "$1}");
+                                  .replaceAll("\\$([^$]*)\\$", this.keepCurlyBraces ? "\\\\{$1\\\\}" : "$1}");
     }
 
     private String getHTMLTag(String latexCommand) {

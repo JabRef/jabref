@@ -22,7 +22,7 @@ public class HTMLCharsTest {
     public void setUp() {
         layout = new HTMLChars();
         layoutKeep = new HTMLChars();
-        layoutKeep.setArgument("keep");
+        layoutKeep.setArgument("keepCurlyBraces");
     }
 
     private static Stream<Arguments> provideBasicFormattingData() {
@@ -116,7 +116,7 @@ public class HTMLCharsTest {
 
     @Test
     void quoteSingle() {
-        assertEquals("&#39;", layout.format("\\textquotesingle"));
+        assertEquals("&#39;", layout.format("{\\textquotesingle}"));
     }
 
     @Test
