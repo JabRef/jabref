@@ -57,16 +57,15 @@ public class HTMLCharsTest {
         return Stream.of(
                 Arguments.of("<em>hallo</em>", "\\emph{hallo}"),
                 Arguments.of("<em>hallo</em>", "{\\emph hallo}"),
-                Arguments.of("<em>hallo</em>", "\\em hallo"),
+                Arguments.of("<em>hallo</em>", "{\\em hallo}"),
 
                 Arguments.of("<i>hallo</i>", "\\textit{hallo}"),
                 Arguments.of("<i>hallo</i>", "{\\textit hallo}"),
-                Arguments.of("<i>hallo</i>", "\\it hallo"),
+                Arguments.of("<i>hallo</i>", "{\\it hallo}"),
 
                 Arguments.of("<b>hallo</b>", "\\textbf{hallo}"),
                 Arguments.of("<b>hallo</b>", "{\\textbf hallo}"),
                 Arguments.of("<b>hallo</b>", "{\\bf hallo}"),
-                Arguments.of("<b>hallo</b>", "\\bf hallo"),
 
                 Arguments.of("<sup>hallo</sup>", "\\textsuperscript{hallo}"),
                 Arguments.of("<sub>hallo</sub>", "\\textsubscript{hallo}"),

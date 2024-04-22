@@ -27,7 +27,7 @@ public class HTMLChars implements ParamLayoutFormatter {
 
     @Override
     public void setArgument(String arg) {
-        if ("keepCurlyBraces".equals(arg)) {
+        if ("keepCurlyBraces".equalsIgnoreCase(arg)) {
             this.keepCurlyBraces = true;
         }
     }
