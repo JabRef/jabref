@@ -30,6 +30,16 @@ class MarkdownFormatterTest {
         return Stream.of(
                 Arguments.of("Hello World", "<p>Hello World</p>"),
                 Arguments.of("""
+                        Markup
+                        
+                        * list item one
+                        * list item two
+                        
+                         rest
+                        """,
+                        "<p>Markup</p> <ul> <li>list item one</li> <li>list item two</li> </ul> <p>rest</p>"
+                ),
+                Arguments.of("""
                         ```
                         Hello World
                         ```
