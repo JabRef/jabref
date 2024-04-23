@@ -223,7 +223,10 @@ dependencies {
         exclude module: 'commons-lang3'
         exclude group: 'org.openjfx'
         exclude group: 'org.apache.logging.log4j'
+        exclude group: 'tech.units'
     }
+    // Required by gemsfx
+    implementation 'tech.units:indriya:2.2'
 
     implementation 'org.controlsfx:controlsfx:11.2.1'
 
