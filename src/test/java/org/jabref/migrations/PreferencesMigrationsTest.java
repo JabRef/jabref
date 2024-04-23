@@ -84,8 +84,8 @@ class PreferencesMigrationsTest {
 
         String newPreviewStyle = "<font face=\"sans-serif\">__NEWLINE__"
                 + "Customized preview style using reviews and comments:__NEWLINE__"
-                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}__NEWLINE__"
-                + "\\begin{comment} Something: \\format[Markdown,HTMLChars]{\\comment} special \\end{comment}__NEWLINE__"
+                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} \\end{comment}__NEWLINE__"
+                + "\\begin{comment} Something: \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} special \\end{comment}__NEWLINE__"
                 + "</font>__NEWLINE__";
 
         when(prefs.get(JabRefPreferences.PREVIEW_STYLE)).thenReturn(oldPreviewStyle);
