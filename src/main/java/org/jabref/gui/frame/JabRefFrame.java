@@ -213,6 +213,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         splitPane.getItems().addAll(tabbedPane);
         SplitPane.setResizableWithParent(sidePane, false);
+        sidePane.widthProperty().addListener(c -> updateSidePane());
         sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
         updateSidePane();
         setCenter(splitPane);
