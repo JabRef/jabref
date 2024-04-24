@@ -161,13 +161,13 @@ public class MetaDataSerializerTest {
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(UnknownField.fromDisplayName("Test1"), UnknownField.fromDisplayName("Test2")),
-                        "jabref-entrytype-v2: test: req[Test1;Test2] opt[]"
+                        "jabref-entrytype-v2: test: req[Test1|CUSTOM_FIELD;Test2|CUSTOM_FIELD] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(UnknownField.fromDisplayName("tEST"), UnknownField.fromDisplayName("tEsT2")),
-                        "jabref-entrytype-v2: test: req[tEST;tEsT2] opt[]"
+                        "jabref-entrytype-v2: test: req[tEST|CUSTOM_FIELD;tEsT2|CUSTOM_FIELD] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
@@ -183,7 +183,7 @@ public class MetaDataSerializerTest {
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(new UnknownField("comment", "comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT)),
-                        "jabref-entrytype-v2: test: req[comment|COMMENT,MULTILINE_TEXT] opt[]"
+                        "jabref-entrytype-v2: test: req[comment|MULTILINE_TEXT,COMMENT] opt[]"
                 )
         );
     }
@@ -191,6 +191,6 @@ public class MetaDataSerializerTest {
     @ParameterizedTest
     @MethodSource
     void serializeCustomizedEntryTypeV2(BibEntryTypeBuilder bibEntryTypeBuilder, String expected) {
-        assertEquals(expected, MetaDataSerializer.serializeCustomEntryTypes(bibEntryTypeBuilder.build()));
+        assertEquals(expected, MetaDataSerializer.serializeCustomEntryTypesV2(bibEntryTypeBuilder.build()));
     }
 }

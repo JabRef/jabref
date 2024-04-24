@@ -26,6 +26,8 @@ public class FieldFactory {
      */
     private static final String FIELD_OR_SEPARATOR = "/";
     private static final String DELIMITER = ";";
+    private static final String FIELD_PROPERTY_SEPARATOR = ",";
+    private static final String FIELD_NAME_PROPERTY_SEPARATOR = "|";
 
     public static String serializeOrFields(Field... fields) {
         return serializeOrFields(new OrFields(fields));
@@ -45,8 +47,35 @@ public class FieldFactory {
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
+    public static String serializeOrFieldsV2(OrFields fields) {
+        return fields.getFields().stream()
+                     .map(field -> {
+                         if (field instanceof UnknownField unknownField) {
+                             return serializeUnknownField(unknownField);
+                         } else {
+                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
+                             return field.getName();
+                         }
+                     })
+                     .collect(Collectors.joining(FIELD_OR_SEPARATOR));
+    }
+
+    private static String serializeUnknownField(UnknownField unknownField) {
+        // In case a user has put a user-defined field, the casing of that field is kept
+        String displayName = unknownField.getDisplayName();
+        String fieldProperties = unknownField.getProperties().stream()
+                                             .map(Enum::name)
+                                             .collect(Collectors.joining(FIELD_PROPERTY_SEPARATOR));
+
+        return displayName + FIELD_NAME_PROPERTY_SEPARATOR + fieldProperties;
+    }
+
     public static String serializeOrFieldsList(Set<OrFields> fields) {
         return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));
+    }
+
+    public static String serializeOrFieldsListV2(Set<OrFields> fields) {
+        return fields.stream().map(FieldFactory::serializeOrFieldsV2).collect(Collectors.joining(DELIMITER));
     }
 
     public static List<Field> getNotTextFieldNames() {
@@ -85,6 +114,19 @@ public class FieldFactory {
                          if (field instanceof UnknownField unknownField) {
                              // In case a user has put a user-defined field, the casing of that field is kept
                              return unknownField.getDisplayName();
+                         } else {
+                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
+                             return field.getName();
+                         }
+                     })
+                     .collect(Collectors.joining(DELIMITER));
+    }
+
+    public static String serializeFieldsListV2(Collection<Field> fields) {
+        return fields.stream()
+                     .map(field -> {
+                         if (field instanceof UnknownField unknownField) {
+                             return serializeUnknownField(unknownField);
                          } else {
                              // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
                              return field.getName();

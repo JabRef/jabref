@@ -168,4 +168,20 @@ public class MetaDataSerializer {
         builder.append("]");
         return builder.toString();
     }
+
+    public static String serializeCustomEntryTypesV2(BibEntryType entryType) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(MetaData.ENTRYTYPE_FLAG_V2);
+        builder.append(entryType.getType().getName());
+        builder.append(": req[");
+        builder.append(FieldFactory.serializeOrFieldsListV2(entryType.getRequiredFields()));
+        builder.append("] opt[");
+        builder.append(FieldFactory.serializeFieldsListV2(
+                entryType.getOptionalFields()
+                         .stream()
+                         .map(BibField::field)
+                         .collect(Collectors.toList())));
+        builder.append("]");
+        return builder.toString();
+    }
 }
