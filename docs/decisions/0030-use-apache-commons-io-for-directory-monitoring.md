@@ -7,7 +7,8 @@ parent: Decision Records
 ## Context and Problem Statement
 
 In JabRef, there is a need to add a directory monitor that will listen for changes in a specified directory.
-This monitor will be used to automatically update the [LaTeX Citations](https://docs.jabref.org/advanced/entryeditor/latex-citations) when a LaTeX file in the LaTeX directory is created, removed, or modified ([#10585](https://github.com/JabRef/jabref/issues/10585)).
+
+Currently, the monitor is used to automatically update the [LaTeX Citations](https://docs.jabref.org/advanced/entryeditor/latex-citations) when a LaTeX file in the LaTeX directory is created, removed, or modified ([#10585](https://github.com/JabRef/jabref/issues/10585)).
 Additionally, this monitor will be used to create a dynamic group that mirrors the file system structure ([#10930](https://github.com/JabRef/jabref/issues/10930)).
 
 ## Considered Options
@@ -18,7 +19,7 @@ Additionally, this monitor will be used to create a dynamic group that mirrors t
 
 ## Decision Outcome
 
-Chosen option: "Use [org.apache.commons.io.monitor](https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/monitor/package-summary.html)", because comes out best \(see below\).
+Chosen option: "Use [org.apache.commons.io.monitor](https://commons.apache.org/proper/commons-io/apidocs/org/apache/commons/io/monitor/package-summary.html)", because comes out best (see below).
 
 ## Pros and Cons of the Options
 
@@ -42,6 +43,6 @@ Chosen option: "Use [org.apache.commons.io.monitor](https://commons.apache.org/p
 
 ### org.apache.commons.io.monitor
 
-* Good, because there is no observed issues.
-* Good, because can handle huge files without overflowing.
+* Good, because there are no observed issues.
+* Good, because can handle huge amount of files without overflowing.
 * Bad, because it uses a polling mechanism at fixed intervals, which can waste CPU cycles if no change occurs.
