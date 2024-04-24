@@ -22,9 +22,8 @@ jobs:
         body: |
           Welcome to the vibrant world of open-source development with JabRef!
 
-          For newcomers, we're excited to have you on board. Start by exploring our [Contributing](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) guidelines, and don't forget to check out our [workspace setup guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) to get started smoothly.
+          Newcomers, we're excited to have you on board. Start by exploring our [Contributing](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) guidelines, and don't forget to check out our [workspace setup guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) to get started smoothly.
 
-          Have any questions or issues? Feel free to ask here on GitHub. Need help setting up your workspace? Join the conversation on JabRef's [Gitter](https://gitter.im/JabRef/jabref) chat. And don't hesitate to open a (draft) pull request early on to showcase your work and receive valuable feedback.
+          Have any questions or issues? Feel free to ask here on GitHub. Need help setting up your workspace? Join the conversation on [JabRef's Gitter chat](https://gitter.im/JabRef/jabref). And don't hesitate to open a (draft) pull request early on to showcase your work and receive valuable feedback.
 
           Happy coding! 🚀
-        
