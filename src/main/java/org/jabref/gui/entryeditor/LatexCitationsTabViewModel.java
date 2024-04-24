@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
@@ -154,13 +155,15 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     public void bindToEntry(BibEntry entry) {
+        checkAndUpdateDirectory();
+
+        currentEntry = entry;
+        Optional<String> citationKey = entry.getCitationKey();
+
         if (observer == null) {
             observer = new FileAlterationObserver(directory.get().toFile(), FILE_FILTER);
             directoryMonitorManager.addObserver(observer, listener);
         }
-
-        currentEntry = entry;
-        Optional<String> citationKey = entry.getCitationKey();
 
         if (citationKey.isPresent()) {
             citationList.setAll(latexFiles.getCitationsByKey(citationKey.get()));
@@ -201,7 +204,16 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     private void updateStatus() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> status.set(citationList.isEmpty() ? Status.NO_RESULTS : Status.CITATIONS_FOUND));
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            if (!Files.exists(directory.get())) {
+                searchError.set(Localization.lang("Current search directory does not exist: %0", directory.get()));
+                status.set(Status.ERROR);
+            } else if (citationList.isEmpty()) {
+                status.set(Status.NO_RESULTS);
+            } else {
+                status.set(Status.CITATIONS_FOUND);
+            }
+        });
     }
 
     public ObjectProperty<Path> directoryProperty() {
