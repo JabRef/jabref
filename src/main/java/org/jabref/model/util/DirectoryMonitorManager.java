@@ -26,8 +26,9 @@ public class DirectoryMonitorManager {
     }
 
     /**
-     * Unregisters all observers from the directory monitor.
-    **/
+     *  Unregister all observers associated with this manager from the directory monitor.
+     *  This method should be called when the library is closed to stop watching observers.
+     */
     public void unregister() {
         observers.forEach(directoryMonitor::removeObserver);
         observers.clear();
