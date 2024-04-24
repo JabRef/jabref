@@ -147,4 +147,5 @@ open module org.jabref {
     requires dd.plist;
     requires mslinks;
     requires org.yaml.snakeyaml;
+    requires org.apache.commons.io;
 }

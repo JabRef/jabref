@@ -109,6 +109,11 @@ public class Globals {
         if (fileUpdateMonitor != null) {
             fileUpdateMonitor.shutdown();
         }
+
+        if (stateManager.getDirectoryMonitor() != null) {
+            stateManager.getDirectoryMonitor().shutdown();
+        }
+
         JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 

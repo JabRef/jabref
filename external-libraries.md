@@ -295,6 +295,12 @@ URL:     https://commons.apache.org/proper/commons-digester/
 ```
 
 ```yaml
+Id:      commons-io:commons-io
+Project: Apache Commons IO
+URL:     https://commons.apache.org/proper/commons-io/
+```
+
+```yaml
 Id:      de.rototor.jeuclid:jeuclid-core
 Project: JEuclid
 URL:     https://github.com/rototor/jeuclid
@@ -537,7 +543,7 @@ Id:      com.ibm.icu:*
 Project: International Components for Unicode
 URL:     https://icu.unicode.org/
 License: Unicode License (https://www.unicode.org/copyright.html)
-Note:    Our own fork https://github.com/JabRef/icu. Upstream PR: https://github.com/unicode-org/icu/pull/2127
+Note:    Our own fork https://github.com/JabRef/icu. [Upstream PR](https://github.com/unicode-org/icu/pull/2127)
 Path:    lib/icu4j.jar
 SourcePath: lib/ic4j-src.jar
 ```
@@ -579,49 +585,49 @@ License: LGPL-2.1-or-later
 
 ```yaml
 Id:      org.openjfx:javafx-base
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-controls
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-fxml
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-graphics
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-media
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-swing
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-web
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
@@ -765,6 +771,7 @@ commons-cli:commons-cli:1.6.0
 commons-codec:commons-codec:1.16.0
 commons-collections:commons-collections:3.2.2
 commons-digester:commons-digester:2.1
+commons-io:commons-io:2.16.1
 commons-logging:commons-logging:1.2
 commons-validator:commons-validator:1.7
 de.rototor.jeuclid:jeuclid-core:3.1.11

@@ -84,6 +84,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -127,9 +128,9 @@ public class LibraryTab extends Tab {
 
     // Indicates whether the tab is loading data using a dataloading task
     // The constructors take care to the right true/false assignment during start.
-    private SimpleBooleanProperty loading = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty loading = new SimpleBooleanProperty(false);
 
-    // initally, the dialog is loading, not saving
+    // initially, the dialog is loading, not saving
     private boolean saving = false;
 
     private PersonNameSuggestionProvider searchAutoCompleter;
@@ -151,6 +152,7 @@ public class LibraryTab extends Tab {
 
     private final IndexingTaskManager indexingTaskManager;
     private final TaskExecutor taskExecutor;
+    private final DirectoryMonitorManager directoryMonitorManager;
 
     private LibraryTab(BibDatabaseContext bibDatabaseContext,
                       LibraryTabContainer tabContainer,
@@ -171,6 +173,7 @@ public class LibraryTab extends Tab {
         this.entryTypesManager = entryTypesManager;
         this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
         this.taskExecutor = taskExecutor;
+        this.directoryMonitorManager = new DirectoryMonitorManager(stateManager.getDirectoryMonitor());
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -833,6 +836,11 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when closing change monitor", e);
         }
         try {
+            directoryMonitorManager.unregister();
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when closing directory monitor", e);
+        }
+        try {
             PdfIndexerManager.shutdownIndexer(bibDatabaseContext);
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down PDF indexer", e);
@@ -862,6 +870,10 @@ public class LibraryTab extends Tab {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return this.bibDatabaseContext;
+    }
+
+    public DirectoryMonitorManager getDirectoryMonitorManager() {
+        return directoryMonitorManager;
     }
 
     public boolean isSaving() {
