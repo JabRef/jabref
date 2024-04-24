@@ -405,7 +405,7 @@ public class ImportHandler {
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
-                LOGGER.debug("First entry to import, we use BREAK");
+                LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
                 importEntryWithDuplicateCheck(database, entry, BREAK);
                 firstEntry = false;
                 continue;
