@@ -19,13 +19,7 @@ public interface DirectoryMonitor {
      */
     void removeObserver(FileAlterationObserver observer);
 
-    /**
-     * Starts the monitor.
-     */
     void start();
 
-    /**
-     * Stops the monitor.
-     */
     void shutdown();
 }

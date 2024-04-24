@@ -25,6 +25,9 @@ public class DirectoryMonitorManager {
         observers.remove(observer);
     }
 
+    /**
+     * Unregisters all observers from the directory monitor.
+    **/
     public void unregister() {
         observers.forEach(directoryMonitor::removeObserver);
         observers.clear();
