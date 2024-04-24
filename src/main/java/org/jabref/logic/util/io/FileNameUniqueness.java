@@ -11,7 +11,12 @@ import java.util.regex.Pattern;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FileNameUniqueness {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileNameUniqueness.class);
+
     private static final Pattern DUPLICATE_MARK_PATTERN = Pattern.compile("(.*) \\(\\d+\\)");
 
     /**
@@ -86,7 +91,7 @@ public class FileNameUniqueness {
                     Files.delete(duplicateFile);
                     dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Keeping '%0'", originalFileName, fileName));
                 } catch (IOException e) {
-                    dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Could not delete '%1'.", originalFileName, fileName));
+                    LOGGER.error("File '{}' is a duplicate of '{}'. Could not delete '{}'.", fileName, originalFileName, fileName);
                 }
                 return true;
             }

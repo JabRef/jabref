@@ -276,7 +276,7 @@ public class ImportHandler {
                                  taskExecutor,
                                  dialogService,
                                  preferencesService
-                         ).download()
+                         ).download(false)
                  );
         }
     }
@@ -411,7 +411,7 @@ public class ImportHandler {
                 continue;
             }
             if (preferencesService.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
-                var decision = preferencesService.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
+                DuplicateResolverDialog.DuplicateResolverResult decision = preferencesService.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
                 importEntryWithDuplicateCheck(database, entry, decision);
             } else {

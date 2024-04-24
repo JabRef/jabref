@@ -57,6 +57,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     private final String downloadUrl;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
+    private final boolean keepHtmlLink;
 
     private final BibDatabaseContext databaseContext;
 
@@ -70,7 +71,8 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                                     DialogService dialogService,
                                     FilePreferences filePreferences,
                                     TaskExecutor taskExecutor,
-                                    String suggestedName) {
+                                    String suggestedName,
+                                    boolean keepHtmlLink) {
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.linkedFile = linkedFile;
@@ -79,10 +81,14 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
+        this.keepHtmlLink = keepHtmlLink;
 
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
     }
 
+    /**
+     * Downloads the given linked file to the first existing file directory. It keeps HTML files as URLs.
+     */
     public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
                                     BibEntry entry,
                                     LinkedFile linkedFile,
@@ -90,7 +96,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                                     DialogService dialogService,
                                     FilePreferences filePreferences,
                                     TaskExecutor taskExecutor) {
-        this(databaseContext, entry, linkedFile, downloadUrl, dialogService, filePreferences, taskExecutor, "");
+        this(databaseContext, entry, linkedFile, downloadUrl, dialogService, filePreferences, taskExecutor, "", true);
     }
 
     @Override
@@ -172,10 +178,19 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
         isHtml = newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName());
         if (isHtml) {
-            dialogService.notify(Localization.lang("Download was a HTML file. Not adding it."));
-            List<LinkedFile> newFiles = new ArrayList<>(entry.getFiles());
-            newFiles.remove(linkedFile);
-            entry.setFiles(newFiles);
+            if (this.keepHtmlLink) {
+                dialogService.notify(Localization.lang("Download '%0' was a HTML file. Keeping URL.", downloadUrl));
+            } else {
+                dialogService.notify(Localization.lang("Download '%0' was a HTML file. Removed.", downloadUrl));
+                List<LinkedFile> newFiles = new ArrayList<>(entry.getFiles());
+                newFiles.remove(linkedFile);
+                entry.setFiles(newFiles);
+                try {
+                    Files.delete(downloadedFile);
+                } catch (IOException e) {
+                    LOGGER.error("Could not delete downloaded file {}.", downloadedFile, e);
+                }
+            }
         } else {
             entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
         }
