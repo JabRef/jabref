@@ -134,49 +134,50 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         taskExecutor.execute(downloadTask);
     }
 
-    private void onSuccess(Path targetDirectory, Path destination) {
+    /**
+     * @param targetDirectory The directory to store the file into. Is an absolute path.
+     */
+    private void onSuccess(Path targetDirectory, Path downloadedFile) {
+        assert targetDirectory.isAbsolute();
+
         boolean isDuplicate;
         boolean isHtml;
         try {
-            isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory, destination.getFileName(), dialogService);
+            isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory, downloadedFile.getFileName(), dialogService);
         } catch (IOException e) {
             LOGGER.error("FileNameUniqueness.isDuplicatedFile failed", e);
             return;
         }
 
         if (isDuplicate) {
-            destination = targetDirectory.resolve(
-                    FileNameUniqueness.eraseDuplicateMarks(destination.getFileName()));
-
-            linkedFile.setLink(FileUtil.relativize(destination,
-                    databaseContext.getFileDirectories(filePreferences)).toString());
-
-            isHtml = linkedFile.getFileType().equals(StandardExternalFileType.URL.getName());
-        } else {
-            // we need to call LinkedFileViewModel#fromFile, because we need to make the path relative to the configured directories
-            LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(
-                    destination,
-                    databaseContext.getFileDirectories(filePreferences),
-                    filePreferences);
-            if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
-                newLinkedFile.setDescription((linkedFile.getDescription()));
-            }
-            if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink())) {
-                newLinkedFile.setSourceURL(linkedFile.getLink());
-            } else {
-                newLinkedFile.setSourceURL(linkedFile.getSourceUrl());
-            }
-            isHtml = newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName());
-            if (!isHtml) {
-                entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
-            }
+            // We do not add duplicate files.
+            // The downloaded file was deleted in {@link org.jabref.logic.util.io.FileNameUniqueness.isDuplicatedFile]}
+            LOGGER.info("File {} already exists in target directory {}.", downloadedFile.getFileName(), targetDirectory);
+            return;
         }
-        // Notify in bar when the file type is HTML.
+
+        // we need to call LinkedFileViewModel#fromFile, because we need to make the path relative to the configured directories
+        LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(
+                downloadedFile,
+                databaseContext.getFileDirectories(filePreferences),
+                filePreferences);
+        if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
+            newLinkedFile.setDescription((linkedFile.getDescription()));
+        }
+        if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink())) {
+            newLinkedFile.setSourceURL(linkedFile.getLink());
+        } else {
+            newLinkedFile.setSourceURL(linkedFile.getSourceUrl());
+        }
+
+        isHtml = newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName());
         if (isHtml) {
             dialogService.notify(Localization.lang("Download was a HTML file. Not adding it."));
             List<LinkedFile> newFiles = new ArrayList<>(entry.getFiles());
             newFiles.remove(linkedFile);
             entry.setFiles(newFiles);
+        } else {
+            entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
         }
     }
 

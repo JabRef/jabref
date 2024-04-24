@@ -61,7 +61,6 @@ public class FileNameUniqueness {
      * @throws IOException Fail when the file is not exist or something wrong when reading the file
      */
     public static boolean isDuplicatedFile(Path directory, Path fileName, DialogService dialogService) throws IOException {
-
         Objects.requireNonNull(directory);
         Objects.requireNonNull(fileName);
         Objects.requireNonNull(dialogService);
@@ -83,10 +82,11 @@ public class FileNameUniqueness {
 
         while (Files.exists(originalFile)) {
             if (com.google.common.io.Files.equal(originalFile.toFile(), duplicateFile.toFile())) {
-                if (duplicateFile.toFile().delete()) {
+                try {
+                    Files.delete(duplicateFile);
                     dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Keeping '%0'", originalFileName, fileName));
-                } else {
-                    dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Keeping both due to deletion error", originalFileName, fileName));
+                } catch (IOException e) {
+                    dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Could not delete '%1'.", originalFileName, fileName));
                 }
                 return true;
             }
