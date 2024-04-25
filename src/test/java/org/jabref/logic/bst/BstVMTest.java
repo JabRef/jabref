@@ -45,7 +45,7 @@ public class BstVMTest {
 
     @Test
     public void ieeetran() throws RecognitionException, IOException {
-        BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/IEEEtran.bst"));
+        BstVM vm = new BstVM(Path.of("src/main/resources/bst/IEEEtran.bst"));
         List<BibEntry> testEntries = List.of(TestEntry.getTestEntry());
 
         String expected = "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
