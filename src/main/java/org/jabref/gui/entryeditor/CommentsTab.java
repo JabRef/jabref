@@ -20,7 +20,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
-import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -139,17 +138,17 @@ public class CommentsTab extends FieldsEditorTab {
         // Show "Hide" button only if user-specific comment field is empty. Otherwise, it is a strange UI, because the
         // button would just disappear and no change **in the current** editor would be made
         if (entryEditorPreferences.shouldShowUserCommentsFields() && !entry.hasField(userSpecificCommentField)) {
-            Button hideDefaultOwnerCommentButton = new Button(Localization.lang("Hide user comments"));
-            hideDefaultOwnerCommentButton.setOnAction(e -> {
-                var labelForField = gridPane.getChildren().stream().filter(s -> s instanceof FieldNameLabel).filter(x -> ((FieldNameLabel) x).getText().equals(userSpecificCommentField.getDisplayName())).findFirst();
-                labelForField.ifPresent(label -> gridPane.getChildren().remove(label));
-                fieldEditorForUserDefinedComment.ifPresent(f -> gridPane.getChildren().remove(f.getNode()));
-                editors.remove(userSpecificCommentField);
-
-                entryEditorPreferences.setShowUserCommentsFields(false);
-                setupPanel(entry, false);
+            Button toggleCommentsButton = new Button("Hide user comments");
+            toggleCommentsButton.setOnAction(e -> {
+                if (gridPane.getChildren().contains(fieldEditorForUserDefinedComment.get().getNode())) {
+                    gridPane.getChildren().remove(fieldEditorForUserDefinedComment.get().getNode());
+                    toggleCommentsButton.setText("Show user comments");
+                } else {
+                    gridPane.add(fieldEditorForUserDefinedComment.get().getNode(), 1, gridPane.getRowCount(), 2, 1);
+                    toggleCommentsButton.setText("Hide user comments");
+                }
             });
-            gridPane.add(hideDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
+            gridPane.add(toggleCommentsButton, 1, gridPane.getRowCount(), 2, 1);
             setCompressedRowLayout();
         }
     }
