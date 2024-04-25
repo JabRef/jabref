@@ -230,10 +230,10 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
         String name = ctx.getChild(0).getText();
         if (bstVMContext.functions().containsKey(name)) {
-            LOGGER.trace("Function {} found", name);
+            LOGGER.trace("Function '{}' found", name);
             bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
         } else {
-            LOGGER.trace("Function {} not found", name);
+            LOGGER.trace("Function '{}' not found", name);
             visit(ctx.getChild(0));
         }
 
