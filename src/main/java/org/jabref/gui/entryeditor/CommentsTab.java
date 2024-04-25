@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.SequencedSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -139,17 +140,22 @@ public class CommentsTab extends FieldsEditorTab {
         // button would just disappear and no change **in the current** editor would be made
         if (entryEditorPreferences.shouldShowUserCommentsFields() && !entry.hasField(userSpecificCommentField)) {
             Button toggleCommentsButton = new Button("Hide user comments");
+            AtomicBoolean commentsVisible = new AtomicBoolean(true); // To keep track of the visibility state
+
             toggleCommentsButton.setOnAction(e -> {
-                if (gridPane.getChildren().contains(fieldEditorForUserDefinedComment.get().getNode())) {
+                if (commentsVisible.get()) {
                     gridPane.getChildren().remove(fieldEditorForUserDefinedComment.get().getNode());
                     toggleCommentsButton.setText("Show user comments");
                 } else {
                     gridPane.add(fieldEditorForUserDefinedComment.get().getNode(), 1, gridPane.getRowCount(), 2, 1);
                     toggleCommentsButton.setText("Hide user comments");
                 }
+                commentsVisible.set(!commentsVisible.get()); // Toggle the visibility state
             });
+
             gridPane.add(toggleCommentsButton, 1, gridPane.getRowCount(), 2, 1);
             setCompressedRowLayout();
         }
+        }
     }
-}
+
