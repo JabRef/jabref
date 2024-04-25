@@ -310,9 +310,9 @@ public class BstFunctions {
      * the book function. When given as an argument to the ITERATE
      * command, call.type$ actually produces the output for the entries.
      * For an entry with an unknown type, it executes the function
-     * default.type. Thus you should define (before the READ command)
+     * default.type. Thus, you should define (before the READ command)
      * one function for each standard entry type as well as a
-     * default.type function.
+     * <code>default.type</code> function.
      */
     public class BstCallTypeFunction implements BstFunction {
         @Override
@@ -325,7 +325,9 @@ public class BstFunctions {
             if (bstEntry == null) {
                 this.execute(visitor, ctx); // Throw error
             } else {
-                functions.get(bstEntry.entry.getType().getName()).execute(visitor, ctx, bstEntry);
+                String entryType = bstEntry.entry.getType().getName();
+                LOGGER.trace("Handling {}", entryType);
+                functions.get(entryType).execute(visitor, ctx, bstEntry);
             }
         }
     }
