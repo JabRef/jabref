@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.preview;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,24 +19,25 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.stage.FileChooser;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -68,6 +67,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
+    @Inject private KeyBindingRepository keyBindingRepository;
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -94,10 +94,14 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         public void execute() {
             if (editArea != null) {
                 switch (command) {
-                    case COPY -> editArea.copy();
-                    case CUT -> editArea.cut();
-                    case PASTE -> editArea.paste();
-                    case SELECT_ALL -> editArea.selectAll();
+                    case COPY ->
+                            editArea.copy();
+                    case CUT ->
+                            editArea.cut();
+                    case PASTE ->
+                            editArea.paste();
+                    case SELECT_ALL ->
+                            editArea.selectAll();
                 }
                 editArea.requestFocus();
             }
@@ -111,18 +115,19 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     @FXML
     private void selectBstFile(ActionEvent event) {
-    FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Select BST File");
-    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("BST Files", "*.bst"));
 
-    File selectedFile = fileChooser.showOpenDialog(null);
-    if (selectedFile != null) {
-        String filePath = selectedFile.getAbsolutePath();
-        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(filePath));
-        viewModel.availableListProperty().add(bstPreviewLayout);
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.BST)
+                .withDefaultExtension(StandardFileType.BST)
+                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
+                .build();
+
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -> {
+            BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(bstFile);
+            viewModel.availableListProperty().add(bstPreviewLayout);
+        });
     }
-}
-    
+
     public void initialize() {
         this.viewModel = new PreviewTabViewModel(dialogService, preferencesService.getPreviewPreferences(), taskExecutor, stateManager);
         lastKeyPressTime = System.currentTimeMillis();
@@ -133,7 +138,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         searchBox.setPromptText(Localization.lang("Search") + "...");
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory factory = new ActionFactory(keyBindingRepository);
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY)),
