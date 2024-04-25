@@ -58,7 +58,9 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
     @Override
     public Integer visitFunctionCommand(BstParser.FunctionCommandContext ctx) {
-        bstVMContext.functions().put(ctx.id.getText(),
+        String name = ctx.id.getText();
+        LOGGER.trace("Function: {}", name);
+        bstVMContext.functions().put(name,
                 (visitor, functionContext) -> visitor.visit(ctx.function));
         return BstVM.TRUE;
     }
@@ -115,13 +117,17 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     @Override
     public Integer visitExecuteCommand(BstParser.ExecuteCommandContext ctx) {
         this.selectedBstEntry = null;
-        visit(ctx.bstFunction());
+        BstParser.BstFunctionContext bstFunction = ctx.bstFunction();
+        String name = bstFunction.getText();
+        LOGGER.trace("Executing function {}", name);
+        visit(bstFunction);
 
         return BstVM.TRUE;
     }
 
     @Override
     public Integer visitIterateCommand(BstParser.IterateCommandContext ctx) {
+        LOGGER.trace("EXECUTE {}", ctx.bstFunction().getText());
         for (BstEntry entry : bstVMContext.entries()) {
             this.selectedBstEntry = entry;
             visit(ctx.bstFunction());
@@ -182,7 +188,9 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
     @Override
     public Integer visitIdentifier(BstParser.IdentifierContext ctx) {
-        resolveIdentifier(ctx.IDENTIFIER().getText(), ctx);
+        String name = ctx.IDENTIFIER().getText();
+        LOGGER.trace("Identifier: {}", name);
+        resolveIdentifier(name, ctx);
         return BstVM.TRUE;
     }
 
@@ -222,8 +230,10 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
         String name = ctx.getChild(0).getText();
         if (bstVMContext.functions().containsKey(name)) {
+            LOGGER.trace("Function {} found", name);
             bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
         } else {
+            LOGGER.trace("Function {} not found", name);
             visit(ctx.getChild(0));
         }
 
