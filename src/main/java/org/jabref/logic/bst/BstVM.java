@@ -69,10 +69,7 @@ public class BstVM {
     public String render(Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
         Objects.requireNonNull(bibEntries);
 
-        List<BstEntry> entries = new ArrayList<>(bibEntries.size());
-        for (BibEntry entry : bibEntries) {
-            entries.add(new BstEntry(entry));
-        }
+        List<BstEntry> entries = bibEntries.stream().map(BstEntry::new).toList();
 
         StringBuilder resultBuffer = new StringBuilder();
 
