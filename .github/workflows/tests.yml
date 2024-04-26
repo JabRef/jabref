@@ -335,3 +335,12 @@ jobs:
           show-progress: 'false'
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
+  other_than_main:
+    name: Check source branch is other than "main"
+    runs-on: ubuntu-latest
+    steps:
+      - if: github.head_ref == 'main'
+        uses: actions/github-script@v6
+        with:
+          script: |
+              core.setFailed('Changes to staging should merge from staging')
