@@ -6,7 +6,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class RemoveBracesFormatter extends Formatter {
+public class RemoveEnclosingBracesFormatter extends Formatter {
 
     @Override
     public String getName() {

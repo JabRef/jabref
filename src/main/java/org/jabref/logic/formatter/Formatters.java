@@ -25,7 +25,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
@@ -82,7 +82,7 @@ public class Formatters {
                 new NormalizeNamesFormatter(),
                 new NormalizePagesFormatter(),
                 new OrdinalsToSuperscriptFormatter(),
-                new RemoveBracesFormatter(),
+                new RemoveEnclosingBracesFormatter(),
                 new UnitsToLatexFormatter(),
                 new EscapeUnderscoresFormatter(),
                 new EscapeAmpersandsFormatter(),
