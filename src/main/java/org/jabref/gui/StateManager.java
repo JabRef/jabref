@@ -24,7 +24,6 @@ import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
@@ -74,7 +73,6 @@ public class StateManager {
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
 
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
-    private final DefaultDirectoryMonitor directoryMonitor = new DefaultDirectoryMonitor();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
@@ -256,9 +254,5 @@ public class StateManager {
 
     public void clearSearchHistory() {
         searchHistory.clear();
-    }
-
-    public DefaultDirectoryMonitor getDirectoryMonitor() {
-        return directoryMonitor;
     }
 }

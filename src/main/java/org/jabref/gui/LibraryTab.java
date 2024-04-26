@@ -173,7 +173,7 @@ public class LibraryTab extends Tab {
         this.entryTypesManager = entryTypesManager;
         this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
         this.taskExecutor = taskExecutor;
-        this.directoryMonitorManager = new DirectoryMonitorManager(stateManager.getDirectoryMonitor());
+        this.directoryMonitorManager = new DirectoryMonitorManager(Globals.getDirectoryMonitor());
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
