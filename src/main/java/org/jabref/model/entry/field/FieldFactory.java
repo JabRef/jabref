@@ -12,6 +12,7 @@ import java.util.SequencedSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.types.EntryType;
@@ -64,8 +65,13 @@ public class FieldFactory {
         // In case a user has put a user-defined field, the casing of that field is kept
         String displayName = unknownField.getDisplayName();
         String fieldProperties = unknownField.getProperties().stream()
+                                             .filter(e -> e != FieldProperty.CUSTOM_FIELD)
                                              .map(Enum::name)
                                              .collect(Collectors.joining(FIELD_PROPERTY_SEPARATOR));
+
+        if (fieldProperties.isBlank()) {
+            return displayName;
+        }
 
         return displayName + FIELD_NAME_PROPERTY_SEPARATOR + fieldProperties;
     }
@@ -145,6 +151,29 @@ public class FieldFactory {
             String username = fieldName.substring("comment-".length());
             return new UserSpecificCommentField(username);
         }
+
+        if (fieldName.contains(FIELD_NAME_PROPERTY_SEPARATOR)) {
+            String[] components = fieldName.split(Pattern.quote(FIELD_NAME_PROPERTY_SEPARATOR));
+
+            if (components.length == 2) {
+                String unknownFieldName = components[0];
+                String[] fieldProperties = components[1].split(Pattern.quote(FIELD_PROPERTY_SEPARATOR));
+
+                if (fieldProperties.length == 0) {
+                    return UnknownField.fromDisplayName(unknownFieldName);
+                } else if (fieldProperties.length == 1) {
+                    return new UnknownField(unknownFieldName, unknownFieldName, FieldProperty.valueOf(fieldProperties[0]));
+                } else {
+                    FieldProperty firstProperty = FieldProperty.valueOf(fieldProperties[0]);
+                    FieldProperty[] restProperties = Arrays.stream(fieldProperties, 1, fieldProperties.length)
+                                                           .map(FieldProperty::valueOf)
+                                                           .toArray(FieldProperty[]::new);
+
+                    return new UnknownField(unknownFieldName, unknownFieldName, firstProperty, restProperties);
+                }
+            }
+        }
+
         return OptionalUtil.<Field>orElse(
               OptionalUtil.<Field>orElse(
                OptionalUtil.<Field>orElse(

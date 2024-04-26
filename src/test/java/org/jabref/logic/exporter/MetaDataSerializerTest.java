@@ -161,13 +161,13 @@ public class MetaDataSerializerTest {
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(UnknownField.fromDisplayName("Test1"), UnknownField.fromDisplayName("Test2")),
-                        "jabref-entrytype-v2: test: req[Test1|CUSTOM_FIELD;Test2|CUSTOM_FIELD] opt[]"
+                        "jabref-entrytype-v2: test: req[Test1;Test2] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(UnknownField.fromDisplayName("tEST"), UnknownField.fromDisplayName("tEsT2")),
-                        "jabref-entrytype-v2: test: req[tEST|CUSTOM_FIELD;tEsT2|CUSTOM_FIELD] opt[]"
+                        "jabref-entrytype-v2: test: req[tEST;tEsT2] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
@@ -182,8 +182,14 @@ public class MetaDataSerializerTest {
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
-                                .withRequiredFields(new UnknownField("comment", "comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT)),
-                        "jabref-entrytype-v2: test: req[comment|MULTILINE_TEXT,COMMENT] opt[]"
+                                .withRequiredFields(new UnknownField("custom1", "custom1", FieldProperty.MULTILINE_TEXT, FieldProperty.COMMENT, FieldProperty.EXTERNAL)),
+                        "jabref-entrytype-v2: test: req[custom1|EXTERNAL,MULTILINE_TEXT,COMMENT] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(new UnknownField("custom2", "custom2")),
+                        "jabref-entrytype-v2: test: req[custom2] opt[]"
                 )
         );
     }

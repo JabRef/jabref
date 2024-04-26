@@ -10,6 +10,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.MetaDataSerializerTest;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.model.entry.BibEntryTypeBuilder;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.UnknownEntryType;
@@ -56,6 +57,53 @@ public class MetaDataParserTest {
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(UnknownField.fromDisplayName("tEST"), UnknownField.fromDisplayName("tEsT2")),
                         "jabref-entrytype: test: req[tEST;tEsT2] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE),
+                        "jabref-entrytype-v2: test: req[author;title] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(StandardField.AUTHOR)
+                                .withImportantFields(StandardField.TITLE),
+                        "jabref-entrytype-v2: test: req[author] opt[title]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(UnknownField.fromDisplayName("Test1"), UnknownField.fromDisplayName("Test2")),
+                        "jabref-entrytype-v2: test: req[Test1;Test2] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(UnknownField.fromDisplayName("tEST"), UnknownField.fromDisplayName("tEsT2")),
+                        "jabref-entrytype-v2: test: req[tEST;tEsT2] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("person"))
+                                .withRequiredFields(new UnknownField("Name", FieldProperty.PERSON_NAMES))
+                                .withImportantFields(
+                                        new UnknownField("Googlescholar", FieldProperty.EXTERNAL),
+                                        new UnknownField("Orcid", FieldProperty.EXTERNAL)
+                                ),
+                        "jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(new UnknownField("custom1", "custom1", FieldProperty.MULTILINE_TEXT, FieldProperty.COMMENT, FieldProperty.EXTERNAL)),
+                        "jabref-entrytype-v2: test: req[custom1|MULTILINE_TEXT,COMMENT,EXTERNAL] opt[]"
+                ),
+                Arguments.of(
+                        new BibEntryTypeBuilder()
+                                .withType(new UnknownEntryType("test"))
+                                .withRequiredFields(new UnknownField("custom2", "custom2")),
+                        "jabref-entrytype-v2: test: req[custom2] opt[]"
                 )
         );
     }
