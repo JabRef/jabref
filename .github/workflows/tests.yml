@@ -343,4 +343,4 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-              core.setFailed('Pull requests should come from a branch other than "main"\n\nPlease read https://devdocs.jabref.org/contributing carefully again.')
+              core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read https://devdocs.jabref.org/contributing carefully again. 👈')
