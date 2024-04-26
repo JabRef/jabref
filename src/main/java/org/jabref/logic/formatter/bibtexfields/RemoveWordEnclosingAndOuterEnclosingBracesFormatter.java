@@ -3,6 +3,7 @@ package org.jabref.logic.formatter.bibtexfields;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
+
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -76,7 +77,8 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
             }
         } else {
             return newName;
-        }    }
+        }
+    }
 
     @Override
     public String getDescription() {

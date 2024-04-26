@@ -30,7 +30,6 @@ public class Author {
 
     private final RemoveWordEnclosingAndOuterEnclosingBracesFormatter formatter = new RemoveWordEnclosingAndOuterEnclosingBracesFormatter();
 
-
     /**
      * Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
      * <p>
@@ -173,6 +172,7 @@ public class Author {
      *
      * @return first name of the author (may consist of several tokens)
      */
+
     public Optional<String> getGivenName() {
         return Optional.ofNullable(givenName);
     }
