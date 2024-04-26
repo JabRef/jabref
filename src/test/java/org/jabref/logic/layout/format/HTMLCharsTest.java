@@ -3,6 +3,7 @@ package org.jabref.logic.layout.format;
 import java.util.stream.Stream;
 
 import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.layout.ParamLayoutFormatter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,10 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class HTMLCharsTest {
 
     private LayoutFormatter layout;
+    private ParamLayoutFormatter layoutKeep;
 
     @BeforeEach
     public void setUp() {
         layout = new HTMLChars();
+        layoutKeep = new HTMLChars();
+        layoutKeep.setArgument("keepCurlyBraces");
     }
 
     private static Stream<Arguments> provideBasicFormattingData() {
@@ -37,6 +41,7 @@ public class HTMLCharsTest {
                 Arguments.of("&auml;", "{\\\"a}"),
                 Arguments.of("&auml;", "\\\"a"),
                 Arguments.of("&Ccedil;", "{\\c{C}}"),
+                Arguments.of("&Ccedil;", "\\c{C}"),
                 Arguments.of("&Oogon;&imath;", "\\k{O}\\i"),
                 Arguments.of("&ntilde; &ntilde; &iacute; &imath; &imath;", "\\~{n} \\~n \\'i \\i \\i")
         );
@@ -143,5 +148,24 @@ public class HTMLCharsTest {
     @MethodSource("provideHTMLEntityFormattingData")
     void hTMLEntityFormatting(String expected, String input) {
         assertEquals(expected, layout.format(input));
+    }
+
+    private static Stream<Arguments> provideBracesKeepFormattingData() {
+        return Stream.of(
+            Arguments.of("{&auml;}", "{\\\"{a}}"),
+            Arguments.of("{&auml;}", "{\\\"a}"),
+            Arguments.of("{&Ccedil;}", "{\\c{C}}"),
+            Arguments.of("{<em>hallo</em>}", "{\\emph hallo}"),
+            Arguments.of("{<b>hallo</b>}", "{\\textbf hallo}"),
+            Arguments.of("{<b>hallo</b>}", "{\\bf hallo}"),
+            Arguments.of("{&#39;}", "{\\textquotesingle}"),
+            Arguments.of("{{ test }}", "{{ test }}")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideBracesKeepFormattingData")
+    void bracesKeepFormatting(String expected, String input) {
+        assertEquals(expected, layoutKeep.format(input));
     }
 }
