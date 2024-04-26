@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
@@ -12,6 +13,7 @@ import org.jabref.model.strings.StringUtil;
  * <p>
  * Current usage: only methods <code>getLastOnly</code>, <code>getFirstLast</code>, and <code>getLastFirst</code> are used; all other methods are provided for completeness.
  */
+@AllowedToUseLogic("because it needs to use formatter")
 public class Author {
 
     /**
