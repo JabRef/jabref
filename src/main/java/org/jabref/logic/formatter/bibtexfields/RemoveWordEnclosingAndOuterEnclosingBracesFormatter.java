@@ -1,5 +1,7 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import java.util.StringJoiner;
+
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
@@ -18,6 +20,9 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatter {
+
+    private static final RemoveEnclosingBracesFormatter REMOVE_ENCLOSING_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
+
     @Override
     public String getName() {
         return Localization.lang("Remove word enclosing braces");
@@ -29,23 +34,35 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
     }
 
     @Override
-    public String format(String name) {
-        if (StringUtil.isBlank(name)) {
-            return null;
+    public String getDescription() {
+        return Localization.lang("Removes braces encapsulating a complete word and the complete field content.");
+    }
+
+    @Override
+    public String getExampleInput() {
+        return "{In {CDMA}}";
+    }
+
+    @Override
+    public String format(String input) {
+        if (StringUtil.isBlank(input)) {
+            return input;
         }
 
-        if (!name.contains("{")) {
-            return name;
+        if (!input.contains("{")) {
+            return input;
         }
 
-        String[] split = name.split(" ");
-        StringBuilder b = new StringBuilder();
+        // We need to first remove the outer braces to have double braces at the last word working (e.g., {In {CDMA}})
+        input = REMOVE_ENCLOSING_BRACES_FORMATTER.format(input);
+
+        String[] split = input.split(" ");
+        StringJoiner result = new StringJoiner(" ");
         for (String s : split) {
             if ((s.length() > 2) && s.startsWith("{") && s.endsWith("}")) {
-                // quick solution (which we don't do: just remove first "{" and last "}"
+                // quick solution (which we don't do): just remove first "{" and last "}"
                 // however, it might be that s is like {A}bbb{c}, where braces may not be removed
 
-                // inner
                 String inner = s.substring(1, s.length() - 1);
 
                 if (inner.contains("}")) {
@@ -57,37 +74,9 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
                     s = inner;
                 }
             }
-            b.append(s).append(' ');
+            result.add(s);
         }
-        // delete last
-        b.deleteCharAt(b.length() - 1);
-
-        // now, all inner words are cleared
-        // case {word word word} remains
-        // as above, we have to be aware of {w}ord word wor{d} and {{w}ord word word}
-
-        String newName = b.toString();
-
-        if (newName.startsWith("{") && newName.endsWith("}")) {
-            String inner = newName.substring(1, newName.length() - 1);
-            if (properBrackets(inner)) {
-                return inner;
-            } else {
-                return newName;
-            }
-        } else {
-            return newName;
-        }
-    }
-
-    @Override
-    public String getDescription() {
-        return Localization.lang("Removes braces encapsulating a complete word and the complete field content.");
-    }
-
-    @Override
-    public String getExampleInput() {
-        return "{In CDMA}";
+        return result.toString();
     }
 
     /**
