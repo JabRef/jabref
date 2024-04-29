@@ -28,29 +28,18 @@ public class LatexParserResults {
         }
     }
 
-    public boolean isParsed(Path texFile) {
-        return parsedTexFiles.containsKey(texFile);
-    }
-
     public void add(Path texFile, LatexParserResult parsedFile) {
         parsedTexFiles.put(texFile, parsedFile);
+    }
+
+    public LatexParserResult remove(Path texFile) {
+        return parsedTexFiles.remove(texFile);
     }
 
     public Set<Path> getBibFiles() {
         Set<Path> bibFiles = new HashSet<>();
         parsedTexFiles.values().forEach(result -> bibFiles.addAll(result.getBibFiles()));
         return bibFiles;
-    }
-
-    public Set<Path> getNonParsedNestedFiles() {
-        Set<Path> nonParsedNestedFiles = new HashSet<>();
-        for (LatexParserResult result : parsedTexFiles.values()) {
-            nonParsedNestedFiles.addAll(result.getNestedFiles()
-                                            .stream()
-                                            .filter(nestedFile -> !parsedTexFiles.containsKey(nestedFile))
-                                            .toList());
-        }
-        return nonParsedNestedFiles;
     }
 
     public Multimap<String, Citation> getCitations() {
@@ -63,6 +52,10 @@ public class LatexParserResults {
         Collection<Citation> citations = new ArrayList<>();
         parsedTexFiles.values().forEach(result -> citations.addAll(result.getCitationsByKey(key)));
         return citations;
+    }
+
+    public void clear() {
+        parsedTexFiles.clear();
     }
 
     @Override
