@@ -340,7 +340,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - if: github.head_ref == 'main'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
               core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read https://devdocs.jabref.org/contributing again carefully. 👈')
