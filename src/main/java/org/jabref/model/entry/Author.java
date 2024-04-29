@@ -23,14 +23,14 @@ public class Author {
      */
     public static final Author OTHERS = new Author("", "", null, "others", null);
 
+    private static final RemoveWordEnclosingAndOuterEnclosingBracesFormatter FORMATTER = new RemoveWordEnclosingAndOuterEnclosingBracesFormatter();
+
     private final String givenName;
     private final String givenNameAbbreviated;
     private final String namePrefix;
     private final String familyName;
     private final String nameSuffix;
     private Author latexFreeAuthor;
-
-    private final RemoveWordEnclosingAndOuterEnclosingBracesFormatter formatter = new RemoveWordEnclosingAndOuterEnclosingBracesFormatter();
 
     /**
      * Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
@@ -46,17 +46,17 @@ public class Author {
     public Author(String givenName, String givenNameAbbreviated, String namePrefix, String familyName, String nameSuffix) {
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
-        this.givenName = addDotIfAbbreviation(formatter.format(givenName));
-        this.givenNameAbbreviated = formatter.format(givenNameAbbreviated);
-        this.namePrefix = formatter.format(namePrefix);
+        this.givenName = addDotIfAbbreviation(FORMATTER.format(givenName));
+        this.givenNameAbbreviated = FORMATTER.format(givenNameAbbreviated);
+        this.namePrefix = FORMATTER.format(namePrefix);
         if (keepBracesAtLastPart) {
             // We do not remove braces here to keep institutions protected
             // https://github.com/JabRef/jabref/issues/10031
             this.familyName = familyName;
         } else {
-            this.familyName = formatter.format(familyName);
+            this.familyName = FORMATTER.format(familyName);
         }
-        this.nameSuffix = formatter.format(nameSuffix);
+        this.nameSuffix = FORMATTER.format(nameSuffix);
     }
 
     public static String addDotIfAbbreviation(String name) {
@@ -174,7 +174,6 @@ public class Author {
      *
      * @return first name of the author (may consist of several tokens)
      */
-
     public Optional<String> getGivenName() {
         return Optional.ofNullable(givenName);
     }
