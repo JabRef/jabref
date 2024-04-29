@@ -31,7 +31,7 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
     @Override
     public String format(String name) {
         if (StringUtil.isBlank(name)) {
-            return null;
+            return name;
         }
 
         if (!name.contains("{")) {
