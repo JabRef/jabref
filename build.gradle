@@ -78,7 +78,15 @@ application {
         // Fix for https://github.com/JabRef/jabref/issues/11198
         '--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module',
         '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
-        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module'
+        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
+
+        // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
+        '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
+        '--add-exports=javafx.base/com.sun.javafx.event=org.jabref',
+        '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref',
+        '--add-opens=javafx.graphics/javafx.scene=org.jabref',
+        '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
+        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref'
     ]
 }
 
@@ -160,9 +168,9 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:2.2.224'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.78'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
 
-    implementation 'commons-cli:commons-cli:1.6.0'
+    implementation 'commons-cli:commons-cli:1.7.0'
 
     implementation 'org.libreoffice:unoloader:7.6.4'
     implementation 'org.libreoffice:libreoffice:7.6.4'
@@ -210,19 +218,22 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.2'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.8.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.9.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.openjfx'
         exclude group: 'org.apache.logging.log4j'
+        exclude group: 'tech.units'
     }
+    // Required by gemsfx
+    implementation 'tech.units:indriya:2.2'
 
     implementation 'org.controlsfx:controlsfx:11.2.1'
 
     implementation 'org.jsoup:jsoup:1.17.2'
     implementation 'com.konghq:unirest-java:3.14.5'
 
-    implementation 'org.slf4j:slf4j-api:2.0.12'
+    implementation 'org.slf4j:slf4j-api:2.0.13'
     implementation "org.tinylog:tinylog-api:2.7.0"
     implementation "org.tinylog:slf4j-tinylog:2.7.0"
     implementation "org.tinylog:tinylog-impl:2.7.0"
@@ -232,7 +243,7 @@ dependencies {
     // route all requests to log4j to SLF4J
     implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.23.1'
 
-    implementation('de.undercouch:citeproc-java:3.0.0') {
+    implementation('de.undercouch:citeproc-java:3.1.0') {
         exclude group: 'org.antlr'
     }
 
@@ -284,6 +295,8 @@ dependencies {
 
     // YAML formatting
     implementation 'org.yaml:snakeyaml:2.2'
+
+    implementation 'commons-io:commons-io:2.16.1'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.170'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'

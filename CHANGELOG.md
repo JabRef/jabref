@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added tooltip on main table cells that shows cell content or cell content and entry preview if set in preferences. [10925](https://github.com/JabRef/jabref/issues/10925)
 - We added the ability to add a keyword/crossref when typing the separator character (e.g., comma) in the keywords/crossref fields. [#11178](https://github.com/JabRef/jabref/issues/11178)
 - We added an exporter and improved the importer for Endnote XML format. [#11137](https://github.com/JabRef/jabref/issues/11137)
+- We added support for automatically update LaTeX citations when a LaTeX file is created, removed, or modified. [#10585](https://github.com/JabRef/jabref/issues/10585)
 
 ### Changed
 
@@ -28,6 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where entry type with duplicate fields prevented opening existing libraries with custom entry types. [#11127](https://github.com/JabRef/jabref/issues/11127)
+- We fixed an issue where Markdown rendering removed braces from the text. [#10928](https://github.com/JabRef/jabref/issues/10928)
 - We fixed an issue when the file was flagged as changed on disk in the case of content selectors or groups. [#9064](https://github.com/JabRef/jabref/issues/9064)
 - We fixed crash on opening the entry editor when auto-completion is enabled. [#11188](https://github.com/JabRef/jabref/issues/11188)
 - We fixed the usage of the key binding for "Clear search" (default: <kbd>Escape</kbd>). [#10764](https://github.com/JabRef/jabref/issues/10764)

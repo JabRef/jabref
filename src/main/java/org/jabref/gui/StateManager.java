@@ -190,7 +190,7 @@ public class StateManager {
     }
 
     public void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task) {
-        this.backgroundTasks.add(0, new Pair<>(backgroundTask, task));
+        this.backgroundTasks.addFirst(new Pair<>(backgroundTask, task));
     }
 
     public EasyBinding<Boolean> getAnyTaskRunning() {
