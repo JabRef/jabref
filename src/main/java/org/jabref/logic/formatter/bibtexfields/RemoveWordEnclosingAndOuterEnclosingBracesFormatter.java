@@ -87,7 +87,7 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
 
     @Override
     public String getExampleInput() {
-        return "{In CDMA}";
+        return "{In {CDMA}}";
     }
 
     /**
