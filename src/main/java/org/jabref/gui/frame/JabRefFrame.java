@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.collections.transformation.FilteredList;
@@ -212,7 +213,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
         splitPane.getItems().addAll(tabbedPane);
         SplitPane.setResizableWithParent(sidePane, false);
-        EasyBind.subscribe(sidePane.widthProperty(), c -> updateSidePane());
+        sidePane.widthProperty().addListener(c -> updateSidePane());
+        sidePane.getChildren().addListener((InvalidationListener) c -> updateSidePane());
+        updateSidePane();
         setCenter(splitPane);
     }
 
