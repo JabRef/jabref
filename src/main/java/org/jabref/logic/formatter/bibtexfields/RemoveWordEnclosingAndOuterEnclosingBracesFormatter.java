@@ -34,6 +34,16 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
     }
 
     @Override
+    public String getDescription() {
+        return Localization.lang("Removes braces encapsulating a complete word and the complete field content.");
+    }
+
+    @Override
+    public String getExampleInput() {
+        return "{In {CDMA}}";
+    }
+
+    @Override
     public String format(String input) {
         if (StringUtil.isBlank(input)) {
             return input;
@@ -67,16 +77,6 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
             result.add(s);
         }
         return result.toString();
-    }
-
-    @Override
-    public String getDescription() {
-        return Localization.lang("Removes braces encapsulating a complete word and the complete field content.");
-    }
-
-    @Override
-    public String getExampleInput() {
-        return "{In {CDMA}}";
     }
 
     /**

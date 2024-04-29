@@ -19,6 +19,16 @@ public class RemoveEnclosingBracesFormatter extends Formatter {
     }
 
     @Override
+    public String getDescription() {
+        return Localization.lang("Removes braces encapsulating the complete field content.");
+    }
+
+    @Override
+    public String getExampleInput() {
+        return "{In CDMA}";
+    }
+
+    @Override
     public String format(String value) {
         String formatted = value;
         while ((formatted.length() >= 2) && (formatted.charAt(0) == '{') && (formatted.charAt(formatted.length() - 1)
@@ -35,16 +45,6 @@ public class RemoveEnclosingBracesFormatter extends Formatter {
             }
         }
         return formatted;
-    }
-
-    @Override
-    public String getDescription() {
-        return Localization.lang("Removes braces encapsulating the complete field content.");
-    }
-
-    @Override
-    public String getExampleInput() {
-        return "{In CDMA}";
     }
 
     /**
