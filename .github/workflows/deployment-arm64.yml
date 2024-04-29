@@ -82,14 +82,14 @@ jobs:
          security delete-keychain signing_temp.keychain ${{runner.temp}}/keychain/notarization.keychain || true
       - name: Setup OSX key chain on macOS-arm
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: apple-actions/import-codesign-certs@v2
+        uses: slidoapp/import-codesign-certs@node20
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
       - name: Setup OSX key chain on OSX for app id cert
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: apple-actions/import-codesign-certs@v2
+        uses: slidoapp/import-codesign-certs@node20
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
