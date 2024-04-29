@@ -296,6 +296,8 @@ dependencies {
     // YAML formatting
     implementation 'org.yaml:snakeyaml:2.2'
 
+    implementation 'commons-io:commons-io:2.16.1'
+
     testImplementation 'io.github.classgraph:classgraph:4.8.170'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
