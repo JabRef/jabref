@@ -238,7 +238,7 @@ public class GlobalSearchBar extends HBox {
                 query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
 
         this.searchQueryProperty.addListener((obs, oldValue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
-        this.searchQueryProperty.addListener((obs, oldValue, newValue) -> searchQueryProperty.get().ifPresent(this::updateSearchResultsForQuery));
+        this.stateManager.activeDatabaseProperty().addListener(obs -> searchQueryProperty.get().ifPresent(this::updateSearchResultsForQuery));
         /*
          * The listener tracks a change on the focus property value.
          * This happens, from active (user types a query) to inactive / focus
