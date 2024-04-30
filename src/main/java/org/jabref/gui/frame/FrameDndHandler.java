@@ -26,8 +26,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FrameDndHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FrameDndHandler.class);
+
     private final TabPane tabPane;
     private final Supplier<Scene> scene;
     private final Supplier<OpenDatabaseAction> openDatabaseAction;
@@ -81,43 +85,63 @@ public class FrameDndHandler {
             tabDragEvent.setDropCompleted(true);
             tabDragEvent.consume();
         } else {
-            if (stateManager.getActiveDatabase().isEmpty()
-                || stateManager.getActiveDatabase().get().getMetaData().getGroups().isEmpty()) {
+            if (stateManager.getActiveDatabase().isEmpty()) {
+                LOGGER.warn("Active library is empty when dropping entries");
                 return;
             }
 
+            LibraryTab destinationLibraryTab = null;
             for (Tab libraryTab : tabPane.getTabs()) {
                 if (libraryTab.getId().equals(destinationTabNode.getId()) &&
                         !tabPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {
-                    LibraryTab destinationLibraryTab = (LibraryTab) libraryTab;
-                    if (hasGroups(dragboard)) {
-                        List<String> groupPathToSources = getGroups(dragboard);
-
-                        copyRootNode(destinationLibraryTab);
-
-                        GroupTreeNode destinationLibraryGroupRoot = destinationLibraryTab
-                                .getBibDatabaseContext()
-                                .getMetaData()
-                                .getGroups().get();
-
-                        GroupTreeNode groupsTreeNode = stateManager.getActiveDatabase().get()
-                                                                   .getMetaData()
-                                                                   .getGroups()
-                                                                   .get();
-
-                        for (String pathToSource : groupPathToSources) {
-                            GroupTreeNode groupTreeNodeToCopy = groupsTreeNode
-                                    .getChildByPath(pathToSource)
-                                    .get();
-                            copyGroupTreeNode((LibraryTab) libraryTab, destinationLibraryGroupRoot, groupTreeNodeToCopy);
-                        }
-                        return;
-                    }
-                    destinationLibraryTab.dropEntry(stateManager.getLocalDragboard().getBibEntries());
+                    destinationLibraryTab = (LibraryTab) libraryTab;
+                    break;
                 }
             }
+
+            if (destinationLibraryTab == null) {
+                LOGGER.warn("Failed to find library tab to drop into");
+                return;
+            }
+
+            if (hasEntries(dragboard)) {
+                List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries()
+                                                         .stream().map(entry -> (BibEntry) entry.clone())
+                                                         .toList();
+                destinationLibraryTab.dropEntry(entryCopies);
+            } else if (hasGroups(dragboard)) {
+                dropGroups(dragboard, destinationLibraryTab);
+            }
+
             tabDragEvent.consume();
         }
+    }
+
+    private void dropGroups(Dragboard dragboard, LibraryTab destinationLibraryTab) {
+        List<String> groupPathToSources = getGroups(dragboard);
+
+        copyRootNode(destinationLibraryTab);
+
+        GroupTreeNode destinationLibraryGroupRoot = destinationLibraryTab
+                .getBibDatabaseContext()
+                .getMetaData()
+                .getGroups().get();
+
+        GroupTreeNode groupsTreeNode = stateManager.getActiveDatabase().get()
+                                                   .getMetaData()
+                                                   .getGroups()
+                                                   .get();
+
+        for (String pathToSource : groupPathToSources) {
+            GroupTreeNode groupTreeNodeToCopy = groupsTreeNode
+                    .getChildByPath(pathToSource)
+                    .get();
+            copyGroupTreeNode(destinationLibraryTab, destinationLibraryGroupRoot, groupTreeNodeToCopy);
+        }
+    }
+
+    private boolean hasEntries(Dragboard dragboard) {
+        return dragboard.hasContent(DragAndDropDataFormats.ENTRIES);
     }
 
     private void onTabDragOver(DragEvent event, DragEvent tabDragEvent, Tab dndIndicator) {
