@@ -105,7 +105,10 @@ public class FrameDndHandler {
             }
 
             if (hasEntries(dragboard)) {
-                destinationLibraryTab.dropEntry(stateManager.getLocalDragboard().getBibEntries());
+                List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries()
+                                                         .stream().map(entry -> (BibEntry) entry.clone())
+                                                         .toList();
+                destinationLibraryTab.dropEntry(entryCopies);
             } else if (hasGroups(dragboard)) {
                 dropGroups(dragboard, destinationLibraryTab);
             }
