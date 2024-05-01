@@ -49,7 +49,7 @@ public class BibDatabaseContext {
      * Generate a random UID for unique of the concrete context
      * In contrast to hashCode this stays unique
      */
-    private final String uid = UUID.randomUUID().toString();
+    private final String uid = "bibdatabasecontext_" + UUID.randomUUID();
 
     /**
      * The path where this database was last saved to.
@@ -297,7 +297,7 @@ public class BibDatabaseContext {
     /**
      * Get the generated UID for the current context. Can be used to distinguish contexts with changing metadata etc
      *
-     * @return The generated UID in UUIDv4 format
+     * @return The generated UID in UUIDv4 format with the prefix bibdatabasecontext_
      */
     public String getUid() {
         return uid;
