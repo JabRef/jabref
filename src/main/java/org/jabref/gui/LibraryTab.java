@@ -857,6 +857,8 @@ public class LibraryTab extends Tab {
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
+        // clean up the groups map
+        stateManager.clearSelectedGroups(bibDatabaseContext);
     }
 
     /**
