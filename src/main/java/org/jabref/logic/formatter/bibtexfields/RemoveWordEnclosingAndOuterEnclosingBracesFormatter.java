@@ -30,7 +30,7 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
 
     @Override
     public String getKey() {
-        return "remove_braces";
+        return "remove_enclosing_and_outer_enclosing_braces";
     }
 
     @Override
