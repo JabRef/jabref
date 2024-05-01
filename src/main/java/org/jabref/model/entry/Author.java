@@ -174,6 +174,7 @@ public class Author {
      *
      * @return first name of the author (may consist of several tokens)
      */
+
     public Optional<String> getGivenName() {
         return Optional.ofNullable(givenName);
     }
