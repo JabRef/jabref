@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,12 +49,6 @@ public class DefaultLatexParser implements LatexParser {
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(
             "\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}".formatted(INCLUDE_GROUP));
 
-    private final LatexParserResults latexParserResults;
-
-    public DefaultLatexParser() {
-        this.latexParserResults = new LatexParserResults();
-    }
-
     @Override
     public LatexParserResult parse(String citeString) {
         Path path = Path.of("");
@@ -70,6 +63,7 @@ public class DefaultLatexParser implements LatexParser {
             LOGGER.error("File does not exist: {}", latexFile);
             return Optional.empty();
         }
+
         LatexParserResult latexParserResult = new LatexParserResult(latexFile);
 
         try (InputStream inputStream = Files.newInputStream(latexFile);
@@ -99,20 +93,9 @@ public class DefaultLatexParser implements LatexParser {
 
     @Override
     public LatexParserResults parse(List<Path> latexFiles) {
-        for (Path latexFile : latexFiles) {
-            if (!latexParserResults.isParsed(latexFile)) {
-                parse(latexFile).ifPresent(parsedTex -> latexParserResults.add(latexFile, parsedTex));
-            }
-        }
-
-        Set<Path> nonParsedNestedFiles = latexParserResults.getNonParsedNestedFiles();
-        // Parse all "non-parsed" files referenced by TEX files, recursively.
-        if (!nonParsedNestedFiles.isEmpty()) {
-            // modifies class variable latexParserResults
-            parse(nonParsedNestedFiles.stream().toList());
-        }
-
-        return latexParserResults;
+        LatexParserResults results = new LatexParserResults();
+        latexFiles.forEach(file -> parse(file).ifPresent(result -> results.add(file, result)));
+        return results;
     }
 
     /**

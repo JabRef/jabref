@@ -335,3 +335,12 @@ jobs:
           show-progress: 'false'
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
+  other_than_main:
+    name: Source branch is other than "main"
+    runs-on: ubuntu-latest
+    steps:
+      - if: github.head_ref == 'main'
+        uses: actions/github-script@v7
+        with:
+          script: |
+              core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read https://devdocs.jabref.org/contributing again carefully. 👈')

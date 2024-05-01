@@ -54,6 +54,9 @@ open module org.jabref {
     requires java.prefs;
     requires com.fasterxml.aalto;
 
+    // YAML
+    requires org.yaml.snakeyaml;
+
     // Annotations (@PostConstruct)
     requires jakarta.annotation;
     requires jakarta.inject;
@@ -88,13 +91,14 @@ open module org.jabref {
     uses org.mariadb.jdbc.credential.CredentialPlugin;
 
     // Apache Commons and other (similar) helper libraries
-    requires org.apache.commons.cli;
-    requires org.apache.commons.csv;
-    requires org.apache.commons.lang3;
-    requires org.apache.commons.text;
     requires com.google.common;
     requires io.github.javadiffutils;
     requires java.string.similarity;
+    requires org.apache.commons.cli;
+    requires org.apache.commons.csv;
+    requires org.apache.commons.io;
+    requires org.apache.commons.lang3;
+    requires org.apache.commons.text;
 
     requires com.github.tomtung.latex2unicode;
     requires fastparse;
@@ -146,5 +150,4 @@ open module org.jabref {
     requires de.saxsys.mvvmfx.validation;
     requires dd.plist;
     requires mslinks;
-    requires org.yaml.snakeyaml;
 }

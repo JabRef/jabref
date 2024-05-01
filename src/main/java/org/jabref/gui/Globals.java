@@ -5,6 +5,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
@@ -14,6 +15,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -65,6 +67,7 @@ public class Globals {
     private static KeyBindingRepository keyBindingRepository;
 
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
+    private static DefaultDirectoryMonitor directoryMonitor;
 
     private Globals() {
     }
@@ -92,6 +95,13 @@ public class Globals {
         return fileUpdateMonitor;
     }
 
+    public static DirectoryMonitor getDirectoryMonitor() {
+        if (directoryMonitor == null) {
+            directoryMonitor = new DefaultDirectoryMonitor();
+        }
+        return directoryMonitor;
+    }
+
     // Background tasks
     public static void startBackgroundTasks() {
         // TODO Currently deactivated due to incompatibilities in XML
@@ -109,6 +119,11 @@ public class Globals {
         if (fileUpdateMonitor != null) {
             fileUpdateMonitor.shutdown();
         }
+
+        if (directoryMonitor != null) {
+            directoryMonitor.shutdown();
+        }
+
         JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 

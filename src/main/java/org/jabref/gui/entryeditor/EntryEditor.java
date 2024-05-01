@@ -55,6 +55,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -73,6 +74,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling
  * the text fields to update themselves if the change is made from somewhere else.
+ * <p>
+ * The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
  */
 public class EntryEditor extends BorderPane {
 
@@ -82,6 +85,7 @@ public class EntryEditor extends BorderPane {
     private final BibDatabaseContext databaseContext;
     private final EntryEditorPreferences entryEditorPreferences;
     private final ExternalFilesEntryLinker fileLinker;
+    private final DirectoryMonitorManager directoryMonitorManager;
 
     private Subscription typeSubscription;
 
@@ -121,6 +125,7 @@ public class EntryEditor extends BorderPane {
     public EntryEditor(LibraryTab libraryTab) {
         this.libraryTab = libraryTab;
         this.databaseContext = libraryTab.getBibDatabaseContext();
+        this.directoryMonitorManager = libraryTab.getDirectoryMonitorManager();
 
         ViewLoader.view(this)
                   .root(this)
@@ -307,7 +312,7 @@ public class EntryEditor extends BorderPane {
                 bibEntryTypesManager,
                 keyBindingRepository);
         entryEditorTabs.add(sourceTab);
-        entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
+        entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
         entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
 
         return entryEditorTabs;
