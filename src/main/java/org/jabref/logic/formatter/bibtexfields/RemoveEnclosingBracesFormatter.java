@@ -15,7 +15,7 @@ public class RemoveEnclosingBracesFormatter extends Formatter {
 
     @Override
     public String getKey() {
-        return "remove_enclosing_braces";
+        return "remove_braces";
     }
 
     @Override
