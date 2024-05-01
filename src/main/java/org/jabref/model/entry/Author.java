@@ -21,9 +21,8 @@ public class Author {
      * Example: <code>authors = {Oliver Kopp and others}</code>. This is then appearing as "Oliver Kopp et al.".
      * In the context of BibTeX key generation, this is "Kopp+" (<code>+</code> for "et al.") and not "KO".
      */
+    public static final RemoveWordEnclosingAndOuterEnclosingBracesFormatter FORMATTER = new RemoveWordEnclosingAndOuterEnclosingBracesFormatter();
     public static final Author OTHERS = new Author("", "", null, "others", null);
-
-    private static final RemoveWordEnclosingAndOuterEnclosingBracesFormatter FORMATTER = new RemoveWordEnclosingAndOuterEnclosingBracesFormatter();
 
     private final String givenName;
     private final String givenNameAbbreviated;
