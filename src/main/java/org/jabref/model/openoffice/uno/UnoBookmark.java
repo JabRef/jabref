@@ -2,6 +2,8 @@ package org.jabref.model.openoffice.uno;
 
 import java.util.Optional;
 
+import org.jabref.model.openoffice.DocumentAnnotation;
+
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
@@ -54,7 +56,6 @@ public class UnoBookmark {
      *
      * @return The XNamed interface of the bookmark.
      * result.getName() should be checked by the caller, because its name may differ from the one requested.
-     * @param documentAnnotation The DocumentAnnotation object
      */
     public static XNamed create(DocumentAnnotation documentAnnotation)
             throws

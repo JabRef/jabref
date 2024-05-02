@@ -4,11 +4,11 @@ import java.util.Optional;
 
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.logic.openoffice.style.OOFormatBibliography;
+import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.style.CitedKeys;
 import org.jabref.model.openoffice.uno.CreationException;
-import org.jabref.model.openoffice.uno.DocumentAnnotation;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoBookmark;
 import org.jabref.model.openoffice.uno.UnoTextSection;
@@ -131,8 +131,8 @@ public class UpdateBibliography {
         initialParagraph.setString("");
 
         UnoBookmark.removeIfExists(doc, BIB_SECTION_END_NAME);
-        DocumentAnnotation annotation = new DocumentAnnotation(doc, BIB_SECTION_END_NAME, cursor, true);
-        UnoBookmark.create(annotation);
+        DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, BIB_SECTION_END_NAME, cursor, true);
+        UnoBookmark.create(documentAnnotation);
 
         cursor.collapseToEnd();
     }

@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.model.openoffice.DocumentAnnotation;
+
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
@@ -109,7 +111,6 @@ public class UnoReferenceMark {
      * <p>
      * Note: LibreOffice 6.4.6.2 will create multiple reference marks with the same name without error or renaming. Its GUI does not allow this, but we can create them programmatically. In the GUI, clicking on any of those identical names will move the cursor to the same mark.
      *
-     * @param documentAnnotation The DocumentAnnotation object that contains information about the document
      */
     public static XNamed create(DocumentAnnotation documentAnnotation)
             throws

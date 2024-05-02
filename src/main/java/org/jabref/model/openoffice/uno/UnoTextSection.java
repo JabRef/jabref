@@ -2,6 +2,8 @@ package org.jabref.model.openoffice.uno;
 
 import java.util.Optional;
 
+import org.jabref.model.openoffice.DocumentAnnotation;
+
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
@@ -63,8 +65,7 @@ public class UnoTextSection {
 
     /**
      * Create a text section with the provided name and insert it at the provided cursor.
-     *
-     * @param documentAnnotation The DocumentAnnotation object
+     * If an XTextSection by that name already exists, LibreOffice (6.4.6.2) creates a section with a name different from what we requested, in "Section {number}" format
      */
     public static XNamed create(DocumentAnnotation documentAnnotation)
             throws

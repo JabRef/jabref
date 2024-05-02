@@ -1,5 +1,7 @@
 package org.jabref.model.openoffice.uno;
 
+import org.jabref.model.openoffice.DocumentAnnotation;
+
 import com.sun.star.container.XNamed;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XTextContent;
@@ -16,7 +18,6 @@ public class UnoNamed {
      *                <p>
      *                Passed to this.asXMultiServiceFactory().createInstance(service) The result is expected to support the XNamed and XTextContent interfaces.
      * @return The XNamed interface, in case we need to check the actual name.
-     * @param documentAnnotation The DocumentAnnotation object that contains information about the document
      */
     static XNamed insertNamedTextContent(String service, DocumentAnnotation documentAnnotation)
             throws
