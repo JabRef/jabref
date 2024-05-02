@@ -372,25 +372,4 @@ public class JabRefCLI {
 
         return sb.toString();
     }
-
-    /**
-     * Creates and wraps a multi-line and colon-seperated string from a List of Strings.
-     */
-    protected static String wrapStringList(List<String> list, int firstLineIndentation) {
-        StringBuilder builder = new StringBuilder();
-        int lastBreak = -firstLineIndentation;
-
-        for (String line : list) {
-            if (((builder.length() + 2 + line.length()) - lastBreak) > WIDTH) {
-                builder.append(",\n");
-                lastBreak = builder.length();
-                builder.append(WRAPPED_LINE_PREFIX);
-            } else if (builder.length() > 0) {
-                builder.append(", ");
-            }
-            builder.append(line);
-        }
-
-        return builder.toString();
-    }
 }
