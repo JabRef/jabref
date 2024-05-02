@@ -189,9 +189,6 @@ public class JabRefCLI {
         options.addOption("v", "version", false, Localization.lang("Display version"));
         options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));
 
-        // The "-console" option is handled by the install4j launcher
-        options.addOption(null, "console", false, Localization.lang("Show console output (only when the launcher is used)"));
-
         options.addOption(Option
                 .builder("i")
                 .longOpt("import")
