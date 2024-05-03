@@ -194,7 +194,7 @@ public class ImportHandler {
         bibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);
-        addToGroups(entries, stateManager.getSelectedGroup(bibDatabaseContext));
+        addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
