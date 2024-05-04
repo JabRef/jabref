@@ -220,7 +220,7 @@ public class Author {
      * @return 'von Last'
      */
     public String getNamePrefixAndFamilyName() {
-        if (namePrefix == null) {
+        if (namePrefix == null || namePrefix.equals("")) {
             return getFamilyName().orElse("");
         } else {
             return familyName == null ? namePrefix : namePrefix + ' ' + familyName;
