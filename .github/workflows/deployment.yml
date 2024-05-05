@@ -142,6 +142,7 @@ jobs:
           --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module \
           --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module
       - name: Build pkg (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
@@ -172,6 +173,7 @@ jobs:
           --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module \
           --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
