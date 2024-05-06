@@ -268,7 +268,7 @@ dependencies {
     implementation group: 'org.jooq', name: 'jool', version: '0.9.15'
     // JAX-RS implemented by Jersey
     // API
-    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.1.0'
+    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:4.0.0'
     // Implementation of the API
     implementation 'org.glassfish.jersey.core:jersey-server:3.1.6'
     // injection framework
