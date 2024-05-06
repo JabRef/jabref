@@ -22,7 +22,7 @@ class FieldWriterTest {
 
     private FieldWriter writer;
 
-    public static Stream<Arguments> getMarkdowns() {
+    static Stream<Arguments> keepHashSignInComment() {
         return Stream.of(Arguments.of("""
                         # Changelog
 
@@ -54,6 +54,14 @@ class FieldWriterTest {
     void setUp() {
         FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(StandardField.MONTH), Collections.emptyList());
         writer = new FieldWriter(fieldPreferences);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void keepHashSignInComment(String text) throws Exception {
+        String writeResult = writer.write(StandardField.COMMENT, text);
+        String resultWithLfAsNewLineSeparator = StringUtil.unifyLineBreaks(writeResult, "\n");
+        assertEquals("{" + text + "}", resultWithLfAsNewLineSeparator);
     }
 
     @Test
@@ -139,13 +147,5 @@ class FieldWriterTest {
     void hashEnclosedWordsGetRealStringsInMonthField() throws Exception {
         String text = "#jan# - #feb#";
         assertEquals("jan # { - } # feb", writer.write(StandardField.MONTH, text));
-    }
-
-    @ParameterizedTest
-    @MethodSource("getMarkdowns")
-    void keepHashSignInComment(String text) throws Exception {
-        String writeResult = writer.write(StandardField.COMMENT, text);
-        String resultWithLfAsNewLineSeparator = StringUtil.unifyLineBreaks(writeResult, "\n");
-        assertEquals("{" + text + "}", resultWithLfAsNewLineSeparator);
     }
 }
