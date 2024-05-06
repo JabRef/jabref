@@ -25,6 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We replaced the word "Key bindings" with "Keyboard shortcuts" in the Preferences tab. [#11153](https://github.com/JabRef/jabref/pull/11153)
 - We slightly improved the duplicate check if ISBNs are present. [#8885](https://github.com/JabRef/jabref/issues/8885)
 - JabRef no longer downloads HTML files of websites when a PDF was not found. [#10149](https://github.com/JabRef/jabref/issues/10149)
+- Leading and trailing whitespaces are automatically removed from single-line fields.
 
 ### Fixed
 

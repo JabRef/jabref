@@ -89,7 +89,7 @@ class BibEntryWriterTest {
 
         String expected = """
                 @Article{,
-                  author = { two spaces before and after  },
+                  author = {two spaces before and after},
                 }
                 """.replace("\n", OS.NEWLINE);
 

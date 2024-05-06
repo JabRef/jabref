@@ -24,9 +24,10 @@ public class FieldContentFormatter {
     }
 
     /**
-     * Performs the reformatting of a field content. Note that "field content" is understood as
-     * the value in BibTeX's key/value pairs of content. For instance, <code>{author}</code> is passed as
-     * content. This allows for things like <code>jan { - } feb</code> to be passed.
+     * Performs the reformatting of a field content. Note that "field content" is  understood as
+     * the value in BibTeX's key/value pairs of content AND without enclosing braces. For instance,
+     * <code>{author}</code> OR <code>author</code> are passed as content. Depends on the caller (who decides whether
+     * strings have been resolved or not).
      *
      * @param fieldContent the content to format.
      * @param field        the name of the bibtex field
@@ -40,7 +41,7 @@ public class FieldContentFormatter {
             return fieldContent;
         }
 
-        String result = WHITESPACE.matcher(fieldContent).replaceAll(" ");
+        String result = WHITESPACE.matcher(fieldContent).replaceAll(" ").trim();
         if (result.startsWith("{ ")) {
             // Remove starting space
             result = "{" + result.substring(2);
@@ -52,6 +53,15 @@ public class FieldContentFormatter {
         return result;
     }
 
+    /**
+     * Performs the reformatting of a field content. Note that "field content" is understood as
+     * the value in BibTeX's key/value pairs of content. For instance, <code>{author}</code> is passed as
+     * content. This allows for things like <code>jan { - } feb</code> to be passed.
+     *
+     * @param fieldContent the content to format.
+     * @param field        the name of the bibtex field
+     * @return the formatted field content.
+     */
     public String format(StringBuilder fieldContent, Field field) {
         return format(fieldContent.toString(), field);
     }
