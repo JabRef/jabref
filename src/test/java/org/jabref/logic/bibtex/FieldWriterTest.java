@@ -148,4 +148,16 @@ class FieldWriterTest {
         String text = "#jan# - #feb#";
         assertEquals("jan # { - } # feb", writer.write(StandardField.MONTH, text));
     }
+
+    @Test
+    void hashWorksSimple() throws Exception {
+        String text = "#text";
+        assertEquals("{#text}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void escapedHashWorksSimple() throws Exception {
+        String text = "\\#text";
+        assertEquals("{\\#text}", writer.write(StandardField.MONTH, text));
+    }
 }

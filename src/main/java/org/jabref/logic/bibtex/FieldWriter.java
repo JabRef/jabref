@@ -110,39 +110,30 @@ public class FieldWriter {
         // jan # { - } # feb
         int pivot = 0;
         while (pivot < content.length()) {
-            int goFrom = pivot;
-            int pos1 = pivot;
-            while (goFrom == pos1) {
-                pos1 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, goFrom);
-                if ((pos1 > 0) && (content.charAt(pos1 - 1) == '\\')) {
-                    goFrom = pos1 + 1;
-                    pos1++;
-                } else {
-                    goFrom = pos1 - 1; // Ends the loop.
-                }
-            }
-
+            int pos1 = getFirstOccurrenceOfStartEndSymbol(content, pivot);
             int pos2;
             if (pos1 == -1) {
-                pos1 = content.length(); // No more occurrences found.
+                // Process content and end the loop after that
+                pos1 = content.length();
                 pos2 = -1;
             } else {
                 pos2 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, pos1 + 1);
-                if (pos2 == -1) {
-                    if (neverFailOnHashes) {
-                        pos1 = content.length(); // just write out the rest of the text, and throw no exception
-                    } else {
-                        LOGGER.error("The character {} is not allowed in BibTeX strings unless escaped as in '\\{}'. "
-                                + "In JabRef, use pairs of # characters to indicate a string. "
-                                + "Note that the entry causing the problem has been selected. Field value: {}",
-                                BIBTEX_STRING_START_END_SYMBOL,
-                                BIBTEX_STRING_START_END_SYMBOL,
-                                content);
-                        throw new InvalidFieldValueException(
-                                "The character " + BIBTEX_STRING_START_END_SYMBOL + " is not allowed in BibTeX strings unless escaped as in '\\" + BIBTEX_STRING_START_END_SYMBOL + "'.\n"
-                                        + "In JabRef, use pairs of # characters to indicate a string.\n"
-                                        + "Note that the entry causing the problem has been selected. Field value: " + content);
-                    }
+            }
+
+            if (pos2 == -1) {
+                if (neverFailOnHashes) {
+                    pos1 = content.length(); // just write out the rest of the text, and throw no exception
+                } else {
+                    LOGGER.error("The character {} is not allowed in BibTeX strings unless escaped as in '\\{}'. "
+                                    + "In JabRef, use pairs of # characters to indicate a string. "
+                                    + "Note that the entry causing the problem has been selected. Field value: {}",
+                            BIBTEX_STRING_START_END_SYMBOL,
+                            BIBTEX_STRING_START_END_SYMBOL,
+                            content);
+                    throw new InvalidFieldValueException(
+                            "The character " + BIBTEX_STRING_START_END_SYMBOL + " is not allowed in BibTeX strings unless escaped as in '\\" + BIBTEX_STRING_START_END_SYMBOL + "'.\n"
+                                    + "In JabRef, use pairs of # characters to indicate a string.\n"
+                                    + "Note that the entry causing the problem has been selected. Field value: " + content);
                 }
             }
 
@@ -165,6 +156,24 @@ public class FieldWriter {
         }
 
         return formatter.format(stringBuilder, field);
+    }
+
+    /**
+     * Finds the first occurrence of # from the pivot point
+     */
+    private static int getFirstOccurrenceOfStartEndSymbol(String content, int pivot) {
+        int goFrom = pivot;
+        int pos1 = pivot;
+        while (goFrom == pos1) {
+            pos1 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, goFrom);
+            if ((pos1 > 0) && (content.charAt(pos1 - 1) == '\\')) {
+                pos1++;
+                goFrom = pos1;
+            } else {
+                break;
+            }
+        }
+        return pos1;
     }
 
     private boolean shouldResolveStrings(Field field) {
