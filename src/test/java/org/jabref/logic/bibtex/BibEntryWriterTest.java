@@ -52,7 +52,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void serialization() throws IOException {
+    void serialization() throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 // set required fields
                 .withField(StandardField.AUTHOR, "Foo Bar")
@@ -74,6 +74,39 @@ class BibEntryWriterTest {
                 """.replace("\n", OS.NEWLINE);
 
         assertEquals(expected, stringWriter.toString());
+    }
+
+    /**
+     * Shows strange behavior: One space is deleted in front of the field.
+     */
+    @Test
+    void bibEntryContentSomehowTrimmed() throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "  two spaces before and after  ")
+                .withChanged(true);
+
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        String expected = """
+                @Article{,
+                  author = { two spaces before and after  },
+                }
+                """.replace("\n", OS.NEWLINE);
+
+        assertEquals(expected, stringWriter.toString());
+    }
+
+    @Test
+    void bibEntryNotModified() throws Exception {
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "  two spaces before and after  ")
+                .withChanged(true);
+
+        BibEntry original = (BibEntry) entry.clone();
+
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        assertEquals(original, entry);
     }
 
     @Test
