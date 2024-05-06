@@ -102,6 +102,8 @@ public class FieldWriter {
     private String formatAndResolveStrings(String content, Field field) throws InvalidFieldValueException {
         checkBraces(content);
 
+        content = content.replace("##", "");
+
         StringBuilder stringBuilder = new StringBuilder();
 
         // Here we assume that the user encloses any bibtex strings in #, e.g.:

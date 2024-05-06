@@ -160,4 +160,10 @@ class FieldWriterTest {
         String text = "\\#text";
         assertEquals("{\\#text}", writer.write(StandardField.MONTH, text));
     }
+
+    @Test
+    void doubleHashesRemoved() throws Exception {
+        String text = "te##xt";
+        assertEquals("{text}", writer.write(StandardField.MONTH, text));
+    }
 }
