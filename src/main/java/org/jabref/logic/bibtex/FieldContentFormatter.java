@@ -1,12 +1,10 @@
 package org.jabref.logic.bibtex;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.FieldFactory;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted
@@ -18,18 +16,11 @@ public class FieldContentFormatter {
     // 's' matches a space, tab, new line, carriage return.
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
-    private final Set<Field> multiLineFields;
+    private final FieldPreferences preferences;
 
     public FieldContentFormatter(FieldPreferences preferences) {
         Objects.requireNonNull(preferences);
-
-        multiLineFields = new HashSet<>();
-        // the following two are also coded in org.jabref.logic.bibtex.LatexFieldFormatter.format(String, String)
-        multiLineFields.add(StandardField.ABSTRACT);
-        multiLineFields.add(StandardField.COMMENT);
-        multiLineFields.add(StandardField.REVIEW);
-        // the file field should not be formatted, therefore we treat it as a multi line field
-        multiLineFields.addAll(preferences.getNonWrappableFields());
+        this.preferences = preferences;
     }
 
     /**
@@ -40,14 +31,14 @@ public class FieldContentFormatter {
      * @return the formatted field content.
      */
     public String format(String fieldContent, Field field) {
-        if (multiLineFields.contains(field)) {
+        if (FieldFactory.isMultiLineField(field, preferences.getNonWrappableFields())) {
             // Keep the field as is.
             // Newlines are normalized at org.jabref.logic.exporter.BibWriter
             // Alternative: StringUtil.unifyLineBreaks(fieldContent, OS.NEWLINE)
             return fieldContent;
         }
 
-        return WHITESPACE.matcher(fieldContent).replaceAll(" ");
+        return WHITESPACE.matcher(fieldContent).replaceAll(" ").trim();
     }
 
     public String format(StringBuilder fieldContent, Field field) {
