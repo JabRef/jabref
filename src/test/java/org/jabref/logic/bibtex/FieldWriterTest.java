@@ -166,4 +166,28 @@ class FieldWriterTest {
         String text = "te##xt";
         assertEquals("{text}", writer.write(StandardField.MONTH, text));
     }
+
+    @Test
+    void multipleSpacesShrunkOnSingleLineField() throws Exception {
+        String text = "t  w  o";
+        assertEquals("{t w o}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void spacesAreTrimmed() throws Exception {
+        String text = "  text      ";
+        assertEquals("{text}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void multipleSpacesKeptOnMultiLineField() throws Exception {
+        String text = "t  w  o";
+        assertEquals("{t  w  o}", writer.write(StandardField.COMMENT, text));
+    }
+
+    @Test
+    void spacesAreKeptAtMultilineField() throws Exception {
+        String text = "  text      ";
+        assertEquals("{  text      }", writer.write(StandardField.COMMENT, text));
+    }
 }
