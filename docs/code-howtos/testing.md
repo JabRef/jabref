@@ -36,7 +36,7 @@ Then, you will find <build/reports/jacoco/test/html/index.html> which shows the 
 
 ## Lists in tests
 
-Instead of 
+Instead of
 
 ```java
 assertTrue(actualList.isEmpty());
