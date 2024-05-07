@@ -575,16 +575,18 @@ databaseTest.mustRunAfter jacocoPrepare
 fetcherTest.mustRunAfter jacocoPrepare
 
 jacocoTestReport {
+    dependsOn jacocoPrepare, test, fetcherTest, databaseTest
+
     executionData files(
-            "$buildDir/jacoco/test.exec",
-            "$buildDir/jacoco/databaseTest.exec",
-            "$buildDir/jacoco/fetcherTest.exec").filter { it.exists() }
-    dependsOn jacocoPrepare, test, databaseTest, fetcherTest
+            layout.buildDirectory.file('jacoco/test.exec').get().asFile,
+            layout.buildDirectory.file('jacoco/fetcherTest.exec').get().asFile,
+            layout.buildDirectory.file('jacoco/databaseTest.exec').get().asFile)
 
     reports {
-        csv.getRequired().set(true)
-        html.getRequired().set(true)
-        xml.getRequired().set(true) // coveralls plugin depends on xml format report
+        csv.required = true
+        html.required = true
+        // coveralls plugin depends on xml format report
+        xml.required = true
     }
 }
 
