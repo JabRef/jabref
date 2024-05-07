@@ -359,7 +359,7 @@ processResources {
                 "biodiversityHeritageApiKey": System.getenv('BiodiversityHeritageApiKey') ? System.getenv('BiodiversityHeritageApiKey') : '',
                 "semanticScholarApiKey": System.getenv('SemanticScholarApiKey') ? System.getenv("SemanticScholarApiKey") : ''
         )
-        filteringCharset = 'UTF-8'9797
+        filteringCharset = 'UTF-8'
     }
 
     filesMatching(["resources/resource/ods/meta.xml", "resources/resource/openoffice/meta.xml"]) {
