@@ -45,17 +45,17 @@ public class Author {
     public Author(String givenName, String givenNameAbbreviated, String namePrefix, String familyName, String nameSuffix) {
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
-        if (givenName != null && !givenName.equals("")) {
+        if (!StringUtil.isBlank(givenName)) {
             this.givenName = addDotIfAbbreviation(FORMATTER.format(givenName));
         } else {
             this.givenName = null;
         }
-        if (givenNameAbbreviated != null && !givenNameAbbreviated.equals("")) {
+        if (!StringUtil.isBlank(givenNameAbbreviated)) {
             this.givenNameAbbreviated = FORMATTER.format(givenNameAbbreviated);
         } else {
             this.givenNameAbbreviated = null;
         }
-        if (namePrefix != null && !namePrefix.equals("")) {
+        if (!StringUtil.isBlank(namePrefix)) {
             this.namePrefix = FORMATTER.format(namePrefix);
         } else {
             this.namePrefix = null;
@@ -65,13 +65,13 @@ public class Author {
             // https://github.com/JabRef/jabref/issues/10031
             this.familyName = familyName;
         } else {
-            if (familyName != null && !familyName.equals("")) {
+            if (!StringUtil.isBlank(familyName)) {
                 this.familyName = FORMATTER.format(familyName);
             } else {
                 this.familyName = null;
             }
         }
-        if (nameSuffix != null && !nameSuffix.equals("")) {
+        if (!StringUtil.isBlank(nameSuffix)) {
             this.nameSuffix = FORMATTER.format(nameSuffix);
         } else {
             this.nameSuffix = null;
@@ -240,7 +240,7 @@ public class Author {
      * @return 'von Last'
      */
     public String getNamePrefixAndFamilyName() {
-        if (namePrefix == null || namePrefix.equals("")) {
+        if (namePrefix == null || "".equals(namePrefix)) {
             return getFamilyName().orElse("");
         } else {
             return familyName == null ? namePrefix : namePrefix + ' ' + familyName;
