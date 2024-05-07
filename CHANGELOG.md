@@ -25,7 +25,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We replaced the word "Key bindings" with "Keyboard shortcuts" in the Preferences tab. [#11153](https://github.com/JabRef/jabref/pull/11153)
 - We slightly improved the duplicate check if ISBNs are present. [#8885](https://github.com/JabRef/jabref/issues/8885)
 - JabRef no longer downloads HTML files of websites when a PDF was not found. [#10149](https://github.com/JabRef/jabref/issues/10149)
-- Leading and trailing whitespaces are automatically removed from single-line fields.
+- Leading and trailing whitespaces are automatically removed from single-line fields. [#11282](https://github.com/JabRef/jabref/pull/11282)
 
 ### Fixed
 
@@ -35,7 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed crash on opening the entry editor when auto-completion is enabled. [#11188](https://github.com/JabRef/jabref/issues/11188)
 - We fixed the usage of the key binding for "Clear search" (default: <kbd>Escape</kbd>). [#10764](https://github.com/JabRef/jabref/issues/10764)
 - We fixed an issue where library shown as unsaved and marked (*) after accepting changes made externally to the file. [#11027](https://github.com/JabRef/jabref/issues/11027)
-- User-specific comment fields now keep double space characters.
+- User-specific comment fields now keep double space characters. [#11282](https://github.com/JabRef/jabref/pull/11282)
 - We fixed an issue where drag and dropping entries from one library to another was not always working. [#11254](https://github.com/JabRef/jabref/issues/11254)
 - We fixed an issue where drag and dropping entries created a shallow copy. [#11160](https://github.com/JabRef/jabref/issues/11160)
 - We fixed an issue where imports to a custom group would only work for the first entry [#11085](https://github.com/JabRef/jabref/issues/11085), [#11269](https://github.com/JabRef/jabref/issues/11269)
