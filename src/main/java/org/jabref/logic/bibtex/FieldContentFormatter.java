@@ -16,6 +16,8 @@ public class FieldContentFormatter {
     // 's' matches a space, tab, new line, carriage return.
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
+    private static Pattern RTRIM = Pattern.compile("\\s+$");
+
     private final FieldPreferences preferences;
 
     public FieldContentFormatter(FieldPreferences preferences) {
@@ -35,10 +37,11 @@ public class FieldContentFormatter {
      */
     public String format(String fieldContent, Field field) {
         if (FieldFactory.isMultiLineField(field, preferences.getNonWrappableFields())) {
-            // Keep the field as is.
+            // In general, keep the field as is.
+            // However, we need to right trim the field for a nice display in the .bib file
             // Newlines are normalized at org.jabref.logic.exporter.BibWriter
             // Alternative: StringUtil.unifyLineBreaks(fieldContent, OS.NEWLINE)
-            return fieldContent;
+            return RTRIM.matcher(fieldContent).replaceAll("");
         }
 
         String result = WHITESPACE.matcher(fieldContent).replaceAll(" ").trim();

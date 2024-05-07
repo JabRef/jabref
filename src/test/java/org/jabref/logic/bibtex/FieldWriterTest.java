@@ -42,8 +42,7 @@ class FieldWriterTest {
                                 #### Achievement\s
                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                                 #### Method
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                                """
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit,"""
                 ),
                 // source: https://github.com/JabRef/jabref/issues/8303 --> bug2.txt
                 Arguments.of("Particularly, we equip SOVA &#x2013; a Semantic and Ontological Variability Analysis method")
@@ -186,8 +185,14 @@ class FieldWriterTest {
     }
 
     @Test
-    void spacesAreKeptAtMultilineField() throws Exception {
+    void leadingSpacesAreKeptAtMultilineField() throws Exception {
         String text = "  text      ";
-        assertEquals("{  text      }", writer.write(StandardField.COMMENT, text));
+        assertEquals("{  text}", writer.write(StandardField.COMMENT, text));
+    }
+
+    @Test
+    void finalNewLineIsRemovedAtMultilineField() throws Exception {
+        String text = "  text      " + OS.NEWLINE;
+        assertEquals("{  text}", writer.write(StandardField.COMMENT, text));
     }
 }

@@ -427,6 +427,10 @@ public class BibtexDatabaseWriterTest {
 
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
+        // .gitattributes sets the .bib files to have LF line endings
+        // This needs to be reflected here
+        bibWriter = new BibWriter(stringWriter, "\n");
+        initializeDatabaseWriter();
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
     }
@@ -556,6 +560,10 @@ public class BibtexDatabaseWriterTest {
 
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
+        // .gitattributes sets the .bib files to have LF line endings
+        // This needs to be reflected here
+        bibWriter = new BibWriter(stringWriter, "\n");
+        initializeDatabaseWriter();
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
     }
@@ -635,6 +643,10 @@ public class BibtexDatabaseWriterTest {
 
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
+        // .gitattributes sets the .bib files to have LF line endings
+        // This needs to be reflected here
+        bibWriter = new BibWriter(stringWriter, "\n");
+        initializeDatabaseWriter();
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(Path.of("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"), encoding), stringWriter.toString());
     }
@@ -652,6 +664,10 @@ public class BibtexDatabaseWriterTest {
 
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
+        // .gitattributes sets the .bib files to have LF line endings
+        // This needs to be reflected here
+        bibWriter = new BibWriter(stringWriter, "\n");
+        initializeDatabaseWriter();
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
 
         assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
@@ -665,6 +681,10 @@ public class BibtexDatabaseWriterTest {
 
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
+        // .gitattributes sets the .bib files to have LF line endings
+        // This needs to be reflected here
+        bibWriter = new BibWriter(stringWriter, "\n");
+        initializeDatabaseWriter();
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
     }
