@@ -49,7 +49,7 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatt
             throw new NullPointerException();
         }
         if (StringUtil.isBlank(input)) {
-            return null;
+            return input;
         }
 
         if (!input.contains("{")) {

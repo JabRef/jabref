@@ -45,36 +45,36 @@ public class Author {
     public Author(String givenName, String givenNameAbbreviated, String namePrefix, String familyName, String nameSuffix) {
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
-        if (givenName != null) {
+        if (givenName != null && !givenName.equals("")) {
             this.givenName = addDotIfAbbreviation(FORMATTER.format(givenName));
         } else {
-            this.givenName = givenName;
+            this.givenName = null;
         }
-        if (givenNameAbbreviated != null) {
+        if (givenNameAbbreviated != null && !givenNameAbbreviated.equals("")) {
             this.givenNameAbbreviated = FORMATTER.format(givenNameAbbreviated);
         } else {
-            this.givenNameAbbreviated = givenNameAbbreviated;
+            this.givenNameAbbreviated = null;
         }
-        if (namePrefix != null) {
+        if (namePrefix != null && !namePrefix.equals("")) {
             this.namePrefix = FORMATTER.format(namePrefix);
         } else {
-            this.namePrefix = namePrefix;
+            this.namePrefix = null;
         }
         if (keepBracesAtLastPart) {
             // We do not remove braces here to keep institutions protected
             // https://github.com/JabRef/jabref/issues/10031
             this.familyName = familyName;
         } else {
-            if (familyName != null) {
+            if (familyName != null && !familyName.equals("")) {
                 this.familyName = FORMATTER.format(familyName);
             } else {
-                this.familyName = familyName;
+                this.familyName = null;
             }
         }
-        if (nameSuffix != null) {
+        if (nameSuffix != null && !nameSuffix.equals("")) {
             this.nameSuffix = FORMATTER.format(nameSuffix);
         } else {
-            this.nameSuffix = nameSuffix;
+            this.nameSuffix = null;
         }
     }
 
