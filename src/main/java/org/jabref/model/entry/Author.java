@@ -45,17 +45,37 @@ public class Author {
     public Author(String givenName, String givenNameAbbreviated, String namePrefix, String familyName, String nameSuffix) {
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
-        this.givenName = addDotIfAbbreviation(FORMATTER.format(givenName));
-        this.givenNameAbbreviated = FORMATTER.format(givenNameAbbreviated);
-        this.namePrefix = FORMATTER.format(namePrefix);
+        if (givenName != null) {
+            this.givenName = addDotIfAbbreviation(FORMATTER.format(givenName));
+        } else {
+            this.givenName = givenName;
+        }
+        if (givenNameAbbreviated != null) {
+            this.givenNameAbbreviated = FORMATTER.format(givenNameAbbreviated);
+        } else {
+            this.givenNameAbbreviated = givenNameAbbreviated;
+        }
+        if (namePrefix != null) {
+            this.namePrefix = FORMATTER.format(namePrefix);
+        } else {
+            this.namePrefix = namePrefix;
+        }
         if (keepBracesAtLastPart) {
             // We do not remove braces here to keep institutions protected
             // https://github.com/JabRef/jabref/issues/10031
             this.familyName = familyName;
         } else {
-            this.familyName = FORMATTER.format(familyName);
+            if (familyName != null) {
+                this.familyName = FORMATTER.format(familyName);
+            } else {
+                this.familyName = familyName;
+            }
         }
-        this.nameSuffix = FORMATTER.format(nameSuffix);
+        if (nameSuffix != null) {
+            this.nameSuffix = FORMATTER.format(nameSuffix);
+        } else {
+            this.nameSuffix = nameSuffix;
+        }
     }
 
     public static String addDotIfAbbreviation(String name) {
