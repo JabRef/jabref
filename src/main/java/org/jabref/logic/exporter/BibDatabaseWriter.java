@@ -15,7 +15,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
@@ -25,9 +24,7 @@ import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
-import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -84,17 +81,6 @@ public abstract class BibDatabaseWriter {
                 changes.addAll(actions.applySaveActions(entry));
             }
         });
-
-        // Run standard cleanups
-        List<FieldFormatterCleanup> preSaveCleanups =
-                Stream.of(new TrimWhitespaceFormatter())
-                      .map(formatter -> new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, formatter))
-                      .toList();
-        for (FieldFormatterCleanup formatter : preSaveCleanups) {
-            for (BibEntry entry : toChange) {
-                changes.addAll(formatter.cleanup(entry));
-            }
-        }
 
         return changes;
     }
