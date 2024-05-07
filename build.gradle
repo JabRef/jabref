@@ -162,9 +162,9 @@ dependencies {
     implementation "org.apache.lucene:lucene-analysis-common:$luceneVersion"
     implementation "org.apache.lucene:lucene-highlighter:$luceneVersion"
 
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.11.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
     implementation 'com.h2database:h2-mvstore:2.2.224'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
@@ -218,7 +218,7 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.2'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.10.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.12.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.openjfx'
@@ -268,7 +268,7 @@ dependencies {
     implementation group: 'org.jooq', name: 'jool', version: '0.9.15'
     // JAX-RS implemented by Jersey
     // API
-    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.1.0'
+    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:4.0.0'
     // Implementation of the API
     implementation 'org.glassfish.jersey.core:jersey-server:3.1.6'
     // injection framework
@@ -298,7 +298,7 @@ dependencies {
 
     implementation 'commons-io:commons-io:2.16.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.170'
+    testImplementation 'io.github.classgraph:classgraph:4.8.172'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
 
