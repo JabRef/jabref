@@ -525,6 +525,12 @@ testlogger {
     showStackTraces false
 }
 
+tasks.withType(Test) {
+    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
+    // Enable parallel tests. See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
+    maxParallelForks = Runtime.runtime.availableProcessors() - 1
+}
+
 tasks.register('databaseTest', Test) {
     useJUnitPlatform {
         includeTags 'DatabaseTest'
@@ -543,6 +549,8 @@ tasks.register('fetcherTest', Test) {
     useJUnitPlatform {
         includeTags 'FetcherTest'
     }
+
+    maxParallelForks = 1
 }
 
 tasks.register('guiTest', Test) {
@@ -555,6 +563,8 @@ tasks.register('guiTest', Test) {
         events = ["FAILED"]
         exceptionFormat "full"
     }
+
+    maxParallelForks = 1
 }
 
 // Test result tasks
@@ -563,12 +573,6 @@ tasks.register('copyTestResources', Copy) {
     into "${buildDir}/classes/test"
 }
 processTestResources.dependsOn copyTestResources
-
-tasks.withType(Test) {
-    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
-    // Enable parallel tests. See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
-    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-}
 
 tasks.register('jacocoPrepare') {
     doFirst {
