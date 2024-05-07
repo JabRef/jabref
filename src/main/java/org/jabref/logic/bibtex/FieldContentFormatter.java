@@ -20,7 +20,7 @@ public class FieldContentFormatter {
 
     private final Set<Field> multiLineFields;
 
-    public FieldContentFormatter(FieldContentFormatterPreferences preferences) {
+    public FieldContentFormatter(FieldPreferences preferences) {
         Objects.requireNonNull(preferences);
 
         multiLineFields = new HashSet<>();

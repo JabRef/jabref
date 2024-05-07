@@ -8,27 +8,27 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class RemoveWhitespaceTest {
 
     @Test
-    public void testEmptyExpectEmpty() {
+    public void emptyExpectEmpty() {
         assertEquals("", new RemoveWhitespace().format(""));
     }
 
     @Test
-    public void testNullExpectNull() {
+    public void nullExpectNull() {
         assertNull(new RemoveWhitespace().format(null));
     }
 
     @Test
-    public void testNormal() {
+    public void normal() {
         assertEquals("abcd EFG", new RemoveWhitespace().format("abcd EFG"));
     }
 
     @Test
-    public void testTab() {
+    public void tab() {
         assertEquals("abcd EFG", new RemoveWhitespace().format("abcd\t EFG"));
     }
 
     @Test
-    public void testNewLineCombo() {
+    public void newLineCombo() {
         assertEquals("abcd EFG", new RemoveWhitespace().format("abcd\r E\nFG\r\n"));
     }
 }

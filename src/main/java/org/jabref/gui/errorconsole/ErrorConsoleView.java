@@ -6,9 +6,11 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -26,6 +28,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -41,6 +44,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
     @FXML private Label descriptionLabel;
 
     @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
     @Inject private KeyBindingRepository keyBindingRepository;
@@ -63,7 +67,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ErrorConsoleViewModel(dialogService, clipBoardManager, buildInfo);
+        viewModel = new ErrorConsoleViewModel(dialogService, preferencesService, clipBoardManager, buildInfo);
         messagesListView.setCellFactory(createCellFactory());
         messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
         messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);
@@ -108,7 +112,16 @@ public class ErrorConsoleView extends BaseDialog<Void> {
                     graphic.getStyleClass().setAll(event.getStyleClass());
                     graphic.getChildren().setAll(icon, message);
                     setGraphic(graphic);
+                    setContextMenu(createContextMenu(event));
                 }
+            }
+
+            private ContextMenu createContextMenu(LogEventViewModel selectedLogEntry) {
+                ContextMenu contextMenu = new ContextMenu();
+                MenuItem copyItem = new MenuItem("Copy");
+                copyItem.setOnAction(event -> viewModel.copyLogEntry(selectedLogEntry));
+                contextMenu.getItems().add(copyItem);
+                return contextMenu;
             }
         };
     }

@@ -34,6 +34,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
     private final StringProperty link = new SimpleStringProperty("");
     private final StringProperty description = new SimpleStringProperty("");
+    private final StringProperty sourceUrl = new SimpleStringProperty("");
     private final ListProperty<ExternalFileType> allExternalFileTypes = new SimpleListProperty<>(FXCollections.emptyObservableList());
     private final ObjectProperty<ExternalFileType> selectedExternalFileType = new SimpleObjectProperty<>();
     private final ObservableOptionalValue<ExternalFileType> monadicSelectedExternalFileType;
@@ -93,6 +94,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
     public void setValues(LinkedFile linkedFile) {
         description.set(linkedFile.getDescription());
+        sourceUrl.set(linkedFile.getSourceUrl());
 
         if (linkedFile.isOnlineLink()) {
             link.setValue(linkedFile.getLink()); // Might be an URL
@@ -119,6 +121,10 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         return description;
     }
 
+    public StringProperty sourceUrlProperty() {
+        return sourceUrl;
+    }
+
     public ListProperty<ExternalFileType> externalFileTypeProperty() {
         return allExternalFileTypes;
     }
@@ -132,12 +138,12 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
 
         if (LinkedFile.isOnlineLink(link.getValue())) {
             try {
-                return new LinkedFile(description.getValue(), new URL(link.getValue()), fileType);
+                return new LinkedFile(description.getValue(), new URL(link.getValue()), fileType, sourceUrl.getValue());
             } catch (MalformedURLException e) {
-                return new LinkedFile(description.getValue(), link.getValue(), fileType);
+                return new LinkedFile(description.getValue(), link.getValue(), fileType, sourceUrl.getValue());
             }
         }
-        return new LinkedFile(description.getValue(), Path.of(link.getValue()), fileType);
+        return new LinkedFile(description.getValue(), Path.of(link.getValue()), fileType, sourceUrl.getValue());
     }
 
     private String relativize(Path filePath) {

@@ -1,34 +1,34 @@
-name: Automerge Pull Requests
-on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - labeled
+name: Auto Merge
+on: [pull_request_target, workflow_dispatch]
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   automerge:
-    name: Automerge Dependency Updates
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || contains(github.event.pull_request.labels.*.name, 'dependencies')
+    # Run only if PR is inside JabRef's main repository and created by dependabot or by an update workflow
+    if: >
+      (github.repository == 'JabRef/jabref') && 
+      (github.event.pull_request.head.repo.full_name == 'JabRef/jabref') &&
+      (
+        (github.actor == 'dependabot[bot]') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') || 
+          startsWith(github.event.pull_request.title, 'Bump ') || 
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     steps:
-      - name: 'Wait for status checks'
-        id: waitforstatuschecks
-        uses: "WyriHaximus/github-action-wait-for-status@v1.7.1"
-        with:
-          ignoreActions: Automerge Dependabot,Code coverage,Create snapcraft image,Deploy binaries on builds.jabref.org,codecov/project,markdown-link-check
-          checkInterval: 13
+      - name: Approve PR
+        run: gh pr review --approve "$PR_URL"
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Auto approve
-        uses: hmarr/auto-approve-action@v3.2.1
-        if: steps.waitforstatuschecks.outputs.status == 'success'
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Merge pull requests
-        uses: pascalgn/automerge-action@v0.15.6
-        if: steps.waitforstatuschecks.outputs.status == 'success'
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
+      - name: Merge PR
+        run: gh pr merge --auto --squash "$PR_URL"
         env:
-          MERGE_METHOD: "merge"
-          MERGE_LABELS: ""
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER}}

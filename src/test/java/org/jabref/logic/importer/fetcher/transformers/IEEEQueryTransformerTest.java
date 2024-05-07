@@ -46,7 +46,7 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         transformer.transformLuceneQuery(luceneQuery);
 
-        assertEquals("\"Nature\"", transformer.getJournal().get());
+        assertEquals(Optional.of("Nature"), transformer.getJournal());
     }
 
     @Override
@@ -60,8 +60,8 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         transformer.transformLuceneQuery(luceneQuery);
 
-        assertEquals(2021, transformer.getStartYear());
-        assertEquals(2021, transformer.getEndYear());
+        assertEquals(Optional.of(2021), transformer.getStartYear());
+        assertEquals(Optional.of(2021), transformer.getEndYear());
     }
 
     @Override
@@ -72,8 +72,8 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         transformer.transformLuceneQuery(luceneQuery);
 
-        assertEquals(2018, transformer.getStartYear());
-        assertEquals(2021, transformer.getEndYear());
+        assertEquals(Optional.of(2018), transformer.getStartYear());
+        assertEquals(Optional.of(2021), transformer.getEndYear());
     }
 
     private static Stream<Arguments> getTitleTestData() {
@@ -86,7 +86,7 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
 
     @ParameterizedTest
     @MethodSource("getTitleTestData")
-    public void testStopWordRemoval(String expected, String queryString) throws Exception {
+    public void stopWordRemoval(String expected, String queryString) throws Exception {
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> result = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.ofNullable(expected), result);

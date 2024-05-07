@@ -62,4 +62,3 @@ Chosen option: "Gradle", because it is lean and fits our development style.
 ## Links
 
 * GADR: [https://github.com/adr/gadr-java/blob/master/gadr-java--build-tool.md](https://github.com/adr/gadr-java/blob/master/gadr-java--build-tool.md)
-

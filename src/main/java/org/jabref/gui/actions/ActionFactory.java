@@ -78,11 +78,14 @@ public class ActionFactory {
     public MenuItem configureMenuItem(Action action, Command command, MenuItem menuItem) {
         ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu), menuItem);
         setGraphic(menuItem, action);
+        enableTooltips(command, menuItem);
+        return menuItem;
+    }
 
-        // Show tooltips
-        if (command instanceof SimpleCommand) {
+    private static void enableTooltips(Command command, MenuItem menuItem) {
+        if (command instanceof SimpleCommand simpleCommand) {
             EasyBind.subscribe(
-                    ((SimpleCommand) command).statusMessageProperty(),
+                    simpleCommand.statusMessageProperty(),
                     message -> {
                         Label label = getAssociatedNode(menuItem);
                         if (label != null) {
@@ -96,8 +99,6 @@ public class ActionFactory {
                     }
             );
         }
-
-        return menuItem;
     }
 
     public MenuItem createMenuItem(Action action, Command command) {

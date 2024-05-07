@@ -10,7 +10,7 @@ import org.jabref.model.pdf.FileAnnotationType;
 
 public class FileAnnotationViewModel {
 
-    private static final String NEWLINE = String.format("%n");
+    private static final String NEWLINE = "%n".formatted();
     private final FileAnnotation annotation;
     private StringProperty author = new SimpleStringProperty();
     private StringProperty page = new SimpleStringProperty();
@@ -31,7 +31,7 @@ public class FileAnnotationViewModel {
             this.content.set(annotation.getLinkedFileAnnotation().getContent());
             String annotationContent = annotation.getContent();
             String illegibleTextMessage = Localization.lang("The marked area does not contain any legible text!");
-            String markingContent = (annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
+            String markingContent = annotationContent.isEmpty() ? illegibleTextMessage : annotationContent;
             this.marking.set(removePunctuationMark(markingContent));
         } else {
             String content = annotation.getContent();
@@ -88,19 +88,19 @@ public class FileAnnotationViewModel {
     @Override
     public String toString() {
         if (annotation.hasLinkedAnnotation() && this.getContent().isEmpty()) {
-            if (FileAnnotationType.UNDERLINE.equals(annotation.getAnnotationType())) {
+            if (FileAnnotationType.UNDERLINE == annotation.getAnnotationType()) {
                 return Localization.lang("Empty Underline");
             }
-            if (FileAnnotationType.HIGHLIGHT.equals(annotation.getAnnotationType())) {
+            if (FileAnnotationType.HIGHLIGHT == annotation.getAnnotationType()) {
                 return Localization.lang("Empty Highlight");
             }
             return Localization.lang("Empty Marking");
         }
 
-        if (FileAnnotationType.UNDERLINE.equals(annotation.getAnnotationType())) {
+        if (FileAnnotationType.UNDERLINE == annotation.getAnnotationType()) {
             return Localization.lang("Underline") + ": " + this.getContent();
         }
-        if (FileAnnotationType.HIGHLIGHT.equals(annotation.getAnnotationType())) {
+        if (FileAnnotationType.HIGHLIGHT == annotation.getAnnotationType()) {
             return Localization.lang("Highlight") + ": " + this.getContent();
         }
 

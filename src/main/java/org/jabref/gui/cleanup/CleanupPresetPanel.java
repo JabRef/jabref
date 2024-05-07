@@ -27,11 +27,13 @@ public class CleanupPresetPanel extends VBox {
     @FXML private Label cleanupRenamePDFLabel;
     @FXML private CheckBox cleanUpDOI;
     @FXML private CheckBox cleanUpEprint;
+    @FXML private CheckBox cleanUpURL;
     @FXML private CheckBox cleanUpISSN;
     @FXML private CheckBox cleanUpMovePDF;
     @FXML private CheckBox cleanUpMakePathsRelative;
     @FXML private CheckBox cleanUpRenamePDF;
     @FXML private CheckBox cleanUpRenamePDFonlyRelativePaths;
+    @FXML private CheckBox cleanUpDeletedFiles;
     @FXML private CheckBox cleanUpUpgradeExternalLinks;
     @FXML private CheckBox cleanUpBiblatex;
     @FXML private CheckBox cleanUpBibtex;
@@ -70,6 +72,7 @@ public class CleanupPresetPanel extends VBox {
                                             .concat(": ")
                                             .concat(filePreferences.getFileNamePattern());
         cleanupRenamePDFLabel.setText(currentPattern);
+
         cleanUpBibtex.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {
@@ -100,6 +103,7 @@ public class CleanupPresetPanel extends VBox {
     private void updateDisplay(CleanupPreferences preset) {
         cleanUpDOI.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
         cleanUpEprint.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
+        cleanUpURL.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_URL));
         if (!cleanUpMovePDF.isDisabled()) {
             cleanUpMovePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF));
         }
@@ -107,6 +111,7 @@ public class CleanupPresetPanel extends VBox {
         cleanUpRenamePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF));
         cleanUpRenamePDFonlyRelativePaths.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
         cleanUpUpgradeExternalLinks.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
+        cleanUpDeletedFiles.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
         cleanUpBiblatex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX));
         cleanUpBibtex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
         cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
@@ -129,6 +134,9 @@ public class CleanupPresetPanel extends VBox {
         if (cleanUpEprint.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEANUP_EPRINT);
         }
+        if (cleanUpURL.isSelected()) {
+            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_URL);
+        }
         if (cleanUpISSN.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         }
@@ -144,6 +152,9 @@ public class CleanupPresetPanel extends VBox {
         }
         if (cleanUpUpgradeExternalLinks.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
+        }
+        if (cleanUpDeletedFiles.isSelected()) {
+            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES);
         }
         if (cleanUpBiblatex.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX);

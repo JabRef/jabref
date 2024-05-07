@@ -124,7 +124,7 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
         textGraphicTranslateBinding = Bindings.createDoubleBinding(
                 () -> switch (getSkinnable().getAlignment()) {
                     case TOP_CENTER, CENTER, BOTTOM_CENTER, BASELINE_CENTER -> 0.0;
-                    default -> -(arrowButton.getWidth());
+                    default -> -arrowButton.getWidth();
                 }, getSkinnable().alignmentProperty(), arrowButton.widthProperty());
         text.translateXProperty().bind(textGraphicTranslateBinding);
 
@@ -189,8 +189,8 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
             @Override
             public StyleableProperty<ArrowSide> getStyleableProperty(TitledPane styleable) {
                 Skin<?> skin = styleable.getSkin();
-                if (skin instanceof CustomTitledPaneSkin) {
-                    return ((CustomTitledPaneSkin) skin).arrowSide;
+                if (skin instanceof CustomTitledPaneSkin paneSkin) {
+                    return paneSkin.arrowSide;
                 }
                 return null;
             }

@@ -23,7 +23,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -72,7 +71,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             // replace "and" by ";" as citation matching API uses ";" for separation
             AuthorList authors = AuthorList.parse(entry.getFieldOrAlias(StandardField.AUTHOR).get());
             String authorsWithSemicolon = authors.getAuthors().stream()
-                                                 .map(author -> author.getLastFirst(false))
+                                                 .map(author -> author.getFamilyGiven(false))
                                                  .collect(Collectors.joining(";"));
             uriBuilder.addParameter("a", authorsWithSemicolon);
         }
@@ -90,7 +89,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             JSONArray result = response.getBody()
                                        .getObject()
                                        .getJSONArray("results");
-            if (result.length() > 0) {
+            if (!result.isEmpty()) {
                 zblid = result.getJSONObject(0)
                               .get("zbl_id")
                               .toString();
@@ -125,7 +124,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(preferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(preferences);
     }
 
     @Override

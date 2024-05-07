@@ -25,7 +25,6 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -229,7 +228,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
         List<BibEntry> list = new ArrayList<>();
         for (String bib : urls) {
-            BibtexParser parser = new BibtexParser(formatPreferences, new DummyFileUpdateMonitor());
+            BibtexParser parser = new BibtexParser(formatPreferences);
             Optional<BibEntry> entry;
             try {
                 entry = parser.parseSingleEntry(bib);
@@ -243,7 +242,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
 
     private BufferedReader getInputStream(String urlString) {
         try {
-            URL url = new URL((urlString));
+            URL url = new URL(urlString);
             return new BufferedReader(new InputStreamReader(url.openStream()));
         } catch (IOException e) {
             LOGGER.debug("Wrong URL:", e);

@@ -57,6 +57,12 @@ class FileFieldParserTest {
                         "Desc:File.PDF:PDF"
                 ),
 
+                // Mendeley input
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", Path.of("C:/Users/XXXXXX/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Brown - 2017 - Physical test methods for elastomers.pdf"), "pdf")),
+                        ":C$\\backslash$:/Users/XXXXXX/AppData/Local/Mendeley Ltd./Mendeley Desktop/Downloaded/Brown - 2017 - Physical test methods for elastomers.pdf:pdf"
+                ),
+
                 // parseCorrectOnlineInput
                 Arguments.of(
                         Collections.singletonList(new LinkedFile(new URL("http://arxiv.org/pdf/2010.08497v1"), "PDF")),
@@ -146,8 +152,8 @@ class FileFieldParserTest {
 
                 // tooManySeparators
                 Arguments.of(
-                        Collections.singletonList(new LinkedFile("desc", Path.of("file.pdf"), "PDF")),
-                        "desc:file.pdf:PDF:asdf"
+                        Collections.singletonList(new LinkedFile("desc", Path.of("file.pdf"), "PDF", "qwer")),
+                        "desc:file.pdf:PDF:qwer:asdf:uiop"
                 ),
 
                 // www inside filename
@@ -177,7 +183,37 @@ class FileFieldParserTest {
                 Arguments.of(
                              Collections.singletonList(new LinkedFile("desc", new URL("http://ceur-ws.org/Vol-438"), "URL")),
                              "desc:http\\://ceur-ws.org/Vol-438:URL"
-               )
+                ),
+                // link with source url
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("arXiv Fulltext PDF", "matheus.ea explicit.pdf", "PDF", "https://arxiv.org/pdf/1109.0517.pdf")),
+                        "arXiv Fulltext PDF:matheus.ea explicit.pdf:PDF:https\\://arxiv.org/pdf/1109.0517.pdf"
+                ),
+                // link without description and with source url
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", "matheus.ea explicit.pdf", "PDF", "https://arxiv.org/pdf/1109.0517.pdf")),
+                        ":matheus.ea explicit.pdf:PDF:https\\://arxiv.org/pdf/1109.0517.pdf"
+                ),
+                // no link but with source url
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("arXiv Fulltext PDF", "", "PDF", "https://arxiv.org/pdf/1109.0517.pdf")),
+                        "arXiv Fulltext PDF::PDF:https\\://arxiv.org/pdf/1109.0517.pdf"
+                ),
+                // No description or file type but with sourceURL
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", "matheus.ea explicit.pdf", "", "https://arxiv.org/pdf/1109.0517.pdf")),
+                        ":matheus.ea explicit.pdf::https\\://arxiv.org/pdf/1109.0517.pdf"
+                ),
+                // Absolute path
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", "A:\\Zotero\\storage\\test.pdf", "")),
+                        ":A:\\Zotero\\storage\\test.pdf"
+                ),
+                // zotero absolute path
+                Arguments.of(
+                        Collections.singletonList(new LinkedFile("", "A:\\Zotero\\storage\\test.pdf", "")),
+                        "A:\\Zotero\\storage\\test.pdf"
+                )
         );
     }
 

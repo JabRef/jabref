@@ -67,14 +67,14 @@ public class ActionHelper {
         Binding<Boolean> fileIsPresent = EasyBind.valueAt(selectedEntries, 0).mapOpt(entry -> {
             List<LinkedFile> files = entry.getFiles();
 
-            if ((entry.getFiles().size() > 0) && stateManager.getActiveDatabase().isPresent()) {
-                if (files.get(0).isOnlineLink()) {
+            if ((!entry.getFiles().isEmpty()) && stateManager.getActiveDatabase().isPresent()) {
+                if (files.getFirst().isOnlineLink()) {
                     return true;
                 }
 
                 Optional<Path> filename = FileUtil.find(
                         stateManager.getActiveDatabase().get(),
-                        files.get(0).getLink(),
+                        files.getFirst().getLink(),
                         preferencesService.getFilePreferences());
                 return filename.isPresent();
             } else {

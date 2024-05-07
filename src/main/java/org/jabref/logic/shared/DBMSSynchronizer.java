@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
@@ -52,12 +52,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final EventBus eventBus;
     private Connection currentConnection;
     private final Character keywordSeparator;
-    private final GlobalCitationKeyPattern globalCiteKeyPattern;
+    private final GlobalCitationKeyPatterns globalCiteKeyPattern;
     private final FileUpdateMonitor fileMonitor;
     private Optional<BibEntry> lastEntryChanged;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
-                            GlobalCitationKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
+                            GlobalCitationKeyPatterns globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -70,8 +70,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Inserts a new {@link BibEntry} into shared database.
-     *
-     * @param event {@link EntriesAddedEvent} object
      */
     @Subscribe
     public void listen(EntriesAddedEvent event) {
@@ -89,8 +87,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Updates an existing shared {@link BibEntry}.
-     *
-     * @param event {@link FieldChangedEvent} object
      */
     @Subscribe
     public void listen(FieldChangedEvent event) {
@@ -110,10 +106,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Deletes the given list of {@link BibEntry} from shared database.
-     *
-     * @param event {@link EntriesRemovedEvent} object
      */
-
     @Subscribe
     public void listen(EntriesRemovedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
@@ -128,8 +121,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
     /**
      * Listening method. Synchronizes the shared {@link MetaData} and applies them locally.
-     *
-     * @param event
      */
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
@@ -282,7 +273,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /**
      * Synchronizes all shared meta data.
      */
-    private void synchronizeSharedMetaData(MetaData data, GlobalCitationKeyPattern globalCiteKeyPattern) {
+    private void synchronizeSharedMetaData(MetaData data, GlobalCitationKeyPatterns globalCiteKeyPattern) {
         if (!checkCurrentConnection()) {
             return;
         }
@@ -382,7 +373,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      */
     public boolean isEventSourceAccepted(EntriesEvent event) {
         EntriesEventSource eventSource = event.getEntriesEventSource();
-        return ((eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO));
+        return (eventSource == EntriesEventSource.LOCAL) || (eventSource == EntriesEventSource.UNDO);
     }
 
     @Override

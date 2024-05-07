@@ -111,7 +111,7 @@ public class CitationStyle {
                 text = CSLUtils.readURLToString(url, StandardCharsets.UTF_8.toString());
             } else {
                 // if the url is null then the style is located outside the classpath
-                text = new String(Files.readAllBytes(Path.of(styleFile)), StandardCharsets.UTF_8);
+                text = Files.readString(Path.of(styleFile));
             }
             return createCitationStyleFromSource(text, styleFile);
         } catch (NoSuchFileException e) {
@@ -141,8 +141,11 @@ public class CitationStyle {
             return STYLES;
         }
 
-        URL url = CitationStyle.class.getResource(STYLES_ROOT + "/acm-siggraph.csl");
-        Objects.requireNonNull(url);
+        URL url = CitationStyle.class.getResource(STYLES_ROOT + DEFAULT);
+        if (url == null) {
+            LOGGER.error("Could not find any citation style. Tried with {}.", DEFAULT);
+            return Collections.emptyList();
+        }
 
         try {
             URI uri = url.toURI();

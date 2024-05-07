@@ -24,7 +24,6 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -79,7 +78,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     @Override
     public Parser getParser() {
         return inputStream -> {
-            BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+            BibtexParser parser = new BibtexParser(importFormatPreferences);
             String text = new BufferedReader(
                     new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
 
@@ -128,7 +127,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
             return Optional.empty();
         }
 
-        String url = elements.get(0).attr("href");
+        String url = elements.getFirst().attr("href");
         return Optional.of(new URL(url));
     }
 

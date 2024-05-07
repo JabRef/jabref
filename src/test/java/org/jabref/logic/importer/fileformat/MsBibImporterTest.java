@@ -18,19 +18,19 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class MsBibImporterTest {
 
     @Test
-    public void testsGetExtensions() {
+    public void sGetExtensions() {
         MsBibImporter importer = new MsBibImporter();
         assertEquals(StandardFileType.XML, importer.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         MsBibImporter importer = new MsBibImporter();
         assertEquals("Importer for the MS Office 2007 XML bibliography format.", importer.getDescription());
     }
 
     @Test
-    public final void testIsNotRecognizedFormat() throws Exception {
+    public final void isNotRecognizedFormat() throws Exception {
         MsBibImporter testImporter = new MsBibImporter();
         List<String> notAccepted = Arrays.asList("CopacImporterTest1.txt", "IsiImporterTest1.isi",
                 "IsiImporterTestInspec.isi", "emptyFile.xml", "IsiImporterTestWOS.isi");
@@ -41,7 +41,7 @@ public class MsBibImporterTest {
     }
 
     @Test
-    public final void testImportEntriesEmpty() throws IOException, URISyntaxException {
+    public final void importEntriesEmpty() throws IOException, URISyntaxException {
         MsBibImporter testImporter = new MsBibImporter();
         Path file = Path.of(MsBibImporter.class.getResource("EmptyMsBib_Test.xml").toURI());
         List<BibEntry> entries = testImporter.importDatabase(file).getDatabase().getEntries();
@@ -49,7 +49,7 @@ public class MsBibImporterTest {
     }
 
     @Test
-    public final void testImportEntriesNotRecognizedFormat() throws IOException, URISyntaxException {
+    public final void importEntriesNotRecognizedFormat() throws IOException, URISyntaxException {
         MsBibImporter testImporter = new MsBibImporter();
         Path file = Path.of(MsBibImporter.class.getResource("CopacImporterTest1.txt").toURI());
         List<BibEntry> entries = testImporter.importDatabase(file).getDatabase().getEntries();
@@ -57,13 +57,13 @@ public class MsBibImporterTest {
     }
 
     @Test
-    public final void testGetFormatName() {
+    public final void getFormatName() {
         MsBibImporter testImporter = new MsBibImporter();
         assertEquals("MSBib", testImporter.getName());
     }
 
     @Test
-    public final void testGetCommandLineId() {
+    public final void getCommandLineId() {
         MsBibImporter testImporter = new MsBibImporter();
         assertEquals("msbib", testImporter.getId());
     }

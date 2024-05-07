@@ -1,5 +1,6 @@
 package org.jabref.logic.bibtex;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -51,8 +52,8 @@ class FieldWriterTest {
 
     @BeforeEach
     void setUp() {
-        FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(true, List.of(StandardField.MONTH), new FieldContentFormatterPreferences());
-        writer = new FieldWriter(fieldWriterPreferences);
+        FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(StandardField.MONTH), Collections.emptyList());
+        writer = new FieldWriter(fieldPreferences);
     }
 
     @Test

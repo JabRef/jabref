@@ -3,6 +3,7 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +12,6 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -63,15 +63,15 @@ public class GrobidService {
                 .data("consolidateCitations", String.valueOf(consolidateCitations.getCode()))
                 .method(Connection.Method.POST)
                 .ignoreContentType(true)
-                .timeout(20000)
+                .timeout(100_000)
                 .execute();
         String httpResponse = response.body();
 
-        if (httpResponse == null || httpResponse.equals("@misc{-1,\n  author = {}\n}\n") || httpResponse.equals("@misc{-1,\n  author = {" + rawCitation + "}\n}\n")) { // This filters empty BibTeX entries
+        if (httpResponse == null || "@misc{-1,\n  author = {}\n}\n".equals(httpResponse) || httpResponse.equals("@misc{-1,\n  author = {" + rawCitation + "}\n}\n")) { // This filters empty BibTeX entries
             throw new IOException("The GROBID server response does not contain anything.");
         }
 
-        return BibtexParser.singleFromString(httpResponse, importFormatPreferences, new DummyFileUpdateMonitor());
+        return BibtexParser.singleFromString(httpResponse, importFormatPreferences);
     }
 
     public List<BibEntry> processPDF(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
@@ -85,13 +85,41 @@ public class GrobidService {
 
         String httpResponse = response.body();
 
-        if (httpResponse == null || httpResponse.equals("@misc{-1,\n  author = {}\n}\n")) { // This filters empty BibTeX entries
+        return getBibEntries(importFormatPreferences, httpResponse);
+    }
+
+    public List<BibEntry> processReferences(List<Path> pathList, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
+        List<BibEntry> entries = new ArrayList<>();
+        for (Path filePath: pathList) {
+            entries.addAll(processReferences(filePath, importFormatPreferences));
+        }
+
+        return entries;
+    }
+
+    public List<BibEntry> processReferences(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
+        Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + "/api/processReferences")
+                                            .header("Accept", MediaTypes.APPLICATION_BIBTEX)
+                                            .data("input", filePath.toString(), Files.newInputStream(filePath))
+                                            .data("consolidateCitations", String.valueOf(ConsolidateCitations.WITH_METADATA))
+                                            .method(Connection.Method.POST)
+                                            .ignoreContentType(true)
+                                            .timeout(20000)
+                                            .execute();
+
+        String httpResponse = response.body();
+
+        return getBibEntries(importFormatPreferences, httpResponse);
+    }
+
+    private static List<BibEntry> getBibEntries(ImportFormatPreferences importFormatPreferences, String httpResponse) throws IOException, ParseException {
+        if (httpResponse == null || "@misc{-1,\n  author = {}\n}\n".equals(httpResponse)) { // This filters empty BibTeX entries
             throw new IOException("The GROBID server response does not contain anything.");
         }
 
-        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
         List<BibEntry> result = parser.parseEntries(httpResponse);
-        result.forEach((entry) -> entry.setCitationKey(""));
+        result.forEach(entry -> entry.setCitationKey(""));
         return result;
     }
 }

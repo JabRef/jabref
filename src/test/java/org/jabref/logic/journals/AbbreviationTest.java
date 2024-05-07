@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class AbbreviationTest {
 
     @Test
-    void testAbbreviationsWithTrailingSpaces() {
+    void abbreviationsWithTrailingSpaces() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.");
 
         assertEquals("Long Name", abbreviation.getName());
@@ -18,7 +18,7 @@ class AbbreviationTest {
     }
 
     @Test
-    void testAbbreviationsWithTrailingSpacesWithShortestUniqueAbbreviation() {
+    void abbreviationsWithTrailingSpacesWithShortestUniqueAbbreviation() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.", "LN");
 
         assertEquals("Long Name", abbreviation.getName());
@@ -28,7 +28,7 @@ class AbbreviationTest {
     }
 
     @Test
-    void testAbbreviationsWithSemicolons() {
+    void abbreviationsWithSemicolons() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.;LN;M");
 
         assertEquals("Long Name", abbreviation.getName());
@@ -38,7 +38,7 @@ class AbbreviationTest {
     }
 
     @Test
-    void testAbbreviationsWithSemicolonsWithShortestUniqueAbbreviation() {
+    void abbreviationsWithSemicolonsWithShortestUniqueAbbreviation() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.;LN;M", "LNLNM");
 
         assertEquals("Long Name", abbreviation.getName());
@@ -48,7 +48,7 @@ class AbbreviationTest {
     }
 
     @Test
-    void testGetNextElement() {
+    void getNextElement() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.");
 
         assertEquals("L. N.", abbreviation.getNext("Long Name"));
@@ -57,7 +57,7 @@ class AbbreviationTest {
     }
 
     @Test
-    void testGetNextElementWithShortestUniqueAbbreviation() {
+    void getNextElementWithShortestUniqueAbbreviation() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.", "LN");
 
         assertEquals("L. N.", abbreviation.getNext("Long Name"));
@@ -67,7 +67,7 @@ class AbbreviationTest {
     }
 
     @Test
-    void testGetNextElementWithTrailingSpaces() {
+    void getNextElementWithTrailingSpaces() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.");
 
         assertEquals("L. N.", abbreviation.getNext("Long Name"));
@@ -76,7 +76,7 @@ class AbbreviationTest {
     }
 
     @Test
-    void testGetNextElementWithTrailingSpacesWithShortestUniqueAbbreviation() {
+    void getNextElementWithTrailingSpacesWithShortestUniqueAbbreviation() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.", "LN");
 
         assertEquals("L. N.", abbreviation.getNext("Long Name"));
@@ -86,29 +86,29 @@ class AbbreviationTest {
     }
 
     @Test
-    void testDefaultAndMedlineAbbreviationsAreSame() {
+    void defaultAndMedlineAbbreviationsAreSame() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N");
         assertEquals(abbreviation.getAbbreviation(), abbreviation.getDotlessAbbreviation());
     }
 
     @Test
-    void testDefaultAndMedlineAbbreviationsAreSameWithShortestUniqueAbbreviation() {
+    void defaultAndMedlineAbbreviationsAreSameWithShortestUniqueAbbreviation() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
         assertEquals(abbreviation.getAbbreviation(), abbreviation.getDotlessAbbreviation());
     }
 
     @Test
-    void testDefaultAndShortestUniqueAbbreviationsAreSame() {
+    void defaultAndShortestUniqueAbbreviationsAreSame() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N");
         assertEquals(abbreviation.getAbbreviation(), abbreviation.getShortestUniqueAbbreviation());
     }
 
     @Test
-    void testEquals() {
-      Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
-      Abbreviation otherAbbreviation = new Abbreviation("Long Name", "L N", "LN");
-      assertEquals(abbreviation, otherAbbreviation);
-      assertNotEquals(abbreviation, "String");
+    void equals() {
+        Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
+        Abbreviation otherAbbreviation = new Abbreviation("Long Name", "L N", "LN");
+        assertEquals(abbreviation, otherAbbreviation);
+        assertNotEquals("String", abbreviation);
     }
 
     @Test

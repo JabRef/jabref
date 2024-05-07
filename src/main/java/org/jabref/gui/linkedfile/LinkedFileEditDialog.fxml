@@ -47,6 +47,10 @@
             <Label text="Filetype" GridPane.rowIndex="2"/>
             <ComboBox fx:id="fileType"
                       GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2"/>
+
+            <Label text="%Source URL" GridPane.rowIndex="3"/>
+            <TextField fx:id="sourceUrl" prefHeight="25.0"
+                       GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3"/>
         </GridPane>
     </content>
 </DialogPane>

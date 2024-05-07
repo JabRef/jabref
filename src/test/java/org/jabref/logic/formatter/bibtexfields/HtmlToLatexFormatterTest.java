@@ -23,6 +23,11 @@ public class HtmlToLatexFormatterTest {
     }
 
     @Test
+    public void formatIeeeHtml() {
+        assertEquals("Towards situation-aware adaptive workflows: SitOPT --- A general purpose situation-aware workflow management system", formatter.format("Towards situation-aware adaptive workflows: SitOPT &amp;#x2014; A general purpose situation-aware workflow management system"));
+    }
+
+    @Test
     public void formatMultipleHtmlCharacters() {
         assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", formatter.format("&aring;&auml;&ouml;"));
     }
@@ -33,12 +38,12 @@ public class HtmlToLatexFormatterTest {
     }
 
     @Test
-    public void testBasic() {
+    public void basic() {
         assertEquals("aaa", formatter.format("aaa"));
     }
 
     @Test
-    public void testHTML() {
+    public void html() {
         assertEquals("{\\\"{a}}", formatter.format("&auml;"));
         assertEquals("{\\\"{a}}", formatter.format("&#228;"));
         assertEquals("{\\\"{a}}", formatter.format("&#xe4;"));
@@ -46,12 +51,12 @@ public class HtmlToLatexFormatterTest {
     }
 
     @Test
-    public void testHTMLRemoveTags() {
+    public void htmlRemoveTags() {
         assertEquals("aaa", formatter.format("<b>aaa</b>"));
     }
 
     @Test
-    public void testHTMLCombiningAccents() {
+    public void htmlCombiningAccents() {
         assertEquals("{\\\"{a}}", formatter.format("a&#776;"));
         assertEquals("{\\\"{a}}", formatter.format("a&#x308;"));
         assertEquals("{\\\"{a}}b", formatter.format("a&#776;b"));

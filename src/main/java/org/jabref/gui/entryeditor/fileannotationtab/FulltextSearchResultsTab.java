@@ -24,6 +24,7 @@ import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -38,12 +39,14 @@ import org.slf4j.LoggerFactory;
 
 public class FulltextSearchResultsTab extends EntryEditorTab {
 
+    public static final String NAME = "Search results";
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
 
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
+    private final TaskExecutor taskExecutor;
 
     private final TextFlow content;
 
@@ -51,11 +54,15 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private DocumentViewerView documentViewerView;
 
-    public FulltextSearchResultsTab(StateManager stateManager, PreferencesService preferencesService, DialogService dialogService) {
+    public FulltextSearchResultsTab(StateManager stateManager,
+                                    PreferencesService preferencesService,
+                                    DialogService dialogService,
+                                    TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        this.taskExecutor = taskExecutor;
 
         content = new TextFlow();
         ScrollPane scrollPane = new ScrollPane(content);
@@ -98,7 +105,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             // Iterate through pages (within file) with search hits
             for (SearchResult searchResult : resultsForPath.getValue()) {
                 for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
-                    content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replaceAll("</b> <b>", " ")));
+                    content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
                     content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(searchResult.getPageNumber()));
                 }
                 if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
@@ -107,7 +114,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                     content.getChildren().add(annotationsText);
                 }
                 for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
-                    content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replaceAll("</b> <b>", " ")));
+                    content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
                     content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(searchResult.getPageNumber()));
                 }
             }
@@ -126,7 +133,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         fileLinkText.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY.equals(event.getButton())) {
                 try {
-                    JabRefDesktop.openBrowser(resolvedPath.toUri());
+                    JabRefDesktop.openBrowser(resolvedPath.toUri(), preferencesService.getFilePreferences());
                 } catch (IOException e) {
                     LOGGER.error("Cannot open {}.", resolvedPath.toString(), e);
                 }
@@ -153,8 +160,10 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private ContextMenu getFileContextMenu(LinkedFile file) {
         ContextMenu fileContextMenu = new ContextMenu();
-        fileContextMenu.getItems().add(actionFactory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferencesService, entry, file)));
-        fileContextMenu.getItems().add(actionFactory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferencesService)));
+        fileContextMenu.getItems().add(actionFactory.createMenuItem(
+                StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferencesService, entry, file, taskExecutor)));
+        fileContextMenu.getItems().add(actionFactory.createMenuItem(
+                StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferencesService, taskExecutor)));
         return fileContextMenu;
     }
 

@@ -16,42 +16,42 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class FileFieldWriterTest {
 
     @Test
-    public void testQuoteStandard() {
+    public void quoteStandard() {
         assertEquals("a", FileFieldWriter.quote("a"));
     }
 
     @Test
-    public void testQuoteAllCharacters() {
+    public void quoteAllCharacters() {
         assertEquals("a\\:\\;\\\\", FileFieldWriter.quote("a:;\\"));
     }
 
     @Test
-    public void testQuoteEmpty() {
+    public void quoteEmpty() {
         assertEquals("", FileFieldWriter.quote(""));
     }
 
     @Test
-    public void testQuoteNull() {
+    public void quoteNull() {
         assertNull(FileFieldWriter.quote(null));
     }
 
     private static Stream<Arguments> getEncodingTestData() {
         return Stream.of(
-                Arguments.of("a:b;c:d", new String[][] {{"a", "b"}, {"c", "d"}}),
-                Arguments.of("a:;c:d", new String[][] {{"a", ""}, {"c", "d"}}),
-                Arguments.of("a:" + null + ";c:d", new String[][] {{"a", null}, {"c", "d"}}),
-                Arguments.of("a:\\:b;c\\;:d", new String[][] {{"a", ":b"}, {"c;", "d"}})
+                Arguments.of("a:b;c:d", new String[][]{{"a", "b"}, {"c", "d"}}),
+                Arguments.of("a:;c:d", new String[][]{{"a", ""}, {"c", "d"}}),
+                Arguments.of("a:" + null + ";c:d", new String[][]{{"a", null}, {"c", "d"}}),
+                Arguments.of("a:\\:b;c\\;:d", new String[][]{{"a", ":b"}, {"c;", "d"}})
         );
     }
 
     @ParameterizedTest
     @MethodSource("getEncodingTestData")
-    public void testEncodeStringArray(String expected, String[][] values) {
+    public void encodeStringArray(String expected, String[][] values) {
         assertEquals(expected, FileFieldWriter.encodeStringArray(values));
     }
 
     @Test
-    public void testFileFieldWriterGetStringRepresentation() {
+    public void fileFieldWriterGetStringRepresentation() {
         LinkedFile file = new LinkedFile("test", Path.of("X:\\Users\\abc.pdf"), "PDF");
         assertEquals("test:X\\:/Users/abc.pdf:PDF", FileFieldWriter.getStringRepresentation(file));
     }

@@ -2,6 +2,9 @@ package org.jabref.gui.keyboard;
 
 import org.jabref.logic.l10n.Localization;
 
+/**
+ * @implNote Cannot be sorted alphabetically, as {@link KeyBindingRepository#getKeyCombination(KeyBinding)} iterates over the enum in order and returns the first match.
+ */
 public enum KeyBinding {
     EDITOR_DELETE("Delete", Localization.lang("Delete text"), "", KeyBindingCategory.EDITOR),
     // DELETE BACKWARDS = Rubout
@@ -32,7 +35,10 @@ public enum KeyBinding {
     CLOSE("Close dialog", Localization.lang("Close dialog"), "Esc", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl+C", KeyBindingCategory.EDIT),
     COPY_TITLE("Copy title", Localization.lang("Copy title"), "ctrl+shift+alt+T", KeyBindingCategory.EDIT),
-    COPY_CITE_CITATION_KEY("Copy \\cite{citation key}", Localization.lang("Copy \\cite{citation key}"), "ctrl+K", KeyBindingCategory.EDIT),
+
+    // We migrated from "Copy \\cite{citation key}" to "Copy citation key with configured cite command", therefore we keep the "old string" for backwards comppatibility
+    COPY_CITE_CITATION_KEY("Copy \\cite{citation key}", Localization.lang("Copy citation key with configured cite command"), "ctrl+K", KeyBindingCategory.EDIT),
+
     COPY_CITATION_KEY("Copy citation key", Localization.lang("Copy citation key"), "ctrl+shift+K", KeyBindingCategory.EDIT),
     COPY_CITATION_KEY_AND_TITLE("Copy citation key and title", Localization.lang("Copy citation key and title"), "ctrl+shift+alt+K", KeyBindingCategory.EDIT),
     COPY_CITATION_KEY_AND_LINK("Copy citation key and link", Localization.lang("Copy citation key and link"), "ctrl+alt+K", KeyBindingCategory.EDIT),
@@ -43,7 +49,7 @@ public enum KeyBinding {
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE", KeyBindingCategory.BIBTEX),
     DEFAULT_DIALOG_ACTION("Execute default action in dialog", Localization.lang("Execute default action in dialog"), "ctrl+ENTER", KeyBindingCategory.VIEW),
     DOWNLOAD_FULL_TEXT("Download full text documents", Localization.lang("Download full text documents"), "alt+F7", KeyBindingCategory.QUALITY),
-    EDIT_ENTRY("Open / close entry editor", Localization.lang("Open / close entry editor"), "ctrl+E", KeyBindingCategory.VIEW),
+    OPEN_CLOSE_ENTRY_EDITOR("Open / close entry editor", Localization.lang("Open / close entry editor"), "ctrl+E", KeyBindingCategory.VIEW),
     EXPORT("Export", Localization.lang("Export"), "ctrl+alt+e", KeyBindingCategory.FILE),
     EXPORT_SELECTED("Export Selected", Localization.lang("Export selected entries"), "ctrl+shift+e", KeyBindingCategory.FILE),
     EDIT_STRINGS("Edit strings", Localization.lang("Edit strings"), "ctrl+T", KeyBindingCategory.BIBTEX),
@@ -56,6 +62,7 @@ public enum KeyBinding {
     FILE_LIST_EDITOR_MOVE_ENTRY_UP("File list editor, move entry up", Localization.lang("File list editor, move entry up"), "ctrl+UP", KeyBindingCategory.VIEW),
     FIND_UNLINKED_FILES("Search for unlinked local files", Localization.lang("Search for unlinked local files"), "shift+F7", KeyBindingCategory.QUALITY),
     FOCUS_ENTRY_TABLE("Focus entry table", Localization.lang("Focus entry table"), "alt+1", KeyBindingCategory.VIEW),
+    FOCUS_GROUP_LIST("Focus group list", Localization.lang("Focus group list"), "alt+s", KeyBindingCategory.VIEW),
     HELP("Help", Localization.lang("Help"), "F1", KeyBindingCategory.FILE),
     IMPORT_INTO_CURRENT_DATABASE("Import into current library", Localization.lang("Import into current library"), "ctrl+I", KeyBindingCategory.FILE),
     IMPORT_INTO_NEW_DATABASE("Import into new library", Localization.lang("Import into new library"), "ctrl+alt+I", KeyBindingCategory.FILE),
@@ -80,10 +87,10 @@ public enum KeyBinding {
     OPEN_FILE("Open file", Localization.lang("Open file"), "F4", KeyBindingCategory.TOOLS),
     OPEN_FOLDER("Open folder", Localization.lang("Open folder"), "ctrl+shift+O", KeyBindingCategory.TOOLS),
     OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt+0", KeyBindingCategory.TOOLS),
+    SHOW_PREFS("Preferences", Localization.lang("Preferences"), "ctrl+,", KeyBindingCategory.FILE),
     OPEN_URL_OR_DOI("Open URL or DOI", Localization.lang("Open URL or DOI"), "F3", KeyBindingCategory.TOOLS),
     PASTE("Paste", Localization.lang("Paste"), "ctrl+V", KeyBindingCategory.EDIT),
     PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl+shift+R", KeyBindingCategory.FILE),
-    PREAMBLE_EDITOR_STORE_CHANGES("Preamble editor, store changes", Localization.lang("Preamble editor, store changes"), "alt+S", KeyBindingCategory.FILE),
     PREVIOUS_PREVIEW_LAYOUT("Previous preview layout", Localization.lang("Previous preview layout"), "shift+F9", KeyBindingCategory.VIEW),
     PREVIOUS_LIBRARY("Previous library", Localization.lang("Previous library"), "ctrl+PAGE_UP", KeyBindingCategory.VIEW),
     PUSH_TO_APPLICATION("Push to application", Localization.lang("Push to application"), "ctrl+L", KeyBindingCategory.TOOLS),
@@ -107,7 +114,7 @@ public enum KeyBinding {
     UNDO("Undo", Localization.lang("Undo"), "ctrl+Z", KeyBindingCategory.EDIT),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt+4", KeyBindingCategory.SEARCH),
     WRITE_METADATA_TO_PDF("Write metadata to PDF files", Localization.lang("Write metadata to PDF files"), "F6", KeyBindingCategory.TOOLS),
-    CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH),
+    CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "Esc", KeyBindingCategory.SEARCH),
     CLEAR_READ_STATUS("Clear read status", Localization.lang("Clear read status"), "", KeyBindingCategory.EDIT),
     READ("Set read status to read", Localization.lang("Set read status to read"), "", KeyBindingCategory.EDIT),
     SKIMMED("Set read status to skimmed", Localization.lang("Set read status to skimmed"), "", KeyBindingCategory.EDIT);

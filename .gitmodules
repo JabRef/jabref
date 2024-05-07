@@ -1,0 +1,15 @@
+[submodule "abbrv.jabref.org"]
+  path = buildres/abbrv.jabref.org
+  url = https://github.com/JabRef/abbrv.jabref.org.git
+  ignore = all
+  shallow = true
+[submodule "csl-styles"]
+  path = src/main/resources/csl-styles
+  url = https://github.com/citation-style-language/styles.git
+  ignore = all
+  shallow = true
+[submodule "csl-locales"]
+  path = src/main/resources/csl-locales
+  url = https://github.com/citation-style-language/locales.git
+  ignore = all
+  shallow = true

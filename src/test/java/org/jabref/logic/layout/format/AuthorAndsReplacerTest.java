@@ -12,7 +12,7 @@ public class AuthorAndsReplacerTest {
      * Test method for {@link org.jabref.logic.layout.format.AuthorAndsReplacer#format(java.lang.String)}.
      */
     @Test
-    public void testFormat() {
+    public void format() {
         LayoutFormatter a = new AuthorAndsReplacer();
 
         // Empty case

@@ -46,18 +46,18 @@ public class InspecImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void testIsRecognizedFormatAccept(String fileName) throws IOException {
+    public void isRecognizedFormatAccept(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("nonInspecfileNames")
-    public void testIsRecognizedFormatReject(String fileName) throws IOException {
+    public void isRecognizedFormatReject(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
     @Test
-    public void testCompleteBibtexEntryOnJournalPaperImport() throws IOException, URISyntaxException {
+    public void completeBibtexEntryOnJournalPaperImport() throws IOException, URISyntaxException {
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
         expectedEntry.setField(StandardField.TITLE, "The SIS project : software reuse with a natural language approach");
         expectedEntry.setField(StandardField.AUTHOR, "Prechelt, Lutz");
@@ -99,28 +99,28 @@ public class InspecImporterTest {
         try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
             List<BibEntry> entries = importer.importDatabase(reader).getDatabase().getEntries();
             assertEquals(1, entries.size());
-            BibEntry entry = entries.get(0);
+            BibEntry entry = entries.getFirst();
             assertEquals(expectedEntry, entry);
         }
     }
 
     @Test
-    public void testGetFormatName() {
+    public void getFormatName() {
         assertEquals("INSPEC", importer.getName());
     }
 
     @Test
-    public void testGetCLIId() {
+    public void getCLIId() {
         assertEquals("inspec", importer.getId());
     }
 
     @Test
-    public void testsGetExtensions() {
+    public void sGetExtensions() {
         assertEquals(StandardFileType.TXT, importer.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         assertEquals("INSPEC format importer.", importer.getDescription());
     }
 }

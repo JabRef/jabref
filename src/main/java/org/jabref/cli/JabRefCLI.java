@@ -1,11 +1,17 @@
 package org.jabref.cli;
 
 import java.util.List;
+import java.util.Objects;
+
+import javafx.util.Pair;
 
 import org.jabref.gui.Globals;
-import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
+import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import org.apache.commons.cli.CommandLine;
@@ -18,6 +24,7 @@ import org.apache.commons.cli.ParseException;
 public class JabRefCLI {
     private static final int WIDTH = 100; // Number of characters per line before a line break must be added.
     private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
+    private static final String STRING_TABLE_DELIMITER = " : ";
 
     private final CommandLine cl;
     private final List<String> leftOver;
@@ -30,7 +37,7 @@ public class JabRefCLI {
     }
 
     public static String getExportMatchesSyntax() {
-        return String.format("[%s]searchTerm,outputFile:%s[,%s]",
+        return "[%s]searchTerm,outputFile:%s[,%s]".formatted(
                 Localization.lang("field"),
                 Localization.lang("file"),
                 Localization.lang("exportFormat"));
@@ -159,7 +166,15 @@ public class JabRefCLI {
     public String getWriteMetadatatoPdf() {
         return cl.hasOption("writeMetadatatoPdf") ? cl.getOptionValue("writeMetadatatoPdf") :
                 cl.hasOption("writeXMPtoPdf") ? cl.getOptionValue("writeXMPtoPdf") :
-                cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
+                        cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
+    }
+
+    public String getJumpToKey() {
+        return cl.getOptionValue("jumpToKey");
+    }
+
+    public boolean isJumpToKey() {
+        return cl.hasOption("jumpToKey");
     }
 
     private static Options getOptions() {
@@ -174,13 +189,10 @@ public class JabRefCLI {
         options.addOption("v", "version", false, Localization.lang("Display version"));
         options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));
 
-        // The "-console" option is handled by the install4j launcher
-        options.addOption(null, "console", false, Localization.lang("Show console output (only when the launcher is used)"));
-
         options.addOption(Option
                 .builder("i")
                 .longOpt("import")
-                .desc(String.format("%s: '%s'", Localization.lang("Import file"), "-i library.bib"))
+                .desc("%s: '%s'".formatted(Localization.lang("Import file"), "-i library.bib"))
                 .hasArg()
                 .argName("FILE[,FORMAT]")
                 .build());
@@ -196,7 +208,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("ib")
                 .longOpt("importBibtex")
-                .desc(String.format("%s: '%s'", Localization.lang("Import BibTeX"), "-ib @article{entry}"))
+                .desc("%s: '%s'".formatted(Localization.lang("Import BibTeX"), "-ib @article{entry}"))
                 .hasArg()
                 .argName("BIBTEXT_STRING")
                 .build());
@@ -204,7 +216,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("o")
                 .longOpt("output")
-                .desc(String.format("%s: '%s'", Localization.lang("Export an input to a file"), "-i db.bib -o db.htm,html"))
+                .desc("%s: '%s'".formatted(Localization.lang("Export an input to a file"), "-i db.bib -o db.htm,html"))
                 .hasArg()
                 .argName("FILE[,FORMAT]")
                 .build());
@@ -212,7 +224,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("m")
                 .longOpt("exportMatches")
-                .desc(String.format("%s: '%s'", Localization.lang("Matching"), "-i db.bib -m author=Newton,search.htm,html"))
+                .desc("%s: '%s'".formatted(Localization.lang("Matching"), "-i db.bib -m author=Newton,search.htm,html"))
                 .hasArg()
                 .argName("QUERY,FILE[,FORMAT]")
                 .build());
@@ -220,7 +232,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("f")
                 .longOpt("fetch")
-                .desc(String.format("%s: '%s'", Localization.lang("Run fetcher"), "-f Medline/PubMed:cancer"))
+                .desc("%s: '%s'".formatted(Localization.lang("Run fetcher"), "-f Medline/PubMed:cancer"))
                 .hasArg()
                 .argName("FETCHER:QUERY")
                 .build());
@@ -228,7 +240,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("a")
                 .longOpt("aux")
-                .desc(String.format("%s: '%s'", Localization.lang("Sublibrary from AUX to BibTeX"), "-a thesis.aux,new.bib"))
+                .desc("%s: '%s'".formatted(Localization.lang("Sublibrary from AUX to BibTeX"), "-a thesis.aux,new.bib"))
                 .hasArg()
                 .argName("FILE[.aux],FILE[.bib] FILE")
                 .build());
@@ -236,7 +248,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("x")
                 .longOpt("prexp")
-                .desc(String.format("%s: '%s'", Localization.lang("Export preferences to a file"), "-x prefs.xml"))
+                .desc("%s: '%s'".formatted(Localization.lang("Export preferences to a file"), "-x prefs.xml"))
                 .hasArg()
                 .argName("[FILE]")
                 .build());
@@ -244,7 +256,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("p")
                 .longOpt("primp")
-                .desc(String.format("%s: '%s'", Localization.lang("Import preferences from a file"), "-p prefs.xml"))
+                .desc("%s: '%s'".formatted(Localization.lang("Import preferences from a file"), "-p prefs.xml"))
                 .hasArg()
                 .argName("[FILE]")
                 .build());
@@ -252,7 +264,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("d")
                 .longOpt("prdef")
-                .desc(String.format("%s: '%s'", Localization.lang("Reset preferences"), "-d mainFontSize,newline' or '-d all"))
+                .desc("%s: '%s'".formatted(Localization.lang("Reset preferences"), "-d mainFontSize,newline' or '-d all"))
                 .hasArg()
                 .argName("KEY1[,KEY2][,KEYn] | all")
                 .build());
@@ -260,7 +272,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder()
                 .longOpt("writeXMPtoPdf")
-                .desc(String.format("%s: '%s'", Localization.lang("Write BibTeXEntry as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeXEntry as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
@@ -268,7 +280,7 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder()
                 .longOpt("embeddBibfileInPdf")
-                .desc(String.format("%s: '%s'", Localization.lang("Embed BibTeXEntry in PDF."), "-w pathToMyOwnPaper.pdf"))
+                .desc("%s: '%s'".formatted(Localization.lang("Embed BibTeX as attached file in PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
@@ -276,9 +288,17 @@ public class JabRefCLI {
         options.addOption(Option
                 .builder("w")
                 .longOpt("writeMetadatatoPdf")
-                .desc(String.format("%s: '%s'", Localization.lang("Write BibTeXEntry as metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeXEntry as metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
+                .build());
+
+        options.addOption(Option
+                .builder("j")
+                .longOpt("jumpToKey")
+                .desc("%s: '%s'".formatted(Localization.lang("Jump to the entry of the given citation key."), "-j key"))
+                .hasArg()
+                .argName("CITATIONKEY")
                 .build());
 
         return options;
@@ -291,16 +311,28 @@ public class JabRefCLI {
     public static void printUsage(PreferencesService preferencesService) {
         String header = "";
 
-        String importFormats = Globals.IMPORT_FORMAT_READER.getImportFormatList();
-        String importFormatsList = String.format("%s:%n%s%n", Localization.lang("Available import formats"), importFormats);
+        ImportFormatReader importFormatReader = new ImportFormatReader(
+                preferencesService.getImporterPreferences(),
+                preferencesService.getImportFormatPreferences(),
+                preferencesService.getCitationKeyPatternPreferences(),
+                new DummyFileUpdateMonitor()
+        );
+        List<Pair<String, String>> importFormats = importFormatReader
+                .getImportFormats().stream()
+                .map(format -> new Pair<>(format.getName(), format.getId()))
+                .toList();
+        String importFormatsIntro = Localization.lang("Available import formats");
+        String importFormatsList = String.format("%s:%n%s%n", importFormatsIntro, alignStringTable(importFormats));
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferencesService,
-                Globals.entryTypesManager,
-                Globals.journalAbbreviationRepository);
+                Globals.entryTypesManager);
+        List<Pair<String, String>> exportFormats = exporterFactory
+                .getExporters().stream()
+                .map(format -> new Pair<>(format.getName(), format.getId()))
+                .toList();
         String outFormatsIntro = Localization.lang("Available export formats");
-        String outFormats = wrapStringList(exporterFactory.getExporters().stream().map(Exporter::getId).toList(), outFormatsIntro.length());
-        String outFormatsList = String.format("%s: %s%n", outFormatsIntro, outFormats);
+        String outFormatsList = String.format("%s:%n%s%n", outFormatsIntro, alignStringTable(exportFormats));
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 
@@ -309,31 +341,32 @@ public class JabRefCLI {
     }
 
     private String getVersionInfo() {
-        return String.format("JabRef %s", Globals.BUILD_INFO.version);
+        return "JabRef %s".formatted(Globals.BUILD_INFO.version);
     }
 
     public List<String> getLeftOver() {
         return leftOver;
     }
 
-    /**
-     * Creates and wraps a multi-line and colon-seperated string from a List of Strings.
-     */
-    protected static String wrapStringList(List<String> list, int firstLineIntroLength) {
-        StringBuilder builder = new StringBuilder();
-        int lastBreak = -firstLineIntroLength;
+    protected static String alignStringTable(List<Pair<String, String>> table) {
+        StringBuilder sb = new StringBuilder();
 
-        for (String line : list) {
-            if (((builder.length() + 2 + line.length()) - lastBreak) > WIDTH) {
-                builder.append(",\n");
-                lastBreak = builder.length();
-                builder.append(WRAPPED_LINE_PREFIX);
-            } else if (builder.length() > 0) {
-                builder.append(", ");
-            }
-            builder.append(line);
+        int maxLength = table.stream()
+                             .mapToInt(pair -> Objects.requireNonNullElse(pair.getKey(), "").length())
+                             .max().orElse(0);
+
+        for (Pair<String, String> pair : table) {
+            int padding = Math.max(0, maxLength - pair.getKey().length());
+            sb.append(WRAPPED_LINE_PREFIX);
+            sb.append(pair.getKey());
+
+            sb.append(StringUtil.repeatSpaces(padding));
+
+            sb.append(STRING_TABLE_DELIMITER);
+            sb.append(pair.getValue());
+            sb.append(OS.NEWLINE);
         }
 
-        return builder.toString();
+        return sb.toString();
     }
 }

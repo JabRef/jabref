@@ -1,9 +1,12 @@
 package org.jabref.gui.slr;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
@@ -66,9 +69,11 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableColumn<String, String> queriesColumn;
     @FXML private TableColumn<String, String> queriesActionColumn;
 
-    @FXML private TableView<StudyDatabaseItem> databaseTable;
-    @FXML private TableColumn<StudyDatabaseItem, Boolean> databaseEnabledColumn;
-    @FXML private TableColumn<StudyDatabaseItem, String> databaseColumn;
+    @FXML private TableView<StudyCatalogItem> catalogTable;
+    @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
+    @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
+
+    @FXML private Label directoryWarning;
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService prefs;
@@ -124,18 +129,19 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     }
 
     private void setupSaveSurveyButton(boolean isEdit) {
-        Button saveSurveyButton = ((Button) this.getDialogPane().lookupButton(saveSurveyButtonType));
+        Button saveSurveyButton = (Button) this.getDialogPane().lookupButton(saveSurveyButtonType);
 
         if (!isEdit) {
             saveSurveyButton.setText(Localization.lang("Start survey"));
         }
 
-        saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
-                                Bindings.isEmpty(viewModel.getQueries()),
-                                Bindings.isEmpty(viewModel.getDatabases())),
-                                Bindings.isEmpty(viewModel.getAuthors())),
-                                viewModel.getTitle().isEmpty()),
-                                viewModel.getDirectory().isEmpty()));
+        saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
+                                                Bindings.isEmpty(viewModel.getQueries()),
+                                                Bindings.isEmpty(viewModel.getCatalogs())),
+                                                Bindings.isEmpty(viewModel.getAuthors())),
+                                                viewModel.getTitle().isEmpty()),
+                                                viewModel.getDirectory().isEmpty()),
+                                                directoryWarning.visibleProperty()));
 
         setResultConverter(button -> {
             if (button == saveSurveyButtonType) {
@@ -166,14 +172,34 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
             selectStudyDirectory.setDisable(true);
         }
 
-        // Listen whether any databases are removed from selection -> Add back to the database selector
+        // Listen whether any catalogs are removed from selection -> Add back to the catalog selector
         studyTitle.textProperty().bindBidirectional(viewModel.titleProperty());
         studyDirectory.textProperty().bindBidirectional(viewModel.getDirectory());
 
         initAuthorTab();
         initQuestionsTab();
         initQueriesTab();
-        initDatabasesTab();
+        initCatalogsTab();
+    }
+
+    private void updateDirectoryWarning(Path directory) {
+        if (!Files.isDirectory(directory)) {
+            directoryWarning.setText(Localization.lang("Warning: The selected directory is not a valid directory."));
+            directoryWarning.setVisible(true);
+        } else {
+            try (Stream<Path> entries = Files.list(directory)) {
+                if (entries.findAny().isPresent()) {
+                    directoryWarning.setText(Localization.lang("Warning: The selected directory is not empty."));
+                    directoryWarning.setVisible(true);
+                } else {
+                    directoryWarning.setVisible(false);
+                }
+            } catch (
+                    IOException e) {
+                directoryWarning.setText(Localization.lang("Warning: Failed to check if the directory is empty."));
+                directoryWarning.setVisible(true);
+            }
+        }
     }
 
     private void initAuthorTab() {
@@ -202,27 +228,27 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 .toString()));
     }
 
-    private void initDatabasesTab() {
-        new ViewModelTableRowFactory<StudyDatabaseItem>()
+    private void initCatalogsTab() {
+        new ViewModelTableRowFactory<StudyCatalogItem>()
                 .withOnMouseClickedEvent((entry, event) -> {
                     if (event.getButton() == MouseButton.PRIMARY) {
                         entry.setEnabled(!entry.isEnabled());
                     }
                 })
-                .install(databaseTable);
+                .install(catalogTable);
 
-        databaseColumn.setReorderable(false);
-        databaseColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        catalogColumn.setReorderable(false);
+        catalogColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        databaseEnabledColumn.setResizable(false);
-        databaseEnabledColumn.setReorderable(false);
-        databaseEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(databaseEnabledColumn));
-        databaseEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
+        catalogEnabledColumn.setResizable(false);
+        catalogEnabledColumn.setReorderable(false);
+        catalogEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(catalogEnabledColumn));
+        catalogEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
 
-        databaseColumn.setEditable(false);
-        databaseColumn.setCellValueFactory(param -> param.getValue().nameProperty());
+        catalogColumn.setEditable(false);
+        catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
 
-        databaseTable.setItems(viewModel.getDatabases());
+        catalogTable.setItems(viewModel.getCatalogs());
     }
 
     private void setupCommonPropertiesForTables(Node addControl,
@@ -278,6 +304,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 .withInitialDirectory(pathToStudyDataDirectory)
                 .build();
 
-        viewModel.setStudyDirectory(dialogService.showDirectorySelectionDialog(directoryDialogConfiguration));
+        Optional<Path> selectedDirectoryOptional = dialogService.showDirectorySelectionDialog(directoryDialogConfiguration);
+        selectedDirectoryOptional.ifPresent(selectedDirectory -> {
+            viewModel.setStudyDirectory(Optional.of(selectedDirectory));
+            updateDirectoryWarning(selectedDirectory);
+        });
     }
 }

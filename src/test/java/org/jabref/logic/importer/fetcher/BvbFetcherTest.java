@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
 public class BvbFetcherTest {
@@ -27,10 +27,10 @@ public class BvbFetcherTest {
     BibEntry bibEntryISBN9783960886402;
 
     @Test
-    void testPerformTest() throws Exception {
+    void performTest() throws Exception {
         String searchquery = "effective java author:bloch";
         List<BibEntry> result = fetcher.performSearch(searchquery);
-        assertTrue(result.size() > 0);
+        assertFalse(result.isEmpty());
 
 //        System.out.println("Query:\n");
 //        System.out.println(fetcher.getURLForQuery(new StandardSyntaxParser().parse(searchquery, NO_EXPLICIT_FIELD)));
@@ -52,7 +52,8 @@ public class BvbFetcherTest {
                 .withField(StandardField.FILE, "ParsedFileField{description='', link='http://search.ebscohost.com/login.aspx?direct=true&scope=site&db=nlebk&db=nlabk&AN=1906353', fileType='PDF'}")
                 .withField(StandardField.ISBN, "9783960886402")
                 .withField(StandardField.KEYWORDS, "Klassen, Interfaces, Generics, Enums, Annotationen, Lambdas, Streams, Module, parallel, Parallele Programmierung, Serialisierung, funktional, funktionale Programmierung, Java EE, Jakarta EE")
-                .withField(StandardField.LOCATION, "Heidelberg")
+                .withField(StandardField.ADDRESS, "Heidelberg")
+                .withField(StandardField.PAGETOTAL, "396")
                 .withField(StandardField.PUBLISHER, "{dpunkt.verlag} and {Dpunkt. Verlag (Heidelberg)}");
 
         bibEntryISBN0134685997 = new BibEntry(StandardEntryType.Misc)
@@ -62,12 +63,13 @@ public class BvbFetcherTest {
                 .withField(StandardField.TITLEADDON, "Joshua Bloch")
                 .withField(StandardField.EDITION, "Third edition")
                 .withField(StandardField.ISBN, "0134685997")
-                .withField(StandardField.LOCATION, "Boston")
+                .withField(StandardField.PAGETOTAL, "392")
+                .withField(StandardField.ADDRESS, "Boston")
                 .withField(StandardField.PUBLISHER, "{Addison-Wesley}");
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("Bibliotheksverbund Bayern (Experimental)", fetcher.getName());
     }
 
@@ -88,14 +90,14 @@ public class BvbFetcherTest {
     }
 
     @Test
-    public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
+    public void performSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("effective java bloch");
-        assertEquals(bibEntryISBN9783960886402, searchResult.get(0));
+        assertEquals(bibEntryISBN9783960886402, searchResult.getFirst());
         assertEquals(bibEntryISBN0134685997, searchResult.get(1));
     }
 
     @Test
-    public void testPerformSearchEmpty() throws FetcherException {
+    public void performSearchEmpty() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("");
         assertEquals(Collections.emptyList(), searchResult);
     }

@@ -90,7 +90,7 @@ public class FileAnnotation {
         try {
             return LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT));
         } catch (DateTimeParseException e) {
-            LOGGER.info(String.format("Expected a parseable date string! However, this text could not be parsed: '%s'", dateTimeString));
+            LOGGER.info("Expected a parseable date string! However, this text could not be parsed: '%s'".formatted(dateTimeString));
             return LocalDateTime.now();
         }
     }

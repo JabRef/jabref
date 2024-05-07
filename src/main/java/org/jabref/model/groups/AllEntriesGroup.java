@@ -20,9 +20,15 @@ public class AllEntriesGroup extends AbstractGroup {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof AllEntriesGroup && Objects.equals(((AllEntriesGroup) o).getName(), getName());
+        return o instanceof AllEntriesGroup aeg && Objects.equals(aeg.getName(), getName());
     }
 
+    /**
+     * Always returns true for any BibEntry!
+     *
+     * @param entry The @{@link BibEntry} to check
+     * @return Always returns true
+     */
     @Override
     public boolean contains(BibEntry entry) {
         return true;

@@ -10,6 +10,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 
@@ -70,5 +71,14 @@ public class SidePaneComponent extends BorderPane {
 
     protected void addExtraButtonToHeader(Button button, int position) {
         this.buttonContainer.getChildren().add(position, button);
+    }
+
+    public void requestFocus() {
+        for (Node child : getChildren()) {
+            if (child instanceof GroupTreeView groupTreeView) {
+                groupTreeView.requestFocusGroupTree();
+                break;
+            }
+        }
     }
 }

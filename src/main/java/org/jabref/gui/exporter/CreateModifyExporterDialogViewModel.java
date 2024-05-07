@@ -8,11 +8,8 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.PreferencesService;
 
@@ -37,13 +34,11 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     private final StringProperty layoutFile = new SimpleStringProperty("");
     private final StringProperty extension = new SimpleStringProperty("");
 
-    private final JournalAbbreviationRepository repository;
-
-    public CreateModifyExporterDialogViewModel(ExporterViewModel exporter, DialogService dialogService, PreferencesService preferences,
-                                               JournalAbbreviationRepository repository) {
+    public CreateModifyExporterDialogViewModel(ExporterViewModel exporter,
+                                               DialogService dialogService,
+                                               PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.repository = repository;
 
         // Set text of each of the boxes
         if (exporter != null) {
@@ -56,21 +51,23 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     public ExporterViewModel saveExporter() {
         Path layoutFileDir = Path.of(layoutFile.get()).getParent();
         if (layoutFileDir != null) {
-            preferences.getImportExportPreferences().setExportWorkingDirectory(layoutFileDir);
+            preferences.getExportPreferences().setExportWorkingDirectory(layoutFileDir);
         }
 
         // Check that there are no empty strings.
         if (layoutFile.get().isEmpty() || name.get().isEmpty() || extension.get().isEmpty()
                 || !layoutFile.get().endsWith(".layout")) {
-            LOGGER.info("One of the fields is empty or invalid!");
+            LOGGER.info("One of the fields is empty or invalid.");
             return null;
         }
 
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(repository);
-        SavePreferences savePreferences = preferences.getSavePreferencesForExport();
-        TemplateExporter format = new TemplateExporter(name.get(), layoutFile.get(), extension.get(),
-                layoutPreferences, savePreferences);
+        TemplateExporter format = new TemplateExporter(
+                name.get(),
+                layoutFile.get(),
+                extension.get(),
+                preferences.getLayoutFormatterPreferences(),
+                preferences.getSelfContainedExportConfiguration().getSelfContainedSaveOrder());
         format.setCustomExport(true);
         return new ExporterViewModel(format);
     }
@@ -79,7 +76,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
                 .withDefaultExtension(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
-                .withInitialDirectory(preferences.getImportExportPreferences().getExportWorkingDirectory()).build();
+                .withInitialDirectory(preferences.getExportPreferences().getExportWorkingDirectory()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString()));
     }
 

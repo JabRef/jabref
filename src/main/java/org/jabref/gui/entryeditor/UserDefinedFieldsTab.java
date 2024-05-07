@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.LinkedHashSet;
+import java.util.SequencedSet;
 import java.util.Set;
 
 import javax.swing.undo.UndoManager;
@@ -12,7 +13,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
+import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -42,7 +43,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Set<Field> determineFieldsToShow(BibEntry entry) {
+    protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         return fields;
     }
 }

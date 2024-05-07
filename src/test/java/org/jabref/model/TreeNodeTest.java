@@ -28,7 +28,7 @@ public class TreeNodeTest {
 
     @Test
     public void constructorChecksThatClassImplementsCorrectInterface() {
-        assertThrows(UnsupportedOperationException.class, () -> new WrongTreeNodeImplementation());
+        assertThrows(UnsupportedOperationException.class, WrongTreeNodeImplementation::new);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class TreeNodeTest {
     @Test
     public void getPositionInParentForRootThrowsException() {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
-        assertThrows(UnsupportedOperationException.class, () -> root.getPositionInParent());
+        assertThrows(UnsupportedOperationException.class, root::getPositionInParent);
     }
 
     @Test
@@ -212,7 +212,7 @@ public class TreeNodeTest {
 
         List<TreeNodeTestData.TreeNodeMock> path = node.getPathFromRoot();
         assertEquals(3, path.size());
-        assertEquals(root, path.get(0));
+        assertEquals(root, path.getFirst());
         assertEquals(node, path.get(2));
     }
 
@@ -223,7 +223,7 @@ public class TreeNodeTest {
 
         List<TreeNodeTestData.TreeNodeMock> path = node.getPathFromRoot();
         assertEquals(4, path.size());
-        assertEquals(root, path.get(0));
+        assertEquals(root, path.getFirst());
         assertEquals(node, path.get(3));
     }
 
@@ -620,7 +620,7 @@ public class TreeNodeTest {
         TreeNodeTestData.TreeNodeMock node = childB.addChild(new TreeNodeTestData.TreeNodeMock("A"));
         TreeNodeTestData.TreeNodeMock childA = root.addChild(new TreeNodeTestData.TreeNodeMock("A"));
 
-        assertEquals(Arrays.asList(root, node, childA), root.findChildrenSatisfying(treeNode -> treeNode.getName().equals("A")));
+        assertEquals(Arrays.asList(root, node, childA), root.findChildrenSatisfying(treeNode -> "A".equals(treeNode.getName())));
     }
 
     private static class WrongTreeNodeImplementation extends TreeNode<TreeNodeTestData.TreeNodeMock> {

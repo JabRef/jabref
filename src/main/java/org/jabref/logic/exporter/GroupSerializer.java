@@ -116,18 +116,18 @@ public class GroupSerializer {
     private String serializeGroup(AbstractGroup group) {
         if (group instanceof AllEntriesGroup) {
             return serializeAllEntriesGroup();
-        } else if (group instanceof ExplicitGroup) {
-            return serializeExplicitGroup((ExplicitGroup) group);
-        } else if (group instanceof KeywordGroup) {
-            return serializeKeywordGroup((KeywordGroup) group);
-        } else if (group instanceof SearchGroup) {
-            return serializeSearchGroup((SearchGroup) group);
-        } else if (group instanceof AutomaticKeywordGroup) {
-            return serializeAutomaticKeywordGroup((AutomaticKeywordGroup) group);
-        } else if (group instanceof AutomaticPersonsGroup) {
-            return serializeAutomaticPersonsGroup((AutomaticPersonsGroup) group);
-        } else if (group instanceof TexGroup) {
-            return serializeTexGroup((TexGroup) group);
+        } else if (group instanceof ExplicitGroup explicitGroup) {
+            return serializeExplicitGroup(explicitGroup);
+        } else if (group instanceof KeywordGroup keywordGroup) {
+            return serializeKeywordGroup(keywordGroup);
+        } else if (group instanceof SearchGroup searchGroup) {
+            return serializeSearchGroup(searchGroup);
+        } else if (group instanceof AutomaticKeywordGroup keywordGroup) {
+            return serializeAutomaticKeywordGroup(keywordGroup);
+        } else if (group instanceof AutomaticPersonsGroup personsGroup) {
+            return serializeAutomaticPersonsGroup(personsGroup);
+        } else if (group instanceof TexGroup texGroup) {
+            return serializeTexGroup(texGroup);
         } else {
             throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
         }

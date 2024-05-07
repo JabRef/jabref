@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
@@ -18,15 +20,18 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
 
     private final SimpleEditorViewModel viewModel;
     private final TextInputControl textInput;
+    private final boolean isMultiLine;
 
     public SimpleEditor(final Field field,
                         final SuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
                         final PreferencesService preferences,
-                        final boolean isMultiLine) {
-        this.viewModel = new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers);
+                        final boolean isMultiLine,
+                        final UndoManager undoManager) {
+        this.viewModel = new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager);
+        this.isMultiLine = isMultiLine;
 
-        textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
+        textInput = createTextInputControl();
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
         textInput.textProperty().bindBidirectional(viewModel.textProperty());
@@ -47,8 +52,13 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     public SimpleEditor(final Field field,
                         final SuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
-                        final PreferencesService preferences) {
-        this(field, suggestionProvider, fieldCheckers, preferences, false);
+                        final PreferencesService preferences,
+                        UndoManager undoManager) {
+        this(field, suggestionProvider, fieldCheckers, preferences, false, undoManager);
+    }
+
+    protected TextInputControl createTextInputControl() {
+        return isMultiLine ? new EditorTextArea() : new EditorTextField();
     }
 
     @Override

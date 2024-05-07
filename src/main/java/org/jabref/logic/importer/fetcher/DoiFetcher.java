@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -28,7 +29,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
 import com.google.common.util.concurrent.RateLimiter;
@@ -85,14 +85,14 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             Optional<String> agency;
             if (doi.isPresent() && (agency = getAgency(doi.get())).isPresent()) {
                 double waitingTime = 0.0;
-                if (agency.get().equalsIgnoreCase("datacite")) {
+                if ("datacite".equalsIgnoreCase(agency.get())) {
                     waitingTime = DATA_CITE_DCN_RATE_LIMITER.acquire();
-                } else if (agency.get().equalsIgnoreCase("crossref")) {
+                } else if ("crossref".equalsIgnoreCase(agency.get())) {
                     waitingTime = CROSSREF_DCN_RATE_LIMITER.acquire();
                 } // mEDRA does not explicit an API rating
 
-                LOGGER.trace(String.format("Thread %s, searching for DOI '%s', waited %.2fs because of API rate limiter",
-                        Thread.currentThread().getId(), identifier, waitingTime));
+                LOGGER.trace("Thread %s, searching for DOI '%s', waited %.2fs because of API rate limiter".formatted(
+                        Thread.currentThread().threadId(), identifier, waitingTime));
             }
         } catch (IOException e) {
             LOGGER.warn("Could not limit DOI API access rate", e);
@@ -133,7 +133,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 URLConnection openConnection;
                 try {
                     openConnection = download.openConnection();
-                    bibtexString = URLDownload.asString(openConnection);
+                    bibtexString = URLDownload.asString(openConnection).trim();
                 } catch (IOException e) {
                     // an IOException with a nested FetcherException will be thrown when you encounter a 400x or 500x http status code
                     if (e.getCause() instanceof FetcherException fe) {
@@ -143,11 +143,11 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 }
 
                 // BibTeX entry
-                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
+                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
                 fetchedEntry.ifPresent(this::doPostCleanup);
 
                 // Crossref has a dynamic API rate limit
-                if (agency.isPresent() && agency.get().equalsIgnoreCase("crossref")) {
+                if (agency.isPresent() && "crossref".equalsIgnoreCase(agency.get())) {
                     updateCrossrefAPIRate(openConnection);
                 }
 
@@ -159,8 +159,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                     }
                 }
 
-                if (openConnection instanceof HttpURLConnection) {
-                    ((HttpURLConnection) openConnection).disconnect();
+                if (openConnection instanceof HttpURLConnection connection) {
+                    connection.disconnect();
                 }
                 return fetchedEntry;
             } else {
@@ -178,6 +178,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     private void doPostCleanup(BibEntry entry) {
         new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new HtmlToLatexFormatter()).cleanup(entry);
     }
 
     private void updateCrossrefAPIRate(URLConnection existingConnection) {
@@ -191,7 +192,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
             // In theory, the actual update might rarely happen...
             if (Math.abs(newRate - oldRate) >= 1.0) {
-                LOGGER.info(String.format("Updated Crossref API rate limit from %.2f to %.2f", oldRate, newRate));
+                LOGGER.info("Updated Crossref API rate limit from %.2f to %.2f".formatted(oldRate, newRate));
                 CROSSREF_DCN_RATE_LIMITER.setRate(newRate);
             }
         } catch (NullPointerException | IllegalArgumentException e) {

@@ -3,6 +3,7 @@ package org.jabref.logic.database;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -26,6 +27,7 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.collect.Sets;
@@ -154,14 +156,14 @@ public class DuplicateCheck {
     }
 
     private static int compareSingleField(final Field field, final BibEntry one, final BibEntry two) {
-        final Optional<String> optionalStringOne = one.getField(field);
-        final Optional<String> optionalStringTwo = two.getField(field);
-        if (!optionalStringOne.isPresent()) {
-            if (!optionalStringTwo.isPresent()) {
+        final Optional<String> optionalStringOne = one.getFieldLatexFree(field);
+        final Optional<String> optionalStringTwo = two.getFieldLatexFree(field);
+        if (optionalStringOne.isEmpty()) {
+            if (optionalStringTwo.isEmpty()) {
                 return EMPTY_IN_BOTH;
             }
             return EMPTY_IN_ONE;
-        } else if (!optionalStringTwo.isPresent()) {
+        } else if (optionalStringTwo.isEmpty()) {
             return EMPTY_IN_TWO;
         }
 
@@ -171,11 +173,11 @@ public class DuplicateCheck {
 
         if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
             return compareAuthorField(stringOne, stringTwo);
-        } else if (StandardField.PAGES.equals(field)) {
+        } else if (StandardField.PAGES == field) {
             return comparePagesField(stringOne, stringTwo);
-        } else if (StandardField.JOURNAL.equals(field)) {
+        } else if (StandardField.JOURNAL == field) {
             return compareJournalField(stringOne, stringTwo);
-        } else if (StandardField.CHAPTER.equals(field)) {
+        } else if (StandardField.CHAPTER == field) {
             return compareChapterField(stringOne, stringTwo);
         }
 
@@ -264,8 +266,8 @@ public class DuplicateCheck {
         if (stringOne.isEmpty() || stringTwo.isEmpty()) {
             return false;
         }
-        return (StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
-                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE)));
+        return StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
+                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE));
     }
 
     /**
@@ -331,17 +333,21 @@ public class DuplicateCheck {
         if (oneDOI.isPresent() && twoDOI.isPresent()) {
             return Objects.equals(oneDOI, twoDOI);
         }
-        // check ISBN
-        Optional<ISBN> oneISBN = one.getISBN();
-        Optional<ISBN> twoISBN = two.getISBN();
-        if (oneISBN.isPresent() && twoISBN.isPresent()) {
-            return Objects.equals(oneISBN, twoISBN);
-        }
 
         if (haveDifferentEntryType(one, two) ||
                 haveDifferentEditions(one, two) ||
                 haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
             return false;
+        }
+
+        // In case an ISBN is present, it is a strong indicator that the entries are equal.
+        // Only in InBook, InCollection, or Article the ISBN may be equal and the puplication on different pages (and thus not equal)
+        Optional<ISBN> oneISBN = one.getISBN();
+        Optional<ISBN> twoISBN = two.getISBN();
+        if (oneISBN.isPresent() && twoISBN.isPresent()
+                && Objects.equals(oneISBN, twoISBN)
+                && !List.of(StandardEntryType.Article, StandardEntryType.InBook, StandardEntryType.InCollection).contains(one.getType())) {
+            return true;
         }
 
         final Optional<BibEntryType> type = entryTypesManager.enrich(one.getType(), bibDatabaseMode);

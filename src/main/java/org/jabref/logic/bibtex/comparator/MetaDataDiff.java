@@ -1,26 +1,36 @@
 package org.jabref.logic.bibtex.comparator;
 
-import java.util.EnumSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.groups.DefaultGroupsFactory;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.PreferencesService;
 
 public class MetaDataDiff {
-    public enum Difference {
-        PROTECTED,
-        GROUPS_ALTERED,
-        ENCODING,
-        SAVE_SORT_ORDER,
-        KEY_PATTERNS,
-        USER_FILE_DIRECTORY,
-        LATEX_FILE_DIRECTORY,
+    public enum DifferenceType {
+        CONTENT_SELECTOR,
         DEFAULT_KEY_PATTERN,
-        SAVE_ACTIONS,
-        MODE,
+        ENCODING,
         GENERAL_FILE_DIRECTORY,
-        CONTENT_SELECTOR
+        GROUPS,
+        KEY_PATTERNS,
+        LATEX_FILE_DIRECTORY,
+        MODE,
+        PROTECTED,
+        SAVE_ACTIONS,
+        SAVE_SORT_ORDER,
+        USER_FILE_DIRECTORY
+    }
+
+    public record Difference(DifferenceType differenceType, Object originalObject, Object newObject) {
     }
 
     private final Optional<GroupDiff> groupDiff;
@@ -37,54 +47,76 @@ public class MetaDataDiff {
         if (originalMetaData.equals(newMetaData)) {
             return Optional.empty();
         } else {
-            return Optional.of(new MetaDataDiff(originalMetaData, newMetaData));
+            MetaDataDiff diff = new MetaDataDiff(originalMetaData, newMetaData);
+            List<Difference> differences = diff.getDifferences(new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN));
+            if (differences.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(diff);
         }
     }
 
     /**
-     * @implNote Should be kept in sync with {@link MetaData#equals(Object)}
+     * Checks if given content selectors are empty or default
      */
-    public EnumSet<Difference> getDifferences(PreferencesService preferences) {
-        EnumSet<Difference> changes = EnumSet.noneOf(Difference.class);
+    private static boolean isDefaultContentSelectors(ContentSelectors contentSelectors) {
+        if (contentSelectors.getContentSelectors().isEmpty()) {
+            return true;
+        }
+        Map<Field, List<String>> fieldKeywordsMap = ContentSelectors.getFieldKeywordsMap(contentSelectors.getContentSelectors());
+        return ContentSelectors.isDefaultMap(fieldKeywordsMap);
+    }
 
-        if (originalMetaData.isProtected() != newMetaData.isProtected()) {
-            changes.add(Difference.PROTECTED);
+    private void addToListIfDiff(List<Difference> changes, DifferenceType differenceType, Object originalObject, Object newObject) {
+        if (!Objects.equals(originalObject, newObject)) {
+            if (differenceType == DifferenceType.CONTENT_SELECTOR) {
+                ContentSelectors originalContentSelectors = (ContentSelectors) originalObject;
+                ContentSelectors newContentSelectors = (ContentSelectors) newObject;
+                if (isDefaultContentSelectors(originalContentSelectors) && isDefaultContentSelectors(newContentSelectors)) {
+                    return;
+                }
+            }
+            if (differenceType == DifferenceType.GROUPS) {
+                Optional<GroupTreeNode> originalGroups = (Optional<GroupTreeNode>) originalObject;
+                Optional<GroupTreeNode> newGroups = (Optional<GroupTreeNode>) newObject;
+                if (isDefaultGroup(originalGroups) && isDefaultGroup(newGroups)) {
+                    return;
+                }
+            }
+            changes.add(new Difference(differenceType, originalObject, newObject));
         }
-        if (!Objects.equals(originalMetaData.getGroups(), newMetaData.getGroups())) {
-            changes.add(Difference.GROUPS_ALTERED);
+    }
+
+    private boolean isDefaultGroup(Optional<GroupTreeNode> groups) {
+        if (groups.isEmpty()) {
+            return true;
         }
-        if (!Objects.equals(originalMetaData.getEncoding(), newMetaData.getEncoding())) {
-            changes.add(Difference.ENCODING);
+        GroupTreeNode groupRoot = groups.get();
+        if (!groupRoot.getChildren().isEmpty()) {
+            return false;
         }
-        if (!Objects.equals(originalMetaData.getSaveOrderConfig(), newMetaData.getSaveOrderConfig())) {
-            changes.add(Difference.SAVE_SORT_ORDER);
-        }
-        if (!Objects.equals(
-                originalMetaData.getCiteKeyPattern(preferences.getCitationKeyPatternPreferences().getKeyPattern()),
-                newMetaData.getCiteKeyPattern(preferences.getCitationKeyPatternPreferences().getKeyPattern()))) {
-            changes.add(Difference.KEY_PATTERNS);
-        }
-        if (!Objects.equals(originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories())) {
-            changes.add(Difference.USER_FILE_DIRECTORY);
-        }
-        if (!Objects.equals(originalMetaData.getLatexFileDirectories(), newMetaData.getLatexFileDirectories())) {
-            changes.add(Difference.LATEX_FILE_DIRECTORY);
-        }
-        if (!Objects.equals(originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern())) {
-            changes.add(Difference.DEFAULT_KEY_PATTERN);
-        }
-        if (!Objects.equals(originalMetaData.getSaveActions(), newMetaData.getSaveActions())) {
-            changes.add(Difference.SAVE_ACTIONS);
-        }
-        if (!originalMetaData.getMode().equals(newMetaData.getMode())) {
-            changes.add(Difference.MODE);
-        }
-        if (!Objects.equals(originalMetaData.getDefaultFileDirectory(), newMetaData.getDefaultFileDirectory())) {
-            changes.add(Difference.GENERAL_FILE_DIRECTORY);
-        }
-        if (!Objects.equals(originalMetaData.getContentSelectors(), newMetaData.getContentSelectors())) {
-            changes.add(Difference.CONTENT_SELECTOR);
-        }
+        return groupRoot.getGroup().equals(DefaultGroupsFactory.getAllEntriesGroup());
+    }
+
+    /**
+     * Should be kept in sync with {@link MetaData#equals(Object)}
+     */
+    public List<Difference> getDifferences(GlobalCitationKeyPatterns globalCitationKeyPatterns) {
+        List<Difference> changes = new ArrayList<>();
+        addToListIfDiff(changes, DifferenceType.PROTECTED, originalMetaData.isProtected(), newMetaData.isProtected());
+        addToListIfDiff(changes, DifferenceType.GROUPS, originalMetaData.getGroups(), newMetaData.getGroups());
+        addToListIfDiff(changes, DifferenceType.ENCODING, originalMetaData.getEncoding(), newMetaData.getEncoding());
+        addToListIfDiff(changes, DifferenceType.SAVE_SORT_ORDER, originalMetaData.getSaveOrder(), newMetaData.getSaveOrder());
+        addToListIfDiff(changes, DifferenceType.KEY_PATTERNS,
+                originalMetaData.getCiteKeyPatterns(globalCitationKeyPatterns),
+                newMetaData.getCiteKeyPatterns(globalCitationKeyPatterns));
+        addToListIfDiff(changes, DifferenceType.USER_FILE_DIRECTORY, originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories());
+        addToListIfDiff(changes, DifferenceType.LATEX_FILE_DIRECTORY, originalMetaData.getLatexFileDirectories(), newMetaData.getLatexFileDirectories());
+        addToListIfDiff(changes, DifferenceType.DEFAULT_KEY_PATTERN, originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern());
+        addToListIfDiff(changes, DifferenceType.SAVE_ACTIONS, originalMetaData.getSaveActions(), newMetaData.getSaveActions());
+        addToListIfDiff(changes, DifferenceType.MODE, originalMetaData.getMode(), newMetaData.getMode());
+        addToListIfDiff(changes, DifferenceType.GENERAL_FILE_DIRECTORY, originalMetaData.getDefaultFileDirectory(), newMetaData.getDefaultFileDirectory());
+        addToListIfDiff(changes, DifferenceType.CONTENT_SELECTOR, originalMetaData.getContentSelectors(), newMetaData.getContentSelectors());
         return changes;
     }
 
@@ -92,7 +124,19 @@ public class MetaDataDiff {
         return newMetaData;
     }
 
+    /**
+     * Currently, the groups diff is contained here - and as entry in {@link #getDifferences(GlobalCitationKeyPatterns)}
+     */
     public Optional<GroupDiff> getGroupDifferences() {
         return groupDiff;
+    }
+
+    @Override
+    public String toString() {
+        return "MetaDataDiff{" +
+                "groupDiff=" + groupDiff +
+                ", originalMetaData=" + originalMetaData +
+                ", newMetaData=" + getNewMetaData() +
+                '}';
     }
 }

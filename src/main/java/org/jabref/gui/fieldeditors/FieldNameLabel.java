@@ -223,14 +223,12 @@ public class FieldNameLabel extends Label {
                 case TIMESTAMP:
                     return Localization.lang("Timestamp of this entry, when it has been created or last modified.");
             }
-        } else if (field instanceof InternalField) {
-            InternalField internalField = (InternalField) field;
+        } else if (field instanceof InternalField internalField) {
             switch (internalField) {
                 case KEY_FIELD:
                     return Localization.lang("Key by which the work may be cited.");
             }
-        } else if (field instanceof SpecialField) {
-            SpecialField specialField = (SpecialField) field;
+        } else if (field instanceof SpecialField specialField) {
             switch (specialField) {
                 case PRINTED:
                     return Localization.lang("User-specific printed flag, in case the entry has been printed.");

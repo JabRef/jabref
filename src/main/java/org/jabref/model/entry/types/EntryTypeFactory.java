@@ -14,14 +14,12 @@ public class EntryTypeFactory {
     }
 
     /**
-     * Checks whether two EntryTypeFactory are equal or not based on the equality of the type names and on the equality of
-     * the required and optional field lists
+     * Checks whether two EntryTypeFactory are equal
+     * based on the equality of the type names and on the equality of the required and optional field lists
      *
-     * @param type1 the first EntryType to compare
-     * @param type2 the secend EntryType to compare
      * @return returns true if the two compared entry types have the same name and equal required and optional fields
      */
-    public static boolean isEqualNameAndFieldBased(BibEntryType type1, BibEntryType type2) {
+    public static boolean nameAndFieldsAreEqual(BibEntryType type1, BibEntryType type2) {
         if ((type1 == null) && (type2 == null)) {
             return true;
         } else if ((type1 == null) || (type2 == null)) {
@@ -30,7 +28,7 @@ public class EntryTypeFactory {
             return Objects.equals(type1.getType(), type2.getType())
                     && Objects.equals(type1.getRequiredFields(), type2.getRequiredFields())
                     && Objects.equals(type1.getOptionalFields(), type2.getOptionalFields())
-                    && Objects.equals(type1.getSecondaryOptionalFields(), type2.getSecondaryOptionalFields());
+                    && Objects.equals(type1.getDetailOptionalFields(), type2.getDetailOptionalFields());
         }
     }
 

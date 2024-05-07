@@ -13,7 +13,7 @@ What parser should be used to parse YAML files?
 ## Considered Options
 
 * [Jackson](https://github.com/FasterXML/jackson-dataformat-yaml)
-* [SnakeYAML Engine](https://bitbucket.org/asomov/snakeyaml)
+* [SnakeYAML Engine](https://bitbucket.org/snakeyaml/snakeyaml-engine/src/master/)
 * [yamlbeans](https://github.com/EsotericSoftware/yamlbeans)
 * [eo-yaml](https://github.com/decorators-squad/eo-yaml)
 * Self-written parser
@@ -34,7 +34,7 @@ Chosen option: Jackson, because as it is a dedicated library for parsing YAML. `
 
 * Good, because established YAML parser library
 * Good, because supports YAML 1.2
-* Bad, because cannot parse YAML into Java DTOs, only into [basic Java structures](https://bitbucket.org/asomov/snakeyaml-engine/src/master/), this then has to be assembled into DTOs
+* Bad, because cannot parse YAML into Java DTOs, only into [basic Java structures](https://bitbucket.org/snakeyaml/snakeyaml-engine/src/master/), this then has to be assembled into DTOs
 
 ### yamlbeans
 

@@ -7,6 +7,8 @@ on:
     paths:
       - 'src/main/java/org/jabref/logic/importer/fetcher/**'
       - 'src/test/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/main/java/org/jabref/logic/crawler/**'
+      - 'src/test/java/org/jabref/logic/crawler/**'
       - '.github/workflows/tests-fetchers.yml'
       - 'build.gradle'
   pull_request:
@@ -27,7 +29,7 @@ env:
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
 
 concurrency:
-  group: fetcher-tests-${{ github.head_ref }}
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
   cancel-in-progress: true
 
 permissions:
@@ -39,13 +41,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/checkout@v4
         with:
-          java-version: 19
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.2
           distribution: 'temurin'
-          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-home-cache-cleanup: true
       - name: Run fetcher tests
         run: ./gradlew fetcherTest
         env:

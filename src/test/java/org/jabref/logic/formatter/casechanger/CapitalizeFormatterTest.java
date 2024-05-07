@@ -51,7 +51,7 @@ public class CapitalizeFormatterTest {
             "-upper, -Upper", // single word with -
             "-{u}pper, -{u}pper", // single word with {} and -
     })
-    public void testInputs(String input, String expectedResult) {
+    public void inputs(String input, String expectedResult) {
         String formattedStr = formatter.format(input);
         assertEquals(expectedResult, formattedStr);
     }

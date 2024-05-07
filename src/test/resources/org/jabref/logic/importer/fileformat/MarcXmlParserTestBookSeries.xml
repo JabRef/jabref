@@ -1,0 +1,297 @@
+<zs:searchRetrieveResponse>
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>1</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+            <zs:recordSchema>info:srw/schema/1/marcxml-v1.1</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <record>
+                    <leader>03794nmm a2200709zcb4500</leader>
+                    <controlfield tag="001">BV049032768</controlfield>
+                    <controlfield tag="003">DE-604</controlfield>
+                    <controlfield tag="005">00000000000000.0</controlfield>
+                    <controlfield tag="007">cr|uuu---uuuuu</controlfield>
+                    <controlfield tag="008">230704s2023 |||| o||u| ||||||eng d</controlfield>
+                    <datafield tag="020" ind1=" " ind2=" ">
+                        <subfield code="a">9783031234767</subfield>
+                        <subfield code="c">Online</subfield>
+                        <subfield code="9">978-3-031-23476-7</subfield>
+                    </datafield>
+                    <datafield tag="040" ind1=" " ind2=" ">
+                        <subfield code="a">DE-604</subfield>
+                        <subfield code="b">ger</subfield>
+                        <subfield code="e">rda</subfield>
+                    </datafield>
+                    <datafield tag="245" ind1="1" ind2="0">
+                        <subfield code="a">Recent Developments and the New Directions of Research, Foundations, and Applications</subfield>
+                        <subfield code="b">Selected Papers of the 8th World Conference on Soft Computing, February 03–05, 2022, Baku, Azerbaijan, Vol. II</subfield>
+                        <subfield code="c">edited by Shahnaz N. Shahbazova, Ali M. Abbasov, Vladik Kreinovich, Janusz Kacprzyk, Ildar Z. Batyrshin</subfield>
+                    </datafield>
+                    <datafield tag="250" ind1=" " ind2=" ">
+                        <subfield code="a">1st ed. 2023</subfield>
+                    </datafield>
+                    <datafield tag="264" ind1=" " ind2="1">
+                        <subfield code="a">Cham</subfield>
+                        <subfield code="b">Springer Nature Switzerland</subfield>
+                        <subfield code="c">2023</subfield>
+                    </datafield>
+                    <datafield tag="264" ind1=" " ind2="1">
+                        <subfield code="a">Cham</subfield>
+                        <subfield code="b">Springer</subfield>
+                    </datafield>
+                    <datafield tag="300" ind1=" " ind2=" ">
+                        <subfield code="a">1 Online-Ressource (XII, 330 p. 64 illus., 42 illus. in color)</subfield>
+                    </datafield>
+                    <datafield tag="700" ind1="1" ind2=" ">
+                        <subfield code="a">Shahbazova, Shahnaz N.</subfield>
+                        <subfield code="4">edt</subfield>
+                    </datafield>
+                    <datafield tag="700" ind1="1" ind2=" ">
+                        <subfield code="a">Abbasov, Ali M.</subfield>
+                        <subfield code="4">edt</subfield>
+                    </datafield>
+                    <datafield tag="700" ind1="1" ind2=" ">
+                        <subfield code="a">Kreinovich, Vladik</subfield>
+                        <subfield code="4">edt</subfield>
+                    </datafield>
+                    <datafield tag="700" ind1="1" ind2=" ">
+                        <subfield code="a">Kacprzyk, Janusz</subfield>
+                        <subfield code="4">edt</subfield>
+                    </datafield>
+                    <datafield tag="700" ind1="1" ind2=" ">
+                        <subfield code="a">Batyrshin, Ildar Z.</subfield>
+                        <subfield code="4">edt</subfield>
+                    </datafield>
+                    <datafield tag="776" ind1="0" ind2="8">
+                        <subfield code="i">Erscheint auch als</subfield>
+                        <subfield code="n">Druck-Ausgabe</subfield>
+                        <subfield code="z">978-3-031-23475-0</subfield>
+                    </datafield>
+                    <datafield tag="776" ind1="0" ind2="8">
+                        <subfield code="i">Erscheint auch als</subfield>
+                        <subfield code="n">Druck-Ausgabe</subfield>
+                        <subfield code="z">978-3-031-23477-4</subfield>
+                    </datafield>
+                    <datafield tag="776" ind1="0" ind2="8">
+                        <subfield code="i">Erscheint auch als</subfield>
+                        <subfield code="n">Druck-Ausgabe</subfield>
+                        <subfield code="z">978-3-031-23478-1</subfield>
+                    </datafield>
+                    <datafield tag="912" ind1=" " ind2=" ">
+                        <subfield code="a">ZDB-2-INR</subfield>
+                    </datafield>
+                    <datafield tag="940" ind1="1" ind2=" ">
+                        <subfield code="q">ZDB-2-INR_2023</subfield>
+                    </datafield>
+                    <datafield tag="024" ind1="7" ind2=" ">
+                        <subfield code="a">10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="2">doi</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(ZDB-2-INR)9783031234767</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(OCoLC)1389184245</subfield>
+                    </datafield>
+                    <datafield tag="035" ind1=" " ind2=" ">
+                        <subfield code="a">(DE-599)BVBBV049032768</subfield>
+                    </datafield>
+                    <datafield tag="041" ind1="0" ind2=" ">
+                        <subfield code="a">eng</subfield>
+                    </datafield>
+                    <datafield tag="049" ind1=" " ind2=" ">
+                        <subfield code="a">DE-91</subfield>
+                        <subfield code="a">DE-1028</subfield>
+                        <subfield code="a">DE-1046</subfield>
+                        <subfield code="a">DE-Aug4</subfield>
+                        <subfield code="a">DE-898</subfield>
+                        <subfield code="a">DE-523</subfield>
+                        <subfield code="a">DE-859</subfield>
+                        <subfield code="a">DE-29</subfield>
+                        <subfield code="a">DE-863</subfield>
+                        <subfield code="a">DE-1050</subfield>
+                        <subfield code="a">DE-862</subfield>
+                        <subfield code="a">DE-92</subfield>
+                        <subfield code="a">DE-522</subfield>
+                        <subfield code="a">DE-573</subfield>
+                        <subfield code="a">DE-M347</subfield>
+                        <subfield code="a">DE-706</subfield>
+                        <subfield code="a">DE-739</subfield>
+                        <subfield code="a">DE-634</subfield>
+                    </datafield>
+                    <datafield tag="082" ind1="0" ind2=" ">
+                        <subfield code="a">006.3</subfield>
+                        <subfield code="2">23</subfield>
+                    </datafield>
+                    <datafield tag="084" ind1=" " ind2=" ">
+                        <subfield code="a">DAT 000</subfield>
+                        <subfield code="2">stub</subfield>
+                    </datafield>
+                    <datafield tag="336" ind1=" " ind2=" ">
+                        <subfield code="b">txt</subfield>
+                        <subfield code="2">rdacontent</subfield>
+                    </datafield>
+                    <datafield tag="337" ind1=" " ind2=" ">
+                        <subfield code="b">c</subfield>
+                        <subfield code="2">rdamedia</subfield>
+                    </datafield>
+                    <datafield tag="338" ind1=" " ind2=" ">
+                        <subfield code="b">cr</subfield>
+                        <subfield code="2">rdacarrier</subfield>
+                    </datafield>
+                    <datafield tag="490" ind1="0" ind2=" ">
+                        <subfield code="a">Studies in Fuzziness and Soft Computing</subfield>
+                        <subfield code="v">423</subfield>
+                        <subfield code="x">1860-0808</subfield>
+                    </datafield>
+                    <datafield tag="650" ind1=" " ind2="4">
+                        <subfield code="a">Computational Intelligence</subfield>
+                    </datafield>
+                    <datafield tag="650" ind1=" " ind2="4">
+                        <subfield code="a">Artificial Intelligence</subfield>
+                    </datafield>
+                    <datafield tag="650" ind1=" " ind2="4">
+                        <subfield code="a">Computational intelligence</subfield>
+                    </datafield>
+                    <datafield tag="650" ind1=" " ind2="4">
+                        <subfield code="a">Artificial intelligence</subfield>
+                    </datafield>
+                    <datafield tag="856" ind1="4" ind2="0">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="z">URL des Erstveröffentlichers</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-522</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-634</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-1046</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-1028</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-Aug4</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-1050</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-573</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-M347</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-92</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-898</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-859</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-863</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-862</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-523</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-91</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-706</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-29</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                    <datafield tag="966" ind1="e" ind2=" ">
+                        <subfield code="u">https://doi.org/10.1007/978-3-031-23476-7</subfield>
+                        <subfield code="l">DE-739</subfield>
+                        <subfield code="p">ZDB-2-INR</subfield>
+                        <subfield code="x">Verlag</subfield>
+                        <subfield code="3">Volltext</subfield>
+                    </datafield>
+                </record>
+            </zs:recordData>
+            <zs:recordPosition>1</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+</zs:searchRetrieveResponse>

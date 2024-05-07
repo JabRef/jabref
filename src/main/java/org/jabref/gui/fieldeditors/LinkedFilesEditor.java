@@ -2,6 +2,8 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -15,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
@@ -38,6 +41,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.GrobidOptInDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
@@ -46,9 +50,11 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
@@ -56,36 +62,61 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+import jakarta.inject.Inject;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
-    @FXML private final LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
+    @FXML private JabRefIconView fulltextFetcher;
+    @FXML private ProgressIndicator progressIndicator;
 
-    private final DialogService dialogService;
+    private final Field field;
     private final BibDatabaseContext databaseContext;
-    private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
-    private final PreferencesService preferencesService;
+    private final SuggestionProvider<?> suggestionProvider;
+    private final FieldCheckers fieldCheckers;
+
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
+    @Inject private BibEntryTypesManager bibEntryTypesManager;
+    @Inject private JournalAbbreviationRepository abbreviationRepository;
+    @Inject private TaskExecutor taskExecutor;
+    @Inject private UndoManager undoManager;
+
+    private LinkedFilesEditorViewModel viewModel;
 
     private ObservableOptionalValue<BibEntry> bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>());
+    private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
 
     public LinkedFilesEditor(Field field,
-                             DialogService dialogService,
                              BibDatabaseContext databaseContext,
-                             TaskExecutor taskExecutor,
                              SuggestionProvider<?> suggestionProvider,
-                             FieldCheckers fieldCheckers,
-                             PreferencesService preferences) {
-        this.viewModel = new LinkedFilesEditorViewModel(field, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
-        this.dialogService = dialogService;
+                             FieldCheckers fieldCheckers) {
+        this.field = field;
         this.databaseContext = databaseContext;
-        this.preferencesService = preferences;
+        this.suggestionProvider = suggestionProvider;
+        this.fieldCheckers = fieldCheckers;
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
-        ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
+        decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
+        Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
+    }
+
+    @FXML
+    private void initialize() {
+        this.viewModel = new LinkedFilesEditorViewModel(
+                field,
+                suggestionProvider,
+                dialogService,
+                databaseContext,
+                taskExecutor,
+                fieldCheckers,
+                preferencesService,
+                undoManager);
+
+        new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
                 .withGraphic(this::createFileDisplay)
                 .withContextMenu(this::createContextMenuForFile)
@@ -93,13 +124,13 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
-                .withValidation(LinkedFileViewModel::fileExistsValidationStatus);
-
-        listView.setCellFactory(cellFactory);
+                .withValidation(LinkedFileViewModel::fileExistsValidationStatus)
+                .install(listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
-        Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
+        fulltextFetcher.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty().not());
+        progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
+
         setUpKeyBindings();
     }
 
@@ -190,10 +221,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
-
-        WriteMetadataToPdfCommand writeMetadataToPdfCommand = linkedFile.createWriteMetadataToPdfCommand();
-        writeMetadataToPdf.disableProperty().bind(writeMetadataToPdfCommand.executableProperty().not());
-        writeMetadataToPdf.setOnAction(event -> writeMetadataToPdfCommand.execute());
+        WriteMetadataToSinglePdfAction writeMetadataToSinglePdfAction = new WriteMetadataToSinglePdfAction(
+                linkedFile.getFile(),
+                bibEntry.getValueOrElse(new BibEntry()),
+                databaseContext, dialogService, preferencesService.getFieldPreferences(),
+                preferencesService.getFilePreferences(), preferencesService.getXmpPreferences(), abbreviationRepository, bibEntryTypesManager,
+                taskExecutor
+        );
+        writeMetadataToPdf.disableProperty().bind(writeMetadataToSinglePdfAction.executableProperty().not());
+        writeMetadataToPdf.setOnAction(event -> writeMetadataToSinglePdfAction.execute());
 
         Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
@@ -218,8 +254,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case DELETE_ENTRY:
-                        new DeleteFileAction(dialogService, preferencesService, databaseContext,
-                                viewModel, listView).execute();
+                        deleteAttachedFilesWithConfirmation();
                         event.consume();
                         break;
                     default:
@@ -227,6 +262,11 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 }
             }
         });
+    }
+
+    private void deleteAttachedFilesWithConfirmation() {
+        new DeleteFileAction(dialogService, preferencesService.getFilePreferences(), databaseContext,
+                viewModel, listView.getSelectionModel().getSelectedItems()).execute();
     }
 
     public LinkedFilesEditorViewModel getViewModel() {
@@ -287,6 +327,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferencesService.getFilePreferences())),
+                factory.createMenuItem(StandardActions.REDOWNLOAD_FILE, new ContextAction(StandardActions.REDOWNLOAD_FILE, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.REMOVE_LINK, new ContextAction(StandardActions.REMOVE_LINK, linkedFile, preferencesService)),
                 factory.createMenuItem(StandardActions.DELETE_FILE, new ContextAction(StandardActions.DELETE_FILE, linkedFile, preferencesService))
         );
@@ -318,6 +359,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                         case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
                                 () -> linkedFile.getFile().isOnlineLink(),
                                 linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                        case REDOWNLOAD_FILE -> Bindings.createBooleanBinding(
+                                () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
+                                linkedFile.getFile().sourceUrlProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
                         case OPEN_FILE, OPEN_FOLDER, RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent(),
@@ -332,7 +376,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 case EDIT_FILE_LINK -> linkedFile.edit();
                 case OPEN_FILE -> linkedFile.open();
                 case OPEN_FOLDER -> linkedFile.openFolder();
-                case DOWNLOAD_FILE -> linkedFile.download();
+                case DOWNLOAD_FILE -> linkedFile.download(true);
+                case REDOWNLOAD_FILE -> linkedFile.redownload();
                 case RENAME_FILE_TO_PATTERN -> linkedFile.renameToSuggestion();
                 case RENAME_FILE_TO_NAME -> linkedFile.askForNameAndRename();
                 case MOVE_FILE_TO_FOLDER -> linkedFile.moveToDefaultDirectory();

@@ -64,7 +64,7 @@ public class OOBibBaseConnect {
             BootstrapException {
 
         // Get the office component context:
-        XComponentContext context = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
+        XComponentContext context = Bootstrap.bootstrap(loPath);
         XMultiComponentFactory sem = context.getServiceManager();
 
         // Create the desktop, which is the root frame of the
@@ -85,7 +85,7 @@ public class OOBibBaseConnect {
         try {
             // get the bridge factory from the local service manager
             XBridgeFactory bridgeFactory = queryInterface(XBridgeFactory.class,
-                                                          org.jabref.gui.openoffice.Bootstrap.createSimpleServiceManager()
+                                                          Bootstrap.createSimpleServiceManager()
                     .createInstance("com.sun.star.bridge.BridgeFactory"));
 
             if (bridgeFactory != null) {
@@ -146,9 +146,9 @@ public class OOBibBaseConnect {
             }
         }
 
-        List<DocumentTitleViewModel> viewModel = (list.stream()
+        List<DocumentTitleViewModel> viewModel = list.stream()
                                                       .map(DocumentTitleViewModel::new)
-                                                      .collect(Collectors.toList()));
+                                                      .collect(Collectors.toList());
 
         // This whole method is part of a background task when
         // auto-detecting instances, so we need to show dialog in FX
@@ -187,7 +187,7 @@ public class OOBibBaseConnect {
         if (textDocumentList.isEmpty()) {
             throw new NoDocumentFoundException("No Writer documents found");
         } else if ((textDocumentList.size() == 1) && autoSelectForSingle) {
-            selected = textDocumentList.get(0); // Get the only one
+            selected = textDocumentList.getFirst(); // Get the only one
         } else { // Bring up a dialog
             selected = OOBibBaseConnect.selectDocumentDialog(textDocumentList,
                     this.dialogService);

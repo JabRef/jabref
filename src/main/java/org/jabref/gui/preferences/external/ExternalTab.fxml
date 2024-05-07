@@ -21,6 +21,10 @@
         <Label text="%Subject for sending an email with references"/>
         <TextField fx:id="eMailReferenceSubject" minWidth="150.0" HBox.hgrow="ALWAYS"/>
     </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="%Email address for sending to Kindle"/>
+        <TextField fx:id="kindleEmail" minWidth="150.0" HBox.hgrow="ALWAYS"/>
+    </HBox>
     <CheckBox fx:id="autoOpenAttachedFolders" text="%Automatically open folders of attached files"/>
 
     <Label styleClass="sectionHeader" text="%Push applications"/>
@@ -29,7 +33,7 @@
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="20.0"/>
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
@@ -51,7 +55,20 @@
 
             <Label text="%Cite command" GridPane.rowIndex="2"/>
             <TextField fx:id="citeCommand"
-                       prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                       prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            <Button fx:id="autolinkExternalHelp"
+                    styleClass="icon-button,narrow"
+                    prefHeight="20.0" prefWidth="20.0"
+                    GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+            <Button styleClass="icon-button,narrow" onAction="#resetCiteCommandToDefault"
+                    prefHeight="20.0" prefWidth="20.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                <graphic>
+                    <JabRefIconView glyph="REFRESH"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="%Reset to default"/>
+                </tooltip>
+            </Button>
         </GridPane>
     </HBox>
 

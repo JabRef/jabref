@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -26,7 +27,6 @@ import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -37,16 +37,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class OOBibStyleTest {
-    private LayoutFormatterPreferences layoutFormatterPreferences;
-
-    @BeforeEach
-    void setUp() {
-        layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-    }
+    private final LayoutFormatterPreferences layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    private final JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
 
     @Test
-    void testAuthorYear() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences);
+    void authorYear() throws IOException {
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences, abbreviationRepository);
         assertTrue(style.isValid());
         assertTrue(style.isInternalStyle());
         assertFalse(style.isCitationKeyCiteMarkers());
@@ -58,10 +54,10 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testAuthorYearAsFile() throws URISyntaxException, IOException {
+    void authorYearAsFile() throws URISyntaxException, IOException {
         Path defFile = Path.of(OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI());
 
-        OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences);
+        OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, abbreviationRepository);
         assertTrue(style.isValid());
         assertFalse(style.isInternalStyle());
         assertFalse(style.isCitationKeyCiteMarkers());
@@ -73,9 +69,11 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testNumerical() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void numerical() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
         assertTrue(style.isValid());
         assertFalse(style.isCitationKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
@@ -162,9 +160,11 @@ class OOBibStyleTest {
      */
 
     @Test
-    void testGetNumCitationMarker() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void getNumCitationMarker() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
         assertEquals("[1] ", runGetNumCitationMarker2a(style, List.of(1), -1, true));
 
         assertEquals("[1]", runGetNumCitationMarker2a(style, List.of(1), -1, false));
@@ -180,9 +180,11 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testGetNumCitationMarkerUndefined() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void getNumCitationMarkerUndefined() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         // unresolved citations look like [??key]
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "key" + "]",
@@ -228,9 +230,11 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testGetCitProperty() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void getCitProperty() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
         assertEquals(", ", style.getStringCitProperty("AuthorSeparator"));
 
         // old
@@ -247,8 +251,11 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testGetCitationMarker() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, layoutFormatterPreferences);
+    void getCitationMarker() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, "Gustav Bostr\\\"{o}m and Jaana W\\\"{a}yrynen and Marine Bod\\'{e}n and Konstantin Beznosov and Philippe Kruchten")
                 .withField(StandardField.YEAR, "2006")
@@ -274,20 +281,23 @@ class OOBibStyleTest {
         assertEquals("Boström et al. [2006]",
                 getCitationMarker2(style,
                         Collections.singletonList(entry), entryDBMap,
-                        false, null, new Boolean[] {false}, null));
+                        false, null, new Boolean[]{false}, null));
 
         assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006]",
                 getCitationMarker2(style,
                         Collections.singletonList(entry), entryDBMap,
                         true,
                         null,
-                        new Boolean[] {true},
+                        new Boolean[]{true},
                         null));
     }
 
     @Test
-    void testLayout() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, layoutFormatterPreferences);
+    void layout() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, "Gustav Bostr\\\"{o}m and Jaana W\\\"{a}yrynen and Marine Bod\\'{e}n and Konstantin Beznosov and Philippe Kruchten")
@@ -313,8 +323,11 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testInstitutionAuthor() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, layoutFormatterPreferences);
+    void institutionAuthor() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
         BibDatabase database = new BibDatabase();
 
         Layout l = style.getReferenceFormat(StandardEntryType.Article);
@@ -331,9 +344,11 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testVonAuthor() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void vonAuthor() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
         BibDatabase database = new BibDatabase();
 
         Layout l = style.getReferenceFormat(StandardEntryType.Article);
@@ -350,33 +365,33 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testInstitutionAuthorMarker() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void institutionAuthorMarker() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
-        BibDatabase database = new BibDatabase();
 
-        BibEntry entry = new BibEntry();
-        entry.setCitationKey("JabRef2016");
-        entry.setType(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "{JabRef Development Team}");
-        entry.setField(StandardField.TITLE, "JabRef Manual");
-        entry.setField(StandardField.YEAR, "2016");
-        database.insertEntry(entry);
-        entries.add(entry);
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("JabRef2016")
+                .withField(StandardField.AUTHOR, "{JabRef Development Team}")
+                .withField(StandardField.TITLE, "JabRef Manual")
+                .withField(StandardField.YEAR, "2016");
+        List<BibEntry> entries = List.of(entry);
+        BibDatabase database = new BibDatabase(entries);
         entryDBMap.put(entry, database);
-
         assertEquals("[JabRef Development Team, 2016]",
                 getCitationMarker2(style,
                         entries, entryDBMap, true, null, null, null));
     }
 
     @Test
-    void testVonAuthorMarker() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void vonAuthorMarker() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -395,9 +410,11 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testNullAuthorMarker() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void nullAuthorMarker() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -414,9 +431,11 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testNullYearMarker() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void nullYearMarker() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -433,9 +452,11 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testEmptyEntryMarker() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void emptyEntryMarker() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -451,9 +472,11 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testGetCitationMarkerInParenthesisUniquefiers() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void getCitationMarkerInParenthesisUniquefiers() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -487,15 +510,17 @@ class OOBibStyleTest {
                 getCitationMarker2b(style, entries, entryDBMap, true, null, null, null));
         assertEquals("[Beta, 2000a,b; Epsilon, 2001]",
                 getCitationMarker2(style, entries, entryDBMap, true,
-                        new String[] {"a", "b", ""},
-                        new Boolean[] {false, false, false},
+                        new String[]{"a", "b", ""},
+                        new Boolean[]{false, false, false},
                         null));
     }
 
     @Test
-    void testGetCitationMarkerInTextUniquefiers() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void getCitationMarkerInTextUniquefiers() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -529,15 +554,17 @@ class OOBibStyleTest {
                 getCitationMarker2b(style, entries, entryDBMap, false, null, null, null));
         assertEquals("Beta [2000a,b]; Epsilon [2001]",
                 getCitationMarker2(style, entries, entryDBMap, false,
-                        new String[] {"a", "b", ""},
-                        new Boolean[] {false, false, false},
+                        new String[]{"a", "b", ""},
+                        new Boolean[]{false, false, false},
                         null));
     }
 
     @Test
-    void testGetCitationMarkerInParenthesisUniquefiersThreeSameAuthor() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void getCitationMarkerInParenthesisUniquefiersThreeSameAuthor() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -570,15 +597,17 @@ class OOBibStyleTest {
 
         assertEquals("[Beta, 2000a,b,c]",
                 getCitationMarker2(style, entries, entryDBMap, true,
-                        new String[] {"a", "b", "c"},
-                        new Boolean[] {false, false, false},
+                        new String[]{"a", "b", "c"},
+                        new Boolean[]{false, false, false},
                         null));
     }
 
     @Test
-    void testGetCitationMarkerInTextUniquefiersThreeSameAuthor() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void getCitationMarkerInTextUniquefiersThreeSameAuthor() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -611,53 +640,69 @@ class OOBibStyleTest {
 
         assertEquals("Beta [2000a,b,c]",
                 getCitationMarker2(style, entries, entryDBMap, false,
-                        new String[] {"a", "b", "c"},
-                        new Boolean[] {false, false, false},
+                        new String[]{"a", "b", "c"},
+                        new Boolean[]{false, false, false},
                         null));
     }
 
     @Test
         // TODO: equals only work when initialized from file, not from reader
-    void testEquals() throws IOException {
-        OOBibStyle style1 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
-        OOBibStyle style2 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void equals() throws IOException {
+        OOBibStyle style1 = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
+        OOBibStyle style2 = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
         assertEquals(style1, style2);
     }
 
     @Test
         // TODO: equals only work when initialized from file, not from reader
-    void testNotEquals() throws IOException {
-        OOBibStyle style1 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
-        OOBibStyle style2 = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
-                layoutFormatterPreferences);
+    void notEquals() throws IOException {
+        OOBibStyle style1 = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
+        OOBibStyle style2 = new OOBibStyle(
+                StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
         assertNotEquals(style1, style2);
     }
 
     @Test
-    void testCompareToEqual() throws IOException {
-        OOBibStyle style1 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
-        OOBibStyle style2 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void compareToEqual() throws IOException {
+        OOBibStyle style1 = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
+        OOBibStyle style2 = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
         assertEquals(0, style1.compareTo(style2));
     }
 
     @Test
-    void testCompareToNotEqual() throws IOException {
-        OOBibStyle style1 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
-        OOBibStyle style2 = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
-                layoutFormatterPreferences);
+    void compareToNotEqual() throws IOException {
+        OOBibStyle style1 = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
+        OOBibStyle style2 = new OOBibStyle(
+                StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
         assertTrue(style1.compareTo(style2) > 0);
         assertFalse(style2.compareTo(style1) > 0);
     }
 
     @Test
-    void testEmptyStringPropertyAndOxfordComma() throws Exception {
-        OOBibStyle style = new OOBibStyle("test.jstyle", layoutFormatterPreferences);
+    void emptyStringPropertyAndOxfordComma() throws Exception {
+        OOBibStyle style = new OOBibStyle("test.jstyle", layoutFormatterPreferences, abbreviationRepository);
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
         BibDatabase database = new BibDatabase();
@@ -676,15 +721,17 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testIsValidWithDefaultSectionAtTheStart() throws Exception {
-        OOBibStyle style = new OOBibStyle("testWithDefaultAtFirstLIne.jstyle", layoutFormatterPreferences);
+    void isValidWithDefaultSectionAtTheStart() throws Exception {
+        OOBibStyle style = new OOBibStyle("testWithDefaultAtFirstLIne.jstyle", layoutFormatterPreferences, abbreviationRepository);
         assertTrue(style.isValid());
     }
 
     @Test
-    void testGetCitationMarkerJoinFirst() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+    void getCitationMarkerJoinFirst() throws IOException {
+        OOBibStyle style = new OOBibStyle(
+                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                layoutFormatterPreferences,
+                abbreviationRepository);
 
         // Question: What should happen if some sources are
         // marked as isFirstAppearanceOfSource?

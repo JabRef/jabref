@@ -58,7 +58,7 @@ public class RangeOverlapWithin {
                 continue;
             }
             XTextRangeCompare cmp = UnoCast.cast(XTextRangeCompare.class,
-                    partition.get(0).getRange().getText()).get();
+                    partition.getFirst().getRange().getText()).get();
 
             for (int i = 0; i < (partition.size() - 1); i++) {
                 V aHolder = partition.get(i);
@@ -97,7 +97,7 @@ public class RangeOverlapWithin {
                     List<V> valuesForOverlappingRanges = new ArrayList<>();
                     valuesForOverlappingRanges.add(aHolder);
                     valuesForOverlappingRanges.add(bHolder);
-                    result.add(new RangeOverlap<>((cmpResult == 0)
+                    result.add(new RangeOverlap<>(cmpResult == 0
                             ? RangeOverlapKind.TOUCH
                             : RangeOverlapKind.OVERLAP,
                             valuesForOverlappingRanges));

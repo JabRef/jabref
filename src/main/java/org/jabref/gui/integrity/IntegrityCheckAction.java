@@ -2,21 +2,23 @@ package org.jabref.gui.integrity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -24,15 +26,23 @@ public class IntegrityCheckAction extends SimpleCommand {
 
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
-    private final JabRefFrame frame;
+    private final Supplier<LibraryTab> tabSupplier;
+    private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final JournalAbbreviationRepository abbreviationRepository;
 
-    public IntegrityCheckAction(JabRefFrame frame, StateManager stateManager, TaskExecutor taskExecutor) {
-        this.frame = frame;
+    public IntegrityCheckAction(Supplier<LibraryTab> tabSupplier,
+                                PreferencesService preferencesService,
+                                DialogService dialogService,
+                                StateManager stateManager,
+                                TaskExecutor taskExecutor,
+                                JournalAbbreviationRepository abbreviationRepository) {
+        this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
-        this.dialogService = frame.getDialogService();
-
+        this.preferencesService = preferencesService;
+        this.dialogService = dialogService;
+        this.abbreviationRepository = abbreviationRepository;
         this.executable.bind(needsDatabase(this.stateManager));
     }
 
@@ -40,18 +50,16 @@ public class IntegrityCheckAction extends SimpleCommand {
     public void execute() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         IntegrityCheck check = new IntegrityCheck(database,
-                Globals.prefs.getFilePreferences(),
-                Globals.prefs.getCitationKeyPatternPreferences(),
-                Globals.journalAbbreviationRepository,
-                Globals.prefs.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
+                preferencesService.getFilePreferences(),
+                preferencesService.getCitationKeyPatternPreferences(),
+                abbreviationRepository,
+                preferencesService.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
 
         Task<List<IntegrityMessage>> task = new Task<>() {
             @Override
             protected List<IntegrityMessage> call() {
-                List<IntegrityMessage> result = new ArrayList<>();
-
                 ObservableList<BibEntry> entries = database.getDatabase().getEntries();
-                result.addAll(check.checkDatabase(database.getDatabase()));
+                List<IntegrityMessage> result = new ArrayList<>(check.checkDatabase(database.getDatabase()));
                 for (int i = 0; i < entries.size(); i++) {
                     if (isCancelled()) {
                         break;
@@ -70,7 +78,7 @@ public class IntegrityCheckAction extends SimpleCommand {
             if (messages.isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, frame.getCurrentLibraryTab()));
+                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, tabSupplier.get()));
             }
         });
         task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));

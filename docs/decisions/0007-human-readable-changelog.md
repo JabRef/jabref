@@ -24,4 +24,3 @@ Chosen option: "Keep-a-changelog format with freedom in the bullet points", beca
   We nevertheless try to follow that style.
 
 Further discussion can be found at [\#2277](https://github.com/JabRef/jabref/issues/2277).
-

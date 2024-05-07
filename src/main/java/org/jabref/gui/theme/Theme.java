@@ -25,7 +25,7 @@ public class Theme {
     public Theme(String name) {
         Objects.requireNonNull(name);
 
-        if (name.equals("") || BASE_CSS.equalsIgnoreCase(name)) {
+        if ("".equals(name) || BASE_CSS.equalsIgnoreCase(name)) {
             this.additionalStylesheet = Optional.empty();
             this.type = Type.DEFAULT;
             this.name = "";

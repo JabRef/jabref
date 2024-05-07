@@ -36,7 +36,7 @@ public class ContainsBasedSearchRule extends FullTextSearchRule {
         List<String> unmatchedWords = new SentenceAnalyzer(searchString).getWords();
 
         for (Field fieldKey : bibEntry.getFields()) {
-            String formattedFieldContent = StringUtil.stripAccents(bibEntry.getLatexFreeField(fieldKey).get());
+            String formattedFieldContent = StringUtil.stripAccents(bibEntry.getFieldLatexFree(fieldKey).get());
             if (!searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
                 formattedFieldContent = formattedFieldContent.toLowerCase(Locale.ROOT);
             }
@@ -54,6 +54,10 @@ public class ContainsBasedSearchRule extends FullTextSearchRule {
             }
         }
 
-        return getFulltextResults(query, bibEntry).numSearchResults() > 0; // Didn't match all words.
+        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT)) {
+            return false;
+        }
+
+        return getFulltextResults(query, bibEntry).numSearchResults() > 0;
     }
 }

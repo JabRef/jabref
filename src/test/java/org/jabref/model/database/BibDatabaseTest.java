@@ -16,7 +16,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.event.EventListenerTest;
-import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,31 +37,12 @@ class BibDatabaseTest {
     }
 
     @Test
-    void noEmptyEntry() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "#AAA#");
-        database.insertEntry(entry);
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, new MetaData());
-        assertEquals(false, bibDatabaseContext.hasEmptyEntries());
-    }
-
-    @Test
-    void withEmptyEntry() {
-        BibEntry entry = new BibEntry();
-        database.insertEntry(entry);
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(database, new MetaData());
-        assertEquals(true, bibDatabaseContext.hasEmptyEntries());
-        bibDatabaseContext.getDatabase().removeEntries(Collections.singletonList(entry));
-        assertEquals(Collections.emptyList(), bibDatabaseContext.getEntries());
-    }
-
-    @Test
     void insertEntryAddsEntryToEntriesList() {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
         assertEquals(1, database.getEntries().size());
         assertEquals(1, database.getEntryCount());
-        assertEquals(entry, database.getEntries().get(0));
+        assertEquals(entry, database.getEntries().getFirst());
     }
 
     @Test
@@ -412,8 +392,8 @@ class BibDatabaseTest {
 
     @Test
     void getUsedStrings() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "#AAA#");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "#AAA#");
         BibtexString tripleA = new BibtexString("AAA", "Some other #BBB#");
         BibtexString tripleB = new BibtexString("BBB", "Some more text");
         BibtexString tripleC = new BibtexString("CCC", "Even more text");
@@ -432,8 +412,8 @@ class BibDatabaseTest {
 
     @Test
     void getUsedStringsSingleString() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "#AAA#");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "#AAA#");
         BibtexString tripleA = new BibtexString("AAA", "Some other text");
         BibtexString tripleB = new BibtexString("BBB", "Some more text");
         List<BibtexString> strings = new ArrayList<>(1);
@@ -449,8 +429,8 @@ class BibDatabaseTest {
 
     @Test
     void getUsedStringsNoString() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "Oscar Gustafsson");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, "Oscar Gustafsson");
         BibtexString string = new BibtexString("AAA", "Some other text");
         database.addString(string);
         database.insertEntry(entry);

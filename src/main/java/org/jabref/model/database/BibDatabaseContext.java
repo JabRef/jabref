@@ -6,23 +6,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.study.Study;
 import org.jabref.preferences.FilePreferences;
 
-import net.harawata.appdirs.AppDirsFactory;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * and the options relevant for this file in Defaults.
  * </p>
  * <p>
- *     To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
+ * To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
  * </p>
  */
 @AllowedToUseLogic("because it needs access to shared database features")
@@ -43,6 +44,12 @@ public class BibDatabaseContext {
 
     private final BibDatabase database;
     private MetaData metaData;
+
+    /**
+     * Generate a random UID for unique of the concrete context
+     * In contrast to hashCode this stays unique
+     */
+    private final String uid = "bibdatabasecontext_" + UUID.randomUUID();
 
     /**
      * The path where this database was last saved to.
@@ -127,9 +134,9 @@ public class BibDatabaseContext {
      */
     public boolean isStudy() {
         return this.getDatabasePath()
-                .map(path -> path.getFileName().toString().equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
-                        Files.exists(path.resolveSibling(StudyRepository.STUDY_DEFINITION_FILE_NAME)))
-                .orElse(false);
+                   .map(path -> path.getFileName().toString().equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
+                           Files.exists(path.resolveSibling(StudyRepository.STUDY_DEFINITION_FILE_NAME)))
+                   .orElse(false);
     }
 
     /**
@@ -156,14 +163,14 @@ public class BibDatabaseContext {
         List<Path> fileDirs = new ArrayList<>();
 
         // 1. Metadata user-specific directory
-        metaData.getUserFileDirectory(preferences.getUser())
+        metaData.getUserFileDirectory(preferences.getUserAndHost())
                 .ifPresent(userFileDirectory -> fileDirs.add(getFileDirectoryPath(userFileDirectory)));
 
         // 2. Metadata general directory
         metaData.getDefaultFileDirectory()
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
-        // 3. BIB file directory or Main file directory
+        // 3. BIB file directory or main file directory
         // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
         // (in the metadata of the bib file)
         if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
@@ -227,7 +234,7 @@ public class BibDatabaseContext {
     }
 
     public void convertToLocalDatabase() {
-        if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
+        if (dbmsListener != null && (location == DatabaseLocation.SHARED)) {
             dbmsListener.unregisterListener(dbmsSynchronizer);
             dbmsListener.shutdown();
         }
@@ -240,24 +247,17 @@ public class BibDatabaseContext {
     }
 
     /**
-     * check if the database has any empty entries
-     *
-     * @return true if the database has any empty entries; otherwise false
+     * @return The path to store the lucene index files. One directory for each library.
      */
-    public boolean hasEmptyEntries() {
-        return this.getEntries().stream().anyMatch(entry -> entry.getFields().isEmpty());
-    }
-
-    public static Path getFulltextIndexBasePath() {
-        return Path.of(AppDirsFactory.getInstance().getUserDataDir(OS.APP_DIR_APP_NAME, SearchFieldConstants.VERSION, OS.APP_DIR_APP_AUTHOR));
-    }
-
+    @NonNull
     public Path getFulltextIndexPath() {
-        Path appData = getFulltextIndexBasePath();
+        Path appData = JabRefDesktop.getFulltextIndexBaseDirectory();
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            indexPath = appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+            Path databaseFileName = getDatabasePath().get().getFileName();
+            String fileName = BackupFileUtil.getUniqueFilePrefix(databaseFileName) + "--" + databaseFileName;
+            indexPath = appData.resolve(fileName);
             LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
             return indexPath;
         }
@@ -276,5 +276,30 @@ public class BibDatabaseContext {
                 ", biblatexMode=" + isBiblatexMode() +
                 ", fulltextIndexPath=" + getFulltextIndexPath() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BibDatabaseContext that)) {
+            return false;
+        }
+        return Objects.equals(database, that.database) && Objects.equals(metaData, that.metaData) && Objects.equals(path, that.path) && location == that.location;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(database, metaData, path, location);
+    }
+
+    /**
+     * Get the generated UID for the current context. Can be used to distinguish contexts with changing metadata etc
+     *
+     * @return The generated UID in UUIDv4 format with the prefix bibdatabasecontext_
+     */
+    public String getUid() {
+        return uid;
     }
 }

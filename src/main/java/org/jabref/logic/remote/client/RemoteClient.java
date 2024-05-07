@@ -18,7 +18,9 @@ public class RemoteClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteClient.class);
 
-    private static final int TIMEOUT = 1000;
+    // Opening a library can take time, thus 2 minutes is a reasonable timeout.
+    private static final int TIMEOUT = 120_000;
+
     private final int port;
 
     public RemoteClient(int port) {
@@ -39,7 +41,7 @@ public class RemoteClient {
                 return false;
             }
         } catch (IOException e) {
-            LOGGER.debug("Could not ping server at port " + port, e);
+            LOGGER.debug("Could not ping server at port {}", port, e);
             return false;
         }
     }
@@ -56,7 +58,7 @@ public class RemoteClient {
             Pair<RemoteMessage, Object> response = protocol.receiveMessage();
             return response.getKey() == RemoteMessage.OK;
         } catch (IOException e) {
-            LOGGER.debug("Could not send args " + String.join(", ", args) + " to the server at port " + port, e);
+            LOGGER.debug("Could not send args {} to the server at port {}", String.join(", ", args), port, e);
             return false;
         }
     }

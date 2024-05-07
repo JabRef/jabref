@@ -388,13 +388,15 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * <p>
      * Similar implementions:
      * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
-     * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
+     * <a href="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
      */
     protected class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
-        private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.logic.importer.fetcher.ArXivFetcher.ArXiv.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(ArXivFetcher.ArXiv.class);
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
+
+        private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
         private final ImportFormatPreferences importFormatPreferences;
 
@@ -429,7 +431,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         private Optional<ArXivEntry> searchForEntry(String searchQuery) throws FetcherException {
             List<ArXivEntry> entries = queryApi(searchQuery, Collections.emptyList(), 0, 1);
             if (entries.size() == 1) {
-                return Optional.of(entries.get(0));
+                return Optional.of(entries.getFirst());
             } else {
                 return Optional.empty();
             }
@@ -442,8 +444,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier.get()), 0, 1);
-            if (entries.size() >= 1) {
-                return Optional.of(entries.get(0));
+            if (!entries.isEmpty()) {
+                return Optional.of(entries.getFirst());
             } else {
                 return Optional.empty();
             }
@@ -541,8 +543,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 uriBuilder.addParameter("max_results", String.valueOf(maxResults));
                 URL url = uriBuilder.build().toURL();
 
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = factory.newDocumentBuilder();
+                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 if (connection.getResponseCode() == 400) {
@@ -568,7 +569,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             //      <summary>incorrect id format for 0307015</summary>
             // </entry>
             if (entries.size() == 1) {
-                Node node = entries.get(0);
+                Node node = entries.getFirst();
                 Optional<String> id = XMLUtil.getNodeContent(node, "id");
                 Boolean isError = id.map(idContent -> idContent.startsWith("http://arxiv.org/api/errors")).orElse(false);
                 if (isError) {
@@ -601,7 +602,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
             List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber)
                     .stream()
-                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
+                    .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))
                     .collect(Collectors.toList());
             return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
         }
@@ -628,7 +629,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         @Override
         public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
             return searchForEntryById(identifier)
-                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
+                    .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()));
         }
 
         @Override

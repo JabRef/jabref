@@ -44,7 +44,7 @@ public class OpenUrlAction extends SimpleCommand {
                 return;
             }
 
-            BibEntry entry = entries.get(0);
+            BibEntry entry = entries.getFirst();
 
             // ToDo: Create dialog or menu to chose which one to open
             // URL - DOI - DOI - EPRINT
@@ -53,6 +53,10 @@ public class OpenUrlAction extends SimpleCommand {
             if (entry.hasField(StandardField.URI)) {
                 link = entry.getField(StandardField.URI);
                 field = StandardField.URI;
+            }
+            if (entry.hasField(StandardField.ISBN)) {
+                link = entry.getField(StandardField.ISBN);
+                field = StandardField.ISBN;
             }
             if (entry.hasField(StandardField.DOI)) {
                 link = entry.getField(StandardField.DOI);

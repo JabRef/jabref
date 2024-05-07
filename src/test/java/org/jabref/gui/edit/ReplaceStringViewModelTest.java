@@ -64,11 +64,11 @@ public class ReplaceStringViewModelTest {
             "2020, 2021, date, FALSE, FALSE, 1", // only replace "2020" in the DATE field to "2021" in the BibEntry
             "2020, 2021, date, TRUE, TRUE, 2", // replace all the "2020"s in the entries
 
-            "System, replaceText, title, FALSE, TRUE, 1", // replace "System" in all entries is case sensitive
+            "System, replaceText, title, FALSE, TRUE, 1", // replace "System" in all entries is case-sensitive
             "and, '', author, TRUE, FALSE, 2", // replace two "and"s with empty string in the same AUTHOR field
             "' ', ',', date, TRUE, FALSE, 1" // replace space with comma in DATE field
     })
-    void testReplace(String findString, String replaceString, String fieldString, boolean selectOnly, boolean allFieldReplace, int expectedResult) {
+    void replace(String findString, String replaceString, String fieldString, boolean selectOnly, boolean allFieldReplace, int expectedResult) {
         viewModel.findStringProperty().bind(new SimpleStringProperty(findString));
         viewModel.replaceStringProperty().bind(new SimpleStringProperty(replaceString));
         viewModel.fieldStringProperty().bind(new SimpleStringProperty(fieldString));

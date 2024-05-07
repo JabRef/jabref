@@ -1,6 +1,5 @@
 package org.jabref.model.search.rules;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -13,14 +12,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.Globals;
-import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.strings.StringUtil;
@@ -45,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * This class implements the "Advanced Search Mode" described in the help
  */
 @AllowedToUseLogic("Because access to the lucene index is needed")
-public class GrammarBasedSearchRule implements SearchRule {
+public class GrammarBasedSearchRule extends FullTextSearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrammarBasedSearchRule.class);
 
@@ -54,8 +49,6 @@ public class GrammarBasedSearchRule implements SearchRule {
     private ParseTree tree;
     private String query;
     private List<SearchResult> searchResults = new ArrayList<>();
-
-    private final BibDatabaseContext databaseContext;
 
     public static class ThrowingErrorListener extends BaseErrorListener {
 
@@ -70,8 +63,8 @@ public class GrammarBasedSearchRule implements SearchRule {
     }
 
     public GrammarBasedSearchRule(EnumSet<SearchFlags> searchFlags) throws RecognitionException {
+        super(searchFlags);
         this.searchFlags = searchFlags;
-        databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
     }
 
     public static boolean isValid(EnumSet<SearchFlags> searchFlags, String query) {
@@ -97,20 +90,9 @@ public class GrammarBasedSearchRule implements SearchRule {
         SearchParser parser = new SearchParser(new CommonTokenStream(lexer));
         parser.removeErrorListeners(); // no infos on file system
         parser.addErrorListener(ThrowingErrorListener.INSTANCE);
-        parser.setErrorHandler(new BailErrorStrategy()); // ParseCancelationException on parse errors
+        parser.setErrorHandler(new BailErrorStrategy()); // ParseCancellationException on parse errors
         tree = parser.start();
         this.query = query;
-
-        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || (databaseContext == null)) {
-            return;
-        }
-        try {
-            PdfSearcher searcher = PdfSearcher.of(databaseContext);
-            PdfSearchResults results = searcher.search(query, 5);
-            searchResults = results.getSortedByScore();
-        } catch (IOException e) {
-            LOGGER.error("Could not retrieve search results!", e);
-        }
     }
 
     @Override
@@ -118,14 +100,9 @@ public class GrammarBasedSearchRule implements SearchRule {
         try {
             return new BibtexSearchVisitor(searchFlags, bibEntry).visit(tree);
         } catch (Exception e) {
-            LOGGER.debug("Search failed", e);
-            return getFulltextResults(query, bibEntry).numSearchResults() > 0;
+            LOGGER.info("Search failed", e);
+            return false;
         }
-    }
-
-    @Override
-    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
-        return new PdfSearchResults(searchResults.stream().filter(searchResult -> searchResult.isResultFor(bibEntry)).collect(Collectors.toList()));
     }
 
     @Override
@@ -192,7 +169,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             }
 
             for (Field field : fieldsKeys) {
-                Optional<String> fieldValue = entry.getLatexFreeField(field);
+                Optional<String> fieldValue = entry.getFieldLatexFree(field);
                 if (fieldValue.isPresent()) {
                     if (matchFieldValue(StringUtil.stripAccents(fieldValue.get()))) {
                         return true;

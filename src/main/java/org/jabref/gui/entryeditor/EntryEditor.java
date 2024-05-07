@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.cleanup.CleanupSingleAction;
+import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
@@ -43,7 +45,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -53,6 +55,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -71,6 +74,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * EntryEditor also registers itself to the event bus, receiving events whenever a field of the entry changes, enabling
  * the text fields to update themselves if the change is made from somewhere else.
+ * <p>
+ * The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
  */
 public class EntryEditor extends BorderPane {
 
@@ -80,21 +85,26 @@ public class EntryEditor extends BorderPane {
     private final BibDatabaseContext databaseContext;
     private final EntryEditorPreferences entryEditorPreferences;
     private final ExternalFilesEntryLinker fileLinker;
-    /*
-    * Tabs which can apply filter, but seems non-sense
-    * */
-    private final List<EntryEditorTab> tabs;
+    private final DirectoryMonitorManager directoryMonitorManager;
+
     private Subscription typeSubscription;
+
     /*
-    * A reference to the entry this editor works on.
-    * */
+     * Reference to the entry this editor works on.
+     */
     private BibEntry entry;
+
     private SourceTab sourceTab;
 
     /*
-    * tabs to be showed in GUI
-    * */
+     * tabs to be shown in GUI
+     */
     @FXML private TabPane tabbed;
+
+    /*
+     * Tabs which can apply filter, but seems non-sense
+     */
+    private final List<EntryEditorTab> tabs;
 
     @FXML private Button typeChangeButton;
     @FXML private Button fetcherButton;
@@ -115,13 +125,14 @@ public class EntryEditor extends BorderPane {
     public EntryEditor(LibraryTab libraryTab) {
         this.libraryTab = libraryTab;
         this.databaseContext = libraryTab.getBibDatabaseContext();
+        this.directoryMonitorManager = libraryTab.getDirectoryMonitorManager();
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), databaseContext);
+        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), databaseContext, dialogService);
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
@@ -146,19 +157,19 @@ public class EntryEditor extends BorderPane {
             boolean success = false;
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
-                List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+                List<Path> draggedFiles = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
                 switch (event.getTransferMode()) {
                     case COPY -> {
                         LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, draggedFiles, libraryTab.getIndexingTaskManager());
                     }
                     case MOVE -> {
                         LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
+                        fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, draggedFiles, libraryTab.getIndexingTaskManager());
                     }
                     case LINK -> {
                         LOGGER.debug("Mode LINK");
-                        fileLinker.addFilesToEntry(entry, files);
+                        fileLinker.addFilesToEntry(entry, draggedFiles);
                     }
                 }
                 success = true;
@@ -196,11 +207,15 @@ public class EntryEditor extends BorderPane {
                         event.consume();
                         break;
                     case HELP:
-                        new HelpAction(HelpFile.ENTRY_EDITOR, dialogService).execute();
+                        new HelpAction(HelpFile.ENTRY_EDITOR, dialogService, preferencesService.getFilePreferences()).execute();
                         event.consume();
                         break;
                     case CLOSE:
-                    case EDIT_ENTRY:
+                        // We do not want to close the entry editor as such
+                        // We just want to unfocus the field
+                        tabbed.requestFocus();
+                        break;
+                    case OPEN_CLOSE_ENTRY_EDITOR:
                         close();
                         event.consume();
                         break;
@@ -245,46 +260,60 @@ public class EntryEditor extends BorderPane {
     }
 
     private List<EntryEditorTab> createTabs() {
-        // Preview tab
-        entryEditorTabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager()));
+        entryEditorTabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor));
 
-        // Required fields
+        // Required, optional (important+detail), deprecated, and "other" fields
         entryEditorTabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
-
-        // Optional fields
-        entryEditorTabs.add(new OptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
-        entryEditorTabs.add(new OptionalFields2Tab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
+        entryEditorTabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
+        entryEditorTabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
         entryEditorTabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
-
-        // Other fields
         entryEditorTabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
 
-        // General fields from preferences
-        for (Map.Entry<String, Set<Field>> tab : entryEditorPreferences.getEntryEditorTabList().entrySet()) {
+        // Comment Tab: Tab for general and user-specific comments
+        entryEditorTabs.add(new CommentsTab(preferencesService, databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository));
+
+        // The preferences allow to configure tabs to show (e.g.,"General", "Abstract")
+        // These should be shown. Already hard-coded ones should be removed.
+        Map<String, Set<Field>> entryEditorTabList = new HashMap<>(entryEditorPreferences.getEntryEditorTabs());
+        entryEditorTabList.remove(PreviewTab.NAME);
+        entryEditorTabList.remove(RequiredFieldsTab.NAME);
+        entryEditorTabList.remove(ImportantOptionalFieldsTab.NAME);
+        entryEditorTabList.remove(DetailOptionalFieldsTab.NAME);
+        entryEditorTabList.remove(DeprecatedFieldsTab.NAME);
+        entryEditorTabList.remove(OtherFieldsTab.NAME);
+        entryEditorTabList.remove(CommentsTab.NAME);
+        entryEditorTabList.remove(MathSciNetTab.NAME);
+        entryEditorTabList.remove(FileAnnotationTab.NAME);
+        entryEditorTabList.remove(SciteTab.NAME);
+        // CitationRelationsTab
+        entryEditorTabList.remove(RelatedArticlesTab.NAME);
+        // SourceTab -- not listed, because it has different names for BibTeX and biblatex mode
+        entryEditorTabList.remove(LatexCitationsTab.NAME);
+        entryEditorTabList.remove(FulltextSearchResultsTab.NAME);
+
+        for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
             entryEditorTabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository));
         }
 
-        // Special tabs
         entryEditorTabs.add(new MathSciNetTab());
         entryEditorTabs.add(new FileAnnotationTab(libraryTab.getAnnotationCache()));
-        entryEditorTabs.add(new RelatedArticlesTab(this, entryEditorPreferences, preferencesService, dialogService));
-
-        // Source tab
+        entryEditorTabs.add(new SciteTab(preferencesService, taskExecutor, dialogService));
+        entryEditorTabs.add(new CitationRelationsTab(entryEditorPreferences, dialogService, databaseContext,
+                undoManager, stateManager, fileMonitor, preferencesService, libraryTab, taskExecutor));
+        entryEditorTabs.add(new RelatedArticlesTab(entryEditorPreferences, preferencesService, dialogService, taskExecutor));
         sourceTab = new SourceTab(
                 databaseContext,
                 undoManager,
-                preferencesService.getFieldWriterPreferences(),
+                preferencesService.getFieldPreferences(),
                 preferencesService.getImportFormatPreferences(),
                 fileMonitor,
                 dialogService,
                 stateManager,
+                bibEntryTypesManager,
                 keyBindingRepository);
         entryEditorTabs.add(sourceTab);
-
-        // LaTeX citations tab
-        entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
-
-        entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService));
+        entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
+        entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
 
         return entryEditorTabs;
     }
@@ -299,7 +328,7 @@ public class EntryEditor extends BorderPane {
         // This hack is required since tabbed.getTabs().setAll(visibleTabs) changes the order of the tabs in the editor
 
         // First, remove tabs that we do not want to show
-        List<EntryEditorTab> toBeRemoved = tabs.stream().filter(tab -> !tab.shouldShow(entry)).collect(Collectors.toList());
+        List<EntryEditorTab> toBeRemoved = tabs.stream().filter(tab -> !tab.shouldShow(entry)).toList();
         tabbed.getTabs().removeAll(toBeRemoved);
 
         // Next add all the visible tabs (if not already present) at the right position
@@ -402,14 +431,14 @@ public class EntryEditor extends BorderPane {
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {
-        new FetchAndMergeEntry(libraryTab, taskExecutor, preferencesService, dialogService).fetchAndMerge(entry, fetcher);
+        new FetchAndMergeEntry(libraryTab.getBibDatabaseContext(), taskExecutor, preferencesService, dialogService, undoManager).fetchAndMerge(entry, fetcher);
     }
 
     public void setFocusToField(Field field) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             for (Tab tab : tabbed.getTabs()) {
-                if ((tab instanceof FieldsEditorTab fieldsEditorTab) && fieldsEditorTab.getShownFields()
-                                                                                     .contains(field)) {
+                if ((tab instanceof FieldsEditorTab fieldsEditorTab)
+                        && fieldsEditorTab.getShownFields().contains(field)) {
                     tabbed.getSelectionModel().select(tab);
                     fieldsEditorTab.requestFocus(field);
                 }

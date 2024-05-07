@@ -36,7 +36,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         this.onlySplitWordsAtSeparator = onlySplitWordsAtSeparator;
 
         if (onlySplitWordsAtSeparator) {
-            if (InternalField.TYPE_HEADER.equals(searchField)) {
+            if (InternalField.TYPE_HEADER == searchField) {
                 searchStrategy = new TypeSearchStrategy();
             } else {
                 searchStrategy = new KeywordListSearchStrategy();

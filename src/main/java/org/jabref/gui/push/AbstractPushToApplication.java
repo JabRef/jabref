@@ -13,9 +13,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PushToApplicationPreferences;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +27,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPushToApplication implements PushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPushToApplication.class);
-
     protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
-    protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate
+    protected boolean couldNotPush; // Set to true in case the tunnel to the program (if one is used) does not operate
     protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
 
     protected String commandPath;
@@ -57,14 +58,19 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     @Override
     public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
-        couldNotConnect = false;
+        pushEntries(database, entries, keyString, new ProcessBuilder());
+    }
+
+    @VisibleForTesting
+    protected void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString, ProcessBuilder processBuilder) {
+        couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 
         commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
-        if ((commandPath == null) || commandPath.trim().isEmpty()) {
+        if (StringUtil.isNullOrEmpty(commandPath)) {
             notDefined = true;
             return;
         }
@@ -77,7 +83,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                     LOGGER.error("Commandline does not contain enough parameters to \"push to application\"");
                     return;
                 }
-                ProcessBuilder processBuilder = new ProcessBuilder(
+                processBuilder.command(
                         "open",
                         "-a",
                         commands[0],
@@ -88,7 +94,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                 );
                 processBuilder.start();
             } else {
-                ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
+                processBuilder.command(getCommandLine(keyString));
                 processBuilder.start();
             }
         } catch (IOException excep) {
@@ -107,7 +113,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),
                     Localization.lang("Could not call executable") + " '" + commandPath + "'.");
-        } else if (couldNotConnect) {
+        } else if (couldNotPush) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),
                     Localization.lang("Could not connect to %0", getDisplayName()) + ".");
@@ -122,7 +128,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     /**
-     * Function to get the command to be executed for pushing keys to be cited
+     * Constructs the command line arguments for pushing citations to the application.
+     * The method formats the citation key and prefixes/suffixes as per user preferences
+     * before invoking the application with the command to insert text.
      *
      * @param keyString String containing the Bibtex keys to be pushed to the application
      * @return String array with the command to call and its arguments
@@ -141,10 +149,19 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return null;
     }
 
-    protected String getCiteCommand() {
-        return preferencesService.getExternalApplicationsPreferences().getCiteCommand();
+    protected String getCitePrefix() {
+        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().prefix();
     }
 
+    public String getDelimiter() {
+        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().delimiter();
+    }
+
+    protected String getCiteSuffix() {
+        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().suffix();
+    }
+
+    @Override
     public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
         return new PushToApplicationSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
     }

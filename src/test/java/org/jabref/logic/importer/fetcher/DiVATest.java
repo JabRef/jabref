@@ -28,17 +28,17 @@ public class DiVATest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("DiVA", fetcher.getName());
     }
 
     @Test
-    public void testPerformSearchById() throws Exception {
+    public void performSearchById() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setCitationKey("Gustafsson260746");
         entry.setField(StandardField.AUTHOR, "Gustafsson, Oscar");
-        entry.setField(StandardField.INSTITUTION, "Linköping University, The Institute of Technology");
+        entry.setField(StandardField.INSTITUTION, "The Institute of Technology");
         entry.setField(StandardField.JOURNAL,
                 "IEEE transactions on circuits and systems. 2, Analog and digital signal processing (Print)");
         entry.setField(StandardField.NUMBER, "11");
@@ -53,17 +53,17 @@ public class DiVATest {
     }
 
     @Test
-    public void testValidIdentifier() {
+    public void validIdentifier() {
         assertTrue(fetcher.isValidId("diva2:260746"));
     }
 
     @Test
-    public void testInvalidIdentifier() {
+    public void invalidIdentifier() {
         assertFalse(fetcher.isValidId("banana"));
     }
 
     @Test
-    public void testEmptyId() throws Exception {
+    public void emptyId() throws Exception {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 }

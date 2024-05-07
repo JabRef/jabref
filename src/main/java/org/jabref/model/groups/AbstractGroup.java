@@ -70,7 +70,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     }
 
     public void setColor(Color color) {
-        this.color = Optional.of(color);
+        this.color = Optional.ofNullable(color);
     }
 
     public void setColor(String colorString) {

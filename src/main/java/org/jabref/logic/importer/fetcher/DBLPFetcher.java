@@ -22,7 +22,6 @@ import org.jabref.logic.layout.LayoutFormatterBasedFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -58,7 +57,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(importFormatPreferences);
     }
 
     @Override
@@ -69,7 +68,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
         FieldFormatterCleanups cleanups = new FieldFormatterCleanups(true,
                 List.of(
                         new FieldFormatterCleanup(StandardField.TIMESTAMP, new ClearFormatter()),
-                        // unescape the the contents of the URL field, e.g., some\_url\_part becomes some_url_part
+                        // unescape the contents of the URL field, e.g., some\_url\_part becomes some_url_part
                         new FieldFormatterCleanup(StandardField.URL, new LayoutFormatterBasedFormatter(new RemoveLatexCommandsFormatter()))
                 ));
         cleanups.applySaveActions(entry);

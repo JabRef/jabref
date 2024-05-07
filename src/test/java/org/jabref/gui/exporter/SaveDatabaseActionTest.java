@@ -8,16 +8,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
-import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,9 +26,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveOrder;
+import org.jabref.preferences.ExportPreferences;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.LibraryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,19 +53,16 @@ class SaveDatabaseActionTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final JabRefPreferences preferences = mock(JabRefPreferences.class);
     private LibraryTab libraryTab = mock(LibraryTab.class);
-    private final JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
 
     @BeforeEach
     public void setUp() {
-        when(libraryTab.frame()).thenReturn(jabRefFrame);
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(filePreferences.getWorkingDirectory()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
-        when(jabRefFrame.getDialogService()).thenReturn(dialogService);
-
-        saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class)));
+        when(preferences.getExportPreferences()).thenReturn(mock(ExportPreferences.class));
+        saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, dialogService, preferences, mock(BibEntryTypesManager.class)));
     }
 
     @Test
@@ -102,34 +102,31 @@ class SaveDatabaseActionTest {
         file = Files.createTempFile("JabRef", ".bib");
         file.toFile().deleteOnExit();
 
-        FieldWriterPreferences fieldWriterPreferences = mock(FieldWriterPreferences.class);
-        when(fieldWriterPreferences.getFieldContentFormatterPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
-        GeneralPreferences generalPreferences = mock(GeneralPreferences.class);
-        SavePreferences savePreferences = mock(SavePreferences.class);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        SaveConfiguration saveConfiguration = mock(SaveConfiguration.class);
         // In case a "thenReturn" is modified, the whole mock has to be recreated
         dbContext = mock(BibDatabaseContext.class);
         libraryTab = mock(LibraryTab.class);
         MetaData metaData = mock(MetaData.class);
-        when(savePreferences.withSaveType(any(SavePreferences.DatabaseSaveType.class))).thenReturn(savePreferences);
-        when(savePreferences.getFieldWriterPreferences()).thenReturn(fieldWriterPreferences);
-        GlobalCitationKeyPattern emptyGlobalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern("");
-        when(metaData.getCiteKeyPattern(any(GlobalCitationKeyPattern.class))).thenReturn(emptyGlobalCitationKeyPattern);
-        when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class));
-        when(savePreferences.getCitationKeyPatternPreferences().getKeyPattern()).thenReturn(emptyGlobalCitationKeyPattern);
+        when(saveConfiguration.withSaveType(any(BibDatabaseWriter.SaveType.class))).thenReturn(saveConfiguration);
+        when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        GlobalCitationKeyPatterns emptyGlobalCitationKeyPatterns = GlobalCitationKeyPatterns.fromPattern("");
+        when(metaData.getCiteKeyPatterns(any(GlobalCitationKeyPatterns.class))).thenReturn(emptyGlobalCitationKeyPatterns);
         when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(dbContext.getDatabase()).thenReturn(database);
         when(dbContext.getMetaData()).thenReturn(metaData);
         when(dbContext.getEntries()).thenReturn(database.getEntries());
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
-        when(preferences.getGeneralPreferences()).thenReturn(generalPreferences);
-        when(preferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
-        when(preferences.getSavePreferences()).thenReturn(savePreferences);
-        when(libraryTab.frame()).thenReturn(jabRefFrame);
+        when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class));
+        when(preferences.getCitationKeyPatternPreferences().getKeyPatterns()).thenReturn(emptyGlobalCitationKeyPatterns);
+        when(preferences.getFieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
+        when(preferences.getLibraryPreferences()).thenReturn(mock(LibraryPreferences.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(libraryTab.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
-        saveDatabaseAction = new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class));
+        saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, mock(BibEntryTypesManager.class));
         return saveDatabaseAction;
     }
 

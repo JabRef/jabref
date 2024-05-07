@@ -42,7 +42,8 @@ class CompositeIdFetcherTest {
                                 .withField(StandardField.TITLE, "Reading the CARDs: the Imprint of Accretion History in the Chemical Abundances of the Milky Way's Stellar Halo")
                                 .withField(StandardField.DATE, "2021-10-06")
                                 .withField(StandardField.YEAR, "2021")
-                                .withField(StandardField.MONTH, "aug")
+                                .withField(StandardField.MONTH, "#aug#")
+                                .withField(StandardField.ISSN, "1538-4357")
                                 .withField(StandardField.NUMBER, "2")
                                 .withField(StandardField.VOLUME, "934")
                                 .withField(StandardField.PUBLISHER, "American Astronomical Society")
@@ -79,22 +80,27 @@ class CompositeIdFetcherTest {
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForIsbnId",
                         new BibEntry(StandardEntryType.Book)
-                                .withField(StandardField.TITLE, "Effective Java")
-                                .withField(StandardField.PUBLISHER, "Addison-Wesley Professional")
-                                .withField(StandardField.YEAR, "2017")
                                 .withField(StandardField.AUTHOR, "Bloch, Joshua")
-                                .withField(StandardField.PAGES, "416")
-                                .withField(StandardField.ISBN, "9780134685991"),
+                                .withField(StandardField.TITLE, "Effective Java")
+                                .withField(StandardField.PUBLISHER, "Addison-Wesley")
+                                .withField(StandardField.YEAR, "2018")
+                                .withField(StandardField.ISBN, "9780134685991")
+                                .withField(StandardField.NOTE, "Titelzusätze auf dem Umschlag: \"Updated for Java 9. Best practices for ... the Java platform\"")
+                                .withField(StandardField.PAGETOTAL, "392")
+                                .withField(new UnknownField("ppn_gvk"), "100121840X")
+                                .withField(StandardField.EDITION, "Third edition")
+                                .withField(StandardField.ADDRESS, "Boston"),
                         "9780134685991"
                 ),
                 Arguments.arguments(
                         "performSearchByIdReturnsCorrectEntryForDoiId",
                         new BibEntry(StandardEntryType.Book)
-                                .withField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}")
+                                .withField(StandardField.TITLE, "Java® For Dummies®")
                                 .withField(StandardField.PUBLISHER, "Wiley")
                                 .withField(StandardField.YEAR, "2011")
-                                .withField(StandardField.AUTHOR, "Barry Burd")
-                                .withField(StandardField.MONTH, "jul")
+                                .withField(StandardField.AUTHOR, "Burd, Barry")
+                                .withField(StandardField.MONTH, "#jul#")
+                                .withField(StandardField.ISBN, "9781118257517")
                                 .withField(StandardField.DOI, "10.1002/9781118257517")
                                 .withCitationKey("Burd_2011"),
                         "10.1002/9781118257517"

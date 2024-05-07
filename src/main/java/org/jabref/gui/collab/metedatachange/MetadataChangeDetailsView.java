@@ -1,39 +1,44 @@
 package org.jabref.gui.collab.metedatachange;
 
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
 
-    public MetadataChangeDetailsView(MetadataChange metadataChange, PreferencesService preferencesService) {
+    public MetadataChangeDetailsView(MetadataChange metadataChange, GlobalCitationKeyPatterns globalCitationKeyPatterns) {
         VBox container = new VBox(15);
 
         Label header = new Label(Localization.lang("The following metadata changed:"));
         header.getStyleClass().add("sectionHeader");
         container.getChildren().add(header);
 
-        for (MetaDataDiff.Difference change : metadataChange.getMetaDataDiff().getDifferences(preferencesService)) {
-            container.getChildren().add(new Label(getDifferenceString(change)));
+        for (MetaDataDiff.Difference diff : metadataChange.getMetaDataDiff().getDifferences(globalCitationKeyPatterns)) {
+            container.getChildren().add(new Label(getDifferenceString(diff.differenceType())));
+            container.getChildren().add(new Label(diff.originalObject().toString()));
+            container.getChildren().add(new Label(diff.newObject().toString()));
         }
 
-        setLeftAnchor(container, 8d);
-        setTopAnchor(container, 8d);
-        setRightAnchor(container, 8d);
-        setBottomAnchor(container, 8d);
+        ScrollPane scrollPane = new ScrollPane(container);
+        scrollPane.setFitToWidth(true);
+        getChildren().setAll(scrollPane);
 
-        getChildren().setAll(container);
+        setLeftAnchor(scrollPane, 8d);
+        setTopAnchor(scrollPane, 8d);
+        setRightAnchor(scrollPane, 8d);
+        setBottomAnchor(scrollPane, 8d);
     }
 
-    private String getDifferenceString(MetaDataDiff.Difference change) {
-        return switch (change) {
+    private String getDifferenceString(MetaDataDiff.DifferenceType changeType) {
+        return switch (changeType) {
             case PROTECTED ->
                     Localization.lang("Library protection");
-            case GROUPS_ALTERED ->
+            case GROUPS ->
                     Localization.lang("Modified groups tree");
             case ENCODING ->
                     Localization.lang("Library encoding");

@@ -115,7 +115,7 @@ public class TooltipTextUtil {
             textList.remove(index);
             String[] textParts = original.split(replacement.toReplace);
             if (textParts.length == 2) {
-                if (textParts[0].equals("")) {
+                if ("".equals(textParts[0])) {
                     textList.add(index, TooltipTextUtil.createText(replacement.replacement, replacement.textType));
                     textList.add(index + 1, TooltipTextUtil.createText(textParts[1], TooltipTextUtil.TextType.NORMAL));
                 } else {
@@ -152,13 +152,13 @@ public class TooltipTextUtil {
         String textString = text.getText();
         textString = textString.replace("\n", "<br>");
         if (text.getStyleClass().toString().contains("tooltip-text-monospaced")) {
-            textString = String.format("<tt>%s</tt>", textString);
+            textString = "<tt>%s</tt>".formatted(textString);
         }
         if (text.getStyleClass().toString().contains("tooltip-text-bold")) {
-            textString = String.format("<b>%s</b>", textString);
+            textString = "<b>%s</b>".formatted(textString);
         }
         if (text.getStyleClass().toString().contains("tooltip-text-italic")) {
-            textString = String.format("<i>%s</i>", textString);
+            textString = "<i>%s</i>".formatted(textString);
         }
         return textString;
     }

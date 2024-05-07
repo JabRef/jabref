@@ -1,10 +1,13 @@
 package org.jabref.gui.edit;
 
-import javafx.scene.control.TextField;
+import java.util.function.Supplier;
+
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.control.TextInputControl;
 import javafx.scene.web.WebView;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -22,15 +25,16 @@ public class EditAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
-    private final JabRefFrame frame;
-    private TextField text;
+    private final Supplier<LibraryTab> tabSupplier;
     private final StandardActions action;
     private final StateManager stateManager;
+    private final UndoManager undoManager;
 
-    public EditAction(StandardActions action, JabRefFrame frame, StateManager stateManager) {
+    public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager, UndoManager undoManager) {
         this.action = action;
-        this.frame = frame;
+        this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
+        this.undoManager = undoManager;
 
         if (action == StandardActions.PASTE) {
             this.executable.bind(ActionHelper.needsDatabase(stateManager));
@@ -47,35 +51,48 @@ public class EditAction extends SimpleCommand {
     @Override
     public void execute() {
         stateManager.getFocusOwner().ifPresent(focusOwner -> {
-            LOGGER.debug("focusOwner: {}; Action: {}", focusOwner.toString(), action.getText());
-            if (focusOwner instanceof TextInputControl) {
+            LOGGER.debug("focusOwner: {}; Action: {}", focusOwner, action.getText());
+            if (focusOwner instanceof TextInputControl textInput) {
                 // Focus is on text field -> copy/paste/cut selected text
-                TextInputControl textInput = (TextInputControl) focusOwner;
                 // DELETE_ENTRY in text field should do forward delete
                 switch (action) {
+                    case SELECT_ALL -> textInput.selectAll();
                     case COPY -> textInput.copy();
-                    case UNDO -> textInput.undo();
-                    case REDO -> textInput.redo();
                     case CUT -> textInput.cut();
                     case PASTE -> textInput.paste();
                     case DELETE -> textInput.clear();
-                    case SELECT_ALL -> textInput.selectAll();
                     case DELETE_ENTRY -> textInput.deleteNextChar();
-                    default -> throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
+                    case UNDO -> textInput.undo();
+                    case REDO -> textInput.redo();
+                    default -> {
+                        String message = "Only cut/copy/paste supported in TextInputControl but got " + action;
+                        LOGGER.error(message);
+                        throw new IllegalStateException(message);
+                    }
                 }
             } else if ((focusOwner instanceof CodeArea) || (focusOwner instanceof WebView)) {
+                LOGGER.debug("Ignoring request in CodeArea or WebView");
                 return;
             } else {
                 LOGGER.debug("Else: {}", focusOwner.getClass().getSimpleName());
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
 
-                // ToDo: Should be handled by BibDatabaseContext instead of LibraryTab
                 switch (action) {
-                    case COPY -> frame.getCurrentLibraryTab().copy();
-                    case CUT -> frame.getCurrentLibraryTab().cut();
-                    case PASTE -> frame.getCurrentLibraryTab().paste();
-                    case DELETE_ENTRY -> frame.getCurrentLibraryTab().delete(false);
-                    default -> throw new IllegalStateException("Only cut/copy/paste supported but got " + action);
+                    case COPY -> tabSupplier.get().copy();
+                    case CUT -> tabSupplier.get().cut();
+                    case PASTE -> tabSupplier.get().paste();
+                    case DELETE_ENTRY -> tabSupplier.get().delete(StandardActions.DELETE_ENTRY);
+                    case UNDO -> {
+                        if (undoManager.canUndo()) {
+                            undoManager.undo();
+                        }
+                    }
+                    case REDO -> {
+                        if (undoManager.canRedo()) {
+                            undoManager.redo();
+                        }
+                    }
+                    default -> LOGGER.debug("Only cut/copy/paste/deleteEntry supported but got: {} and focus owner {}", action, focusOwner);
                 }
             }
         });

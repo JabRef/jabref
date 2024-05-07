@@ -42,7 +42,7 @@
 }
 
 .logo-pane {
-    fx-fill: transparent;
+    -fx-fill: transparent;
 }
 
 .logo-pane SVGPath {

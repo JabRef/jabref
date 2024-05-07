@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParseException;
@@ -17,7 +18,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
-import com.microsoft.applicationinsights.core.dependencies.http.client.utils.URIBuilder;
+import org.apache.http.client.utils.URIBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +41,7 @@ public class ACMPortalParserTest {
                 .addParameter("AllField", searchQuery).build().toURL();
         searchEntryList = List.of(
                 new BibEntry(StandardEntryType.Conference)
-                        .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
+                        .withField(StandardField.AUTHOR, "Olsson, Tobias and Ericsson, Morgan and Wingkvist, Anna")
                         .withField(StandardField.YEAR, "2017")
                         .withField(StandardField.MONTH, "9")
                         .withField(StandardField.DAY, "11")
@@ -58,6 +59,7 @@ public class ACMPortalParserTest {
                         .withField(StandardField.PAGES, "152–158"),
                 new BibEntry(StandardEntryType.Book)
                         .withField(StandardField.YEAR, "2016")
+                        .withField(StandardField.MONTH, "10")
                         .withField(StandardField.TITLE, "Proceedings of the 2016 24th ACM SIGSOFT International Symposium on Foundations of Software Engineering")
                         .withField(StandardField.LOCATION, "Seattle, WA, USA")
                         .withField(StandardField.ISBN, "9781450342186")
@@ -67,26 +69,26 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void testParseEntries() throws IOException, ParseException {
+    void parseEntries() throws IOException, ParseException {
         CookieHandler.setDefault(new CookieManager());
         List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(searchUrl).asInputStream());
         for (BibEntry bibEntry : bibEntries) {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
-        assertEquals(searchEntryList.get(0), bibEntries.get(0));
+        assertEquals(Optional.of(searchEntryList.getFirst()), bibEntries.stream().findFirst());
     }
 
     @Test
-    void testParseDoiSearchPage() throws ParseException, IOException {
+    void parseDoiSearchPage() throws ParseException, IOException {
         String testDoi = "10.1145/3129790.3129810";
         CookieHandler.setDefault(new CookieManager());
         List<String> doiList = parser.parseDoiSearchPage(new URLDownload(searchUrl).asInputStream());
         assertFalse(doiList.isEmpty());
-        assertEquals(testDoi, doiList.get(0));
+        assertEquals(testDoi, doiList.getFirst());
     }
 
     @Test
-    void testGetBibEntriesFromDoiList() throws FetcherException {
+    void getBibEntriesFromDoiList() throws FetcherException {
         List<String> testDoiList = List.of("10.1145/3129790.3129810", "10.1145/2950290");
         List<BibEntry> bibEntries = parser.getBibEntriesFromDoiList(testDoiList);
         for (BibEntry bibEntry : bibEntries) {
@@ -96,7 +98,7 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void testGetUrlFromDoiList() throws MalformedURLException, URISyntaxException {
+    void getUrlFromDoiList() throws MalformedURLException, URISyntaxException {
         String target = "https://dl.acm.org/action/exportCiteProcCitation?targetFile=custom-bibtex&format=bibTex&dois=10.1145%2F3129790.3129810%2C10.1145%2F2950290";
 
         List<String> doiList = List.of("10.1145/3129790.3129810", "10.1145/2950290");
@@ -105,14 +107,39 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void testParseBibEntry() {
+    void parseBibEntry() {
         BibEntry bibEntry = parser.parseBibEntry(jsonStr);
         bibEntry.clearField(StandardField.ABSTRACT);
-        assertEquals(searchEntryList.get(0), bibEntry);
+        assertEquals(searchEntryList.getFirst(), bibEntry);
     }
 
     @Test
-    void testNoEntryFound() throws URISyntaxException, IOException, ParseException {
+    void parseBibEntryWithFamilyAuthorOnly() {
+        String json = "{\"id\":\"10.1145/3011077.3011113\",\"type\":\"PAPER_CONFERENCE\",\"author\":[{\"family\":\"Ngo-Thi-Thu-Trang\"},{\"family\":\"Bui\",\"given\":\"Hieu T.\"},{\"family\":\"Nguyen\",\"given\":\"Nhan D.\"}],\"accessed\":{\"date-parts\":[[2023,8,4]]},\"issued\":{\"date-parts\":[[2016,12,8]]},\"original-date\":{\"date-parts\":[[2016,12,8]]},\"abstract\":\"\",\"call-number\":\"10.1145/3011077.3011113\",\"collection-title\":\"SoICT '16\",\"container-title\":\"Proceedings of the 7th Symposium on Information and Communication Technology\",\"DOI\":\"10.1145/3011077.3011113\",\"event-place\":\"Ho Chi Minh City, Vietnam\",\"ISBN\":\"9781450348157\",\"keyword\":\"orthogonal frequency division multiplexing (OFDM), long-range passive optical network (LR PON), four-wave mixing (FWM), wavelength division multiplexing (WDM)\",\"number-of-pages\":\"6\",\"page\":\"216–221\",\"publisher\":\"Association for Computing Machinery\",\"publisher-place\":\"New York, NY, USA\",\"title\":\"A simple performance analysis of IM-DD OFDM WDM systems in long range PON application\",\"URL\":\"https://doi.org/10.1145/3011077.3011113\"}";
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Conference)
+            .withField(StandardField.AUTHOR, "Ngo-Thi-Thu-Trang and Bui, Hieu T. and Nguyen, Nhan D.")
+            .withField(StandardField.TITLE, "A simple performance analysis of IM-DD OFDM WDM systems in long range PON application")
+            .withField(StandardField.BOOKTITLE, "Proceedings of the 7th Symposium on Information and Communication Technology")
+            .withField(StandardField.YEAR, "2016")
+            .withField(StandardField.SERIES, "SoICT '16")
+            .withField(StandardField.PAGES, "216–221")
+            .withField(StandardField.ADDRESS, "New York, NY, USA")
+            .withField(StandardField.MONTH, "12")
+            .withField(StandardField.PUBLISHER, "Association for Computing Machinery")
+            .withField(StandardField.LOCATION, "Ho Chi Minh City, Vietnam")
+            .withField(StandardField.ISBN, "9781450348157")
+            .withField(StandardField.DAY, "8")
+            .withField(StandardField.PAGETOTAL, "6")
+            .withField(StandardField.DOI, "10.1145/3011077.3011113")
+            .withField(StandardField.KEYWORDS, "four-wave mixing (FWM), long-range passive optical network (LR PON), orthogonal frequency division multiplexing (OFDM), wavelength division multiplexing (WDM)")
+            .withField(StandardField.URL, "https://doi.org/10.1145/3011077.3011113");
+
+        BibEntry parsedEntry = parser.parseBibEntry(json);
+        assertEquals(expectedEntry, parsedEntry);
+    }
+
+    @Test
+    void noEntryFound() throws URISyntaxException, IOException, ParseException {
         CookieHandler.setDefault(new CookieManager());
         URL url = new URIBuilder("https://dl.acm.org/action/doSearch?AllField=10.1145/3129790.31298").build().toURL();
         List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(url).asInputStream());

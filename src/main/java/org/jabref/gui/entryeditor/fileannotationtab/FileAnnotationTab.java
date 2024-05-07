@@ -13,6 +13,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class FileAnnotationTab extends EntryEditorTab {
 
+    public static final String NAME = "File annotations";
     private final FileAnnotationCache fileAnnotationCache;
 
     public FileAnnotationTab(FileAnnotationCache cache) {

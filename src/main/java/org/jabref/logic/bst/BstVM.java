@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
-import java.util.Stack;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -93,7 +93,7 @@ public class BstVM {
         return render(bibEntries, null);
     }
 
-    protected Stack<Object> getStack() {
+    protected Deque<Object> getStack() {
         if (latestContext != null) {
             return latestContext.stack();
         } else {

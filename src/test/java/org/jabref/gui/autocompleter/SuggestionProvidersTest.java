@@ -39,25 +39,25 @@ class SuggestionProvidersTest {
     private static Stream<Arguments> getTestPairs() {
         return Stream.of(
                 // a person
-                Arguments.of(org.jabref.gui.autocompleter.PersonNameSuggestionProvider.class, StandardField.AUTHOR),
+                Arguments.of(PersonNameSuggestionProvider.class, StandardField.AUTHOR),
 
                 // a single entry field
-                Arguments.of(org.jabref.gui.autocompleter.BibEntrySuggestionProvider.class, StandardField.XREF),
+                Arguments.of(BibEntrySuggestionProvider.class, StandardField.XREF),
 
                 // multi entry fieldg
-                Arguments.of(org.jabref.gui.autocompleter.JournalsSuggestionProvider.class, StandardField.JOURNAL),
+                Arguments.of(JournalsSuggestionProvider.class, StandardField.JOURNAL),
 
                 // TODO: We should offer pre-configured publishers
-                Arguments.of(org.jabref.gui.autocompleter.JournalsSuggestionProvider.class, StandardField.PUBLISHER),
+                Arguments.of(JournalsSuggestionProvider.class, StandardField.PUBLISHER),
 
                 // TODO: Auto completion should be aware of possible values of special fields
-                Arguments.of(org.jabref.gui.autocompleter.WordSuggestionProvider.class, SpecialField.PRINTED)
+                Arguments.of(WordSuggestionProvider.class, SpecialField.PRINTED)
         );
     }
 
     @ParameterizedTest
     @MethodSource("getTestPairs")
-    public void testAppropriateCompleterReturned(Class<SuggestionProvider<BibEntry>> expected, Field field) {
+    public void appropriateCompleterReturned(Class<SuggestionProvider<BibEntry>> expected, Field field) {
         assertEquals(expected, suggestionProviders.getForField(field).getClass());
     }
 

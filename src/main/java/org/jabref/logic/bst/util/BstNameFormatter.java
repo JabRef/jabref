@@ -95,21 +95,17 @@ public class BstNameFormatter {
                     continue;
                 }
 
-                if ((control.length() > 2)) {
+                if (control.length() > 2) {
                     LOGGER.warn("Format string in format.name$ may only be one or two character long on brace level 1 in group {}: {}", group, format);
                 }
 
                 char type = control.charAt(0);
 
                 Optional<String> tokenS = switch (type) {
-                    case 'f' ->
-                            author.getFirst();
-                    case 'v' ->
-                            author.getVon();
-                    case 'l' ->
-                            author.getLast();
-                    case 'j' ->
-                            author.getJr();
+                    case 'f' -> author.getGivenName();
+                    case 'v' -> author.getNamePrefix();
+                    case 'l' -> author.getFamilyName();
+                    case 'j' -> author.getNameSuffix();
                     default ->
                             throw new BstVMException("Internal error");
                 };
@@ -216,7 +212,7 @@ public class BstNameFormatter {
             }
             i++;
         }
-        if ((braceLevel != 0)) {
+        if (braceLevel != 0) {
             LOGGER.warn("Unbalanced brace in format string for nameFormat: {}", format);
         }
 

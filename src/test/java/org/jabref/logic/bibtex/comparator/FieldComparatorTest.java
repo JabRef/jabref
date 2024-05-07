@@ -202,25 +202,63 @@ public class FieldComparatorTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideArgumentsForNumericalComparison")
-    public void compareNumericalValues(int comparisonResult, String id1, String id2, String errorMessage) {
+    @MethodSource
+    public void compareNumericalValues(int comparisonResult, String id1, String id2, String message) {
         FieldComparator comparator = new FieldComparator(StandardField.PMID);
         BibEntry entry1 = new BibEntry()
                 .withField(StandardField.PMID, id1);
         BibEntry entry2 = new BibEntry()
                 .withField(StandardField.PMID, id2);
 
-        assertEquals(comparisonResult, comparator.compare(entry1, entry2), errorMessage);
+        assertEquals(comparisonResult, comparator.compare(entry1, entry2), message);
     }
 
-    private static Stream<Arguments> provideArgumentsForNumericalComparison() {
+    private static Stream<Arguments> compareNumericalValues() {
         return Stream.of(
-                Arguments.of(0, "123456", "123456", "IDs are lexicographically not equal [1]"),
-                Arguments.of(1, "234567", "123456", "234567 is lexicographically smaller than 123456"),
-                Arguments.of(1, "abc##z", "123456", "abc##z is lexicographically smaller than 123456 "),
-                Arguments.of(0, "", "", "IDs are lexicographically not equal [2]"),
-                Arguments.of(1, "", "123456", "No ID is lexicographically smaller than 123456"),
-                Arguments.of(-1, "123456", "", "123456 is lexicographically greater than no ID")
+                Arguments.of(0, "123456", "123456", "IDs should be lexicographically equal"),
+                Arguments.of(1, "234567", "123456", "234567 should be lexicographically greater than 123456"),
+                Arguments.of(1, "abc##z", "123456", "abc##z should be lexicographically greater than 123456 "),
+                Arguments.of(0, "", "", "Empty IDs should be lexicographically equal"),
+                Arguments.of(-1, "", "123456", "No ID should be lexicographically smaller than 123456"),
+                Arguments.of(1, "123456", "", "123456 should be lexicographically greater than no ID")
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void nullTests(int comparisonResult, String firstValue, String secondValue) {
+        FieldComparator comparator = new FieldComparator(StandardField.TITLE);
+
+        BibEntry entry1 = new BibEntry();
+        if (firstValue != null) {
+            entry1.setField(StandardField.TITLE, firstValue);
+        }
+
+        BibEntry entry2 = new BibEntry();
+        if (secondValue != null) {
+            entry2.setField(StandardField.TITLE, secondValue);
+        }
+
+        assertEquals(comparisonResult, comparator.compare(entry1, entry2));
+    }
+
+    private static Stream<Arguments> nullTests() {
+        return Stream.of(
+                Arguments.of(0, null, null),
+                Arguments.of(0, "value", "value"),
+                Arguments.of(-1, null, "value"),
+                Arguments.of(1, "value", null)
+        );
+    }
+
+    @Test
+    public void compareAuthorField() throws Exception {
+        FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
+        BibEntry bigger = new BibEntry()
+                .withField(StandardField.AUTHOR, "Freund, Lucas");
+        BibEntry smaller = new BibEntry()
+                .withField(StandardField.AUTHOR, "Mustermann, Max");
+
+        assertEquals(1, comparator.compare(smaller, bigger));
     }
 }

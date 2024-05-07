@@ -5,18 +5,16 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -34,17 +32,22 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LookupIdentifierAction.class);
 
-    private final JabRefFrame frame;
-
     private final IdFetcher<T> fetcher;
     private final StateManager stateManager;
-    private UndoManager undoManager;
+    private final UndoManager undoManager;
+    private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
 
-    public LookupIdentifierAction(JabRefFrame frame, IdFetcher<T> fetcher, StateManager stateManager, UndoManager undoManager) {
-        this.frame = frame;
+    public LookupIdentifierAction(IdFetcher<T> fetcher,
+                                  StateManager stateManager,
+                                  UndoManager undoManager,
+                                  DialogService dialogService,
+                                  TaskExecutor taskExecutor) {
         this.fetcher = fetcher;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
+        this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(this.stateManager)));
         this.statusMessage.bind(BindingsHelper.ifThenElse(executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
@@ -54,35 +57,15 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
     public void execute() {
         try {
             BackgroundTask.wrap(() -> lookupIdentifiers(stateManager.getSelectedEntries()))
-                          .onSuccess(frame.getDialogService()::notify)
-                          .executeWith(Globals.TASK_EXECUTOR);
+                          .onSuccess(dialogService::notify)
+                          .executeWith(taskExecutor);
         } catch (Exception e) {
             LOGGER.error("Problem running ID Worker", e);
         }
     }
 
     public Action getAction() {
-        return new Action() {
-            @Override
-            public Optional<JabRefIcon> getIcon() {
-                return Optional.empty();
-            }
-
-            @Override
-            public Optional<KeyBinding> getKeyBinding() {
-                return Optional.empty();
-            }
-
-            @Override
-            public String getText() {
-                return fetcher.getIdentifierName();
-            }
-
-            @Override
-            public String getDescription() {
-                return "";
-            }
-        };
+        return fetcher::getIdentifierName;
     }
 
     private String lookupIdentifiers(List<BibEntry> bibEntries) {
@@ -94,7 +77,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
             count++;
             final String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                     fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-            DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(statusMessage));
+            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.notify(statusMessage));
             Optional<T> identifier = Optional.empty();
             try {
                 identifier = fetcher.findIdentifier(bibEntry);
@@ -108,7 +91,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                     foundCount++;
                     final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                             fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-                    DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(nextStatusMessage));
+                    DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.notify(nextStatusMessage));
                 }
             }
         }

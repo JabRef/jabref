@@ -3,6 +3,8 @@ package org.jabref.gui.fieldeditors;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -20,15 +22,15 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MapBasedEditorViewModel.class);
 
-    public MapBasedEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        super(field, suggestionProvider, fieldCheckers);
+    public MapBasedEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
+        super(field, suggestionProvider, fieldCheckers, undoManager);
     }
 
     protected abstract BiMap<String, T> getItemMap();
 
     @Override
     public StringConverter<T> getStringConverter() {
-        return new StringConverter<T>() {
+        return new StringConverter<>() {
             @Override
             public String toString(T object) {
                 if (object == null) {
@@ -60,7 +62,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
         try {
             return (T) string;
         } catch (ClassCastException ex) {
-            LOGGER.error(String.format("Could not cast string to type %1$s. Try overriding the method in a subclass and provide a conversion from string to the concrete type %1$s", string.getClass()), ex);
+            LOGGER.error("Could not cast string to type %1$s. Try overriding the method in a subclass and provide a conversion from string to the concrete type %1$s".formatted(string.getClass()), ex);
         }
         return null;
     }

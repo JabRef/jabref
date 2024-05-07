@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ public class BibDatabaseFilesTest {
     public void resolveStrings() throws IOException {
         try (FileInputStream stream = new FileInputStream("src/test/resources/org/jabref/util/twente.bib");
              InputStreamReader fr = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(fr);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(fr);
 
             BibDatabase db = result.getDatabase();
 

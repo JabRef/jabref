@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
@@ -24,6 +23,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.LoggerFactory;
@@ -103,11 +103,12 @@ public class BibEntryWriter {
         if (type.isPresent()) {
             // Write required fields first
             List<Field> requiredFields = type.get()
-                                             .getRequiredFields()
-                                             .stream()
-                                             .flatMap(Collection::stream)
-                                             .sorted(Comparator.comparing(Field::getName))
-                                             .collect(Collectors.toList());
+                    .getRequiredFields()
+                    .stream()
+                    .map(OrFields::getFields)
+                    .flatMap(Collection::stream)
+                    .sorted(Comparator.comparing(Field::getName))
+                    .collect(Collectors.toList());
 
             for (Field field : requiredFields) {
                 writeField(entry, out, field, indent);
@@ -173,7 +174,7 @@ public class BibEntryWriter {
     }
 
     static int getLengthOfLongestFieldName(BibEntry entry) {
-        Predicate<Field> isNotCitationKey = field -> !InternalField.KEY_FIELD.equals(field);
+        Predicate<Field> isNotCitationKey = field -> InternalField.KEY_FIELD != field;
         return entry.getFields()
                     .stream()
                     .filter(isNotCitationKey)

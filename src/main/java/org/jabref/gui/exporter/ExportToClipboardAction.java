@@ -75,8 +75,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferences,
-                Globals.entryTypesManager,
-                Globals.journalAbbreviationRepository);
+                Globals.entryTypesManager);
         List<Exporter> exporters = exporterFactory.getExporters().stream()
                                                   .sorted(Comparator.comparing(Exporter::getName))
                                                   .filter(exporter -> SUPPORTED_FILETYPES.contains(exporter.getFileType()))
@@ -84,7 +83,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         // Find default choice, if any
         Exporter defaultChoice = exporters.stream()
-                                          .filter(exporter -> exporter.getName().equals(preferences.getImportExportPreferences().getLastExportExtension()))
+                                          .filter(exporter -> exporter.getName().equals(preferences.getExportPreferences().getLastExportExtension()))
                                           .findAny()
                                           .orElse(null);
 
@@ -107,7 +106,7 @@ public class ExportToClipboardAction extends SimpleCommand {
                                                     .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
 
         // Add chosen export type to last used preference, to become default
-        preferences.getImportExportPreferences().setLastExportExtension(exporter.getName());
+        preferences.getExportPreferences().setLastExportExtension(exporter.getName());
 
         Path tmp = null;
         try {
@@ -118,7 +117,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             entries.addAll(stateManager.getSelectedEntries());
 
             // Write to file:
-            exporter.export(stateManager.getActiveDatabase().get(), tmp, entries, fileDirForDatabase);
+            exporter.export(stateManager.getActiveDatabase().get(), tmp, entries, fileDirForDatabase, Globals.journalAbbreviationRepository);
             // Read the file and put the contents on the clipboard:
 
             return new ExportResult(Files.readString(tmp), exporter.getFileType());

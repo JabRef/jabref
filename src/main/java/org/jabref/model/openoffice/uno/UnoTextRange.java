@@ -37,7 +37,7 @@ public class UnoTextRange {
      * 1 if  (a &gt; b); (-1) if (a &lt; b)
      */
     public static int compareStartsUnsafe(XTextRangeCompare compare, XTextRange a, XTextRange b) {
-        return (-1) * compare.compareRegionStarts(a, b);
+        return -1 * compare.compareRegionStarts(a, b);
     }
 
     public static int compareStarts(XTextRange a, XTextRange b) {
@@ -57,7 +57,7 @@ public class UnoTextRange {
             throw new java.lang.IllegalArgumentException("compareEnds: got incomparable regions");
         }
         final XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, a.getText()).get();
-        return (-1) * compare.compareRegionEnds(a, b);
+        return -1 * compare.compareRegionEnds(a, b);
     }
 
     /*
@@ -66,9 +66,9 @@ public class UnoTextRange {
     public static int compareStartsThenEndsUnsafe(XTextRangeCompare compare, XTextRange a, XTextRange b) {
         int res = compare.compareRegionStarts(a, b);
         if (res != 0) {
-            return (-1) * res;
+            return -1 * res;
         }
-        return (-1) * compare.compareRegionEnds(a, b);
+        return -1 * compare.compareRegionEnds(a, b);
     }
 
     public static int compareStartsThenEnds(XTextRange a, XTextRange b) {

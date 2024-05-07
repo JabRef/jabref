@@ -8,13 +8,14 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.preferences.PreferencesService;
 
 public class PersonsNameFieldRowView extends FieldRowView {
     private final AuthorList leftEntryNames;
     private final AuthorList rightEntryNames;
 
-    public PersonsNameFieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, int rowIndex) {
-        super(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory, rowIndex);
+    public PersonsNameFieldRowView(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory, PreferencesService preferencesService, int rowIndex) {
+        super(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory, preferencesService, rowIndex);
         assert field.getProperties().contains(FieldProperty.PERSON_NAMES);
 
         var authorsParser = new AuthorListParser();

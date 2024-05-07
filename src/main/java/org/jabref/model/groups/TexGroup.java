@@ -14,6 +14,7 @@ import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -51,8 +52,9 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         return group;
     }
 
-    public static TexGroup createWithoutFileMonitoring(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
-        return new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
+    // without FileUpdateMonitor
+    public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, MetaData metaData) throws IOException {
+        return new TexGroup(name, context, filePath, auxParser, new DummyFileUpdateMonitor(), metaData);
     }
 
     public Path getFilePathResolved() {

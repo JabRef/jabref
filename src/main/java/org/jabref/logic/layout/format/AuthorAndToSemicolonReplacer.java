@@ -6,6 +6,6 @@ public class AuthorAndToSemicolonReplacer implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        return fieldText.replaceAll(" and ", "; ");
+        return fieldText.replace(" and ", "; ");
     }
 }

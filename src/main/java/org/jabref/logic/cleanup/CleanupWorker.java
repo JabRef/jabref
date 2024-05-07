@@ -57,6 +57,8 @@ public class CleanupWorker {
                     new DoiCleanup();
             case CLEANUP_EPRINT ->
                     new EprintCleanup();
+            case CLEAN_UP_URL ->
+                    new URLCleanup();
             case MAKE_PATHS_RELATIVE ->
                     new RelativePathsCleanup(databaseContext, filePreferences);
             case RENAME_PDF ->
@@ -65,6 +67,8 @@ public class CleanupWorker {
                     new RenamePdfCleanup(true, databaseContext, filePreferences);
             case CLEAN_UP_UPGRADE_EXTERNAL_LINKS ->
                     new UpgradePdfPsToFileCleanup();
+            case CLEAN_UP_DELETED_LINKED_FILES ->
+                    new RemoveLinksToNotExistentFiles(databaseContext, filePreferences);
             case CONVERT_TO_BIBLATEX ->
                     new ConvertToBiblatexCleanup();
             case CONVERT_TO_BIBTEX ->

@@ -10,8 +10,10 @@ public enum FieldProperty {
     FILE_EDITOR,
     GENDER,
     ISBN,
+    ISSN,
     JOURNAL_NAME,
     LANGUAGE,
+    MARKDOWN, // Field content is text, but should be interpreted as markdown
     MONTH,
     MULTIPLE_ENTRY_LINK,
     MULTILINE_TEXT,
@@ -23,5 +25,7 @@ public enum FieldProperty {
     SINGLE_ENTRY_LINK,
     TYPE,
     VERBATIM,
-    YES_NO
+    YES_NO,
+    COMMENT,
+    CUSTOM_FIELD
 }

@@ -2,7 +2,6 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
@@ -12,7 +11,7 @@ import org.jabref.model.strings.StringUtil;
 public class TitleChecker implements ValueChecker {
 
     private static final Pattern INSIDE_CURLY_BRAKETS = Pattern.compile("\\{[^}\\{]*\\}");
-    private static final Pattern DELIMITERS = Pattern.compile("\\.|\\!|\\?|\\;|\\:");
+    private static final Pattern DELIMITERS = Pattern.compile("\\.|\\!|\\?|\\;|\\:|\\[");
     private static final Predicate<String> HAS_CAPITAL_LETTERS = Pattern.compile("[\\p{Lu}\\p{Lt}]").asPredicate();
 
     private final BibDatabaseContext databaseContext;
@@ -23,13 +22,13 @@ public class TitleChecker implements ValueChecker {
 
     /**
      * Algorithm:
-     * - remove everything that is in brackets
-     * - split the title into sub titles based on the delimiters
-     * (defined in the local variable DELIMITERS, currently . ! ? ; :)
+     * - remove everything that is in curly brackets
+     * - split the title into subtitles based on the delimiters
+     * (defined in the local variable DELIMITERS, currently . ! ? ; : [)
      * - for each sub title:
      * -    remove trailing whitespaces
      * -    ignore first letter as this can always be written in caps
-     * -    check if at least one capital letter is in the sub title
+     * -    check if at least one capital letter is in the subtitle
      */
     @Override
     public Optional<String> checkValue(String value) {
@@ -41,14 +40,7 @@ public class TitleChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        String valueOnlySpacesWithinCurlyBraces = value;
-        while (true) {
-            Matcher matcher = INSIDE_CURLY_BRAKETS.matcher(valueOnlySpacesWithinCurlyBraces);
-            if (!matcher.find()) {
-                break;
-            }
-            valueOnlySpacesWithinCurlyBraces = matcher.replaceAll("");
-        }
+        String valueOnlySpacesWithinCurlyBraces = INSIDE_CURLY_BRAKETS.matcher(value).replaceAll("");
 
         String[] splitTitle = DELIMITERS.split(valueOnlySpacesWithinCurlyBraces);
         for (String subTitle : splitTitle) {

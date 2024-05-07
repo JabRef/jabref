@@ -14,6 +14,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -40,6 +41,12 @@ public interface DialogService {
      */
     default <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection<T> choices) {
         return showChoiceDialogAndWait(title, content, okButtonLabel, null, choices);
+    }
+
+    <T> Optional<T> showEditableChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices, StringConverter<T> converter);
+
+    default <T> Optional<T> showEditableChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection<T> choices, StringConverter<T> converter) {
+        return showEditableChoiceDialogAndWait(title, content, okButtonLabel, null, choices, converter);
     }
 
     /**
@@ -204,13 +211,25 @@ public interface DialogService {
     <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog);
 
     /**
-     * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
+     * Constructs and shows a cancelable {@link ProgressDialog}.
+     * Clicking cancel will cancel the underlying service and close the dialog
      *
      * @param title   title of the dialog
      * @param content message to show above the progress bar
      * @param task    The {@link Task} which executes the work and for which to show the dialog
      */
     <V> void showProgressDialog(String title, String content, Task<V> task);
+
+    /**
+     * Constructs and shows a cancelable {@link ProgressDialog}.
+     * Clicking cancel will cancel the underlying service and close the dialog,
+     * otherwise will wait for the task to finish.
+     *
+     * @param title   title of the dialog
+     * @param content message to show above the progress bar
+     * @param task    The {@link Task} which executes the work and for which to show the dialog
+     */
+    <V> void showProgressDialogAndWait(String title, String content, Task<V> task);
 
     /**
      * Constructs and shows a dialog showing the progress of running background tasks.

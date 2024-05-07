@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,7 +17,6 @@ import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -55,10 +53,10 @@ public class PdfVerbatimBibTextImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(Path filePath) {
-        List<BibEntry> result = new ArrayList<>(1);
+        List<BibEntry> result;
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
-            BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+            BibtexParser parser = new BibtexParser(importFormatPreferences);
             result = parser.parseEntries(firstPageContents);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));

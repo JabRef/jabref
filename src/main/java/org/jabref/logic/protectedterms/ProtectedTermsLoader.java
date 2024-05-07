@@ -28,6 +28,7 @@ public class ProtectedTermsLoader {
         INTERNAL_LISTS.put("/protectedterms/months_weekdays.terms", () -> Localization.lang("Months and weekdays in English"));
         INTERNAL_LISTS.put("/protectedterms/countries_territories.terms", () -> Localization.lang("Countries and territories in English"));
         INTERNAL_LISTS.put("/protectedterms/electrical_engineering.terms", () -> Localization.lang("Electrical engineering terms"));
+        INTERNAL_LISTS.put("/protectedterms/computer_science.terms", () -> Localization.lang("Computer science"));
     }
 
     public ProtectedTermsLoader(ProtectedTermsPreferences preferences) {

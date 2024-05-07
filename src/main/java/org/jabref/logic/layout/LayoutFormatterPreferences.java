@@ -6,22 +6,23 @@ import java.util.Optional;
 
 import javafx.beans.property.StringProperty;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.logic.preferences.DOIPreferences;
 
 public class LayoutFormatterPreferences {
 
     private final NameFormatterPreferences nameFormatterPreferences;
+
+    private final DOIPreferences doiPreferences;
     private final StringProperty mainFileDirectoryProperty;
     private final Map<String, String> customExportNameFormatters = new HashMap<>();
-    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public LayoutFormatterPreferences(NameFormatterPreferences nameFormatterPreferences,
-                                      StringProperty mainFileDirectoryProperty,
-                                      JournalAbbreviationRepository journalAbbreviationRepository) {
+                                      DOIPreferences doiPreferences,
+                                      StringProperty mainFileDirectoryProperty) {
         this.nameFormatterPreferences = nameFormatterPreferences;
         this.mainFileDirectoryProperty = mainFileDirectoryProperty;
-        this.journalAbbreviationRepository = journalAbbreviationRepository;
+        this.doiPreferences = doiPreferences;
     }
 
     public NameFormatterPreferences getNameFormatterPreferences() {
@@ -32,8 +33,8 @@ public class LayoutFormatterPreferences {
         return mainFileDirectoryProperty.get();
     }
 
-    public JournalAbbreviationRepository getJournalAbbreviationRepository() {
-        return journalAbbreviationRepository;
+    public Optional<String> getCustomExportNameFormatter(String formatterName) {
+        return Optional.ofNullable(customExportNameFormatters.get(formatterName));
     }
 
     public void clearCustomExportNameFormatters() {
@@ -44,7 +45,7 @@ public class LayoutFormatterPreferences {
         customExportNameFormatters.put(formatterName, contents);
     }
 
-    public Optional<String> getCustomExportNameFormatter(String formatterName) {
-        return Optional.ofNullable(customExportNameFormatters.get(formatterName));
+    public DOIPreferences getDoiPreferences() {
+        return doiPreferences;
     }
 }

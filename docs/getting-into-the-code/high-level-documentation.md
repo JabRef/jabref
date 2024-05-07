@@ -1,6 +1,6 @@
 ---
 parent: Getting into the code
-nav_order: 4
+nav_order: 3
 ---
 # High-level documentation
 
@@ -24,7 +24,7 @@ Note that we are currently switching to JavaFX's observables, as this concepts s
 
 Permitted dependencies in our architecture are:
 
-```
+```monospaced
 gui --> logic --> model
 gui ------------> model
 gui ------------> preferences

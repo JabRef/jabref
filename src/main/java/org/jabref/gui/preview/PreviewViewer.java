@@ -1,6 +1,8 @@
 package org.jabref.gui.preview;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,13 +25,14 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,8 +122,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
 
-    private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
+    private final TaskExecutor taskExecutor;
     private final WebView previewView;
     private PreviewLayout layout;
 
@@ -143,11 +147,15 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      */
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
+                         PreferencesService preferencesService,
                          StateManager stateManager,
-                         ThemeManager themeManager) {
+                         ThemeManager themeManager,
+                         TaskExecutor taskExecutor) {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
         this.clipBoardManager = Globals.getClipboardManager();
+        this.taskExecutor = taskExecutor;
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -162,6 +170,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             }
             if (!registered) {
                 stateManager.activeSearchQueryProperty().addListener(listener);
+                stateManager.activeGlobalSearchQueryProperty().addListener(listener);
                 registered = true;
             }
             highlightSearchPattern();
@@ -177,7 +186,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     String href = anchorElement.getHref();
                     if (href != null) {
                         try {
-                            JabRefDesktop.openBrowser(href);
+                            JabRefDesktop.openBrowser(href, preferencesService.getFilePreferences());
                         } catch (MalformedURLException exception) {
                             LOGGER.error("Invalid URL", exception);
                         } catch (IOException exception) {
@@ -196,9 +205,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         String callbackForUnmark = "";
         if (searchHighlightPattern.isPresent()) {
             String javaScriptRegex = createJavaScriptRegex(searchHighlightPattern.get());
-            callbackForUnmark = String.format(JS_MARK_REG_EXP_CALLBACK, javaScriptRegex);
+            callbackForUnmark = JS_MARK_REG_EXP_CALLBACK.formatted(javaScriptRegex);
         }
-        String unmarkInstance = String.format(JS_UNMARK_WITH_CALLBACK, callbackForUnmark);
+        String unmarkInstance = JS_UNMARK_WITH_CALLBACK.formatted(callbackForUnmark);
         previewView.getEngine().executeScript(unmarkInstance);
     }
 
@@ -249,28 +258,37 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
+        Number.serialExportNumber = 1; // Set entry number in case that is included in the preview layout.
 
+        final BibEntry theEntry = entry.get();
         BackgroundTask
-                .wrap(() -> layout.generatePreview(entry.get(), database))
+                .wrap(() -> layout.generatePreview(theEntry, database))
                 .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getDisplayName() + " ..." + "</i>"))
                 .onSuccess(this::setPreviewText)
                 .onFailure(exception -> {
                     LOGGER.error("Error while generating citation style", exception);
-                    setPreviewText(Localization.lang("Error while generating citation style"));
+
+                    // Convert stack trace to a string
+                    StringWriter stringWriter = new StringWriter();
+                    PrintWriter printWriter = new PrintWriter(stringWriter);
+                    exception.printStackTrace(printWriter);
+                    String stackTraceString = stringWriter.toString();
+
+                    // Set the preview text with the localized error message and the stack trace
+                    setPreviewText(Localization.lang("Error while generating citation style") + "\n\n" + exception.getLocalizedMessage() + "\n\nBibTeX (internal):\n" + theEntry + "\n\nStack Trace:\n" + stackTraceString);
                 })
                 .executeWith(taskExecutor);
     }
 
     private void setPreviewText(String text) {
-        String myText = String.format("""
+        String myText = """
                 <html>
                     %s
                     <body id="previewBody">
                         <div id="content"> %s </div>
                     </body>
                 </html>
-                """, JS_HIGHLIGHT_FUNCTION, text);
+                """.formatted(JS_HIGHLIGHT_FUNCTION, text);
         previewView.getEngine().setJavaScriptEnabled(true);
         previewView.getEngine().loadContent(myText);
 

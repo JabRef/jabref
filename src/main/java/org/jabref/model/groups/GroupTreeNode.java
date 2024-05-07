@@ -135,6 +135,13 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return Objects.hash(group);
     }
 
+    /**
+     * Get only groups containing all the entries or just groups containing any of the
+     *
+     * @param entries    List of {@link BibEntry} to search for
+     * @param requireAll Whether to return only groups that must contain all entries
+     * @return List of {@link GroupTreeNode} containing the matches. {@link AllEntriesGroup} is always contained}
+     */
     public List<GroupTreeNode> getContainingGroups(List<BibEntry> entries, boolean requireAll) {
         List<GroupTreeNode> groups = new ArrayList<>();
 
@@ -197,6 +204,11 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return result;
     }
 
+    /**
+     * Get the name of the underlying group
+     *
+     * @return String the name of the group
+     */
     public String getName() {
         return group.getName();
     }

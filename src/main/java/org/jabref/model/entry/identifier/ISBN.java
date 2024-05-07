@@ -62,13 +62,13 @@ public class ISBN implements Identifier {
 
         int sum = 0;
         for (int pos = 0; pos <= 8; pos++) {
-            sum += (isbnString.charAt(pos) - '0') * ((10 - pos));
+            sum += (isbnString.charAt(pos) - '0') * (10 - pos);
         }
         char control = isbnString.charAt(9);
         if ((control == 'x') || (control == 'X')) {
             control = '9' + 1;
         }
-        sum += (control - '0');
+        sum += control - '0';
         return (sum % 11) == 0;
     }
 

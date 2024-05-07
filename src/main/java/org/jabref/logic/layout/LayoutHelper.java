@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+
 /**
  * Helper class to get a Layout object.
  *
@@ -39,16 +41,23 @@ public class LayoutHelper {
     private final List<StringInt> parsedEntries = new ArrayList<>();
     private final List<Path> fileDirForDatabase;
     private final LayoutFormatterPreferences preferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
     private boolean endOfFile;
 
-    public LayoutHelper(Reader in, List<Path> fileDirForDatabase, LayoutFormatterPreferences preferences) {
+    public LayoutHelper(Reader in,
+                        List<Path> fileDirForDatabase,
+                        LayoutFormatterPreferences preferences,
+                        JournalAbbreviationRepository abbreviationRepository) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
         this.preferences = Objects.requireNonNull(preferences);
+        this.abbreviationRepository = abbreviationRepository;
         this.fileDirForDatabase = fileDirForDatabase;
     }
 
-    public LayoutHelper(Reader in, LayoutFormatterPreferences preferences) {
-        this(in, Collections.emptyList(), preferences);
+    public LayoutHelper(Reader in,
+                        LayoutFormatterPreferences preferences,
+                        JournalAbbreviationRepository abbreviationRepository) {
+        this(in, Collections.emptyList(), preferences, abbreviationRepository);
     }
 
     public Layout getLayoutFromText() throws IOException {
@@ -62,7 +71,7 @@ public class LayoutHelper {
             }
         }
 
-        return new Layout(parsedEntries, fileDirForDatabase, preferences);
+        return new Layout(parsedEntries, fileDirForDatabase, preferences, abbreviationRepository);
     }
 
     public static String getCurrentGroup() {

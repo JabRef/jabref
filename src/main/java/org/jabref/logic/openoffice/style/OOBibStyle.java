@@ -19,6 +19,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -108,6 +109,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String AUTHOR_FIELD = "AuthorField";
     private static final String BRACKET_AFTER = "BracketAfter";
     private static final String BRACKET_BEFORE = "BracketBefore";
+    private static final String SPACE_BEFORE = "SpaceBefore";
     private static final String IS_NUMBER_ENTRIES = "IsNumberEntries";
     private static final String IS_SORT_BY_POSITION = "IsSortByPosition";
     private static final String SORT_ALGORITHM = "SortAlgorithm";
@@ -130,7 +132,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private final Map<String, Object> citProperties = new HashMap<>();
     private final boolean fromResource;
     private final String path;
-    private final LayoutFormatterPreferences prefs;
+    private final LayoutFormatterPreferences layoutPreferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
     private String name = "";
     private Layout defaultBibLayout;
     private boolean valid;
@@ -139,8 +142,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private String localCopy;
     private boolean isDefaultLayoutPresent;
 
-    public OOBibStyle(Path styleFile, LayoutFormatterPreferences prefs) throws IOException {
-        this.prefs = Objects.requireNonNull(prefs);
+    public OOBibStyle(Path styleFile, LayoutFormatterPreferences layoutPreferences, JournalAbbreviationRepository abbreviationRepository) throws IOException {
+        this.layoutPreferences = Objects.requireNonNull(layoutPreferences);
+        this.abbreviationRepository = abbreviationRepository;
         this.styleFile = Objects.requireNonNull(styleFile);
         setDefaultProperties();
         reload();
@@ -148,8 +152,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         path = styleFile.toAbsolutePath().toString();
     }
 
-    public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
-        this.prefs = Objects.requireNonNull(prefs);
+    public OOBibStyle(String resourcePath, LayoutFormatterPreferences layoutPreferences, JournalAbbreviationRepository abbreviationRepository) throws IOException {
+        this.layoutPreferences = Objects.requireNonNull(layoutPreferences);
+        this.abbreviationRepository = abbreviationRepository;
+
         Objects.requireNonNull(resourcePath);
         setDefaultProperties();
         initialize(OOBibStyle.class.getResourceAsStream(resourcePath));
@@ -198,6 +204,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         citProperties.put(IN_TEXT_YEAR_SEPARATOR, " ");
         citProperties.put(BRACKET_BEFORE, "(");
         citProperties.put(BRACKET_AFTER, ")");
+        citProperties.put(SPACE_BEFORE, Boolean.TRUE);
         citProperties.put(CITATION_SEPARATOR, "; ");
         citProperties.put(PAGE_INFO_SEPARATOR, "; ");
         citProperties.put(GROUPED_NUMBERS_SEPARATOR, "-");
@@ -379,7 +386,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             try {
                 final String typeName = line.substring(0, index);
                 final String formatString = line.substring(index + 1);
-                Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs).getLayoutFromText();
+                Layout layout = new LayoutHelper(new StringReader(formatString), layoutPreferences, abbreviationRepository).getLayoutFromText();
                 EntryType type = EntryTypeFactory.parse(typeName);
 
                 if (!isDefaultLayoutPresent && OOBibStyle.DEFAULT_MARK.equals(typeName)) {
@@ -488,6 +495,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return (Boolean) citProperties.get(FORMAT_CITATIONS);
     }
 
+    public boolean spaceBeforeCitation() {
+        return (Boolean) citProperties.get(SPACE_BEFORE);
+    }
+
     public boolean isCitationKeyCiteMarkers() {
         return (Boolean) citProperties.get(CITATION_KEY_CITATIONS);
     }
@@ -547,8 +558,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if (this == object) {
             return true;
         }
-        if (object instanceof OOBibStyle) {
-            OOBibStyle otherStyle = (OOBibStyle) object;
+        if (object instanceof OOBibStyle otherStyle) {
             return Objects.equals(path, otherStyle.path)
                     && Objects.equals(name, otherStyle.name)
                     && Objects.equals(citProperties, otherStyle.citProperties)
@@ -655,8 +665,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         valid = isValid;
     }
 
-    protected LayoutFormatterPreferences getPrefs() {
-        return prefs;
+    protected LayoutFormatterPreferences getLayoutPreferences() {
+        return layoutPreferences;
     }
 
     protected void setDefaultBibLayout(Layout layout) {
@@ -918,8 +928,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         OOBibStyle style = this;
         OOText title = style.getReferenceHeaderText();
         String parStyle = style.getReferenceHeaderParagraphFormat();
-        return (parStyle == null
+        return parStyle == null
                 ? OOFormat.paragraph(title)
-                : OOFormat.paragraph(title, parStyle));
+                : OOFormat.paragraph(title, parStyle);
     }
 }

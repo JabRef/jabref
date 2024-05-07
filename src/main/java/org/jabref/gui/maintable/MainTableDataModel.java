@@ -28,8 +28,8 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
-    private final SortedList<BibEntryTableViewModel> entriesSorted;
-    private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
+    private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
+    private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter = new SimpleObjectProperty<>();
     private final GroupsPreferences groupsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
@@ -38,8 +38,8 @@ public class MainTableDataModel {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = context;
-        this.fieldValueFormatter = new SimpleObjectProperty<>(
-                new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
+
+        resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
         ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
@@ -57,7 +57,7 @@ public class MainTableDataModel {
         resultSize.bind(Bindings.size(entriesFiltered));
         stateManager.setActiveSearchResultSize(context, resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
-        entriesSorted = new SortedList<>(entriesFiltered);
+        entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
@@ -93,10 +93,10 @@ public class MainTableDataModel {
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
-        return entriesSorted;
+        return entriesFilteredAndSorted;
     }
 
-    public void refresh() {
+    public void resetFieldFormatter() {
         this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
     }
 }

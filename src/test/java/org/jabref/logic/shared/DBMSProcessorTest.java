@@ -20,6 +20,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -65,7 +66,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testInsertEntry() throws SQLException {
+    void insertEntry() throws SQLException {
         BibEntry expectedEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedEntry);
@@ -90,13 +91,13 @@ class DBMSProcessorTest {
             }
         }
 
-        Map<String, String> expectedFieldMap = expectedEntry.getFieldMap().entrySet().stream().collect(Collectors.toMap((entry) -> entry.getKey().getName(), Map.Entry::getValue));
+        Map<String, String> expectedFieldMap = expectedEntry.getFieldMap().entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue));
 
         assertEquals(expectedFieldMap, actualFieldMap);
     }
 
     @Test
-    void testInsertEntryWithEmptyFields() throws SQLException {
+    void insertEntryWithEmptyFields() throws SQLException {
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
 
         dbmsProcessor.insertEntry(expectedEntry);
@@ -125,7 +126,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testUpdateEntry() throws Exception {
+    void updateEntry() throws Exception {
         BibEntry expectedEntry = getBibEntryExample();
         dbmsProcessor.insertEntry(expectedEntry);
 
@@ -140,7 +141,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testUpdateEmptyEntry() throws Exception {
+    void updateEmptyEntry() throws Exception {
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
         dbmsProcessor.insertEntry(expectedEntry);
 
@@ -154,7 +155,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testGetEntriesByIdList() throws Exception {
+    void getEntriesByIdList() throws Exception {
         BibEntry firstEntry = getBibEntryExample();
         firstEntry.setField(InternalField.INTERNAL_ID_FIELD, "00001");
         BibEntry secondEntry = getBibEntryExample();
@@ -169,7 +170,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testUpdateNewerEntry() {
+    void updateNewerEntry() {
         BibEntry bibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -182,7 +183,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testUpdateEqualEntry() throws OfflineLockException, SQLException {
+    void updateEqualEntry() throws OfflineLockException, SQLException {
         BibEntry expectedBibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedBibEntry);
@@ -197,7 +198,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testRemoveAllEntries() throws SQLException {
+    void removeAllEntries() throws SQLException {
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample2();
         List<BibEntry> entriesToRemove = Arrays.asList(firstEntry, secondEntry);
@@ -211,7 +212,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testRemoveSomeEntries() throws SQLException {
+    void removeSomeEntries() throws SQLException {
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample2();
         BibEntry thirdEntry = getBibEntryExample3();
@@ -232,7 +233,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testRemoveSingleEntry() throws SQLException {
+    void removeSingleEntry() throws SQLException {
         BibEntry entryToRemove = getBibEntryExample();
         dbmsProcessor.insertEntry(entryToRemove);
         dbmsProcessor.removeEntries(Collections.singletonList(entryToRemove));
@@ -243,12 +244,12 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testRemoveEntriesOnNullThrows() {
+    void removeEntriesOnNullThrows() {
         assertThrows(NullPointerException.class, () -> dbmsProcessor.removeEntries(null));
     }
 
     @Test
-    void testRemoveEmptyEntryList() throws SQLException {
+    void removeEmptyEntryList() throws SQLException {
         dbmsProcessor.removeEntries(Collections.emptyList());
 
         try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
@@ -257,7 +258,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testGetSharedEntries() {
+    void getSharedEntries() {
         BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -268,7 +269,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testGetSharedEntry() {
+    void getSharedEntry() {
         BibEntry expectedBibEntry = getBibEntryExampleWithEmptyFields();
 
         dbmsProcessor.insertEntry(expectedBibEntry);
@@ -279,13 +280,13 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testGetNotExistingSharedEntry() {
+    void getNotExistingSharedEntry() {
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(1);
         assertFalse(actualBibEntryOptional.isPresent());
     }
 
     @Test
-    void testGetSharedIDVersionMapping() throws OfflineLockException, SQLException {
+    void getSharedIDVersionMapping() throws OfflineLockException, SQLException {
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
 
@@ -303,7 +304,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testGetSharedMetaData() {
+    void getSharedMetaData() {
         insertMetaData("databaseType", "bibtex;", dbmsConnection, dbmsProcessor);
         insertMetaData("protectedFlag", "true;", dbmsConnection, dbmsProcessor);
         insertMetaData("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;", dbmsConnection, dbmsProcessor);
@@ -317,7 +318,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testSetSharedMetaData() throws SQLException {
+    void setSharedMetaData() throws SQLException {
         Map<String, String> expectedMetaData = getMetaDataExample();
         dbmsProcessor.setSharedMetaData(expectedMetaData);
 
@@ -366,7 +367,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testInsertMultipleEntries() throws SQLException {
+    void insertMultipleEntries() throws SQLException {
         List<BibEntry> entries = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             entries.add(new BibEntry(StandardEntryType.Article).withField(StandardField.JOURNAL, "journal " + i)
@@ -417,8 +418,8 @@ class DBMSProcessorTest {
         }
         Map<Integer, Map<String, String>> expectedFieldMap = entries.stream()
                                                                     .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedID(),
-                                                                            (bibEntry) -> bibEntry.getFieldMap().entrySet().stream()
-                                                                                                  .collect(Collectors.toMap((entry) -> entry.getKey().getName(), Map.Entry::getValue))));
+                                                                            bibEntry -> bibEntry.getFieldMap().entrySet().stream()
+                                                                                                  .collect(Collectors.toMap(entry -> entry.getKey().getName(), Map.Entry::getValue))));
 
         assertEquals(expectedFieldMap, actualFieldMap);
     }
@@ -435,13 +436,11 @@ class DBMSProcessorTest {
     // Oracle does not support multiple tuple insertion in one INSERT INTO command.
     // Therefore this function was defined to improve the readability and to keep the code short.
     private void insertMetaData(String key, String value, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA", dbmsProcessor) + "("
                     + escape("KEY", dbmsProcessor) + ", " + escape("VALUE", dbmsProcessor) + ") VALUES("
                     + escapeValue(key) + ", " + escapeValue(value) + ")");
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
+        });
     }
 
     private static String escape(String expression, DBMSProcessor dbmsProcessor) {

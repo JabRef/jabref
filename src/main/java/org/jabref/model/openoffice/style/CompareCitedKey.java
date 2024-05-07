@@ -22,7 +22,7 @@ public class CompareCitedKey implements Comparator<ComparableCitedKey> {
     public int compare(ComparableCitedKey a, ComparableCitedKey b) {
         Optional<BibEntry> aBibEntry = a.getBibEntry();
         Optional<BibEntry> bBibEntry = b.getBibEntry();
-        final int mul = unresolvedComesFirst ? (+1) : (-1);
+        final int mul = unresolvedComesFirst ? (+1) : -1;
 
         if (aBibEntry.isEmpty() && bBibEntry.isEmpty()) {
             // Both are unresolved: compare them by citation key.

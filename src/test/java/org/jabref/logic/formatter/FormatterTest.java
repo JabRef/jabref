@@ -42,7 +42,7 @@ class FormatterTest {
         // idea for uniqueness checking by https://stackoverflow.com/a/44032568/873282
         assertEquals(Collections.emptyList(),
                 getFormatters().collect(Collectors.groupingBy(
-                        formatter -> formatter.getKey(),
+                                       Formatter::getKey,
                         Collectors.counting()))
                                .entrySet().stream()
                                .filter(e -> e.getValue() > 1)

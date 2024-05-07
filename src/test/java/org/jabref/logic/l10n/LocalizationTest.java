@@ -24,26 +24,26 @@ class LocalizationTest {
     }
 
     @Test
-    void testSetKnownLanguage() {
+    void setKnownLanguage() {
         Locale.setDefault(Locale.CHINA);
         Localization.setLanguage(Language.ENGLISH);
         assertEquals("en", Locale.getDefault().toString());
     }
 
     @Test
-    void testKnownTranslationWithGroups() {
+    void knownTranslationWithGroups() {
         Localization.setLanguage(Language.ENGLISH);
         assertEquals("Groups", Localization.lang("Groups"));
     }
 
     @Test
-    void testKnownEnglishTranslationOfUndo() {
+    void knownEnglishTranslationOfUndo() {
         Localization.setLanguage(Language.ENGLISH);
         assertEquals("Undo", Localization.lang("Undo"));
     }
 
     @Test
-    void testKnownGermanTranslation() {
+    void knownGermanTranslation() {
         Localization.setLanguage(Language.GERMAN);
         assertEquals("Zeige Einstellungen", Localization.lang("Show preferences"));
     }
@@ -55,19 +55,19 @@ class LocalizationTest {
     }
 
     @Test
-    void testKnownTranslationWithCountryModifier() {
+    void knownTranslationWithCountryModifier() {
         Localization.setLanguage(Language.BRAZILIAN_PORTUGUESE);
         assertEquals("Grupos", Localization.lang("Groups"));
     }
 
     @Test
-    void testUnknownTranslation() {
+    void unknownTranslation() {
         Localization.setLanguage(Language.ENGLISH);
         assertEquals("WHATEVER", Localization.lang("WHATEVER"));
     }
 
     @Test
-    void testUnsetLanguageTranslation() {
+    void unsetLanguageTranslation() {
         assertEquals("Groups", Localization.lang("Groups"));
     }
 }

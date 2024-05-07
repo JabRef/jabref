@@ -13,6 +13,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BstVMVisitorTest {
 
     @Test
-    public void testVisitStringsCommand() {
+    public void visitStringsCommand() {
         BstVM vm = new BstVM("STRINGS { test.string1 test.string2 test.string3 }");
 
         vm.render(Collections.emptyList());
@@ -35,7 +36,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void testVisitIntegersCommand() {
+    public void visitIntegersCommand() {
         BstVM vm = new BstVM("INTEGERS { variable.a variable.b variable.c }");
 
         vm.render(Collections.emptyList());
@@ -50,7 +51,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitFunctionCommand() {
+    void visitFunctionCommand() {
         BstVM vm = new BstVM("""
                 FUNCTION { test.func } { #1 'test.var := }
                 EXECUTE { test.func }
@@ -64,7 +65,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitMacroCommand() {
+    void visitMacroCommand() {
         BstVM vm = new BstVM("""
                 MACRO { jan } { "January" }
                 EXECUTE { jan }
@@ -80,13 +81,13 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitEntryCommand() {
+    void visitEntryCommand() {
         BstVM vm = new BstVM("ENTRY { address author title type } { variable } { label }");
         List<BibEntry> testEntries = List.of(BstVMTest.defaultTestEntry());
 
         vm.render(testEntries);
 
-        BstEntry bstEntry = vm.latestContext.entries().get(0);
+        BstEntry bstEntry = vm.latestContext.entries().getFirst();
         assertTrue(bstEntry.fields.containsKey("address"));
         assertTrue(bstEntry.fields.containsKey("author"));
         assertTrue(bstEntry.fields.containsKey("title"));
@@ -97,7 +98,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitReadCommand() {
+    void visitReadCommand() {
         BstVM vm = new BstVM("""
                 ENTRY { author title booktitle year owner timestamp url } { } { }
                 READ
@@ -106,7 +107,7 @@ class BstVMVisitorTest {
 
         vm.render(testEntries);
 
-        Map<String, String> fields = vm.latestContext.entries().get(0).fields;
+        Map<String, String> fields = vm.latestContext.entries().getFirst().fields;
         assertEquals("Crowston, K. and Annabi, H. and Howison, J. and Masango, C.", fields.get("author"));
         assertEquals("Effective work practices for floss development: A model and propositions", fields.get("title"));
         assertEquals("Hawaii International Conference On System Sciences (HICSS)", fields.get("booktitle"));
@@ -117,7 +118,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void testVisitExecuteCommand() throws RecognitionException {
+    public void visitExecuteCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 INTEGERS { variable.a }
                 FUNCTION { init.state.consts } { #5 'variable.a := }
@@ -130,7 +131,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void testVisitIterateCommand() throws RecognitionException {
+    public void visitIterateCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { test } { cite$ }
@@ -150,7 +151,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void testVisitReverseCommand() throws RecognitionException {
+    public void visitReverseCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { test } { cite$ }
@@ -170,7 +171,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void testVisitSortCommand() throws RecognitionException {
+    public void visitSortCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }
@@ -186,14 +187,14 @@ class BstVMVisitorTest {
         vm.render(testEntries);
 
         List<BstEntry> sortedEntries = vm.latestContext.entries();
-        assertEquals(Optional.of("a"), sortedEntries.get(0).entry.getCitationKey());
+        assertEquals(Optional.of("a"), sortedEntries.getFirst().entry.getCitationKey());
         assertEquals(Optional.of("b"), sortedEntries.get(1).entry.getCitationKey());
         assertEquals(Optional.of("c"), sortedEntries.get(2).entry.getCitationKey());
         assertEquals(Optional.of("d"), sortedEntries.get(3).entry.getCitationKey());
     }
 
     @Test
-    void testVisitIdentifier() {
+    void visitIdentifier() {
         BstVM vm = new BstVM("""
                 ENTRY { } { local.variable } { local.label }
                 READ
@@ -221,7 +222,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    void testVisitStackitem() {
+    void visitStackitem() {
         BstVM vm = new BstVM("""
                 STRINGS { t }
                 FUNCTION { test2 } { #3 }
@@ -238,7 +239,7 @@ class BstVMVisitorTest {
         vm.render(Collections.emptyList());
 
         assertEquals(3, vm.getStack().pop());
-        assertTrue(vm.getStack().pop() instanceof ParseTree);
+        assertInstanceOf(ParseTree.class, vm.getStack().pop());
         assertEquals(new BstVMVisitor.Identifier("t"), vm.getStack().pop());
         assertEquals(1, vm.getStack().pop());
         assertEquals("HELLO", vm.getStack().pop());

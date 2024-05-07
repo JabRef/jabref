@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -38,7 +38,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         this(new OrFields(field), false);
     }
 
-    public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
+    public FieldComparator(SaveOrder.SortCriterion sortCriterion) {
         this(new OrFields(sortCriterion.field), sortCriterion.descending);
     }
 
@@ -59,13 +59,13 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private FieldType determineFieldType() {
-        if (InternalField.TYPE_HEADER.equals(this.fields.getPrimary())) {
+        if (InternalField.TYPE_HEADER == this.fields.getPrimary()) {
             return FieldType.TYPE;
         } else if (this.fields.getPrimary().getProperties().contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if (StandardField.YEAR.equals(this.fields.getPrimary())) {
+        } else if (StandardField.YEAR == this.fields.getPrimary()) {
             return FieldType.YEAR;
-        } else if (StandardField.MONTH.equals(this.fields.getPrimary())) {
+        } else if (StandardField.MONTH == this.fields.getPrimary()) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;
@@ -73,7 +73,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private String getFieldValue(BibEntry entry) {
-        for (Field aField : fields) {
+        for (Field aField : fields.getFields()) {
             Optional<String> o = entry.getFieldOrAliasLatexFree(aField);
             if (o.isPresent()) {
                 return o.get();
@@ -92,8 +92,6 @@ public class FieldComparator implements Comparator<BibEntry> {
             f1 = e1.getType().getDisplayName();
             f2 = e2.getType().getDisplayName();
         } else {
-            // If the field is author or editor, we rearrange names so they are
-            // sorted according to last name.
             f1 = getFieldValue(e1);
             f2 = getFieldValue(e2);
         }
@@ -102,9 +100,9 @@ public class FieldComparator implements Comparator<BibEntry> {
         if ((f1 == null) && (f2 == null)) {
             return 0;
         } else if (f1 == null) {
-            return multiplier;
-        } else if (f2 == null) {
             return -multiplier;
+        } else if (f2 == null) {
+            return +multiplier;
         }
 
         // Now we know that both f1 and f2 are != null
@@ -112,8 +110,18 @@ public class FieldComparator implements Comparator<BibEntry> {
             f1 = AuthorList.fixAuthorForAlphabetization(f1);
             f2 = AuthorList.fixAuthorForAlphabetization(f2);
         } else if (fieldType == FieldType.YEAR) {
-            Integer f1year = StringUtil.intValueOfOptional(f1).orElse(0);
-            Integer f2year = StringUtil.intValueOfOptional(f2).orElse(0);
+            int f1year;
+            try {
+                f1year = StringUtil.intValueOf(f1);
+            } catch (NumberFormatException ex) {
+                f1year = 0;
+            }
+            int f2year;
+            try {
+                f2year = StringUtil.intValueOf(f2);
+            } catch (NumberFormatException ex) {
+                f2year = 0;
+            }
             int comparisonResult = Integer.compare(f1year, f2year);
             return comparisonResult * multiplier;
         } else if (fieldType == FieldType.MONTH) {
@@ -123,17 +131,36 @@ public class FieldComparator implements Comparator<BibEntry> {
         }
 
         if (isNumeric) {
-            Optional<Integer> i1 = StringUtil.intValueOfOptional(f1);
-            Optional<Integer> i2 = StringUtil.intValueOfOptional(f2);
+            // Cannot use {@link org.jabref.logic.util.comparator.NumericFieldComparator}, because
+            //   we need the "Else both are strings" branch and
+            //   unparseable strings are sorted differently.
+            int i1;
+            boolean i1present;
+            try {
+                i1 = StringUtil.intValueOf(f1);
+                i1present = true;
+            } catch (NumberFormatException ex) {
+                i1 = 0;
+                i1present = false;
+            }
+            int i2;
+            boolean i2present;
+            try {
+                i2 = StringUtil.intValueOf(f2);
+                i2present = true;
+            } catch (NumberFormatException ex) {
+                i2 = 0;
+                i2present = false;
+            }
 
-            if ((i2.isPresent()) && (i1.isPresent())) {
+            if (i1present && i2present) {
                 // Ok, parsing was successful. Update f1 and f2:
-                return i1.get().compareTo(i2.get()) * multiplier;
-            } else if (i1.isPresent()) {
+                return Integer.compare(i1, i2) * multiplier;
+            } else if (i1present) {
                 // The first one was parsable, but not the second one.
                 // This means we consider one < two
                 return -1 * multiplier;
-            } else if (i2.isPresent()) {
+            } else if (i2present) {
                 // The second one was parsable, but not the first one.
                 // This means we consider one > two
                 return multiplier;

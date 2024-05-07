@@ -144,8 +144,8 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         new ViewModelListCellFactory<DiffMode>()
                 .withText(DiffMode::getDisplayText)
                 .install(diffMode);
-        diffMode.setValue(preferences.getGuiPreferences().getMergeDiffMode());
-        EasyBind.subscribe(this.diffMode.valueProperty(), mode -> preferences.getGuiPreferences().setMergeDiffMode(mode));
+        diffMode.setValue(preferences.getMergeDialogPreferences().getMergeDiffMode());
+        EasyBind.subscribe(this.diffMode.valueProperty(), mode -> preferences.getMergeDialogPreferences().setMergeDiffMode(mode));
     }
 
     private void addColumn(MultiMergeEntriesViewModel.EntrySource entrySourceColumn) {
@@ -233,9 +233,9 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             if (newValue) {
                 optionsGrid.getChildrenUnmodifiable().stream()
                            .filter(node -> GridPane.getColumnIndex(node) == column)
-                           .filter(node -> node instanceof HBox)
+                           .filter(HBox.class::isInstance)
                            .forEach(hbox -> ((HBox) hbox).getChildrenUnmodifiable().stream()
-                                                         .filter(node -> node instanceof ToggleButton)
+                                                         .filter(ToggleButton.class::isInstance)
                                                          .forEach(toggleButton -> ((ToggleButton) toggleButton).setSelected(true)));
                 sourceButton.setSelected(true);
             }
@@ -252,7 +252,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         if (field.equals(StandardField.DOI)) {
             return false;
         }
-        return FieldFactory.isMultiLineField(field, preferences.getFieldContentParserPreferences().getNonWrappableFields());
+        return FieldFactory.isMultiLineField(field, preferences.getFieldPreferences().getNonWrappableFields());
     }
 
     private class Cell extends HBox {

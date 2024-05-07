@@ -26,13 +26,12 @@ public class OpenDatabase {
     public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
             throws IOException {
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen);
-
         performLoadDatabaseMigrations(result, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
-
         return result;
     }
 
-    private static void performLoadDatabaseMigrations(ParserResult parserResult, Character keywordDelimited) {
+    private static void performLoadDatabaseMigrations(ParserResult parserResult,
+                                                      Character keywordDelimited) {
         List<PostOpenMigration> postOpenMigrations = Arrays.asList(
                 new ConvertLegacyExplicitGroups(),
                 new ConvertMarkingToGroups(),

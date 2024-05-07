@@ -12,13 +12,20 @@ To ensure high code-quality,
 * We follow the principles of [Effective Java](https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/).
 * We use [Design Patterns](https://java-design-patterns.com/patterns/) when applicable.
 * We document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
-* We review each external pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS/README.md).
+* We review each external pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS).
 
 Read on about our automated quality checks at [Code Quality](../code-howtos/code-quality.md).
 
 ## Continuous integration
 
-Since end of 2019, we just use GitHub actions to execute our tests and to creates binaries. The binaries are created using [gradle](https://gradle.org) and are uploaded to [https://builds.jabref.org](https://builds.jabref.org). These binaries are created without any checks to have them available as quickly as possible, even if the localization or some fetchers are broken. Deep link: [https://github.com/JabRef/jabref/actions?workflow=Deployment](https://github.com/JabRef/jabref/actions?workflow=Deployment).
+JabRef has automatic checks using GitHub actions in place.
+One of them is checking for the formatting of the code.
+Consistent formatting ensures more easy reading of the code.
+Thus, we pay attention that JabRef's code follows the same code style.
+
+Binaries are created using [gradle](https://gradle.org) and are uploaded to [https://builds.jabref.org](https://builds.jabref.org).
+These binaries are created without any checks to have them available as quickly as possible, even if the localization or some fetchers are broken.
+Deep link to the action: [https://github.com/JabRef/jabref/actions?workflow=Deployment](https://github.com/JabRef/jabref/actions?workflow=Deployment).
 
 ## Branches
 
@@ -28,7 +35,7 @@ Other branches are used for discussing improvements with the help of [pull reque
 
 ## How JabRef acquires contributors
 
-* We participate in [Hacktoberfest](https://hacktoberfest.digitalocean.com). See [https://www.jabref.org/hacktoberfest/](https://www.jabref.org/hacktoberfest/) for details.
+* We participate in [Hacktoberfest](https://www.hacktoberfest.com).
 * We participate in [Google Summer of Code](https://developers.google.com/open-source/gsoc/).
 
 ## Historical notes

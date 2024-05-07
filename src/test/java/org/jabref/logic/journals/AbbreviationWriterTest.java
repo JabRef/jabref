@@ -21,7 +21,7 @@ class AbbreviationWriterTest {
         AbbreviationWriter.writeOrCreate(
                 csvFile,
                 List.of(abbreviation));
-        assertEquals(List.of("Full;Abbr;A"), Files.readAllLines(csvFile));
+        assertEquals(List.of("Full,Abbr,A"), Files.readAllLines(csvFile));
     }
 
     @Test
@@ -31,6 +31,6 @@ class AbbreviationWriterTest {
         AbbreviationWriter.writeOrCreate(
                 csvFile,
                 List.of(abbreviation));
-        assertEquals(List.of("Full;Abbr"), Files.readAllLines(csvFile));
+        assertEquals(List.of("Full,Abbr"), Files.readAllLines(csvFile));
     }
 }

@@ -115,7 +115,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
         }
 
         // Remove from previous parent
-        getParent().ifPresent(oldParent -> oldParent.removeChild());
+        getParent().ifPresent(ChainNode::removeChild);
 
         // Add as child
         target.setChild((T) this);

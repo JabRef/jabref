@@ -26,7 +26,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.paging.Page;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -98,7 +97,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         // Check results for PDF link
         // TODO: link always on first result or none?
         for (int i = 0; i < NUM_RESULTS; i++) {
-            Elements link = doc.select(String.format("div[data-rp=%S] div.gs_or_ggsm a", i));
+            Elements link = doc.select("div[data-rp=%S] div.gs_or_ggsm a".formatted(i));
 
             if (link.first() != null) {
                 String target = link.first().attr("href");
@@ -147,7 +146,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
 
     private BibEntry downloadEntry(String link) throws IOException, FetcherException {
         String downloadedContent = new URLDownload(link).asString();
-        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
         ParserResult result = parser.parse(new StringReader(downloadedContent));
         if ((result == null) || (result.getDatabase() == null)) {
             throw new FetcherException("Parsing entries from Google Scholar bib file failed.");

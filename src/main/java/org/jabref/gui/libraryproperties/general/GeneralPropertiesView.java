@@ -2,11 +2,8 @@ package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
 
-import javax.swing.undo.UndoManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
@@ -25,10 +22,8 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private TextField generalFileDirectory;
     @FXML private TextField userSpecificFileDirectory;
     @FXML private TextField laTexFileDirectory;
-    @FXML private TextArea preamble;
 
     @Inject private PreferencesService preferencesService;
-    @Inject private UndoManager undoManager;
 
     public GeneralPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -44,7 +39,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     }
 
     public void initialize() {
-        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferencesService, undoManager);
+        this.viewModel = new GeneralPropertiesViewModel(databaseContext, dialogService, preferencesService);
 
         new ViewModelListCellFactory<Charset>()
                 .withText(Charset::displayName)
@@ -62,8 +57,6 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         generalFileDirectory.textProperty().bindBidirectional(viewModel.generalFileDirectoryPropertyProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
         laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
-
-        preamble.textProperty().bindBidirectional(viewModel.preambleProperty());
     }
 
     @FXML

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
+import org.jabref.gui.Globals;
 import org.jabref.logic.util.OS;
 
 public class KeyBindingRepository {
@@ -110,6 +112,11 @@ public class KeyBindingRepository {
         return this.bindings.size();
     }
 
+    /**
+     * Searches the key bindings for the given KeyEvent. Only the first matching key binding is returned.
+     * <p>
+     * If you need all matching key bindings, use {@link #mapToKeyBindings(KeyEvent)} instead.
+     */
     public Optional<KeyBinding> mapToKeyBinding(KeyEvent keyEvent) {
         for (KeyBinding binding : KeyBinding.values()) {
             if (checkKeyCombinationEquality(binding, keyEvent)) {
@@ -117,6 +124,28 @@ public class KeyBindingRepository {
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Used if the same key could be used by multiple actions
+     */
+    private Set<KeyBinding> mapToKeyBindings(KeyEvent keyEvent) {
+        return Arrays.stream(KeyBinding.values())
+                     .filter(binding -> checkKeyCombinationEquality(binding, keyEvent))
+                     .collect(Collectors.toSet());
+    }
+
+    /**
+     * Checks if the given KeyEvent matches the given KeyBinding.
+     * <p>
+     * Used if a keyboard shortcut leads to multiple actions (e.g., ESC for closing a dialog and clearing the search).
+     */
+    public boolean matches(KeyEvent event, KeyBinding keyBinding) {
+        return Globals.getKeyPrefs().mapToKeyBindings(event)
+                      .stream()
+                      .filter(binding -> binding == keyBinding)
+                      .findFirst()
+                      .isPresent();
     }
 
     public Optional<KeyCombination> getKeyCombination(KeyBinding bindName) {

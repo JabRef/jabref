@@ -25,6 +25,7 @@ public class TestArchitectureTest {
                    .and().doNotHaveSimpleName("PreferencesMigrationsTest")
                    .and().doNotHaveSimpleName("SaveDatabaseActionTest")
                    .and().doNotHaveSimpleName("UpdateTimestampListenerTest")
+                   .and().doNotHaveSimpleName("DatabaseSearcherWithBibFilesTest")
                    .and().doNotHaveFullyQualifiedName("org.jabref.benchmarks.Benchmarks")
                    .and().doNotHaveFullyQualifiedName("org.jabref.testutils.interactive.styletester.StyleTesterMain")
                    .should().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
@@ -36,6 +37,7 @@ public class TestArchitectureTest {
     public void testNaming(JavaClasses classes) {
         classes().that().areTopLevelClasses()
                  .and().doNotHaveFullyQualifiedName("org.jabref.benchmarks.Benchmarks")
+                 .and().doNotHaveFullyQualifiedName("org.jabref.http.server.TestBibFile")
                  .and().doNotHaveFullyQualifiedName("org.jabref.gui.autocompleter.AutoCompleterUtil")
                  .and().doNotHaveFullyQualifiedName("org.jabref.gui.search.TextFlowEqualityHelper")
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.bibtex.BibEntryAssert")
