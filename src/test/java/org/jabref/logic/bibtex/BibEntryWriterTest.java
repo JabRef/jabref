@@ -790,7 +790,6 @@ class BibEntryWriterTest {
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
-        // @formatter:off
         String expected = """
                 % Some random comment that should stay here
                 @Article{test,
@@ -800,7 +799,6 @@ class BibEntryWriterTest {
                   number  = {1},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -822,7 +820,6 @@ class BibEntryWriterTest {
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBLATEX);
 
-        // @formatter:off
         String expected = """
                 @Article{,
                   author       = {Foo Bar},
@@ -835,7 +832,6 @@ class BibEntryWriterTest {
                   year         = {2019},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -872,7 +868,6 @@ class BibEntryWriterTest {
 
         String output = bibEntryWriter.serializeAll(List.of(entry1, entry2), BibDatabaseMode.BIBLATEX);
 
-        // @formatter:off
         String expected1 = """
                 @Article{,
                   author       = {Journal Author},
@@ -885,9 +880,7 @@ class BibEntryWriterTest {
                   year         = {2019},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
 
-        // @formatter:off
         String expected2 = """
                 @Book{,
                   author    = {John Book},
@@ -900,12 +893,11 @@ class BibEntryWriterTest {
                   year      = {2020},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
 
         assertEquals(expected1 + OS.NEWLINE + expected2, output);
     }
 
-    static Stream<Arguments> testGetFormattedFieldNameData() {
+    static Stream<Arguments> getFormattedFieldName() {
         return Stream.of(
                 Arguments.of(" = ", "", 0),
                 Arguments.of("a = ", "a", 0),
@@ -917,13 +909,13 @@ class BibEntryWriterTest {
     }
 
     @ParameterizedTest
-    @MethodSource("testGetFormattedFieldNameData")
+    @MethodSource
     void getFormattedFieldName(String expected, String fieldName, int indent) {
         Field field = FieldFactory.parseField(fieldName);
         assertEquals(expected, BibEntryWriter.getFormattedFieldName(field, indent));
     }
 
-    static Stream<Arguments> testGetLengthOfLongestFieldNameData() {
+    static Stream<Arguments> getLengthOfLongestFieldName() {
         return Stream.of(
                 Arguments.of(1, new BibEntry().withField(FieldFactory.parseField("t"), "t")),
                 Arguments.of(5, new BibEntry(EntryTypeFactory.parse("reference"))
@@ -933,7 +925,7 @@ class BibEntryWriterTest {
     }
 
     @ParameterizedTest
-    @MethodSource("testGetLengthOfLongestFieldNameData")
+    @MethodSource
     void getLengthOfLongestFieldName(int expected, BibEntry entry) {
         assertEquals(expected, BibEntryWriter.getLengthOfLongestFieldName(entry));
     }
