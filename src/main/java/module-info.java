@@ -126,6 +126,7 @@ open module org.jabref {
 
     // AI
     requires langchain4j;
+    requires kotlin.stdlib;
 
     // fulltext search
     requires org.apache.lucene.core;
