@@ -72,8 +72,10 @@ application {
 
         // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
 
-        '--add-exports=langchain4j/dev.langchain4j.model.chat=org.jabref',
-        '--add-exports=langchain4j/dev.langchain4j.model.chat=org.jabref.merged.module',
+        // '--add-exports=langchain4j/dev.langchain4j.model.chat=org.jabref',
+        // '--add-exports=langchain4j/dev.langchain4j.model.chat=org.jabref.merged.module',
+        // '--add-exports=langchain4j/dev.langchain4j.model.openai=org.jabref',
+        // '--add-exports=langchain4j/dev.langchain4j.model.openai=org.jabref.merged.module',
 
         // Fix for https://github.com/JabRef/jabref/issues/11188
         '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
@@ -99,9 +101,11 @@ application {
 modularity.disableEffectiveArgumentsAdjustment()
 
 // Required as workaround for  https://github.com/langchain4j/langchain4j/issues/1066
+// modularity.patchModule("langchain4j", "langchain4j-0.28.0.jar")
 modularity.patchModule("langchain4j", "langchain4j-core-0.28.0.jar")
 modularity.patchModule("langchain4j", "langchain4j-embeddings-0.28.0.jar")
 modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-0.28.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-open-ai-0.28.0.jar")
 
 sourceSets {
     main {
@@ -456,6 +460,7 @@ compileJava {
                 'langchain4j/dev.langchain4j.data.segment' : 'org.jabref',
                 'langchain4j/dev.langchain4j.model.chat' : 'org.jabref',
                 'langchain4j/dev.langchain4j.model.embedding' : 'org.jabref',
+                'langchain4j/dev.langchain4j.model.openai' : 'org.jabref',
                 'langchain4j/dev.langchain4j.rag.content.retriever' : 'org.jabref',
                 'langchain4j/dev.langchain4j.store.embedding' : 'org.jabref'
         ]
