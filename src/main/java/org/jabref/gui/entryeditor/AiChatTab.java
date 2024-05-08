@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.logging.Logger;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -73,7 +74,7 @@ public class AiChatTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (entry.getFiles().isEmpty()) {
             setContent(new Label(Localization.lang("No files attached")));
-        } else if (entry.getFiles().stream().allMatch(file -> file.getFileType().equals("PDF"))) {
+        } else if (!entry.getFiles().stream().allMatch(file -> file.getFileType().equals("PDF"))) {
             /*
                 QUESTION: What is the type of file.getFileType()????
                 I thought it is the part after the dot, but it turns out not.
