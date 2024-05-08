@@ -1,9 +1,10 @@
 package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.logging.Logger;
+import java.util.Optional;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,24 +13,37 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
+import org.jabref.logic.xmp.XmpUtilReader;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
+import dev.langchain4j.data.document.splitter.DocumentSplitters;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AiChatTab extends EntryEditorTab {
     public static final String NAME = "AI chat";
 
     private final PreferencesService preferencesService;
+    private final BibDatabaseContext bibDatabaseContext;
+    private final FilePreferences filePreferences;
 
     // Stores embeddings generated from full-text articles.
     // Depends on the embedding model.
@@ -42,6 +56,8 @@ public class AiChatTab extends EntryEditorTab {
     // Holds and performs the conversation with user. Stores the message history and manages API calls.
     // Depends on the chat language model and content retriever.
     private ConversationalRetrievalChain chain = null;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiChatTab.class.getName());
 
     /*
         Classes from langchain:
@@ -58,8 +74,10 @@ public class AiChatTab extends EntryEditorTab {
                                    we don't need to store it somewhere).
      */
 
-    public AiChatTab(PreferencesService preferencesService) {
+    public AiChatTab(PreferencesService preferencesService, BibDatabaseContext bibDatabaseContext) {
         this.preferencesService = preferencesService;
+        this.bibDatabaseContext = bibDatabaseContext;
+        this.filePreferences = preferencesService.getFilePreferences();
 
         setText(Localization.lang(NAME));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
@@ -85,7 +103,8 @@ public class AiChatTab extends EntryEditorTab {
             try {
                 bindToEntryRaw(entry);
             } catch (IOException e) {
-                setContent(new Label(e.getMessage()));
+                setContent(new Label("ERROR"));
+                LOGGER.error(e.getMessage(), e);
             }
         }
     }
@@ -131,10 +150,16 @@ public class AiChatTab extends EntryEditorTab {
         EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
                                               .embeddingStore(this.embeddingStore)
                                               .embeddingModel(preferencesService.getAiPreferences().getEmbeddingModel())
+                                                                .documentSplitter(DocumentSplitters.recursive(300, 0))
                                               .build();
 
         for (LinkedFile linkedFile : entry.getFiles()) {
-            String fileContents = Files.readString(Path.of(linkedFile.getLink()));
+            Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
+            if (path.isEmpty()) {
+                LOGGER.warn("Could not find file {}", linkedFile.getLink());
+                continue;
+            }
+            String fileContents = readPDFFile(path.get());
             Document document = new Document(fileContents);
             ingestor.ingest(document);
         }
@@ -150,5 +175,22 @@ public class AiChatTab extends EntryEditorTab {
                 .chatLanguageModel(preferencesService.getAiPreferences().getChatModel())
                 .contentRetriever(this.contentRetriever)
                 .build();
+    }
+
+    private String readPDFFile(Path path) {
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(path)) {
+            PDFTextStripper stripper = new PDFTextStripper();
+
+            int lastPage = document.getNumberOfPages();
+            stripper.setStartPage(1);
+            stripper.setEndPage(lastPage);
+            StringWriter writer = new StringWriter();
+            stripper.writeText(document, writer);
+
+            String result = writer.toString();LOGGER.trace("PDF content", result); return result;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return "";
+        }
     }
 }

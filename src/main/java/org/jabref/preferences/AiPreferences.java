@@ -8,6 +8,7 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 
 public class AiPreferences {
     private final ObjectProperty<EmbeddingModel> embeddingModel;
+    private final ObjectProperty<ChatLanguageModel> chatModel;
 
     public AiPreferences(EmbeddingModel embeddingModel, ChatLanguageModel chatModel) {
         this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
@@ -26,7 +27,6 @@ public class AiPreferences {
         this.embeddingModel.set(embeddingModel);
     }
 
-    private final ObjectProperty<ChatLanguageModel> chatModel;
 
     public ChatLanguageModel getChatModel() {
         return chatModel.get();
