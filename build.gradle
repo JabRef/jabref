@@ -296,6 +296,11 @@ dependencies {
     // YAML formatting
     implementation 'org.yaml:snakeyaml:2.2'
 
+    // AI
+    implementation 'dev.langchain4j:langchain4j-open-ai:0.28.0'
+    implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2:0.28.0'
+    implementation 'dev.langchain4j:langchain4j-document-parser-apache-pdfbox:0.28.0'
+
     implementation 'commons-io:commons-io:2.16.1'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.172'
