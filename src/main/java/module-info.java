@@ -124,6 +124,10 @@ open module org.jabref {
 
     requires org.jooq.jool;
 
+    // AI
+    requires langchain4j.core;
+    requires langchain4j;
+
     // fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
