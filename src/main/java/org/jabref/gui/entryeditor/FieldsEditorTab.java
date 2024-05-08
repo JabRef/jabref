@@ -273,7 +273,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     }
 
     private void savePreviewWidthDividerPosition(Number position) {
-        if(!preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab()) {
+        if (!preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab()) {
             preferences.getEntryEditorPreferences().setPreviewWidthDividerPosition(position.doubleValue());
         }
     }
