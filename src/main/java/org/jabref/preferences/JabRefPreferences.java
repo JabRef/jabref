@@ -128,6 +128,9 @@ import org.jabref.model.strings.StringUtil;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.tobiasdiez.easybind.EasyBind;
+import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
 import jakarta.inject.Singleton;
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
@@ -2699,6 +2702,25 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), (obs, oldValue, newValue) -> put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, newValue.name()));
 
         return mergeDialogPreferences;
+    }
+
+    @Override
+    public AiPreferences getAiPreferences() {
+        String token = System.getenv("OPENAI_API_TOKEN");
+
+        if (token == null) {
+            // Not good.
+            throw new RuntimeException(Localization.lang("No OpenAI token found"));
+        }
+
+        EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+
+        OpenAiChatModel chatModel = OpenAiChatModel
+            .builder()
+            .apiKey(token)
+            .build();
+
+        return new AiPreferences(embeddingModel, chatModel);
     }
 
     //*************************************************************************************************************
