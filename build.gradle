@@ -60,10 +60,6 @@ java {
     }
 }
 
-modularity.patchModule("langchain4j", "langchain4j-core-0.28.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-embeddings-0.28.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-0.28.0.jar")
-
 application {
     mainClass.set('org.jabref.Launcher')
     mainModule.set('org.jabref')
@@ -75,6 +71,9 @@ application {
         //   3. "deployment-arm64.yml"
 
         // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+
+        '--add-exports=langchain4j/dev.langchain4j.model.chat=org.jabref',
+        '--add-exports=langchain4j/dev.langchain4j.model.chat=org.jabref.merged.module',
 
         // Fix for https://github.com/JabRef/jabref/issues/11188
         '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
@@ -98,6 +97,11 @@ application {
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
 modularity.disableEffectiveArgumentsAdjustment()
+
+// Required as workaround for  https://github.com/langchain4j/langchain4j/issues/1066
+modularity.patchModule("langchain4j", "langchain4j-core-0.28.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-embeddings-0.28.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-0.28.0.jar")
 
 sourceSets {
     main {
@@ -446,7 +450,14 @@ compileJava {
         // TODO: Remove access to internal api
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+
+                'langchain4j/dev.langchain4j.data.document' : 'org.jabref',
+                'langchain4j/dev.langchain4j.data.segment' : 'org.jabref',
+                'langchain4j/dev.langchain4j.model.chat' : 'org.jabref',
+                'langchain4j/dev.langchain4j.model.embedding' : 'org.jabref',
+                'langchain4j/dev.langchain4j.rag.content.retriever' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.embedding' : 'org.jabref'
         ]
     }
 }
@@ -464,6 +475,9 @@ run {
         addExports = [
                 'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
+
+                'langchain4j/dev.langchain4j.model.chat' : 'org.jabref',
+                'langchain4j/dev.langchain4j.model.chat' : 'org.jabref.merged.module',
 
                 // We need to restate the ControlsFX exports, because we get following error otherwise:
                 //   java.lang.IllegalAccessError:
