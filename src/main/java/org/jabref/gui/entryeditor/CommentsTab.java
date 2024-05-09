@@ -3,10 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
 import java.util.SequencedSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -20,7 +17,6 @@ import javafx.scene.layout.RowConstraints;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -41,6 +37,7 @@ public class CommentsTab extends FieldsEditorTab {
     private final UserSpecificCommentField userSpecificCommentField;
 
     private final EntryEditorPreferences entryEditorPreferences;
+    private Button toggleCommentsButton = new Button("Hide user comments");
 
     public CommentsTab(PreferencesService preferences,
                        BibDatabaseContext databaseContext,
@@ -81,16 +78,18 @@ public class CommentsTab extends FieldsEditorTab {
         comments.add(StandardField.COMMENT);
 
         // Also show comment field of the current user (if enabled in the preferences)
-        if (entry.hasField(userSpecificCommentField) || entryEditorPreferences.shouldShowUserCommentsFields()) {
+        if (entry.hasField(userSpecificCommentField) && entryEditorPreferences.shouldShowUserCommentsFields()) {
             comments.add(userSpecificCommentField);
         }
 
         // Show all non-empty comment fields (otherwise, they are completely hidden)
         comments.addAll(entry.getFields().stream()
-                .filter(field -> (field instanceof UserSpecificCommentField && !field.equals(userSpecificCommentField))
-                        || field.getName().toLowerCase().contains("comment"))
+                .filter(field -> (field instanceof UserSpecificCommentField
+                        && field.getName().toLowerCase().contains("comment") && entryEditorPreferences.shouldShowUserCommentsFields() && !field.equals(userSpecificCommentField)))
                 .sorted(Comparator.comparing(Field::getName))
                 .collect(Collectors.toCollection(LinkedHashSet::new)));
+
+        System.out.println(comments);
         return comments;
     }
 
@@ -121,41 +120,44 @@ public class CommentsTab extends FieldsEditorTab {
         rowConstraints.add(buttonConstraint);
     }
 
+    @SuppressWarnings("checkstyle:EmptyLineSeparator")
     @Override
     protected void setupPanel(BibEntry entry, boolean compressed) {
         super.setupPanel(entry, compressed);
+        toggleCommentsButton.setOnAction(e -> {
+            if (toggleCommentsButton.getText().equals("Hide user comments")) {
+                entryEditorPreferences.setShowUserCommentsFields(false);
+                toggleCommentsButton.setText("Show user comments");
+            } else {
+                entryEditorPreferences.setShowUserCommentsFields(true);
+                toggleCommentsButton.setText("Hide user comments");
+            }
+            setupPanel(entry, compressed);
+        });
 
-        Optional<FieldEditorFX> fieldEditorForUserDefinedComment = editors.entrySet().stream().filter(f -> f.getKey().getName().contains(defaultOwner)).map(Map.Entry::getValue).findFirst();
-        for (Map.Entry<Field, FieldEditorFX> fieldEditorEntry : editors.entrySet()) {
-            Field field = fieldEditorEntry.getKey();
-            FieldEditorFX editor = fieldEditorEntry.getValue();
-
-            boolean isStandardBibtexComment = field == StandardField.COMMENT;
-            boolean isDefaultOwnerComment = field.equals(userSpecificCommentField);
-            boolean shouldBeEnabled = isStandardBibtexComment || isDefaultOwnerComment;
-            editor.getNode().setDisable(!shouldBeEnabled);
-        }
+        gridPane.add(toggleCommentsButton, 1, gridPane.getRowCount(), 2, 1);
+        setCompressedRowLayout();
 
         // Show "Hide" button only if user-specific comment field is empty. Otherwise, it is a strange UI, because the
         // button would just disappear and no change **in the current** editor would be made
-        if (entryEditorPreferences.shouldShowUserCommentsFields() && !entry.hasField(userSpecificCommentField)) {
-            Button toggleCommentsButton = new Button("Hide user comments");
-            AtomicBoolean commentsVisible = new AtomicBoolean(true); // To keep track of the visibility state
-
-            toggleCommentsButton.setOnAction(e -> {
-                if (commentsVisible.get()) {
-                    gridPane.getChildren().remove(fieldEditorForUserDefinedComment.get().getNode());
-                    toggleCommentsButton.setText("Show user comments");
-                } else {
-                    gridPane.add(fieldEditorForUserDefinedComment.get().getNode(), 1, gridPane.getRowCount(), 2, 1);
-                    toggleCommentsButton.setText("Hide user comments");
-                }
-                commentsVisible.set(!commentsVisible.get()); // Toggle the visibility state
-            });
-
-            gridPane.add(toggleCommentsButton, 1, gridPane.getRowCount(), 2, 1);
-            setCompressedRowLayout();
-        }
+//        if (entryEditorPreferences.shouldShowUserCommentsFields() && !entry.hasField(userSpecificCommentField)) {
+//            Button toggleCommentsButton = new Button("Hide user comments");
+//            AtomicBoolean commentsVisible = new AtomicBoolean(true); // To keep track of the visibility state
+//
+//            toggleCommentsButton.setOnAction(e -> {
+//                if (commentsVisible.get()) {
+//                    gridPane.getChildren().remove(fieldEditorForUserDefinedComment.get().getNode());
+//                    toggleCommentsButton.setText("Show user comments");
+//                } else {
+//                    gridPane.add(fieldEditorForUserDefinedComment.get().getNode(), 1, gridPane.getRowCount(), 2, 1);
+//                    toggleCommentsButton.setText("Hide user comments");
+//                }
+//                commentsVisible.set(!commentsVisible.get()); // Toggle the visibility state
+//            });
+//
+//            gridPane.add(toggleCommentsButton, 1, gridPane.getRowCount(), 2, 1);
+//            setCompressedRowLayout();
+//        }
         }
     }
 
