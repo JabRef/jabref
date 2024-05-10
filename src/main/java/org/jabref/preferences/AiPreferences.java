@@ -1,42 +1,40 @@
 package org.jabref.preferences;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.embedding.EmbeddingModel;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class AiPreferences {
-    private final ObjectProperty<EmbeddingModel> embeddingModel;
-    private final ObjectProperty<ChatLanguageModel> chatModel;
+    private final BooleanProperty useAi;
+    private final StringProperty openAiToken;
 
-    public AiPreferences(EmbeddingModel embeddingModel, ChatLanguageModel chatModel) {
-        this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
-        this.chatModel = new SimpleObjectProperty<>(chatModel);
+    public AiPreferences(boolean useAi, String openAiToken) {
+        this.useAi = new SimpleBooleanProperty(useAi);
+        this.openAiToken = new SimpleStringProperty(openAiToken);
     }
 
-    public EmbeddingModel getEmbeddingModel() {
-        return embeddingModel.get();
+    public BooleanProperty useAiProperty() {
+        return useAi;
     }
 
-    public ObjectProperty<EmbeddingModel> embeddingModelProperty() {
-        return embeddingModel;
+    public boolean isUseAi() {
+        return useAi.get();
     }
 
-    public void setEmbeddingModel(EmbeddingModel embeddingModel) {
-        this.embeddingModel.set(embeddingModel);
+    public void setUseAi(boolean useAi) {
+        this.useAi.set(useAi);
     }
 
-
-    public ChatLanguageModel getChatModel() {
-        return chatModel.get();
+    public StringProperty openAiTokenProperty() {
+        return openAiToken;
     }
 
-    public ObjectProperty<ChatLanguageModel> chatModelProperty() {
-        return chatModel;
+    public String getOpenAiToken() {
+        return openAiToken.get();
     }
 
-    public void setChatModel(ChatLanguageModel chatModel) {
-        this.chatModel.set(chatModel);
+    public void setOpenAiToken(String openAiToken) {
+        this.openAiToken.set(openAiToken);
     }
 }

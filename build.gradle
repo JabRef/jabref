@@ -475,7 +475,9 @@ compileJava {
                 'langchain4j/dev.langchain4j.model.embedding' : 'org.jabref',
                 'langchain4j/dev.langchain4j.model.openai' : 'org.jabref',
                 'langchain4j/dev.langchain4j.rag.content.retriever' : 'org.jabref',
-                'langchain4j/dev.langchain4j.store.embedding' : 'org.jabref'
+                'langchain4j/dev.langchain4j.store.embedding' : 'org.jabref',
+                'langchain4j/dev.langchain4j.memory' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.memory.chat' : 'org.jabref'
         ]
     }
 }

@@ -449,6 +449,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
+    // AI
+    private static final String USE_AI = "useAi";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
 
@@ -506,6 +509,7 @@ public class JabRefPreferences implements PreferencesService {
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private MergeDialogPreferences mergeDialogPreferences;
+    private AiPreferences aiPreferences;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -831,6 +835,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(THEME, Theme.BASE_CSS);
         defaults.put(THEME_SYNC_OS, Boolean.FALSE);
         setLanguageDependentDefaultValues();
+
+        // AI
+        defaults.put(USE_AI, Boolean.FALSE);
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -2706,21 +2713,42 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AiPreferences getAiPreferences() {
-        String token = System.getenv("OPENAI_API_TOKEN");
-
-        if (token == null) {
-            // Not good.
-            throw new RuntimeException(Localization.lang("No OpenAI token found"));
+        if (aiPreferences != null) {
+            return aiPreferences;
         }
 
-        EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+        String token = getOpenAiTokenFromKeyring();
+        aiPreferences = new AiPreferences(getBoolean(USE_AI), token);
 
-        OpenAiChatModel chatModel = OpenAiChatModel
-            .builder()
-            .apiKey(token)
-            .build();
+        EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
+        EasyBind.listen(aiPreferences.useAiProperty(), (obs, oldValue, newValue) -> putBoolean(USE_AI, newValue));
 
-        return new AiPreferences(embeddingModel, chatModel);
+        return aiPreferences;
+    }
+
+    private String getOpenAiTokenFromKeyring() {
+        try (final Keyring keyring = Keyring.create()) {
+            String rawPassword = keyring.getPassword("org.jabref.customapikeys", "openaitoken");
+            Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
+            return password.decrypt();
+        } catch (Exception e) {
+            // What to do in this place?
+            // There are many different error types.
+            LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token");
+            return ""; // What to return? Is empty key valid?
+        }
+    }
+
+    private void storeOpenAiTokenToKeyring(String newToken) {
+        try (final Keyring keyring = Keyring.create()) {
+            Password password = new Password(newToken, getInternalPreferences().getUserAndHost());
+            String rawPassword = password.encrypt();
+            keyring.setPassword("org.jabref.customapikeys", "openaitoken", rawPassword);
+        } catch (Exception e) {
+            // What to do in this place?
+            // There are many different error types.
+            LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token");
+        }
     }
 
     //*************************************************************************************************************
