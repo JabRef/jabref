@@ -477,7 +477,8 @@ compileJava {
                 'langchain4j/dev.langchain4j.rag.content.retriever' : 'org.jabref',
                 'langchain4j/dev.langchain4j.store.embedding' : 'org.jabref',
                 'langchain4j/dev.langchain4j.memory' : 'org.jabref',
-                'langchain4j/dev.langchain4j.store.memory.chat' : 'org.jabref'
+                'langchain4j/dev.langchain4j.store.memory.chat' : 'org.jabref',
+                'langchain4j/dev.langchain4j.data.message' : 'org.jabref',
         ]
     }
 }
