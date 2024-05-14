@@ -26,10 +26,12 @@ public class FieldContentFormatter {
     }
 
     /**
-     * Performs the reformatting of a field content. Note that "field content" is  understood as
-     * the value in BibTeX's key/value pairs of content AND without enclosing braces. For instance,
-     * <code>{author}</code> OR <code>author</code> are passed as content. Depends on the caller (who decides whether
-     * strings have been resolved or not).
+     * Performs the reformatting of a field content. Note that "field content" is either with enclosing {}.
+     * When outputting something which is using strings, the parts of the plain string are passed (without enclosing {}).
+     * For instance, for <code>#kopp# and #breit#"</code>, <code> and </code> is passed.
+     * Also depends on the caller whether strings have been resolved.
+     *
+     * Mutliline fields are just right trimmed.
      *
      * @param fieldContent the content to format.
      * @param field        the name of the bibtex field
@@ -46,14 +48,6 @@ public class FieldContentFormatter {
 
         // Replace multiple whitespaces by one. We need to keep the leading and trailing whitespace to enable constructs such as "#kopp# and #breit#"
         String result = WHITESPACE.matcher(fieldContent).replaceAll(" ");
-        if (result.startsWith("{ ")) {
-            // Remove starting space
-            result = "{" + result.substring(2);
-        }
-        if (result.endsWith(" }")) {
-            // Remove ending space
-            result = result.substring(0, result.length() - 2) + "}";
-        }
         return result;
     }
 

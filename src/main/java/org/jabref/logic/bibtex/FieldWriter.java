@@ -190,7 +190,8 @@ public class FieldWriter {
         checkBraces(content);
 
         StringBuilder stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
-        stringBuilder.append(formatter.format(content, field));
+        // Whitespace at the beginning/end is trimmed here because within the formatter it gets complicated in the case if strings are used.
+        stringBuilder.append(formatter.format(content, field).trim());
         stringBuilder.append(FIELD_END);
         return stringBuilder.toString();
     }
