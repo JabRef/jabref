@@ -134,19 +134,6 @@ class JabRefCLITest {
     }
 
     @Test
-    void wrapStringList() {
-        List<String> given = List.of("html", "simplehtml", "docbook5", "docbook4", "din1505", "bibordf", "tablerefs", "listrefs",
-                "tablerefsabsbib", "harvard", "iso690rtf", "iso690txt", "endnote", "oocsv", "ris", "misq", "yaml", "bibtexml", "oocalc", "ods",
-                "MSBib", "mods", "xmp", "pdf", "bib");
-        String expected = """
-                Available export formats: html, simplehtml, docbook5, docbook4, din1505, bibordf, tablerefs,
-                listrefs, tablerefsabsbib, harvard, iso690rtf, iso690txt, endnote, oocsv, ris, misq, yaml, bibtexml,
-                oocalc, ods, MSBib, mods, xmp, pdf, bib""";
-
-        assertEquals(expected, "Available export formats: " + JabRefCLI.wrapStringList(given, 26));
-    }
-
-    @Test
     void alignStringTable() {
         List<Pair<String, String>> given = List.of(
                 new Pair<>("Apple", "Slice"),

@@ -279,7 +279,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 dialogService,
                 preferences);
         files.add(onlineFile);
-        onlineFile.download();
+        onlineFile.download(true);
     }
 
     public void deleteFile(LinkedFileViewModel file) {

@@ -29,7 +29,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.testutils.category.FetcherTest;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.AfterEach;
@@ -37,6 +36,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -181,8 +183,12 @@ class LinkedFileViewModelTest {
         assertTrue(Files.exists(tempFile));
     }
 
-    @Test
-    void downloadHtmlFileCausesWarningDisplay() throws MalformedURLException {
+    @ParameterizedTest
+    @CsvSource({
+            "true, Download 'https://www.google.com/' was a HTML file. Keeping URL.",
+            "false, Download 'https://www.google.com/' was a HTML file. Removed."
+    })
+    void downloadHtmlFileCausesWarningDisplay(Boolean keepHtmlLink, String warningText) throws MalformedURLException {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
@@ -194,39 +200,9 @@ class LinkedFileViewModelTest {
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
 
-        viewModel.download();
+        viewModel.download(keepHtmlLink);
 
-        verify(dialogService, atLeastOnce()).notify("Downloaded website as an HTML file.");
-    }
-
-    @FetcherTest
-    @Test
-    void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException {
-        // use google as test url, wiley is protected by CloudFlare
-        String url = "https://google.com";
-        String fileType = StandardExternalFileType.URL.getName();
-        linkedFile = new LinkedFile(new URL(url), fileType);
-
-        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
-
-        databaseContext.setDatabasePath(tempFile);
-
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
-
-        viewModel.download();
-
-        List<LinkedFile> linkedFiles = entry.getFiles();
-
-        for (LinkedFile file: linkedFiles) {
-            if ("Misc/asdf.html".equalsIgnoreCase(file.getLink())) {
-                assertEquals("URL", file.getFileType());
-                return;
-            }
-        }
-        // If the file was not found among the linked files to the entry
-        fail();
+        verify(dialogService, atLeastOnce()).notify(warningText);
     }
 
     @Test
@@ -290,9 +266,11 @@ class LinkedFileViewModelTest {
         assertEquals("URL", actual);
     }
 
-    @Test
-    @FetcherTest
-    void downloadPdfFileWhenLinkedFilePointsToPdfUrl() throws MalformedURLException {
+    // We cannot use "@FetcherTest" annotation, because a @FetcherTest does not fire up a GUI environment (which is needed for this test)
+    // @FetcherTest
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void downloadPdfFileWhenLinkedFilePointsToPdfUrl(boolean keepHtml) throws MalformedURLException {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
         // Needed Mockito stubbing methods to run test
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
@@ -302,7 +280,9 @@ class LinkedFileViewModelTest {
         databaseContext.setDatabasePath(tempFile);
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
-        viewModel.download();
+
+        // TODO: Rewrite using WireMock
+        viewModel.download(keepHtml);
 
         // Loop through downloaded files to check for filetype='pdf'
         List<LinkedFile> linkedFiles = entry.getFiles();

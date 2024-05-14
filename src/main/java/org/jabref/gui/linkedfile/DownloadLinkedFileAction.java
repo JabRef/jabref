@@ -6,6 +6,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.net.ssl.HostnameVerifier;
@@ -55,6 +57,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     private final String downloadUrl;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
+    private final boolean keepHtmlLink;
 
     private final BibDatabaseContext databaseContext;
 
@@ -68,7 +71,8 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                                     DialogService dialogService,
                                     FilePreferences filePreferences,
                                     TaskExecutor taskExecutor,
-                                    String suggestedName) {
+                                    String suggestedName,
+                                    boolean keepHtmlLink) {
         this.databaseContext = databaseContext;
         this.entry = entry;
         this.linkedFile = linkedFile;
@@ -77,10 +81,14 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
+        this.keepHtmlLink = keepHtmlLink;
 
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, filePreferences);
     }
 
+    /**
+     * Downloads the given linked file to the first existing file directory. It keeps HTML files as URLs.
+     */
     public DownloadLinkedFileAction(BibDatabaseContext databaseContext,
                                     BibEntry entry,
                                     LinkedFile linkedFile,
@@ -88,12 +96,12 @@ public class DownloadLinkedFileAction extends SimpleCommand {
                                     DialogService dialogService,
                                     FilePreferences filePreferences,
                                     TaskExecutor taskExecutor) {
-        this(databaseContext, entry, linkedFile, downloadUrl, dialogService, filePreferences, taskExecutor, "");
+        this(databaseContext, entry, linkedFile, downloadUrl, dialogService, filePreferences, taskExecutor, "", true);
     }
 
     @Override
     public void execute() {
-        LOGGER.info("Downloading file from " + downloadUrl);
+        LOGGER.info("Downloading file from {}", downloadUrl);
         if (downloadUrl.isEmpty() || !LinkedFile.isOnlineLink(downloadUrl)) {
             throw new UnsupportedOperationException("In order to download the file, the url has to be an online link");
         }
@@ -132,51 +140,64 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         taskExecutor.execute(downloadTask);
     }
 
-    private void onSuccess(Path targetDirectory, Path destination) {
+    /**
+     * @param targetDirectory The directory to store the file into. Is an absolute path.
+     */
+    private void onSuccess(Path targetDirectory, Path downloadedFile) {
+        assert targetDirectory.isAbsolute();
+
         boolean isDuplicate;
         boolean isHtml;
         try {
-            isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory, destination.getFileName(), dialogService);
+            isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory, downloadedFile.getFileName(), dialogService);
         } catch (IOException e) {
             LOGGER.error("FileNameUniqueness.isDuplicatedFile failed", e);
             return;
         }
 
         if (isDuplicate) {
-            destination = targetDirectory.resolve(
-                    FileNameUniqueness.eraseDuplicateMarks(destination.getFileName()));
-
-            linkedFile.setLink(FileUtil.relativize(destination,
-                    databaseContext.getFileDirectories(filePreferences)).toString());
-
-            isHtml = linkedFile.getFileType().equals(StandardExternalFileType.URL.getName());
-        } else {
-            // we need to call LinkedFileViewModel#fromFile, because we need to make the path relative to the configured directories
-            LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(
-                    destination,
-                    databaseContext.getFileDirectories(filePreferences),
-                    filePreferences);
-            if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
-                newLinkedFile.setDescription((linkedFile.getDescription()));
-            }
-            if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink())) {
-                newLinkedFile.setSourceURL(linkedFile.getLink());
-            } else {
-                newLinkedFile.setSourceURL(linkedFile.getSourceUrl());
-            }
-            entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
-            isHtml = newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName());
+            // We do not add duplicate files.
+            // The downloaded file was deleted in {@link org.jabref.logic.util.io.FileNameUniqueness.isDuplicatedFile]}
+            LOGGER.info("File {} already exists in target directory {}.", downloadedFile.getFileName(), targetDirectory);
+            return;
         }
 
-        // Notify in bar when the file type is HTML.
+        // we need to call LinkedFileViewModel#fromFile, because we need to make the path relative to the configured directories
+        LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(
+                downloadedFile,
+                databaseContext.getFileDirectories(filePreferences),
+                filePreferences);
+        if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
+            newLinkedFile.setDescription((linkedFile.getDescription()));
+        }
+        if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink())) {
+            newLinkedFile.setSourceURL(linkedFile.getLink());
+        } else {
+            newLinkedFile.setSourceURL(linkedFile.getSourceUrl());
+        }
+
+        isHtml = newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName());
         if (isHtml) {
-            dialogService.notify(Localization.lang("Downloaded website as an HTML file."));
-            LOGGER.debug("Downloaded website {} as an HTML file at {}", linkedFile.getLink(), destination);
+            if (this.keepHtmlLink) {
+                dialogService.notify(Localization.lang("Download '%0' was a HTML file. Keeping URL.", downloadUrl));
+            } else {
+                dialogService.notify(Localization.lang("Download '%0' was a HTML file. Removed.", downloadUrl));
+                List<LinkedFile> newFiles = new ArrayList<>(entry.getFiles());
+                newFiles.remove(linkedFile);
+                entry.setFiles(newFiles);
+                try {
+                    Files.delete(downloadedFile);
+                } catch (IOException e) {
+                    LOGGER.error("Could not delete downloaded file {}.", downloadedFile, e);
+                }
+            }
+        } else {
+            entry.replaceDownloadedFile(linkedFile.getLink(), newLinkedFile);
         }
     }
 
     private void onFailure(URLDownload urlDownload, Exception ex) {
-        LOGGER.error("Error downloading from URL: " + urlDownload, ex);
+        LOGGER.error("Error downloading from URL: {}", urlDownload, ex);
         String fetcherExceptionMessage = ex.getMessage();
         String failedTitle = Localization.lang("Failed to download from URL");
         int statusCode;
@@ -261,7 +282,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         String mimeType = urlDownload.getMimeType();
 
         if (mimeType != null) {
-            LOGGER.debug("MIME Type suggested: " + mimeType);
+            LOGGER.debug("MIME Type suggested: {}", mimeType);
             return ExternalFileTypes.getExternalFileTypeByMimeType(mimeType, filePreferences);
         } else {
             return Optional.empty();

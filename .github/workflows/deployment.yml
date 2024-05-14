@@ -100,14 +100,14 @@ jobs:
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Setup macOS key chain
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: apple-actions/import-codesign-certs@v2
+        uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
       - name: Setup macOS key chain for app id cert
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: apple-actions/import-codesign-certs@v2
+        uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
@@ -142,7 +142,14 @@ jobs:
           --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
-          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module
+          --java-options --add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref
       - name: Build pkg (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -172,7 +179,14 @@ jobs:
           --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
-          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module
+          --java-options --add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash

@@ -613,11 +613,11 @@ public class BibEntry implements Cloneable {
         }
 
         String oldValue = getField(field).orElse(null);
-        boolean isNewField = oldValue == null;
         if (value.equals(oldValue)) {
             return Optional.empty();
         }
 
+        boolean isNewField = oldValue == null;
         changed = true;
 
         invalidateFieldCache(field);
@@ -1062,15 +1062,15 @@ public class BibEntry implements Cloneable {
      * Gets a list of linked files.
      *
      * @return the list of linked files, is never null but can be empty.
-     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}
+     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
      */
     public List<LinkedFile> getFiles() {
-        // Extract the path
         Optional<String> oldValue = getField(StandardField.FILE);
         if (oldValue.isEmpty()) {
             return new ArrayList<>(); // Return new ArrayList because emptyList is immutable
         }
 
+        // Extract the path
         return FileFieldParser.parse(oldValue.get());
     }
 

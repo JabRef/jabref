@@ -3,6 +3,8 @@ package org.jabref.model.entry;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
@@ -11,6 +13,7 @@ import org.jabref.model.strings.StringUtil;
  * <p>
  * Current usage: only methods <code>getLastOnly</code>, <code>getFirstLast</code>, and <code>getLastFirst</code> are used; all other methods are provided for completeness.
  */
+@AllowedToUseLogic("because it needs to use formatter")
 public class Author {
 
     /**
@@ -19,6 +22,8 @@ public class Author {
      * In the context of BibTeX key generation, this is "Kopp+" (<code>+</code> for "et al.") and not "KO".
      */
     public static final Author OTHERS = new Author("", "", null, "others", null);
+
+    public static final RemoveWordEnclosingAndOuterEnclosingBracesFormatter FORMATTER = new RemoveWordEnclosingAndOuterEnclosingBracesFormatter();
 
     private final String givenName;
     private final String givenNameAbbreviated;
@@ -41,17 +46,37 @@ public class Author {
     public Author(String givenName, String givenNameAbbreviated, String namePrefix, String familyName, String nameSuffix) {
         boolean keepBracesAtLastPart = StringUtil.isBlank(givenName) && StringUtil.isBlank(givenNameAbbreviated) && StringUtil.isBlank(namePrefix) && !StringUtil.isBlank(familyName) && StringUtil.isBlank(nameSuffix);
 
-        this.givenName = addDotIfAbbreviation(removeStartAndEndBraces(givenName));
-        this.givenNameAbbreviated = removeStartAndEndBraces(givenNameAbbreviated);
-        this.namePrefix = removeStartAndEndBraces(namePrefix);
+        if (!StringUtil.isBlank(givenName)) {
+            this.givenName = addDotIfAbbreviation(FORMATTER.format(givenName));
+        } else {
+            this.givenName = null;
+        }
+        if (!StringUtil.isBlank(givenNameAbbreviated)) {
+            this.givenNameAbbreviated = FORMATTER.format(givenNameAbbreviated);
+        } else {
+            this.givenNameAbbreviated = null;
+        }
+        if (!StringUtil.isBlank(namePrefix)) {
+            this.namePrefix = FORMATTER.format(namePrefix);
+        } else {
+            this.namePrefix = null;
+        }
         if (keepBracesAtLastPart) {
             // We do not remove braces here to keep institutions protected
             // https://github.com/JabRef/jabref/issues/10031
             this.familyName = familyName;
         } else {
-            this.familyName = removeStartAndEndBraces(familyName);
+            if (!StringUtil.isBlank(familyName)) {
+                this.familyName = FORMATTER.format(familyName);
+            } else {
+                this.familyName = null;
+            }
         }
-        this.nameSuffix = removeStartAndEndBraces(nameSuffix);
+        if (!StringUtil.isBlank(nameSuffix)) {
+            this.nameSuffix = FORMATTER.format(nameSuffix);
+        } else {
+            this.nameSuffix = null;
+        }
     }
 
     public static String addDotIfAbbreviation(String name) {
@@ -166,94 +191,6 @@ public class Author {
     }
 
     /**
-     * @return true iff the brackets in s are properly paired
-     */
-    private boolean properBrackets(String s) {
-        // nested construct is there, check for "proper" nesting
-        int i = 0;
-        int level = 0;
-        while (i < s.length()) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '{':
-                    level++;
-                    break;
-                case '}':
-                    level--;
-                    if (level == -1) { // improper nesting
-                        return false;
-                    }
-                    break;
-                default:
-                    break;
-            }
-            i++;
-        }
-        return level == 0;
-    }
-
-    /**
-     * Removes start and end brace both at the complete string and at beginning/end of a word
-     * <p>
-     * E.g.,
-     * <ul>
-     *     <li>{Vall{\'e}e Poussin} -> Vall{\'e}e Poussin</li>
-     *     <li>{Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin</li>
-     *     <li>Vall{\'e}e Poussin -> Vall{\'e}e Poussin</li>
-     * </ul>
-     */
-    private String removeStartAndEndBraces(String name) {
-        if (StringUtil.isBlank(name)) {
-            return null;
-        }
-
-        if (!name.contains("{")) {
-            return name;
-        }
-
-        String[] split = name.split(" ");
-        StringBuilder b = new StringBuilder();
-        for (String s : split) {
-            if ((s.length() > 2) && s.startsWith("{") && s.endsWith("}")) {
-                // quick solution (which we don't do: just remove first "{" and last "}"
-                // however, it might be that s is like {A}bbb{c}, where braces may not be removed
-
-                // inner
-                String inner = s.substring(1, s.length() - 1);
-
-                if (inner.contains("}")) {
-                    if (properBrackets(inner)) {
-                        s = inner;
-                    }
-                } else {
-                    //  no inner curly brackets found, no check needed, inner can just be used as s
-                    s = inner;
-                }
-            }
-            b.append(s).append(' ');
-        }
-        // delete last
-        b.deleteCharAt(b.length() - 1);
-
-        // now, all inner words are cleared
-        // case {word word word} remains
-        // as above, we have to be aware of {w}ord word wor{d} and {{w}ord word word}
-
-        String newName = b.toString();
-
-        if (newName.startsWith("{") && newName.endsWith("}")) {
-            String inner = newName.substring(1, newName.length() - 1);
-            if (properBrackets(inner)) {
-                return inner;
-            } else {
-                return newName;
-            }
-        } else {
-            return newName;
-        }
-    }
-
-    /**
      * Returns the first name of the author stored in this object ("First").
      *
      * @return first name of the author (may consist of several tokens)
@@ -304,7 +241,7 @@ public class Author {
      * @return 'von Last'
      */
     public String getNamePrefixAndFamilyName() {
-        if (namePrefix == null) {
+        if (namePrefix == null || "".equals(namePrefix)) {
             return getFamilyName().orElse("");
         } else {
             return familyName == null ? namePrefix : namePrefix + ' ' + familyName;
