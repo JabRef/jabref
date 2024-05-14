@@ -32,12 +32,6 @@ After clicking "Download", IntelliJ installs Eclipse Temurin:
 ![IntelliJ installs Eclipse Temurin](guidelines-intellij-installs-temurin.png)
 {% endfigure %}
 
-Open the module settings: Right click on "JabRef" and select "Open Module Settings":
-
-{% figure caption:"Open IntelliJ Module Settings" %}
-![IntelliJ Module Settings](guidelines-intellij-open-module-settings.png)
-{% endfigure %}
-
 Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 21.
 
 {% figure caption:"Project SDK is pinned to the downloaded SDK (showing JDK 21 as example)" %}
