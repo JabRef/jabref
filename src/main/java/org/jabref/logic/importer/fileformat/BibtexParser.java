@@ -728,18 +728,15 @@ public class BibtexParser implements Parser {
         if (!content.isEmpty()) {
             if (entry.hasField(field)) {
                 // The following hack enables the parser to deal with multiple
-                // author or
-                // editor lines, stringing them together instead of getting just
+                // author or editor lines, stringing them together instead of getting just
                 // one of them.
                 // Multiple author or editor lines are not allowed by the bibtex
-                // format, but
-                // at least one online database exports bibtex likes to do that, making
-                // it inconvenient
-                // for users if JabRef did not accept it.
+                // format, but at least one online database exports bibtex likes to do that, making
+                // it inconvenient for users if JabRef did not accept it.
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                     entry.setField(field, entry.getField(field).orElse("") + " and " + content);
                 } else if (StandardField.KEYWORDS == field) {
-                    // multiple keywords fields should be combined to one
+                    // TODO: multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
             } else {
