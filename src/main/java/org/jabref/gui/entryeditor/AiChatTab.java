@@ -75,7 +75,10 @@ public class AiChatTab extends EntryEditorTab {
         }
 
         EasyBind.listen(aiPreferences.useAiProperty(), (obs, oldValue, newValue) -> {
-            if (!newValue) {
+            if (newValue && !aiPreferences.getOpenAiToken().isEmpty()) {
+                aiService = new AiService(aiPreferences.getOpenAiToken());
+                rebuildAiChat();
+            } else {
                 aiService = null;
                 aiChat = null;
             }
