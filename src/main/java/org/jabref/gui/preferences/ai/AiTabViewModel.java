@@ -15,16 +15,13 @@ import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
+    private static final String OPENAI_TOKEN_PATTERN_STRING = "sk-[A-Za-z0-9-_]*[A-Za-z0-9]{20}T3BlbkFJ[A-Za-z0-9]{20}";
+    private static final Pattern OPENAI_TOKEN_PATTERN = Pattern.compile(OPENAI_TOKEN_PATTERN_STRING);
+
     private final BooleanProperty useAi = new SimpleBooleanProperty();
     private final StringProperty openAiToken = new SimpleStringProperty();
-
-    // What about a checkbox "Use AI in JabRef"?
-
     private final AiPreferences aiPreferences;
     private final DialogService dialogService;
-
-    private static final String OPENAI_TOKEN_PATTERN_STRING = "sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}";
-    private static final Pattern OPENAI_TOKEN_PATTERN = Pattern.compile(OPENAI_TOKEN_PATTERN_STRING);
 
     public AiTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
         this.aiPreferences = preferencesService.getAiPreferences();
@@ -54,7 +51,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private boolean validateOpenAiToken() {
         if (StringUtil.isBlank(openAiToken.get())) {
-            // Uhm, actually, it can be empty, if user does not want to use AI things.
             dialogService.showErrorDialogAndWait(Localization.lang("Format error"), Localization.lang("The OpenAI token cannot be empty"));
             return false;
         }

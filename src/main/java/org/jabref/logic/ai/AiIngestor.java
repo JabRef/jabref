@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
@@ -26,62 +27,75 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is an "algorithm class". Meaning it is used in one place and is thrown away quickly.
- * <p>
  * This class contains a bunch of methods that are useful for loading the documents to AI.
+ * <p>
+ * This class is an "algorithm class". Meaning it is used in one place and is thrown away quickly.
  */
 public class AiIngestor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiIngestor.class.getName());
+
+    public static final int DOCUMENT_SPLITTER_MAX_SEGMENT_SIZE_IN_CHARS = 300;
+    public static final int DOCUMENT_SPLITTER_MAX_OVERLAP_SIZE_IN_CHARS = 0;
+
     // Another "algorithm class" that ingests the contents of the file into the embedding store.
     private final EmbeddingStoreIngestor ingestor;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiIngestor.class.getName());
-
     public AiIngestor(EmbeddingStore<TextSegment> embeddingStore, EmbeddingModel embeddingModel) {
-        // TODO: Tweak the parameters of this object.
-        DocumentSplitter documentSplitter = DocumentSplitters.recursive(300, 0);
+        DocumentSplitter documentSplitter = DocumentSplitters
+                .recursive(DOCUMENT_SPLITTER_MAX_SEGMENT_SIZE_IN_CHARS, DOCUMENT_SPLITTER_MAX_OVERLAP_SIZE_IN_CHARS);
 
         this.ingestor = EmbeddingStoreIngestor
                 .builder()
                 .embeddingStore(embeddingStore)
-                .embeddingModel(embeddingModel) // What if null?
+                .embeddingModel(embeddingModel)
                 .documentSplitter(documentSplitter)
                 .build();
     }
 
-    public void ingestString(String contents) {
-        LOGGER.trace("Ingesting: {}", contents);
-        Document document = new Document(contents);
-        ingestor.ingest(document);
-    }
-
-    public void ingestPDFFile(Path path) throws IOException {
-        PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(path);
-        PDFTextStripper stripper = new PDFTextStripper();
-
-        int lastPage = document.getNumberOfPages();
-        stripper.setStartPage(1);
-        stripper.setEndPage(lastPage);
-        StringWriter writer = new StringWriter();
-        stripper.writeText(document, writer);
-
-        String result = writer.toString();
-
-        ingestString(result);
-    }
-
-    public void ingestLinkedFile(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) throws IOException, JabRefException {
-        if (!"PDF".equals(linkedFile.getFileType())) {
-            String errorMsg = Localization.lang("Unsupported file type") + ": "
-                    + linkedFile.getFileType() + ". "
-                    + Localization.lang("Only PDF files are supported") + ".";
-            throw new JabRefException(errorMsg);
-        }
+    public void ingestLinkedFile(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
+        // TODO: Ingest not only the contents of documents, but also their metadata.
+        // This will help the AI to identify a document while performing a QA session over several bib entries.
+        // Useful link: https://docs.langchain4j.dev/tutorials/rag/#metadata.
 
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
         if (path.isPresent()) {
-            ingestPDFFile(path.get());
+            ingestFile(path.get());
         } else {
-            throw new FileNotFoundException(linkedFile.getLink());
+            LOGGER.error("Could not find path for a linked file: " + linkedFile.getLink());
         }
+    }
+
+    public void ingestFile(Path path) {
+        if (FileUtil.isPDFFile(path)) {
+            ingestPDFFile(path);
+        } else {
+            LOGGER.info("Usupported file type of file: " + path + ". For now, only PDF files are supported");
+        }
+    }
+
+    public void ingestPDFFile(Path path) {
+        try {
+            PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(path);
+            PDFTextStripper stripper = new PDFTextStripper();
+
+            int lastPage = document.getNumberOfPages();
+            stripper.setStartPage(1);
+            stripper.setEndPage(lastPage);
+            StringWriter writer = new StringWriter();
+            stripper.writeText(document, writer);
+
+            ingestString(writer.toString());
+        } catch (Exception e) {
+            LOGGER.error("An error occurred while reading a PDF file: " + path, e);
+        }
+    }
+
+    public void ingestString(String string) {
+        ingestDocument(new Document(string));
+    }
+
+    public void ingestDocument(Document document) {
+        LOGGER.trace("Ingesting: {}", document);
+        ingestor.ingest(document);
     }
 }

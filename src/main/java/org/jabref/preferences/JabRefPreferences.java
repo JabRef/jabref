@@ -128,10 +128,8 @@ import org.jabref.model.strings.StringUtil;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.tobiasdiez.easybind.EasyBind;
-import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
-import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.Nullable;
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -449,7 +447,6 @@ public class JabRefPreferences implements PreferencesService {
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
-    // AI
     private static final String USE_AI = "useAi";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
@@ -2717,8 +2714,16 @@ public class JabRefPreferences implements PreferencesService {
             return aiPreferences;
         }
 
+        boolean useAi = getBoolean(USE_AI);
+
         String token = getOpenAiTokenFromKeyring();
-        aiPreferences = new AiPreferences(getBoolean(USE_AI), token);
+
+        // To ensure that the token is never null or empty while useAi is true.
+        if (token == null) {
+            useAi = false;
+        }
+
+        aiPreferences = new AiPreferences(useAi, token);
 
         EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
         EasyBind.listen(aiPreferences.useAiProperty(), (obs, oldValue, newValue) -> putBoolean(USE_AI, newValue));
@@ -2726,16 +2731,14 @@ public class JabRefPreferences implements PreferencesService {
         return aiPreferences;
     }
 
-    private String getOpenAiTokenFromKeyring() {
+    private @Nullable String getOpenAiTokenFromKeyring() {
         try (final Keyring keyring = Keyring.create()) {
             String rawPassword = keyring.getPassword("org.jabref.customapikeys", "openaitoken");
             Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
             return password.decrypt();
         } catch (Exception e) {
-            // What to do in this place?
-            // There are many different error types.
-            LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token");
-            return ""; // What to return? Is empty key valid?
+            LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token", e);
+            return null;
         }
     }
 
@@ -2745,9 +2748,7 @@ public class JabRefPreferences implements PreferencesService {
             String rawPassword = password.encrypt();
             keyring.setPassword("org.jabref.customapikeys", "openaitoken", rawPassword);
         } catch (Exception e) {
-            // What to do in this place?
-            // There are many different error types.
-            LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token");
+            LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token", e);
         }
     }
 

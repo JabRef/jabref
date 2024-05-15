@@ -252,6 +252,10 @@
 
     /* Consistent size for headers of tab-pane and side-panels*/
     -jr-header-height: 3em;
+
+    /* AI chat style */
+    -jr-ai-message-user: #7ee3fb;
+    -jr-ai-message-ai: #bac8cb;
 }
 
 .unchanged {

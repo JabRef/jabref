@@ -72,11 +72,6 @@ application {
 
         // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
 
-        // '--add-exports=langchain4j/dev.langchain4j.model.chat=org.jabref',
-        // '--add-exports=langchain4j/dev.langchain4j.model.chat=org.jabref.merged.module',
-        // '--add-exports=langchain4j/dev.langchain4j.model.openai=org.jabref',
-        // '--add-exports=langchain4j/dev.langchain4j.model.openai=org.jabref.merged.module',
-
         // Fix for https://github.com/JabRef/jabref/issues/11188
         '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
         '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',

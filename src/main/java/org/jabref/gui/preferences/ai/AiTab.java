@@ -11,11 +11,8 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
-    @FXML
-    private CheckBox useAi;
-
-    @FXML
-    private TextField openAiToken;
+    @FXML private CheckBox useAi;
+    @FXML private TextField openAiToken;
 
     public AiTab() {
         ViewLoader.view(this)

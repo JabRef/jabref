@@ -1,6 +1,6 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.List;
+import java.nio.file.Path;
 
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
@@ -18,10 +18,10 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.AiChat;
-import org.jabref.logic.ai.AiChatData;
-import org.jabref.logic.ai.AiConnection;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.AiIngestor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -32,24 +32,30 @@ import org.jabref.preferences.PreferencesService;
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.ChatMessageType;
 import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.store.embedding.EmbeddingStore;
+import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 
 public class AiChatTab extends EntryEditorTab {
     public static final String NAME = "AI chat";
 
     private final DialogService dialogService;
-
     private final FilePreferences filePreferences;
     private final AiPreferences aiPreferences;
-
     private final BibDatabaseContext bibDatabaseContext;
-
-    private AiConnection aiConnection = null;
-    private AiChat aiChat = null;
 
     private VBox chatVBox = null;
 
-    public AiChatTab(DialogService dialogService, PreferencesService preferencesService, BibDatabaseContext bibDatabaseContext) {
+    private AiService aiService = null;
+    private AiChat aiChat = null;
+
+    // TODO: This field should somehow live in bib entry.
+    private EmbeddingStore<TextSegment> currentEmbeddingStore = null;
+
+    public AiChatTab(DialogService dialogService, PreferencesService preferencesService,
+                     BibDatabaseContext bibDatabaseContext) {
         this.dialogService = dialogService;
 
         this.filePreferences = preferencesService.getFilePreferences();
@@ -63,36 +69,32 @@ public class AiChatTab extends EntryEditorTab {
         setUpAiConnection();
     }
 
-    // Set up the AI connection if AI is used.
-    // Also listen for AI preferences changes and update the classes appropriately.
     private void setUpAiConnection() {
         if (aiPreferences.isUseAi()) {
-            aiConnection = new AiConnection(aiPreferences.getOpenAiToken());
+            aiService = new AiService(aiPreferences.getOpenAiToken());
         }
 
         EasyBind.listen(aiPreferences.useAiProperty(), (obs, oldValue, newValue) -> {
             if (newValue) {
-                aiConnection = new AiConnection(aiPreferences.getOpenAiToken());
+                aiService = new AiService(aiPreferences.getOpenAiToken());
                 rebuildAiChat();
             } else {
-                aiConnection = null;
-                // QUESTION: If user chose AI but then unchooses, what should we do with the AI chat?
+                aiService = null;
                 aiChat = null;
             }
         });
 
         EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> {
-            if (aiConnection != null) {
-                aiConnection = new AiConnection(newValue);
+            if (aiService != null) {
+                aiService = new AiService(newValue);
                 rebuildAiChat();
             }
         });
     }
 
     private void rebuildAiChat() {
-        if (aiChat != null) {
-            AiChatData data = aiChat.getData();
-            aiChat = new AiChat(data, aiConnection);
+        if (aiChat != null && currentEmbeddingStore != null) {
+            aiChat = new AiChat(aiService, currentEmbeddingStore);
         }
     }
 
@@ -103,89 +105,100 @@ public class AiChatTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        Node node;
-
         if (entry.getFiles().isEmpty()) {
-            node = stateNoFiles();
-        } else if (!entry.getFiles().stream().allMatch(file -> "PDF".equals(file.getFileType()))) {
-            /*
-                QUESTION: What is the type of file.getFileType()????
-                I thought it is the part after the dot, but it turns out not.
-                I got the "PDF" string by looking at tests.
-             */
-            node = stateWrongFilesFormat();
+            setContent(new Label(Localization.lang("No files attached")));
+        } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
+            setContent(new Label(Localization.lang("Only PDF files are supported")));
         } else {
-            configureAiChat(entry);
-            node = stateAiChat();
-            restoreMessages(aiChat.getData().getChatMemoryStore().getMessages(aiChat.getChatId()));
+            bindToCorrectEntry(entry);
+        }
+    }
+
+    private void bindToCorrectEntry(BibEntry entry) {
+        configureAiChat(entry);
+        setContent(createAiChatUI());
+    }
+
+    private void configureAiChat(BibEntry entry) {
+        EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+
+        aiChat = new AiChat(aiService, embeddingStore);
+
+        AiIngestor ingestor = new AiIngestor(embeddingStore, aiService.getEmbeddingModel());
+
+        for (LinkedFile linkedFile : entry.getFiles()) {
+            try {
+                ingestor.ingestLinkedFile(linkedFile, bibDatabaseContext, filePreferences);
+            } catch (Exception e) {
+                dialogService.notify(Localization.lang("An error occurred while loading a file into the AI")
+                        + ":\n"
+                        + e.getMessage() + "\n"
+                        + Localization.lang("This file will be skipped") + ".");
+            }
         }
 
-        setContent(node);
+        currentEmbeddingStore = embeddingStore;
     }
 
-    private Node stateNoFiles() {
-        return new Label(Localization.lang("No files attached"));
-    }
-
-    private Node stateWrongFilesFormat() {
-        return new Label(Localization.lang("Only PDF files are supported"));
-    }
-
-    private Node stateAiChat() {
-        // Don't bully me for this style.
-
+    private Node createAiChatUI() {
         VBox aiChatBox = new VBox(10);
         aiChatBox.setPadding(new Insets(10));
 
-            ScrollPane chatScrollPane = new ScrollPane();
-            chatScrollPane.setStyle("-fx-border-color: black;");
-            chatScrollPane.setPadding(new Insets(10, 10, 0, 10));
-            VBox.setVgrow(chatScrollPane, Priority.ALWAYS);
-
-                chatVBox = new VBox(10);
-
-                    // Chat messages will be children of chatVBox.
-
-                chatScrollPane.setContent(chatVBox);
-
-            aiChatBox.getChildren().add(chatScrollPane);
-
-            HBox userPromptHBox = new HBox(10);
-            userPromptHBox.setAlignment(Pos.CENTER);
-
-                TextField userPromptTextField = new TextField();
-                HBox.setHgrow(userPromptTextField, Priority.ALWAYS);
-
-                userPromptHBox.getChildren().add(userPromptTextField);
-
-                Button userPromptSubmitButton = new Button(Localization.lang("Submit"));
-                userPromptSubmitButton.setOnAction(e -> {
-                    String userPrompt = userPromptTextField.getText();
-                    userPromptTextField.setText("");
-
-                    addMessage(true, userPrompt);
-
-                    String aiMessage = aiChat.execute(userPrompt);
-
-                    addMessage(false, aiMessage);
-                });
-
-                userPromptHBox.getChildren().add(userPromptSubmitButton);
-
-            aiChatBox.getChildren().add(userPromptHBox);
+        aiChatBox.getChildren().add(constructChatScrollPane());
+        aiChatBox.getChildren().add(constructUserPromptBox());
 
         return aiChatBox;
     }
 
-    private void addMessage(boolean isUser, String text) {
-        Node messageNode = generateMessage(isUser, text);
-        chatVBox.getChildren().add(messageNode);
+    private Node constructChatScrollPane() {
+        ScrollPane chatScrollPane = new ScrollPane();
+        chatScrollPane.setStyle("-fx-border-color: black;");
+        chatScrollPane.setPadding(new Insets(10, 10, 0, 10));
+        VBox.setVgrow(chatScrollPane, Priority.ALWAYS);
+
+        chatVBox = new VBox(10);
+        aiService.getChatMemoryStore().getMessages(aiChat.getChatId()).forEach(this::addMessage);
+        chatScrollPane.setContent(chatVBox);
+
+        return chatScrollPane;
     }
 
-    private static final String USER_MESSAGE_COLOR = "#7ee3fb";
-    private static final String AI_MESSAGE_COLOR = "#bac8cb";
+    private Node constructUserPromptBox() {
+        HBox userPromptHBox = new HBox(10);
+        userPromptHBox.setAlignment(Pos.CENTER);
 
-    private static Node generateMessage(boolean isUser, String text) {
+        TextField userPromptTextField = new TextField();
+        HBox.setHgrow(userPromptTextField, Priority.ALWAYS);
+
+        userPromptHBox.getChildren().add(userPromptTextField);
+
+        Button userPromptSubmitButton = new Button(Localization.lang("Submit"));
+        userPromptSubmitButton.setOnAction(e -> {
+            String userPrompt = userPromptTextField.getText();
+            userPromptTextField.setText("");
+
+            addMessage(new UserMessage(userPrompt));
+
+            String aiMessage = aiChat.execute(userPrompt);
+
+            addMessage(new AiMessage(aiMessage));
+        });
+
+        userPromptHBox.getChildren().add(userPromptSubmitButton);
+
+        return userPromptHBox;
+    }
+
+    private void addMessage(ChatMessage chatMessage) {
+        if (chatMessage.type() == ChatMessageType.AI || chatMessage.type() == ChatMessageType.USER) {
+            Node messageNode = constructMessageNode(chatMessage);
+            chatVBox.getChildren().add(messageNode);
+        }
+    }
+
+    private static Node constructMessageNode(ChatMessage chatMessage) {
+        boolean isUser = chatMessage.type() == ChatMessageType.USER;
+
         Pane pane = new Pane();
 
         if (isUser) {
@@ -194,14 +207,14 @@ public class AiChatTab extends EntryEditorTab {
 
         VBox paneVBox = new VBox(10);
 
-        paneVBox.setStyle("-fx-background-color: " + (isUser ? USER_MESSAGE_COLOR : AI_MESSAGE_COLOR) + ";");
+        paneVBox.setStyle("-fx-background-color: " + (isUser ? "-jr-ar-message-user" : "-jr-ai-message-ai") + ";");
         paneVBox.setPadding(new Insets(10));
 
         Label authorLabel = new Label(Localization.lang(isUser ? "User" : "AI"));
         authorLabel.setStyle("-fx-font-weight: bold");
         paneVBox.getChildren().add(authorLabel);
 
-        Label messageLabel = new Label(text);
+        Label messageLabel = new Label(chatMessage.text());
         paneVBox.getChildren().add(messageLabel);
 
         pane.getChildren().add(paneVBox);
@@ -209,30 +222,4 @@ public class AiChatTab extends EntryEditorTab {
         return pane;
     }
 
-    private void configureAiChat(BibEntry entry) {
-        aiChat = new AiChat(aiConnection);
-
-        AiIngestor ingestor = new AiIngestor(aiChat.getData().getEmbeddingStore(), aiConnection.getEmbeddingModel());
-
-        for (LinkedFile linkedFile : entry.getFiles()) {
-            try {
-                ingestor.ingestLinkedFile(linkedFile, bibDatabaseContext, filePreferences);
-            } catch (Exception e) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Error while loading file"),
-                        Localization.lang("An error occurred while loading a file into the AI") + ":\n"
-                                + e.getMessage() + "\n"
-                                + Localization.lang("This file will be skipped") + ".");
-            }
-        }
-    }
-
-    private void restoreMessages(List<ChatMessage> messages) {
-        for (ChatMessage message : messages) {
-            if (message instanceof UserMessage userMessage) {
-                addMessage(true, userMessage.singleText());
-            } else if (message instanceof AiMessage aiMessage) {
-                addMessage(false, aiMessage.text());
-            }
-        }
-    }
 }
