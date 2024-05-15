@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.ai;
 
-import java.util.regex.Pattern;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,9 +13,6 @@ import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
-    private static final String OPENAI_TOKEN_PATTERN_STRING = "sk-[A-Za-z0-9-_]*[A-Za-z0-9]{20}T3BlbkFJ[A-Za-z0-9]{20}";
-    private static final Pattern OPENAI_TOKEN_PATTERN = Pattern.compile(OPENAI_TOKEN_PATTERN_STRING);
-
     private final BooleanProperty useAi = new SimpleBooleanProperty();
     private final StringProperty openAiToken = new SimpleStringProperty();
     private final AiPreferences aiPreferences;
@@ -52,11 +47,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private boolean validateOpenAiToken() {
         if (StringUtil.isBlank(openAiToken.get())) {
             dialogService.showErrorDialogAndWait(Localization.lang("Format error"), Localization.lang("The OpenAI token cannot be empty"));
-            return false;
-        }
-
-        if (!OPENAI_TOKEN_PATTERN.matcher(openAiToken.get()).matches()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Format error"), Localization.lang("The OpenAI token is not valid"));
             return false;
         }
 
