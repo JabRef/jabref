@@ -3,6 +3,7 @@ package org.jabref.logic.ai;
 import java.util.UUID;
 
 import dev.langchain4j.chain.ConversationalRetrievalChain;
+import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -19,11 +20,13 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
  */
 public class AiChat {
     public static final int MESSAGE_WINDOW_SIZE = 10;
+    public static final int RAG_MAX_RESULTS = 10;
+    public static final double RAG_MIN_SCORE = 0.5;
 
     // The main class that executes user prompts. Maintains API calls and retrieval augmented generation (RAG).
     private final ConversationalRetrievalChain chain;
 
-    private final Object chatId;
+    private final ChatMemory chatMemory;
 
     public AiChat(AiService aiService, EmbeddingStore<TextSegment> embeddingStore) {
         // This class is basically an "algorithm class" for retrieving the relevant contents of documents.
@@ -31,19 +34,19 @@ public class AiChat {
                 .builder()
                 .embeddingStore(embeddingStore)
                 .embeddingModel(aiService.getEmbeddingModel())
+                .maxResults(RAG_MAX_RESULTS)
+                .minScore(RAG_MIN_SCORE)
                 .build();
 
         // This class is also an "algorithm class" that maintains the chat history.
         // An algorithm for managing chat history is needed because you cannot stuff the whole history for the AI:
         // there would be too many tokens. This class, for example, sends only the 10 last messages.
-        ChatMemory chatMemory = MessageWindowChatMemory
+        this.chatMemory = MessageWindowChatMemory
                 .builder()
                 .chatMemoryStore(aiService.getChatMemoryStore())
                 .maxMessages(MESSAGE_WINDOW_SIZE) // This was the default value in the original implementation.
                 .id(UUID.randomUUID())
                 .build();
-
-        this.chatId = chatMemory.id();
 
         this.chain = ConversationalRetrievalChain
                 .builder()
@@ -53,11 +56,16 @@ public class AiChat {
                 .build();
     }
 
+    public void setSystemMessage(String message) {
+        // ChatMemory automatically manages that there is only one system message.
+        this.chatMemory.add(new SystemMessage(message));
+    }
+
     public String execute(String prompt) {
         return chain.execute(prompt);
     }
 
     public Object getChatId() {
-        return chatId;
+        return this.chatMemory.id();
     }
 }

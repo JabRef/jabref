@@ -6,24 +6,24 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class AiPreferences {
-    private final BooleanProperty useAi;
+    private final BooleanProperty enableChatWithFiles;
     private final StringProperty openAiToken;
 
-    public AiPreferences(boolean useAi, String openAiToken) {
-        this.useAi = new SimpleBooleanProperty(useAi);
+    public AiPreferences(boolean enableChatWithFiles, String openAiToken) {
+        this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
         this.openAiToken = new SimpleStringProperty(openAiToken);
     }
 
-    public BooleanProperty useAiProperty() {
-        return useAi;
+    public BooleanProperty enableChatWithFilesProperty() {
+        return enableChatWithFiles;
     }
 
-    public boolean isUseAi() {
-        return useAi.get();
+    public boolean getEnableChatWithFiles() {
+        return enableChatWithFiles.get();
     }
 
-    public void setUseAi(boolean useAi) {
-        this.useAi.set(useAi);
+    public void setEnableChatWithFiles(boolean enableChatWithFiles) {
+        this.enableChatWithFiles.set(enableChatWithFiles);
     }
 
     public StringProperty openAiTokenProperty() {

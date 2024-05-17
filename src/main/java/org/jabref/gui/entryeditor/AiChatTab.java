@@ -41,9 +41,16 @@ import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 public class AiChatTab extends EntryEditorTab {
     public static final String NAME = "AI chat";
 
+    private static final String QA_SYSTEM_MESSAGE = """
+            You are an AU research assistant. You read and analyze scientific articles.
+            The user will send you a question regarding a paper. You will be supplied also with the relevant information found in the article.
+            Answer the question only by using the relevant information. Don't make up the answer.
+            If you can't answer the user question using the provided information, then reply that you couldn't do it.""";
+
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final AiPreferences aiPreferences;
+    private final EntryEditorPreferences entryEditorPreferences;
     private final BibDatabaseContext bibDatabaseContext;
 
     private VBox chatVBox = null;
@@ -60,6 +67,7 @@ public class AiChatTab extends EntryEditorTab {
 
         this.filePreferences = preferencesService.getFilePreferences();
         this.aiPreferences = preferencesService.getAiPreferences();
+        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
 
         this.bibDatabaseContext = bibDatabaseContext;
 
@@ -70,11 +78,11 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void setUpAiConnection() {
-        if (aiPreferences.isUseAi()) {
+        if (aiPreferences.getEnableChatWithFiles()) {
             aiService = new AiService(aiPreferences.getOpenAiToken());
         }
 
-        EasyBind.listen(aiPreferences.useAiProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> {
             if (newValue && !aiPreferences.getOpenAiToken().isEmpty()) {
                 aiService = new AiService(aiPreferences.getOpenAiToken());
                 rebuildAiChat();
@@ -95,17 +103,20 @@ public class AiChatTab extends EntryEditorTab {
     private void rebuildAiChat() {
         if (aiChat != null && currentEmbeddingStore != null) {
             aiChat = new AiChat(aiService, currentEmbeddingStore);
+            aiChat.setSystemMessage(QA_SYSTEM_MESSAGE);
         }
     }
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return aiPreferences.isUseAi();
+        return entryEditorPreferences.shouldShowAiChatTab();
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (entry.getFiles().isEmpty()) {
+        if (!aiPreferences.getEnableChatWithFiles()) {
+            setContent(new Label(Localization.lang("JabRef uses OpenAI to enable \"chatting\" with PDF files. OpenAI is an external service. To enable JabRef chatgting with PDF files, the content of the PDF files need to be shared with OpenAI. As soon as you ask a question, the text content of all PDFs attached to the entry are send to OpenAI. The privacy policy of OpenAI applies. You find it at <https://openai.com/policies/privacy-policy/>.")));
+        } else if (entry.getFiles().isEmpty()) {
             setContent(new Label(Localization.lang("No files attached")));
         } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
             setContent(new Label(Localization.lang("Only PDF files are supported")));
@@ -123,6 +134,7 @@ public class AiChatTab extends EntryEditorTab {
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
         aiChat = new AiChat(aiService, embeddingStore);
+        aiChat.setSystemMessage(QA_SYSTEM_MESSAGE);
 
         AiIngestor ingestor = new AiIngestor(embeddingStore, aiService.getEmbeddingModel());
 
@@ -152,11 +164,12 @@ public class AiChatTab extends EntryEditorTab {
 
     private Node constructChatScrollPane() {
         ScrollPane chatScrollPane = new ScrollPane();
+        chatScrollPane.setFitToWidth(true);
         chatScrollPane.setStyle("-fx-border-color: black;");
-        chatScrollPane.setPadding(new Insets(10, 10, 0, 10));
         VBox.setVgrow(chatScrollPane, Priority.ALWAYS);
 
         chatVBox = new VBox(10);
+        chatVBox.setPadding(new Insets(10, 10, 0, 10));
         aiService.getChatMemoryStore().getMessages(aiChat.getChatId()).forEach(this::addMessage);
         chatScrollPane.setContent(chatVBox);
 
@@ -206,8 +219,9 @@ public class AiChatTab extends EntryEditorTab {
         }
 
         VBox paneVBox = new VBox(10);
+        paneVBox.setMaxWidth(500);
 
-        paneVBox.setStyle("-fx-background-color: " + (isUser ? "-jr-ar-message-user" : "-jr-ai-message-ai") + ";");
+        paneVBox.setStyle("-fx-background-color: " + (isUser ? "-jr-ai-message-user" : "-jr-ai-message-ai") + ";");
         paneVBox.setPadding(new Insets(10));
 
         Label authorLabel = new Label(Localization.lang(isUser ? "User" : "AI"));

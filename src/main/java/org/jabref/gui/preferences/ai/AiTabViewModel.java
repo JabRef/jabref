@@ -25,13 +25,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        useAi.setValue(aiPreferences.isUseAi());
+        useAi.setValue(aiPreferences.getEnableChatWithFiles());
         openAiToken.setValue(aiPreferences.getOpenAiToken());
     }
 
     @Override
     public void storeSettings() {
-        aiPreferences.setUseAi(useAi.get());
+        aiPreferences.setEnableChatWithFiles(useAi.get());
         aiPreferences.setOpenAiToken(openAiToken.get());
     }
 

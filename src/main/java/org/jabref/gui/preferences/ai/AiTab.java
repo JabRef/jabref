@@ -11,7 +11,7 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
-    @FXML private CheckBox useAi;
+    @FXML private CheckBox enableChat;
     @FXML private TextField openAiToken;
 
     public AiTab() {
@@ -23,12 +23,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     public void initialize() {
         this.viewModel = new AiTabViewModel(preferencesService, dialogService);
 
-        useAi.selectedProperty().bindBidirectional(viewModel.useAiProperty());
+        enableChat.selectedProperty().bindBidirectional(viewModel.useAiProperty());
         openAiToken.textProperty().bindBidirectional(viewModel.openAiTokenProperty());
 
-        openAiToken.setDisable(!useAi.isSelected());
+        openAiToken.setDisable(!enableChat.isSelected());
 
-        useAi.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        enableChat.selectedProperty().addListener((observable, oldValue, newValue) -> {
             openAiToken.setDisable(!newValue);
         });
     }

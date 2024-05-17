@@ -35,7 +35,7 @@ public class AiIngestor {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiIngestor.class.getName());
 
     public static final int DOCUMENT_SPLITTER_MAX_SEGMENT_SIZE_IN_CHARS = 300;
-    public static final int DOCUMENT_SPLITTER_MAX_OVERLAP_SIZE_IN_CHARS = 0;
+    public static final int DOCUMENT_SPLITTER_MAX_OVERLAP_SIZE_IN_CHARS = 30;
 
     // Another "algorithm class" that ingests the contents of the file into the embedding store.
     private final EmbeddingStoreIngestor ingestor;
