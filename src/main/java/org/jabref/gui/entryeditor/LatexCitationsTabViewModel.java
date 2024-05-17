@@ -92,14 +92,14 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             @Override
             public void onStart(FileAlterationObserver observer) {
                 if (!updateStatusOnCreate.get()) {
-                    status.set(Status.IN_PROGRESS);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> status.set(Status.IN_PROGRESS));
                 }
             }
 
             @Override
             public void onStop(FileAlterationObserver observer) {
                 if (!updateStatusOnCreate.get()) {
-                    updateStatusOnCreate.set(true);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> updateStatusOnCreate.set(true));
                     updateStatus();
                 }
             }
