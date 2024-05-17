@@ -16,11 +16,11 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexNotFoundException;
@@ -130,7 +130,7 @@ public class PdfIndexer {
             indexWriter = new IndexWriter(
                     indexDirectory,
                     new IndexWriterConfig(
-                            new EnglishStemAnalyzer()).setOpenMode(mode));
+                            new EnglishAnalyzer()).setOpenMode(mode));
         } catch (IOException e) {
             LOGGER.error("Could not initialize the IndexWriter", e);
             // FIXME: This can also happen if another instance of JabRef is launched in parallel.
