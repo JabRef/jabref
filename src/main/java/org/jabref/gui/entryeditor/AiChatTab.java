@@ -2,21 +2,21 @@ package org.jabref.gui.entryeditor;
 
 import java.nio.file.Path;
 
+import dev.langchain4j.agent.tool.P;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.AiIngestor;
@@ -37,9 +37,13 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
+import org.slf4j.LoggerFactory;
+import org.tinylog.Logger;
 
 public class AiChatTab extends EntryEditorTab {
     public static final String NAME = "AI chat";
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AiChatTab.class.getName());
 
     private static final String QA_SYSTEM_MESSAGE = """
             You are an AI research assistant. You read and analyze scientific articles.
@@ -52,8 +56,10 @@ public class AiChatTab extends EntryEditorTab {
     private final AiPreferences aiPreferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final BibDatabaseContext bibDatabaseContext;
+    private final TaskExecutor taskExecutor;
 
     private VBox chatVBox = null;
+    private TextField userPromptTextField = null;
 
     private AiService aiService = null;
     private AiChat aiChat = null;
@@ -62,7 +68,7 @@ public class AiChatTab extends EntryEditorTab {
     private EmbeddingStore<TextSegment> currentEmbeddingStore = null;
 
     public AiChatTab(DialogService dialogService, PreferencesService preferencesService,
-                     BibDatabaseContext bibDatabaseContext) {
+                     BibDatabaseContext bibDatabaseContext, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
 
         this.filePreferences = preferencesService.getFilePreferences();
@@ -70,6 +76,8 @@ public class AiChatTab extends EntryEditorTab {
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
 
         this.bibDatabaseContext = bibDatabaseContext;
+
+        this.taskExecutor = taskExecutor;
 
         setText(Localization.lang(NAME));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
@@ -169,9 +177,11 @@ public class AiChatTab extends EntryEditorTab {
         VBox.setVgrow(chatScrollPane, Priority.ALWAYS);
 
         chatVBox = new VBox(10);
-        chatVBox.setPadding(new Insets(10, 10, 0, 10));
+        chatVBox.setPadding(new Insets(10));
         aiService.getChatMemoryStore().getMessages(aiChat.getChatId()).forEach(this::addMessage);
         chatScrollPane.setContent(chatVBox);
+
+        chatScrollPane.vvalueProperty().bind(chatVBox.heightProperty());
 
         return chatScrollPane;
     }
@@ -180,32 +190,77 @@ public class AiChatTab extends EntryEditorTab {
         HBox userPromptHBox = new HBox(10);
         userPromptHBox.setAlignment(Pos.CENTER);
 
-        TextField userPromptTextField = new TextField();
+        userPromptTextField = new TextField();
         HBox.setHgrow(userPromptTextField, Priority.ALWAYS);
+        userPromptTextField.setOnAction(e -> sendMessageToAiEvent());
 
         userPromptHBox.getChildren().add(userPromptTextField);
 
         Button userPromptSubmitButton = new Button(Localization.lang("Submit"));
-        userPromptSubmitButton.setOnAction(e -> {
-            String userPrompt = userPromptTextField.getText();
-            userPromptTextField.setText("");
-
-            addMessage(new UserMessage(userPrompt));
-
-            String aiMessage = aiChat.execute(userPrompt);
-
-            addMessage(new AiMessage(aiMessage));
-        });
+        userPromptSubmitButton.setOnAction(e -> sendMessageToAiEvent());
 
         userPromptHBox.getChildren().add(userPromptSubmitButton);
 
         return userPromptHBox;
     }
 
-    private void addMessage(ChatMessage chatMessage) {
+    private void sendMessageToAiEvent() {
+        String userPrompt = userPromptTextField.getText();
+        userPromptTextField.clear();
+
+        addMessage(new UserMessage(userPrompt));
+
+        Node aiMessage = addMessage(new AiMessage("empty"));
+        setContentsOfMessage(aiMessage, new ProgressIndicator());
+
+        BackgroundTask.wrap(() -> aiChat.execute(userPrompt))
+                .onSuccess(aiMessageText -> setContentsOfMessage(aiMessage, makeMessageTextArea(aiMessageText)))
+                .onFailure(e -> {
+                    LOGGER.error("Got an error while sending a message to AI", e);
+                    setContentsOfMessage(aiMessage, constructErrorPane(e));
+                })
+                .executeWith(taskExecutor);
+    }
+
+    private static void setContentsOfMessage(Node messageNode, Node content) {
+        ((VBox)((Pane)messageNode).getChildren().getFirst()).getChildren().set(1, content);
+    }
+
+    private static TextArea makeMessageTextArea(String content) {
+        TextArea message = new TextArea(content);
+        message.setWrapText(true);
+        message.setEditable(false);
+        return message;
+    }
+
+    private Node constructErrorPane(Exception e) {
+        Pane pane = new Pane();
+        pane.setStyle("-fx-background-color: -jr-red");
+
+        VBox paneVBox = new VBox(10);
+        paneVBox.setMaxWidth(500);
+        paneVBox.setPadding(new Insets(10));
+
+        Label errorLabel = new Label(Localization.lang("Error"));
+        errorLabel.setStyle("-fx-font-weight: bold");
+        paneVBox.getChildren().add(errorLabel);
+
+        TextArea message = makeMessageTextArea(e.getMessage());
+        paneVBox.getChildren().add(message);
+
+        pane.getChildren().add(paneVBox);
+
+        return pane;
+    }
+
+    private Node addMessage(ChatMessage chatMessage) {
         if (chatMessage.type() == ChatMessageType.AI || chatMessage.type() == ChatMessageType.USER) {
             Node messageNode = constructMessageNode(chatMessage);
             chatVBox.getChildren().add(messageNode);
+            return messageNode;
+        } else {
+            Logger.warn("Cannot construct the UI for a system or tool message.");
+            return null;
         }
     }
 
@@ -228,8 +283,8 @@ public class AiChatTab extends EntryEditorTab {
         authorLabel.setStyle("-fx-font-weight: bold");
         paneVBox.getChildren().add(authorLabel);
 
-        Label messageLabel = new Label(chatMessage.text());
-        paneVBox.getChildren().add(messageLabel);
+        TextArea message = makeMessageTextArea(chatMessage.text());
+        paneVBox.getChildren().add(message);
 
         pane.getChildren().add(paneVBox);
 
