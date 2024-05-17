@@ -23,7 +23,7 @@ public class DOABFetcherTest {
     private final DOABFetcher fetcher = new DOABFetcher();
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("DOAB", fetcher.getName());
     }
 
@@ -106,7 +106,7 @@ public class DOABFetcherTest {
 
     @ParameterizedTest
     @MethodSource
-    public void testPerformSearch(BibEntry expected, String query) throws FetcherException {
+    public void performSearch(BibEntry expected, String query) throws FetcherException {
         List<BibEntry> entries = fetcher.performSearch(query);
         // We must not contain abstracts in our code base; thus we remove the abstracts from the fetched results
         entries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));

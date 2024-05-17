@@ -28,7 +28,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private static final String DONATION_URL = "https://donations.jabref.org";
     private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/main/external-libraries.md";
     private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
-    private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/main/LICENSE.md";
+    private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/main/LICENSE";
     private static final String CONTRIBUTORS_URL = "https://github.com/JabRef/jabref/graphs/contributors";
     private static final String PRIVACY_POLICY_URL = "https://github.com/JabRef/jabref/blob/main/PRIVACY.md";
     private final String changelogUrl;
@@ -65,7 +65,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
         String javafx_version = System.getProperty("javafx.runtime.version", BuildInfo.UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
 
-        versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s %nJavaFX %s", buildInfo.version, BuildInfo.OS,
+        versionInfo = "JabRef %s%n%s %s %s %nJava %s %nJavaFX %s".formatted(buildInfo.version, BuildInfo.OS,
                 BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION, javafx_version);
     }
 

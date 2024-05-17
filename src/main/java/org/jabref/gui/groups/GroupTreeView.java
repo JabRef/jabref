@@ -49,6 +49,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -121,14 +122,9 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void createNodes() {
-        searchField = new CustomTextField();
-
-        searchField.setPromptText(Localization.lang("Filter groups"));
-        searchField.setId("searchField");
-        HBox.setHgrow(searchField, Priority.ALWAYS);
-        HBox groupFilterBar = new HBox(searchField);
-        groupFilterBar.setId("groupFilterBar");
-        this.setTop(groupFilterBar);
+        searchField = SearchTextField.create(preferencesService.getKeyBindingRepository());
+        searchField.setPromptText(Localization.lang("Filter groups..."));
+        this.setTop(searchField);
 
         mainColumn = new TreeTableColumn<>();
         mainColumn.setId("mainColumn");
@@ -310,7 +306,7 @@ public class GroupTreeView extends BorderPane {
             } else {
                 reducedFontSize = 0.75;
             }
-            return String.format("-fx-font-size: %fem;", reducedFontSize);
+            return "-fx-font-size: %fem;".formatted(reducedFontSize);
         }, preferencesService.getWorkspacePreferences().mainFontSizeProperty()));
 
         node.getChildren().add(text);

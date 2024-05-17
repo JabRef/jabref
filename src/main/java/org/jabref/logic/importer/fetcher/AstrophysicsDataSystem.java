@@ -17,7 +17,7 @@ import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
@@ -149,9 +149,9 @@ public class AstrophysicsDataSystem
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveEnclosingBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
 
@@ -227,7 +227,7 @@ public class AstrophysicsDataSystem
                 LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
                         + ". We will use the first entry.");
             }
-            BibEntry entry = fetchedEntries.get(0);
+            BibEntry entry = fetchedEntries.getFirst();
             return Optional.of(entry);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);

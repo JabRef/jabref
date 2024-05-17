@@ -3,18 +3,19 @@ package org.jabref.gui;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.remote.CLIMessageHandler;
-import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.journals.predatory.PredatoryJournalRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -52,8 +53,6 @@ public class Globals {
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static JournalAbbreviationRepository journalAbbreviationRepository;
-    public static PredatoryJournalRepository predatoryJournalRepository;
-
     /**
      * This field is initialized upon startup.
      * <p>
@@ -66,9 +65,9 @@ public class Globals {
 
     private static ClipBoardManager clipBoardManager = null;
     private static KeyBindingRepository keyBindingRepository;
-    private static ThemeManager themeManager;
 
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
+    private static DefaultDirectoryMonitor directoryMonitor;
 
     private Globals() {
     }
@@ -88,22 +87,19 @@ public class Globals {
         return clipBoardManager;
     }
 
-    public static synchronized ThemeManager getThemeManager() {
-        if (themeManager == null) {
-            themeManager = new ThemeManager(
-                    prefs.getWorkspacePreferences(),
-                    getFileUpdateMonitor(),
-                    Runnable::run);
-        }
-        return themeManager;
-    }
-
     public static synchronized FileUpdateMonitor getFileUpdateMonitor() {
         if (fileUpdateMonitor == null) {
             fileUpdateMonitor = new DefaultFileUpdateMonitor();
             JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
         }
         return fileUpdateMonitor;
+    }
+
+    public static DirectoryMonitor getDirectoryMonitor() {
+        if (directoryMonitor == null) {
+            directoryMonitor = new DefaultDirectoryMonitor();
+        }
+        return directoryMonitor;
     }
 
     // Background tasks
@@ -123,6 +119,11 @@ public class Globals {
         if (fileUpdateMonitor != null) {
             fileUpdateMonitor.shutdown();
         }
+
+        if (directoryMonitor != null) {
+            directoryMonitor.shutdown();
+        }
+
         JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 

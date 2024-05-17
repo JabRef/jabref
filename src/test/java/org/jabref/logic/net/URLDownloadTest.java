@@ -28,21 +28,21 @@ public class URLDownloadTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
 
     @Test
-    public void testStringDownloadWithSetEncoding() throws IOException {
+    public void stringDownloadWithSetEncoding() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(dl.asString().contains("Google"), "google.com should contain google");
     }
 
     @Test
-    public void testStringDownload() throws IOException {
+    public void stringDownload() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(dl.asString(StandardCharsets.UTF_8).contains("Google"), "google.com should contain google");
     }
 
     @Test
-    public void testFileDownload() throws IOException {
+    public void fileDownload() throws IOException {
         File destination = File.createTempFile("jabref-test", ".html");
         try {
             URLDownload dl = new URLDownload(new URL("http://www.google.com"));
@@ -57,7 +57,7 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void testDetermineMimeType() throws IOException {
+    public void determineMimeType() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(dl.getMimeType().startsWith("text/html"));
@@ -105,14 +105,14 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void testCheckConnectionSuccess() throws MalformedURLException {
+    public void checkConnectionSuccess() throws MalformedURLException {
         URLDownload google = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(google.canBeReached());
     }
 
     @Test
-    public void testCheckConnectionFail() throws MalformedURLException {
+    public void checkConnectionFail() throws MalformedURLException {
         URLDownload nonsense = new URLDownload(new URL("http://nonsenseadddress"));
 
         assertThrows(UnirestException.class, nonsense::canBeReached);

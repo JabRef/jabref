@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
-import org.jabref.cli.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -199,7 +199,7 @@ public class Linux extends NativeDesktop {
                 LoggerFactory.getLogger(Linux.class).error("xdg-user-dir returned nothing");
                 return getUserDirectory();
             }
-            String documentsDirectory = strings.get(0);
+            String documentsDirectory = strings.getFirst();
             Path documentsPath = Path.of(documentsDirectory);
             if (!Files.exists(documentsPath)) {
                 LoggerFactory.getLogger(Linux.class).error("xdg-user-dir returned non-existant directory {}", documentsDirectory);

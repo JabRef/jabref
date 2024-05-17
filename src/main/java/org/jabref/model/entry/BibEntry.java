@@ -144,6 +144,11 @@ public class BibEntry implements Cloneable {
         this(DEFAULT_TYPE);
     }
 
+    public BibEntry(String citationKey) {
+        this();
+        this.setCitationKey(citationKey);
+    }
+
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
@@ -151,6 +156,11 @@ public class BibEntry implements Cloneable {
         this.id = IdGenerator.next();
         setType(type);
         this.sharedBibEntryData = new SharedBibEntryData();
+    }
+
+    public BibEntry(EntryType type, String citationKey) {
+        this(type);
+        this.setCitationKey(citationKey);
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
@@ -382,6 +392,9 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
+    /**
+     * If not present, {@link BibEntry#getAuthorTitleYear(int)} can be used
+     */
     public Optional<String> getCitationKey() {
         String key = fields.get(InternalField.KEY_FIELD);
         if (StringUtil.isBlank(key)) {
@@ -562,7 +575,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Return the LaTeX-free contents of the given field or its alias an an Optional
+     * Return the LaTeX-free contents of the given field or its alias an Optional
      * <p>
      * For details see also {@link #getFieldOrAlias(Field)}
      *
@@ -592,7 +605,7 @@ public class BibEntry implements Cloneable {
      */
     public Optional<FieldChange> setField(Field field, String value, EntriesEventSource eventSource) {
         Objects.requireNonNull(field, "field name must not be null");
-        Objects.requireNonNull(value, "field value must not be null");
+        Objects.requireNonNull(value, "field value for field " + field.getName() + " must not be null");
         Objects.requireNonNull(eventSource, "field eventSource must not be null");
 
         if (value.isEmpty()) {
@@ -600,11 +613,11 @@ public class BibEntry implements Cloneable {
         }
 
         String oldValue = getField(field).orElse(null);
-        boolean isNewField = oldValue == null;
         if (value.equals(oldValue)) {
             return Optional.empty();
         }
 
+        boolean isNewField = oldValue == null;
         changed = true;
 
         invalidateFieldCache(field);
@@ -1049,15 +1062,15 @@ public class BibEntry implements Cloneable {
      * Gets a list of linked files.
      *
      * @return the list of linked files, is never null but can be empty.
-     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}
+     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
      */
     public List<LinkedFile> getFiles() {
-        // Extract the path
         Optional<String> oldValue = getField(StandardField.FILE);
         if (oldValue.isEmpty()) {
             return new ArrayList<>(); // Return new ArrayList because emptyList is immutable
         }
 
+        // Extract the path
         return FileFieldParser.parse(oldValue.get());
     }
 
@@ -1128,7 +1141,7 @@ public class BibEntry implements Cloneable {
             i++;
         }
         if (oldFileIndex == -1) {
-            linkedFiles.add(0, downloadedFile);
+            linkedFiles.addFirst(downloadedFile);
         } else {
             linkedFiles.set(oldFileIndex, downloadedFile);
         }

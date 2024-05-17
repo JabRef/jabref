@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -15,16 +16,23 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
+import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
 
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -34,7 +42,10 @@ import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
+import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
@@ -73,6 +84,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -84,7 +96,14 @@ import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
+ */
 public class LibraryTab extends Tab {
+    /**
+     * Defines the different modes that the tab can operate in
+     */
+    private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
@@ -103,10 +122,17 @@ public class LibraryTab extends Tab {
     private FileAnnotationCache annotationCache;
     private EntryEditor entryEditor;
     private MainTable mainTable;
-    private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
+    private PanelMode mode = PanelMode.MAIN_TABLE;
     private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
-    private boolean saving;
+
+    // Indicates whether the tab is loading data using a dataloading task
+    // The constructors take care to the right true/false assignment during start.
+    private final SimpleBooleanProperty loading = new SimpleBooleanProperty(false);
+
+    // initially, the dialog is loading, not saving
+    private boolean saving = false;
+
     private PersonNameSuggestionProvider searchAutoCompleter;
 
     // Used to track whether the base has changed since last save.
@@ -126,8 +152,9 @@ public class LibraryTab extends Tab {
 
     private final IndexingTaskManager indexingTaskManager;
     private final TaskExecutor taskExecutor;
+    private final DirectoryMonitorManager directoryMonitorManager;
 
-    public LibraryTab(BibDatabaseContext bibDatabaseContext,
+    private LibraryTab(BibDatabaseContext bibDatabaseContext,
                       LibraryTabContainer tabContainer,
                       DialogService dialogService,
                       PreferencesService preferencesService,
@@ -146,6 +173,7 @@ public class LibraryTab extends Tab {
         this.entryTypesManager = entryTypesManager;
         this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
         this.taskExecutor = taskExecutor;
+        this.directoryMonitorManager = new DirectoryMonitorManager(Globals.getDirectoryMonitor());
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -179,6 +207,9 @@ public class LibraryTab extends Tab {
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
+
+        setOnCloseRequest(this::onCloseRequest);
+        setOnClosed(this::onClosed);
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -188,7 +219,7 @@ public class LibraryTab extends Tab {
 
     private static void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
         String mode = bibDatabaseContext.getMode().getFormattedName();
-        String modeInfo = String.format("\n%s", Localization.lang("%0 mode", mode));
+        String modeInfo = "\n%s".formatted(Localization.lang("%0 mode", mode));
         text.append(modeInfo);
     }
 
@@ -199,38 +230,31 @@ public class LibraryTab extends Tab {
         text.append("]");
     }
 
-    public void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
+    private void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
+        this.loading.set(true);
         this.dataLoadingTask = dataLoadingTask;
     }
 
-    public void cancelLoading() {
-        if (dataLoadingTask != null) {
-            dataLoadingTask.cancel();
-        }
-    }
-
     /**
-     * The layout to display in the tab when it's loading
+     * The layout to display in the tab when it is loading
      */
-    public Node createLoadingAnimationLayout() {
+    private Node createLoadingAnimationLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
         BorderPane pane = new BorderPane();
         pane.setCenter(progressIndicator);
-
         return pane;
     }
 
-    public void onDatabaseLoadingStarted() {
+    private void onDatabaseLoadingStarted() {
         Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
-        tabContainer.addTab(this, true);
     }
 
-    public void onDatabaseLoadingSucceed(ParserResult result) {
+    private void onDatabaseLoadingSucceed(ParserResult result) {
         BibDatabaseContext context = result.getDatabaseContext();
         OpenDatabaseAction.performPostOpenActions(result, dialogService);
 
-        feedData(context);
+        setDatabaseContext(context);
 
         if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
             try {
@@ -239,41 +263,47 @@ public class LibraryTab extends Tab {
                 LOGGER.error("Cannot access lucene index", e);
             }
         }
+
+        LOGGER.trace("loading.set(false);");
+        loading.set(false);
+        dataLoadingTask = null;
     }
 
-    public void onDatabaseLoadingFailed(Exception ex) {
+    private void onDatabaseLoadingFailed(Exception ex) {
+        loading.set(false);
+
         String title = Localization.lang("Connection error");
-        String content = String.format("%s\n\n%s", ex.getMessage(), Localization.lang("A local copy will be opened."));
+        String content = "%s\n\n%s".formatted(ex.getMessage(), Localization.lang("A local copy will be opened."));
 
         dialogService.showErrorDialogAndWait(title, content, ex);
     }
 
-    public void feedData(BibDatabaseContext bibDatabaseContextFromParserResult) {
-        cleanUp();
-
-        if (this.getTabPane().getSelectionModel().selectedItemProperty().get().equals(this)) {
-            // If you open an existing library, a library tab with a loading animation is added immediately.
-            // At that point, the library tab is given a temporary bibDatabaseContext with no entries.
-            // This line is necessary because, while there is already a binding that updates the active database when a new tab is added,
-            // it doesn't handle the case when a library is loaded asynchronously.
-            // See org.jabref.gui.LibraryTab.createLibraryTab for the asynchronous loading.
-            stateManager.setActiveDatabase(bibDatabaseContextFromParserResult);
+    private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+        TabPane tabPane = this.getTabPane();
+        if (tabPane == null) {
+            LOGGER.debug("User interrupted loading. Not showing any library.");
+            return;
+        }
+        if (tabPane.getSelectionModel().selectedItemProperty().get().equals(this)) {
+            LOGGER.debug("This case should not happen.");
+            stateManager.setActiveDatabase(bibDatabaseContext);
+            stateManager.activeTabProperty().set(Optional.of(this));
         }
 
         // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
         Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
         foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
 
-        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContextFromParserResult);
+        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
 
-        stateManager.getOpenDatabases().add(bibDatabaseContextFromParserResult);
+        stateManager.getOpenDatabases().add(bibDatabaseContext);
 
-        bibDatabaseContextFromParserResult.getDatabase().registerListener(this);
-        bibDatabaseContextFromParserResult.getMetaData().registerListener(this);
+        bibDatabaseContext.getDatabase().registerListener(this);
+        bibDatabaseContext.getMetaData().registerListener(this);
 
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
-        citationStyleCache = new CitationStyleCache(bibDatabaseContextFromParserResult);
-        annotationCache = new FileAnnotationCache(bibDatabaseContextFromParserResult, preferencesService.getFilePreferences());
+        citationStyleCache = new CitationStyleCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
         setupMainPanel();
         setupAutoCompletion();
@@ -406,49 +436,61 @@ public class LibraryTab extends Tab {
         return suggestionProviders;
     }
 
-    public BasePanelMode getMode() {
-        return mode;
-    }
-
-    public void setMode(BasePanelMode mode) {
-        this.mode = mode;
+    /**
+     * Removes the selected entries and files linked to selected entries from the database
+     *
+     * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
+     */
+    public void delete(StandardActions mode) {
+        delete(mode, mainTable.getSelectedEntries());
     }
 
     /**
-     * Removes the selected entries from the database
+     * Removes the selected entries and files linked to selected entries from the database
      *
-     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
+     * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
-    public void delete(boolean cut) {
-        delete(cut, mainTable.getSelectedEntries());
-    }
-
-    /**
-     * Removes the selected entries from the database
-     *
-     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
-     */
-    private void delete(boolean cut, List<BibEntry> entries) {
+    private void delete(StandardActions mode, List<BibEntry> entries) {
         if (entries.isEmpty()) {
             return;
         }
-        if (!cut && !showDeleteConfirmationDialog(entries.size())) {
+        if (mode == StandardActions.DELETE_ENTRY && !showDeleteConfirmationDialog(entries.size())) {
             return;
         }
 
-        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, cut));
+        // Delete selected entries
+        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, mode == StandardActions.CUT));
         bibDatabaseContext.getDatabase().removeEntries(entries);
+
+        if (mode != StandardActions.CUT) {
+            List<LinkedFile> linkedFileList = entries.stream()
+                                                     .flatMap(entry -> entry.getFiles().stream())
+                                                     .distinct()
+                                                     .toList();
+
+            if (!linkedFileList.isEmpty()) {
+                List<LinkedFileViewModel> viewModels = linkedFileList.stream()
+                                                                     .map(linkedFile -> linkedFile.toModel(null, bibDatabaseContext, null, null, preferencesService))
+                                                                     .collect(Collectors.toList());
+
+                new DeleteFileAction(dialogService, preferencesService.getFilePreferences(), bibDatabaseContext, viewModels).execute();
+            }
+        }
+
         ensureNotShowingBottomPanel(entries);
 
         this.changedProperty.setValue(true);
-        dialogService.notify(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
+        switch (mode) {
+            case StandardActions.CUT -> dialogService.notify(Localization.lang("Cut %0 entry(ies)", entries.size()));
+            case StandardActions.DELETE_ENTRY -> dialogService.notify(Localization.lang("Deleted %0 entry(ies)", entries.size()));
+        }
 
         // prevent the main table from loosing focus
         mainTable.requestFocus();
     }
 
     public void delete(BibEntry entry) {
-        delete(false, Collections.singletonList(entry));
+        delete(StandardActions.DELETE_ENTRY, Collections.singletonList(entry));
     }
 
     public void registerUndoableChanges(List<FieldChange> changes) {
@@ -516,7 +558,7 @@ public class LibraryTab extends Tab {
             stateManager.setSelectedEntries(entries);
             if (!entries.isEmpty()) {
                 // Update entry editor and preview according to selected entries
-                entryEditor.setEntry(entries.get(0));
+                entryEditor.setEntry(entries.getFirst());
             }
         });
     }
@@ -579,37 +621,25 @@ public class LibraryTab extends Tab {
      * @param entry The entry to edit.
      */
     public void showAndEdit(BibEntry entry) {
-        showBottomPane(BasePanelMode.SHOWING_EDITOR);
+        if (!splitPane.getItems().contains(entryEditor)) {
+            splitPane.getItems().addLast(entryEditor);
+            mode = PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR;
+            splitPane.setDividerPositions(preferencesService.getEntryEditorPreferences().getDividerPosition());
+        }
 
         // We use != instead of equals because of performance reasons
-        if (entry != getShowing()) {
+        if (entry != showing) {
             entryEditor.setEntry(entry);
             showing = entry;
         }
         entryEditor.requestFocus();
     }
 
-    private void showBottomPane(BasePanelMode newMode) {
-        if (newMode != BasePanelMode.SHOWING_EDITOR) {
-            throw new UnsupportedOperationException("new mode not recognized: " + newMode.name());
-        }
-        Node pane = entryEditor;
-
-        if (splitPane.getItems().size() == 2) {
-            splitPane.getItems().set(1, pane);
-        } else {
-            splitPane.getItems().add(1, pane);
-        }
-        mode = newMode;
-
-        splitPane.setDividerPositions(preferencesService.getEntryEditorPreferences().getDividerPosition());
-    }
-
     /**
      * Removes the bottom component.
      */
     public void closeBottomPane() {
-        mode = BasePanelMode.SHOWING_NOTHING;
+        mode = PanelMode.MAIN_TABLE;
         splitPane.getItems().remove(entryEditor);
     }
 
@@ -642,13 +672,13 @@ public class LibraryTab extends Tab {
     private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
         // This method is not able to close the bottom pane currently
 
-        if ((mode == BasePanelMode.SHOWING_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
+        if ((mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
             closeBottomPane();
         }
     }
 
     public void updateEntryEditorIfShowing() {
-        if (mode == BasePanelMode.SHOWING_EDITOR) {
+        if (mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
             BibEntry currentEntry = entryEditor.getEntry();
             showAndEdit(currentEntry);
         }
@@ -670,6 +700,14 @@ public class LibraryTab extends Tab {
         return bibDatabaseContext.getDatabase();
     }
 
+    /**
+     * Initializes a pop-up dialog box to confirm whether the user wants to delete the selected entry
+     * Keep track of user preference:
+     * if the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
+     *
+     * @param numberOfEntries number of entries user is selecting
+     * @return true if user confirm to delete entry
+     */
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
         if (preferencesService.getWorkspacePreferences().shouldConfirmDelete()) {
             String title = Localization.lang("Delete entry");
@@ -683,7 +721,8 @@ public class LibraryTab extends Tab {
                 cancelButton = Localization.lang("Keep entries");
             }
 
-            return dialogService.showConfirmationDialogWithOptOutAndWait(title,
+            return dialogService.showConfirmationDialogWithOptOutAndWait(
+                    title,
                     message,
                     okButton,
                     cancelButton,
@@ -698,18 +737,128 @@ public class LibraryTab extends Tab {
      * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct preference setting.
      */
     private void saveDividerLocation(Number position) {
-        if (mode == BasePanelMode.SHOWING_EDITOR) {
+        if (mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
             preferencesService.getEntryEditorPreferences().setDividerPosition(position.doubleValue());
         }
     }
 
+    public boolean requestClose() {
+        if (isModified() && (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL)) {
+            return confirmClose();
+        } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
+            bibDatabaseContext.convertToLocalDatabase();
+            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+            bibDatabaseContext.clearDBMSSynchronizer();
+        }
+
+        return true;
+    }
+
     /**
-     * Perform necessary cleanup when this BasePanel is closed.
+     * Ask if the user really wants to close the given database.
+     * Offers to save or discard the changes -- or return to the library
+     *
+     * @return <code>true</code> if the user choose to close the database
      */
-    public void cleanUp() {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        AutosaveManager.shutdown(bibDatabaseContext);
-        BackupManager.shutdown(bibDatabaseContext, preferencesService.getFilePreferences().getBackupDirectory(), preferencesService.getFilePreferences().shouldCreateBackup());
+    private boolean confirmClose() {
+        // Database could not have been changed, since it is still loading
+        if (dataLoadingTask != null) {
+            dataLoadingTask.cancel();
+            loading.setValue(false);
+            return true;
+        }
+
+        String filename = getBibDatabaseContext()
+                .getDatabasePath()
+                .map(Path::toAbsolutePath)
+                .map(Path::toString)
+                .orElse(Localization.lang("untitled"));
+
+        ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
+        ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
+        ButtonType returnToLibrary = new ButtonType(Localization.lang("Return to library"), ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
+                Localization.lang("Save before closing"),
+                Localization.lang("Library '%0' has changed.", filename),
+                saveChanges, discardChanges, returnToLibrary);
+
+        if (response.isEmpty()) {
+            return true;
+        }
+
+        ButtonType buttonType = response.get();
+
+        if (buttonType.equals(returnToLibrary)) {
+            return false;
+        }
+
+        if (buttonType.equals(saveChanges)) {
+            try {
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferencesService, Globals.entryTypesManager);
+                if (saveAction.save()) {
+                    return true;
+                }
+                // The action was either canceled or unsuccessful.
+                dialogService.notify(Localization.lang("Unable to save library"));
+            } catch (Throwable ex) {
+                LOGGER.error("A problem occurred when trying to save the file", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+            }
+            // Save was cancelled or an error occurred.
+            return false;
+        }
+
+        if (buttonType.equals(discardChanges)) {
+            BackupManager.discardBackup(bibDatabaseContext, preferencesService.getFilePreferences().getBackupDirectory());
+            return true;
+        }
+
+        return false;
+    }
+
+    private void onCloseRequest(Event event) {
+        if (!requestClose()) {
+            event.consume();
+        }
+    }
+
+    /**
+     * Perform necessary cleanup when this Library is closed.
+     */
+    private void onClosed(Event event) {
+        if (dataLoadingTask != null) {
+            dataLoadingTask.cancel();
+        }
+        try {
+            changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when closing change monitor", e);
+        }
+        try {
+            directoryMonitorManager.unregister();
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when closing directory monitor", e);
+        }
+        try {
+            PdfIndexerManager.shutdownIndexer(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down PDF indexer", e);
+        }
+        try {
+            AutosaveManager.shutdown(bibDatabaseContext);
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down autosave manager", e);
+        }
+        try {
+            BackupManager.shutdown(bibDatabaseContext,
+                    preferencesService.getFilePreferences().getBackupDirectory(),
+                    preferencesService.getFilePreferences().shouldCreateBackup());
+        } catch (RuntimeException e) {
+            LOGGER.error("Problem when shutting down backup manager", e);
+        }
+        // clean up the groups map
+        stateManager.clearSelectedGroups(bibDatabaseContext);
     }
 
     /**
@@ -725,6 +874,10 @@ public class LibraryTab extends Tab {
         return this.bibDatabaseContext;
     }
 
+    public DirectoryMonitorManager getDirectoryMonitorManager() {
+        return directoryMonitorManager;
+    }
+
     public boolean isSaving() {
         return saving;
     }
@@ -733,12 +886,8 @@ public class LibraryTab extends Tab {
         this.saving = saving;
     }
 
-    private BibEntry getShowing() {
-        return showing;
-    }
-
-    public String formatOutputMessage(String start, int count) {
-        return String.format("%s %d %s.", start, count, (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
+    public ObservableBooleanValue getLoading() {
+        return loading;
     }
 
     public CountingUndoManager getUndoManager() {
@@ -775,7 +924,8 @@ public class LibraryTab extends Tab {
                 taskExecutor,
                 dialogService,
                 preferencesService,
-                databaseNotificationPane));
+                databaseNotificationPane,
+                stateManager));
     }
 
     public void copy() {
@@ -794,20 +944,12 @@ public class LibraryTab extends Tab {
         mainTable.cut();
     }
 
-    public BooleanProperty changedProperty() {
-        return changedProperty;
-    }
-
     public boolean isModified() {
         return changedProperty.getValue();
     }
 
     public void markBaseChanged() {
         this.changedProperty.setValue(true);
-    }
-
-    public BooleanProperty nonUndoableChangeProperty() {
-        return nonUndoableChangeProperty;
     }
 
     public void markNonUndoableBaseChanged() {
@@ -893,7 +1035,7 @@ public class LibraryTab extends Tab {
 
             // Automatically add new entries to the selected group (or set of groups)
             if (preferencesService.getGroupsPreferences().shouldAutoAssignGroup()) {
-                stateManager.getSelectedGroup(bibDatabaseContext).forEach(
+                stateManager.getSelectedGroups(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
             }
         }
@@ -983,5 +1125,13 @@ public class LibraryTab extends Tab {
 
     public DatabaseNotification getNotificationPane() {
         return databaseNotificationPane;
+    }
+
+    @Override
+    public String toString() {
+        return "LibraryTab{" +
+                "bibDatabaseContext=" + bibDatabaseContext +
+                ", showing=" + showing +
+                '}';
     }
 }

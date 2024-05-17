@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -95,9 +96,27 @@ public class GrobidServiceTest {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
         List<BibEntry> response = grobidService.processPDF(file, importFormatPreferences);
         assertEquals(1, response.size());
-        BibEntry be0 = response.get(0);
+        BibEntry be0 = response.getFirst();
         assertEquals(Optional.of("Lastname, Firstname"), be0.getField(StandardField.AUTHOR));
         // assertEquals(Optional.of("Paper Title"), be0.getField(StandardField.TITLE));
         // assertEquals(Optional.of("2014-10-05"), be0.getField(StandardField.DATE));
+    }
+
+    @Test
+    public void extractsReferencesFromPdf() throws IOException, ParseException, URISyntaxException {
+        BibEntry ref1 = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Kopp, O")
+                .withField(StandardField.ADDRESS, "Berlin; Heidelberg")
+                .withField(StandardField.DATE, "2013")
+                .withField(StandardField.JOURNAL, "All links were last followed on October")
+                .withField(StandardField.PAGES, "700--704")
+                .withField(StandardField.PUBLISHER, "Springer")
+                .withField(StandardField.TITLE, "Winery -A Modeling Tool for TOSCA-based Cloud Applications")
+                .withField(StandardField.VOLUME, "8274")
+                .withField(StandardField.YEAR, "2013");
+
+        Path file = Path.of(Objects.requireNonNull(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf")).toURI());
+        List<BibEntry> extractedReferences = grobidService.processReferences(file, importFormatPreferences);
+        assertEquals(List.of(ref1), extractedReferences);
     }
 }

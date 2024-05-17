@@ -17,11 +17,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.Telemetry;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -169,15 +169,18 @@ public class OpenDatabaseAction extends SimpleCommand {
                 openTheFile(theFile);
                 fileHistory.newFile(theFile);
             });
-        } else if (toRaise != null) {
+        } else if (toRaise != null && tabContainer.getCurrentLibraryTab() == null) {
             // If no files are remaining to open, this could mean that a file was
             // already open. If so, we may have to raise the correct tab:
+            // If there is already a library focused, do not show this library
             tabContainer.showLibraryTab(toRaise);
         }
     }
 
     /**
      * This is the real file opening. Should be called via {@link #openFile(Path)}
+     *
+     * Similar method: {@link org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
      *
      * @param file the file, may be NOT null, but may not be existing
      */
@@ -201,6 +204,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 undoManager,
                 taskExecutor);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
+        tabContainer.addTab(newTab, true);
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
@@ -215,7 +219,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService, fileUpdateMonitor)
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService, fileUpdateMonitor, stateManager)
                                           .orElse(null);
         }
 

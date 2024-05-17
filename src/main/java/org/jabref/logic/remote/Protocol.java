@@ -92,13 +92,17 @@ public class Protocol implements AutoCloseable {
         try {
             out.close();
         } catch (IOException e) {
-            LOGGER.warn("Output stream not closed", e);
+            // On the server side, the socket is automatically closed, thus we don't need to close it here.
+            // See org.jabref.logic.remote.server.RemoteListenerServer.run
+            LOGGER.debug("Output stream not closed", e);
         }
 
         try {
             socket.close();
         } catch (IOException e) {
-            LOGGER.warn("Socket not closed", e);
+            // On the server side, the socket is automatically closed, thus we don't need to close it here.
+            // See org.jabref.logic.remote.server.RemoteListenerServer.run
+            LOGGER.debug("Socket not closed", e);
         }
     }
 }

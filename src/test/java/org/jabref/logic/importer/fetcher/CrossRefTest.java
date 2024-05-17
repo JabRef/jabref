@@ -132,7 +132,6 @@ public class CrossRefTest {
         entry.setField(StandardField.JOURNAL, "Indo-Iranian Journal");
         entry.setField(StandardField.NUMBER, "2");
         entry.setField(StandardField.PUBLISHER, "Brill");
-        entry.setField(StandardField.KEYWORDS, "Political Science and International Relations, Linguistics and Language, Philosophy");
 
         assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
     }
@@ -151,7 +150,7 @@ public class CrossRefTest {
      * reveal fetching error on crossref performSearchById
      */
     @Test
-    public void testPerformSearchValidReturnNothingDOI() throws FetcherException {
+    public void performSearchValidReturnNothingDOI() throws FetcherException {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1392/BC1.0"));
     }
 }

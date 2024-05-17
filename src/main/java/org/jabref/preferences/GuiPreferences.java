@@ -14,7 +14,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.logic.util.io.FileHistory;
 
 public class GuiPreferences {
@@ -27,17 +26,12 @@ public class GuiPreferences {
     private final BooleanProperty windowFullScreen;
 
     // the last libraries that were open when jabref closes and should be reopened on startup
-    private final ObservableList<String> lastFilesOpened;
+    private final ObservableList<Path> lastFilesOpened;
     private final ObjectProperty<Path> lastFocusedFile;
     // observable list last files opened in the file menu
     private final FileHistory fileHistory;
 
     private final StringProperty lastSelectedIdBasedFetcher;
-    private final ObjectProperty<DiffMode> mergeDiffMode;
-    private final BooleanProperty mergeShouldShowDiff;
-    private final BooleanProperty mergeShouldShowUnifiedDiff;
-    private final BooleanProperty mergeHighlightWords;
-    private final BooleanProperty mergeShowChangedFieldsOnly;
     private final DoubleProperty sidePaneWidth;
 
     public GuiPreferences(double positionX,
@@ -46,16 +40,11 @@ public class GuiPreferences {
                           double sizeY,
                           boolean windowMaximised,
                           boolean windowFullScreen,
-                          List<String> lastFilesOpened,
+                          List<Path> lastFilesOpened,
                           Path lastFocusedFile,
                           FileHistory fileHistory,
                           String lastSelectedIdBasedFetcher,
-                          DiffMode mergeDiffMode,
-                          boolean mergeShouldShowDiff,
-                          boolean mergeShouldShowUnifiedDiff,
-                          boolean mergeHighlightWords,
-                          double sidePaneWidth,
-                          boolean mergeShowChangedFieldsOnly) {
+                          double sidePaneWidth) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
         this.sizeX = new SimpleDoubleProperty(sizeX);
@@ -65,14 +54,8 @@ public class GuiPreferences {
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
-        this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
-        this.mergeShouldShowDiff = new SimpleBooleanProperty(mergeShouldShowDiff);
-        this.mergeShouldShowUnifiedDiff = new SimpleBooleanProperty(mergeShouldShowUnifiedDiff);
-        this.mergeHighlightWords = new SimpleBooleanProperty(mergeHighlightWords);
-
         this.sidePaneWidth = new SimpleDoubleProperty(sidePaneWidth);
         this.fileHistory = fileHistory;
-        this.mergeShowChangedFieldsOnly = new SimpleBooleanProperty(mergeShowChangedFieldsOnly);
     }
 
     public double getPositionX() {
@@ -147,11 +130,11 @@ public class GuiPreferences {
         return windowFullScreen.get();
     }
 
-    public ObservableList<String> getLastFilesOpened() {
+    public ObservableList<Path> getLastFilesOpened() {
         return lastFilesOpened;
     }
 
-    public void setLastFilesOpened(List<String> files) {
+    public void setLastFilesOpened(List<Path> files) {
         lastFilesOpened.setAll(files);
     }
 
@@ -183,54 +166,6 @@ public class GuiPreferences {
         this.lastSelectedIdBasedFetcher.set(lastSelectedIdBasedFetcher);
     }
 
-    public DiffMode getMergeDiffMode() {
-        return mergeDiffMode.get();
-    }
-
-    public ObjectProperty<DiffMode> mergeDiffModeProperty() {
-        return mergeDiffMode;
-    }
-
-    public void setMergeDiffMode(DiffMode mergeDiffMode) {
-        this.mergeDiffMode.set(mergeDiffMode);
-    }
-
-    public boolean getMergeShouldShowDiff() {
-        return mergeShouldShowDiff.get();
-    }
-
-    public BooleanProperty mergeShouldShowDiffProperty() {
-        return mergeShouldShowDiff;
-    }
-
-    public void setMergeShouldShowDiff(boolean mergeShouldShowDiff) {
-        this.mergeShouldShowDiff.set(mergeShouldShowDiff);
-    }
-
-    public boolean getMergeShouldShowUnifiedDiff() {
-        return mergeShouldShowUnifiedDiff.get();
-    }
-
-    public BooleanProperty mergeShouldShowUnifiedDiffProperty() {
-        return mergeShouldShowUnifiedDiff;
-    }
-
-    public void setMergeShouldShowUnifiedDiff(boolean mergeShouldShowUnifiedDiff) {
-        this.mergeShouldShowUnifiedDiff.set(mergeShouldShowUnifiedDiff);
-    }
-
-    public boolean getMergeHighlightWords() {
-        return mergeHighlightWords.get();
-    }
-
-    public BooleanProperty mergeHighlightWordsProperty() {
-        return mergeHighlightWords;
-    }
-
-    public void setMergeHighlightWords(boolean mergeHighlightsWords) {
-        this.mergeHighlightWords.set(mergeHighlightsWords);
-    }
-
     public double getSidePaneWidth() {
         return sidePaneWidth.get();
     }
@@ -241,9 +176,5 @@ public class GuiPreferences {
 
     public void setSidePaneWidth(double sidePaneWidth) {
         this.sidePaneWidth.set(sidePaneWidth);
-    }
-
-    public BooleanProperty mergeShowChangedFieldOnlyProperty() {
-        return mergeShowChangedFieldsOnly;
     }
 }

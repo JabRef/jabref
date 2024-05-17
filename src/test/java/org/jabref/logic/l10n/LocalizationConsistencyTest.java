@@ -39,7 +39,7 @@ class LocalizationConsistencyTest {
     void allFilesMustBeInLanguages() throws IOException {
         String bundle = "JabRef";
         // e.g., "<bundle>_en.properties", where <bundle> is [JabRef, Menu]
-        Pattern propertiesFile = Pattern.compile(String.format("%s_.{2,}.properties", bundle));
+        Pattern propertiesFile = Pattern.compile("%s_.{2,}.properties".formatted(bundle));
         Set<String> localizationFiles = new HashSet<>();
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Path.of("src/main/resources/l10n"))) {
             for (Path fullPath : directoryStream) {
@@ -60,13 +60,15 @@ class LocalizationConsistencyTest {
     void ensureNoDuplicates() {
         String bundle = "JabRef";
         for (Language lang : Language.values()) {
-            String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang.getId());
+            String propertyFilePath = "/l10n/%s_%s.properties".formatted(bundle, lang.getId());
 
             // read in
             DuplicationDetectionProperties properties = new DuplicationDetectionProperties();
-            try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath);
-                 InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-                properties.load(reader);
+            try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath)) {
+                assert is != null;
+                try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                    properties.load(reader);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -79,10 +81,10 @@ class LocalizationConsistencyTest {
 
     @Test
     void keyValueShouldBeEqualForEnglishPropertiesMessages() {
-        Properties englishKeys = LocalizationParser.getProperties(String.format("/l10n/%s_%s.properties", "JabRef", "en"));
+        Properties englishKeys = LocalizationParser.getProperties("/l10n/%s_%s.properties".formatted("JabRef", "en"));
         for (Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
-            String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey().toString().replace("\n", "\\n"));
-            String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue().toString().replace("\n", "\\n"));
+            String expectedKeyEqualsKey = "%s=%s".formatted(entry.getKey(), entry.getKey().toString().replace("\n", "\\n"));
+            String actualKeyEqualsValue = "%s=%s".formatted(entry.getKey(), entry.getValue().toString().replace("\n", "\\n"));
             assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
         }
     }
@@ -99,7 +101,7 @@ class LocalizationConsistencyTest {
                         "Please correct the following entries:\n" +
                         quotedEntries
                                 .stream()
-                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .map(key -> "\n%s (%s)\n".formatted(key.getKey(), key.getPath()))
                                 .toList());
     }
 
@@ -115,7 +117,7 @@ class LocalizationConsistencyTest {
                         "Please correct the following entries:\n" +
                         entriesWithHtml
                                 .stream()
-                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .map(key -> "\n%s (%s)\n".formatted(key.getKey(), key.getPath()))
                                 .toList());
     }
 
@@ -125,7 +127,7 @@ class LocalizationConsistencyTest {
         assertEquals(Collections.emptyList(), missingKeys,
                 missingKeys.stream()
                            .map(key -> LocalizationKey.fromKey(key.getKey()))
-                           .map(key -> String.format("%s=%s",
+                           .map(key -> "%s=%s".formatted(
                                    key.getEscapedPropertiesKey(),
                                    key.getValueForEnglishPropertiesFile()))
                            .collect(Collectors.joining("\n",

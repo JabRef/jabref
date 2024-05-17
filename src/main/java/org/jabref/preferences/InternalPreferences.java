@@ -71,6 +71,10 @@ public class InternalPreferences {
         return userAndHost.get();
     }
 
+    public StringProperty getUserAndHostProperty() {
+        return userAndHost;
+    }
+
     public boolean isMemoryStickMode() {
         return memoryStickMode.get();
     }

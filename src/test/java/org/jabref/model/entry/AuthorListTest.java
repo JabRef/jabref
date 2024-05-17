@@ -14,6 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Other parsing tests are available in {@link org.jabref.logic.importer.AuthorListParserTest}
+ */
 public class AuthorListTest {
 
     /*
@@ -43,7 +46,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testFixAuthorNatbib() {
+    public void fixAuthorNatbib() {
         assertEquals("", AuthorList.fixAuthorNatbib(""));
         assertEquals("Smith", AuthorList.fixAuthorNatbib("John Smith"));
         assertEquals("Smith and Black Brown", AuthorList
@@ -116,7 +119,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testFixAuthorFirstNameFirstCommas() {
+    public void fixAuthorFirstNameFirstCommas() {
         // No Commas
         assertEquals("", AuthorList.fixAuthorFirstNameFirstCommas("", true, false));
         assertEquals("", AuthorList.fixAuthorFirstNameFirstCommas("", false, false));
@@ -285,7 +288,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testFixAuthorFirstNameFirst() {
+    public void fixAuthorFirstNameFirst() {
         assertEquals("John Smith", AuthorList.fixAuthorFirstNameFirst("John Smith"));
 
         assertEquals("John Smith and Peter Black Brown", AuthorList
@@ -304,7 +307,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testFixAuthorLastNameFirstCommasNoComma() {
+    public void fixAuthorLastNameFirstCommasNoComma() {
         // No commas before and
         assertEquals("", AuthorList.fixAuthorLastNameFirstCommas("", true, false));
         assertEquals("", AuthorList.fixAuthorLastNameFirstCommas("", false, false));
@@ -335,7 +338,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testFixAuthorLastNameFirstCommasOxfordComma() {
+    public void fixAuthorLastNameFirstCommasOxfordComma() {
         // Oxford Commas
         assertEquals("", AuthorList.fixAuthorLastNameFirstCommas("", true, true));
         assertEquals("", AuthorList.fixAuthorLastNameFirstCommas("", false, true));
@@ -558,7 +561,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testFixAuthorLastNameFirst() {
+    public void fixAuthorLastNameFirst() {
         // Test helper method
 
         assertEquals("Smith, John", AuthorList.fixAuthorLastNameFirst("John Smith"));
@@ -612,7 +615,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testFixAuthorLastNameOnlyCommas() {
+    public void fixAuthorLastNameOnlyCommas() {
         // No comma before and
         assertEquals("", AuthorList.fixAuthorLastNameOnlyCommas("", false));
         assertEquals("Smith", AuthorList.fixAuthorLastNameOnlyCommas("John Smith", false));
@@ -688,7 +691,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testFixAuthorForAlphabetization() {
+    public void fixAuthorForAlphabetization() {
         assertEquals("Smith, J.", AuthorList.fixAuthorForAlphabetization("John Smith"));
         assertEquals("Neumann, J.", AuthorList.fixAuthorForAlphabetization("John von Neumann"));
         assertEquals("Neumann, J.", AuthorList.fixAuthorForAlphabetization("J. von Neumann"));
@@ -699,7 +702,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testSize() {
+    public void size() {
         assertEquals(0, AuthorListTest.size(""));
         assertEquals(1, AuthorListTest.size("Bar"));
         assertEquals(1, AuthorListTest.size("Foo Bar"));
@@ -721,83 +724,83 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testIsEmpty() {
+    public void isEmpty() {
         assertTrue(AuthorList.parse("").isEmpty());
         assertFalse(AuthorList.parse("Bar").isEmpty());
     }
 
     @Test
-    public void testGetEmptyAuthor() {
+    public void getEmptyAuthor() {
         assertThrows(Exception.class, () -> AuthorList.parse("").getAuthor(0));
     }
 
     @Test
-    public void testGetAuthor() {
+    public void getAuthor() {
         Author author = AuthorList.parse("John Smith and von Neumann, Jr, John").getAuthor(0);
-        assertEquals(Optional.of("John"), author.getFirst());
-        assertEquals(Optional.of("J."), author.getFirstAbbr());
-        assertEquals("John Smith", author.getFirstLast(false));
-        assertEquals("J. Smith", author.getFirstLast(true));
-        assertEquals(Optional.empty(), author.getJr());
-        assertEquals(Optional.of("Smith"), author.getLast());
-        assertEquals("Smith, John", author.getLastFirst(false));
-        assertEquals("Smith, J.", author.getLastFirst(true));
-        assertEquals("Smith", author.getLastOnly());
+        assertEquals(Optional.of("John"), author.getGivenName());
+        assertEquals(Optional.of("J."), author.getGivenNameAbbreviated());
+        assertEquals("John Smith", author.getGivenFamily(false));
+        assertEquals("J. Smith", author.getGivenFamily(true));
+        assertEquals(Optional.empty(), author.getNameSuffix());
+        assertEquals(Optional.of("Smith"), author.getFamilyName());
+        assertEquals("Smith, John", author.getFamilyGiven(false));
+        assertEquals("Smith, J.", author.getFamilyGiven(true));
+        assertEquals("Smith", author.getNamePrefixAndFamilyName());
         assertEquals("Smith, J.", author.getNameForAlphabetization());
-        assertEquals(Optional.empty(), author.getVon());
+        assertEquals(Optional.empty(), author.getNamePrefix());
 
         author = AuthorList.parse("Peter Black Brown").getAuthor(0);
-        assertEquals(Optional.of("Peter Black"), author.getFirst());
-        assertEquals(Optional.of("P. B."), author.getFirstAbbr());
-        assertEquals("Peter Black Brown", author.getFirstLast(false));
-        assertEquals("P. B. Brown", author.getFirstLast(true));
-        assertEquals(Optional.empty(), author.getJr());
-        assertEquals(Optional.empty(), author.getVon());
+        assertEquals(Optional.of("Peter Black"), author.getGivenName());
+        assertEquals(Optional.of("P. B."), author.getGivenNameAbbreviated());
+        assertEquals("Peter Black Brown", author.getGivenFamily(false));
+        assertEquals("P. B. Brown", author.getGivenFamily(true));
+        assertEquals(Optional.empty(), author.getNameSuffix());
+        assertEquals(Optional.empty(), author.getNamePrefix());
 
         author = AuthorList.parse("John Smith and von Neumann, Jr, John").getAuthor(1);
-        assertEquals(Optional.of("John"), author.getFirst());
-        assertEquals(Optional.of("J."), author.getFirstAbbr());
-        assertEquals("John von Neumann, Jr", author.getFirstLast(false));
-        assertEquals("J. von Neumann, Jr", author.getFirstLast(true));
-        assertEquals(Optional.of("Jr"), author.getJr());
-        assertEquals(Optional.of("Neumann"), author.getLast());
-        assertEquals("von Neumann, Jr, John", author.getLastFirst(false));
-        assertEquals("von Neumann, Jr, J.", author.getLastFirst(true));
-        assertEquals("von Neumann", author.getLastOnly());
+        assertEquals(Optional.of("John"), author.getGivenName());
+        assertEquals(Optional.of("J."), author.getGivenNameAbbreviated());
+        assertEquals("John von Neumann, Jr", author.getGivenFamily(false));
+        assertEquals("J. von Neumann, Jr", author.getGivenFamily(true));
+        assertEquals(Optional.of("Jr"), author.getNameSuffix());
+        assertEquals(Optional.of("Neumann"), author.getFamilyName());
+        assertEquals("von Neumann, Jr, John", author.getFamilyGiven(false));
+        assertEquals("von Neumann, Jr, J.", author.getFamilyGiven(true));
+        assertEquals("von Neumann", author.getNamePrefixAndFamilyName());
         assertEquals("Neumann, Jr, J.", author.getNameForAlphabetization());
-        assertEquals(Optional.of("von"), author.getVon());
+        assertEquals(Optional.of("von"), author.getNamePrefix());
     }
 
     @Test
-    public void testCompanyAuthor() {
+    public void companyAuthor() {
         Author author = AuthorList.parse("{JabRef Developers}").getAuthor(0);
-        Author expected = new Author(null, null, null, "JabRef Developers", null);
+        Author expected = new Author(null, null, null, "{JabRef Developers}", null);
         assertEquals(expected, author);
     }
 
     @Test
-    public void testCompanyAuthorAndPerson() {
-        Author company = new Author(null, null, null, "JabRef Developers", null);
+    public void companyAuthorAndPerson() {
+        Author company = new Author(null, null, null, "{JabRef Developers}", null);
         Author person = new Author("Stefan", "S.", null, "Kolb", null);
         assertEquals(Arrays.asList(company, person), AuthorList.parse("{JabRef Developers} and Stefan Kolb").getAuthors());
     }
 
     @Test
-    public void testCompanyAuthorWithLowerCaseWord() {
+    public void companyAuthorWithLowerCaseWord() {
         Author author = AuthorList.parse("{JabRef Developers on Fire}").getAuthor(0);
-        Author expected = new Author(null, null, null, "JabRef Developers on Fire", null);
+        Author expected = new Author(null, null, null, "{JabRef Developers on Fire}", null);
         assertEquals(expected, author);
     }
 
     @Test
-    public void testAbbreviationWithRelax() {
+    public void abbreviationWithRelax() {
         Author author = AuthorList.parse("{\\relax Ch}ristoph Cholera").getAuthor(0);
         Author expected = new Author("{\\relax Ch}ristoph", "{\\relax Ch}.", null, "Cholera", null);
         assertEquals(expected, author);
     }
 
     @Test
-    public void testGetAuthorsNatbib() {
+    public void getAuthorsNatbib() {
         assertEquals("", AuthorList.parse("").getAsNatbib());
         assertEquals("Smith", AuthorList.parse("John Smith").getAsNatbib());
         assertEquals("Smith and Black Brown", AuthorList.parse(
@@ -818,7 +821,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testGetAuthorsLastOnly() {
+    public void getAuthorsLastOnly() {
         // No comma before and
         assertEquals("", AuthorList.parse("").getAsLastNames(false));
         assertEquals("Smith", AuthorList.parse("John Smith").getAsLastNames(false));
@@ -841,7 +844,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testGetAuthorsLastFirstNoComma() {
+    public void getAuthorsLastFirstNoComma() {
         // No commas before and
         AuthorList al;
 
@@ -869,7 +872,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testGetAuthorsLastFirstOxfordComma() {
+    public void getAuthorsLastFirstOxfordComma() {
         // Oxford comma
         AuthorList al;
 
@@ -896,7 +899,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testGetAuthorsLastFirstAnds() {
+    public void getAuthorsLastFirstAnds() {
         assertEquals("Smith, John", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(
                 false));
         assertEquals("Smith, John and Black Brown, Peter", AuthorList.parse(
@@ -918,7 +921,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testGetAuthorsFirstFirst() {
+    public void getAuthorsFirstFirst() {
         AuthorList al;
 
         al = AuthorList.parse("");
@@ -957,7 +960,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testGetAuthorsFirstFirstAnds() {
+    public void getAuthorsFirstFirstAnds() {
         assertEquals("John Smith", AuthorList.parse("John Smith")
                                              .getAsFirstLastNamesWithAnd());
         assertEquals("John Smith and Peter Black Brown", AuthorList.parse(
@@ -970,7 +973,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testGetAuthorsForAlphabetization() {
+    public void getAuthorsForAlphabetization() {
         assertEquals("Smith, J.", AuthorList.parse("John Smith")
                                             .getForAlphabetization());
         assertEquals("Neumann, J.", AuthorList.parse("John von Neumann")
@@ -983,19 +986,19 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testRemoveStartAndEndBraces() {
+    public void removeStartAndEndBraces() {
         assertEquals("{A}bbb{c}", AuthorList.parse("{A}bbb{c}").getAsLastNames(false));
-        assertEquals("Vall{\\'e}e Poussin", AuthorList.parse("{Vall{\\'e}e Poussin}").getAsLastNames(false));
+        assertEquals("{Vall{\\'e}e Poussin}", AuthorList.parse("{Vall{\\'e}e Poussin}").getAsLastNames(false));
         assertEquals("Poussin", AuthorList.parse("{Vall{\\'e}e} {Poussin}").getAsLastNames(false));
         assertEquals("Poussin", AuthorList.parse("Vall{\\'e}e Poussin").getAsLastNames(false));
         assertEquals("Lastname", AuthorList.parse("Firstname {Lastname}").getAsLastNames(false));
-        assertEquals("Firstname Lastname", AuthorList.parse("{Firstname Lastname}").getAsLastNames(false));
+        assertEquals("{Firstname Lastname}", AuthorList.parse("{Firstname Lastname}").getAsLastNames(false));
     }
 
     @Test
     public void createCorrectInitials() {
         assertEquals(Optional.of("J. G."),
-                AuthorList.parse("Hornberg, Johann Gottfried").getAuthor(0).getFirstAbbr());
+                AuthorList.parse("Hornberg, Johann Gottfried").getAuthor(0).getGivenNameAbbreviated());
     }
 
     @Test
@@ -1052,34 +1055,34 @@ public class AuthorListTest {
     public void parseFirstNameFromFirstAuthorMultipleAuthorsWithLatexNames() throws Exception {
         assertEquals("Mu{\\d{h}}ammad",
                 AuthorList.parse("Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}} and Corrado B{\\\"o}hm")
-                          .getAuthor(0).getFirst().orElse(null));
+                          .getAuthor(0).getGivenName().orElse(null));
     }
 
     @Test
     public void parseFirstNameFromSecondAuthorMultipleAuthorsWithLatexNames() throws Exception {
         assertEquals("Corrado",
                 AuthorList.parse("Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}} and Corrado B{\\\"o}hm")
-                          .getAuthor(1).getFirst().orElse(null));
+                          .getAuthor(1).getGivenName().orElse(null));
     }
 
     @Test
     public void parseLastNameFromFirstAuthorMultipleAuthorsWithLatexNames() throws Exception {
         assertEquals("al-Khw{\\={a}}rizm{\\={i}}",
                 AuthorList.parse("Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}} and Corrado B{\\\"o}hm")
-                          .getAuthor(0).getLast().orElse(null));
+                          .getAuthor(0).getFamilyName().orElse(null));
     }
 
     @Test
     public void parseLastNameFromSecondAuthorMultipleAuthorsWithLatexNames() throws Exception {
         assertEquals("B{\\\"o}hm",
                 AuthorList.parse("Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}} and Corrado B{\\\"o}hm")
-                          .getAuthor(1).getLast().orElse(null));
+                          .getAuthor(1).getFamilyName().orElse(null));
     }
 
     @Test
     public void parseInstitutionAuthorWithLatexNames() throws Exception {
-        assertEquals("The Ban\\={u} M\\={u}s\\={a} brothers",
-                AuthorList.parse("{The Ban\\={u} M\\={u}s\\={a} brothers}").getAuthor(0).getLast().orElse(null));
+        assertEquals("{The Ban\\={u} M\\={u}s\\={a} brothers}",
+                AuthorList.parse("{The Ban\\={u} M\\={u}s\\={a} brothers}").getAuthor(0).getFamilyName().orElse(null));
     }
 
     @Test

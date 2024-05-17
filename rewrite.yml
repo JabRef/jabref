@@ -94,17 +94,16 @@ recipeList:
   #  - org.openrewrite.staticanalysis.UseAsBuilder
   # "Upgrades" too much, deletes fields
   #  - org.openrewrite.staticanalysis.UseCollectionInterfaces
-  # Does not work at TreeNode
-  #  - org.openrewrite.staticanalysis.UseDiamondOperator
   # States that it gains performance, but the code is more unreable
   #  - org.openrewrite.staticanalysis.UseForEachRemoveInsteadOfSetRemoveAll
   # We voted against it
   #  - org.openrewrite.staticanalysis.ExplicitInitialization
 
   - org.openrewrite.java.migrate.io.ReplaceFileInOrOutputStreamFinalizeWithClose
+  - org.openrewrite.java.migrate.lang.StringFormatted
+  - org.openrewrite.java.migrate.util.SequencedCollection
 
-  - org.openrewrite.java.recipes.UseJavaParserBuilderInJavaTemplate
-
+  - org.openrewrite.java.RemoveObjectsIsNull
   - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
 
   - org.openrewrite.java.testing.junit5.AssertTrueInstanceofToAssertInstanceOf
@@ -186,6 +185,7 @@ recipeList:
   - org.openrewrite.staticanalysis.TypecastParenPad
   - org.openrewrite.staticanalysis.UnwrapRepeatableAnnotations
   - org.openrewrite.staticanalysis.UpperCaseLiteralSuffixes
+  - org.openrewrite.staticanalysis.UseDiamondOperator
 #  - org.openrewrite.staticanalysis.UseJavaStyleArrayDeclarations
   - org.openrewrite.staticanalysis.UseLambdaForFunctionalInterface
 #  - org.openrewrite.staticanalysis.UseListSort
@@ -196,5 +196,6 @@ recipeList:
   - org.openrewrite.staticanalysis.WhileInsteadOfFor
 #  - org.openrewrite.staticanalysis.WriteOctalValuesAsDecimal
 
+  - org.openrewrite.java.testing.cleanup.RemoveTestPrefix
   - org.openrewrite.java.testing.junit5.CleanupAssertions
 #  - org.openrewrite.java.testing.junit5.JUnit5BestPractices

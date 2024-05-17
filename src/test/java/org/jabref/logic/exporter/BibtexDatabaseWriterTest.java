@@ -14,10 +14,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.bibtex.FieldPreferences;
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
@@ -255,7 +255,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeMetadata() throws Exception {
-        DatabaseCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
+        DatabaseCitationKeyPatterns bibtexKeyPattern = new DatabaseCitationKeyPatterns(mock(GlobalCitationKeyPatterns.class));
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setCiteKeyPattern(bibtexKeyPattern);
 
@@ -267,7 +267,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeMetadataAndEncoding() throws Exception {
-        DatabaseCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
+        DatabaseCitationKeyPatterns bibtexKeyPattern = new DatabaseCitationKeyPatterns(mock(GlobalCitationKeyPatterns.class));
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setCiteKeyPattern(bibtexKeyPattern);
         metaData.setEncoding(StandardCharsets.US_ASCII);
@@ -322,6 +322,17 @@ public class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 
         assertEquals("@String{name = {content}}" + OS.NEWLINE, stringWriter.toString());
+    }
+
+    @Test
+    void writeStringWithQuotes() throws Exception {
+        String parsedSerialization = "@String{name = \"content\"}";
+        BibtexString bibtexString = new BibtexString("name", "content", parsedSerialization);
+        database.addString(bibtexString);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
+
+        assertEquals(parsedSerialization + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -691,8 +702,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeSavedSerializationOfStringIfUnchanged() throws Exception {
-        BibtexString string = new BibtexString("name", "content");
-        string.setParsedSerialization("serialization");
+        BibtexString string = new BibtexString("name", "content", "serialization");
         database.addString(string);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -702,8 +712,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void reformatStringIfAskedToDoSo() throws Exception {
-        BibtexString string = new BibtexString("name", "content");
-        string.setParsedSerialization("wrong serialization");
+        BibtexString string = new BibtexString("name", "content", "wrong serialization");
         database.addString(string);
 
         saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, true);
@@ -750,7 +759,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeCustomKeyPattern() throws Exception {
-        AbstractCitationKeyPattern pattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
+        AbstractCitationKeyPatterns pattern = new DatabaseCitationKeyPatterns(mock(GlobalCitationKeyPatterns.class));
         pattern.setDefaultValue("test");
         pattern.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
         metaData.setCiteKeyPattern(pattern);

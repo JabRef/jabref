@@ -3,9 +3,11 @@ package org.jabref.gui.search;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -23,29 +25,37 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class SearchResultsTableDataModel {
 
-    private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
+    private final StateManager stateManager;
 
     public SearchResultsTableDataModel(BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, StateManager stateManager) {
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = bibDatabaseContext;
+        this.stateManager = stateManager;
         this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
 
         ObservableList<BibEntryTableViewModel> entriesViewModel = FXCollections.observableArrayList();
+        populateEntriesViewModel(entriesViewModel);
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> populateEntriesViewModel(entriesViewModel));
+
+        FilteredList<BibEntryTableViewModel> entriesFiltered = new FilteredList<>(entriesViewModel);
+        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeGlobalSearchQueryProperty(), query -> entry -> isMatchedBySearch(query, entry)));
+        stateManager.getGlobalSearchResultSize().bind(Bindings.size(entriesFiltered));
+
+        // We need to wrap the list since otherwise sorting in the table does not work
+        entriesSorted = new SortedList<>(entriesFiltered);
+    }
+
+    private void populateEntriesViewModel(ObservableList<BibEntryTableViewModel> entriesViewModel) {
+        entriesViewModel.clear();
         for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
             ObservableList<BibEntry> entriesForDb = context.getDatabase().getEntries();
             List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter));
             entriesViewModel.addAll(viewModelForDb);
         }
-
-        entriesFiltered = new FilteredList<>(entriesViewModel);
-        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeSearchQueryProperty(), query -> entry -> isMatchedBySearch(query, entry)));
-
-        // We need to wrap the list since otherwise sorting in the table does not work
-        entriesSorted = new SortedList<>(entriesFiltered);
     }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {

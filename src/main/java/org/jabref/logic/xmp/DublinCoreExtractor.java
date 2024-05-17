@@ -9,7 +9,7 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
@@ -85,7 +85,7 @@ public class DublinCoreExtractor {
     private void extractDate() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
         if ((dates != null) && !dates.isEmpty()) {
-            String date = dates.get(0).trim();
+            String date = dates.getFirst().trim();
             Date.parse(date)
                     .ifPresent(dateValue -> {
                         dateValue.getDay().ifPresent(day -> bibEntry.setField(StandardField.DAY, Integer.toString(day)));
@@ -223,7 +223,7 @@ public class DublinCoreExtractor {
     private void extractType() {
         List<String> types = dcSchema.getTypes();
         if ((types != null) && !types.isEmpty()) {
-            String type = types.get(0);
+            String type = types.getFirst();
             if (!StringUtil.isNullOrEmpty(type)) {
                 bibEntry.setType(EntryTypeFactory.parse(type));
             }
@@ -299,7 +299,7 @@ public class DublinCoreExtractor {
     private void fillContributor(String authors) {
         AuthorList list = AuthorList.parse(authors);
         for (Author author : list.getAuthors()) {
-            dcSchema.addContributor(author.getFirstLast(false));
+            dcSchema.addContributor(author.getGivenFamily(false));
         }
     }
 
@@ -309,7 +309,7 @@ public class DublinCoreExtractor {
     private void fillCreator(String creators) {
         AuthorList list = AuthorList.parse(creators);
         for (Author author : list.getAuthors()) {
-            dcSchema.addCreator(author.getFirstLast(false));
+            dcSchema.addCreator(author.getGivenFamily(false));
         }
     }
 

@@ -16,18 +16,25 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
 class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
-    private final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.InProceedings)
+    private static ImportFormatPreferences importFormatPreferences;
+
+    private static ImporterPreferences importerPreferences;
+
+    private static final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.InProceedings)
             .withField(StandardField.AUTHOR, "Igor Steinmacher and Tayana Uchoa Conte and Christoph Treude and Marco Aurélio Gerosa")
             .withField(StandardField.DATE, "14-22 May 2016")
             .withField(StandardField.YEAR, "2016")
@@ -45,65 +52,76 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
             .withField(StandardField.FILE, ":https\\://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7886910:PDF");
 
     private IEEE fetcher;
-    private BibEntry entry;
+
+    @BeforeAll
+    static void ensureIeeeIsAvailable() throws Exception {
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
+        importerPreferences = mock(ImporterPreferences.class);
+        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+
+        IEEE ieee = new IEEE(importFormatPreferences, importerPreferences);
+
+        assumeFalse(List.of().equals(ieee.performSearch("article_number:8801912")));
+    }
 
     @BeforeEach
     void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-
-        ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
-        when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-
         fetcher = new IEEE(importFormatPreferences, importerPreferences);
-        entry = new BibEntry();
     }
 
     @Test
+    @Disabled("IEEE seems to block us")
     void findByDOI() throws Exception {
-        entry.setField(StandardField.DOI, "10.1109/ACCESS.2016.2535486");
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1109/ACCESS.2016.2535486");
         assertEquals(Optional.of(new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
     }
 
     @Test
+    @Disabled("IEEE seems to block us")
     void findByDocumentUrl() throws Exception {
-        entry.setField(StandardField.URL, "https://ieeexplore.ieee.org/document/7421926/");
+        BibEntry entry = new BibEntry().withField(StandardField.URL, "https://ieeexplore.ieee.org/document/7421926/");
         assertEquals(Optional.of(new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
     }
 
     @Test
+    @Disabled("IEEE seems to block us")
     void findByURL() throws Exception {
-        entry.setField(StandardField.URL, "https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7421926&ref=");
+        BibEntry entry = new BibEntry().withField(StandardField.URL, "https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7421926&ref=");
         assertEquals(Optional.of(new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
     }
 
     @Test
+    @Disabled("IEEE blocks us - works in browser")
     void findByOldURL() throws Exception {
-        entry.setField(StandardField.URL, "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7421926");
+        BibEntry entry = new BibEntry().withField(StandardField.URL, "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7421926");
         assertEquals(Optional.of(new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
     }
 
     @Test
+    @Disabled("IEEE seems to block us")
     void findByDOIButNotURL() throws Exception {
-        entry.setField(StandardField.DOI, "10.1109/ACCESS.2016.2535486");
-        entry.setField(StandardField.URL, "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.DOI, "10.1109/ACCESS.2016.2535486")
+                .withField(StandardField.URL, "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
         assertEquals(Optional.of(new URL("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
     }
 
     @Test
     void notFoundByURL() throws Exception {
-        entry.setField(StandardField.URL, "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
+        BibEntry entry = new BibEntry().withField(StandardField.URL, "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
         assertEquals(Optional.empty(), fetcher.findFullText(entry));
     }
 
     @Test
     void notFoundByDOI() throws Exception {
-        entry.setField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
+        BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
         assertEquals(Optional.empty(), fetcher.findFullText(entry));
     }
 
@@ -124,8 +142,9 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
                 .withField(StandardField.VOLUME, "16")
                 .withField(StandardField.KEYWORDS, "Batteries, Generators, Economics, Power quality, State of charge, Harmonic analysis, Control systems, Battery, diesel generator (DG), distributed generation, power quality, photovoltaic (PV), voltage source converter (VSC)");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("article_number:8801912"); // article number
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
+        List<BibEntry> fetchedEntries = fetcher.performSearch("article_number:8801912");
+        // Abstract should not be included in JabRef tests (copyrighted)
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 

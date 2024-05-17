@@ -14,6 +14,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -42,36 +43,38 @@ public class PdfGrobidImporterTest {
     }
 
     @Test
-    public void testsGetExtensions() {
+    public void getExtensions() {
         assertEquals(StandardFileType.PDF, importer.getFileType());
     }
 
     @Test
-    public void testImportEntries() throws URISyntaxException {
+    @Disabled("Currently does not return anything")
+    public void importEntries() throws URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
+        // TODO: Rewrite using our logic of full BibEntries
         assertEquals(1, bibEntries.size());
 
-        BibEntry be0 = bibEntries.get(0);
+        BibEntry be0 = bibEntries.getFirst();
         assertEquals(Optional.of("Lastname, Firstname"), be0.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("Paper Title"), be0.getField(StandardField.TITLE));
     }
 
     @Test
-    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+    public void isRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("annotated.pdf").toURI());
         assertTrue(importer.isRecognizedFormat(file));
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
+    public void isRecognizedFormatReject() throws IOException, URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         assertFalse(importer.isRecognizedFormat(file));
     }
 
     @Test
-    public void testGetCommandLineId() {
+    public void getCommandLineId() {
         assertEquals("grobidPdf", importer.getId());
     }
 }

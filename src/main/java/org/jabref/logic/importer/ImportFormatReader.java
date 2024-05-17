@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CffImporter;
@@ -50,13 +51,15 @@ public class ImportFormatReader {
     private final ImporterPreferences importerPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     public ImportFormatReader(ImporterPreferences importerPreferences,
                               ImportFormatPreferences importFormatPreferences,
-                              FileUpdateMonitor fileUpdateMonitor) {
+                              CitationKeyPatternPreferences citationKeyPatternPreferences, FileUpdateMonitor fileUpdateMonitor) {
         this.importerPreferences = importerPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         reset();
     }
 
@@ -82,7 +85,7 @@ public class ImportFormatReader {
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());
-        formats.add(new CffImporter());
+        formats.add(new CffImporter(citationKeyPatternPreferences));
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));
         formats.add(new CitaviXmlImporter());

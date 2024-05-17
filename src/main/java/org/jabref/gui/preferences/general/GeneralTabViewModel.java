@@ -24,6 +24,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.remote.CLIMessageHandler;
+import org.jabref.gui.telemetry.TelemetryPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -41,8 +42,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.InternalPreferences;
 import org.jabref.preferences.LibraryPreferences;
+import org.jabref.preferences.MergeDialogPreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.TelemetryPreferences;
 import org.jabref.preferences.WorkspacePreferences;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
@@ -75,7 +76,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
     private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
-
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
 
     private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
@@ -94,6 +94,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
     private final RemotePreferences remotePreferences;
+    private final MergeDialogPreferences mergeDialogPreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -106,7 +107,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
-    private TrustStoreManager trustStoreManager;
+    private final TrustStoreManager trustStoreManager;
 
     public GeneralTabViewModel(DialogService dialogService, PreferencesService preferences, FileUpdateMonitor fileUpdateMonitor, BibEntryTypesManager entryTypesManager) {
         this.dialogService = dialogService;
@@ -117,9 +118,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = preferences.getFilePreferences();
         this.remotePreferences = preferences.getRemotePreferences();
         this.internalPreferences = preferences.getInternalPreferences();
+        this.mergeDialogPreferences = preferences.getMergeDialogPreferences();
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.trustStoreManager = trustStoreManager;
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -130,7 +131,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                         return false;
                     }
                 },
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("General"),
                         Localization.lang("Font settings"),
                         Localization.lang("You must enter an integer value higher than 8."))));
@@ -138,7 +139,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         customPathToThemeValidator = new FunctionBasedValidator<>(
                 customPathToThemeProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("General"),
                         Localization.lang("Visual theme"),
                         Localization.lang("Please specify a css theme file."))));
@@ -153,7 +154,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                         return false;
                     }
                 },
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
@@ -189,6 +190,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         openLastStartupProperty.setValue(workspacePreferences.shouldOpenLastEdited());
         showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());
         inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());
+
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
 
         collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
@@ -223,13 +225,15 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                     workspacePreferences.setTheme(Theme.light());
             case DARK ->
                     workspacePreferences.setTheme(Theme.dark());
-            case CUSTOM -> workspacePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
+            case CUSTOM ->
+                    workspacePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));
         }
         workspacePreferences.setThemeSyncOs(themeSyncOsProperty.getValue());
 
         workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());
         workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());
         workspacePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
+
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
 
         telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
@@ -256,12 +260,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             }
         });
 
+        // stop in all cases, because the port might have changed
+        Globals.REMOTE_LISTENER.stop();
+
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
             Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
-            Globals.REMOTE_LISTENER.stop();
         }
         trustStoreManager.flush();
 

@@ -22,27 +22,27 @@ public class RISImporterTest {
     }
 
     @Test
-    public void testGetFormatName() {
+    public void getFormatName() {
         assertEquals("RIS", importer.getName());
     }
 
     @Test
-    public void testGetCLIId() {
+    public void getCLIId() {
         assertEquals("ris", importer.getId());
     }
 
     @Test
-    public void testsGetExtensions() {
+    public void sGetExtensions() {
         assertEquals(StandardFileType.RIS, importer.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         assertEquals("Imports a Biblioscape Tag File.", importer.getDescription());
     }
 
     @Test
-    public void testIfNotRecognizedFormat() throws IOException, URISyntaxException {
+    public void ifNotRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
         assertFalse(importer.isRecognizedFormat(file));
     }

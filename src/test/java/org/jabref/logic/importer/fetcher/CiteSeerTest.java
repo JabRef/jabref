@@ -13,16 +13,24 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 @FetcherTest
 class CiteSeerTest {
 
     private CiteSeer fetcher = new CiteSeer();
+
+    @BeforeAll
+    static void ensureCiteSeerIsAvailable() throws Exception {
+        assumeFalse(List.of().equals(new CiteSeer().performSearch("title:\"Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory\" AND pageSize:1")));
+    }
 
     @Test
     void searchByQueryFindsEntryRigorousDerivation() throws Exception {
@@ -73,6 +81,7 @@ class CiteSeerTest {
     @Test
     void searchWithSortingByYearAndYearRange() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:Theory AND year-range:2002-2012 AND sortBy:Year");
+        assertNotEquals(List.of(), fetchedEntries);
         Iterator<BibEntry> fetchedEntriesIter = fetchedEntries.iterator();
         BibEntry recentEntry = fetchedEntriesIter.next();
         while (fetchedEntriesIter.hasNext()) {

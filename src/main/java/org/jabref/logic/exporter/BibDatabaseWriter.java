@@ -24,7 +24,7 @@ import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
@@ -207,7 +207,7 @@ public abstract class BibDatabaseWriter {
 
         if (saveConfiguration.getSaveType() == SaveType.WITH_JABREF_META_DATA) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData(), keyPatternPreferences.getKeyPattern());
+            writeMetaData(bibDatabaseContext.getMetaData(), keyPatternPreferences.getKeyPatterns());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);
@@ -226,7 +226,7 @@ public abstract class BibDatabaseWriter {
     /**
      * Writes all data to the specified writer, using each object's toString() method.
      */
-    protected void writeMetaData(MetaData metaData, GlobalCitationKeyPattern globalCiteKeyPattern) throws IOException {
+    protected void writeMetaData(MetaData metaData, GlobalCitationKeyPatterns globalCiteKeyPattern) throws IOException {
         Objects.requireNonNull(metaData);
 
         Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData,

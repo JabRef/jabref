@@ -89,7 +89,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
         for (BibEntryType entryType : allTypes) {
             EntryTypeViewModel viewModel;
-            if (entryTypesManager.isCustomType(entryType.getType(), bibDatabaseMode)) {
+            if (entryTypesManager.isCustomType(entryType, bibDatabaseMode)) {
                 viewModel = new CustomEntryTypeViewModel(entryType, isMultiline);
             } else {
                 viewModel = new EntryTypeViewModel(entryType, isMultiline);
@@ -102,23 +102,28 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         Set<Field> multilineFields = new HashSet<>();
         for (EntryTypeViewModel typeViewModel : entryTypesWithFields) {
-            BibEntryType type = typeViewModel.entryType().getValue();
             List<FieldViewModel> allFields = typeViewModel.fields();
 
+            BibEntryType type = typeViewModel.entryType().getValue();
+            EntryType newPlainType = type.getType();
+
+            // Collect multilineFields for storage in preferences later
             multilineFields.addAll(allFields.stream()
                                             .filter(FieldViewModel::isMultiline)
-                                            .map(FieldViewModel::toField)
+                                            .map(model -> model.toField(newPlainType))
                                             .toList());
 
             List<OrFields> required = allFields.stream()
                                                .filter(FieldViewModel::isRequired)
-                                               .map(FieldViewModel::toField)
+                                               .map(model -> model.toField(newPlainType))
                                                .map(OrFields::new)
                                                .collect(Collectors.toList());
-            List<BibField> fields = allFields.stream().map(FieldViewModel::toBibField).collect(Collectors.toList());
 
-            BibEntryType newType = new BibEntryType(type.getType(), fields, required);
-            entryTypesManager.addCustomOrModifiedType(newType, bibDatabaseMode);
+            List<BibField> fields = allFields.stream().map(model -> model.toBibField(newPlainType)).collect(Collectors.toList());
+
+            BibEntryType newType = new BibEntryType(newPlainType, fields, required);
+
+            entryTypesManager.update(newType, bibDatabaseMode);
         }
 
         for (var entryType : entryTypesToDelete) {

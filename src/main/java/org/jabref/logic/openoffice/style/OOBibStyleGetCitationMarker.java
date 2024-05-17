@@ -3,9 +3,9 @@ package org.jabref.logic.openoffice.style;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -20,7 +20,11 @@ import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
 import org.jabref.model.openoffice.style.PageInfo;
 import org.jabref.model.strings.StringUtil;
 
+import org.jspecify.annotations.NonNull;
+
 class OOBibStyleGetCitationMarker {
+
+    private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
     private OOBibStyleGetCitationMarker() {
     }
@@ -42,13 +46,13 @@ class OOBibStyleGetCitationMarker {
         if (authorList.getNumberOfAuthors() > number) {
             Author author = authorList.getAuthor(number);
             // "von " if von exists
-            Optional<String> von = author.getVon();
+            Optional<String> von = author.getNamePrefix();
             if (von.isPresent() && !von.get().isEmpty()) {
                 stringBuilder.append(von.get());
                 stringBuilder.append(' ');
             }
             // last name if it exists
-            stringBuilder.append(author.getLast().orElse(""));
+            stringBuilder.append(author.getFamilyName().map(last -> REMOVE_BRACES_FORMATTER.format(last)).orElse(""));
         }
 
         return stringBuilder.toString();
@@ -87,12 +91,9 @@ class OOBibStyleGetCitationMarker {
      *          - andString  is only emitted if nAuthors is at least 2.
      */
     private static String formatAuthorList(OOBibStyle style,
-                                           AuthorList authorList,
+                                           @NonNull AuthorList authorList,
                                            int maxAuthors,
                                            String andString) {
-
-        Objects.requireNonNull(authorList);
-
         // Apparently maxAuthorsBeforeEtAl is always 1 for in-text citations.
         // In reference lists can be for example 7,
         // (https://www.chicagomanualofstyle.org/turabian/turabian-author-date-citation-quick-guide.html)
@@ -224,16 +225,13 @@ class OOBibStyleGetCitationMarker {
      * field (or alias) from {@code fields} found in {@code entry}.
      * Return {@code Optional.empty()} if found nothing.
      */
-    private static Optional<FieldAndContent> getRawCitationMarkerField(BibEntry entry,
-                                                                       BibDatabase database,
-                                                                       OrFields fields) {
-        Objects.requireNonNull(entry, "Entry cannot be null");
-        Objects.requireNonNull(database, "database cannot be null");
-
+    private static Optional<FieldAndContent> getRawCitationMarkerField(@NonNull BibEntry entry,
+                                                                       @NonNull BibDatabase database,
+                                                                       @NonNull OrFields fields) {
         for (Field field : fields.getFields() /* FieldFactory.parseOrFields(fields)*/) {
+            // NOT LaTeX free, because there is some latextohtml in org.jabref.logic.openoffice.style.OOPreFormatter
             Optional<String> optionalContent = entry.getResolvedFieldOrAlias(field, database);
-            final boolean foundSomething = optionalContent.isPresent()
-                                            && !optionalContent.get().trim().isEmpty();
+            final boolean foundSomething = !StringUtil.isBlank(optionalContent);
             if (foundSomething) {
                 return Optional.of(new FieldAndContent(field, optionalContent.get()));
             }
@@ -264,10 +262,8 @@ class OOBibStyleGetCitationMarker {
      *
      */
     private static String getCitationMarkerField(OOBibStyle style,
-                                                 CitationLookupResult db,
+                                                 @NonNull CitationLookupResult db,
                                                  OrFields fields) {
-        Objects.requireNonNull(db);
-
         Optional<FieldAndContent> optionalFieldAndContent =
             getRawCitationMarkerField(db.entry, db.database, fields);
 
@@ -444,7 +440,7 @@ class OOBibStyleGetCitationMarker {
 
             final boolean isUnresolved = entry.getLookupResult().isEmpty();
             if (isUnresolved) {
-                stringBuilder.append(String.format("Unresolved(%s)", entry.getCitationKey()));
+                stringBuilder.append("Unresolved(%s)".formatted(entry.getCitationKey()));
                 if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
                     stringBuilder.append(pageInfoPart);
                 }
@@ -642,7 +638,7 @@ class OOBibStyleGetCitationMarker {
         int i_out = 0;
 
         if (nEntries > 0) {
-            filteredCitationMarkerEntries.add(citationMarkerEntries.get(0));
+            filteredCitationMarkerEntries.add(citationMarkerEntries.getFirst());
             startsNewGroup[i_out] = true;
             i_out++;
         }

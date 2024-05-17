@@ -8,14 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SortedSet;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
@@ -48,6 +50,7 @@ public class MetaData {
     public static final String FILE_DIRECTORY_LATEX = "fileDirectoryLatex";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
+    public static final String BIBDESK_STATIC_FLAG = "BibDesk Static Groups";
 
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
@@ -113,44 +116,44 @@ public class MetaData {
     /**
      * @return the stored label patterns
      */
-    public AbstractCitationKeyPattern getCiteKeyPattern(GlobalCitationKeyPattern globalPattern) {
-        Objects.requireNonNull(globalPattern);
-        AbstractCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(globalPattern);
+    public AbstractCitationKeyPatterns getCiteKeyPatterns(GlobalCitationKeyPatterns globalPatterns) {
+        Objects.requireNonNull(globalPatterns);
+        AbstractCitationKeyPatterns bibtexKeyPatterns = new DatabaseCitationKeyPatterns(globalPatterns);
 
         // Add stored key patterns
-        citeKeyPatterns.forEach(bibtexKeyPattern::addCitationKeyPattern);
-        getDefaultCiteKeyPattern().ifPresent(bibtexKeyPattern::setDefaultValue);
+        citeKeyPatterns.forEach(bibtexKeyPatterns::addCitationKeyPattern);
+        getDefaultCiteKeyPattern().ifPresent(bibtexKeyPatterns::setDefaultValue);
 
-        return bibtexKeyPattern;
+        return bibtexKeyPatterns;
     }
 
     /**
      * Updates the stored key patterns to the given key patterns.
      *
-     * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
+     * @param bibtexKeyPatterns the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
      */
-    public void setCiteKeyPattern(AbstractCitationKeyPattern bibtexKeyPattern) {
-        Objects.requireNonNull(bibtexKeyPattern);
+    public void setCiteKeyPattern(AbstractCitationKeyPatterns bibtexKeyPatterns) {
+        Objects.requireNonNull(bibtexKeyPatterns);
 
-        List<String> defaultValue = bibtexKeyPattern.getDefaultValue();
-        Map<EntryType, List<String>> nonDefaultPatterns = bibtexKeyPattern.getPatterns();
+        CitationKeyPattern defaultValue = bibtexKeyPatterns.getDefaultValue();
+        Map<EntryType, CitationKeyPattern> nonDefaultPatterns = bibtexKeyPatterns.getPatterns();
         setCiteKeyPattern(defaultValue, nonDefaultPatterns);
     }
 
-    public void setCiteKeyPattern(List<String> defaultValue, Map<EntryType, List<String>> nonDefaultPatterns) {
+    public void setCiteKeyPattern(CitationKeyPattern defaultValue, Map<EntryType, CitationKeyPattern> nonDefaultPatterns) {
         // Remove all patterns from metadata
         citeKeyPatterns.clear();
 
         // Set new value if it is not a default value
-        for (Map.Entry<EntryType, List<String>> pattern : nonDefaultPatterns.entrySet()) {
-            citeKeyPatterns.put(pattern.getKey(), pattern.getValue().get(0));
+        for (Map.Entry<EntryType, CitationKeyPattern> pattern : nonDefaultPatterns.entrySet()) {
+            citeKeyPatterns.put(pattern.getKey(), pattern.getValue().stringRepresentation());
         }
 
         // Store default pattern
-        if (defaultValue.isEmpty()) {
+        if (defaultValue.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
             defaultCiteKeyPattern = null;
         } else {
-            defaultCiteKeyPattern = defaultValue.get(0);
+            defaultCiteKeyPattern = defaultValue.stringRepresentation();
         }
 
         postChange();
@@ -186,7 +189,7 @@ public class MetaData {
         return contentSelectors;
     }
 
-    public List<ContentSelector> getContentSelectorList() {
+    public SortedSet<ContentSelector> getContentSelectorsSorted() {
         return contentSelectors.getContentSelectors();
     }
 
@@ -367,24 +370,23 @@ public class MetaData {
         if (this == o) {
             return true;
         }
-        if ((o == null) || (getClass() != o.getClass())) {
+        if (!(o instanceof MetaData that)) {
             return false;
         }
-        MetaData metaData = (MetaData) o;
-        return (isProtected == metaData.isProtected)
-                && Objects.equals(groupsRoot.getValue(), metaData.groupsRoot.getValue())
-                && Objects.equals(encoding, metaData.encoding)
-                && Objects.equals(encodingExplicitlySupplied, metaData.encodingExplicitlySupplied)
-                && Objects.equals(saveOrder, metaData.saveOrder)
-                && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
-                && Objects.equals(userFileDirectory, metaData.userFileDirectory)
-                && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
-                && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
-                && Objects.equals(saveActions, metaData.saveActions)
-                && (mode == metaData.mode)
-                && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)
-                && Objects.equals(contentSelectors, metaData.contentSelectors)
-                && Objects.equals(versionDBStructure, metaData.versionDBStructure);
+        return (isProtected == that.isProtected)
+                && Objects.equals(groupsRoot.getValue(), that.groupsRoot.getValue())
+                && Objects.equals(encoding, that.encoding)
+                && Objects.equals(encodingExplicitlySupplied, that.encodingExplicitlySupplied)
+                && Objects.equals(saveOrder, that.saveOrder)
+                && Objects.equals(citeKeyPatterns, that.citeKeyPatterns)
+                && Objects.equals(userFileDirectory, that.userFileDirectory)
+                && Objects.equals(laTexFileDirectory, that.laTexFileDirectory)
+                && Objects.equals(defaultCiteKeyPattern, that.defaultCiteKeyPattern)
+                && Objects.equals(saveActions, that.saveActions)
+                && (mode == that.mode)
+                && Objects.equals(defaultFileDirectory, that.defaultFileDirectory)
+                && Objects.equals(contentSelectors, that.contentSelectors)
+                && Objects.equals(versionDBStructure, that.versionDBStructure);
     }
 
     @Override

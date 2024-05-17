@@ -38,24 +38,24 @@ public class TitleFetcherTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("Title", fetcher.getName());
     }
 
     @Test
-    public void testPerformSearchKopp2007() throws FetcherException {
+    public void performSearchKopp2007() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("BPELscript: A simplified script syntax for WS-BPEL 2.0");
         assertEquals(Optional.of(bibEntryBischof2009), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchEmptyTitle() throws FetcherException {
+    public void performSearchEmptyTitle() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchInvalidTitle() throws FetcherException {
+    public void performSearchInvalidTitle() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("An unknown title where noi DOI can be determined");
         assertEquals(Optional.empty(), fetchedEntry);
     }

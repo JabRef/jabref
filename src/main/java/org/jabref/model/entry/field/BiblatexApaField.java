@@ -3,7 +3,6 @@ package org.jabref.model.entry.field;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
-import java.util.Set;
 
 import org.jabref.model.entry.types.BiblatexApaEntryType;
 
@@ -20,7 +19,7 @@ public enum BiblatexApaField implements Field {
 
     private final String name;
     private final String displayName;
-    private final Set<FieldProperty> properties;
+    private final EnumSet<FieldProperty> properties;
 
     BiblatexApaField(String name) {
         this.name = name;
@@ -48,6 +47,8 @@ public enum BiblatexApaField implements Field {
 
     public static <T> Optional<BiblatexApaField> fromName(T type, String name) {
         if (!(type instanceof BiblatexApaEntryType)) {
+            // Also returns nothing if no type is given.
+            // Reason: The field should also be recognized in the presence of a BiblatexApa entry type.
             return Optional.empty();
         }
         return Arrays.stream(BiblatexApaField.values())
@@ -56,7 +57,7 @@ public enum BiblatexApaField implements Field {
     }
 
     @Override
-    public Set<FieldProperty> getProperties() {
+    public EnumSet<FieldProperty> getProperties() {
         return properties;
     }
 

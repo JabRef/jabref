@@ -119,6 +119,7 @@ class MainArchitectureTest {
     public static void restrictUsagesInLogic(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                    .and().areNotAnnotatedWith(AllowedToUseSwing.class)
+                   .and().areNotAssignableFrom("org.jabref.logic.search.DatabaseSearcherWithBibFilesTest")
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                    .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);
@@ -131,6 +132,21 @@ class MainArchitectureTest {
                    .and().areNotAnnotatedWith(AllowedToUseStandardStreams.class)
                    .should(GeneralCodingRules.ACCESS_STANDARD_STREAMS)
                    .because("logging framework should be used instead or the class be marked explicitly as @AllowedToUseStandardStreams")
+                   .check(classes);
+    }
+
+    @ArchTest
+    public static void nativeDesktopIsRestricted(JavaClasses classes) {
+        noClasses().that().doNotHaveSimpleName("JabRefDesktop")
+                   .and().doNotHaveSimpleName("Launcher")
+                   .and().doNotHaveSimpleName("DefaultDesktop")
+                   .and().doNotHaveSimpleName("OS")
+                   .and().doNotHaveSimpleName("Linux")
+                   .and().doNotHaveSimpleName("OSX")
+                   .and().doNotHaveSimpleName("Windows")
+                   .and().doNotHaveSimpleName("JabRefPreferences")
+                   .and().haveNameNotMatching(".*Test")
+                   .should().dependOnClassesThat().haveSimpleName("NativeDesktop")
                    .check(classes);
     }
 }

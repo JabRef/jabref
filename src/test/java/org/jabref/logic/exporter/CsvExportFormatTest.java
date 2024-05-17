@@ -46,7 +46,7 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForSingleAuthor(@TempDir Path testFolder) throws Exception {
+    public void performExportForSingleAuthor(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Someone, Van Something");
@@ -62,7 +62,7 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForMultipleAuthors(@TempDir Path testFolder) throws Exception {
+    public void performExportForMultipleAuthors(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
 
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "von Neumann, John and Smith, John and Black Brown, Peter");
@@ -78,7 +78,7 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForSingleEditor(@TempDir Path testFolder) throws Exception {
+    public void performExportForSingleEditor(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
         BibEntry entry = new BibEntry().withField(StandardField.EDITOR, "Someone, Van Something");
@@ -94,7 +94,7 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testPerformExportForMultipleEditors(@TempDir Path testFolder) throws Exception {
+    public void performExportForMultipleEditors(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         File tmpFile = path.toFile();
         BibEntry entry = new BibEntry()

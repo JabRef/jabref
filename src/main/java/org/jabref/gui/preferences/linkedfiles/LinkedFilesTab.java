@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -37,6 +38,8 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     @FXML private ComboBox<String> fileNamePattern;
     @FXML private TextField fileDirectoryPattern;
+    @FXML private CheckBox confirmLinkedFileDelete;
+    @FXML private CheckBox moveToTrash;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -60,6 +63,9 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
         useMainFileDirectory.selectedProperty().bindBidirectional(viewModel.useMainFileDirectoryProperty());
 
+        moveToTrash.selectedProperty().bindBidirectional(viewModel.moveToTrashProperty());
+        moveToTrash.setDisable(!JabRefDesktop.moveToTrashSupported());
+
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
         autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());
         autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());
@@ -69,6 +75,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
+        confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferencesService.getFilePreferences()), autolinkRegexHelp);

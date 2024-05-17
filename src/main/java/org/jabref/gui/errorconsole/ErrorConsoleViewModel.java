@@ -79,6 +79,13 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     }
 
     /**
+     * Copies the detailed text of the given {@link LogEventViewModel} to the clipboard.
+     */
+    public void copyLogEntry(LogEventViewModel logEvent) {
+        clipBoardManager.setContent(logEvent.getDetailedText());
+    }
+
+    /**
      * Clears the current log
      */
     public void clearLog() {
@@ -91,7 +98,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     public void reportIssue() {
         try {
             // System info
-            String systemInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.version, BuildInfo.OS,
+            String systemInfo = "JabRef %s%n%s %s %s %nJava %s".formatted(buildInfo.version, BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
             // Steps to reproduce
             String howToReproduce = "Steps to reproduce:\n\n1. ...\n2. ...\n3. ...";

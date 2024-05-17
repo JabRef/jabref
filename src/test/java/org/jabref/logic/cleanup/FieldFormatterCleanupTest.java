@@ -38,7 +38,7 @@ public class FieldFormatterCleanupTest {
     }
 
     @Test
-    public void testInternalAllField() throws Exception {
+    public void internalAllField() throws Exception {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new UpperCaseFormatter());
         cleanup.cleanup(entry);
 
@@ -52,7 +52,7 @@ public class FieldFormatterCleanupTest {
     }
 
     @Test
-    public void testInternalAllTextFieldsField() throws Exception {
+    public void internalAllTextFieldsField() throws Exception {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UpperCaseFormatter());
         cleanup.cleanup(entry);
 
@@ -66,7 +66,7 @@ public class FieldFormatterCleanupTest {
     }
 
     @Test
-    public void testCleanupAllFieldsIgnoresKeyField() throws Exception {
+    public void cleanupAllFieldsIgnoresKeyField() throws Exception {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new UnicodeToLatexFormatter());
         entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);
@@ -75,7 +75,7 @@ public class FieldFormatterCleanupTest {
     }
 
     @Test
-    public void testCleanupAllTextFieldsIgnoresKeyField() throws Exception {
+    public void cleanupAllTextFieldsIgnoresKeyField() throws Exception {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UnicodeToLatexFormatter());
         entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);
@@ -84,7 +84,7 @@ public class FieldFormatterCleanupTest {
     }
 
     @Test
-    public void testCleanupKeyFieldCleansUpKeyField() throws Exception {
+    public void cleanupKeyFieldCleansUpKeyField() throws Exception {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.KEY_FIELD, new UnicodeToLatexFormatter());
         entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);

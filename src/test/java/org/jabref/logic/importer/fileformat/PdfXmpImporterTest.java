@@ -39,17 +39,17 @@ public class PdfXmpImporterTest {
     }
 
     @Test
-    public void testGetFormatName() {
+    public void getFormatName() {
         assertEquals("XMP-annotated PDF", importer.getName());
     }
 
     @Test
-    public void testsGetExtensions() {
+    public void sGetExtensions() {
         assertEquals(StandardFileType.PDF, importer.getFileType());
     }
 
     @Test
-    public void testGetDescription() {
+    public void getDescription() {
         assertEquals("Wraps the XMPUtility function to be used as an Importer.", importer.getDescription());
     }
 
@@ -62,13 +62,13 @@ public class PdfXmpImporterTest {
     }
 
     @Test
-    public void testImportEntries() throws URISyntaxException {
+    public void importEntries() throws URISyntaxException {
         Path file = Path.of(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
         assertEquals(1, bibEntries.size());
 
-        BibEntry be0 = bibEntries.get(0);
+        BibEntry be0 = bibEntries.getFirst();
         assertEquals(Optional.of("how to annotate a pdf"), be0.getField(StandardField.ABSTRACT));
         assertEquals(Optional.of("Chris"), be0.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("pdf, annotation"), be0.getField(StandardField.KEYWORDS));
@@ -76,19 +76,19 @@ public class PdfXmpImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+    public void isRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
         assertTrue(importer.isRecognizedFormat(file));
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void testIsRecognizedFormatReject(String fileName) throws IOException, URISyntaxException {
+    public void isRecognizedFormatReject(String fileName) throws IOException, URISyntaxException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
     @Test
-    public void testGetCommandLineId() {
+    public void getCommandLineId() {
         assertEquals("xmp", importer.getId());
     }
 }

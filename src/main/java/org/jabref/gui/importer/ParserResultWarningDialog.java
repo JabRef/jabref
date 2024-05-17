@@ -24,7 +24,7 @@ public class ParserResultWarningDialog {
                                                      final DialogService dialogService) {
         Objects.requireNonNull(parserResult);
         // Return if no warnings
-        if (!(parserResult.hasWarnings())) {
+        if (!parserResult.hasWarnings()) {
             return;
         }
 
@@ -33,7 +33,7 @@ public class ParserResultWarningDialog {
         final StringBuilder dialogContent = new StringBuilder();
         int warningCount = 1;
         for (final String warning : warnings) {
-            dialogContent.append(String.format("%d. %s%n", warningCount++, warning));
+            dialogContent.append("%d. %s%n".formatted(warningCount++, warning));
         }
         dialogContent.deleteCharAt(dialogContent.length() - 1);
 

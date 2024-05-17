@@ -4,7 +4,7 @@ grand_parent: Getting into the code
 nav_order: 12
 ---
 
-# Step 2: Setup the build system: JDK and Gradle
+# Step 2: Set up the build system: JDK and Gradle
 
 ## Ensure that JDK 21 is available to IntelliJ
 
@@ -30,12 +30,6 @@ After clicking "Download", IntelliJ installs Eclipse Temurin:
 
 {% figure caption:"IntelliJ installs Eclipse Temurin" %}
 ![IntelliJ installs Eclipse Temurin](guidelines-intellij-installs-temurin.png)
-{% endfigure %}
-
-Open the module settings: Right click on "JabRef" and select "Open Module Settings":
-
-{% figure caption:"Open IntelliJ Module Settings" %}
-![IntelliJ Module Settings](guidelines-intellij-open-module-settings.png)
 {% endfigure %}
 
 Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 21.
@@ -158,7 +152,7 @@ Now, `BibEntryTest` should appear first:
 
 Press <kbd>Enter</kbd> to jump to that class.
 
-Hover on the green play button on `testDefaultConstructor`:
+Hover on the green play button on `defaultConstructor`:
 
 {% figure caption:"However on green play button" %}
 ![However on green play button](guidelines-intellij-run-single-test.png)

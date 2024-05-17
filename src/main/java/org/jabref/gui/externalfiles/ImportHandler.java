@@ -18,6 +18,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -40,7 +41,9 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -55,6 +58,8 @@ import org.jabref.preferences.PreferencesService;
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult.BREAK;
 
 public class ImportHandler {
 
@@ -189,14 +194,18 @@ public class ImportHandler {
         bibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);
-        addToGroups(entries, stateManager.getSelectedGroup(bibDatabaseContext));
+        addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK);
+    }
+
+    private void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision) {
         BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
         Optional<BibEntry> existingDuplicateInLibrary = findDuplicate(bibDatabaseContext, entryToInsert);
         if (existingDuplicateInLibrary.isPresent()) {
-            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get());
+            Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
             if (duplicateHandledEntry.isEmpty()) {
                 return;
             }
@@ -216,8 +225,8 @@ public class ImportHandler {
         return new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(bibDatabaseContext.getDatabase(), entryToCheck, bibDatabaseContext.getMode());
     }
 
-    public Optional<BibEntry> handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry) {
-        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext);
+    public Optional<BibEntry> handleDuplicates(BibDatabaseContext bibDatabaseContext, BibEntry originalEntry, BibEntry duplicateEntry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+        DuplicateDecisionResult decisionResult = getDuplicateDecision(originalEntry, duplicateEntry, bibDatabaseContext, decision);
         switch (decisionResult.decision()) {
             case KEEP_RIGHT:
                 bibDatabaseContext.getDatabase().removeEntry(duplicateEntry);
@@ -236,9 +245,14 @@ public class ImportHandler {
         return Optional.of(originalEntry);
     }
 
-    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext) {
+    public DuplicateDecisionResult getDuplicateDecision(BibEntry originalEntry, BibEntry duplicateEntry, BibDatabaseContext bibDatabaseContext, DuplicateResolverDialog.DuplicateResolverResult decision) {
         DuplicateResolverDialog dialog = new DuplicateResolverDialog(duplicateEntry, originalEntry, DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, bibDatabaseContext, stateManager, dialogService, preferencesService);
-        DuplicateResolverDialog.DuplicateResolverResult decision = dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+        if (decision == BREAK) {
+            decision = dialogService.showCustomDialogAndWait(dialog).orElse(BREAK);
+        }
+        if (preferencesService.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
+            preferencesService.getMergeDialogPreferences().setAllEntriesDuplicateResolverDecision(decision);
+        }
         return new DuplicateDecisionResult(decision, dialog.getMergedEntry());
     }
 
@@ -253,17 +267,17 @@ public class ImportHandler {
     public void downloadLinkedFiles(BibEntry entry) {
         if (preferencesService.getFilePreferences().shouldDownloadLinkedFiles()) {
             entry.getFiles().stream()
-                    .filter(LinkedFile::isOnlineLink)
-                    .forEach(linkedFile ->
-                            new LinkedFileViewModel(
-                                    linkedFile,
-                                    entry,
-                                    bibDatabaseContext,
-                                    taskExecutor,
-                                    dialogService,
-                                    preferencesService
-                            ).download()
-                    );
+                 .filter(LinkedFile::isOnlineLink)
+                 .forEach(linkedFile ->
+                         new LinkedFileViewModel(
+                                 linkedFile,
+                                 entry,
+                                 bibDatabaseContext,
+                                 taskExecutor,
+                                 dialogService,
+                                 preferencesService
+                         ).download(false)
+                 );
         }
     }
 
@@ -290,8 +304,8 @@ public class ImportHandler {
             return;
         }
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                bibDatabaseContext.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
-                                                                                     .getKeyPattern()),
+                bibDatabaseContext.getMetaData().getCiteKeyPatterns(preferencesService.getCitationKeyPatternPreferences()
+                                                                                      .getKeyPatterns()),
                 bibDatabaseContext.getDatabase(),
                 preferencesService.getCitationKeyPatternPreferences());
         entries.forEach(keyGenerator::generateAndSetKey);
@@ -300,10 +314,33 @@ public class ImportHandler {
     public List<BibEntry> handleBibTeXData(String entries) {
         BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), fileUpdateMonitor);
         try {
-            return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
+            List<BibEntry> result = parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
+            Collection<BibtexString> stringConstants = parser.getStringValues();
+            importStringConstantsWithDuplicateCheck(stringConstants);
+            return result;
         } catch (ParseException ex) {
             LOGGER.error("Could not paste", ex);
             return Collections.emptyList();
+        }
+    }
+
+    public void importStringConstantsWithDuplicateCheck(Collection<BibtexString> stringConstants) {
+        List<String> failures = new ArrayList<>();
+
+        for (BibtexString stringConstantToAdd : stringConstants) {
+            try {
+                ConstantsItemModel checker = new ConstantsItemModel(stringConstantToAdd.getName(), stringConstantToAdd.getContent());
+                if (checker.combinedValidationValidProperty().get()) {
+                    bibDatabaseContext.getDatabase().addString(stringConstantToAdd);
+                } else {
+                    failures.add(Localization.lang("String constant \"%0\" was not imported because it is not a valid string constant", stringConstantToAdd.getName()));
+                }
+            } catch (KeyCollisionException ex) {
+                failures.add(Localization.lang("String constant %0 was not imported because it already exists in this library", stringConstantToAdd.getName()));
+            }
+        }
+        if (!failures.isEmpty()) {
+            dialogService.showWarningDialogAndWait(Localization.lang("Importing String constants"), Localization.lang("Could not import the following string constants:\n %0", String.join("\n", failures)));
         }
     }
 
@@ -335,7 +372,9 @@ public class ImportHandler {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     preferencesService.getImporterPreferences(),
                     preferencesService.getImportFormatPreferences(),
-                    fileUpdateMonitor);
+                    preferencesService.getCitationKeyPatternPreferences(),
+                    fileUpdateMonitor
+            );
             UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
             return unknownFormatImport.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
@@ -345,7 +384,7 @@ public class ImportHandler {
     }
 
     private List<BibEntry> fetchByDOI(DOI doi) throws FetcherException {
-        LOGGER.info("Found DOI identifer in clipboard");
+        LOGGER.info("Found DOI identifier in clipboard");
         Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
         return OptionalUtil.toList(entry);
     }
@@ -360,5 +399,25 @@ public class ImportHandler {
         LOGGER.info("Found ISBN identifier in clipboard");
         Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
+    }
+
+    public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
+        boolean firstEntry = true;
+        for (BibEntry entry : entriesToAdd) {
+            if (firstEntry) {
+                LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
+                importEntryWithDuplicateCheck(database, entry, BREAK);
+                firstEntry = false;
+                continue;
+            }
+            if (preferencesService.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
+                DuplicateResolverDialog.DuplicateResolverResult decision = preferencesService.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
+                LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
+                importEntryWithDuplicateCheck(database, entry, decision);
+            } else {
+                LOGGER.debug("not first entry, not pref flag, break will  be used");
+                importEntryWithDuplicateCheck(database, entry);
+            }
+        }
     }
 }

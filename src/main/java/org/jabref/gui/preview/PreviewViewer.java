@@ -170,6 +170,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             }
             if (!registered) {
                 stateManager.activeSearchQueryProperty().addListener(listener);
+                stateManager.activeGlobalSearchQueryProperty().addListener(listener);
                 registered = true;
             }
             highlightSearchPattern();
@@ -204,9 +205,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         String callbackForUnmark = "";
         if (searchHighlightPattern.isPresent()) {
             String javaScriptRegex = createJavaScriptRegex(searchHighlightPattern.get());
-            callbackForUnmark = String.format(JS_MARK_REG_EXP_CALLBACK, javaScriptRegex);
+            callbackForUnmark = JS_MARK_REG_EXP_CALLBACK.formatted(javaScriptRegex);
         }
-        String unmarkInstance = String.format(JS_UNMARK_WITH_CALLBACK, callbackForUnmark);
+        String unmarkInstance = JS_UNMARK_WITH_CALLBACK.formatted(callbackForUnmark);
         previewView.getEngine().executeScript(unmarkInstance);
     }
 
@@ -280,14 +281,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void setPreviewText(String text) {
-        String myText = String.format("""
+        String myText = """
                 <html>
                     %s
                     <body id="previewBody">
                         <div id="content"> %s </div>
                     </body>
                 </html>
-                """, JS_HIGHLIGHT_FUNCTION, text);
+                """.formatted(JS_HIGHLIGHT_FUNCTION, text);
         previewView.getEngine().setJavaScriptEnabled(true);
         previewView.getEngine().loadContent(myText);
 

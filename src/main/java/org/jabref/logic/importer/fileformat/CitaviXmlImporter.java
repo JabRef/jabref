@@ -387,10 +387,10 @@ public class CitaviXmlImporter extends Importer implements Parser {
                                                                     QUOTATION_TYPES.stream()
                                                                     .filter(qt -> type == qt.getCitaviIndexType())
                                                                     .map(QuotationTypeMapping::getName).findFirst());
-            quotationTypeDesc.ifPresent(qt -> comment.add(String.format("quotation type: %s", qt)));
+            quotationTypeDesc.ifPresent(qt -> comment.add("quotation type: %s".formatted(qt)));
 
             Optional<Short> quotationIndex = Optional.of(knowledgeItem.getQuotationIndex());
-            quotationIndex.ifPresent(index -> comment.add(String.format("quotation index: %d", index)));
+            quotationIndex.ifPresent(index -> comment.add("quotation index: %d".formatted(index)));
         }
         return comment.toString();
     }

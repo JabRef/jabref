@@ -24,6 +24,7 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.maintable.columns.FieldColumn;
 import org.jabref.gui.maintable.columns.FileColumn;
 import org.jabref.gui.maintable.columns.LibraryColumn;
@@ -31,6 +32,7 @@ import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -42,6 +44,7 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +61,9 @@ public class MainTableColumnFactory {
     private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
     private final StateManager stateManager;
+    private final MainTableTooltip tooltip;
 
     public MainTableColumnFactory(BibDatabaseContext database,
                                   PreferencesService preferencesService,
@@ -75,6 +80,8 @@ public class MainTableColumnFactory {
         this.cellFactory = new CellFactory(preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
+        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager,
+                themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
@@ -85,6 +92,9 @@ public class MainTableColumnFactory {
                 break;
             case GROUPS:
                 returnColumn = createGroupColumn(column);
+                break;
+            case GROUP_ICONS:
+                returnColumn = createGroupIconColumn(column);
                 break;
             case FILES:
                 returnColumn = createFilesColumn(column);
@@ -107,14 +117,14 @@ public class MainTableColumnFactory {
                         returnColumn = createSpecialFieldColumn(column);
                     } else {
                         LOGGER.warn("Special field type '{}' is unknown. Using normal column type.", column.getQualifier());
-                        returnColumn = createFieldColumn(column);
+                        returnColumn = createFieldColumn(column, tooltip);
                     }
                 }
                 break;
             default:
             case NORMALFIELD:
                 if (!column.getQualifier().isBlank()) {
-                    returnColumn = createFieldColumn(column);
+                    returnColumn = createFieldColumn(column, tooltip);
                 }
                 break;
         }
@@ -176,6 +186,25 @@ public class MainTableColumnFactory {
         return column;
     }
 
+    /**
+     * Creates a column for group icons
+     */
+    private TableColumn<BibEntryTableViewModel, ?> createGroupIconColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(columnModel);
+        Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLUMN.getGraphicNode();
+        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group icons")));
+        column.setGraphic(headerGraphic);
+        column.getStyleClass().add(STYLE_ICON_COLUMN);
+        column.setResizable(true);
+        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
+        new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
+                .withGraphic(this::createGroupIconRegion)
+                .install(column);
+        column.setStyle("-fx-padding: 0 0 0 0;");
+        column.setSortable(true);
+        return column;
+    }
+
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<Color> groupColors = matchedGroups.stream()
                                                .flatMap(group -> group.getColor().stream())
@@ -209,11 +238,39 @@ public class MainTableColumnFactory {
         return new Pane();
     }
 
+    private Node createGroupIconRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
+        List<JabRefIcon> groupIcons = matchedGroups.stream()
+                                                   .filter(abstractGroup -> abstractGroup.getIconName().isPresent())
+                                                   .flatMap(group -> IconTheme.findIcon(group.getIconName().get(), group.getColor().orElse(IconTheme.getDefaultGroupColor())).stream()
+                                                   )
+                                                   .toList();
+        if (!groupIcons.isEmpty()) {
+            HBox container = new HBox();
+            container.setSpacing(2);
+            container.setMinWidth(10);
+            container.setAlignment(Pos.CENTER_LEFT);
+            container.setPadding(new Insets(0, 2, 0, 2));
+
+            groupIcons.stream().distinct().forEach(groupIcon -> {
+                container.getChildren().add(groupIcon.getGraphicNode());
+            });
+
+            String matchedGroupsString = matchedGroups.stream()
+                                                      .distinct()
+                                                      .map(AbstractGroup::getName)
+                                                      .collect(Collectors.joining(", "));
+            Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);
+            Tooltip.install(container, tooltip);
+            return container;
+        }
+        return new Pane();
+    }
+
     /**
      * Creates a text column to display any standard field.
      */
-    private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel) {
-        return new FieldColumn(columnModel);
+    private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel, MainTableTooltip tooltip) {
+        return new FieldColumn(columnModel, tooltip);
     }
 
     /**

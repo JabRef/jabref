@@ -1,5 +1,7 @@
 package org.jabref.gui.desktop;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -32,6 +34,10 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.model.entry.field.StandardField.PDF;
+import static org.jabref.model.entry.field.StandardField.PS;
+import static org.jabref.model.entry.field.StandardField.URL;
+
 /**
  * See http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
  * http://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT
@@ -48,7 +54,7 @@ public class JabRefDesktop {
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
-     *
+     * <p>
      * Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext,
@@ -60,7 +66,7 @@ public class JabRefDesktop {
             throws IOException {
         String link = initialLink;
         Field field = initialField;
-        if ((StandardField.PS == field) || (StandardField.PDF == field)) {
+        if ((PS == field) || (PDF == field)) {
             // Find the default directory for this field type:
             List<Path> directories = databaseContext.getFileDirectories(preferencesService.getFilePreferences());
 
@@ -76,10 +82,10 @@ public class JabRefDesktop {
             String[] split = file.get().getFileName().toString().split("\\.");
             if (split.length >= 2) {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
-                    field = StandardField.PDF;
+                    field = PDF;
                 } else if ("ps".equalsIgnoreCase(split[split.length - 1])
                         || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
-                    field = StandardField.PS;
+                    field = PS;
                 }
             }
         } else if (StandardField.DOI == field) {
@@ -102,29 +108,32 @@ public class JabRefDesktop {
                 if (eprintTypeOpt.isEmpty() && archivePrefixOpt.isEmpty()) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please set the eprinttype field"));
                 } else {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please verify that the eprint field has a valid '%0' id", eprintTypeOpt.get()));
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open linked eprint. Please verify that the eprint field has a valid '%0' id", link));
                 }
             }
             // should be opened in browser
-            field = StandardField.URL;
+            field = URL;
         }
 
-        if (StandardField.URL == field) {
-            openBrowser(link, preferencesService.getFilePreferences());
-        } else if (StandardField.PS == field) {
-            try {
-                NATIVE_DESKTOP.openFile(link, StandardField.PS.getName(), preferencesService.getFilePreferences());
-            } catch (IOException e) {
-                LOGGER.error("An error occurred on the command: " + link, e);
+        switch (field) {
+            case URL ->
+                    openBrowser(link, preferencesService.getFilePreferences());
+            case PS -> {
+                try {
+                    NATIVE_DESKTOP.openFile(link, PS.getName(), preferencesService.getFilePreferences());
+                } catch (IOException e) {
+                    LOGGER.error("An error occurred on the command: " + link, e);
+                }
             }
-        } else if (StandardField.PDF == field) {
-            try {
-                NATIVE_DESKTOP.openFile(link, StandardField.PDF.getName(), preferencesService.getFilePreferences());
-            } catch (IOException e) {
-                LOGGER.error("An error occurred on the command: " + link, e);
+            case PDF -> {
+                try {
+                    NATIVE_DESKTOP.openFile(link, PDF.getName(), preferencesService.getFilePreferences());
+                } catch (IOException e) {
+                    LOGGER.error("An error occurred on the command: " + link, e);
+                }
             }
-        } else {
-            LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
+            case null, default ->
+                    LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
         }
     }
 
@@ -232,7 +241,6 @@ public class JabRefDesktop {
      * If no command is specified in {@link Globals}, the default system console will be executed.
      *
      * @param file Location the console should be opened at.
-     *
      */
     public static void openConsole(Path file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
         if (file == null) {
@@ -306,5 +314,27 @@ public class JabRefDesktop {
             dialogService.notify(couldNotOpenBrowser);
             dialogService.showErrorDialogAndWait(couldNotOpenBrowser, couldNotOpenBrowser + "\n" + openManually + "\n" + copiedToClipboard);
         }
+    }
+
+    /**
+     * Moves the given file to the trash.
+     *
+     * @throws UnsupportedOperationException if the current platform does not support the {@link Desktop.Action#MOVE_TO_TRASH} action
+     * @see Desktop#moveToTrash(File)
+     */
+    public static void moveToTrash(Path path) {
+        NATIVE_DESKTOP.moveToTrash(path);
+    }
+
+    public static boolean moveToTrashSupported() {
+        return NATIVE_DESKTOP.moveToTrashSupported();
+    }
+
+    public static Path getApplicationDirectory() {
+        return NATIVE_DESKTOP.getApplicationDirectory();
+    }
+
+    public static Path getFulltextIndexBaseDirectory() {
+        return NATIVE_DESKTOP.getFulltextIndexBaseDirectory();
     }
 }

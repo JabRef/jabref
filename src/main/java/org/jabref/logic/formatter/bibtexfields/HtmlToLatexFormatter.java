@@ -13,6 +13,9 @@ import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The inverse operation is "somehow" contained in {@link org.jabref.logic.openoffice.style.OOPreFormatter}
+ */
 public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlToLatexFormatter.class);
@@ -67,8 +70,8 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
         while (m.find()) {
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
             if (HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.containsKey(num)) {
-                result = result.replace("&#" + m.group(1) + m.group(2) + m.group(3) + ";",
-                        HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.get(num));
+                result = result.replaceAll("\\\\?&#" + m.group(1) + m.group(2) + m.group(3) + ";",
+                        Matcher.quoteReplacement(HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.get(num)));
             }
         }
 

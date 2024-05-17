@@ -6,9 +6,11 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -110,7 +112,16 @@ public class ErrorConsoleView extends BaseDialog<Void> {
                     graphic.getStyleClass().setAll(event.getStyleClass());
                     graphic.getChildren().setAll(icon, message);
                     setGraphic(graphic);
+                    setContextMenu(createContextMenu(event));
                 }
+            }
+
+            private ContextMenu createContextMenu(LogEventViewModel selectedLogEntry) {
+                ContextMenu contextMenu = new ContextMenu();
+                MenuItem copyItem = new MenuItem("Copy");
+                copyItem.setOnAction(event -> viewModel.copyLogEntry(selectedLogEntry));
+                contextMenu.getItems().add(copyItem);
+                return contextMenu;
             }
         };
     }

@@ -69,7 +69,7 @@ public class SearchQuery implements SearchMatcher {
 
     @Override
     public String toString() {
-        return String.format("\"%s\" (%s, %s) %s", getQuery(), getCaseSensitiveDescription(), getRegularExpressionDescription(), searchFlags);
+        return "\"%s\" (%s, %s) %s".formatted(getQuery(), getCaseSensitiveDescription(), getRegularExpressionDescription(), searchFlags);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class SearchQuery implements SearchMatcher {
     }
 
     public String localize() {
-        return String.format("\"%s\" (%s, %s)",
+        return "\"%s\" (%s, %s)".formatted(
                 getQuery(),
                 getLocalizedCaseSensitiveDescription(),
                 getLocalizedRegularExpressionDescription());
@@ -172,7 +172,7 @@ public class SearchQuery implements SearchMatcher {
     private Optional<Pattern> joinWordsToPattern(EscapeMode escapeMode) {
         List<String> words = getSearchWords();
 
-        if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
+        if ((words == null) || words.isEmpty() || words.getFirst().isEmpty()) {
             return Optional.empty();
         }
 

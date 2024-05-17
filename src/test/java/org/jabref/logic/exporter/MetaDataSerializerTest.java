@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
@@ -38,13 +38,13 @@ public class MetaDataSerializerTest {
     private static final EntryType CUSTOM_TYPE = new UnknownEntryType("customType");
 
     private MetaData metaData;
-    private GlobalCitationKeyPattern pattern;
+    private GlobalCitationKeyPatterns pattern;
     private BibEntryType newCustomType;
 
     @BeforeEach
     public void setUp() {
         metaData = new MetaData();
-        pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
+        pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         newCustomType = new BibEntryType(
                 CUSTOM_TYPE,
                 List.of(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT)),
@@ -84,14 +84,14 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    void testParsingEmptyOrFieldsReturnsEmptyCollections() {
+    void parsingEmptyOrFieldsReturnsEmptyCollections() {
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
         Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
         assertEquals(Collections.emptySet(), type.get().getRequiredFields());
     }
 
     @Test
-    void testParsingEmptyOptionalFieldsFieldsReturnsEmptyCollections() {
+    void parsingEmptyOptionalFieldsFieldsReturnsEmptyCollections() {
         newCustomType = new BibEntryType(
                 CUSTOM_TYPE,
                 Collections.emptySet(),

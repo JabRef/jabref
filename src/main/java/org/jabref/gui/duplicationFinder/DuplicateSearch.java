@@ -132,7 +132,7 @@ public class DuplicateSearch extends SimpleCommand {
                 return null;
             }
 
-            BibEntry first = dups.get(0);
+            BibEntry first = dups.getFirst();
             BibEntry second = dups.get(1);
 
             if (!result.isToRemove(first) && !result.isToRemove(second)) {

@@ -11,24 +11,130 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- When importing entries form the "Citation relations" tab, the field [cites](https://docs.jabref.org/advanced/entryeditor/entrylinks) is now filled according to the relationship between the entries. [#10572](https://github.com/JabRef/jabref/pull/10752)
+- We added support for offline extracting references from PDFs following the IEEE format. [#11156](https://github.com/JabRef/jabref/pull/11156)
+- We added a new keyboard shortcut  <kbd>ctrl</kbd> + <kbd>,</kbd> to open the preferences. [#11154](https://github.com/JabRef/jabref/pull/11154)
+- We added value selection (such as for month) for content selectors in custom entry types. [#11109](https://github.com/JabRef/jabref/issues/11109)
+- We added a duplicate checker for the Citation Relations tab. [#10414](https://github.com/JabRef/jabref/issues/10414)
+- We added tooltip on main table cells that shows cell content or cell content and entry preview if set in preferences. [10925](https://github.com/JabRef/jabref/issues/10925)
+- Added a formatter to remove word enclosing braces. [#11222](https://github.com/JabRef/jabref/issues/11222)
+- We added the ability to add a keyword/crossref when typing the separator character (e.g., comma) in the keywords/crossref fields. [#11178](https://github.com/JabRef/jabref/issues/11178)
+- We added an exporter and improved the importer for Endnote XML format. [#11137](https://github.com/JabRef/jabref/issues/11137)
+- We added support for automatically update LaTeX citations when a LaTeX file is created, removed, or modified. [#10585](https://github.com/JabRef/jabref/issues/10585)
 
 ### Changed
 
-- The Custom export format now uses the custom DOI base URI in the preferences for the `DOICheck`, if activated [forum#4084](https://discourse.jabref.org/t/export-html-disregards-custom-doi-base-uri/4084)
-- The index directories for full text search have now more readable names to increase debugging possibilities using Apache Lucense's Lurk. [#10193](https://github.com/JabRef/jabref/issues/10193)
-- The fulltext search also indexes files ending with .pdf (but do not having an explicit file type set). [#10193](https://github.com/JabRef/jabref/issues/10193)
-- We changed the order of the lists in the "Citation relations" tab. `Cites` are now on the left and `Cited by` on the right [#10572](https://github.com/JabRef/jabref/pull/10752)
+- We replaced the word "Key bindings" with "Keyboard shortcuts" in the Preferences tab. [#11153](https://github.com/JabRef/jabref/pull/11153)
+- We slightly improved the duplicate check if ISBNs are present. [#8885](https://github.com/JabRef/jabref/issues/8885)
+- JabRef no longer downloads HTML files of websites when a PDF was not found. [#10149](https://github.com/JabRef/jabref/issues/10149)
 
 ### Fixed
 
-- We fixed an issue where attempting to cancel the importing/generation of an entry from id is ignored. [#10508](https://github.com/JabRef/jabref/issues/10508)
-- We fixed an issue where the preview panel showing the wrong entry (an entry that is not selected in the entry table). [#9172](https://github.com/JabRef/jabref/issues/9172)
-- The last page of a PDF is now indexed by the full text search. [#10193](https://github.com/JabRef/jabref/issues/10193)
-- We fixed an issue where the duplicate check did not take umlauts or other LaTeX-encoded characters into account. [#10744](https://github.com/JabRef/jabref/pull/10744)
-- We fixed the colors of the icon on hover for unset special fields. [#10431](https://github.com/JabRef/jabref/issues/10431)
+- We fixed an issue where entry type with duplicate fields prevented opening existing libraries with custom entry types. [#11127](https://github.com/JabRef/jabref/issues/11127)
+- We fixed an issue where Markdown rendering removed braces from the text. [#10928](https://github.com/JabRef/jabref/issues/10928)
+- We fixed an issue when the file was flagged as changed on disk in the case of content selectors or groups. [#9064](https://github.com/JabRef/jabref/issues/9064)
+- We fixed crash on opening the entry editor when auto-completion is enabled. [#11188](https://github.com/JabRef/jabref/issues/11188)
+- We fixed the usage of the key binding for "Clear search" (default: <kbd>Escape</kbd>). [#10764](https://github.com/JabRef/jabref/issues/10764)
+- We fixed an issue where library shown as unsaved and marked (*) after accepting changes made externally to the file. [#11027](https://github.com/JabRef/jabref/issues/11027)
+- We fixed an issue where drag and dropping entries from one library to another was not always working. [#11254](https://github.com/JabRef/jabref/issues/11254)
+- We fixed an issue where drag and dropping entries created a shallow copy. [#11160](https://github.com/JabRef/jabref/issues/11160)
+- We fixed an issue where imports to a custom group would only work for the first entry [#11085](https://github.com/JabRef/jabref/issues/11085), [#11269](https://github.com/JabRef/jabref/issues/11269)
+- We fixed an issue where a new entry was not added to the selected group [#8933](https://github.com/JabRef/jabref/issues/8933)
+- We fixed an issue where the horizontal position of the Entry Preview inside the entry editor was not remembered across restarts [#11281](https://github.com/JabRef/jabref/issues/11281)
 
 ### Removed
+
+
+
+
+
+
+## [5.13] – 2024-04-01
+
+### Added
+
+- We converted the "Custom API key" list to a table to be more accessible. [#10926](https://github.com/JabRef/jabref/issues/10926)
+- We added a "refresh" button for the LaTeX citations tab in the entry editor. [#10584](https://github.com/JabRef/jabref/issues/10584)
+- We added the possibility to show the BibTeX source in the [web search](https://docs.jabref.org/collect/import-using-online-bibliographic-database) import screen. [#560](https://github.com/koppor/jabref/issues/560)
+- We added a fetcher for [ISIDORE](https://isidore.science/), simply paste in the link into the text field or the last 6 digits in the link that identify that paper. [#10423](https://github.com/JabRef/jabref/issues/10423)
+- When importing entries form the "Citation relations" tab, the field [cites](https://docs.jabref.org/advanced/entryeditor/entrylinks) is now filled according to the relationship between the entries. [#10572](https://github.com/JabRef/jabref/pull/10752)
+- We added a new integrity check and clean up option for strings having Unicode characters not encoded in [Unicode "Normalization Form Canonical Composition" (NFC)](https://en.wikipedia.org/wiki/Unicode_equivalence#Normal_forms"). [#10506](https://github.com/JabRef/jabref/issues/10506)
+- We added a new group icon column to the main table showing the icons of the entry's groups. [#10801](https://github.com/JabRef/jabref/pull/10801)
+- When deleting an entry, the files linked to the entry are now optionally deleted as well. [#10509](https://github.com/JabRef/jabref/issues/10509)
+- We added support to move the file to the system trash (instead of deleting it). [#10591](https://github.com/JabRef/jabref/pull/10591)
+- We added ability to jump to an entry in the command line using `-j CITATIONKEY`. [koppor#540](https://github.com/koppor/jabref/issues/540)
+- We added a new boolean to the style files for Openoffice/Libreoffice integration to switch between ZERO_WIDTH_SPACE (default) and no space. [#10843](https://github.com/JabRef/jabref/pull/10843)
+- When pasting HTML into the abstract or a comment field, the hypertext is automatically converted to Markdown. [#10558](https://github.com/JabRef/jabref/issues/10558)
+- We added the possibility to redownload files that had been present but are no longer in the specified location. [#10848](https://github.com/JabRef/jabref/issues/10848)
+- We added the citation key pattern `[camelN]`. Equivalent to the first N words of the `[camel]` pattern.
+- We added importing of static groups and linked files from BibDesk .bib files. [#10381](https://github.com/JabRef/jabref/issues/10381)
+- We added ability to export in CFF (Citation File Format) [#10661](https://github.com/JabRef/jabref/issues/10661).
+- We added ability to push entries to TeXworks. [#3197](https://github.com/JabRef/jabref/issues/3197)
+- We added the ability to zoom in and out in the document viewer using <kbd>Ctrl</kbd> + <kbd>Scroll</kbd>. [#10964](https://github.com/JabRef/jabref/pull/10964)
+- We added a Cleanup for removing non-existent files and grouped the related options [#10929](https://github.com/JabRef/jabref/issues/10929)
+- We added the functionality to parse the bibliography of PDFs using the GROBID online service. [#10200](https://github.com/JabRef/jabref/issues/10200)
+- We added a seperated search bar for the global search window. [#11032](https://github.com/JabRef/jabref/pull/11032)
+- We added ability to double-click on an entry in the global search window to select the corresponding entry in the main table. [#11010](https://github.com/JabRef/jabref/pull/11010)
+- We added support for BibTeX String constants during copy & paste between libraries. [#10872](https://github.com/JabRef/jabref/issues/10872)
+- We added the field `langid` which is important for hyphenation and casing in LaTeX. [#10868](https://github.com/JabRef/jabref/issues/10868)
+- Event log entries can now be copied via a context menu. [#11100](https://github.com/JabRef/jabref/issues/11100)
+
+### Changed
+
+- The "Automatically open folders of attached files" preference default status has been changed to enabled on Windows. [koppor#56](https://github.com/koppor/jabref/issues/56)
+- The Custom export format now uses the custom DOI base URI in the preferences for the `DOICheck`, if activated [forum#4084](https://discourse.jabref.org/t/export-html-disregards-custom-doi-base-uri/4084)
+- The index directories for full text search have now more readable names to increase debugging possibilities using Apache Lucense's Lurk. [#10193](https://github.com/JabRef/jabref/issues/10193)
+- The fulltext search also indexes files ending with .pdf (but do not having an explicit file type set). [#10193](https://github.com/JabRef/jabref/issues/10193)
+- We changed the arrangement of the lists in the "Citation relations" tab. `Cites` are now on the left and `Cited by` on the right [#10572](https://github.com/JabRef/jabref/pull/10752)
+- Sub libraries based on `aux` file can now also be generated if some citations are not found library. [#10775](https://github.com/JabRef/jabref/pull/10775)
+- We rearranged the tab order in the entry editor and renamed the "Scite Tab" to "Citation information". [#10821](https://github.com/JabRef/jabref/issues/10821)
+- We changed the duplicate handling in the Import entries dialog. Potential duplicate entries are marked with an icon and importing will now trigger the merge dialog [#10914](https://github.com/JabRef/jabref/pull/10914)
+- We made the command "Push to TexShop" more robust to allow cite commands with a character before the first slash. [forum#2699](https://discourse.jabref.org/t/push-to-texshop-mac/2699/17?u=siedlerchr)
+- We only show the notification "Saving library..." if the library contains more than 2000 entries. [#9803](https://github.com/JabRef/jabref/issues/9803)
+- JabRef now keeps previous log files upon start. [#11023](https://github.com/JabRef/jabref/pull/11023)
+- When normalizing author names, complete enclosing braces are kept. [#10031](https://github.com/JabRef/jabref/issues/10031)
+- We enhanced the dialog for adding new fields in the content selector with a selection box containing a list of standard fields. [#10912](https://github.com/JabRef/jabref/pull/10912)
+- We store the citation relations in an LRU cache to avoid bloating the memory and out-of-memory exceptions. [#10958](https://github.com/JabRef/jabref/issues/10958)
+- Keywords field are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
+- Citation relations now get more information, and have quick access to view the articles in a browser without adding them to the library [#10869](https://github.com/JabRef/jabref/issues/10869)
+- Importer/Exporter for CFF format now supports JabRef `cites` and `related` relationships, as well as all fields from the CFF specification. [#10993](https://github.com/JabRef/jabref/issues/10993)
+- The XMP-Exporter no longer writes the content of the `file`-field. [#11083](https://github.com/JabRef/jabref/pull/11083)
+- We added notes, checks and warnings for the case of selection of non-empty directories while starting a new Systematic Literature Review. [#600](https://github.com/koppor/jabref/issues/600)
+- Text in the import dialog (web search results) will now be wrapped to prevent horizontal scrolling. [#10931](https://github.com/JabRef/jabref/issues/10931)
+- We improved the error handling when invalid bibdesk-files are encountered [#11117](https://github.com/JabRef/jabref/issues/11117)
+
+### Fixed
+
+- We fixed an issue where the fulltext search button in entry editor used to disappear on click till the search is completed. [#10425](https://github.com/JabRef/jabref/issues/10425)
+- We fixed an issue where attempting to cancel the importing/generation of an entry from id is ignored. [#10508](https://github.com/JabRef/jabref/issues/10508)
+- We fixed an issue where the preview panel showing the wrong entry (an entry that is not selected in the entry table). [#9172](https://github.com/JabRef/jabref/issues/9172)
+- We fixed an issue where HTML-reserved characters like '&' and '<', in addition to HTML entities like '&amp;' were not rendered correctly in entry preview. [#10677](https://github.com/JabRef/jabref/issues/10677)
+- The last page of a PDF is now indexed by the full text search. [#10193](https://github.com/JabRef/jabref/issues/10193)
+- The entry editor respects the configured custom tabs when showing "Other fields". [#11012](https://github.com/JabRef/jabref/pull/11012)
+- The default owner of an entry can be changed again. [#10924](https://github.com/JabRef/jabref/issues/10924)
+- We fixed an issue where the duplicate check did not take umlauts or other LaTeX-encoded characters into account. [#10744](https://github.com/JabRef/jabref/pull/10744)
+- We fixed the colors of the icon on hover for unset special fields. [#10431](https://github.com/JabRef/jabref/issues/10431)
+- We fixed an issue where the CrossRef field did not work if autocompletion was disabled [#8145](https://github.com/JabRef/jabref/issues/8145)
+- In biblatex mode, JabRef distinguishes between "Optional fields" and "Optional fields 2" again. [#11022](https://github.com/JabRef/jabref/pull/11022)
+- We fixed an issue where exporting`@electronic` and `@online` entry types to the Office XMl would duplicate the field `title`  [#10807](https://github.com/JabRef/jabref/issues/10807)
+- We fixed an issue where the `CommentsTab` was not properly formatted when the `defaultOwner` contained capital or special letters. [#10870](https://github.com/JabRef/jabref/issues/10870)
+- We fixed an issue where the `File -> Close library` menu item was not disabled when no library was open. [#10948](https://github.com/JabRef/jabref/issues/10948)
+- We fixed an issue where the Document Viewer would show the PDF in only half the window when maximized. [#10934](https://github.com/JabRef/jabref/issues/10934)
+- Clicking on the crossref and related tags in the entry editor jumps to the linked entry. [#5484](https://github.com/JabRef/jabref/issues/5484) [#9369](https://github.com/JabRef/jabref/issues/9369)
+- We fixed an issue where JabRef could not parse absolute file paths from Zotero exports. [#10959](https://github.com/JabRef/jabref/issues/10959)
+- We fixed an issue where an exception occured when toggling between "Live" or "Locked" in the internal Document Viewer. [#10935](https://github.com/JabRef/jabref/issues/10935)
+- When fetching article information fom IEEE Xplore, the em dash is now converted correctly. [koppor#286](https://github.com/koppor/jabref/issues/286)
+- Fixed an issue on Windows where the browser extension reported failure to send an entry to JabRef even though it was sent properly. [JabRef-Browser-Extension#493](https://github.com/JabRef/JabRef-Browser-Extension/issues/493)
+- Fixed an issue on Windows where TeXworks path was not resolved if it was installed with MiKTeX. [#10977](https://github.com/JabRef/jabref/issues/10977)
+- We fixed an issue with where JabRef would throw an error when using MathSciNet search, as it was unable to parse the fetched JSON coreectly. [10996](https://github.com/JabRef/jabref/issues/10996)
+- We fixed an issue where the "Import by ID" function would throw an error when a DOI that contains URL-encoded characters was entered. [#10648](https://github.com/JabRef/jabref/issues/10648)
+- We fixed an issue with handling of an "overflow" of authors at `[authIniN]`. [#11087](https://github.com/JabRef/jabref/issues/11087)
+- We fixed an issue where an exception occurred when selecting entries in the web search results. [#11081](https://github.com/JabRef/jabref/issues/11081)
+- When a new library is unsaved, there is now no warning when fetching entries with PDFs. [#11075](https://github.com/JabRef/jabref/issues/11075)
+- We fixed an issue where the message "The libary has been modified by another program" occurred when editing library metadata and saving the library. [#4877](https://github.com/JabRef/jabref/issues/4877)
+
+### Removed
+
+- We removed the predatory journal checks due to a high rate of false positives. [#11066](https://github.com/JabRef/jabref/pull/11066)
 
 ## [5.12] – 2023-12-24
 
@@ -1222,7 +1328,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.12...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.13...HEAD
+[5.13]: https://github.com/JabRef/jabref/compare/v5.12...v5.13
 [5.12]: https://github.com/JabRef/jabref/compare/v5.11...v5.12
 [5.11]: https://github.com/JabRef/jabref/compare/v5.10...v5.11
 [5.10]: https://github.com/JabRef/jabref/compare/v5.9...v5.10

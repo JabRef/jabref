@@ -16,9 +16,11 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
+import org.jabref.gui.entryeditor.CommentsTab;
+import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.OS;
@@ -57,13 +59,14 @@ public class PreferencesMigrations {
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);
         // changeColumnVariableNamesFor51 needs to be run before upgradeColumnPre50Preferences to ensure
-        // backwardcompatibility, as it copies the old values to new variable names and keeps th old sored with the old
+        // backward compatibility, as it copies the old values to new variable names and keeps th old sored with the old
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
         changeColumnVariableNamesFor51(preferences);
         upgradeColumnPreferences(preferences);
         restoreVariablesForBackwardCompatibility(preferences);
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
+        removeCommentsFromCustomEditorTabs(preferences);
     }
 
     /**
@@ -307,7 +310,7 @@ public class PreferencesMigrations {
             throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
-        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(
+        GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(
                 prefs.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addCitationKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
@@ -326,8 +329,9 @@ public class PreferencesMigrations {
      */
     protected static void upgradePreviewStyle(JabRefPreferences prefs) {
         String currentPreviewStyle = prefs.get(JabRefPreferences.PREVIEW_STYLE);
-        String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}")
+        String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
                                                   .replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
+                                                  .replace("\\format[Markdown,HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}")
                                                   .replace("<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>", "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>")
                                                   .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__");
         prefs.put(JabRefPreferences.PREVIEW_STYLE, migratedStyle);
@@ -514,9 +518,9 @@ public class PreferencesMigrations {
         List<String> formatterCleanups = List.of(StringUtil.unifyLineBreaks(prefs.get(V5_8_CLEANUP_FIELD_FORMATTERS), "\n")
                                                            .split("\n"));
         if (formatterCleanups.size() >= 2
-                && (formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
-                || formatterCleanups.get(0).equals(FieldFormatterCleanups.DISABLED))) {
-            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, formatterCleanups.get(0).equals(FieldFormatterCleanups.ENABLED)
+                && (formatterCleanups.getFirst().equals(FieldFormatterCleanups.ENABLED)
+                || formatterCleanups.getFirst().equals(FieldFormatterCleanups.DISABLED))) {
+            prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, formatterCleanups.getFirst().equals(FieldFormatterCleanups.ENABLED)
                     ? Boolean.TRUE
                     : Boolean.FALSE);
 
@@ -544,5 +548,13 @@ public class PreferencesMigrations {
                 LOGGER.error("Unable to open key store", ex);
             }
         }
+    }
+
+    /**
+     * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link EntryEditor#createTabs()}.
+     * Thus, the configuration ih the preferences is obsolete
+     */
+    static void removeCommentsFromCustomEditorTabs(JabRefPreferences preferences) {
+        preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
     }
 }

@@ -54,6 +54,7 @@ public class BibDatabase {
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
     private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
 
+    // Not included in equals, because it is not relevant for the content of the database
     private final EventBus eventBus = new EventBus();
 
     private String preamble;
@@ -200,7 +201,7 @@ public class BibDatabase {
         if (newEntries.isEmpty()) {
             eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
         } else {
-            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.get(0), eventSource));
+            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.getFirst(), eventSource));
         }
         entries.addAll(newEntries);
     }
@@ -369,9 +370,13 @@ public class BibDatabase {
     /**
      * Get all strings used in the entries.
      */
-    public Collection<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
-        List<BibtexString> result = new ArrayList<>();
+    public List<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
         Set<String> allUsedIds = new HashSet<>();
+
+        // Preamble
+        if (preamble != null) {
+            resolveContent(preamble, new HashSet<>(), allUsedIds);
+        }
 
         // All entries
         for (BibEntry entry : entries) {
@@ -380,16 +385,7 @@ public class BibDatabase {
             }
         }
 
-        // Preamble
-        if (preamble != null) {
-            resolveContent(preamble, new HashSet<>(), allUsedIds);
-        }
-
-        for (String stringId : allUsedIds) {
-            result.add((BibtexString) bibtexStrings.get(stringId).clone());
-        }
-
-        return result;
+        return allUsedIds.stream().map(bibtexStrings::get).toList();
     }
 
     /**
@@ -458,7 +454,7 @@ public class BibDatabase {
                 // circular reference, and have to stop to avoid
                 // infinite recursion.
                 if (usedIds.contains(string.getId())) {
-                    LOGGER.info("Stopped due to circular reference in strings: " + label);
+                    LOGGER.info("Stopped due to circular reference in strings: {}", label);
                     return label;
                 }
                 // If not, log this string's ID now.
@@ -632,5 +628,26 @@ public class BibDatabase {
      */
     public String getNewLineSeparator() {
         return newLineSeparator;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof BibDatabase that)) {
+            return false;
+        }
+        return Objects.equals(entries, that.entries)
+                && Objects.equals(bibtexStrings, that.bibtexStrings)
+                && Objects.equals(preamble, that.preamble)
+                && Objects.equals(epilog, that.epilog)
+                && Objects.equals(sharedDatabaseID, that.sharedDatabaseID)
+                && Objects.equals(newLineSeparator, that.newLineSeparator);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entries, bibtexStrings, preamble, epilog, sharedDatabaseID, newLineSeparator);
     }
 }

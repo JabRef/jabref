@@ -1,8 +1,9 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -28,6 +29,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
@@ -37,9 +39,15 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -69,6 +77,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
+    private final DuplicateCheck duplicateCheck;
 
     public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService,
                                 BibDatabaseContext databaseContext, UndoManager undoManager,
@@ -86,6 +95,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
+        this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferencesService.getImporterPreferences()),
                 new BibEntryRelationsCache());
         citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService, fileUpdateMonitor, Globals.TASK_EXECUTOR);
@@ -201,17 +211,20 @@ public class CitationRelationsTab extends EntryEditorTab {
                     HBox hContainer = new HBox();
                     hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
 
+                    VBox vContainer = new VBox();
+
                     if (entry.isLocal()) {
+                        hContainer.getStyleClass().add("duplicate-entry");
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
-                        jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in database")));
+                        jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(event -> {
-                            libraryTab.showAndEdit(entry.entry());
-                            libraryTab.clearAndSelect(entry.entry());
                             citingTask.cancel();
                             citedByTask.cancel();
+                            libraryTab.showAndEdit(entry.localEntry());
+                            libraryTab.clearAndSelect(entry.localEntry());
                         });
-                        hContainer.getChildren().addAll(entryNode, separator, jumpTo);
+                        vContainer.getChildren().add(jumpTo);
                     } else {
                         ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
                         addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
@@ -224,8 +237,28 @@ public class CitationRelationsTab extends EntryEditorTab {
                         });
                         addToggle.getStyleClass().add("addEntryButton");
                         addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(entry));
-                        hContainer.getChildren().addAll(entryNode, separator, addToggle);
+                        vContainer.getChildren().add(addToggle);
                     }
+
+                    if (entry.entry().getDOI().isPresent() || entry.entry().getField(StandardField.URL).isPresent()) {
+                        Button openWeb = IconTheme.JabRefIcons.OPEN_LINK.asButton();
+                        openWeb.setTooltip(new Tooltip(Localization.lang("Open URL or DOI")));
+                        openWeb.setOnMouseClicked(event -> {
+                            String url = entry.entry().getDOI().flatMap(DOI::getExternalURI).map(URI::toString)
+                                              .or(() -> entry.entry().getField(StandardField.URL)).orElse("");
+                            if (StringUtil.isNullOrEmpty(url)) {
+                                return;
+                            }
+                            try {
+                                JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
+                            } catch (IOException ex) {
+                                dialogService.notify(Localization.lang("Unable to open link."));
+                            }
+                        });
+                        vContainer.getChildren().addLast(openWeb);
+                    }
+
+                    hContainer.getChildren().addAll(entryNode, separator, vContainer);
                     hContainer.getStyleClass().add("entry-container");
 
                     return hContainer;
@@ -356,8 +389,16 @@ public class CitationRelationsTab extends EntryEditorTab {
                                              ObservableList<CitationRelationItem> observableList) {
         hideNodes(abortButton, progress);
 
-        observableList.setAll(fetchedList.stream().map(entr -> new CitationRelationItem(entr, false))
-                                         .collect(Collectors.toList()));
+        observableList.setAll(
+        fetchedList.stream()
+            .map(entr -> duplicateCheck.containsDuplicate(
+                    databaseContext.getDatabase(),
+                    entr,
+                    BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()))
+                .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
+                .orElseGet(() -> new CitationRelationItem(entr, false)))
+            .toList()
+    );
 
         if (!observableList.isEmpty()) {
             listView.refresh();
@@ -391,8 +432,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void showNodes(Node... nodes) {
         Arrays.stream(nodes).forEach(node -> node.setVisible(true));
     }
-
-    // Absolute-phase phenomena in photoionization with few-cycle laser pulses
 
     /**
      * Function to import selected entries to the database. Also writes the entries to import to the CITING/CITED field

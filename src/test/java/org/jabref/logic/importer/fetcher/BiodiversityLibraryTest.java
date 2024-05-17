@@ -41,7 +41,7 @@ public class BiodiversityLibraryTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("Biodiversity Heritage", fetcher.getName());
         assertNotEquals("Biodiversity Heritage Library", fetcher.getName());
         assertNotEquals("Biodiversity Library", fetcher.getName());
@@ -90,7 +90,7 @@ public class BiodiversityLibraryTest {
     }
 
     @Test
-    public void testPerformSearch() throws FetcherException {
+    public void performSearch() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
             .withField(StandardField.AUTHOR, "Clark, John L. (John Littner)  and Neill, David A. ")
             .withField(StandardField.JOURNALTITLE, "PhytoKeys")
@@ -100,10 +100,10 @@ public class BiodiversityLibraryTest {
             .withField(StandardField.URL, "https://www.biodiversitylibrary.org/part/356490")
             .withField(StandardField.DATE, "2023")
             .withField(StandardField.VOLUME, "227")
-            .withField(StandardField.PAGES, "89-97")
+            .withField(StandardField.PAGES, "89--97")
             .withField(StandardField.DOI, "10.3897/phytokeys.227.104703");
 
-        assertEquals(expected, fetcher.performSearch("Amanoa condorensis (Phyllanthaceae)").get(0));
+        assertEquals(expected, fetcher.performSearch("Amanoa condorensis (Phyllanthaceae)").getFirst());
     }
 
     @Test

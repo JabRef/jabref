@@ -1,8 +1,11 @@
 package org.jabref.logic.msbib;
 
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.model.entry.Author;
 
 public class MsBibAuthor {
+
+    private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
     private String firstName;
     private String middleName;
@@ -13,7 +16,7 @@ public class MsBibAuthor {
         this.author = author;
 
         StringBuilder sb = new StringBuilder();
-        author.getFirst().ifPresent(firstNames -> {
+        author.getGivenName().ifPresent(firstNames -> {
 
             String[] names = firstNames.split(" ");
             for (int i = 1; i < names.length; i++) {
@@ -34,7 +37,7 @@ public class MsBibAuthor {
         if (!"".equals(firstName)) {
             return firstName;
         }
-        return author.getFirst().orElse(null);
+        return author.getGivenName().orElse(null);
     }
 
     public String getMiddleName() {
@@ -45,15 +48,15 @@ public class MsBibAuthor {
     }
 
     public String getLastName() {
-        return author.getLastOnly();
+        return REMOVE_BRACES_FORMATTER.format(author.getNamePrefixAndFamilyName());
     }
 
     public String getFirstLast() {
-        return author.getFirstLast(false);
+        return author.getGivenFamily(false);
     }
 
     public String getLastFirst() {
-        return author.getLastFirst(false);
+        return author.getFamilyGiven(false);
     }
 
     public boolean isCorporate() {

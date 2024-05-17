@@ -68,7 +68,7 @@ public class ReplaceStringViewModelTest {
             "and, '', author, TRUE, FALSE, 2", // replace two "and"s with empty string in the same AUTHOR field
             "' ', ',', date, TRUE, FALSE, 1" // replace space with comma in DATE field
     })
-    void testReplace(String findString, String replaceString, String fieldString, boolean selectOnly, boolean allFieldReplace, int expectedResult) {
+    void replace(String findString, String replaceString, String fieldString, boolean selectOnly, boolean allFieldReplace, int expectedResult) {
         viewModel.findStringProperty().bind(new SimpleStringProperty(findString));
         viewModel.replaceStringProperty().bind(new SimpleStringProperty(replaceString));
         viewModel.fieldStringProperty().bind(new SimpleStringProperty(fieldString));

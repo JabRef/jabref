@@ -26,9 +26,8 @@ env:
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
   OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
-  GRADLE_OPTS: -Xmx4g -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+  GRADLE_OPTS: -Xmx4g -Dorg.gradle.vfs.watch=false
   JAVA_OPTS: -Xmx4g
-  JDK21: ""
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -44,14 +43,11 @@ jobs:
           - os: ubuntu-latest
             displayName: linux
             archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
-            eaJdk: https://files.jabref.org/jdks/jdk-linux-x64.tar.gz
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-            eaJDK: https://files.jabref.org/jdks/jdk-windows-x64.zip
           - os: macos-latest
             displayName: macOS
-            eaJDK: https://files.jabref.org/jdks/jdk-macos-x64.tar.gz
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
@@ -83,32 +79,35 @@ jobs:
           packages: pigz
           version: 1.0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.10.2
+        uses: gittools/actions/gitversion/setup@v1.1.1
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.10.2
+        uses: gittools/actions/gitversion/execute@v1.1.1
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21.0.1
-          distribution: 'liberica'
+          java-version: 21.0.2
+          distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-home-cache-cleanup: true
       - name: Prepare merged jars and modules dir (macOS)
+        # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (matrix.os == 'macos-latest') || (steps.checksecrets.outputs.secretspresent == 'NO')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
       - name: Setup macOS key chain
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: apple-actions/import-codesign-certs@v2
+        uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
       - name: Setup macOS key chain for app id cert
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: apple-actions/import-codesign-certs@v2
+        uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
@@ -119,7 +118,7 @@ jobs:
         shell: bash
         run: |
           jpackage \
-          --module org.jabref/org.jabref.cli.Launcher \
+          --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --dest build/distribution \
@@ -138,13 +137,25 @@ jobs:
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
+          --jlink-options --bind-services \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref
       - name: Build pkg (macOS)
         if: (matrix.os == 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           jpackage \
-          --module org.jabref/org.jabref.cli.Launcher \
+          --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --dest build/distribution \
@@ -163,7 +174,19 @@ jobs:
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services
+          --jlink-options --bind-services \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-latest') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -225,13 +248,14 @@ jobs:
           # tbn = to-be-notarized
           name: JabRef-macOS-tbn
           path: build/distribution
+          compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
         if: (steps.checksecrets.outputs.secretspresent != 'YES')
         uses: actions/upload-artifact@v4
         with:
-          # tbn = to-be-notarized
           name: JabRef-${{ matrix.os }}
           path: build/distribution
+          compression-level: 0 # no compression
   announce:
     name: Comment on pull request
     runs-on: ubuntu-latest

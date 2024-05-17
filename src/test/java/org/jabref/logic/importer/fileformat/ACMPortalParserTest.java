@@ -69,26 +69,26 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void testParseEntries() throws IOException, ParseException {
+    void parseEntries() throws IOException, ParseException {
         CookieHandler.setDefault(new CookieManager());
         List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(searchUrl).asInputStream());
         for (BibEntry bibEntry : bibEntries) {
             bibEntry.clearField(StandardField.ABSTRACT);
         }
-        assertEquals(Optional.of(searchEntryList.get(0)), bibEntries.stream().findFirst());
+        assertEquals(Optional.of(searchEntryList.getFirst()), bibEntries.stream().findFirst());
     }
 
     @Test
-    void testParseDoiSearchPage() throws ParseException, IOException {
+    void parseDoiSearchPage() throws ParseException, IOException {
         String testDoi = "10.1145/3129790.3129810";
         CookieHandler.setDefault(new CookieManager());
         List<String> doiList = parser.parseDoiSearchPage(new URLDownload(searchUrl).asInputStream());
         assertFalse(doiList.isEmpty());
-        assertEquals(testDoi, doiList.get(0));
+        assertEquals(testDoi, doiList.getFirst());
     }
 
     @Test
-    void testGetBibEntriesFromDoiList() throws FetcherException {
+    void getBibEntriesFromDoiList() throws FetcherException {
         List<String> testDoiList = List.of("10.1145/3129790.3129810", "10.1145/2950290");
         List<BibEntry> bibEntries = parser.getBibEntriesFromDoiList(testDoiList);
         for (BibEntry bibEntry : bibEntries) {
@@ -98,7 +98,7 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void testGetUrlFromDoiList() throws MalformedURLException, URISyntaxException {
+    void getUrlFromDoiList() throws MalformedURLException, URISyntaxException {
         String target = "https://dl.acm.org/action/exportCiteProcCitation?targetFile=custom-bibtex&format=bibTex&dois=10.1145%2F3129790.3129810%2C10.1145%2F2950290";
 
         List<String> doiList = List.of("10.1145/3129790.3129810", "10.1145/2950290");
@@ -107,14 +107,14 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void testParseBibEntry() {
+    void parseBibEntry() {
         BibEntry bibEntry = parser.parseBibEntry(jsonStr);
         bibEntry.clearField(StandardField.ABSTRACT);
-        assertEquals(searchEntryList.get(0), bibEntry);
+        assertEquals(searchEntryList.getFirst(), bibEntry);
     }
 
     @Test
-    void testParseBibEntryWithFamilyAuthorOnly() {
+    void parseBibEntryWithFamilyAuthorOnly() {
         String json = "{\"id\":\"10.1145/3011077.3011113\",\"type\":\"PAPER_CONFERENCE\",\"author\":[{\"family\":\"Ngo-Thi-Thu-Trang\"},{\"family\":\"Bui\",\"given\":\"Hieu T.\"},{\"family\":\"Nguyen\",\"given\":\"Nhan D.\"}],\"accessed\":{\"date-parts\":[[2023,8,4]]},\"issued\":{\"date-parts\":[[2016,12,8]]},\"original-date\":{\"date-parts\":[[2016,12,8]]},\"abstract\":\"\",\"call-number\":\"10.1145/3011077.3011113\",\"collection-title\":\"SoICT '16\",\"container-title\":\"Proceedings of the 7th Symposium on Information and Communication Technology\",\"DOI\":\"10.1145/3011077.3011113\",\"event-place\":\"Ho Chi Minh City, Vietnam\",\"ISBN\":\"9781450348157\",\"keyword\":\"orthogonal frequency division multiplexing (OFDM), long-range passive optical network (LR PON), four-wave mixing (FWM), wavelength division multiplexing (WDM)\",\"number-of-pages\":\"6\",\"page\":\"216–221\",\"publisher\":\"Association for Computing Machinery\",\"publisher-place\":\"New York, NY, USA\",\"title\":\"A simple performance analysis of IM-DD OFDM WDM systems in long range PON application\",\"URL\":\"https://doi.org/10.1145/3011077.3011113\"}";
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Conference)
             .withField(StandardField.AUTHOR, "Ngo-Thi-Thu-Trang and Bui, Hieu T. and Nguyen, Nhan D.")
@@ -139,7 +139,7 @@ public class ACMPortalParserTest {
     }
 
     @Test
-    void testNoEntryFound() throws URISyntaxException, IOException, ParseException {
+    void noEntryFound() throws URISyntaxException, IOException, ParseException {
         CookieHandler.setDefault(new CookieManager());
         URL url = new URIBuilder("https://dl.acm.org/action/doSearch?AllField=10.1145/3129790.31298").build().toURL();
         List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(url).asInputStream());

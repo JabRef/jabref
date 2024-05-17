@@ -10,42 +10,42 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class MsBibAuthorTest {
 
     @Test
-    public void testGetFirstName() {
+    public void getGivenNameName() {
         Author author = new Author("Gustav Peter Johann", null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("Gustav", msBibAuthor.getFirstName());
     }
 
     @Test
-    public void testGetMiddleName() {
+    public void getMiddleName() {
         Author author = new Author("Gustav Peter Johann", null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("Peter Johann", msBibAuthor.getMiddleName());
     }
 
     @Test
-    public void testGetNoMiddleName() {
+    public void getNoMiddleName() {
         Author author = new Author("Gustav", null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertNull(msBibAuthor.getMiddleName());
     }
 
     @Test
-    public void testGetNoFirstName() {
+    public void getNoFirstName() {
         Author author = new Author(null, null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertNull(msBibAuthor.getMiddleName());
     }
 
     @Test
-    public void testGetLastName() {
+    public void getFamilyNameName() {
         Author author = new Author("Gustav Peter Johann", null, null, "Bach", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("Bach", msBibAuthor.getLastName());
     }
 
     @Test
-    public void testGetVonAndLastName() {
+    public void getNamePrefixAndLastName() {
         Author author = new Author("John", null, "von", "Neumann", null);
         MsBibAuthor msBibAuthor = new MsBibAuthor(author);
         assertEquals("von Neumann", msBibAuthor.getLastName());

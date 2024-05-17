@@ -19,6 +19,11 @@ public class MetadataSerializationConfiguration {
     public static final char GROUP_QUOTE_CHAR = '\\';
 
     /**
+     * Group Type suffix (part of the GroupType)
+     */
+    public static final String GROUP_TYPE_SUFFIX = ":";
+
+    /**
      * For separating units (e.g. name and hierarchic context) in the string representation
      */
     public static final String GROUP_UNIT_SEPARATOR = ";";

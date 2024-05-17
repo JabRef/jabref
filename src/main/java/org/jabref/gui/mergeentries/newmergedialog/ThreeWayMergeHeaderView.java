@@ -23,7 +23,7 @@ public class ThreeWayMergeHeaderView extends GridPane {
 
         this.leftHeaderCell = new HeaderCell(leftHeader);
         this.rightHeaderCell = new HeaderCell(rightHeader);
-        this.mergedHeaderCell = new HeaderCell(Localization.lang("Merged Entry"));
+        this.mergedHeaderCell = new HeaderCell(Localization.lang("Merged entry"));
 
         addRow(0,
                new HeaderCell(""),

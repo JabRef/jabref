@@ -77,7 +77,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
     FileNodeViewModel searchDirectory(Path directory, UnlinkedPDFFileFilter unlinkedPDFFileFilter) throws IOException {
         // Return null if the directory is not valid.
         if ((directory == null) || !Files.isDirectory(directory)) {
-            throw new IOException(String.format("Invalid directory for searching: %s", directory));
+            throw new IOException("Invalid directory for searching: %s".formatted(directory));
         }
 
         FileNodeViewModel fileNodeViewModelForCurrentDirectory = new FileNodeViewModel(directory);

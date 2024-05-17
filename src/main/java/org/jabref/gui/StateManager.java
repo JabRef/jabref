@@ -54,13 +54,16 @@ public class StateManager {
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
+    private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
-    private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
+    private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
+    private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
+    private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[]{task.getValue().progressProperty(), task.getValue().runningProperty()});
+    private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
     private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
@@ -72,7 +75,7 @@ public class StateManager {
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
 
     public StateManager() {
-        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
+        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null).map(BibDatabaseContext::getUid)));
     }
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
@@ -91,6 +94,10 @@ public class StateManager {
         return activeDatabase;
     }
 
+    public OptionalObjectProperty<LibraryTab> activeTabProperty() {
+        return activeTab;
+    }
+
     public OptionalObjectProperty<SearchQuery> activeSearchQueryProperty() {
         return activeSearchQuery;
     }
@@ -101,6 +108,22 @@ public class StateManager {
 
     public IntegerProperty getSearchResultSize() {
         return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()), new SimpleIntegerProperty(0));
+    }
+
+    public OptionalObjectProperty<SearchQuery> activeGlobalSearchQueryProperty() {
+        return activeGlobalSearchQuery;
+    }
+
+    public IntegerProperty getGlobalSearchResultSize() {
+        return globalSearchResultSize;
+    }
+
+    public IntegerProperty getSearchResultSize(OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+        if (searchQueryProperty.equals(activeSearchQuery)) {
+            return getSearchResultSize();
+        } else {
+            return getGlobalSearchResultSize();
+        }
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
@@ -117,16 +140,16 @@ public class StateManager {
 
     public void setSelectedGroups(BibDatabaseContext database, List<GroupTreeNode> newSelectedGroups) {
         Objects.requireNonNull(newSelectedGroups);
-        selectedGroups.put(database, FXCollections.observableArrayList(newSelectedGroups));
+        selectedGroups.put(database.getUid(), FXCollections.observableArrayList(newSelectedGroups));
     }
 
-    public ObservableList<GroupTreeNode> getSelectedGroup(BibDatabaseContext database) {
-        ObservableList<GroupTreeNode> selectedGroupsForDatabase = selectedGroups.get(database);
+    public ObservableList<GroupTreeNode> getSelectedGroups(BibDatabaseContext context) {
+        ObservableList<GroupTreeNode> selectedGroupsForDatabase = selectedGroups.get(context.getUid());
         return selectedGroupsForDatabase != null ? selectedGroupsForDatabase : FXCollections.observableArrayList();
     }
 
     public void clearSelectedGroups(BibDatabaseContext database) {
-        selectedGroups.remove(database);
+        selectedGroups.remove(database.getUid());
     }
 
     public Optional<BibDatabaseContext> getActiveDatabase() {
@@ -146,8 +169,12 @@ public class StateManager {
         activeSearchQuery.setValue(Optional.empty());
     }
 
-    public void setSearchQuery(SearchQuery searchQuery) {
-        activeSearchQuery.setValue(Optional.of(searchQuery));
+    public void setSearchQuery(OptionalObjectProperty<SearchQuery> searchQueryProperty, SearchQuery query) {
+        searchQueryProperty.setValue(Optional.of(query));
+    }
+
+    public void clearSearchQuery(OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+        searchQueryProperty.setValue(Optional.empty());
     }
 
     public OptionalObjectProperty<Node> focusOwnerProperty() {
@@ -163,7 +190,7 @@ public class StateManager {
     }
 
     public void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task) {
-        this.backgroundTasks.add(0, new Pair<>(backgroundTask, task));
+        this.backgroundTasks.addFirst(new Pair<>(backgroundTask, task));
     }
 
     public EasyBinding<Boolean> getAnyTaskRunning() {

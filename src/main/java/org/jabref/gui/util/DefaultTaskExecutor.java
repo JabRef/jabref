@@ -141,11 +141,11 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
-        Task<V> javaTask = new Task<V>() {
+        Task<V> javaTask = new Task<>() {
             {
                 this.updateMessage(task.messageProperty().get());
                 this.updateTitle(task.titleProperty().get());
-                BindingsHelper.subscribeFuture(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
+                BindingsHelper.subscribeFuture(task.progressProperty(), progress -> updateProgress(progress.workDone(), progress.max()));
                 BindingsHelper.subscribeFuture(task.messageProperty(), this::updateMessage);
                 BindingsHelper.subscribeFuture(task.titleProperty(), this::updateTitle);
                 BindingsHelper.subscribeFuture(task.isCanceledProperty(), cancelled -> {

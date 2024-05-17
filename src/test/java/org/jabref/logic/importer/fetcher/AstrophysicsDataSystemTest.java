@@ -122,7 +122,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
                 .withField(StandardField.AUTHOR, "Ingersoll, A.~P. and Pollard, D.")
                 .withField(StandardField.DOI, "10.1016/0019-1035(82)90169-5")
                 .withField(StandardField.JOURNAL, "\\icarus")
-                .withField(StandardField.KEYWORDS, "Atmospheric Circulation, Barotropic Flow, Convective Flow, Flow Stability, Jupiter Atmosphere, Rotating Fluids, Saturn Atmosphere, Adiabatic Flow, Anelasticity, Compressible Fluids, Planetary Rotation, Rotating Cylinders, Scaling Laws, Wind Profiles, PLANETS, JUPITER, SATURN, MOTION, INTERIORS, ATMOSPHERE, ANALYSIS, SCALE, BAROTROPY, CHARACTERISTICS, STRUCTURE, WINDS, VISCOSITY, DATA, CONVECTION, ROTATION, EDDY EFFECTS, ENERGY, ADIABATICITY, DIAGRAMS, REVIEW, LATITUDE, ZONES, VELOCITY, MATHEMATICAL MODELS, HEAT FLOW, EQUATIONS OF MOTION, FLUIDS, DYNAMICS, TEMPERATURE, GRADIENTS, Lunar and Planetary Exploration; Planets, Earth Science")
+                .withField(StandardField.KEYWORDS, "Atmospheric Circulation, Barotropic Flow, Convective Flow, Flow Stability, Jupiter Atmosphere, Rotating Fluids, Saturn Atmosphere, Adiabatic Flow, Anelasticity, Compressible Fluids, Planetary Rotation, Rotating Cylinders, Scaling Laws, Wind Profiles, PLANETS, JUPITER, SATURN, MOTION, INTERIORS, ATMOSPHERE, ANALYSIS, SCALE, BAROTROPY, CHARACTERISTICS, STRUCTURE, WINDS, VISCOSITY, DATA, CONVECTION, ROTATION, EDDY EFFECTS, ENERGY, ADIABATICITY, DIAGRAMS, REVIEW, LATITUDE, ZONES, VELOCITY, MATHEMATICAL MODELS, HEAT FLOW, EQUATIONS OF MOTION, FLUIDS, DYNAMICS, TEMPERATURE, GRADIENTS")
                 .withField(StandardField.MONTH, "#oct#")
                 .withField(StandardField.NUMBER, "1")
                 .withField(StandardField.PAGES, "62-80")
@@ -133,7 +133,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("SAO/NASA ADS", fetcher.getName());
     }
 
@@ -158,44 +158,44 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    public void testPerformSearchByFamaeyMcGaughEntry() throws Exception {
+    public void performSearchByFamaeyMcGaughEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
         fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(famaeyMcGaughEntry), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchByIdEmptyDOI() throws Exception {
+    public void performSearchByIdEmptyDOI() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchByIdInvalidDoi() throws Exception {
+    public void performSearchByIdInvalidDoi() throws Exception {
         assertEquals(Optional.empty(), fetcher.performSearchById("this.doi.will.fail"));
     }
 
     @Test
-    public void testPerformSearchBySunWelchEntry() throws Exception {
+    public void performSearchBySunWelchEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160");
         fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(sunWelchEntry), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchByXiongSunEntry() throws Exception {
+    public void performSearchByXiongSunEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/TGRS.2006.890567");
         assertEquals(Optional.of(xiongSunEntry), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchByIngersollPollardEntry() throws Exception {
+    public void performSearchByIngersollPollardEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1016/0019-1035(82)90169-5");
         assertEquals(Optional.of(ingersollPollardEntry), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchByLuceyPaulEntry() throws Exception {
+    public void performSearchByLuceyPaulEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("2000JGR...10520297L");
         assertEquals(Optional.of(luceyPaulEntry), fetchedEntry);
     }

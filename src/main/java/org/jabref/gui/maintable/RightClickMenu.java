@@ -4,19 +4,20 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.SendAsKindleEmailAction;
-import org.jabref.gui.SendAsStandardEmailAction;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
+import org.jabref.gui.frame.SendAsKindleEmailAction;
+import org.jabref.gui.frame.SendAsStandardEmailAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
@@ -34,6 +35,8 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PreviewPreferences;
 
+import com.tobiasdiez.easybind.EasyBind;
+
 public class RightClickMenu {
 
     public static ContextMenu create(BibEntryTableViewModel entry,
@@ -49,6 +52,9 @@ public class RightClickMenu {
                                      BibEntryTypesManager entryTypesManager) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
+
+        MenuItem extractFileReferencesOnline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_ONLINE, new ExtractReferencesAction(true, dialogService, stateManager, preferencesService, taskExecutor));
+        MenuItem extractFileReferencesOffline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_OFFLINE, new ExtractReferencesAction(false, dialogService, stateManager, preferencesService, taskExecutor));
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
@@ -75,6 +81,8 @@ public class RightClickMenu {
                 factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferencesService)),
                 factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferencesService, taskExecutor)),
                 factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferencesService, taskExecutor)),
+                extractFileReferencesOnline,
+                extractFileReferencesOffline,
 
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferencesService)),
                 factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferencesService)),
@@ -84,6 +92,11 @@ public class RightClickMenu {
                 new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, keyBindingRepository, entryTypesManager).asSubMenu(),
                 factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferencesService, undoManager))
         );
+
+        EasyBind.subscribe(preferencesService.getGrobidPreferences().grobidEnabledProperty(), enabled -> {
+            extractFileReferencesOnline.setVisible(enabled);
+            extractFileReferencesOffline.setVisible(!enabled);
+        });
 
         return contextMenu;
     }

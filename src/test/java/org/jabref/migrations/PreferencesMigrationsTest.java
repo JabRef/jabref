@@ -38,7 +38,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testOldStyleBibtexkeyPattern0() {
+    void oldStyleBibtexkeyPattern0() {
         when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[0]);
         when(mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(oldStylePatterns[0]);
         when(prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(true);
@@ -50,7 +50,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testOldStyleBibtexkeyPattern1() {
+    void oldStyleBibtexkeyPattern1() {
         when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[1]);
         when(mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(oldStylePatterns[1]);
         when(prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(true);
@@ -62,7 +62,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testArbitraryBibtexkeyPattern() {
+    void arbitraryBibtexkeyPattern() {
         String arbitraryPattern = "[anyUserPrividedString]";
 
         when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(arbitraryPattern);
@@ -75,7 +75,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testPreviewStyleReviewToComment() {
+    void previewStyleReviewToComment() {
         String oldPreviewStyle = "<font face=\"sans-serif\">__NEWLINE__"
                 + "Customized preview style using reviews and comments:__NEWLINE__"
                 + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}__NEWLINE__"
@@ -84,8 +84,8 @@ class PreferencesMigrationsTest {
 
         String newPreviewStyle = "<font face=\"sans-serif\">__NEWLINE__"
                 + "Customized preview style using reviews and comments:__NEWLINE__"
-                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}__NEWLINE__"
-                + "\\begin{comment} Something: \\format[Markdown,HTMLChars]{\\comment} special \\end{comment}__NEWLINE__"
+                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} \\end{comment}__NEWLINE__"
+                + "\\begin{comment} Something: \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} special \\end{comment}__NEWLINE__"
                 + "</font>__NEWLINE__";
 
         when(prefs.get(JabRefPreferences.PREVIEW_STYLE)).thenReturn(oldPreviewStyle);
@@ -96,7 +96,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testUpgradeColumnPreferencesAlreadyMigrated() {
+    void upgradeColumnPreferencesAlreadyMigrated() {
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
@@ -110,7 +110,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testUpgradeColumnPreferencesFromWithoutTypes() {
+    void upgradeColumnPreferencesFromWithoutTypes() {
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
         List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:citationkey", "special:printed");
@@ -128,7 +128,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testChangeColumnPreferencesVariableNamesFor51() {
+    void changeColumnPreferencesVariableNamesFor51() {
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
@@ -152,7 +152,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testChangeColumnPreferencesVariableNamesBackwardsCompatibility() {
+    void changeColumnPreferencesVariableNamesBackwardsCompatibility() {
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
@@ -176,7 +176,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testRestoreColumnVariablesForBackwardCompatibility() {
+    void restoreColumnVariablesForBackwardCompatibility() {
         List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:citationkey", "special:printed");
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("100", "100", "100", "100", "100", "100", "100");
@@ -196,7 +196,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void testMoveApiKeysToKeyRing() throws Exception {
+    void moveApiKeysToKeyRing() throws Exception {
         final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
         final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
         final Keyring keyring = mock(Keyring.class);

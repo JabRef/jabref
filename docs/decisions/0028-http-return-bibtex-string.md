@@ -2,8 +2,6 @@
 nav_order: 28
 parent: Decision Records
 ---
-<!-- we need to disable MD025, because we use the different heading "ADR Template" in the homepage (see above) than it is foreseen in the template -->
-<!-- markdownlint-disable-next-line MD025 -->
 # Return BibTeX string and CSL Item JSON in the API
 
 ## Context and Problem Statement

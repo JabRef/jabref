@@ -1,76 +1,98 @@
 package org.jabref.gui;
 
-import java.nio.file.Path;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
+import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.importer.ParserResultWarningDialog;
-import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
-import org.jabref.logic.importer.ParserResult;
+import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.gui.telemetry.Telemetry;
+import org.jabref.gui.theme.ThemeManager;
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
-import org.jabref.logic.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.JabRefPreferences;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
-import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JabRefGUI {
+/**
+ * Represents the outer stage and the scene of the JabRef window.
+ */
+public class JabRefGUI extends Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
+    private static List<UiCommand> uiCommands;
+    private static JabRefPreferences preferencesService;
+    private static FileUpdateMonitor fileUpdateMonitor;
     private static JabRefFrame mainFrame;
-    private final PreferencesService preferencesService;
-    private final FileUpdateMonitor fileUpdateMonitor;
+    private static DialogService dialogService;
+    private static ThemeManager themeManager;
 
-    private final List<ParserResult> parserResults;
-    private final boolean isBlank;
-    private boolean correctedWindowPos;
-    private final List<ParserResult> failed = new ArrayList<>();
-    private final List<ParserResult> toOpenTab = new ArrayList<>();
+    private boolean correctedWindowPos = false;
+    private Stage mainStage;
 
-    public JabRefGUI(Stage mainStage,
-                     List<ParserResult> parserResults,
-                     boolean isBlank,
-                     PreferencesService preferencesService,
-                     FileUpdateMonitor fileUpdateMonitor) {
-        this.parserResults = parserResults;
-        this.isBlank = isBlank;
-        this.preferencesService = preferencesService;
-        this.fileUpdateMonitor = fileUpdateMonitor;
-        this.correctedWindowPos = false;
+    public static void setup(List<UiCommand> uiCommands,
+                             JabRefPreferences preferencesService,
+                             FileUpdateMonitor fileUpdateMonitor) {
+        JabRefGUI.uiCommands = uiCommands;
+        JabRefGUI.preferencesService = preferencesService;
+        JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
+    }
+
+    @Override
+    public void start(Stage stage) {
+        this.mainStage = stage;
+
+        FallbackExceptionHandler.installExceptionHandler();
+        Globals.startBackgroundTasks();
 
         WebViewStore.init();
 
-        mainFrame = new JabRefFrame(mainStage);
+        JabRefGUI.themeManager = new ThemeManager(
+                preferencesService.getWorkspacePreferences(),
+                fileUpdateMonitor,
+                Runnable::run);
+        JabRefGUI.dialogService = new JabRefDialogService(mainStage);
+        JabRefGUI.mainFrame = new JabRefFrame(
+                mainStage,
+                dialogService,
+                fileUpdateMonitor,
+                preferencesService,
+                Globals.stateManager,
+                Globals.undoManager,
+                Globals.entryTypesManager,
+                Globals.TASK_EXECUTOR);
 
-        openWindow(mainStage);
+        openWindow();
+
+        if (!fileUpdateMonitor.isActive()) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Unable to monitor file changes. Please close files " +
+                            "and processes and restart. You may encounter errors if you continue " +
+                            "with this session."));
+        }
 
         EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
                 new VersionWorker(Globals.BUILD_INFO.version,
-                        mainFrame.getDialogService(),
+                        dialogService,
                         Globals.TASK_EXECUTOR,
                         preferencesService)
                         .checkForNewVersionDelayed();
@@ -78,6 +100,13 @@ public class JabRefGUI {
         });
 
         setupProxy();
+    }
+
+    @Override
+    public void stop() {
+        OOBibBaseConnect.closeOfficeConnection();
+        Globals.stopBackgroundTasks();
+        Globals.shutdownThreadPools();
     }
 
     private void setupProxy() {
@@ -92,7 +121,6 @@ public class JabRefGUI {
             return;
         }
 
-        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         Optional<String> password = dialogService.showPasswordDialogAndWait(
                 Localization.lang("Proxy configuration"),
                 Localization.lang("Proxy requires password"),
@@ -106,23 +134,15 @@ public class JabRefGUI {
         }
     }
 
-    private void openWindow(Stage mainStage) {
+    private void openWindow() {
         LOGGER.debug("Initializing frame");
-        mainFrame.init();
 
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
 
-        // Set the min-width and min-height for the main window
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
-
-        if (guiPreferences.isWindowFullscreen()) {
-            mainStage.setFullScreen(true);
-        }
-        // Restore window location and/or maximised state
-        if (guiPreferences.isWindowMaximised()) {
-            mainStage.setMaximized(true);
-        }
+        mainStage.setFullScreen(guiPreferences.isWindowFullscreen());
+        mainStage.setMaximized(guiPreferences.isWindowMaximised());
         if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
             // corrects the Window, if it is outside the mainscreen
             LOGGER.debug("The Jabref window is outside the main screen");
@@ -139,13 +159,8 @@ public class JabRefGUI {
         }
         debugLogWindowState(mainStage);
 
-        // We create a decoration pane ourselves for performance reasons
-        // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
-        DecorationPane root = new DecorationPane();
-        root.getChildren().add(JabRefGUI.mainFrame);
-
-        Scene scene = new Scene(root, 800, 800);
-        Globals.getThemeManager().installCss(scene);
+        Scene scene = new Scene(JabRefGUI.mainFrame);
+        themeManager.installCss(scene);
 
         // Handle TextEditor key bindings
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(scene, event));
@@ -153,134 +168,46 @@ public class JabRefGUI {
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
+        mainStage.setOnShowing(this::onShowing);
+        mainStage.setOnCloseRequest(this::onCloseRequest);
+        mainStage.setOnHiding(this::onHiding);
         mainStage.show();
 
-        mainStage.setOnCloseRequest(event -> {
-            if (!correctedWindowPos) {
-                // saves the window position only if its not  corrected -> the window will rest at the old Position,
-                // if the external Screen is connected again.
-                getMainFrame().saveWindowState();
-            }
-            boolean reallyQuit = mainFrame.quit();
-            if (!reallyQuit) {
-                event.consume();
-            }
-        });
-        Platform.runLater(this::openDatabases);
+        Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
+    }
 
-        if (!(fileUpdateMonitor.isActive())) {
-            getMainFrame().getDialogService()
-                          .showErrorDialogAndWait(Localization.lang("Unable to monitor file changes. Please close files " +
-                                  "and processes and restart. You may encounter errors if you continue " +
-                                  "with this session."));
+    public void onShowing(WindowEvent event) {
+        Platform.runLater(() -> mainFrame.updateDividerPosition());
+
+        // Open last edited databases
+        if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
+            && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
+            mainFrame.openLastEditedDatabases();
+        }
+
+        Telemetry.initTrackingNotification(dialogService, preferencesService.getTelemetryPreferences());
+    }
+
+    public void onCloseRequest(WindowEvent event) {
+        if (!mainFrame.close()) {
+            event.consume();
         }
     }
 
-    /**
-     * ToDo: This should be part of JabRefFrame
-     */
-    private void openDatabases() {
-        // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
-            openLastEditedDatabases();
+    public void onHiding(WindowEvent event) {
+        if (!correctedWindowPos) {
+            // saves the window position only if its not corrected -> the window will rest at the old Position,
+            // if the external Screen is connected again.
+            saveWindowState();
         }
 
-        // From here on, the libraries provided by command line arguments are treated
+        preferencesService.flush();
 
-        // Remove invalid databases
-        List<ParserResult> invalidDatabases = parserResults.stream()
-                                                           .filter(ParserResult::isInvalid)
-                                                           .toList();
-        failed.addAll(invalidDatabases);
-        parserResults.removeAll(invalidDatabases);
-
-        // passed file (we take the first one) should be focused
-        Path focusedFile = parserResults.stream()
-                                        .findFirst()
-                                        .flatMap(ParserResult::getPath)
-                                        .orElse(preferencesService.getGuiPreferences()
-                                                                 .getLastFocusedFile())
-                                        .toAbsolutePath();
-
-        // Add all bibDatabases databases to the frame:
-        boolean first = false;
-        for (ParserResult parserResult : parserResults) {
-            // Define focused tab
-            if (parserResult.getPath().filter(path -> path.toAbsolutePath().equals(focusedFile)).isPresent()) {
-                first = true;
-            }
-
-            if (parserResult.getDatabase().isShared()) {
-                try {
-                    OpenDatabaseAction.openSharedDatabase(
-                            parserResult,
-                            mainFrame,
-                            mainFrame.getDialogService(),
-                            preferencesService,
-                            Globals.stateManager,
-                            Globals.entryTypesManager,
-                            fileUpdateMonitor,
-                            mainFrame.getUndoManager(),
-                            Globals.TASK_EXECUTOR);
-                } catch (SQLException |
-                        DatabaseNotSupportedException |
-                        InvalidDBMSConnectionPropertiesException |
-                        NotASharedDatabaseException e) {
-
-                    LOGGER.error("Connection error", e);
-                    mainFrame.getDialogService().showErrorDialogAndWait(
-                            Localization.lang("Connection error"),
-                            Localization.lang("A local copy will be opened."),
-                            e);
-                    toOpenTab.add(parserResult);
-                }
-            } else if (parserResult.toOpenTab()) {
-                // things to be appended to an opened tab should be done after opening all tabs
-                // add them to the list
-                toOpenTab.add(parserResult);
-            } else {
-                mainFrame.addTab(parserResult, first);
-                first = false;
-            }
-        }
-
-        // finally add things to the currently opened tab
-        for (ParserResult parserResult : toOpenTab) {
-            mainFrame.addTab(parserResult, first);
-            first = false;
-        }
-
-        for (ParserResult pr : failed) {
-            String message = Localization.lang("Error opening file '%0'",
-                    pr.getPath().map(Path::toString).orElse("(File name unknown)")) + "\n" +
-                    pr.getErrorMessage();
-
-            mainFrame.getDialogService().showErrorDialogAndWait(Localization.lang("Error opening file"), message);
-        }
-
-        // Display warnings, if any
-        for (int tabNumber = 0; tabNumber < parserResults.size(); tabNumber++) {
-            // ToDo: Method needs to be rewritten, because the index of the parser result and of the libraryTab may not
-            //  be identical, if there are also other tabs opened, that are not libraryTabs. Currently there are none,
-            //  therefore for now this ok.
-            ParserResult pr = parserResults.get(tabNumber);
-            if (pr.hasWarnings()) {
-                ParserResultWarningDialog.showParserResultWarningDialog(pr, mainFrame.getDialogService());
-                mainFrame.showLibraryTabAt(tabNumber);
-            }
-        }
-
-        // After adding the databases, go through each and see if
-        // any post open actions need to be done. For instance, checking
-        // if we found new entry types that can be imported, or checking
-        // if the database contents should be modified due to new features
-        // in this version of JabRef.
-        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, mainFrame.getDialogService()));
-
-        LOGGER.debug("Finished adding panels");
+        // Goodbye!
+        Platform.exit();
     }
 
-    private void saveWindowState(Stage mainStage) {
+    private void saveWindowState() {
         GuiPreferences preferences = preferencesService.getGuiPreferences();
         preferences.setPositionX(mainStage.getX());
         preferences.setPositionY(mainStage.getY());
@@ -319,17 +246,15 @@ public class JabRefGUI {
                 preferencesService.getGuiPreferences().getPositionY());
     }
 
-    private void openLastEditedDatabases() {
-        List<String> lastFiles = preferencesService.getGuiPreferences().getLastFilesOpened();
-        if (lastFiles.isEmpty()) {
-            return;
-        }
-
-        List<Path> filesToOpen = lastFiles.stream().map(Path::of).collect(Collectors.toList());
-        getMainFrame().getOpenDatabaseAction().openFiles(filesToOpen);
-    }
-
     public static JabRefFrame getMainFrame() {
         return mainFrame;
+    }
+
+    public static DialogService getDialogService() {
+        return dialogService;
+    }
+
+    public static ThemeManager getThemeManager() {
+        return themeManager;
     }
 }

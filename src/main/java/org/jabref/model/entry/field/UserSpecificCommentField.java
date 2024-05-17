@@ -2,10 +2,9 @@ package org.jabref.model.entry.field;
 
 import java.util.EnumSet;
 import java.util.Objects;
-import java.util.Set;
 
 public class UserSpecificCommentField implements Field {
-    private static final Set<FieldProperty> PROPERTIES = EnumSet.of(FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM);
+    private static final EnumSet<FieldProperty> PROPERTIES = EnumSet.of(FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN);
     private final String name;
 
     public UserSpecificCommentField(String username) {
@@ -13,7 +12,7 @@ public class UserSpecificCommentField implements Field {
     }
 
     @Override
-    public Set<FieldProperty> getProperties() {
+    public EnumSet<FieldProperty> getProperties() {
         return PROPERTIES;
     }
 

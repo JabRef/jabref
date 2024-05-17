@@ -11,7 +11,7 @@ import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFe
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -67,8 +67,8 @@ class CitationsRelationsTabViewModelTest {
         when(preferencesService.getTimestampPreferences()).thenReturn(mock(TimestampPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
-        GlobalCitationKeyPattern pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
-        when(citationKeyPatternPreferences.getKeyPattern()).thenReturn(pattern);
+        GlobalCitationKeyPatterns patterns = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+        when(citationKeyPatternPreferences.getKeyPatterns()).thenReturn(patterns);
         when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
 
         bibDatabaseContext = new BibDatabaseContext(new BibDatabase());
@@ -99,7 +99,7 @@ class CitationsRelationsTabViewModelTest {
     }
 
     @Test
-    void testExistingEntryCitesOtherPaperWithCitationKeys() {
+    void existingEntryCitesOtherPaperWithCitationKeys() {
         var citationItems = List.of(new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 
@@ -109,7 +109,7 @@ class CitationsRelationsTabViewModelTest {
     }
 
     @Test
-    void testImportedEntriesWithExistingCitationKeysCiteExistingEntry() {
+    void importedEntriesWithExistingCitationKeysCiteExistingEntry() {
         var citationItems = List.of(new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 
@@ -119,7 +119,7 @@ class CitationsRelationsTabViewModelTest {
     }
 
     @Test
-    void testExistingEntryCitesOtherPaperWithCitationKeysAndExistingCiteField() {
+    void existingEntryCitesOtherPaperWithCitationKeysAndExistingCiteField() {
         existingEntry.setField(StandardField.CITES, "Asdf1222");
         var citationItems = List.of(new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));

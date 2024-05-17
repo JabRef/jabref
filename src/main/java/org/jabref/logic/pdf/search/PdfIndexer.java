@@ -1,6 +1,7 @@
 package org.jabref.logic.pdf.search;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -34,6 +35,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
+import org.jooq.lambda.Unchecked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,16 +48,34 @@ public class PdfIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfIndexer.class);
 
     @VisibleForTesting
+    @Nullable // null might happen if lock is held by another JabRef instance
     IndexWriter indexWriter;
 
     private final BibDatabaseContext databaseContext;
+
     private final FilePreferences filePreferences;
+
+    @Nullable
     private final Directory indexDirectory;
+
     private IndexReader reader;
 
     private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences) {
         this.databaseContext = databaseContext;
-        this.indexDirectory = indexDirectory;
+        if (indexDirectory == null) {
+            // FIXME: This should never happen, but was reported at https://github.com/JabRef/jabref/issues/10781.
+            String tmpDir = System.getProperty("java.io.tmpdir");
+            LOGGER.info("Index directory must not be null. Falling back to {}", tmpDir);
+            Directory tmpIndexDirectory = null;
+            try {
+                tmpIndexDirectory = new NIOFSDirectory(Path.of(tmpDir));
+            } catch (IOException e) {
+                LOGGER.info("Could not use {}. Indexing unavailable.", tmpDir, e);
+            }
+            this.indexDirectory = tmpIndexDirectory;
+        } else {
+            this.indexDirectory = indexDirectory;
+        }
         this.filePreferences = filePreferences;
     }
 
@@ -69,7 +90,6 @@ public class PdfIndexer {
     /**
      * Method is public, because DatabaseSearcherWithBibFilesTest resides in another package
      */
-    @VisibleForTesting
     public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
         return new PdfIndexer(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences);
     }
@@ -79,6 +99,10 @@ public class PdfIndexer {
      * Any previous state of the Lucene search is deleted.
      */
     public void createIndex() {
+        if (indexDirectory == null) {
+            LOGGER.info("Index directory must not be null. Returning.");
+            return;
+        }
         LOGGER.debug("Creating new index for directory {}.", indexDirectory);
         initializeIndexWriterAndReader(IndexWriterConfig.OpenMode.CREATE);
     }
@@ -86,7 +110,7 @@ public class PdfIndexer {
     /**
      * Needs to be accessed by {@link PdfSearcher}
      */
-    IndexWriter getIndexWriter() {
+    Optional<IndexWriter> getIndexWriter() {
         LOGGER.trace("Getting the index writer");
         if (indexWriter == null) {
             LOGGER.trace("Initializing the index writer");
@@ -94,10 +118,14 @@ public class PdfIndexer {
         } else {
             LOGGER.trace("Using existing index writer");
         }
-        return indexWriter;
+        return Optional.ofNullable(indexWriter);
     }
 
     private void initializeIndexWriterAndReader(IndexWriterConfig.OpenMode mode) {
+        if (indexDirectory == null) {
+            LOGGER.info("Index directory must not be null. Returning.");
+            return;
+        }
         try {
             indexWriter = new IndexWriter(
                     indexDirectory,
@@ -105,6 +133,12 @@ public class PdfIndexer {
                             new EnglishStemAnalyzer()).setOpenMode(mode));
         } catch (IOException e) {
             LOGGER.error("Could not initialize the IndexWriter", e);
+            // FIXME: This can also happen if another instance of JabRef is launched in parallel.
+            //        We could implement a read-only access to the index in this case.
+            //        This requires a major rewrite of the code, though.
+            //        Accessing the index using a permanent writer object is (much) faster than always
+            //        closing and opening the writer and reader on demand.
+            return;
         }
         try {
             reader = DirectoryReader.open(indexWriter);
@@ -171,8 +205,8 @@ public class PdfIndexer {
 
     private void doCommit() {
         try {
-            getIndexWriter().commit();
-        } catch (IOException e) {
+            getIndexWriter().ifPresent(Unchecked.consumer(IndexWriter::commit));
+        } catch (UncheckedIOException e) {
             LOGGER.warn("Could not commit changes to the index.", e);
         }
     }
@@ -184,9 +218,11 @@ public class PdfIndexer {
      */
     public void removeFromIndex(String linkedFilePath) {
         try {
-            getIndexWriter().deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
-            getIndexWriter().commit();
-        } catch (IOException e) {
+            getIndexWriter().ifPresent(Unchecked.consumer(writer -> {
+                writer.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
+                writer.commit();
+            }));
+        } catch (UncheckedIOException e) {
             LOGGER.debug("Could not remove document {} from the index.", linkedFilePath, e);
         }
     }
@@ -238,7 +274,6 @@ public class PdfIndexer {
             LOGGER.debug("Could not find {}", linkedFile.getLink());
             return;
         }
-        LOGGER.debug("Adding {} to index", linkedFile.getLink());
         try {
             // Check if a document with this path is already in the index
             try {
@@ -247,28 +282,34 @@ public class PdfIndexer {
                 TopDocs topDocs = searcher.search(query, 1);
                 // If a document was found, check if is less current than the one in the FS
                 if (topDocs.scoreDocs.length > 0) {
-                    Document doc = reader.document(topDocs.scoreDocs[0].doc);
+                    Document doc = reader.storedFields().document(topDocs.scoreDocs[0].doc);
                     long indexModificationTime = Long.parseLong(doc.getField(SearchFieldConstants.MODIFIED).stringValue());
                     BasicFileAttributes attributes = Files.readAttributes(resolvedPath.get(), BasicFileAttributes.class);
                     if (indexModificationTime >= attributes.lastModifiedTime().to(TimeUnit.SECONDS)) {
-                        LOGGER.debug("File {} is already indexed", linkedFile.getLink());
+                        LOGGER.debug("File {} is already indexed and up-to-date.", linkedFile.getLink());
                         return;
+                    } else {
+                        LOGGER.debug("File {} is already indexed but outdated. Removing from index.", linkedFile.getLink());
+                        removeFromIndex(linkedFile.getLink());
                     }
                 }
             } catch (IndexNotFoundException e) {
                 LOGGER.debug("Index not found. Continuing.", e);
             }
+            LOGGER.debug("Adding {} to index", linkedFile.getLink());
             // If no document was found, add the new one
             Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
-                getIndexWriter().addDocuments(pages.get());
-                if (shouldCommit) {
-                    getIndexWriter().commit();
-                }
+                getIndexWriter().ifPresent(Unchecked.consumer(writer -> {
+                    writer.addDocuments(pages.get());
+                    if (shouldCommit) {
+                        writer.commit();
+                    }
+                }));
             } else {
                 LOGGER.debug("No content found in file {}", linkedFile.getLink());
             }
-        } catch (IOException e) {
+        } catch (UncheckedIOException | IOException e) {
             LOGGER.warn("Could not add document {} to the index.", linkedFile.getLink(), e);
         }
     }
@@ -280,12 +321,17 @@ public class PdfIndexer {
      */
     public Set<String> getListOfFilePaths() {
         Set<String> paths = new HashSet<>();
-        try (IndexReader reader = DirectoryReader.open(indexWriter)) {
+        Optional<IndexWriter> optionalIndexWriter = getIndexWriter();
+        if (optionalIndexWriter.isEmpty()) {
+            LOGGER.debug("IndexWriter is empty. Returning empty list.");
+            return paths;
+        }
+        try (IndexReader reader = DirectoryReader.open(optionalIndexWriter.get())) {
             IndexSearcher searcher = new IndexSearcher(reader);
             MatchAllDocsQuery query = new MatchAllDocsQuery();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
-                Document doc = reader.document(scoreDoc.doc);
+                Document doc = reader.storedFields().document(scoreDoc.doc);
                 paths.add(doc.getField(SearchFieldConstants.PATH).stringValue());
             }
         } catch (IOException e) {
@@ -296,6 +342,10 @@ public class PdfIndexer {
     }
 
     public void close() throws IOException {
+        if (indexWriter == null) {
+            LOGGER.debug("IndexWriter is null.");
+            return;
+        }
         indexWriter.close();
     }
 }

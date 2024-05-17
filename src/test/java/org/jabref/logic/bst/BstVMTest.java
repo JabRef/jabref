@@ -30,7 +30,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testAbbrv() throws RecognitionException, IOException {
+    public void abbrv() throws RecognitionException, IOException {
         BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> testEntries = List.of(defaultTestEntry());
 
@@ -43,7 +43,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testSimple() throws RecognitionException {
+    public void simple() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { address author title type } { } { label }
                 INTEGERS { output.state before.all mid.sentence after.sentence after.block }
@@ -63,12 +63,12 @@ public class BstVMTest {
         assertEquals(2, vm.latestContext.strings().size());
         assertEquals(7, vm.latestContext.integers().size());
         assertEquals(1, vm.latestContext.entries().size());
-        assertEquals(5, vm.latestContext.entries().get(0).fields.size());
+        assertEquals(5, vm.latestContext.entries().getFirst().fields.size());
         assertEquals(38, vm.latestContext.functions().size());
     }
 
     @Test
-    public void testLabel() throws RecognitionException {
+    public void label() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { title } {} { label }
                 FUNCTION { test } {
@@ -88,7 +88,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testQuote() throws RecognitionException {
+    public void quote() throws RecognitionException {
         BstVM vm = new BstVM("FUNCTION { a }{ quote$ quote$ * } EXECUTE { a }");
 
         vm.render(Collections.emptyList());
@@ -96,7 +96,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testBuildIn() throws RecognitionException {
+    public void buildIn() throws RecognitionException {
         BstVM vm = new BstVM("EXECUTE { global.max$ }");
 
         vm.render(Collections.emptyList());
@@ -106,7 +106,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testVariables() throws RecognitionException {
+    public void variables() throws RecognitionException {
         BstVM vm = new BstVM("""
                 STRINGS { t }
                 FUNCTION { not } {
@@ -125,7 +125,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void testHypthenatedName() throws RecognitionException, IOException {
+    public void hypthenatedName() throws RecognitionException, IOException {
         BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> testEntries = List.of(
                 new BibEntry(StandardEntryType.Article)
@@ -139,7 +139,7 @@ public class BstVMTest {
     }
 
     @Test
-    void testAbbrevStyleChopWord() {
+    void abbrevStyleChopWord() {
         BstVM vm = new BstVM("""
                 STRINGS { s }
                 INTEGERS { len }
@@ -175,7 +175,7 @@ public class BstVMTest {
     }
 
     @Test
-    void testAbbrevStyleSortFormatTitle() {
+    void abbrevStyleSortFormatTitle() {
         BstVM vm = new BstVM("""
                 STRINGS { s t }
                 INTEGERS { len }

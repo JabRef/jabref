@@ -51,6 +51,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -186,7 +187,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             if (this.getSortOrder().isEmpty()) {
                 return;
             }
-            this.jumpToSearchKey(getSortOrder().get(0), key);
+            this.jumpToSearchKey(getSortOrder().getFirst(), key);
         });
 
         database.getDatabase().registerListener(this);
@@ -206,11 +207,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     /**
      * This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link MainTable} will scroll to the cell with the same starting column value and typed string
+     * If the user presses any other special key as well, e.g. alt or shift we don't jump
      *
      * @param sortedColumn The sorted column in {@link MainTable}
      * @param keyEvent     The pressed character
      */
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
+        if (keyEvent.isAltDown() || keyEvent.isControlDown() || keyEvent.isMetaDown() || keyEvent.isShiftDown()) {
+            return;
+        }
         if ((keyEvent.getCharacter() == null) || (sortedColumn == null)) {
             return;
         }
@@ -253,18 +258,23 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         List<BibEntry> selectedEntries = getSelectedEntries();
 
         if (!selectedEntries.isEmpty()) {
+            List<BibtexString> stringConstants = getUsedStringValues(selectedEntries);
             try {
-                clipBoardManager.setContent(selectedEntries, entryTypesManager);
-                dialogService.notify(libraryTab.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
+                if (stringConstants.isEmpty()) {
+                    clipBoardManager.setContent(selectedEntries, entryTypesManager);
+                } else {
+                    clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);
+                }
+                dialogService.notify(Localization.lang("Copied %0 entry(ies)", selectedEntries.size()));
             } catch (IOException e) {
-                LOGGER.error("Error while copying selected entries to clipboard", e);
+                LOGGER.error("Error while copying selected entries to clipboard.", e);
             }
         }
     }
 
     public void cut() {
         copy();
-        libraryTab.delete(true);
+        libraryTab.delete(StandardActions.CUT);
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
@@ -338,9 +348,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (entriesToAdd.isEmpty()) {
             return;
         }
-        for (BibEntry entry : entriesToAdd) {
-            importHandler.importEntryWithDuplicateCheck(database, entry);
-        }
+
+        importHandler.importEntriesWithDuplicateCheck(database, entriesToAdd);
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
@@ -359,9 +368,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     public void dropEntry(List<BibEntry> entriesToAdd) {
-        for (BibEntry entry : entriesToAdd) {
-            importHandler.importEntryWithDuplicateCheck(database, (BibEntry) entry.clone());
-        }
+        importHandler.importEntriesWithDuplicateCheck(database, entriesToAdd);
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
@@ -424,7 +431,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // Center -> link files to entry
             // Depending on the pressed modifier, move/copy/link files to drop target
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
-                case TOP, BOTTOM -> importHandler.importFilesInBackground(files).executeWith(taskExecutor);
+                case TOP, BOTTOM ->
+                        importHandler.importFilesInBackground(files).executeWith(taskExecutor);
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {
@@ -473,10 +481,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         return model;
     }
 
-    public BibEntry getEntryAt(int row) {
-        return model.getEntriesFilteredAndSorted().get(row).getEntry();
-    }
-
     public List<BibEntry> getSelectedEntries() {
         return getSelectionModel()
                 .getSelectedItems()
@@ -492,10 +496,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .findFirst();
     }
 
-    public static List<MainTableColumnModel> toColumnModels(List<TableColumn<BibEntryTableViewModel, ?>> columns) {
-        return columns.stream()
-                      .filter(col -> col instanceof MainTableColumn<?>)
-                      .map(column -> ((MainTableColumn<?>) column).getModel())
-                      .collect(Collectors.toList());
+    private List<BibtexString> getUsedStringValues(List<BibEntry> entries) {
+        return database.getDatabase().getUsedStrings(entries);
     }
 }

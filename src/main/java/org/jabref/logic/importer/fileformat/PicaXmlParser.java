@@ -28,17 +28,15 @@ import org.xml.sax.SAXException;
 
 public class PicaXmlParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(PicaXmlParser.class);
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
-            DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilder dbuild = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
             Document content = dbuild.parse(inputStream);
             return this.parseEntries(content);
-        } catch (
-                ParserConfigurationException |
-                SAXException |
-                IOException exception) {
+        } catch (ParserConfigurationException | SAXException | IOException exception) {
             throw new ParseException(exception);
         }
     }

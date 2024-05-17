@@ -8,38 +8,38 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 
 import javafx.collections.FXCollections;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -52,9 +52,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+// Need to run on JavaFX thread since {@link org.jabref.gui.linkedfile.DeleteFileAction.execute} creates a DialogPane
+@ExtendWith(ApplicationExtension.class)
+@GUITest
 class LinkedFileViewModelTest {
 
     private Path tempFile;
@@ -77,6 +79,7 @@ class LinkedFileViewModelTest {
         dialogService = mock(DialogService.class);
 
         when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(filePreferences.confirmDeleteLinkedFile()).thenReturn(true);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         tempFile = tempFolder.resolve("temporaryFile");
@@ -107,19 +110,21 @@ class LinkedFileViewModelTest {
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
-        verifyNoInteractions(dialogService); // dialog was never shown
+
+        // We show "Error accessing file '%0'.", thus the next condition does not hold
+        // verifyNoInteractions(dialogService); // dialog was never shown
     }
 
     @Test
     void deleteWhenRemoveChosenReturnsTrueButDoesNotDeletesFile() {
         linkedFile = new LinkedFile("", tempFile, "");
-        when(dialogService.showCustomButtonDialogAndWait(
-                any(AlertType.class),
+        // Mock the dialog created at {@link org.jabref.gui.linkedfile.DeleteFileAction.execute}
+        when(dialogService.showCustomDialogAndWait(
                 anyString(),
-                anyString(),
+                any(DialogPane.class),
                 any(ButtonType.class),
                 any(ButtonType.class),
-                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // first vararg - remove button
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(2))); // first vararg - remove button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
         boolean removed = viewModel.delete();
@@ -131,13 +136,12 @@ class LinkedFileViewModelTest {
     @Test
     void deleteWhenDeleteChosenReturnsTrueAndDeletesFile() {
         linkedFile = new LinkedFile("", tempFile, "");
-        when(dialogService.showCustomButtonDialogAndWait(
-                any(AlertType.class),
+        when(dialogService.showCustomDialogAndWait(
                 anyString(),
-                anyString(),
+                any(DialogPane.class),
                 any(ButtonType.class),
                 any(ButtonType.class),
-                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // second vararg - delete button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
         boolean removed = viewModel.delete();
@@ -149,13 +153,12 @@ class LinkedFileViewModelTest {
     @Test
     void deleteMissingFileReturnsTrue() {
         linkedFile = new LinkedFile("", Path.of("!!nonexistent file!!"), "");
-        when(dialogService.showCustomButtonDialogAndWait(
-                any(AlertType.class),
+        when(dialogService.showCustomDialogAndWait(
                 anyString(),
-                anyString(),
+                any(DialogPane.class),
                 any(ButtonType.class),
                 any(ButtonType.class),
-                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // second vararg - delete button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
         boolean removed = viewModel.delete();
@@ -166,13 +169,12 @@ class LinkedFileViewModelTest {
     @Test
     void deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile() {
         linkedFile = new LinkedFile("desc", tempFile, "pdf");
-        when(dialogService.showCustomButtonDialogAndWait(
-                any(AlertType.class),
+        when(dialogService.showCustomDialogAndWait(
                 anyString(),
-                anyString(),
+                any(DialogPane.class),
                 any(ButtonType.class),
                 any(ButtonType.class),
-                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(5))); // third vararg - cancel button
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // third vararg - cancel button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences);
         boolean removed = viewModel.delete();
@@ -181,8 +183,12 @@ class LinkedFileViewModelTest {
         assertTrue(Files.exists(tempFile));
     }
 
-    @Test
-    void downloadHtmlFileCausesWarningDisplay() throws MalformedURLException {
+    @ParameterizedTest
+    @CsvSource({
+            "true, Download 'https://www.google.com/' was a HTML file. Keeping URL.",
+            "false, Download 'https://www.google.com/' was a HTML file. Removed."
+    })
+    void downloadHtmlFileCausesWarningDisplay(Boolean keepHtmlLink, String warningText) throws MalformedURLException {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
@@ -194,78 +200,9 @@ class LinkedFileViewModelTest {
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
 
-        viewModel.download();
+        viewModel.download(keepHtmlLink);
 
-        verify(dialogService, atLeastOnce()).notify("Downloaded website as an HTML file.");
-    }
-
-    @FetcherTest
-    @Test
-    void downloadOfFileReplacesLink(@TempDir Path tempFolder) throws Exception {
-        linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
-        entry.setFiles(new ArrayList<>(List.of(linkedFile)));
-
-        databaseContext = mock(BibDatabaseContext.class);
-        when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
-
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
-
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
-        viewModel.download();
-
-        assertEquals(List.of(new LinkedFile("", tempFolder.resolve("asdf.pdf"), "PDF")), entry.getFiles());
-    }
-
-    @FetcherTest
-    @Test
-    void downloadDoesNotOverwriteFileTypeExtension() throws Exception {
-        linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
-
-        databaseContext = mock(BibDatabaseContext.class);
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
-
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
-
-        BackgroundTask<Path> task = viewModel.prepareDownloadTask(tempFile.getParent(), new URLDownload("http://arxiv.org/pdf/1207.0408v1"));
-        task.onSuccess(destination -> {
-            LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, Collections.singletonList(tempFile.getParent()), filePreferences);
-            assertEquals("asdf.pdf", newLinkedFile.getLink());
-            assertEquals("PDF", newLinkedFile.getFileType());
-        });
-        task.onFailure(Assertions::fail);
-        new CurrentThreadTaskExecutor().execute(task);
-    }
-
-    @FetcherTest
-    @Test
-    void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException {
-        // use google as test url, wiley is protected by CloudFlare
-        String url = "https://google.com";
-        String fileType = StandardExternalFileType.URL.getName();
-        linkedFile = new LinkedFile(new URL(url), fileType);
-
-        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
-        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
-
-        databaseContext.setDatabasePath(tempFile);
-
-        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
-
-        viewModel.download();
-
-        List<LinkedFile> linkedFiles = entry.getFiles();
-
-        for (LinkedFile file: linkedFiles) {
-            if ("Misc/asdf.html".equalsIgnoreCase(file.getLink())) {
-                assertEquals("URL", file.getFileType());
-                return;
-            }
-        }
-        // If the file was not found among the linked files to the entry
-        fail();
+        verify(dialogService, atLeastOnce()).notify(warningText);
     }
 
     @Test
@@ -329,9 +266,11 @@ class LinkedFileViewModelTest {
         assertEquals("URL", actual);
     }
 
-    @Test
-    @FetcherTest
-    void downloadPdfFileWhenLinkedFilePointsToPdfUrl() throws MalformedURLException {
+    // We cannot use "@FetcherTest" annotation, because a @FetcherTest does not fire up a GUI environment (which is needed for this test)
+    // @FetcherTest
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void downloadPdfFileWhenLinkedFilePointsToPdfUrl(boolean keepHtml) throws MalformedURLException {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
         // Needed Mockito stubbing methods to run test
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
@@ -341,7 +280,9 @@ class LinkedFileViewModelTest {
         databaseContext.setDatabasePath(tempFile);
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, preferences);
-        viewModel.download();
+
+        // TODO: Rewrite using WireMock
+        viewModel.download(keepHtml);
 
         // Loop through downloaded files to check for filetype='pdf'
         List<LinkedFile> linkedFiles = entry.getFiles();

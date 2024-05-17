@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class MathSciNetTest {
-
     MathSciNet fetcher;
     private BibEntry ratiuEntry;
 
@@ -30,7 +29,6 @@ class MathSciNetTest {
     void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-
         fetcher = new MathSciNet(importFormatPreferences);
 
         ratiuEntry = new BibEntry();
@@ -43,9 +41,9 @@ class MathSciNetTest {
         ratiuEntry.setField(StandardField.YEAR, "2016");
         ratiuEntry.setField(StandardField.NUMBER, "3");
         ratiuEntry.setField(StandardField.PAGES, "571--589");
-        ratiuEntry.setField(StandardField.ISSN, "1422-6928,1422-6952");
         ratiuEntry.setField(StandardField.KEYWORDS, "76A15 (35A01 35A02 35K61 82D30)");
         ratiuEntry.setField(StandardField.MR_NUMBER, "3537908");
+        ratiuEntry.setField(StandardField.ISSN, "1422-6928,1422-6952");
         ratiuEntry.setField(StandardField.DOI, "10.1007/s00021-016-0250-0");
     }
 
@@ -57,7 +55,7 @@ class MathSciNetTest {
         searchEntry.setField(StandardField.JOURNAL, "fluid");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-        assertEquals(Collections.singletonList(ratiuEntry), fetchedEntries);
+        assertEquals(List.of(ratiuEntry), fetchedEntries);
     }
 
     @Test
@@ -67,7 +65,7 @@ class MathSciNetTest {
         searchEntry.setField(StandardField.MR_NUMBER, "3537908");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-        assertEquals(Collections.singletonList(ratiuEntry), fetchedEntries);
+        assertEquals(List.of(ratiuEntry), fetchedEntries);
     }
 
     @Test
@@ -79,9 +77,24 @@ class MathSciNetTest {
     }
 
     @Test
-    @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response")
-    void searchByIdFindsEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3537908");
-        assertEquals(Optional.of(ratiuEntry), fetchedEntry);
+    void getParser() throws Exception {
+        String fileName = "mathscinet.json";
+        try (InputStream is = MathSciNetTest.class.getResourceAsStream(fileName)) {
+            List<BibEntry> entries = fetcher.getParser().parseEntries(is);
+
+            assertEquals(Optional.of(
+                    new BibEntry(StandardEntryType.Article)
+                            .withField(StandardField.TITLE, "On the weights of general MDS codes")
+                            .withField(StandardField.AUTHOR, "Alderson, Tim L.")
+                            .withField(StandardField.YEAR, "2020")
+                            .withField(StandardField.JOURNAL, "IEEE Trans. Inform. Theory")
+                            .withField(StandardField.VOLUME, "66")
+                            .withField(StandardField.NUMBER, "9")
+                            .withField(StandardField.PAGES, "5414--5418")
+                            .withField(StandardField.MR_NUMBER, "4158623")
+                            .withField(StandardField.KEYWORDS, "Bounds on codes")
+                            .withField(StandardField.DOI, "10.1109/TIT.2020.2977319")
+            ), entries.stream().findFirst());
+        }
     }
 }
