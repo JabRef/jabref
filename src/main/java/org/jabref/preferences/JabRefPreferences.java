@@ -664,7 +664,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SHOW_USER_COMMENTS_FIELDS, Boolean.TRUE);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
-        defaults.put(SHOW_AI_CHAT, Boolean.FALSE);
+        defaults.put(SHOW_AI_CHAT, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
         defaults.put(SHOW_SCITE_TAB, Boolean.TRUE);
@@ -2725,6 +2725,7 @@ public class JabRefPreferences implements PreferencesService {
         // To ensure that the token is never null or empty while useAi is true.
         if (token == null) {
             useAi = false;
+            token = "";
         }
 
         aiPreferences = new AiPreferences(useAi, token);

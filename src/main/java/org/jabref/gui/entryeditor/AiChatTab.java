@@ -42,7 +42,7 @@ public class AiChatTab extends EntryEditorTab {
     public static final String NAME = "AI chat";
 
     private static final String QA_SYSTEM_MESSAGE = """
-            You are an AU research assistant. You read and analyze scientific articles.
+            You are an AI research assistant. You read and analyze scientific articles.
             The user will send you a question regarding a paper. You will be supplied also with the relevant information found in the article.
             Answer the question only by using the relevant information. Don't make up the answer.
             If you can't answer the user question using the provided information, then reply that you couldn't do it.""";
