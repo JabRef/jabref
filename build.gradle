@@ -424,6 +424,9 @@ tasks.register('generateCitaviSource', XjcTask) {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+
+    // hint by https://docs.gradle.org/current/userguide/performance.html#run_the_compiler_as_a_separate_process
+    options.fork = true
 }
 
 compileJava {
