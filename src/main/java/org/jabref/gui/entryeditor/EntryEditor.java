@@ -31,6 +31,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.cleanup.CleanupSingleAction;
+import org.jabref.gui.entryeditor.aichattab.AiChatTab;
 import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
@@ -314,7 +315,7 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(sourceTab);
         entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
         entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
-        entryEditorTabs.add(new AiChatTab(dialogService, preferencesService, databaseContext, taskExecutor));
+        entryEditorTabs.add(new AiChatTab(preferencesService, databaseContext, taskExecutor));
 
         return entryEditorTabs;
     }

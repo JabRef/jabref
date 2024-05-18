@@ -1,15 +1,20 @@
 package org.jabref.logic.ai;
 
+import java.util.List;
 import java.util.UUID;
 
 import dev.langchain4j.chain.ConversationalRetrievalChain;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * This class maintains an AI chat.
@@ -43,9 +48,7 @@ public class AiChat {
         // there would be too many tokens. This class, for example, sends only the 10 last messages.
         this.chatMemory = MessageWindowChatMemory
                 .builder()
-                .chatMemoryStore(aiService.getChatMemoryStore())
                 .maxMessages(MESSAGE_WINDOW_SIZE) // This was the default value in the original implementation.
-                .id(UUID.randomUUID())
                 .build();
 
         this.chain = ConversationalRetrievalChain
@@ -62,10 +65,11 @@ public class AiChat {
     }
 
     public String execute(String prompt) {
+        // chain.execute() will automatically add messages to ChatMemory.
         return chain.execute(prompt);
     }
 
-    public Object getChatId() {
-        return this.chatMemory.id();
+    public void restoreMessages(List<ChatMessage> messages) {
+        messages.forEach(this.chatMemory::add);
     }
 }

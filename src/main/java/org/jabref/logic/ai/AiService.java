@@ -16,7 +16,6 @@ import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 public class AiService {
     private final ChatLanguageModel chatModel;
     private final EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-    private final ChatMemoryStore chatMemoryStore = new InMemoryChatMemoryStore();
 
     public AiService(String apiKey) {
         // Later this class can accepts different enums or other pieces of information in order
@@ -34,9 +33,5 @@ public class AiService {
 
     public EmbeddingModel getEmbeddingModel() {
         return embeddingModel;
-    }
-
-    public ChatMemoryStore getChatMemoryStore() {
-        return chatMemoryStore;
     }
 }

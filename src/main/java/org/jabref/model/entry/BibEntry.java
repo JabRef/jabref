@@ -18,6 +18,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.store.embedding.EmbeddingStore;
+import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -136,6 +140,8 @@ public class BibEntry implements Cloneable {
      * Is set to <code>true</code>, if parts of the entry changed. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
+
+    private final List<ChatMessage> aiChatMessages = new ArrayList<>();
 
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
@@ -1192,5 +1198,9 @@ public class BibEntry implements Cloneable {
             return true;
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
+    }
+
+    public List<ChatMessage> getAiChatMessages() {
+        return aiChatMessages;
     }
 }
