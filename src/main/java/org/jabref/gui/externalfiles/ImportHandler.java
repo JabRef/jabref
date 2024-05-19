@@ -194,7 +194,7 @@ public class ImportHandler {
         bibDatabaseContext.getDatabase().insertEntries(entries);
         generateKeys(entries);
         setAutomaticFields(entries);
-        addToGroups(entries, stateManager.getSelectedGroup(bibDatabaseContext));
+        addToGroups(entries, stateManager.getSelectedGroups(bibDatabaseContext));
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
@@ -276,7 +276,7 @@ public class ImportHandler {
                                  taskExecutor,
                                  dialogService,
                                  preferencesService
-                         ).download()
+                         ).download(false)
                  );
         }
     }
@@ -405,13 +405,13 @@ public class ImportHandler {
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
-                LOGGER.debug("First entry to import, we use BREAK");
+                LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
                 importEntryWithDuplicateCheck(database, entry, BREAK);
                 firstEntry = false;
                 continue;
             }
             if (preferencesService.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
-                var decision = preferencesService.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
+                DuplicateResolverDialog.DuplicateResolverResult decision = preferencesService.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
                 importEntryWithDuplicateCheck(database, entry, decision);
             } else {

@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class RemoveBracesFormatterTest {
+public class RemoveEnclosingBracesFormatterTest {
 
-    private final RemoveBracesFormatter formatter = new RemoveBracesFormatter();
+    private final RemoveEnclosingBracesFormatter formatter = new RemoveEnclosingBracesFormatter();
 
     @ParameterizedTest
     @CsvSource({

@@ -376,7 +376,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 case EDIT_FILE_LINK -> linkedFile.edit();
                 case OPEN_FILE -> linkedFile.open();
                 case OPEN_FOLDER -> linkedFile.openFolder();
-                case DOWNLOAD_FILE -> linkedFile.download();
+                case DOWNLOAD_FILE -> linkedFile.download(true);
                 case REDOWNLOAD_FILE -> linkedFile.redownload();
                 case RENAME_FILE_TO_PATTERN -> linkedFile.renameToSuggestion();
                 case RENAME_FILE_TO_NAME -> linkedFile.askForNameAndRename();

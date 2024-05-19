@@ -2,6 +2,7 @@ package org.jabref.logic.openoffice.backend;
 
 import java.util.Optional;
 
+import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.backend.NamedRange;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
@@ -101,8 +102,8 @@ class NamedRangeReferenceMark implements NamedRange {
                 : left + right;
 
         cursor.getText().insertString(cursor, bracketedContent, true);
-
-        UnoReferenceMark.create(doc, refMarkName, cursor, true /* absorb */);
+        DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, refMarkName, cursor, true /* absorb */);
+        UnoReferenceMark.create(documentAnnotation);
 
         // eat the first inserted space
         cursorBefore.goRight((short) 1, true);

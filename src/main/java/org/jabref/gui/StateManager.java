@@ -57,13 +57,13 @@ public class StateManager {
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
-    private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
+    private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[]{task.getValue().progressProperty(), task.getValue().runningProperty()});
+    private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
     private final EasyBinding<Boolean> anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(task -> !task.getKey().willBeRecoveredAutomatically() && task.getValue().isRunning()));
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
@@ -75,7 +75,7 @@ public class StateManager {
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
 
     public StateManager() {
-        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null)));
+        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null).map(BibDatabaseContext::getUid)));
     }
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
@@ -140,16 +140,16 @@ public class StateManager {
 
     public void setSelectedGroups(BibDatabaseContext database, List<GroupTreeNode> newSelectedGroups) {
         Objects.requireNonNull(newSelectedGroups);
-        selectedGroups.put(database, FXCollections.observableArrayList(newSelectedGroups));
+        selectedGroups.put(database.getUid(), FXCollections.observableArrayList(newSelectedGroups));
     }
 
-    public ObservableList<GroupTreeNode> getSelectedGroup(BibDatabaseContext database) {
-        ObservableList<GroupTreeNode> selectedGroupsForDatabase = selectedGroups.get(database);
+    public ObservableList<GroupTreeNode> getSelectedGroups(BibDatabaseContext context) {
+        ObservableList<GroupTreeNode> selectedGroupsForDatabase = selectedGroups.get(context.getUid());
         return selectedGroupsForDatabase != null ? selectedGroupsForDatabase : FXCollections.observableArrayList();
     }
 
     public void clearSelectedGroups(BibDatabaseContext database) {
-        selectedGroups.remove(database);
+        selectedGroups.remove(database.getUid());
     }
 
     public Optional<BibDatabaseContext> getActiveDatabase() {
@@ -190,7 +190,7 @@ public class StateManager {
     }
 
     public void addBackgroundTask(BackgroundTask<?> backgroundTask, Task<?> task) {
-        this.backgroundTasks.add(0, new Pair<>(backgroundTask, task));
+        this.backgroundTasks.addFirst(new Pair<>(backgroundTask, task));
     }
 
     public EasyBinding<Boolean> getAnyTaskRunning() {

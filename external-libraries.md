@@ -295,6 +295,12 @@ URL:     https://commons.apache.org/proper/commons-digester/
 ```
 
 ```yaml
+Id:      commons-io:commons-io
+Project: Apache Commons IO
+URL:     https://commons.apache.org/proper/commons-io/
+```
+
+```yaml
 Id:      de.rototor.jeuclid:jeuclid-core
 Project: JEuclid
 URL:     https://github.com/rototor/jeuclid
@@ -537,7 +543,7 @@ Id:      com.ibm.icu:*
 Project: International Components for Unicode
 URL:     https://icu.unicode.org/
 License: Unicode License (https://www.unicode.org/copyright.html)
-Note:    Our own fork https://github.com/JabRef/icu. Upstream PR: https://github.com/unicode-org/icu/pull/2127
+Note:    Our own fork https://github.com/JabRef/icu. [Upstream PR](https://github.com/unicode-org/icu/pull/2127)
 Path:    lib/icu4j.jar
 SourcePath: lib/ic4j-src.jar
 ```
@@ -579,49 +585,49 @@ License: LGPL-2.1-or-later
 
 ```yaml
 Id:      org.openjfx:javafx-base
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-controls
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-fxml
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-graphics
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-media
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-swing
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
 Id:      org.openjfx:javafx-web
-Project  JavaFX
+Project: JavaFX
 URL:     https://openjfx.io/
 License: GPL-2.0 WITH Classpath-exception-2.0
 ```
@@ -691,9 +697,13 @@ License: BSD-3-Clause
 
 ## Sorted list of runtime dependencies output by gradle
 
-1. `./gradlew dependencies > build/dependencies.txt`
-2. Manually edit depedencies.txt to contain the tree of "compileClasspath" and "implementation" only. Otherwise, libraries such as "Apache Commons Lang 3" are missed. Ensure LF as line ending.
-3. (on WSL) `sed 's/[^a-z]*//' < build/dependencies.txt | sed "s/\(.*\) .*/\1/" | grep -v "\->" | sort | uniq > build/dependencies-for-external-libraries.txt`
+1. `./gradlew dependencyReport --configuration compileClasspath`
+2. Fix `build/reports/project/dependencies.txt`
+
+   - Change line endings to `LF`
+   - Remove text above and below the tree
+
+3. (on WSL) `sed 's/[^a-z]*//' < build/reports/project/dependencies.txt | sed "s/\(.*\) .*/\1/" | grep -v "\->" | sort | uniq > build/dependencies-for-external-libraries.txt`
 
 ```text
 at.favre.lib:hkdf:1.1.0
@@ -761,6 +771,7 @@ commons-cli:commons-cli:1.6.0
 commons-codec:commons-codec:1.16.0
 commons-collections:commons-collections:3.2.2
 commons-digester:commons-digester:2.1
+commons-io:commons-io:2.16.1
 commons-logging:commons-logging:1.2
 commons-validator:commons-validator:1.7
 de.rototor.jeuclid:jeuclid-core:3.1.11
@@ -809,7 +820,7 @@ org.apache.pdfbox:fontbox:3.0.2
 org.apache.pdfbox:pdfbox-io:3.0.2
 org.apache.pdfbox:pdfbox:3.0.2
 org.apache.pdfbox:xmpbox:3.0.2
-org.bouncycastle:bcprov-jdk18on:1.77
+org.bouncycastle:bcprov-jdk18on:1.78
 org.checkerframework:checker-qual:3.42.0
 org.codehaus.woodstox:stax2-api:4.2
 org.controlsfx:controlsfx:11.2.1
@@ -818,24 +829,24 @@ org.fxmisc.flowless:flowless:0.7.2
 org.fxmisc.richtext:richtextfx:0.11.2
 org.fxmisc.undo:undofx:2.1.1
 org.fxmisc.wellbehaved:wellbehavedfx:0.3.3
-org.glassfish.grizzly:grizzly-framework:4.0.1
-org.glassfish.grizzly:grizzly-http-server:4.0.1
-org.glassfish.grizzly:grizzly-http:4.0.1
+org.glassfish.grizzly:grizzly-framework:4.0.2
+org.glassfish.grizzly:grizzly-http-server:4.0.2
+org.glassfish.grizzly:grizzly-http:4.0.2
 org.glassfish.hk2.external:aopalliance-repackaged:3.1.0
 org.glassfish.hk2:hk2-api:3.1.0
-org.glassfish.hk2:hk2-locator:3.0.5
+org.glassfish.hk2:hk2-locator:3.0.6
 org.glassfish.hk2:hk2-utils:3.1.0
 org.glassfish.hk2:osgi-resource-locator:1.0.3
 org.glassfish.jaxb:jaxb-core:4.0.3
 org.glassfish.jaxb:jaxb-runtime:4.0.3
 org.glassfish.jaxb:txw2:4.0.3
-org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.5
-org.glassfish.jersey.core:jersey-client:3.1.5
-org.glassfish.jersey.core:jersey-common:3.1.5
-org.glassfish.jersey.core:jersey-server:3.1.5
-org.glassfish.jersey.inject:jersey-hk2:3.1.5
+org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.6
+org.glassfish.jersey.core:jersey-client:3.1.6
+org.glassfish.jersey.core:jersey-common:3.1.6
+org.glassfish.jersey.core:jersey-server:3.1.6
+org.glassfish.jersey.inject:jersey-hk2:3.1.6
 org.jabref:afterburner.fx:2.0.0
-org.javassist:javassist:3.29.2-GA
+org.javassist:javassist:3.30.2-GA
 org.jbibtex:jbibtex:1.0.20
 org.jetbrains:annotations:24.0.1
 org.jooq:jool:0.9.15
@@ -850,18 +861,18 @@ org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1
 org.libreoffice:libreoffice:7.6.4
 org.libreoffice:unoloader:7.6.4
 org.mariadb.jdbc:mariadb-java-client:2.7.9
-org.openjfx:javafx-base:22
-org.openjfx:javafx-controls:22
-org.openjfx:javafx-fxml:22
-org.openjfx:javafx-graphics:22
-org.openjfx:javafx-media:22
-org.openjfx:javafx-swing:22
-org.openjfx:javafx-web:22
+org.openjfx:javafx-base:22.0.1
+org.openjfx:javafx-controls:22.0.1
+org.openjfx:javafx-fxml:22.0.1
+org.openjfx:javafx-graphics:22.0.1
+org.openjfx:javafx-media:22.0.1
+org.openjfx:javafx-swing:22.0.1
+org.openjfx:javafx-web:22.0.1
 org.postgresql:postgresql:42.7.3
 org.reactfx:reactfx:2.0-M5
 org.scala-lang:scala-library:2.13.8
-org.slf4j:jul-to-slf4j:2.0.12
-org.slf4j:slf4j-api:2.0.12
+org.slf4j:jul-to-slf4j:2.0.13
+org.slf4j:slf4j-api:2.0.13
 org.tinylog:slf4j-tinylog:2.7.0
 org.tinylog:tinylog-api:2.7.0
 org.tinylog:tinylog-impl:2.7.0
