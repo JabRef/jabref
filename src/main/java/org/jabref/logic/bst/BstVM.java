@@ -2,7 +2,6 @@ package org.jabref.logic.bst;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
