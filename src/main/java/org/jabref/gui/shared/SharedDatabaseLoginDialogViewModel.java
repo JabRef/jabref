@@ -13,6 +13,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -76,6 +77,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BooleanProperty useSSL = new SimpleBooleanProperty();
     private final StringProperty keyStorePasswordProperty = new SimpleStringProperty("");
     private final StringProperty serverTimezone = new SimpleStringProperty("");
+    private final BooleanProperty expertMode = new SimpleBooleanProperty();
+    private final StringProperty jdbcUrl = new SimpleStringProperty("");
 
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
@@ -144,6 +147,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 .setAllowPublicKeyRetrieval(true)
                 .setKeyStore(keystore.getValue())
                 .setServerTimezone(serverTimezone.getValue())
+                .setExpertMode(expertMode.getValue())
+                .setJdbcUrl(jdbcUrl.getValue())
                 .createDBMSConnectionProperties();
 
         setupKeyStore();
@@ -402,5 +407,13 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public StringProperty serverTimezoneProperty() {
         return serverTimezone;
+    }
+
+    public BooleanProperty expertModeProperty() {
+        return expertMode;
+    }
+
+    public StringProperty jdbcUrlProperty() {
+        return jdbcUrl;
     }
 }
