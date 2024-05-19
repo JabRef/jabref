@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor.aichattab;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
@@ -126,6 +127,10 @@ public class AiChatTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (!aiPreferences.getEnableChatWithFiles()) {
             setContent(new Label(Localization.lang("JabRef uses OpenAI to enable \"chatting\" with PDF files. OpenAI is an external service. To enable JabRef chatgting with PDF files, the content of the PDF files need to be shared with OpenAI. As soon as you ask a question, the text content of all PDFs attached to the entry are send to OpenAI. The privacy policy of OpenAI applies. You find it at <https://openai.com/policies/privacy-policy/>.")));
+        } else if (entry.getCitationKey().isEmpty()) {
+            setContent(new Label(Localization.lang("Please provide a citation key for the entry in order to enable chatting with PDF files.")));
+        } else if (!checkIfCitationKeyIsUnique(bibDatabaseContext, entry.getCitationKey().get())) {
+            setContent(new Label(Localization.lang("Please provide a unique citation key for the entry in order to enable chatting with PDF files.")));
         } else if (entry.getFiles().isEmpty()) {
             setContent(new Label(Localization.lang("No files attached")));
         } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
@@ -133,6 +138,15 @@ public class AiChatTab extends EntryEditorTab {
         } else {
             bindToCorrectEntry(entry);
         }
+    }
+
+    private static boolean checkIfCitationKeyIsUnique(BibDatabaseContext bibDatabaseContext, String citationKey) {
+        return bibDatabaseContext.getDatabase().getEntries().stream()
+              .map(BibEntry::getCitationKey)
+              .filter(Optional::isPresent)
+              .map(Optional::get)
+              .filter(key -> key.equals(citationKey))
+              .count() == 1;
     }
 
     private void bindToCorrectEntry(BibEntry entry) {

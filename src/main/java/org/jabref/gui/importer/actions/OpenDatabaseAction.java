@@ -20,6 +20,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
+import org.jabref.gui.importer.actions.loadchathistory.LoadChatHistoryAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -54,7 +55,8 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Warning for migrating the Review into the Comment field
             new MergeReviewIntoCommentAction(),
             // Check for new custom entry types loaded from the BIB file:
-            new CheckForNewEntryTypesAction());
+            new CheckForNewEntryTypesAction(),
+            new LoadChatHistoryAction());
 
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;

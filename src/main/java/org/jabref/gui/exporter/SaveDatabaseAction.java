@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,6 +23,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
+import org.jabref.gui.importer.actions.loadchathistory.AiChatFile;
+import org.jabref.gui.importer.actions.loadchathistory.AiChatFileMessage;
+import org.jabref.gui.importer.actions.loadchathistory.LoadChatHistoryAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.BackgroundTask;
@@ -38,6 +42,8 @@ import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -45,6 +51,7 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.preferences.PreferencesService;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -283,8 +290,41 @@ public class SaveDatabaseAction {
             } catch (IOException ex) {
                 throw new SaveException("Problems saving: " + ex, ex);
             }
+
+            // TODO: What to do with chat backups? Should we do it?
+            try (AtomicFileWriter fileWriter = new AtomicFileWriter(FileUtil.addExtension(file, LoadChatHistoryAction.AI_CHAT_HISTORY_EXTENSION), encoding, saveConfiguration.shouldMakeBackup())) {
+                // TODO: What to do with selectedOnly?
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                AiChatFile aiChatFile = makeAiChatFile(bibDatabaseContext.getDatabase());
+                objectMapper.writeValue(fileWriter, aiChatFile);
+
+                if (fileWriter.hasEncodingProblems()) {
+                    saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType, saveOrder);
+                }
+            } catch (UnsupportedCharsetException ex) {
+                throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
+            } catch (IOException ex) {
+                throw new SaveException("Problems saving: " + ex, ex);
+            }
+
             return true;
         }
+    }
+
+    private AiChatFile makeAiChatFile(BibDatabase bibDatabase) {
+        AiChatFile aiChatFile = new AiChatFile();
+        aiChatFile.chatHistoryMap = new HashMap<>();
+
+        bibDatabase.getEntries().forEach(entry ->
+            entry.getCitationKey().ifPresent(citationKey -> {
+                    List<AiChatFileMessage> aiChatFileMessages = entry.getAiChatMessages().stream().map(AiChatFileMessage::fromLangchain).toList();
+                    aiChatFile.chatHistoryMap.put(citationKey, aiChatFileMessages);
+                }
+            )
+        );
+
+        return aiChatFile;
     }
 
     private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
