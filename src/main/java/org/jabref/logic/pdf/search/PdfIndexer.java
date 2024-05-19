@@ -16,11 +16,11 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexNotFoundException;
@@ -130,7 +130,7 @@ public class PdfIndexer {
             indexWriter = new IndexWriter(
                     indexDirectory,
                     new IndexWriterConfig(
-                            new EnglishStemAnalyzer()).setOpenMode(mode));
+                            new EnglishAnalyzer()).setOpenMode(mode));
         } catch (IOException e) {
             LOGGER.error("Could not initialize the IndexWriter", e);
             // FIXME: This can also happen if another instance of JabRef is launched in parallel.
@@ -205,7 +205,7 @@ public class PdfIndexer {
 
     private void doCommit() {
         try {
-            getIndexWriter().ifPresent(Unchecked.consumer(writer -> writer.commit()));
+            getIndexWriter().ifPresent(Unchecked.consumer(IndexWriter::commit));
         } catch (UncheckedIOException e) {
             LOGGER.warn("Could not commit changes to the index.", e);
         }
@@ -274,7 +274,6 @@ public class PdfIndexer {
             LOGGER.debug("Could not find {}", linkedFile.getLink());
             return;
         }
-        LOGGER.debug("Adding {} to index", linkedFile.getLink());
         try {
             // Check if a document with this path is already in the index
             try {
@@ -283,17 +282,21 @@ public class PdfIndexer {
                 TopDocs topDocs = searcher.search(query, 1);
                 // If a document was found, check if is less current than the one in the FS
                 if (topDocs.scoreDocs.length > 0) {
-                    Document doc = reader.document(topDocs.scoreDocs[0].doc);
+                    Document doc = reader.storedFields().document(topDocs.scoreDocs[0].doc);
                     long indexModificationTime = Long.parseLong(doc.getField(SearchFieldConstants.MODIFIED).stringValue());
                     BasicFileAttributes attributes = Files.readAttributes(resolvedPath.get(), BasicFileAttributes.class);
                     if (indexModificationTime >= attributes.lastModifiedTime().to(TimeUnit.SECONDS)) {
-                        LOGGER.debug("File {} is already indexed", linkedFile.getLink());
+                        LOGGER.debug("File {} is already indexed and up-to-date.", linkedFile.getLink());
                         return;
+                    } else {
+                        LOGGER.debug("File {} is already indexed but outdated. Removing from index.", linkedFile.getLink());
+                        removeFromIndex(linkedFile.getLink());
                     }
                 }
             } catch (IndexNotFoundException e) {
                 LOGGER.debug("Index not found. Continuing.", e);
             }
+            LOGGER.debug("Adding {} to index", linkedFile.getLink());
             // If no document was found, add the new one
             Optional<List<Document>> pages = new DocumentReader(entry, filePreferences).readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
@@ -328,7 +331,7 @@ public class PdfIndexer {
             MatchAllDocsQuery query = new MatchAllDocsQuery();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
-                Document doc = reader.document(scoreDoc.doc);
+                Document doc = reader.storedFields().document(scoreDoc.doc);
                 paths.add(doc.getField(SearchFieldConstants.PATH).stringValue());
             }
         } catch (IOException e) {
