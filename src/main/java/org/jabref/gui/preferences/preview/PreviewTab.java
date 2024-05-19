@@ -115,7 +115,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     @FXML
     private void selectBstFile(ActionEvent event) {
-
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BST)
                 .withDefaultExtension(StandardFileType.BST)
