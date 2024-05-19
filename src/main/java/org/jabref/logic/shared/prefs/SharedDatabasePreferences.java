@@ -193,6 +193,4 @@ public class SharedDatabasePreferences {
             LOGGER.error("Could not store the password due to encryption problems.", e);
         }
     }
-
-
 }
