@@ -164,7 +164,7 @@ public class BstFunctions {
     }
 
     /**
-     *  Pops the top two (integer) literals and pushes their sum.
+     * Pops the top two (integer) literals and pushes their sum.
      */
     private void bstAdd(BstVMVisitor visitor, ParserRuleContext ctx) {
         if (stack.size() < 2) {
@@ -328,6 +328,10 @@ public class BstFunctions {
             } else {
                 String entryType = bstEntry.entry.getType().getName();
                 LOGGER.trace("Handling {}", entryType);
+                if (!functions.containsKey(entryType)) {
+                    LOGGER.error("Function for {} not found ", entryType);
+                    return;
+                }
                 functions.get(entryType).execute(visitor, ctx, bstEntry);
             }
         }
@@ -753,7 +757,7 @@ public class BstFunctions {
      * precisely, a "special character", defined in Section 4) counts as
      * a single text character, even if it's missing its matching right
      * brace, and where braces don't count as text characters.
-     *
+     * <p>
      * From BibTeXing: For the purposes of counting letters in labels,
      * BibTEX considers everything contained inside the braces as a
      * single letter.
