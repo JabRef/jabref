@@ -34,7 +34,6 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.StandardFileType;
@@ -120,7 +119,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
                 .withDefaultExtension(StandardFileType.BST)
                 .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
                 .build();
-
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -> {
             viewModel.addBstStyle(bstFile);

@@ -127,7 +127,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             availableListProperty.getValue().add(previewPreferences.getCustomPreviewLayout());
         }
 
-
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
                       .onSuccess(styles -> styles.stream()
                                                  .map(style -> new CitationStylePreviewLayout(style, Globals.entryTypesManager))
