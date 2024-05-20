@@ -2112,8 +2112,7 @@ public class JabRefPreferences implements PreferencesService {
             if (!newValue) {
                 try {
                     Files.deleteIfExists(Path.of("jabref.xml"));
-                } catch (
-                        IOException e) {
+                } catch (IOException e) {
                     LOGGER.warn("Error accessing filesystem", e);
                 }
             }
