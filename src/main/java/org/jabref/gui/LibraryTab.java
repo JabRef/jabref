@@ -15,7 +15,9 @@ import javax.swing.undo.UndoManager;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
@@ -60,6 +62,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
@@ -84,6 +87,8 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.event.GroupUpdatedEvent;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -114,6 +119,7 @@ public class LibraryTab extends Tab {
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
+    private final ObjectProperty<MetaData> groupsTreeChanged = new SimpleObjectProperty<>();
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
 
     private BibDatabaseContext bibDatabaseContext;
@@ -427,6 +433,14 @@ public class LibraryTab extends Tab {
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
         this.changedProperty.setValue(true);
+
+        // TODO: Check performance and maybe also re-add the event source check?
+        if (event instanceof GroupUpdatedEvent groupUpdatedEvent) {
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                groupsTreeChanged.setValue(null);
+                groupsTreeChanged.setValue(groupUpdatedEvent.getMetaData());
+            });
+        }
     }
 
     /**
@@ -888,6 +902,10 @@ public class LibraryTab extends Tab {
 
     public ObservableBooleanValue getLoading() {
         return loading;
+    }
+
+    public ObjectProperty<MetaData> groupsTreeChangedProperty() {
+        return groupsTreeChanged;
     }
 
     public CountingUndoManager getUndoManager() {

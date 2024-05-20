@@ -1,10 +1,12 @@
 package org.jabref.gui.util;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import javafx.beans.binding.BooleanExpression;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 
 import com.tobiasdiez.easybind.PreboundBinding;
 
@@ -42,4 +44,5 @@ public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>>
             }
         });
     }
+
 }

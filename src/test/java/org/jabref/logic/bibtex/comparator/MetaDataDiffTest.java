@@ -60,4 +60,22 @@ public class MetaDataDiffTest {
 
         assertNotEquals(Optional.empty(), MetaDataDiff.compare(one, two));
     }
+
+    @Test
+    public void metadataWithColoredGroupsShowsDiff() {
+        MetaData one = new MetaData();
+        GroupTreeNode root = GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup());
+        var group = new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ',');
+        group.setColor("0xffb399ff");
+        root.addSubgroup(group);
+        one.setGroups(root);
+
+        MetaData two = new MetaData();
+        GroupTreeNode root2 = GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup());
+        var group2 = new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ',');
+        root2.addSubgroup(group2);
+        two.setGroups(root2);
+
+        assertNotEquals(Optional.empty(), MetaDataDiff.compare(one, two));
+    }
 }
