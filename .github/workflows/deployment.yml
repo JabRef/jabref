@@ -34,6 +34,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  nativeimage:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21.0.2
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-home-cache-cleanup: true
+      - run: ./gradlew nativeCompile
+      - name: Upload to GitHub workflow artifacts store
+        uses: actions/upload-artifact@v4
+        with:
+          name: JabRef-native-image-${{ matrix.os }}
+          path: build/native/nativeCompile
+          compression-level: 0 # no compression
+      - name: Check image (win)
+        if: (matrix.os == 'windows-latest')
+        run: |
+          cd build/native/nativeCompile
+          ./JabRef.exe --help
+      - name: Check image (linux, macOS)
+        if: (matrix.os != 'windows-latest')
+        run: |
+          cd build/native/nativeCompile
+          ./JabRef --help
   build:
     strategy:
       fail-fast: false

@@ -29,6 +29,8 @@ plugins {
     id 'idea'
 
     id 'org.openrewrite.rewrite' version '6.12.0'
+
+    id 'org.graalvm.buildtools.native' version '0.10.1'
 }
 
 // Enable following for debugging
@@ -528,7 +530,7 @@ testlogger {
     showStackTraces false
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
     // Enable parallel tests. See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
     maxParallelForks = Runtime.runtime.availableProcessors() - 1
@@ -830,4 +832,11 @@ jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
+}
+
+graalvmNative.binaries.configureEach {
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+        vendor = JvmVendorSpec.GRAAL_VM
+    })
 }
