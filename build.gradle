@@ -57,7 +57,7 @@ java {
         // - .github/workflows/deployment-jdk-ea.yml#L53
         languageVersion = JavaLanguageVersion.of(21)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
-        // vendor = JvmVendorSpec.AMAZON
+        vendor = JvmVendorSpec.GRAAL_VM
     }
 }
 
@@ -831,9 +831,39 @@ jmh {
     fork = 2
 }
 
-graalvmNative.binaries.configureEach {
-    javaLauncher.set(javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(21)
-        vendor = JvmVendorSpec.GRAAL_VM
-    })
+// Source: https://github.com/tinylog-org/tinylog/issues/145#issuecomment-603430594
+task generateConfiguration(type: Exec) {
+    group = "graal"
+    description = "Run application to generate the configuration for native image"
+    dependsOn assemble
+    commandLine project.gradle.gradleUserHomeDir.toPath().resolve("jdks/graalvm_community-21-amd64-windows/graalvm-community-openjdk-21.0.2+13.1/bin/java"), "-agentlib:native-image-agent=config-output-dir=" + project.buildDir.toPath().resolve("resources/main/META-INF/native-image"), "-cp", sourceSets.main.runtimeClasspath.getAsPath(), 'org.jabref.Launcher'
+
+    doFirst {
+        mkdir project.buildDir.toPath().resolve("resources/main/META-INF/native-image")
+    }
+}
+
+
+graalvmNative {
+    // toolchainDetection = true
+    binaries {
+        main {
+            imageName = "JabRef"
+            mainClass = "org.jabref.Launcher"
+            buildArgs.add("-O4")
+        }
+        test {
+            buildArgs.add("-O0")
+        }
+    }
+    binaries.configureEach {
+        buildArgs.add("-H:+AddAllCharsets")
+        buildArgs.add("--allow-incomplete-classpath")
+        buildArgs.add("--verbose")
+        resources.autodetect()
+        javaLauncher.set(javaToolchains.launcherFor {
+            languageVersion = JavaLanguageVersion.of(21)
+            vendor = JvmVendorSpec.GRAAL_VM
+        })
+    }
 }
