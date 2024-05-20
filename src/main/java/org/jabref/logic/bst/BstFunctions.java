@@ -306,7 +306,7 @@ public class BstFunctions {
     }
 
     /**
-     * Executes the function whose name is the entry type of an entry.
+     * Executes the function whose name is the entry type of entry.
      * For example if an entry is of type book, this function executes
      * the book function. When given as an argument to the ITERATE
      * command, call.type$ actually produces the output for the entries.
@@ -447,7 +447,7 @@ public class BstFunctions {
             throw new BstVMException("Operand does not match function empty$ (line %d)".formatted(ctx.start.getLine()));
         }
 
-        boolean result = "".equals(s.trim());
+        boolean result = s.trim().isEmpty();
         LOGGER.trace("empty$({}) result: {}", s, result);
         stack.push(result ? BstVM.TRUE : BstVM.FALSE);
     }

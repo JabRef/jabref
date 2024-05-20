@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.preview;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.regex.Pattern;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -33,6 +35,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
@@ -69,6 +72,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final FilteredList<PreviewLayout> filteredAvailableLayouts = new FilteredList<>(this.availableListProperty());
     private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
+
+    private final ListProperty<Path> bstStylesPaths = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
     private final ObjectProperty<PreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
@@ -123,6 +128,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             availableListProperty.getValue().add(previewPreferences.getCustomPreviewLayout());
         }
 
+
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
                       .onSuccess(styles -> styles.stream()
                                                  .map(style -> new CitationStylePreviewLayout(style, Globals.entryTypesManager))
@@ -135,6 +141,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                           dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
                       })
                       .executeWith(taskExecutor);
+        bstStylesPaths.clear();
+        bstStylesPaths.addAll(previewPreferences.getBstPreviewLayoutPaths());
+        bstStylesPaths.forEach(path -> {
+            BstPreviewLayout layout = new BstPreviewLayout(path);
+            availableListProperty.add(layout);
+        });
     }
 
     public void setPreviewLayout(PreviewLayout selectedLayout) {
@@ -194,10 +206,11 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         previewPreferences.setShowPreviewAsExtraTab(showAsExtraTabProperty.getValue());
         previewPreferences.setShowPreviewEntryTableTooltip(showPreviewInEntryTableTooltip.getValue());
         previewPreferences.setCustomPreviewLayout((TextBasedPreviewLayout) customLayout);
+        previewPreferences.setBstPreviewLayoutPaths(bstStylesPaths);
 
         if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
             previewPreferences.setLayoutCyclePosition(chosenListProperty.getValue().indexOf(
-                    chosenSelectionModelProperty.getValue().getSelectedItems().get(0)));
+                    chosenSelectionModelProperty.getValue().getSelectedItems().getFirst()));
         }
     }
 
@@ -482,5 +495,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty sourceTextProperty() {
         return sourceTextProperty;
+    }
+
+    public void addBstStyle(Path bstFile) {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(bstFile);
+        bstStylesPaths.add(bstFile);
+        availableListProperty().add(bstPreviewLayout);
+        chosenListProperty().add(bstPreviewLayout);
     }
 }

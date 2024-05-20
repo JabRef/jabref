@@ -12,6 +12,7 @@ import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -97,5 +98,12 @@ public final class BstPreviewLayout implements PreviewLayout {
     @Override
     public String getText() {
         return source;
+    }
+
+    /**
+     * Checks if the given style file is a BST file by checking the extension
+     */
+    public static boolean isBstStyleFile(String styleFile) {
+        return StandardFileType.BST.getExtensions().stream().anyMatch(styleFile::endsWith);
     }
 }
