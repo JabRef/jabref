@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -88,7 +87,7 @@ public class GlobalSearchBar extends HBox {
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
 
-    private final CustomTextField searchField = SearchTextField.create();
+    private final CustomTextField searchField;
     private final ToggleButton caseSensitiveButton;
     private final ToggleButton regularExpressionButton;
     private final ToggleButton fulltextButton;
@@ -130,6 +129,9 @@ public class GlobalSearchBar extends HBox {
             searchQueryProperty = stateManager.activeGlobalSearchQueryProperty();
         }
 
+        KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
+
+        searchField = SearchTextField.create(keyBindingRepository);
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the tabContainer width is too small
@@ -140,18 +142,14 @@ public class GlobalSearchBar extends HBox {
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
-        KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
-            if (keyBinding.isPresent()) {
-                if (keyBinding.get() == KeyBinding.CLOSE) {
-                    // Clear search and select first entry, if available
-                    searchField.setText("");
-                    if (searchType == SearchType.NORMAL_SEARCH) {
-                        tabContainer.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();
-                    }
-                    event.consume();
+            if (keyBindingRepository.matches(event, KeyBinding.CLEAR_SEARCH)) {
+                // Clear search and select first entry, if available
+                searchField.clear();
+                if (searchType == SearchType.NORMAL_SEARCH) {
+                    tabContainer.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();
                 }
+                event.consume();
             }
         });
 
@@ -240,7 +238,7 @@ public class GlobalSearchBar extends HBox {
                 query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
 
         this.searchQueryProperty.addListener((obs, oldValue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
-        this.searchQueryProperty.addListener((obs, oldValue, newValue) -> searchQueryProperty.get().ifPresent(this::updateSearchResultsForQuery));
+        this.stateManager.activeDatabaseProperty().addListener(obs -> searchQueryProperty.get().ifPresent(this::updateSearchResultsForQuery));
         /*
          * The listener tracks a change on the focus property value.
          * This happens, from active (user types a query) to inactive / focus
@@ -301,6 +299,7 @@ public class GlobalSearchBar extends HBox {
             if (globalSearchResultDialog == null) {
                 globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
             }
+            stateManager.activeGlobalSearchQueryProperty().setValue(searchQueryProperty.get());
             updateSearchQuery();
             dialogService.showCustomDialogAndWait(globalSearchResultDialog);
             globalSearchActive.setValue(false);

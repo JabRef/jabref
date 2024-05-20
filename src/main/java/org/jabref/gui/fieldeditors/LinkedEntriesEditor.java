@@ -29,6 +29,7 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryLinkList;
 import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.field.Field;
 
@@ -70,6 +71,14 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         entryLinkField.setShowSearchIcon(false);
         entryLinkField.getEditor().getStyleClass().clear();
         entryLinkField.getEditor().getStyleClass().add("tags-field-editor");
+
+        String separator = EntryLinkList.SEPARATOR;
+        entryLinkField.getEditor().setOnKeyReleased(event -> {
+            if (event.getText().equals(separator)) {
+                entryLinkField.commit();
+                event.consume();
+            }
+        });
 
         Bindings.bindContentBidirectional(entryLinkField.getTags(), viewModel.linkedEntriesProperty());
     }

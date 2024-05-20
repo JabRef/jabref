@@ -7,11 +7,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.LibraryTab;
-import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.strings.StringUtil;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
@@ -31,7 +32,7 @@ public final class PdfSearcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final PdfIndexer indexer;
-    private EnglishStemAnalyzer englishStemAnalyzer = new EnglishStemAnalyzer();
+    private final Analyzer englishAnalyzer = new EnglishAnalyzer();
 
     private PdfSearcher(PdfIndexer indexer) {
         this.indexer = indexer;
@@ -65,7 +66,7 @@ public final class PdfSearcher {
             return new PdfSearchResults();
         }
         try (IndexReader reader = DirectoryReader.open(optionalIndexWriter.get())) {
-            Query query = new MultiFieldQueryParser(PDF_FIELDS, englishStemAnalyzer).parse(searchString);
+            Query query = new MultiFieldQueryParser(PDF_FIELDS, englishAnalyzer).parse(searchString);
             IndexSearcher searcher = new IndexSearcher(reader);
             TopDocs results = searcher.search(query, maxHits);
             for (ScoreDoc scoreDoc : results.scoreDocs) {

@@ -11,7 +11,12 @@ import java.util.regex.Pattern;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FileNameUniqueness {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileNameUniqueness.class);
+
     private static final Pattern DUPLICATE_MARK_PATTERN = Pattern.compile("(.*) \\(\\d+\\)");
 
     /**
@@ -61,7 +66,6 @@ public class FileNameUniqueness {
      * @throws IOException Fail when the file is not exist or something wrong when reading the file
      */
     public static boolean isDuplicatedFile(Path directory, Path fileName, DialogService dialogService) throws IOException {
-
         Objects.requireNonNull(directory);
         Objects.requireNonNull(fileName);
         Objects.requireNonNull(dialogService);
@@ -83,10 +87,11 @@ public class FileNameUniqueness {
 
         while (Files.exists(originalFile)) {
             if (com.google.common.io.Files.equal(originalFile.toFile(), duplicateFile.toFile())) {
-                if (duplicateFile.toFile().delete()) {
+                try {
+                    Files.delete(duplicateFile);
                     dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Keeping '%0'", originalFileName, fileName));
-                } else {
-                    dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Keeping both due to deletion error", originalFileName, fileName));
+                } catch (IOException e) {
+                    LOGGER.error("File '{}' is a duplicate of '{}'. Could not delete '{}'.", fileName, originalFileName, fileName);
                 }
                 return true;
             }

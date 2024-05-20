@@ -10,11 +10,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelItemModel;
-import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelViewModel;
+import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelItemModel;
+import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
@@ -30,9 +30,9 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     // The list and the default properties are being overwritten by the bound properties of the tableView, but to
     // prevent an NPE on storing the preferences before lazy-loading of the setValues, they need to be initialized.
-    private final ListProperty<CitationKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<CitationKeyPatternPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
-            new CitationKeyPatternPanelItemModel(new CitationKeyPatternPanelViewModel.DefaultEntryType(), ""));
+    private final ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<CitationKeyPatternsPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
+            new CitationKeyPatternsPanelItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), ""));
 
     private final CitationKeyPatternPreferences keyPatternPreferences;
 
@@ -69,8 +69,8 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        GlobalCitationKeyPattern newKeyPattern =
-                new GlobalCitationKeyPattern(keyPatternPreferences.getKeyPattern().getDefaultValue());
+        GlobalCitationKeyPatterns newKeyPattern =
+                new GlobalCitationKeyPatterns(keyPatternPreferences.getKeyPatterns().getDefaultValue());
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
             if (!item.getEntryType().getName().equals("default")) {
@@ -101,7 +101,7 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
         keyPatternPreferences.setKeyPatternRegex(keyPatternRegexProperty.getValue());
         keyPatternPreferences.setKeyPatternReplacement(keyPatternReplacementProperty.getValue());
         keyPatternPreferences.setUnwantedCharacters(unwantedCharactersProperty.getValue());
-        keyPatternPreferences.setKeyPattern(newKeyPattern);
+        keyPatternPreferences.setKeyPatterns(newKeyPattern);
     }
 
     public BooleanProperty overwriteAllowProperty() {
@@ -136,11 +136,11 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
         return keyPatternReplacementProperty;
     }
 
-    public ListProperty<CitationKeyPatternPanelItemModel> patternListProperty() {
+    public ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<CitationKeyPatternPanelItemModel> defaultKeyPatternProperty() {
+    public ObjectProperty<CitationKeyPatternsPanelItemModel> defaultKeyPatternProperty() {
         return defaultKeyPatternProperty;
     }
 

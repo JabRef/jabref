@@ -18,6 +18,7 @@ public enum StandardFileType implements FileType {
     SILVER_PLATTER("SilverPlatter", "dat", "txt"),
     AUX("Aux file", "aux"),
     BIBTEX_DB("Bibtex library", "bib"),
+    BST("BibTeX-Style file", "bst"),
     CITATION_STYLE("Citation Style", "csl"),
     CLASS("Class file", "class"),
     CSV("CSV", "csv"),
@@ -71,6 +72,6 @@ public enum StandardFileType implements FileType {
         return OptionalUtil.orElse(Arrays.stream(StandardFileType.values())
                                          .filter(field -> field.getExtensions().stream().anyMatch(exts::contains))
                                          .findAny(),
-                                   new UnknownFileType(extensions));
+                new UnknownFileType(extensions));
     }
 }

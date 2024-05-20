@@ -3,9 +3,9 @@ package org.jabref.logic.integrity;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -26,16 +26,16 @@ public class CitationKeyDeviationCheckerTest {
     private final BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
     private final BibDatabase bibDatabase = mock(BibDatabase.class);
     private final MetaData metaData = mock(MetaData.class);
-    private final AbstractCitationKeyPattern abstractCitationKeyPattern = mock(AbstractCitationKeyPattern.class);
-    private final GlobalCitationKeyPattern globalCitationKeyPattern = mock(GlobalCitationKeyPattern.class);
+    private final AbstractCitationKeyPatterns abstractCitationKeyPatterns = mock(AbstractCitationKeyPatterns.class);
+    private final GlobalCitationKeyPatterns globalCitationKeyPatterns = mock(GlobalCitationKeyPatterns.class);
     private final CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
     private final CitationKeyDeviationChecker checker = new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences);
 
     @BeforeEach
     void setUp() {
         when(bibDatabaseContext.getMetaData()).thenReturn(metaData);
-        when(citationKeyPatternPreferences.getKeyPattern()).thenReturn(globalCitationKeyPattern);
-        when(metaData.getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern())).thenReturn(abstractCitationKeyPattern);
+        when(citationKeyPatternPreferences.getKeyPatterns()).thenReturn(globalCitationKeyPatterns);
+        when(metaData.getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns())).thenReturn(abstractCitationKeyPatterns);
         when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
     }
 

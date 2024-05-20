@@ -3,20 +3,7 @@ parent: Code Howtos
 ---
 # Testing JabRef
 
-## Background on Java testing
-
-In JabRef, we mainly rely on basic JUnit tests to increase code coverage. There are other ways to test:
-
-| Type           | Techniques                                 | Tool (Java)                                                             | Kind of tests                                                  | Used In JabRef                                                |
-| -------------- | ------------------------------------------ | ----------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------- |
-| Functional     | Dynamics, black box, positive and negative | [JUnit-QuickCheck](https://github.com/pholser/junit-quickcheck)         | Random data generation                                         | No, not intended, because other test kinds seem more helpful. |
-| Functional     | Dynamics, black box, positive and negative | [GraphWalker](https://graphwalker.github.io)                            | Model-based                                                    | No, because the BibDatabase doesn't need to be tests          |
-| Functional     | Dynamics, black box, positive and negative | [TestFX](https://github.com/TestFX/TestFX)                              | GUI Tests                                                      | Yes                                                           |
-| Functional     | Dynamics, white box, negative              | [PIT](https://pitest.org)                                               | Mutation                                                       | No                                                            |
-| Functional     | Dynamics, white box, positive and negative | [Mockito](https://site.mockito.org)                                     | Mocking                                                        | Yes                                                           |
-| Non-functional | Dynamics, black box, positive and negative | [JETM](http://jetm.void.fm), [Apache JMeter](https://jmeter.apache.org) | Performance (performance testing vs load testing respectively) | No                                                            |
-| Structural     | Static, white box                          | [CheckStyle](https://checkstyle.sourceforge.io)                         | Constient formatting of the source code                        | Yes                                                           |
-| Structural     | Dynamics, white box                        | [SpotBugs](https://spotbugs.github.io)                                  | Reocurreing bugs (based on experience of other projects)       | No                                                            |
+In JabRef, we mainly rely on basic [JUnit](https://junit.org/junit5/docs/current/user-guide/) unit tests to increase code coverage.
 
 ## General hints on tests
 
@@ -27,10 +14,10 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
 * _Test only one thing per test:_ tests should be short and test only one small part of the method. So instead of
 
     ```java
-    testFormat() {
-     assertEqual("test", format("test"));
-     assertEqual("{test", format("{test"));
-     assertEqual("test", format("test}}"));
+    void format() {
+        assertEqual("test", format("test"));
+        assertEqual("{test", format("{test"));
+        assertEqual("test", format("test}}"));
     }
     ```
 
@@ -38,18 +25,42 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
 * Do _not just test happy paths_, but also wrong/weird input.
 * It is recommended to write tests _before_ you actually implement the functionality (test driven development).
 * _Bug fixing:_ write a test case covering the bug and then fix it, leaving the test as a security that the bug will never reappear.
-* Do not catch exceptions in tests, instead use the `assertThrows(Exception.class, ()->doSomethingThrowsEx())` feature of [junit-jupiter](https://junit.org/junit5/docs/current/user-guide/) to the test method.
+* Do not catch exceptions in tests, instead use the `assertThrows(Exception.class, () -> doSomethingThrowsEx())` feature of [junit-jupiter](https://junit.org/junit5/docs/current/user-guide/) to the test method.
+
+## Coverage
+
+IntelliJ has build in test coverage reports. Choose "Run with coverage".
+
+For a full coverage report as HTML, execute the gradle task `jacocoTestReport` (available in the "verification" folder in IntelliJ).
+Then, you will find <build/reports/jacoco/test/html/index.html> which shows the coverage of the tests.
 
 ## Lists in tests
 
-* Use `assertEquals(Collections.emptyList(), actualList);` instead of `assertEquals(0, actualList.size());` to test whether a list is empty.
-* Similarly, use `assertEquals(Arrays.asList("a", "b"), actualList);` to compare lists instead of
+Instead of
 
-    ```java
-           assertEquals(2, actualList.size());
-           assertEquals("a", actualList.get(0));
-           assertEquals("b", actualList.get(1));
-    ```
+```java
+assertTrue(actualList.isEmpty());
+```
+
+use
+
+```java
+assertEquals(List.of(), actualList);
+```
+
+Similarly, to compare lists, instead of following code:
+
+```java
+assertEquals(2, actualList.size());
+assertEquals("a", actualList.get(0));
+assertEquals("b", actualList.get(1));
+```
+
+use the following code:
+
+```java
+assertEquals(List.of("a", "b"), actualList);
+```
 
 ## BibEntries in tests
 
@@ -57,19 +68,18 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
 
 ## Files and folders in tests
 
-* If you need a temporary file in tests, then add the following Annotation before the class:
+If you need a temporary file in tests, use the `@TempDir` annotation:
 
-    ```java
-    @ExtendWith(TempDirectory.class)
-    class TestClass{
+```java
+class TestClass{
 
-      @BeforeEach
-      void setUp(@TempDirectory.TempDir Path temporaryFolder){
-      }
-    }
-    ```
+  @Test
+  void deletionWorks(@TempDir Path tempDir) {
+  }
+}
+```
 
-    to the test class. A temporary file is now created by `Files.createFile(path)`. Using this pattern automatically ensures that the test folder is deleted after the tests are run. See the [junit-pioneer doc](https://junit-pioneer.org/docs/temp-directory/) for more details.
+to the test class. A temporary file is now created by `Files.createFile(path)`. Using this pattern automatically ensures that the test folder is deleted after the tests are run. See <https://www.geeksforgeeks.org/junit-5-tempdir/>  for more details.
 
 ## Loading Files from Resources
 
@@ -129,3 +139,18 @@ docker run -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=jabref -p 3800:3307 mys
 ```
 
 Set the environment variable `DBMS` to `mysql`.
+
+## Advanced testing and further reading
+
+On top of basic unit testing, there are more ways to test a software:
+
+| Type           | Techniques                                 | Tool (Java)                                                             | Kind of tests                                                  | Used In JabRef                                                |
+| -------------- | ------------------------------------------ | ----------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------- |
+| Functional     | Dynamics, black box, positive and negative | [JUnit-QuickCheck](https://github.com/pholser/junit-quickcheck)         | Random data generation                                         | No, not intended, because other test kinds seem more helpful. |
+| Functional     | Dynamics, black box, positive and negative | [GraphWalker](https://graphwalker.github.io)                            | Model-based                                                    | No, because the BibDatabase doesn't need to be tests          |
+| Functional     | Dynamics, black box, positive and negative | [TestFX](https://github.com/TestFX/TestFX)                              | GUI Tests                                                      | Yes                                                           |
+| Functional     | Dynamics, white box, negative              | [PIT](https://pitest.org)                                               | Mutation                                                       | No                                                            |
+| Functional     | Dynamics, white box, positive and negative | [Mockito](https://site.mockito.org)                                     | Mocking                                                        | Yes                                                           |
+| Non-functional | Dynamics, black box, positive and negative | [JETM](http://jetm.void.fm), [Apache JMeter](https://jmeter.apache.org) | Performance (performance testing vs load testing respectively) | No                                                            |
+| Structural     | Static, white box                          | [CheckStyle](https://checkstyle.sourceforge.io)                         | Constient formatting of the source code                        | Yes                                                           |
+| Structural     | Dynamics, white box                        | [SpotBugs](https://spotbugs.github.io)                                  | Reocurreing bugs (based on experience of other projects)       | No                                                            |

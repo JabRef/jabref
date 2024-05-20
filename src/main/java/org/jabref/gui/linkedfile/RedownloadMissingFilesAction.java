@@ -56,6 +56,9 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
         }
     }
 
+    /**
+     * @implNote Similar method {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#redownload}
+     */
     private void redownloadMissing(BibDatabaseContext databaseContext) {
         LOGGER.info("Redownloading missing files");
         databaseContext.getEntries().forEach(entry -> {
@@ -71,7 +74,7 @@ public class RedownloadMissingFilesAction extends SimpleCommand {
                 String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
 
                 DownloadLinkedFileAction downloadAction = new DownloadLinkedFileAction(this.databaseContext, entry,
-                        linkedFile, linkedFile.getSourceUrl(), dialogService, filePreferences, taskExecutor, fileName);
+                        linkedFile, linkedFile.getSourceUrl(), dialogService, filePreferences, taskExecutor, fileName, true);
                 downloadAction.execute();
             });
         });

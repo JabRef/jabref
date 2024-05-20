@@ -2,8 +2,10 @@ package org.jabref.logic.texparser;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.texparser.LatexParserResult;
+import org.jabref.model.texparser.LatexParserResults;
 
 /**
  * Parses a LaTeX file
@@ -22,15 +24,15 @@ public interface LatexParser {
      * Parse a single LaTeX file.
      *
      * @param latexFile Path to a LaTeX file
-     * @return a LatexParserResult, which contains all data related to the bibliographic entries
+     * @return Optional LatexParserResult, which contains all data related to the bibliographic entries, or empty if the file does not exist
      */
-    LatexParserResult parse(Path latexFile);
+    Optional<LatexParserResult> parse(Path latexFile);
 
     /**
      * Parse a list of LaTeX files.
      *
      * @param latexFiles List of Path objects linked to a LaTeX file
-     * @return a LatexParserResult, which contains all data related to the bibliographic entries
+     * @return a LatexParserResults, which contains all data related to the bibliographic entries
      */
-    LatexParserResult parse(List<Path> latexFiles);
+    LatexParserResults parse(List<Path> latexFiles);
 }

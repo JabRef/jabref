@@ -86,7 +86,7 @@ public class SharedDatabaseUIManager {
 
         if (answer.isPresent()) {
             if (answer.get().equals(reconnect)) {
-                tabContainer.closeCurrentTab();
+                tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
                 dialogService.showCustomDialogAndWait(new SharedDatabaseLoginDialogView(tabContainer));
             } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
@@ -94,7 +94,7 @@ public class SharedDatabaseUIManager {
                 dialogService.notify(Localization.lang("Working offline."));
             }
         } else {
-            tabContainer.closeCurrentTab();
+            tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
         }
     }
 
@@ -209,7 +209,7 @@ public class SharedDatabaseUIManager {
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(
                 bibDatabaseContext,
                 preferencesService.getBibEntryPreferences().getKeywordSeparator(),
-                preferencesService.getCitationKeyPatternPreferences().getKeyPattern(),
+                preferencesService.getCitationKeyPatternPreferences().getKeyPatterns(),
                 fileUpdateMonitor);
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
         return bibDatabaseContext;

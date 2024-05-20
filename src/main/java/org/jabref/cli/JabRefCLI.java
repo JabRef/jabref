@@ -189,9 +189,6 @@ public class JabRefCLI {
         options.addOption("v", "version", false, Localization.lang("Display version"));
         options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));
 
-        // The "-console" option is handled by the install4j launcher
-        options.addOption(null, "console", false, Localization.lang("Show console output (only when the launcher is used)"));
-
         options.addOption(Option
                 .builder("i")
                 .longOpt("import")
@@ -371,26 +368,5 @@ public class JabRefCLI {
         }
 
         return sb.toString();
-    }
-
-    /**
-     * Creates and wraps a multi-line and colon-seperated string from a List of Strings.
-     */
-    protected static String wrapStringList(List<String> list, int firstLineIndentation) {
-        StringBuilder builder = new StringBuilder();
-        int lastBreak = -firstLineIndentation;
-
-        for (String line : list) {
-            if (((builder.length() + 2 + line.length()) - lastBreak) > WIDTH) {
-                builder.append(",\n");
-                lastBreak = builder.length();
-                builder.append(WRAPPED_LINE_PREFIX);
-            } else if (builder.length() > 0) {
-                builder.append(", ");
-            }
-            builder.append(line);
-        }
-
-        return builder.toString();
     }
 }
