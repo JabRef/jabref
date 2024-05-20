@@ -1,14 +1,15 @@
 package org.jabref.logic.protectedterms;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
@@ -29,19 +30,27 @@ public class ProtectedTermsParser {
     private String location;
 
     public void readTermsFromResource(String resourceFileName, String descriptionString) {
-        try {
-            Path path = Path.of(Objects.requireNonNull(ProtectedTermsLoader.class.getResource(Objects.requireNonNull(resourceFileName))).toURI());
-            readTermsList(path);
-            description = descriptionString;
-            location = resourceFileName;
-        } catch (URISyntaxException e1) {
-            LOGGER.error("");
-        }
+        readTermsList(ProtectedTermsLoader.class.getResourceAsStream(Objects.requireNonNull(resourceFileName)));
+        description = descriptionString;
+        location = resourceFileName;
     }
 
     public void readTermsFromFile(Path path) {
         location = path.toAbsolutePath().toString();
         readTermsList(path);
+    }
+
+    private void readTermsList(InputStream inputStream) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            this.terms.addAll(
+                    reader.lines()
+                          .map(this::setDescription)
+                          .filter(Objects::nonNull)
+                          .toList()
+            );
+        } catch (IOException e) {
+            LOGGER.warn("Could not read terms from input stream", e);
+        }
     }
 
     private void readTermsList(Path path) {
@@ -50,7 +59,7 @@ public class ProtectedTermsParser {
             return;
         }
         try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
-            this.terms.addAll(lines.map(this::setDescription).filter(Objects::nonNull).collect(Collectors.toList()));
+            this.terms.addAll(lines.map(this::setDescription).filter(Objects::nonNull).toList());
         } catch (IOException e) {
             LOGGER.warn("Could not read terms from file {}", path, e);
         }
