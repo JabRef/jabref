@@ -175,7 +175,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NAMES_AS_IS = "namesAsIs";
     public static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
     /**
-     *  Holds the horizontal divider position of the preview view when it is shown inside the entry editor
+     * Holds the horizontal divider position of the preview view when it is shown inside the entry editor
      */
     public static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
     public static final String AUTO_RESIZE_MODE = "autoResizeMode";
