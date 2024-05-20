@@ -3032,8 +3032,7 @@ public class JabRefPreferences implements PreferencesService {
                 if (StringUtil.isNullOrEmpty(keys.get(i))) {
                     try {
                         keyring.deletePassword("org.jabref.customapikeys", names.get(i));
-                    } catch (
-                            PasswordAccessException ex) {
+                    } catch (PasswordAccessException ex) {
                         // Already removed
                     }
                 } else {
