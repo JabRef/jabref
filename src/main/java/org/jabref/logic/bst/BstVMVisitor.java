@@ -202,34 +202,39 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         if (selectedBstEntry != null) {
             LOGGER.trace("selectedBstEntry is available");
             if (selectedBstEntry.fields.containsKey(name)) {
-                LOGGER.trace("entry fields {}", name);
-                bstVMContext.stack().push(selectedBstEntry.fields.get(name));
+                String value = selectedBstEntry.fields.get(name);
+                LOGGER.trace("entry field {}={}", name, value);
+                bstVMContext.stack().push(value);
                 return;
             }
             if (selectedBstEntry.localStrings.containsKey(name)) {
-                LOGGER.trace("entry local strings {}", name);
-                bstVMContext.stack().push(selectedBstEntry.localStrings.get(name));
+                String value = selectedBstEntry.localStrings.get(name);
+                LOGGER.trace("entry local string {}={}", name, value);
+                bstVMContext.stack().push(value);
                 return;
             }
             if (selectedBstEntry.localIntegers.containsKey(name)) {
-                LOGGER.trace("entry local integers {}", name);
-                bstVMContext.stack().push(selectedBstEntry.localIntegers.get(name));
+                Integer value = selectedBstEntry.localIntegers.get(name);
+                LOGGER.trace("entry local integer {}={}", name, value);
+                bstVMContext.stack().push(value);
                 return;
             }
         }
 
         if (bstVMContext.strings().containsKey(name)) {
-            LOGGER.trace("global strings {}", name);
-            bstVMContext.stack().push(bstVMContext.strings().get(name));
+            String value = bstVMContext.strings().get(name);
+            LOGGER.trace("global string {}={}", name, value);
+            bstVMContext.stack().push(value);
             return;
         }
         if (bstVMContext.integers().containsKey(name)) {
-            LOGGER.trace("global integers {}", name);
-            bstVMContext.stack().push(bstVMContext.integers().get(name));
+            Integer value = bstVMContext.integers().get(name);
+            LOGGER.trace("global integer {}={}", name, value);
+            bstVMContext.stack().push(value);
             return;
         }
         if (bstVMContext.functions().containsKey(name)) {
-            LOGGER.trace("functions {}", name);
+            LOGGER.trace("function {}", name);
             bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
             return;
         }
@@ -244,7 +249,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
         count++;
         LOGGER.trace("Count: {}", count);
-        if (count > 1_000)
+        if (count > 2_000)
             throw new RuntimeException("Count greater than threshold");
         String name = ctx.getChild(0).getText();
         LOGGER.trace("Resolving name {} at visitBstFunction", name);

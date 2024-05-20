@@ -139,7 +139,7 @@ public class BstVMTest {
     }
 
     @Test
-    public void hypthenatedName() throws RecognitionException, IOException {
+    public void hyphenatedName() throws RecognitionException, IOException {
         BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> testEntries = List.of(
                 new BibEntry(StandardEntryType.Article)
