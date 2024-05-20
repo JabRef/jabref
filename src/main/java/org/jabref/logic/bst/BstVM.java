@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -68,7 +69,8 @@ public class BstVM {
     public String render(Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
         Objects.requireNonNull(bibEntries);
 
-        List<BstEntry> entries = bibEntries.stream().map(BstEntry::new).toList();
+        // needs to be modifiable due to sort operations later
+        List<BstEntry> entries = bibEntries.stream().map(BstEntry::new).collect(Collectors.toList());
 
         StringBuilder resultBuffer = new StringBuilder();
 

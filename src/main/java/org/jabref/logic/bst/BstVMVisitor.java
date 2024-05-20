@@ -121,18 +121,20 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         String name = bstFunction.getText();
         LOGGER.trace("Executing function {}", name);
         visit(bstFunction);
+        LOGGER.trace("Finished executing function {}", name);
 
         return BstVM.TRUE;
     }
 
     @Override
     public Integer visitIterateCommand(BstParser.IterateCommandContext ctx) {
-        LOGGER.trace("EXECUTE {}", ctx.bstFunction().getText());
+        String name = ctx.bstFunction().getText();
+        LOGGER.trace("Executing {}", name);
         for (BstEntry entry : bstVMContext.entries()) {
             this.selectedBstEntry = entry;
             visit(ctx.bstFunction());
         }
-
+        LOGGER.trace("Finished executing {}", name);
         return BstVM.TRUE;
     }
 
@@ -195,48 +197,57 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
     }
 
     protected void resolveIdentifier(String name, ParserRuleContext ctx) {
+        LOGGER.trace("Resolving name {} at resolveIdentifier", name);
+        LOGGER.trace("Stack: {}", bstVMContext.stack());
         if (selectedBstEntry != null) {
+            LOGGER.trace("selectedBstEntry is available");
             if (selectedBstEntry.fields.containsKey(name)) {
-                bstVMContext.stack().push(selectedBstEntry.fields.get(name));
+                String value = selectedBstEntry.fields.get(name);
+                LOGGER.trace("entry field {}={}", name, value);
+                bstVMContext.stack().push(value);
                 return;
             }
             if (selectedBstEntry.localStrings.containsKey(name)) {
-                bstVMContext.stack().push(selectedBstEntry.localStrings.get(name));
+                String value = selectedBstEntry.localStrings.get(name);
+                LOGGER.trace("entry local string {}={}", name, value);
+                bstVMContext.stack().push(value);
                 return;
             }
             if (selectedBstEntry.localIntegers.containsKey(name)) {
-                bstVMContext.stack().push(selectedBstEntry.localIntegers.get(name));
+                Integer value = selectedBstEntry.localIntegers.get(name);
+                LOGGER.trace("entry local integer {}={}", name, value);
+                bstVMContext.stack().push(value);
                 return;
             }
         }
 
         if (bstVMContext.strings().containsKey(name)) {
-            bstVMContext.stack().push(bstVMContext.strings().get(name));
+            String value = bstVMContext.strings().get(name);
+            LOGGER.trace("global string {}={}", name, value);
+            bstVMContext.stack().push(value);
             return;
         }
         if (bstVMContext.integers().containsKey(name)) {
-            bstVMContext.stack().push(bstVMContext.integers().get(name));
+            Integer value = bstVMContext.integers().get(name);
+            LOGGER.trace("global integer {}={}", name, value);
+            bstVMContext.stack().push(value);
             return;
         }
         if (bstVMContext.functions().containsKey(name)) {
-            bstVMContext.functions().get(name).execute(this, ctx);
+            LOGGER.trace("function {}", name);
+            bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
             return;
         }
 
+        LOGGER.warn("No matching identifier found: {}", name);
         throw new BstVMException("No matching identifier found: " + name);
     }
 
     @Override
     public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
         String name = ctx.getChild(0).getText();
-        if (bstVMContext.functions().containsKey(name)) {
-            LOGGER.trace("Function '{}' found", name);
-            bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
-        } else {
-            LOGGER.trace("Function '{}' not found", name);
-            visit(ctx.getChild(0));
-        }
-
+        LOGGER.trace("Resolving name {} at visitBstFunction", name);
+        resolveIdentifier(name, ctx);
         return BstVM.TRUE;
     }
 
