@@ -243,17 +243,10 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
         throw new BstVMException("No matching identifier found: " + name);
     }
 
-    private static int count = 0;
-
     @Override
     public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
-        count++;
-        LOGGER.trace("Count: {}", count);
-        if (count > 2_000)
-            throw new RuntimeException("Count greater than threshold");
         String name = ctx.getChild(0).getText();
         LOGGER.trace("Resolving name {} at visitBstFunction", name);
-        // bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);
         resolveIdentifier(name, ctx);
         return BstVM.TRUE;
     }
