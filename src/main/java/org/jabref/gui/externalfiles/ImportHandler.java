@@ -89,7 +89,6 @@ public class ImportHandler {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-//        this.filePreferences = filePreferences;
 
         this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database, dialogService);
         this.contentImporter = new ExternalFilesContentImporter(preferencesService.getImportFormatPreferences());
@@ -408,11 +407,6 @@ public class ImportHandler {
         Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
     }
-
-//    private String relativise(Path path) {
-//        List<Path> fileDirectories = bibDatabaseContext.getFileDirectories(filePreferences);
-//        return FileUtil.relativize(path, fileDirectories).toString();
-//    }
 
     public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
         boolean firstEntry = true;
