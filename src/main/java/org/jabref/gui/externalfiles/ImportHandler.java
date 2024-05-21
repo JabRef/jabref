@@ -53,6 +53,7 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -88,6 +89,7 @@ public class ImportHandler {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+//        this.filePreferences = filePreferences;
 
         this.linker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database, dialogService);
         this.contentImporter = new ExternalFilesContentImporter(preferencesService.getImportFormatPreferences());
@@ -109,6 +111,9 @@ public class ImportHandler {
                 CompoundEdit ce = new CompoundEdit();
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
+                    Path parentPath = file.getParent();
+                    Path rootPath = parentPath.getParent();
+                    Path relPath = rootPath.relativize(file);
 
                     if (isCanceled()) {
                         break;
@@ -129,6 +134,9 @@ public class ImportHandler {
                             }
 
                             if (!pdfEntriesInFile.isEmpty()) {
+                                for (BibEntry entry : pdfEntriesInFile) {
+                                    entry.setField(StandardField.FILE,relPath.toString());
+                                }
                                 entriesToAdd.addAll(pdfEntriesInFile);
                                 addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                             } else {
@@ -400,6 +408,11 @@ public class ImportHandler {
         Optional<BibEntry> entry = new IsbnFetcher(preferencesService.getImportFormatPreferences()).performSearchById(isbn.getNormalized());
         return OptionalUtil.toList(entry);
     }
+
+//    private String relativise(Path path) {
+//        List<Path> fileDirectories = bibDatabaseContext.getFileDirectories(filePreferences);
+//        return FileUtil.relativize(path, fileDirectories).toString();
+//    }
 
     public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
         boolean firstEntry = true;
