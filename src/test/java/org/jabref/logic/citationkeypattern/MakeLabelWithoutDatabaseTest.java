@@ -1,7 +1,5 @@
 package org.jabref.logic.citationkeypattern;
 
-import java.util.Collections;
-
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.model.database.BibDatabase;
@@ -22,7 +20,7 @@ class MakeLabelWithoutDatabaseTest {
 
     @BeforeEach
     void setUp() {
-        GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(Collections.emptyList());
+        GlobalCitationKeyPatterns keyPattern = new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN);
         keyPattern.setDefaultValue("[auth]");
         CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
                 false,

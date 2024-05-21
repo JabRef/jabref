@@ -10,13 +10,13 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.model.texparser.LatexParserResult;
+import org.jabref.model.texparser.LatexParserResults;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,75 +49,59 @@ public class DefaultLatexParser implements LatexParser {
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(
             "\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}".formatted(INCLUDE_GROUP));
 
-    private final LatexParserResult latexParserResult;
-
-    public DefaultLatexParser() {
-        this.latexParserResult = new LatexParserResult();
-    }
-
-    public LatexParserResult getLatexParserResult() {
-        return latexParserResult;
-    }
-
     @Override
     public LatexParserResult parse(String citeString) {
-        matchCitation(Path.of(""), 1, citeString);
+        Path path = Path.of("");
+        LatexParserResult latexParserResult = new LatexParserResult(path);
+        matchCitation(path, 1, citeString, latexParserResult);
         return latexParserResult;
     }
 
     @Override
-    public LatexParserResult parse(Path latexFile) {
-        return parse(Collections.singletonList(latexFile));
-    }
+    public Optional<LatexParserResult> parse(Path latexFile) {
+        if (!Files.exists(latexFile)) {
+            LOGGER.error("File does not exist: {}", latexFile);
+            return Optional.empty();
+        }
 
-    @Override
-    public LatexParserResult parse(List<Path> latexFiles) {
-        latexParserResult.addFiles(latexFiles);
-        List<Path> referencedFiles = new ArrayList<>();
+        LatexParserResult latexParserResult = new LatexParserResult(latexFile);
 
-        for (Path file : latexFiles) {
-            if (!Files.exists(file)) {
-                LOGGER.error("File does not exist: {}", file);
-                continue;
-            }
-
-            try (
-                    InputStream inputStream = Files.newInputStream(file);
-                    Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-                    LineNumberReader lineNumberReader = new LineNumberReader(reader)) {
-                for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
-                    // Skip comments and blank lines.
-                    if (line.trim().isEmpty() || line.trim().charAt(0) == '%') {
-                        continue;
-                    }
-                    matchCitation(file, lineNumberReader.getLineNumber(), line);
-                    matchBibFile(file, line);
-                    matchNestedFile(file, latexFiles, referencedFiles, line);
+        try (InputStream inputStream = Files.newInputStream(latexFile);
+             Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             LineNumberReader lineNumberReader = new LineNumberReader(reader)) {
+            for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {
+                // Skip comments and blank lines.
+                if (line.trim().isEmpty() || line.trim().charAt(0) == '%') {
+                    continue;
                 }
-            } catch (ClosedChannelException e) {
-                // User changed the underlying LaTeX file
-                // We ignore this error and just continue with parsing
-                LOGGER.info("Parsing has been interrupted");
-            } catch (IOException | UncheckedIOException e) {
-                // Some weired error during reading
-                // We ignore this error and just continue with parsing
-                LOGGER.info("Error while parsing file {}", file, e);
+                matchCitation(latexFile, lineNumberReader.getLineNumber(), line, latexParserResult);
+                matchBibFile(latexFile, line, latexParserResult);
+                matchNestedFile(latexFile, line, latexParserResult);
             }
+        } catch (ClosedChannelException e) {
+            // User changed the underlying LaTeX file
+            // We ignore this error and just continue with parsing
+            LOGGER.info("Parsing has been interrupted");
+        } catch (IOException | UncheckedIOException e) {
+            // Some weired error during reading
+            // We ignore this error and just continue with parsing
+            LOGGER.info("Error while parsing file {}", latexFile, e);
         }
 
-        // Parse all files referenced by TEX files, recursively.
-        if (!referencedFiles.isEmpty()) {
-            // modifies class variable latexParserResult
-            parse(referencedFiles);
-        }
+        return Optional.of(latexParserResult);
+    }
 
-        return latexParserResult;
+    @Override
+    public LatexParserResults parse(List<Path> latexFiles) {
+        LatexParserResults results = new LatexParserResults();
+        latexFiles.forEach(file -> parse(file).ifPresent(result -> results.add(file, result)));
+        return results;
     }
 
     /**
      * Find cites along a specific line and store them.
      */
-    private void matchCitation(Path file, int lineNumber, String line) {
+    private void matchCitation(Path file, int lineNumber, String line, LatexParserResult latexParserResult) {
         Matcher citeMatch = CITE_PATTERN.matcher(line);
 
         while (citeMatch.find()) {
@@ -130,7 +114,7 @@ public class DefaultLatexParser implements LatexParser {
     /**
      * Find BIB files along a specific line and store them.
      */
-    private void matchBibFile(Path file, String line) {
+    private void matchBibFile(Path file, String line, LatexParserResult latexParserResult) {
         Matcher bibliographyMatch = BIBLIOGRAPHY_PATTERN.matcher(line);
 
         while (bibliographyMatch.find()) {
@@ -139,10 +123,10 @@ public class DefaultLatexParser implements LatexParser {
                 Path bibFile = file.getParent().resolve(
                         bibString.endsWith(BIB_EXT)
                                 ? bibString
-                                : "%s%s".formatted(bibString, BIB_EXT));
+                                : "%s%s".formatted(bibString, BIB_EXT)).normalize();
 
                 if (Files.exists(bibFile)) {
-                    latexParserResult.addBibFile(file, bibFile);
+                    latexParserResult.addBibFile(bibFile);
                 }
             }
         }
@@ -151,7 +135,7 @@ public class DefaultLatexParser implements LatexParser {
     /**
      * Find inputs and includes along a specific line and store them for parsing later.
      */
-    private void matchNestedFile(Path texFile, List<Path> texFiles, List<Path> referencedFiles, String line) {
+    private void matchNestedFile(Path texFile, String line, LatexParserResult latexParserResult) {
         Matcher includeMatch = INCLUDE_PATTERN.matcher(line);
 
         while (includeMatch.find()) {
@@ -159,9 +143,9 @@ public class DefaultLatexParser implements LatexParser {
             String texFileName = filenamePassedToInclude.endsWith(TEX_EXT)
                     ? filenamePassedToInclude
                     : "%s%s".formatted(filenamePassedToInclude, TEX_EXT);
-            Path nestedFile = texFile.getParent().resolve(texFileName);
-            if (Files.exists(nestedFile) && !texFiles.contains(nestedFile)) {
-                referencedFiles.add(nestedFile);
+            Path nestedFile = texFile.getParent().resolve(texFileName).normalize();
+            if (Files.exists(nestedFile)) {
+                latexParserResult.addNestedFile(nestedFile);
             }
         }
     }

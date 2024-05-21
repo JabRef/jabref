@@ -90,10 +90,7 @@ public class TextInputKeyBindings {
                         focusedTextField.positionCaret(res.caretPosition);
                         event.consume();
                     }
-                    case CLOSE -> {
-                        focusedTextField.clear();
-                        event.consume();
-                    }
+                    // CLEAR_SEARCH is handled at org.jabref.gui.search.SearchTextField
                 }
             });
         }

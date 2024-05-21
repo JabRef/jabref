@@ -46,7 +46,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
                                StateManager stateManager,
                                DialogService dialogService) {
         super(tabContainer,
-                openDatabaseActionSupplier.get(),
+                openDatabaseActionSupplier,
                 dialogService,
                 fileUpdateMonitor,
                 taskExecutor,

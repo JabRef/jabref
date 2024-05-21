@@ -20,7 +20,7 @@ import org.jabref.gui.entryeditor.CommentsTab;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.OS;
@@ -310,7 +310,7 @@ public class PreferencesMigrations {
             throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
-        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(
+        GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(
                 prefs.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addCitationKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
@@ -331,6 +331,7 @@ public class PreferencesMigrations {
         String currentPreviewStyle = prefs.get(JabRefPreferences.PREVIEW_STYLE);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
                                                   .replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
+                                                  .replace("\\format[Markdown,HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}")
                                                   .replace("<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>", "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>")
                                                   .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__");
         prefs.put(JabRefPreferences.PREVIEW_STYLE, migratedStyle);

@@ -4,7 +4,7 @@ grand_parent: Getting into the code
 nav_order: 13
 ---
 
-# Step 3: Using JabRef's code style
+# Step 3: Set up JabRef's code style
 
 Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
 

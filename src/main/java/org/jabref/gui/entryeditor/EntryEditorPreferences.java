@@ -49,6 +49,7 @@ public class EntryEditorPreferences {
     private final ObjectProperty<JournalPopupEnabled> enablementStatus;
     private final BooleanProperty shouldShowSciteTab;
     private final BooleanProperty showUserCommentsFields;
+    private final DoubleProperty previewWidthDividerPosition;
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
                                   Map<String, Set<Field>> defaultEntryEditorTabList,
@@ -62,7 +63,8 @@ public class EntryEditorPreferences {
                                   boolean autolinkFilesEnabled,
                                   JournalPopupEnabled journalPopupEnabled,
                                   boolean showSciteTab,
-                                  boolean showUserCommentsFields) {
+                                  boolean showUserCommentsFields,
+                                  double previewWidthDividerPosition) {
 
         this.entryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(entryEditorTabList));
         this.defaultEntryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
@@ -77,6 +79,7 @@ public class EntryEditorPreferences {
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
         this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
         this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
+        this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
     public ObservableMap<String, Set<Field>> getEntryEditorTabs() {
@@ -225,5 +228,20 @@ public class EntryEditorPreferences {
 
     public void setShowUserCommentsFields(boolean showUserCommentsFields) {
         this.showUserCommentsFields.set(showUserCommentsFields);
+    }
+
+    public void setPreviewWidthDividerPosition(double previewWidthDividerPosition) {
+        this.previewWidthDividerPosition.set(previewWidthDividerPosition);
+    }
+
+    /**
+     * Holds the horizontal divider position when the Preview is shown in the entry editor
+     */
+    public DoubleProperty previewWidthDividerPositionProperty() {
+        return previewWidthDividerPosition;
+    }
+
+    public Double getPreviewWidthDividerPosition() {
+        return previewWidthDividerPosition.get();
     }
 }

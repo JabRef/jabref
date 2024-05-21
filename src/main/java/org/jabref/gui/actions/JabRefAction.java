@@ -4,8 +4,8 @@ import java.util.Map;
 
 import javafx.beans.binding.Bindings;
 
-import org.jabref.gui.Telemetry;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.telemetry.Telemetry;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
 

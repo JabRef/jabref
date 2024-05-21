@@ -19,8 +19,8 @@ class MakeLabelWithDatabaseTest {
 
     private BibDatabase database;
     private CitationKeyPatternPreferences preferences;
-    private GlobalCitationKeyPattern pattern;
-    private DatabaseCitationKeyPattern bibtexKeyPattern;
+    private GlobalCitationKeyPatterns pattern;
+    private DatabaseCitationKeyPatterns bibtexKeyPattern;
     private BibEntry entry;
 
     @BeforeEach
@@ -32,8 +32,8 @@ class MakeLabelWithDatabaseTest {
         entry.setField(StandardField.YEAR, "2016");
         entry.setField(StandardField.TITLE, "An awesome paper on JabRef");
         database.insertEntry(entry);
-        pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
-        bibtexKeyPattern = new DatabaseCitationKeyPattern(pattern);
+        pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
+        bibtexKeyPattern = new DatabaseCitationKeyPatterns(pattern);
         preferences = new CitationKeyPatternPreferences(
                 false,
                 false,

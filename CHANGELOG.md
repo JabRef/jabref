@@ -11,16 +11,36 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added support for offline extracting refereferences from PDFs following the IEEE format. [#11156](https://github.com/JabRef/jabref/pull/11156)
+- We added support for offline extracting references from PDFs following the IEEE format. [#11156](https://github.com/JabRef/jabref/pull/11156)
 - We added a new keyboard shortcut  <kbd>ctrl</kbd> + <kbd>,</kbd> to open the preferences. [#11154](https://github.com/JabRef/jabref/pull/11154)
+- We added value selection (such as for month) for content selectors in custom entry types. [#11109](https://github.com/JabRef/jabref/issues/11109)
+- We added a duplicate checker for the Citation Relations tab. [#10414](https://github.com/JabRef/jabref/issues/10414)
+- We added tooltip on main table cells that shows cell content or cell content and entry preview if set in preferences. [10925](https://github.com/JabRef/jabref/issues/10925)
+- Added a formatter to remove word enclosing braces. [#11222](https://github.com/JabRef/jabref/issues/11222)
+- We added the ability to add a keyword/crossref when typing the separator character (e.g., comma) in the keywords/crossref fields. [#11178](https://github.com/JabRef/jabref/issues/11178)
+- We added an exporter and improved the importer for Endnote XML format. [#11137](https://github.com/JabRef/jabref/issues/11137)
+- We added support for using BibTeX Style files (BST) in the Preview. [#11102](https://github.com/JabRef/jabref/issues/11102)
+- We added support for automatically update LaTeX citations when a LaTeX file is created, removed, or modified. [#10585](https://github.com/JabRef/jabref/issues/10585)
 
 ### Changed
 
 - We replaced the word "Key bindings" with "Keyboard shortcuts" in the Preferences tab. [#11153](https://github.com/JabRef/jabref/pull/11153)
+- We slightly improved the duplicate check if ISBNs are present. [#8885](https://github.com/JabRef/jabref/issues/8885)
+- JabRef no longer downloads HTML files of websites when a PDF was not found. [#10149](https://github.com/JabRef/jabref/issues/10149)
 
 ### Fixed
 
-- We fixed an issue where entry type with duplicate fields prevented opening existing libraries with custom entry types [#11127](https://github.com/JabRef/jabref/issues/11127)
+- We fixed an issue where entry type with duplicate fields prevented opening existing libraries with custom entry types. [#11127](https://github.com/JabRef/jabref/issues/11127)
+- We fixed an issue where Markdown rendering removed braces from the text. [#10928](https://github.com/JabRef/jabref/issues/10928)
+- We fixed an issue when the file was flagged as changed on disk in the case of content selectors or groups. [#9064](https://github.com/JabRef/jabref/issues/9064)
+- We fixed crash on opening the entry editor when auto-completion is enabled. [#11188](https://github.com/JabRef/jabref/issues/11188)
+- We fixed the usage of the key binding for "Clear search" (default: <kbd>Escape</kbd>). [#10764](https://github.com/JabRef/jabref/issues/10764)
+- We fixed an issue where library shown as unsaved and marked (*) after accepting changes made externally to the file. [#11027](https://github.com/JabRef/jabref/issues/11027)
+- We fixed an issue where drag and dropping entries from one library to another was not always working. [#11254](https://github.com/JabRef/jabref/issues/11254)
+- We fixed an issue where drag and dropping entries created a shallow copy. [#11160](https://github.com/JabRef/jabref/issues/11160)
+- We fixed an issue where imports to a custom group would only work for the first entry [#11085](https://github.com/JabRef/jabref/issues/11085), [#11269](https://github.com/JabRef/jabref/issues/11269)
+- We fixed an issue where a new entry was not added to the selected group [#8933](https://github.com/JabRef/jabref/issues/8933)
+- We fixed an issue where the horizontal position of the Entry Preview inside the entry editor was not remembered across restarts [#11281](https://github.com/JabRef/jabref/issues/11281)
 
 ### Removed
 

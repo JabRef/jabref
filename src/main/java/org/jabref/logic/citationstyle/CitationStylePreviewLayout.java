@@ -5,7 +5,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-public class CitationStylePreviewLayout implements PreviewLayout {
+public final class CitationStylePreviewLayout implements PreviewLayout {
     private final CitationStyle citationStyle;
     private final BibEntryTypesManager bibEntryTypesManager;
 
@@ -24,7 +24,8 @@ public class CitationStylePreviewLayout implements PreviewLayout {
         return citationStyle.getTitle();
     }
 
-    public String getSource() {
+    @Override
+    public String getText() {
         return citationStyle.getSource();
     }
 
