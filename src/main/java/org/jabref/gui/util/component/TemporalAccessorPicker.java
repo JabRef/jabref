@@ -19,7 +19,6 @@ import javafx.scene.control.DatePicker;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.Globals;
-import org.jabref.gui.fieldeditors.TextInputControlBehavior;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.model.entry.Date;
@@ -28,18 +27,18 @@ import org.jabref.model.strings.StringUtil;
 /**
  * A date picker with configurable datetime format where both date and time can be changed via the text field and the
  * date can additionally be changed via the JavaFX default date picker. Also supports incomplete dates.
- *
+ * <p>
  * First recall how the date picker normally works: - The user selects a date in the popup, which sets {@link
  * #valueProperty()} to the selected date. - The converter ({@link #converterProperty()}) is used to transform the date
  * to a string representation and display it in the text field.
- *
+ * <p>
  * The idea is now to intercept the process and add an additional step: - The user selects a date in the popup, which
  * sets {@link #valueProperty()} to the selected date. - The date is converted to a {@link TemporalAccessor} (i.e,
  * enriched by a time component) using {@link #addCurrentTime(LocalDate)} - The string converter ({@link
  * #stringConverterProperty()}) is used to transform the temporal accessor to a string representation and display it in
  * the text field.
- *
- * Inspiration taken from https://github.com/edvin/tornadofx-controls/blob/master/src/main/java/tornadofx/control/DateTimePicker.java
+ * <p>
+ * Inspiration taken from <a href="https://github.com/edvin/tornadofx-controls/blob/master/src/main/java/tornadofx/control/DateTimePicker.java">Controlsfx DateTimePicker</a>
  */
 public class TemporalAccessorPicker extends DatePicker {
     private final ObjectProperty<TemporalAccessor> temporalAccessorValue = new SimpleObjectProperty<>(null);
@@ -58,7 +57,7 @@ public class TemporalAccessorPicker extends DatePicker {
         getEditor().setOnContextMenuRequested(event -> {
             ContextMenu contextMenu = new ContextMenu();
             contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(getEditor(), Globals.getKeyPrefs()));
-            TextInputControlBehavior.showContextMenu(getEditor(), contextMenu, event);
+            contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
     }
 
