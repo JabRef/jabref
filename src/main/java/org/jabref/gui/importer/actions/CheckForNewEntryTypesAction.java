@@ -9,6 +9,9 @@ import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
+
+import com.airhacks.afterburner.injection.Injector;
 
 /**
  * This action checks whether any new custom entry types were loaded from this
@@ -29,10 +32,11 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
     private List<BibEntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult) {
         BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
+        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
 
         return parserResult.getEntryTypes()
                            .stream()
-                           .filter(type -> Globals.entryTypesManager.isDifferentCustomOrModifiedType(type, mode))
+                           .filter(type -> entryTypesManager.isDifferentCustomOrModifiedType(type, mode))
                            .collect(Collectors.toList());
     }
 

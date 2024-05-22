@@ -88,6 +88,7 @@ import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -334,7 +335,7 @@ public class LibraryTab extends Tab {
             autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferencesService, entryTypesManager));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferencesService.getFilePreferences().shouldCreateBackup()) {
-            BackupManager.start(this, bibDatabaseContext, Globals.entryTypesManager, preferencesService);
+            BackupManager.start(this, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferencesService);
         }
     }
 
@@ -795,7 +796,7 @@ public class LibraryTab extends Tab {
 
         if (buttonType.equals(saveChanges)) {
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferencesService, Globals.entryTypesManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferencesService, Injector.instantiateModelOrService(BibEntryTypesManager.class));
                 if (saveAction.save()) {
                     return true;
                 }

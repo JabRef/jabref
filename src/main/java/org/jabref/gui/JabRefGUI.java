@@ -16,18 +16,23 @@ import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.WebViewStore;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
+import kong.unirest.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +66,7 @@ public class JabRefGUI extends Application {
         this.mainStage = stage;
 
         FallbackExceptionHandler.installExceptionHandler();
-        Globals.startBackgroundTasks();
+        startBackgroundTasks();
 
         WebViewStore.init();
 
@@ -77,7 +82,7 @@ public class JabRefGUI extends Application {
                 preferencesService,
                 Globals.stateManager,
                 Globals.undoManager,
-                Globals.entryTypesManager,
+                Injector.instantiateModelOrService(BibEntryTypesManager.class),
                 Globals.TASK_EXECUTOR);
 
         openWindow();
@@ -105,7 +110,7 @@ public class JabRefGUI extends Application {
     @Override
     public void stop() {
         OOBibBaseConnect.closeOfficeConnection();
-        Globals.stopBackgroundTasks();
+        stopBackgroundTasks();
         Globals.shutdownThreadPools();
     }
 
@@ -256,5 +261,27 @@ public class JabRefGUI extends Application {
 
     public static ThemeManager getThemeManager() {
         return themeManager;
+    }
+
+    // Background tasks
+    public static void startBackgroundTasks() {
+        // TODO Currently deactivated due to incompatibilities in XML
+      /*  if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
+            Telemetry.start(prefs.getTelemetryPreferences());
+        } */
+        RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
+        if (remotePreferences.useRemoteServer()) {
+            Globals.REMOTE_LISTENER.openAndStart(
+                    new CLIMessageHandler(
+                            Globals.prefs,
+                            Globals.getFileUpdateMonitor(),
+                            Injector.instantiateModelOrService(BibEntryTypesManager.class)),
+                    remotePreferences.getPort());
+        }
+    }
+
+    public static void stopBackgroundTasks() {
+        Telemetry.shutdown();
+        Unirest.shutDown();
     }
 }

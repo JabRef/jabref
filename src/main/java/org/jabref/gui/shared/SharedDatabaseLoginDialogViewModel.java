@@ -23,7 +23,6 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -48,6 +47,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -194,7 +194,12 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
             if (!folder.getValue().isEmpty() && autosave.get()) {
                 try {
-                    new SaveDatabaseAction(libraryTab, dialogService, preferencesService, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
+                    new SaveDatabaseAction(
+                            libraryTab,
+                            dialogService,
+                            preferencesService,
+                            Injector.instantiateModelOrService(BibEntryTypesManager.class)
+                    ).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }

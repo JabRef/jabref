@@ -126,6 +126,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.tobiasdiez.easybind.EasyBind;
@@ -2463,8 +2464,9 @@ public class JabRefPreferences implements PreferencesService {
         return cycle.stream()
                     .map(layout -> {
                         if (CitationStyle.isCitationStyleFile(layout)) {
+                            BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
                             return CitationStyle.createCitationStyleFromFile(layout)
-                                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, Globals.entryTypesManager))
+                                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
                                                 .orElse(null);
                         }
                         if (BstPreviewLayout.isBstStyleFile(layout)) {

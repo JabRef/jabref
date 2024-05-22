@@ -32,6 +32,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +65,8 @@ public class Launcher {
 
         addLogToDisk();
         try {
-            BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
-            Globals.entryTypesManager = entryTypesManager;
+            Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
+            BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
 
             // Initialize preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
@@ -187,7 +188,7 @@ public class Launcher {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader
                 .loadRepository(preferences.getJournalAbbreviationPreferences());
-        Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
+        Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
         Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
     }
 

@@ -59,6 +59,7 @@ import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.base.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -250,7 +251,7 @@ public class ArgumentProcessor {
                         preferencesService.getXmpPreferences(),
                         preferencesService.getFilePreferences(),
                         preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                        Globals.entryTypesManager,
+                        Injector.instantiateModelOrService(BibEntryTypesManager.class),
                         preferencesService.getFieldPreferences(),
                         Globals.journalAbbreviationRepository,
                         cli.isWriteXMPtoPdf() || cli.isWriteMetadatatoPdf(),
@@ -486,7 +487,7 @@ public class ArgumentProcessor {
                 // export new database
                 ExporterFactory exporterFactory = ExporterFactory.create(
                         preferencesService,
-                        Globals.entryTypesManager);
+                        Injector.instantiateModelOrService(BibEntryTypesManager.class));
                 Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
                 if (exporter.isEmpty()) {
                     System.err.println(Localization.lang("Unknown export format %0", formatName));
@@ -661,7 +662,7 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Exporting %0", data[0]));
             ExporterFactory exporterFactory = ExporterFactory.create(
                     preferencesService,
-                    Globals.entryTypesManager);
+                    Injector.instantiateModelOrService(BibEntryTypesManager.class));
             Optional<Exporter> exporter = exporterFactory.getExporterByName(data[1]);
             if (exporter.isEmpty()) {
                 System.err.println(Localization.lang("Unknown export format %0", data[1]));
@@ -684,7 +685,7 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             preferencesService.importPreferences(Path.of(cli.getPreferencesImport()));
-            Globals.entryTypesManager = preferencesService.getCustomEntryTypesRepository();
+            Injector.setModelOrService(BibEntryTypesManager.class, preferencesService.getCustomEntryTypesRepository());
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }
