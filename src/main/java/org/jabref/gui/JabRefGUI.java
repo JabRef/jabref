@@ -79,6 +79,7 @@ public class JabRefGUI extends Application {
                 preferencesService.getWorkspacePreferences(),
                 fileUpdateMonitor,
                 Runnable::run);
+        Injector.setModelOrService(ThemeManager.class, themeManager);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         Injector.setModelOrService(DialogService.class, dialogService);
@@ -287,9 +288,5 @@ public class JabRefGUI extends Application {
 
     public static JabRefFrame getMainFrame() {
         return mainFrame;
-    }
-
-    public static ThemeManager getThemeManager() {
-        return themeManager;
     }
 }
