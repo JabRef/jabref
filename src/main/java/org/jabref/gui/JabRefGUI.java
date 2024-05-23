@@ -3,6 +3,8 @@ package org.jabref.gui;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -19,6 +21,7 @@ import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -50,6 +53,8 @@ public class JabRefGUI extends Application {
     private static DialogService dialogService;
     private static ThemeManager themeManager;
 
+    private static CountingUndoManager countingUndoManager;
+
     private boolean correctedWindowPos = false;
     private Stage mainStage;
 
@@ -74,14 +79,20 @@ public class JabRefGUI extends Application {
                 preferencesService.getWorkspacePreferences(),
                 fileUpdateMonitor,
                 Runnable::run);
+
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
+
+        JabRefGUI.countingUndoManager = new CountingUndoManager();
+        Injector.setModelOrService(UndoManager.class, countingUndoManager);
+        Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
+
         JabRefGUI.mainFrame = new JabRefFrame(
                 mainStage,
                 dialogService,
                 fileUpdateMonitor,
                 preferencesService,
                 Globals.stateManager,
-                Globals.undoManager,
+                countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
                 Globals.TASK_EXECUTOR);
 

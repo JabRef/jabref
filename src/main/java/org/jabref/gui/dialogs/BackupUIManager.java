@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
@@ -33,8 +35,6 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.gui.Globals.undoManager;
-
 /**
  * Stores all user dialogs related to {@link BackupManager}.
  */
@@ -48,6 +48,7 @@ public class BackupUIManager {
                                                                  Path originalPath,
                                                                  PreferencesService preferencesService,
                                                                  FileUpdateMonitor fileUpdateMonitor,
+                                                                 UndoManager undoManager,
                                                                  StateManager stateManager) {
         var actionOpt = showBackupResolverDialog(
                 dialogService,
@@ -59,7 +60,7 @@ public class BackupUIManager {
                 BackupManager.restoreBackup(originalPath, preferencesService.getFilePreferences().getBackupDirectory());
                 return Optional.empty();
             } else if (action == BackupResolverDialog.REVIEW_BACKUP) {
-                return showReviewBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, stateManager);
+                return showReviewBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, undoManager, stateManager);
             }
             return Optional.empty();
         });
@@ -78,6 +79,7 @@ public class BackupUIManager {
             Path originalPath,
             PreferencesService preferencesService,
             FileUpdateMonitor fileUpdateMonitor,
+            UndoManager undoManager,
             StateManager stateManager) {
         try {
             ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
@@ -117,7 +119,7 @@ public class BackupUIManager {
                 }
 
                 // In case not all changes are resolved, start from scratch
-                return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, stateManager);
+                return showRestoreBackupDialog(dialogService, originalPath, preferencesService, fileUpdateMonitor, undoManager, stateManager);
             });
         } catch (IOException e) {
             LOGGER.error("Error while loading backup or current database", e);

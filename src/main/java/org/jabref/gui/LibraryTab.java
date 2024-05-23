@@ -926,6 +926,7 @@ public class LibraryTab extends Tab {
                 dialogService,
                 preferencesService,
                 databaseNotificationPane,
+                undoManager,
                 stateManager));
     }
 

@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -55,7 +54,6 @@ public class Globals {
      */
     public static ProtectedTermsLoader protectedTermsLoader;
 
-    public static CountingUndoManager undoManager = new CountingUndoManager();
     public static BibEntryTypesManager entryTypesManager;
 
     private static ClipBoardManager clipBoardManager = null;
