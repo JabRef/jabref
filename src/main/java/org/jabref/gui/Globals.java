@@ -30,12 +30,7 @@ public class Globals {
 
     public static final RemoteListenerServerManager REMOTE_LISTENER = new RemoteListenerServerManager();
 
-    /**
-     * Manager for the state of the GUI.
-     */
-    public static StateManager stateManager = new StateManager();
-
-    public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor(stateManager);
+    public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor();
 
     /**
      * This field is initialized upon startup.

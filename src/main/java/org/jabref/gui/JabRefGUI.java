@@ -52,6 +52,7 @@ public class JabRefGUI extends Application {
     private static JabRefFrame mainFrame;
     private static DialogService dialogService;
     private static ThemeManager themeManager;
+    private static StateManager stateManager;
 
     private static CountingUndoManager countingUndoManager;
 
@@ -75,6 +76,8 @@ public class JabRefGUI extends Application {
 
         WebViewStore.init();
 
+        JabRefGUI.stateManager = new StateManager();
+
         JabRefGUI.themeManager = new ThemeManager(
                 preferencesService.getWorkspacePreferences(),
                 fileUpdateMonitor,
@@ -93,7 +96,7 @@ public class JabRefGUI extends Application {
                 dialogService,
                 fileUpdateMonitor,
                 preferencesService,
-                Globals.stateManager,
+                stateManager,
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
                 Globals.TASK_EXECUTOR);

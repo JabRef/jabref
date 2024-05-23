@@ -29,8 +29,6 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.getKeyPrefs();
         } else if (clazz == JournalAbbreviationRepository.class) {
             return Globals.journalAbbreviationRepository;
-        } else if (clazz == StateManager.class) {
-            return Globals.stateManager;
         } else if (clazz == FileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
         } else if (clazz == ProtectedTermsLoader.class) {

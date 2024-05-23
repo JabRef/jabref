@@ -56,7 +56,7 @@ public class ClipBoardManagerTest {
         entryTypesManager = new BibEntryTypesManager();
 
         // initialize a clipBoardManager
-        clipBoardManager = new ClipBoardManager(clipboard, clipboardPrimary, preferencesService);
+        clipBoardManager = new ClipBoardManager(clipboard, clipboardPrimary);
     }
 
     @DisplayName("Check that the ClipBoardManager can set a bibentry as its content from the clipboard")
