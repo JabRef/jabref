@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,7 +53,7 @@ public class PdfVerbatimBibTextImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(Path filePath) {
-        List<BibEntry> result = new ArrayList<>(1);
+        List<BibEntry> result;
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
             BibtexParser parser = new BibtexParser(importFormatPreferences);

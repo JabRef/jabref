@@ -193,6 +193,7 @@ public class IconTheme {
         DELETE_ENTRY(MaterialDesignD.DELETE),
         SEARCH(MaterialDesignM.MAGNIFY),
         FILE_SEARCH(MaterialDesignF.FILE_FIND),
+        FILE_STAR(MaterialDesignF.FILE_STAR),
         PDF_METADATA_READ(MaterialDesignF.FORMAT_ALIGN_TOP),
         PDF_METADATA_WRITE(MaterialDesignF.FORMAT_ALIGN_BOTTOM),
         ADVANCED_SEARCH(Color.CYAN, MaterialDesignM.MAGNIFY),
@@ -277,6 +278,8 @@ public class IconTheme {
         APPLICATION_VIM(JabRefMaterialDesignIcon.VIM),
         APPLICATION_WINEDT(JabRefMaterialDesignIcon.WINEDT),
         APPLICATION_SUBLIMETEXT(JabRefMaterialDesignIcon.SUBLIME_TEXT),
+        APPLICATION_TEXSHOP(JabRefMaterialDesignIcon.TEXSHOP),
+        APPLICATION_TEXWORS(JabRefMaterialDesignIcon.TEXWORKS),
         KEY_BINDINGS(MaterialDesignK.KEYBOARD),
         FIND_DUPLICATES(MaterialDesignC.CODE_EQUAL),
         CONNECT_DB(MaterialDesignC.CLOUD_UPLOAD),
@@ -296,7 +299,8 @@ public class IconTheme {
         BLOG(MaterialDesignR.RSS),
         DATE_PICKER(MaterialDesignC.CALENDAR),
         DEFAULT_GROUP_ICON_COLORED(MaterialDesignR.RECORD),
-        DEFAULT_GROUP_ICON(MaterialDesignL.LABEL_OUTLINE),
+        DEFAULT_GROUP_ICON(MaterialDesignF.FILE_TREE),
+        DEFAULT_GROUP_ICON_COLUMN(MaterialDesignL.LABEL_OUTLINE),
         ALL_ENTRIES_GROUP_ICON(MaterialDesignD.DATABASE),
         IMPORT(MaterialDesignC.CALL_RECEIVED),
         EXPORT(MaterialDesignC.CALL_MADE),
@@ -353,7 +357,6 @@ public class IconTheme {
         ACCEPT_LEFT(MaterialDesignS.SUBDIRECTORY_ARROW_LEFT),
         ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
         MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE);
-
         private final JabRefIcon icon;
 
         JabRefIcons(Ikon... icons) {

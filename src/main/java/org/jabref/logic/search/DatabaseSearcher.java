@@ -23,16 +23,19 @@ public class DatabaseSearcher {
         this.database = Objects.requireNonNull(database);
     }
 
+    /**
+     * @return The matches in the order they appear in the library.
+     */
     public List<BibEntry> getMatches() {
-        LOGGER.debug("Search term: " + query);
+        LOGGER.debug("Search term: {}", query);
 
         if (!query.isValid()) {
-            LOGGER.warn("Search failed: illegal search expression");
+            LOGGER.warn("Search failed: invalid search expression");
             return Collections.emptyList();
         }
 
         List<BibEntry> matchEntries = List.of();
-        // List<BibEntry> matchEntries = database.getEntries().stream().filter(query::isMatch).collect(Collectors.toList());
+        // List<BibEntry> matchEntries = database.getEntries().stream().filter(query::isMatch).toList();
         // TODO btut: is this for CLI? We need the databasecontext to access the index
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }

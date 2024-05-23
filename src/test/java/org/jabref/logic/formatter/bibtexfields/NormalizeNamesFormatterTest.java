@@ -18,7 +18,10 @@ public class NormalizeNamesFormatterTest {
     }
 
     @Test
-    public void testNormalizeAuthorList() {
+    public void normalizeAuthorList() {
+        assertEquals("{Society of Automotive Engineers}", formatter.format("{Society of Automotive Engineers}"));
+        assertEquals("{Company Name, LLC}", formatter.format("{Company Name, LLC}"));
+
         assertEquals("Bilbo, Staci D.", formatter.format("Staci D Bilbo"));
         assertEquals("Bilbo, Staci D.", formatter.format("Staci D. Bilbo"));
 
@@ -99,13 +102,13 @@ public class NormalizeNamesFormatterTest {
     }
 
     @Test
-    public void testConcatenationOfAuthorsWithCommas() {
+    public void concatenationOfAuthorsWithCommas() {
         assertEquals("Ali Babar, M. and Dingsøyr, T. and Lago, P. and van der Vliet, H.", formatter.format("Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H."));
         assertEquals("Ali Babar, M.", formatter.format("Ali Babar, M."));
     }
 
     @Test
-    public void testOddCountOfCommas() {
+    public void oddCountOfCommas() {
         assertEquals("Ali Babar, M., Dingsøyr T. Lago P.", formatter.format("Ali Babar, M., Dingsøyr, T., Lago P."));
     }
 
@@ -115,66 +118,66 @@ public class NormalizeNamesFormatterTest {
     }
 
     @Test
-    public void testNameAffixe() {
+    public void nameAffixe() {
         assertEquals("Surname, jr, First and Surname2, First2", formatter.format("Surname, jr, First, Surname2, First2"));
     }
 
     @Test
-    public void testAvoidSpecialCharacter() {
+    public void avoidSpecialCharacter() {
         assertEquals("Surname, {, First; Surname2, First2", formatter.format("Surname, {, First; Surname2, First2"));
     }
 
     @Test
-    public void testAndInName() {
+    public void andInName() {
         assertEquals("Surname and , First, Surname2 First2", formatter.format("Surname, and , First, Surname2, First2"));
     }
 
     @Test
-    public void testMultipleNameAffixes() {
+    public void multipleNameAffixes() {
         assertEquals("Mair, Jr, Daniel and Brühl, Sr, Daniel", formatter.format("Mair, Jr, Daniel, Brühl, Sr, Daniel"));
     }
 
     @Test
-    public void testCommaSeperatedNames() {
+    public void commaSeperatedNames() {
         assertEquals("Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal",
                 formatter.format("Cristina Bosoi, Mariana Oliveira, Rafael Ochoa Sanchez, Mélanie Tremblay, Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur"));
     }
 
     @Test
-    public void testMultipleSpaces() {
+    public void multipleSpaces() {
         assertEquals("Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal",
                 formatter.format("Cristina    Bosoi,    Mariana Oliveira, Rafael Ochoa Sanchez   ,   Mélanie Tremblay  , Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur"));
     }
 
     @Test
-    public void testAvoidPreposition() {
+    public void avoidPreposition() {
         assertEquals("von Zimmer, Hans and van Oberbergern, Michael and zu Berger, Kevin", formatter.format("Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger"));
     }
 
     @Test
-    public void testPreposition() {
+    public void preposition() {
         assertEquals("von Zimmer, Hans and van Oberbergern, Michael and zu Berger, Kevin", formatter.format("Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger"));
     }
 
     @Test
-    public void testOneCommaUntouched() {
+    public void oneCommaUntouched() {
         assertEquals("Canon der Barbar, Alexander der Große", formatter.format("Canon der Barbar, Alexander der Große"));
     }
 
     @Test
-    public void testAvoidNameAffixes() {
+    public void avoidNameAffixes() {
         assertEquals("der Barbar, Canon and der Große, Alexander and der Alexander, Peter", formatter.format("Canon der Barbar, Alexander der Große, Peter der Alexander"));
     }
 
     @Test
-    public void testUpperCaseSensitiveList() {
+    public void upperCaseSensitiveList() {
         assertEquals("der Barbar, Canon and der Große, Alexander", formatter.format("Canon der Barbar AND Alexander der Große"));
         assertEquals("der Barbar, Canon and der Große, Alexander", formatter.format("Canon der Barbar aNd Alexander der Große"));
         assertEquals("der Barbar, Canon and der Große, Alexander", formatter.format("Canon der Barbar AnD Alexander der Große"));
     }
 
     @Test
-    public void testSemiCorrectNamesWithSemicolon() {
+    public void semiCorrectNamesWithSemicolon() {
         assertEquals("Last, First and Last2, First2 and Last3, First3", formatter.format("Last, First; Last2, First2; Last3, First3"));
         assertEquals("Last, Jr, First and Last2, First2", formatter.format("Last, Jr, First; Last2, First2"));
         assertEquals("Last, First and Last2, First2 and Last3, First3 and Last4, First4", formatter.format("Last, First; Last2, First2; Last3, First3; First4 Last4"));

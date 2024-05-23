@@ -34,6 +34,7 @@ import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
@@ -137,13 +138,12 @@ public class SaveDatabaseAction {
     boolean saveAs(Path file, SaveDatabaseMode mode) {
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
-        // Close AutosaveManager and BackupManager for original library
         Optional<Path> databasePath = context.getDatabasePath();
         if (databasePath.isPresent()) {
-            final Path oldFile = databasePath.get();
-            context.setDatabasePath(oldFile);
+            // Close AutosaveManager, BackupManager, and PdfIndexer for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
+            PdfIndexerManager.shutdownIndexer(context);
         }
 
         // Set new location
@@ -164,6 +164,7 @@ public class SaveDatabaseAction {
             // Reset (here: uninstall and install again) AutosaveManager and BackupManager for the new file name
             libraryTab.resetChangeMonitor();
             libraryTab.installAutosaveManagerAndBackupManager();
+            // PdfIndexerManager does not need to be called; the method {@link org.jabref.logic.pdf.search.PdfIndexerManager.get()} is called if a new indexer is needed
 
             preferences.getGuiPreferences().getFileHistory().newFile(file);
         }
@@ -188,7 +189,7 @@ public class SaveDatabaseAction {
         if (selectedPath.isPresent()) {
             Path savePath = selectedPath.get();
             // Workaround for linux systems not adding file extension
-            if (!(savePath.getFileName().toString().toLowerCase().endsWith(".bib"))) {
+            if (!savePath.getFileName().toString().toLowerCase().endsWith(".bib")) {
                 savePath = Path.of(savePath.toString() + ".bib");
                 if (!Files.notExists(savePath)) {
                     if (!dialogService.showConfirmationDialogAndWait(Localization.lang("Overwrite file"), Localization.lang("'%0' exists. Overwrite file?", savePath.getFileName()))) {
@@ -205,18 +206,15 @@ public class SaveDatabaseAction {
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty()) {
             Optional<Path> savePath = askForSavePath();
-            if (savePath.isEmpty()) {
-                return false;
-            }
-            return saveAs(savePath.get(), mode);
+            return savePath.filter(path -> saveAs(path, mode)).isPresent();
         }
 
         return save(databasePath.get(), mode);
     }
 
     private boolean save(Path targetPath, SaveDatabaseMode mode) {
-        if (mode == SaveDatabaseMode.NORMAL) {
-            dialogService.notify(String.format("%s...", Localization.lang("Saving library")));
+        if (mode == SaveDatabaseMode.NORMAL && libraryTab.getBibDatabaseContext().getEntries().size() > 2_000) {
+            dialogService.notify("%s...".formatted(Localization.lang("Saving library")));
         }
 
         synchronized (libraryTab) {
@@ -245,7 +243,7 @@ public class SaveDatabaseAction {
             dialogService.notify(Localization.lang("Library saved"));
             return success;
         } catch (SaveException ex) {
-            LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
+            LOGGER.error("A problem occurred when trying to save the file %s".formatted(targetPath), ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
         } finally {

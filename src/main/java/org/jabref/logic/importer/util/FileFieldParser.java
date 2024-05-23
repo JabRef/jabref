@@ -102,6 +102,11 @@ public class FileFieldParser {
                     // We are at the second : (position 3 in the example) and "just" add it to the current element
                     charactersOfCurrentElement.append(c);
                     windowsPath = true;
+                    // special case for zotero absolute path on windows that do not have a colon in front
+                    // e.g. A:\zotero\paper.pdf
+                } else if (charactersOfCurrentElement.length() == 1 && value.charAt(i + 1) == '\\') {
+                    charactersOfCurrentElement.append(c);
+                    windowsPath = true;
                 } else {
                     // We are in the next LinkedFile data element
                     linkedFileData.add(charactersOfCurrentElement.toString());
@@ -137,6 +142,9 @@ public class FileFieldParser {
      *
      * SIDE EFFECT: The given entry list is cleared upon completion
      *
+     * Expected format is: description:link:fileType:sourceURL
+     * fileType is an {@link org.jabref.gui.externalfiletype.ExternalFileType}, which contains a name and a mime type
+     *
      * @param entry the list of elements in the linked file textual representation
      * @return a LinkedFile object
      */
@@ -149,30 +157,31 @@ public class FileFieldParser {
         LinkedFile field = null;
         if (LinkedFile.isOnlineLink(entry.get(1))) {
             try {
-                field = new LinkedFile(entry.get(0), new URL(entry.get(1)), entry.get(2));
+                field = new LinkedFile(entry.getFirst(), new URL(entry.get(1)), entry.get(2));
             } catch (MalformedURLException e) {
                 // in case the URL is malformed, store it nevertheless
-                field = new LinkedFile(entry.get(0), entry.get(1), entry.get(2));
+                field = new LinkedFile(entry.getFirst(), entry.get(1), entry.get(2));
             }
-        }
-
-        if (field == null) {
+        } else {
             String pathStr = entry.get(1);
             if (pathStr.contains("//")) {
                 // In case the path contains //, we assume it is a malformed URL, not a malformed path.
                 // On linux, the double slash would be converted to a single slash.
-                field = new LinkedFile(entry.get(0), pathStr, entry.get(2));
+                field = new LinkedFile(entry.getFirst(), pathStr, entry.get(2));
             } else {
                 try {
                     // there is no Path.isValidPath(String) method
-                    Path path = Path.of(pathStr);
-                    field = new LinkedFile(entry.get(0), path, entry.get(2));
+                    field = new LinkedFile(entry.getFirst(), Path.of(pathStr), entry.get(2));
                 } catch (InvalidPathException e) {
                     // Ignored
-                    LOGGER.debug("Invalid path object, continueing with string", e);
-                    field = new LinkedFile(entry.get(0), pathStr, entry.get(2));
+                    LOGGER.debug("Invalid path object, continuing with string", e);
+                    field = new LinkedFile(entry.getFirst(), pathStr, entry.get(2));
                 }
             }
+        }
+
+        if (entry.size() > 3) {
+            field.setSourceURL(entry.get(3));
         }
 
         // link is the only mandatory field

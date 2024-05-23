@@ -1,15 +1,12 @@
 package org.jabref.gui.libraryproperties.contentselectors;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -23,21 +20,23 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
+import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.ContentSelector;
+import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 
 public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
-    private static final List<Field> DEFAULT_FIELD_NAMES = Arrays.asList(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
-
     private final MetaData metaData;
+
     private final DialogService dialogService;
-    private final Map<Field, List<String>> fieldKeywordsMap = new HashMap<>();
+
+    // The map from each field to its predefined strings ("keywords") that can be selected
+    private Map<Field, List<String>> fieldKeywordsMap = new HashMap<>();
 
     private final ListProperty<Field> fields = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<String> keywords = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -52,49 +51,31 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     @Override
     public void setValues() {
         // Populate field names keyword map
-        metaData.getContentSelectors().getContentSelectors().forEach(
-                existingContentSelector -> fieldKeywordsMap.put(existingContentSelector.getField(), new ArrayList<>(existingContentSelector.getValues()))
-        );
+        fieldKeywordsMap = ContentSelectors.getFieldKeywordsMap(metaData.getContentSelectors().getContentSelectors());
 
         // Populate Field names list
         List<Field> existingFields = new ArrayList<>(fieldKeywordsMap.keySet());
         fields.addAll(existingFields);
 
         if (fields.isEmpty()) {
-            DEFAULT_FIELD_NAMES.forEach(this::addFieldIfUnique);
+            ContentSelectors.DEFAULT_FIELD_NAMES.forEach(this::addFieldIfUnique);
         }
     }
 
     @Override
     public void storeSettings() {
         List<Field> metaDataFields = metaData.getContentSelectors().getFieldsWithSelectors();
+        List<Field> fieldNamesToRemove;
 
-        if (isDefaultMap(fieldKeywordsMap)) {
-            Iterator<ContentSelector> iterator = metaData.getContentSelectors().getContentSelectors().iterator();
-            while (iterator.hasNext()) {
-                metaData.clearContentSelectors(iterator.next().getField());
-            }
+        if (ContentSelectors.isDefaultMap(fieldKeywordsMap)) {
+            // Remove all fields of the content selector
+            fieldNamesToRemove = metaData.getContentSelectorsSorted().stream().map(ContentSelector::getField).toList();
+        } else {
+            fieldNamesToRemove = determineFieldsToRemove();
         }
 
         fieldKeywordsMap.forEach((field, keywords) -> updateMetaDataContentSelector(metaDataFields, field, keywords));
-
-        List<Field> fieldNamesToRemove = filterFieldsToRemove();
         fieldNamesToRemove.forEach(metaData::clearContentSelectors);
-    }
-
-    private boolean isDefaultMap(Map<Field, List<String>> fieldKeywordsMap) {
-        if (fieldKeywordsMap.size() != DEFAULT_FIELD_NAMES.size()) {
-            return false;
-        }
-        for (Field field : DEFAULT_FIELD_NAMES) {
-            if (!fieldKeywordsMap.containsKey(field)) {
-                return false;
-            }
-            if (!fieldKeywordsMap.get(field).isEmpty()) {
-                return false;
-            }
-        }
-        return true;
     }
 
     public ListProperty<Field> getFieldNamesBackingList() {
@@ -126,8 +107,11 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
     }
 
     void showInputFieldNameDialog() {
-        dialogService.showInputDialogAndWait(Localization.lang("Add new field name"), Localization.lang("Field name"))
-                     .map(FieldFactory::parseField)
+        dialogService.showEditableChoiceDialogAndWait(Localization.lang("Add new field name"),
+                             Localization.lang("Field name"),
+                             Localization.lang("Add"),
+                             FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey()),
+                             FieldsUtil.FIELD_STRING_CONVERTER)
                      .ifPresent(this::addFieldIfUnique);
     }
 
@@ -201,11 +185,28 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
         keywords.remove(keywordToRemove);
     }
 
-    private List<Field> filterFieldsToRemove() {
+    /**
+     * Determines the list of fields to remove in case a non-default map:
+     *
+     * <ul>
+     *     <li>Fields that are not in the new list of fields and</li>
+     *     <li>>all default fields that have no associated keywords</li>
+     * </ul>
+     */
+    private List<Field> determineFieldsToRemove() {
         Set<Field> newlyAddedKeywords = fieldKeywordsMap.keySet();
-        return metaData.getContentSelectors().getFieldsWithSelectors().stream()
-                       .filter(field -> !newlyAddedKeywords.contains(field))
-                       .collect(Collectors.toList());
+
+        // Remove all content selectors that are not in the new list
+        List<Field> result = new ArrayList(metaData.getContentSelectors().getFieldsWithSelectors().stream()
+                                                   .filter(field -> !newlyAddedKeywords.contains(field))
+                                                   .toList());
+        // Remove all unset default fields
+        result.addAll(fieldKeywordsMap.entrySet()
+                                      .stream()
+                                      .filter(entry -> ContentSelectors.DEFAULT_FIELD_NAMES.contains(entry.getKey()) && entry.getValue().isEmpty()).map(Map.Entry::getKey)
+                                      .toList());
+
+        return result;
     }
 
     private void updateMetaDataContentSelector(List<Field> existingFields, Field field, List<String> keywords) {

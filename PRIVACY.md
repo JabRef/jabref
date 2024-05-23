@@ -46,7 +46,7 @@ These third-party services are the following:
 | [arXiv.org](https://arxiv.org/)                                                                                 | <https://info.arxiv.org/help/policies/privacy_policy.html> |
 | [Bibliotheksverbund Bayern](https://www.bib-bvb.de/)                                                            | <https://www.bib-bvb.de/web/guest/datenschutzerklaerung-bvb-homepage> |
 | [Biodiversity Heritage Library](https://www.biodiversitylibrary.org/)                                           | <https://www.si.edu/Privacy> |
-| [Collection of Computer Science Bibliographies](http://liinwww.ira.uka.de/)                                     | **currently unavailable**, offline  |
+| [Collection of Computer Science Bibliographies](https://en.wikipedia.org/wiki/Collection_of_Computer_Science_Bibliographies)                                     | **currently unavailable**, offline  |
 | [CrossRef](https://www.crossref.org/)                                                                           | <https://www.crossref.org/operations-and-sustainability/privacy/> |
 | [dblp](https://dblp.uni-trier.de/)                                                                              | <https://dblp.uni-trier.de/db/about/privacy.html> |
 | [Directory of Open Access Books](https://www.doabooks.org/)                                                     | <https://www.doabooks.org/en/resources/accessibility> |
@@ -62,16 +62,17 @@ These third-party services are the following:
 | [Library of Congress](https://lccn.loc.gov/)                                                                    | <https://www.loc.gov/legal/> |
 | [National Library of Medicine](https://www.ncbi.nlm.nih.gov/)                                                   | <https://www.nlm.nih.gov/web_policies.html> |
 | [MathSciNet](http://www.ams.org/mathscinet)                                                                     | <https://www.ams.org/about-us/privacy> |
-| [mEDRA](https://medra.org/)                                                                                     | <https://www.medra.org/stdoc/en/Servizio_DOI_Informativa_ENG.pdf> |
+| [mEDRA](https://www.medra.org/)                                                                                     | <https://<https://www.medra.org/stdoc/en/Servizio_DOI_Informativa_ENG.pdf> |
 | [Mr. DLib](https://mr-dlib.org/) [1]                                                                            | <https://support.dataverse.harvard.edu/harvard-dataverse-privacy-policy> |
 | [Openlibrary](https://openlibrary.org)                                                                          | <https://archive.org/about/terms.php> |
 | [ResearchGate](https://www.researchgate.net/)                                                                   | <https://www.researchgate.net/privacy-policy> |
 | [IETF Datatracker](https://datatracker.ietf.org/)                                                               | <https://www.ietf.org/privacy-statement/> |
 | [Semantic Scholar](https://www.semanticscholar.org/), powered by [Allen Institute for AI](https://allenai.org/) | <https://allenai.org/privacy-policy> |
-| [Springer Nature](https://dev.springernature.com/)                                                              | <https://dev.springernature.com/privacypolicy> |
+| [Springer Nature](https://dev.springernature.com/)                                                              | <https://dev.springernature.com/privacy-policy/> |
 | [The SAO/NASA Astrophysics Data System](https://ui.adsabs.harvard.edu/)                                         | <https://ui.adsabs.harvard.edu/help/privacy/> |
 | [Unpaywall](https://unpaywall.org/)                                                                             | <https://unpaywall.org/legal/privacy> |
 | [zbMATH Open](https://www.zbmath.org)                                                                           | <https://zbmath.org/privacy-policy/> |
+| [ISIDORE](https://isidore.science/)                                                                             | <https://isidore.science/credit> |
 
 [1]: *Note: The Mr. DLib service is used for the related articles tab in the entry editor and collects also your language, your browser and operating system (by default*disabled*).*
 
@@ -111,10 +112,12 @@ This privacy policy is in effect as of the day mentioned as "last updated" above
 
 ## Contact
 
-If you get in touch with us, we may aks you to provide us with certain personal information (e.g. name and email address) to stay in contact with you.
+If you get in touch with us, we may ask you to provide us with certain personal information (e.g. name and email address) to stay in contact with you.
 For any questions or concerns regarding the privacy policy, please send us an email to <vorstand@jabref.org> or write to
 
 JabRef e.V.  
 Josef-Lanner-Str. 9  
 71069 Sindelfingen  
 Germany
+
+<!-- markdownlint-disable-file MD024 -->

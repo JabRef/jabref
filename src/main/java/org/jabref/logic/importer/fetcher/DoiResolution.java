@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 public class DoiResolution implements FulltextFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
-    private DOIPreferences doiPreferences;
+    private final DOIPreferences doiPreferences;
 
     public DoiResolution(DOIPreferences doiPreferences) {
         super();
@@ -121,7 +121,7 @@ public class DoiResolution implements FulltextFetcher {
             // return if only one link was found (high accuracy)
             if (links.size() == 1) {
                 LOGGER.info("Fulltext PDF found @ {}", doiLink);
-                return Optional.of(links.get(0));
+                return Optional.of(links.getFirst());
             }
             // return if links are equal
             return findDistinctLinks(links);
@@ -181,7 +181,7 @@ public class DoiResolution implements FulltextFetcher {
         }
         // equal
         if (distinctLinks.size() == 1) {
-            return Optional.of(distinctLinks.get(0));
+            return Optional.of(distinctLinks.getFirst());
         }
 
         return Optional.empty();

@@ -1,23 +1,24 @@
 import org.gradle.internal.os.OperatingSystem
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
 plugins {
     id 'application'
 
-    id 'com.github.andygoossens.modernizer' version '1.8.0'
+    id 'com.github.andygoossens.modernizer' version '1.9.2'
 
-    id 'me.champeau.jmh' version '0.7.1'
+    id 'me.champeau.jmh' version '0.7.2'
 
-    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    id 'org.javamodularity.moduleplugin' version '1.8.15'
 
     id 'org.openjfx.javafxplugin' version '0.1.0'
 
-    id 'org.beryx.jlink' version '3.0.0'
+    id 'org.beryx.jlink' version '3.0.1'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id 'com.adarshr.test-logger' version '3.2.0'
+    id 'com.adarshr.test-logger' version '4.0.0'
 
     id 'jacoco'
 
@@ -27,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.3.8'
+    id 'org.openrewrite.rewrite' version '6.14.0'
 }
 
 // Enable following for debugging
@@ -48,14 +49,45 @@ java {
     modularity.inferModulePath.set(false)
 
     toolchain {
-        // If this is updated, also update .devcontainer/devcontainer.json#L34
+        // If this is updated, also update
+        // - .gitpod.Dockerfile
+        // - .devcontainer/devcontainer.json#L34 and
+        // - .github/workflows/deployment-jdk-ea.yml#L53
         languageVersion = JavaLanguageVersion.of(21)
+        // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
+        // vendor = JvmVendorSpec.AMAZON
     }
 }
 
 application {
-    mainClass.set('org.jabref.cli.Launcher')
+    mainClass.set('org.jabref.Launcher')
     mainModule.set('org.jabref')
+
+    applicationDefaultJvmArgs = [
+        // On a change here, also adapt
+        //   1. "run > moduleOptions"
+        //   2. "deployment.yml" (macOS part)
+        //   3. "deployment-arm64.yml"
+
+        // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+
+        // Fix for https://github.com/JabRef/jabref/issues/11188
+        '--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module',
+        '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
+
+        // Fix for https://github.com/JabRef/jabref/issues/11198
+        '--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module',
+        '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
+        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
+
+        // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
+        '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
+        '--add-exports=javafx.base/com.sun.javafx.event=org.jabref',
+        '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref',
+        '--add-opens=javafx.graphics/javafx.scene=org.jabref',
+        '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
+        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref'
+    ]
 }
 
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
@@ -99,7 +131,7 @@ dependencyLocking {
 }
 
 javafx {
-    version = "20.0.2"
+    version = "22.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -111,27 +143,37 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:3.0.0'
-    implementation 'org.apache.pdfbox:fontbox:3.0.0'
-    implementation 'org.apache.pdfbox:xmpbox:3.0.0'
+    def pdfbox = "3.0.2"
+    implementation ("org.apache.pdfbox:pdfbox:$pdfbox") {
+        exclude group: 'commons-logging'
+    }
+    implementation ("org.apache.pdfbox:fontbox:$pdfbox") {
+        exclude group: 'commons-logging'
+    }
+    implementation ("org.apache.pdfbox:xmpbox:$pdfbox") {
+        exclude group: 'org.junit.jupiter'
+        exclude group: 'commons-logging'
+    }
 
-    implementation 'org.apache.lucene:lucene-core:9.7.0'
-    implementation 'org.apache.lucene:lucene-queryparser:9.7.0'
-    implementation 'org.apache.lucene:lucene-queries:9.7.0'
-    implementation 'org.apache.lucene:lucene-analysis-common:9.7.0'
-    implementation 'org.apache.lucene:lucene-highlighter:9.7.0'
+    def luceneVersion = "9.10.0"
+    implementation "org.apache.lucene:lucene-core:$luceneVersion"
+    implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
+    implementation "org.apache.lucene:lucene-queries:$luceneVersion"
+    implementation "org.apache.lucene:lucene-analysis-common:$luceneVersion"
+    implementation "org.apache.lucene:lucene-highlighter:$luceneVersion"
 
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.10.0'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.13.0'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
     implementation 'com.h2database:h2-mvstore:2.2.224'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk18on:1.76'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
 
-    implementation 'commons-cli:commons-cli:1.5.0'
+    implementation 'commons-cli:commons-cli:1.7.0'
 
-    implementation 'org.libreoffice:unoloader:7.6.1'
-    implementation 'org.libreoffice:libreoffice:7.6.1'
+    implementation 'org.libreoffice:unoloader:7.6.4'
+    implementation 'org.libreoffice:libreoffice:7.6.4'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -140,21 +182,23 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.13.1'
     implementation 'org.antlr:antlr4-runtime:4.13.1'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.7.0.202309050840-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.9.0.202403050737-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.15.2'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.2'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.17.1'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.1'
+
+    implementation 'com.fasterxml:aalto-xml:1.3.2'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
 
-    implementation 'org.postgresql:postgresql:42.6.0'
+    implementation 'org.postgresql:postgresql:42.7.3'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:32.1.2-jre') {
+    implementation ('com.google.guava:guava:33.1.0-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -162,39 +206,50 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
-    implementation('org.jabref:afterburner.fx:2.0.0')
+    implementation('org.jabref:afterburner.fx:2.0.0') {
+        exclude group: 'org.openjfx'
+    }
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT')
-    implementation 'org.fxmisc.flowless:flowless:0.7.1'
-    implementation 'org.fxmisc.richtext:richtextfx:0.11.1'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '1.77.0') {
-        exclude module: 'javax.inject' // Split package, use only jakarta.inject
-        exclude group: 'org.apache.logging.log4j'
+    implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT') {
+        exclude group: 'org.openjfx'
     }
+    implementation 'org.fxmisc.flowless:flowless:0.7.3'
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.17.0') {
+        exclude module: 'javax.inject' // Split package, use only jakarta.inject
+        exclude module: 'commons-lang3'
+        exclude group: 'org.openjfx'
+        exclude group: 'org.apache.logging.log4j'
+        exclude group: 'tech.units'
+    }
+    // Required by gemsfx
+    implementation 'tech.units:indriya:2.2'
 
-    implementation 'org.controlsfx:controlsfx:11.1.2'
+    implementation 'org.controlsfx:controlsfx:11.2.1'
 
-    implementation 'org.jsoup:jsoup:1.16.1'
+    implementation 'org.jsoup:jsoup:1.17.2'
     implementation 'com.konghq:unirest-java:3.14.5'
 
-    implementation 'org.slf4j:slf4j-api:2.0.9'
-    implementation "org.tinylog:tinylog-api:2.6.2"
-    implementation "org.tinylog:slf4j-tinylog:2.6.2"
-    implementation "org.tinylog:tinylog-impl:2.6.2"
+    implementation 'org.slf4j:slf4j-api:2.0.13'
+    implementation "org.tinylog:tinylog-api:2.7.0"
+    implementation "org.tinylog:slf4j-tinylog:2.7.0"
+    implementation "org.tinylog:tinylog-impl:2.7.0"
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation 'org.slf4j:jul-to-slf4j:2.0.9'
+    implementation 'org.slf4j:jul-to-slf4j:2.0.13'
+    // route all requests to log4j to SLF4J
+    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.23.1'
 
-    implementation('de.undercouch:citeproc-java:3.0.0-beta.2') {
+    implementation('de.undercouch:citeproc-java:3.1.0') {
         exclude group: 'org.antlr'
     }
 
     // jakarta.activation is already dependency of glassfish
-    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.1'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
+    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.3'
 
     implementation ('com.github.tomtung:latex2unicode_2.13:0.3.2') {
         exclude module: 'fastparse_2.13'
@@ -205,57 +260,83 @@ dependencies {
         exclude group: "org.apache.xmlgraphics"
     }
 
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
-    implementation (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1') {
-        exclude module: "log4j-core"
-    }
-
     implementation 'com.vladsch.flexmark:flexmark:0.64.8'
+    implementation 'com.vladsch.flexmark:flexmark-html2md-converter:0.64.8'
 
     implementation group: 'net.harawata', name: 'appdirs', version: '1.2.2'
 
     implementation group: 'org.jooq', name: 'jool', version: '0.9.15'
     // JAX-RS implemented by Jersey
     // API
-    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.1.0'
+    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:4.0.0'
     // Implementation of the API
-    implementation 'org.glassfish.jersey.core:jersey-server:3.1.1'
+    implementation 'org.glassfish.jersey.core:jersey-server:3.1.6'
     // injection framework
-    implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.3'
-    implementation 'org.glassfish.hk2:hk2-api:3.0.4'
+    implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.6'
+    implementation 'org.glassfish.hk2:hk2-api:3.1.0'
     // testImplementation 'org.glassfish.hk2:hk2-testing:3.0.4'
     // implementation 'org.glassfish.hk2:hk2-testing-jersey:3.0.4'
     // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
     // HTTP server
     // implementation 'org.glassfish.jersey.containers:jersey-container-netty-http:3.1.1'
-    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.3'
-    testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.3'
+    implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.6'
+    testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.6'
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.162'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.0'
+    // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
+    implementation 'org.jspecify:jspecify:0.3.0'
 
-    testImplementation 'org.mockito:mockito-core:5.5.0'
-    testImplementation 'org.xmlunit:xmlunit-core:2.9.1'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.9.1'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.1.0'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.1.0'
+    // parse plist files
+    implementation 'com.googlecode.plist:dd-plist:1.28'
+
+    // Parse lnk files
+    implementation 'com.github.vatbub:mslinks:1.0.6.2'
+
+    // YAML formatting
+    implementation 'org.yaml:snakeyaml:2.2'
+
+    implementation 'commons-io:commons-io:2.16.1'
+
+    testImplementation 'io.github.classgraph:classgraph:4.8.172'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
+
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.xmlunit:xmlunit-core:2.10.0'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.10.0'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.3.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.3.0'
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.3'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.16.0'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.3.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.11.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-migrate-java")
+
+    configurations.checkstyle {
+        resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
+            select("com.google.guava:guava:0")
+        }
+    }
+
+    configurations
+            .matching(c -> c.name.contains("downloadSources"))
+            .configureEach {
+                attributes {
+                    attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage, Usage.JAVA_RUNTIME))
+                    attribute(OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE, objects.named(OperatingSystemFamily, DefaultNativePlatform.getCurrentOperatingSystem().getName()))
+                    attribute(MachineArchitecture.ARCHITECTURE_ATTRIBUTE, objects.named(MachineArchitecture, DefaultNativePlatform.getCurrentArchitecture().getName()))
+                }
+            }
 }
 
 clean {
@@ -264,14 +345,6 @@ clean {
 }
 
 processResources {
-    gradle.taskGraph.whenReady {
-        if (gradle.taskGraph.hasTask(":jpackage")) {
-            logger.info('Adding buildres/csl to resources')
-            from("buildres/csl")
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        }
-    }
-
     filteringCharset = 'UTF-8'
 
     filesMatching("build.properties") {
@@ -283,7 +356,8 @@ processResources {
                 "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey') ? System.getenv('AstrophysicsDataSystemAPIKey') : '',
                 "ieeeAPIKey": System.getenv('IEEEAPIKey') ? System.getenv('IEEEAPIKey') : '',
                 "scienceDirectApiKey": System.getenv('SCIENCEDIRECTAPIKEY') ? System.getenv('SCIENCEDIRECTAPIKEY') : '',
-                "biodiversityHeritageApiKey": System.getenv('BiodiversityHeritageApiKey') ? System.getenv('BiodiversityHeritageApiKey') : ''
+                "biodiversityHeritageApiKey": System.getenv('BiodiversityHeritageApiKey') ? System.getenv('BiodiversityHeritageApiKey') : '',
+                "semanticScholarApiKey": System.getenv('SemanticScholarApiKey') ? System.getenv("SemanticScholarApiKey") : ''
         )
         filteringCharset = 'UTF-8'
     }
@@ -306,6 +380,7 @@ tasks.register("generateBstGrammarSource", JavaExec) {
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr4.'
     classpath = configurations.antlr4
     mainClass = "org.antlr.v4.Tool"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 
     inputs.dir('src/main/antlr4/org/jabref/bst/')
     outputs.dir("src-gen/main/java/org/jabref/logic/bst/")
@@ -317,6 +392,7 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     description = "Generates java files for Search.g antlr4."
     classpath = configurations.antlr4
     mainClass = "org.antlr.v4.Tool"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 
     inputs.dir("src/main/antlr4/org/jabref/search/")
     outputs.dir("src-gen/main/java/org/jabref/search/")
@@ -328,12 +404,14 @@ tasks.register("generateJournalListMV", JavaExec) {
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     classpath = sourceSets.main.runtimeClasspath
     mainClass = "org.jabref.cli.JournalListMvGenerator"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     onlyIf {
         !file("build/resources/main/journals/journal-list.mv").exists()
     }
 }
-jar.dependsOn "generateJournalListMV"
-compileTestJava.dependsOn "generateJournalListMV"
+
+jar.dependsOn("generateJournalListMV")
+compileTestJava.dependsOn("generateJournalListMV")
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
@@ -346,6 +424,9 @@ tasks.register('generateCitaviSource', XjcTask) {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+
+    // hint by https://docs.gradle.org/current/userguide/performance.html#run_the_compiler_as_a_separate_process
+    options.fork = true
 }
 
 compileJava {
@@ -363,14 +444,25 @@ compileJava {
     }
 }
 
+// Configures "application > run" task
 run {
+    doFirst {
+        // Clear the default JVM arguments, to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+        application.applicationDefaultJvmArgs = []
+    }
+
     // TODO: Remove access to internal api
     moduleOptions {
+        // On a change here, also adapt "application > applicationDefaultJvmArgs"
         addExports = [
+                'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
-                // Not sure why we need to restate the controlfx exports
+                // We need to restate the ControlsFX exports, because we get following error otherwise:
+                //   java.lang.IllegalAccessError:
+                //     class org.controlsfx.control.textfield.AutoCompletionBinding (in module org.controlsfx.controls)
+                //     cannot access class com.sun.javafx.event.EventHandlerManager (in module javafx.base) because
+                //     module javafx.base does not export com.sun.javafx.event to module org.controlsfx.controls
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
                 'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
                 'javafx.graphics/com.sun.javafx.scene.traversal' : 'org.controlsfx.controls',
@@ -386,8 +478,9 @@ run {
 
         addOpens = [
                 'javafx.controls/javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
 
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
                 'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
@@ -407,8 +500,7 @@ javadoc {
         version = false
         author = false
         addMultilineStringsOption("-add-exports").setValue([
-            'javafx.controls/com.sun.javafx.scene.control=org.jabref',
-            'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
+            'javafx.controls/com.sun.javafx.scene.control=org.jabref'
         ])
     }
 }
@@ -422,19 +514,24 @@ test {
         // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
     }
-
-    testLogging {
-        // set options for log level LIFECYCLE
-        // for debugging tests: add "STANDARD_OUT", "STANDARD_ERROR"
-        events = ["FAILED"]
-        exceptionFormat "full"
-    }
 }
 
 testlogger {
-    theme 'standard-parallel'
+    // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
+
+    theme 'standard'
+
     showPassed false
     showSkipped false
+
+    showCauses false
+    showStackTraces false
+}
+
+tasks.withType(Test) {
+    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
+    // Enable parallel tests. See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
+    maxParallelForks = Runtime.runtime.availableProcessors() - 1
 }
 
 tasks.register('databaseTest', Test) {
@@ -447,6 +544,8 @@ tasks.register('databaseTest', Test) {
         events = ["FAILED"]
         exceptionFormat "full"
     }
+
+    maxParallelForks = 1
 }
 
 tasks.register('fetcherTest', Test) {
@@ -454,11 +553,7 @@ tasks.register('fetcherTest', Test) {
         includeTags 'FetcherTest'
     }
 
-    testLogging {
-        // set options for log level LIFECYCLE
-        events = ["FAILED"]
-        exceptionFormat "full"
-    }
+    maxParallelForks = 1
 }
 
 tasks.register('guiTest', Test) {
@@ -471,6 +566,8 @@ tasks.register('guiTest', Test) {
         events = ["FAILED"]
         exceptionFormat "full"
     }
+
+    maxParallelForks = 1
 }
 
 // Test result tasks
@@ -479,10 +576,6 @@ tasks.register('copyTestResources', Copy) {
     into "${buildDir}/classes/test"
 }
 processTestResources.dependsOn copyTestResources
-
-tasks.withType(Test) {
-    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
-}
 
 tasks.register('jacocoPrepare') {
     doFirst {
@@ -499,16 +592,18 @@ databaseTest.mustRunAfter jacocoPrepare
 fetcherTest.mustRunAfter jacocoPrepare
 
 jacocoTestReport {
+    dependsOn jacocoPrepare, test, fetcherTest, databaseTest
+
     executionData files(
-            "$buildDir/jacoco/test.exec",
-            "$buildDir/jacoco/databaseTest.exec",
-            "$buildDir/jacoco/fetcherTest.exec").filter { it.exists() }
-    dependsOn jacocoPrepare, test, databaseTest, fetcherTest
+            layout.buildDirectory.file('jacoco/test.exec').get().asFile,
+            layout.buildDirectory.file('jacoco/fetcherTest.exec').get().asFile,
+            layout.buildDirectory.file('jacoco/databaseTest.exec').get().asFile)
 
     reports {
-        csv.getRequired().set(true)
-        html.getRequired().set(true)
-        xml.getRequired().set(true) // coveralls plugin depends on xml format report
+        csv.required = true
+        html.required = true
+        // coveralls plugin depends on xml format report
+        xml.required = true
     }
 }
 
@@ -555,7 +650,10 @@ tasks.register('deleteInstallerTemp', Delete) {
 jpackage.dependsOn deleteInstallerTemp
 jlinkZip.dependsOn jpackage
 jlink {
-    addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
+    // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
+    addExtraDependencies("javafx")
+
+    addOptions('--strip-debug', '--compress', 'zip-6', '--no-header-files', '--no-man-pages')
     launcher {
         name = 'JabRef'
     }
@@ -567,13 +665,20 @@ jlink {
     // but it was removed in the newer releases.
     // The pom.xml associated with such a non-modular artifact does not mention that the artifact depends on the removed code
     // (because the artifact was published when this code was still available in the JDK).
-    forceMerge "javafx"
     forceMerge "controlsfx", "bcprov", "jaxb", "istack", "stax", "log4j"
 
     // TODO: Remove the following correction to the merged module
     // The module descriptor automatically generated by the plugin for the merged module contained some invalid entries.
-    // Execute ./gradlew suggestMergedModuleInfo and include the suggested directives here.
+    // This is based on ./gradlew suggestMergedModuleInfo, sort, strip ";"", comment non-used modules, and include the suggested directives here.
+    //   However, we need to fine-tune this manually (non-alphabetic order)
     mergedModule {
+        requires 'javafx.base'
+        requires 'javafx.controls'
+        requires 'javafx.fxml'
+        requires 'javafx.graphics'
+        requires 'javafx.media'
+        requires 'javafx.swing'
+
         requires 'java.compiler'
         requires 'java.datatransfer'
         requires 'java.desktop'
@@ -595,8 +700,11 @@ jlink {
         requires 'jdk.security.jgss'
         requires 'jdk.xml.dom'
         requires 'com.google.gson'
+        requires 'org.jsoup'
         requires 'org.slf4j'
         requires 'jakarta.xml.bind'
+        requires 'org.apache.commons.lang3'
+        requires 'org.apache.commons.text'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'

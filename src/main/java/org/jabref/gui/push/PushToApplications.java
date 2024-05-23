@@ -13,9 +13,11 @@ public class PushToApplications {
     public static final String LYX = "LyX/Kile";
     public static final String TEXMAKER = "Texmaker";
     public static final String TEXSTUDIO = "TeXstudio";
+    public static final String TEXWORKS = "TeXworks";
     public static final String VIM = "Vim";
     public static final String WIN_EDT = "WinEdt";
     public static final String SUBLIME_TEXT = "Sublime Text";
+    public static final String TEXSHOP = "TeXShop";
 
     private static final List<PushToApplication> APPLICATIONS = new ArrayList<>();
 
@@ -33,8 +35,10 @@ public class PushToApplications {
                 new PushToSublimeText(dialogService, preferencesService),
                 new PushToTexmaker(dialogService, preferencesService),
                 new PushToTeXstudio(dialogService, preferencesService),
+                new PushToTeXworks(dialogService, preferencesService),
                 new PushToVim(dialogService, preferencesService),
-                new PushToWinEdt(dialogService, preferencesService)));
+                new PushToWinEdt(dialogService, preferencesService),
+                new PushToTexShop(dialogService, preferencesService)));
 
         return APPLICATIONS;
     }

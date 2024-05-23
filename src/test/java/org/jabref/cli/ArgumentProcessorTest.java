@@ -54,7 +54,7 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void testAuxImport(@TempDir Path tempDir) throws Exception {
+    void auxImport(@TempDir Path tempDir) throws Exception {
         String auxFile = Path.of(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
         String originBib = Path.of(AuxCommandLineTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
 
@@ -75,7 +75,7 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void testExportMatches(@TempDir Path tempDir) throws Exception {
+    void exportMatches(@TempDir Path tempDir) throws Exception {
         Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String originBibFile = originBib.toAbsolutePath().toString();
 

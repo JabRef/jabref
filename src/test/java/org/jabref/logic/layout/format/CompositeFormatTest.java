@@ -9,13 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CompositeFormatTest {
 
     @Test
-    public void testEmptyComposite() {
+    public void emptyComposite() {
         LayoutFormatter f = new CompositeFormat();
         assertEquals("No Change", f.format("No Change"));
     }
 
     @Test
-    public void testArrayComposite() {
+    public void arrayComposite() {
         LayoutFormatter f = new CompositeFormat(new LayoutFormatter[]{fieldText -> fieldText + fieldText,
                 fieldText -> "A" + fieldText, fieldText -> "B" + fieldText});
 
@@ -23,7 +23,7 @@ public class CompositeFormatTest {
     }
 
     @Test
-    public void testDoubleComposite() {
+    public void doubleComposite() {
         LayoutFormatter f = new CompositeFormat(new AuthorOrgSci(), new NoSpaceBetweenAbbreviations());
         LayoutFormatter first = new AuthorOrgSci();
         LayoutFormatter second = new NoSpaceBetweenAbbreviations();

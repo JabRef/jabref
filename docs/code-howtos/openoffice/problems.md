@@ -11,22 +11,22 @@ grand_parent: Code Howtos
   a `(problem)`: pageInfo strings are conceptually associated with citations, but the implementation associates them to citation groups.\
   The number of available pageInfo slots changes during`[click:Merge]` and `[click:Separate]` while the number of citations remains fixed.
   * The proposed solution was to change the association.
-    *   Not only reference marks (citation groups) need unique identifiers, but also citations.\
-        Possible encoding for reference mark names:\
-        `JR_cite{type}_{number1}_{citationKey1},{number2}_{citationKey2}`\
-        where `{type}` encodes the citation type (for the group), `{citationKey1}` is made unique by choosing an appropriate number for `{number1}`\
-        This would allow `JR_cite_{number1}_{citationKey1}` to be used as a property name for storing the pageInfo.
+    * Not only reference marks (citation groups) need unique identifiers, but also citations.\
+      Possible encoding for reference mark names:\
+      `JR_cite{type}_{number1}_{citationKey1},{number2}_{citationKey2}`\
+      where `{type}` encodes the citation type (for the group), `{citationKey1}` is made unique by choosing an appropriate number for `{number1}`\
+      This would allow `JR_cite_{number1}_{citationKey1}` to be used as a property name for storing the pageInfo.
 
-        Changes required to
+      Changes required to
 
-        * reference mark search, name generation and parsing
-        * name generation and parsing for properties storing pageInfo values
-        * in-memory representation
-          * JabRef 5.2 does not collect pageInfo values, accesses only when needed.\
-            So it would be change to code accessing them.
-          * The proposed representation does collect, to allow separation of getting from the document and processing
-        * insertion of pageInfo into citation markers: JabRef 5.2 injects a single pageInfo before the closing parenthesis, now we need to handle several values
-        * `[click:Manage citations]` should work on citations, not citation groups.
+      * reference mark search, name generation and parsing
+      * name generation and parsing for properties storing pageInfo values
+      * in-memory representation
+        * JabRef 5.2 does not collect pageInfo values, accesses only when needed.\
+          So it would be change to code accessing them.
+        * The proposed representation does collect, to allow separation of getting from the document and processing
+      * insertion of pageInfo into citation markers: JabRef 5.2 injects a single pageInfo before the closing parenthesis, now we need to handle several values
+      * `[click:Manage citations]` should work on citations, not citation groups.
 
 ## Backend
 
@@ -44,7 +44,7 @@ Reference marks have some features that make it easy to mess up citations in a d
   * If the space separating to citation marks is deleted, the user cannot reliably type between the marks.\
     The text typed usually becomes part of one of the marks. No visual clue as to which one.\
     Note: `[click:Merge]` then `[click:Separate]` adds a single space between. The user can position the cursor before or after it. In either case the cursor is on a boundary: it is not clear if it is in or out of a reference mark.\
-    Special case: a reference mark at the start or end of a paragraph: the cursor is usually considered to be within at the coresponding edge.
+    Special case: a reference mark at the start or end of a paragraph: the cursor is usually considered to be within at the corresponding edge.
 * (good) They can be moved (Ctrl-X,Ctrl-V)
 * They cannot be copied. (Ctrl-C, Ctrl-V) copies the text without the reference mark.
 * Reference marks are lost if the document is saved as docx.
@@ -60,11 +60,11 @@ It would be nice if we could have a backend with better properties. We probably 
 ## Undo
 
 * JabRef 5.3 does not collect the effects of GUI actions on the document into larger Undo actions.\
-  This makes the Undo functionality of LO impractial.
+  This makes the Undo functionality of LO impractical.
 * `(change)` collect the effects of GUI actions into large chunks: now a GUI action can be undone with a single click.
   * except the effect on pageInfo: that is stored at the document level and is not restored by Undo.
 
 ## Block screen refresh
 
-* LibreOffice has support in [XModel](https://api.libreoffice.org/docs/idl/ref/interfacecom\_1\_1sun\_1\_1star\_1\_1frame\_1\_1XModel.html#a7b7d36374033ee9210ec0ac5c1a90d9f) to "suspend some notifications to the controllers which are used for display updates."
+* LibreOffice has support in [XModel](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1frame_1_1XModel.html#a7b7d36374033ee9210ec0ac5c1a90d9f) to "suspend some notifications to the controllers which are used for display updates."
 * `(change)` Now we are using this facility.

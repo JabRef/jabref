@@ -47,6 +47,9 @@ public class EntryEditorPreferences {
     private final DoubleProperty dividerPosition;
     private final BooleanProperty autoLinkFiles;
     private final ObjectProperty<JournalPopupEnabled> enablementStatus;
+    private final BooleanProperty shouldShowSciteTab;
+    private final BooleanProperty showUserCommentsFields;
+    private final DoubleProperty previewWidthDividerPosition;
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
                                   Map<String, Set<Field>> defaultEntryEditorTabList,
@@ -58,7 +61,10 @@ public class EntryEditorPreferences {
                                   boolean allowIntegerEditionBibtex,
                                   double dividerPosition,
                                   boolean autolinkFilesEnabled,
-                                  JournalPopupEnabled journalPopupEnabled) {
+                                  JournalPopupEnabled journalPopupEnabled,
+                                  boolean showSciteTab,
+                                  boolean showUserCommentsFields,
+                                  double previewWidthDividerPosition) {
 
         this.entryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(entryEditorTabList));
         this.defaultEntryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
@@ -71,6 +77,9 @@ public class EntryEditorPreferences {
         this.dividerPosition = new SimpleDoubleProperty(dividerPosition);
         this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
+        this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
+        this.showUserCommentsFields = new SimpleBooleanProperty(showUserCommentsFields);
+        this.previewWidthDividerPosition = new SimpleDoubleProperty(previewWidthDividerPosition);
     }
 
     public ObservableMap<String, Set<Field>> getEntryEditorTabs() {
@@ -195,5 +204,44 @@ public class EntryEditorPreferences {
 
     public void setEnableJournalPopup(JournalPopupEnabled journalPopupEnabled) {
         this.enablementStatus.set(journalPopupEnabled);
+    }
+
+    public boolean shouldShowSciteTab() {
+        return this.shouldShowSciteTab.get();
+    }
+
+    public BooleanProperty shouldShowLSciteTabProperty() {
+        return this.shouldShowSciteTab;
+    }
+
+    public void setShouldShowSciteTab(boolean shouldShowSciteTab) {
+        this.shouldShowSciteTab.set(shouldShowSciteTab);
+    }
+
+    public boolean shouldShowUserCommentsFields() {
+        return showUserCommentsFields.get();
+    }
+
+    public BooleanProperty showUserCommentsFieldsProperty() {
+        return showUserCommentsFields;
+    }
+
+    public void setShowUserCommentsFields(boolean showUserCommentsFields) {
+        this.showUserCommentsFields.set(showUserCommentsFields);
+    }
+
+    public void setPreviewWidthDividerPosition(double previewWidthDividerPosition) {
+        this.previewWidthDividerPosition.set(previewWidthDividerPosition);
+    }
+
+    /**
+     * Holds the horizontal divider position when the Preview is shown in the entry editor
+     */
+    public DoubleProperty previewWidthDividerPositionProperty() {
+        return previewWidthDividerPosition;
+    }
+
+    public Double getPreviewWidthDividerPosition() {
+        return previewWidthDividerPosition.get();
     }
 }

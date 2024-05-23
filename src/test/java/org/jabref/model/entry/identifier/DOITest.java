@@ -123,6 +123,24 @@ public class DOITest {
                 Arguments.of("10/gf4gqc", DOI.parse("�https : \n  ␛ / / doi.org / \t 10 / \r gf4gqc�␛").get().getDOI()),
                 Arguments.of("10/gf4gqc", DOI.parse(" 10 / gf4gqc ").get().getDOI()),
                 Arguments.of("10.3218/3846-0", DOI.parse(" �10.3218\n/384␛6-0�").get().getDOI()),
+                // parse DOI with backslashes
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/978-3-030-02671-4\\_7").get().getDOI()),
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/\\978-3-03\\0-02671-4\\_7").get().getDOI()),
+                Arguments.of("https://doi.org/10.1007/978-3-030-02671-4_7", DOI.parse("https://doi.org/10.\\\\1007/9\\\\78-3\\\\-030-026\\\\\\71-4_7").get().getURIAsASCIIString()),
+                // parse DOI with {}
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/9{}78{-3{-03{0-0}}}26}{71-4}_7").get().getDOI()),
+                // parse DOI with `
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/9`78`-3`-03`0-0``26````71-4}_7").get().getDOI()),
+                // parse DOI with |
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/9||78|-3|-03|0-0|26|71-4|||_7").get().getDOI()),
+                // parse DOI with ~
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/9~~~78~-3~-03~0-0~26~71-4~_7").get().getDOI()),
+                // parse DOI with []
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1007/][9[][]78-3-03[[]0-02671-4_7").get().getDOI()),
+                // parse DOI with ^
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("^^^10.10^07/978-3^-0^30-02671-4_7").get().getDOI()),
+                // parse DOI with special characters
+                Arguments.of("10.1007/978-3-030-02671-4_7", DOI.parse("10.1^00^^7/9|~^]`7^8-3~[[[]]-0^3]~0-0~26``71-4~||_7").get().getDOI()),
                 // parse already-cleaned DOI
                 Arguments.of("10.3218/3846-0", DOI.parse("10.3218/3846-0").get().getDOI()),
 
@@ -168,6 +186,11 @@ public class DOITest {
                 Arguments.of("10.1006/rwei.1999 .0001", new DOI("http://doi.org/10.1006/rwei.1999%20.0001").getDOI()),
                 // ? -> (%3F)
                 Arguments.of("10.1006/rwei.1999?.0001", new DOI("http://doi.org/10.1006/rwei.1999%3F.0001").getDOI()),
+                // <,> -> (%3C, %3E)
+                Arguments.of("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2").getDOI()),
+
+                // acceptDoiWithSpecialCharacters
+                Arguments.of("10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2", new DOI("https://doi.org/10.1175/1520-0493(2002)130<1913:EDAWPO>2.0.CO;2").getDOI()),
 
                 // findDoiInsideArbitraryText
                 Arguments.of("10.1006/jmbi.1998.2354",
@@ -177,7 +200,7 @@ public class DOITest {
                 Arguments.of("10.1007/s10549-018-4743-9",
                         DOI.findInText("Breast Cancer Res Treat. 2018 July ; 170(1): 77–87. doi:10.1007/s10549-018-4743-9, ").get().getDOI()),
                 Arguments.of("10.1007/s10549-018-4743-9",
-                        DOI.findInText("Breast Cancer Res Treat. 2018 July ; 170(1): 77–87. doi:10.1007/s10549-018-4743-9;something else").get().getDOI()),
+                        DOI.findInText("Breast Cancer Res Treat. 2018 July ; 170(1): 77–87. doi:10.1007/s10549-018-4743-9; something else").get().getDOI()),
                 Arguments.of("10.1007/s10549-018-4743-9.1234",
                         DOI.findInText("bla doi:10.1007/s10549-018-4743-9.1234 with . in doi").get().getDOI()),
 
@@ -208,7 +231,7 @@ public class DOITest {
 
     @ParameterizedTest
     @MethodSource("testData")
-    public void testEquals(String expected, String input) {
+    public void equals(String expected, String input) {
         assertEquals(expected, input);
     }
 
@@ -287,5 +310,16 @@ public class DOITest {
     @Test
     public void rejectMissingDividerInShortDoi() {
         assertThrows(IllegalArgumentException.class, () -> new DOI("10gf4gqc end"));
+    }
+
+    @Test
+    public void rejectNullDoiParameter() {
+        assertThrows(NullPointerException.class, () -> new DOI(null));
+    }
+
+    @Test
+    public void findDoiWithSpecialCharactersInText() {
+        assertEquals(Optional.of(new DOI("10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2")),
+                DOI.findInText("https://doi.org/10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2"));
     }
 }

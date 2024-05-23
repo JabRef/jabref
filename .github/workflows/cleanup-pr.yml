@@ -1,0 +1,42 @@
+name: Cleanup after PR
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel deployment run
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          ignore_sha: true
+          workflow_id: 9813 # workflow "Deployment"
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
+            echo "secretspresent=NO" >> $GITHUB_OUTPUT
+          else
+            echo "secretspresent=YES" >> $GITHUB_OUTPUT
+          fi
+        env:
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Delete folder on builds.jabref.org
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          script: rm -rf /var/www/builds.jabref.org/www/pull/${{ github.event.pull_request.number }} || true
+          host: build-upload.jabref.org
+          port: 9922
+          username: jrrsync
+          key: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Update PR comment
+        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          comment_tag: download-link
+          message: The build for this PR is no longer available. Please visit <https://builds.jabref.org/main/> for the latest build.
+          mode: upsert

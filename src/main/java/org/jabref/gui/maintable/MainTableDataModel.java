@@ -15,8 +15,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.pdf.search.LuceneSearcher;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
@@ -49,6 +49,8 @@ public class MainTableDataModel {
         this.stateManager = stateManager;
         this.fieldValueFormatter = new SimpleObjectProperty<>(
                 new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
+
+        resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
         ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
@@ -148,7 +150,7 @@ public class MainTableDataModel {
         return entriesFilteredAndSorted;
     }
 
-    public void refresh() {
+    public void resetFieldFormatter() {
         this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
     }
 }

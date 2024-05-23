@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class SpecialFieldAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecialFieldAction.class);
-    private final JabRefFrame frame;
+    private final Supplier<LibraryTab> tabSupplier;
     private final SpecialField specialField;
     private final String value;
     private final boolean nullFieldIfValueIsTheSame;
@@ -40,7 +41,7 @@ public class SpecialFieldAction extends SimpleCommand {
     /**
      * @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
      */
-    public SpecialFieldAction(JabRefFrame frame,
+    public SpecialFieldAction(Supplier<LibraryTab> tabSupplier,
                               SpecialField specialField,
                               String value,
                               boolean nullFieldIfValueIsTheSame,
@@ -49,7 +50,7 @@ public class SpecialFieldAction extends SimpleCommand {
                               PreferencesService preferencesService,
                               UndoManager undoManager,
                               StateManager stateManager) {
-        this.frame = frame;
+        this.tabSupplier = tabSupplier;
         this.specialField = specialField;
         this.value = value;
         this.nullFieldIfValueIsTheSame = nullFieldIfValueIsTheSame;
@@ -79,9 +80,9 @@ public class SpecialFieldAction extends SimpleCommand {
             }
             ce.end();
             if (ce.hasEdits()) {
-                frame.getCurrentLibraryTab().getUndoManager().addEdit(ce);
-                frame.getCurrentLibraryTab().markBaseChanged();
-                frame.getCurrentLibraryTab().updateEntryEditorIfShowing();
+                undoManager.addEdit(ce);
+                tabSupplier.get().markBaseChanged();
+                tabSupplier.get().updateEntryEditorIfShowing();
                 String outText;
                 if (nullFieldIfValueIsTheSame || value == null) {
                     outText = getTextDone(specialField, Integer.toString(bes.size()));

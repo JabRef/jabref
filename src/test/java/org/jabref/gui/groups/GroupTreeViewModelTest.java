@@ -62,7 +62,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void rootGroupIsSelectedByDefault() {
-        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroups(databaseContext).get(0));
+        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroups(databaseContext).getFirst());
     }
 
     @Test

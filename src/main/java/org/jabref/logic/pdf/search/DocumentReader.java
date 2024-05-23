@@ -57,7 +57,7 @@ public final class DocumentReader {
     public DocumentReader(BibEntry bibEntry, FilePreferences filePreferences) {
         this.filePreferences = filePreferences;
         if (bibEntry.getFiles().isEmpty()) {
-            throw new IllegalStateException("There are no linked PDF files to this BibEntry!");
+            throw new IllegalStateException("There are no linked PDF files to this BibEntry.");
         }
 
         this.entry = bibEntry;
@@ -93,17 +93,17 @@ public final class DocumentReader {
     private List<Document> readPdfContents(LinkedFile pdf, Path resolvedPdfPath) {
         List<Document> pages = new ArrayList<>();
         try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
-                for (int pageNumber = 0; pageNumber < pdfDocument.getNumberOfPages(); pageNumber++) {
-                    Document newDocument = new Document();
-                    addIdentifiers(newDocument, pdf.getLink());
-                    addMetaData(newDocument, resolvedPdfPath, pageNumber);
-                    try {
-                        addContentIfNotEmpty(pdfDocument, newDocument, pageNumber);
-                    } catch (IOException e) {
-                        LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPdfPath.toAbsolutePath(), e);
-                    }
-                    pages.add(newDocument);
+            for (int pageNumber = 0; pageNumber < pdfDocument.getNumberOfPages(); pageNumber++) {
+                Document newDocument = new Document();
+                addIdentifiers(newDocument, pdf.getLink());
+                addMetaData(newDocument, resolvedPdfPath, pageNumber);
+                try {
+                    addContentIfNotEmpty(pdfDocument, newDocument, pageNumber);
+                } catch (IOException e) {
+                    LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPdfPath.toAbsolutePath(), e);
                 }
+                pages.add(newDocument);
+            }
         } catch (IOException e) {
             LOGGER.warn("Could not read {}", resolvedPdfPath.toAbsolutePath(), e);
         }
@@ -134,7 +134,7 @@ public final class DocumentReader {
     }
 
     private boolean isValidField(String value) {
-        return !(StringUtil.isNullOrEmpty(value));
+        return !StringUtil.isNullOrEmpty(value);
     }
 
     public static String mergeLines(String text) {
@@ -145,8 +145,9 @@ public final class DocumentReader {
     private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, int pageNumber) throws IOException {
         PDFTextStripper pdfTextStripper = new PDFTextStripper();
         pdfTextStripper.setLineSeparator("\n");
-        pdfTextStripper.setStartPage(pageNumber);
-        pdfTextStripper.setEndPage(pageNumber);
+        // Apache PDFTextStripper is 1-based. See {@link org.apache.pdfbox.text.PDFTextStripper.processPages}
+        pdfTextStripper.setStartPage(pageNumber + 1);
+        pdfTextStripper.setEndPage(pageNumber + 1);
 
         String pdfContent = pdfTextStripper.getText(pdfDocument);
         if (StringUtil.isNotBlank(pdfContent)) {

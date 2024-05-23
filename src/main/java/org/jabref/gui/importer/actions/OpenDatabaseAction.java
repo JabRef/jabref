@@ -14,14 +14,14 @@ import java.util.Optional;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.Telemetry;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -56,7 +56,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction());
 
-    private final JabRefFrame frame;
+    private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -65,7 +65,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final CountingUndoManager undoManager;
     private final TaskExecutor taskExecutor;
 
-    public OpenDatabaseAction(JabRefFrame frame,
+    public OpenDatabaseAction(LibraryTabContainer tabContainer,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               StateManager stateManager,
@@ -73,7 +73,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                               BibEntryTypesManager entryTypesManager,
                               CountingUndoManager undoManager,
                               TaskExecutor taskExecutor) {
-        this.frame = frame;
+        this.tabContainer = tabContainer;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -86,14 +86,12 @@ public class OpenDatabaseAction extends SimpleCommand {
     /**
      * Go through the list of post open actions, and perform those that need to be performed.
      *
-     * @param libraryTab The BasePanel where the database is shown.
      * @param result     The result of the BIB file parse operation.
      */
-    public static void performPostOpenActions(LibraryTab libraryTab, ParserResult result) {
+    public static void performPostOpenActions(ParserResult result, DialogService dialogService) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
-                action.performAction(libraryTab, result);
-                libraryTab.frame().showLibraryTab(libraryTab);
+                action.performAction(result, dialogService);
             }
         }
     }
@@ -114,10 +112,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      * @return Path of current panel database directory or the working directory
      */
     private Path getInitialDirectory() {
-        if (frame.getLibraryTabs().isEmpty()) {
+        if (tabContainer.getLibraryTabs().isEmpty()) {
             return preferencesService.getFilePreferences().getWorkingDirectory();
         } else {
-            Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
+            Optional<Path> databasePath = tabContainer.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
             return databasePath.map(Path::getParent).orElse(preferencesService.getFilePreferences().getWorkingDirectory());
         }
     }
@@ -146,8 +144,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Check if any of the files are already open:
         for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
-            for (int i = 0; i < frame.getLibraryTabs().size(); i++) {
-                LibraryTab libraryTab = frame.getLibraryTabAt(i);
+            for (LibraryTab libraryTab : tabContainer.getLibraryTabs()) {
                 if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
                         && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
                     iterator.remove();
@@ -172,15 +169,18 @@ public class OpenDatabaseAction extends SimpleCommand {
                 openTheFile(theFile);
                 fileHistory.newFile(theFile);
             });
-        } else if (toRaise != null) {
+        } else if (toRaise != null && tabContainer.getCurrentLibraryTab() == null) {
             // If no files are remaining to open, this could mean that a file was
             // already open. If so, we may have to raise the correct tab:
-            frame.showLibraryTab(toRaise);
+            // If there is already a library focused, do not show this library
+            tabContainer.showLibraryTab(toRaise);
         }
     }
 
     /**
      * This is the real file opening. Should be called via {@link #openFile(Path)}
+     *
+     * Similar method: {@link org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
      *
      * @param file the file, may be NOT null, but may not be existing
      */
@@ -198,12 +198,13 @@ public class OpenDatabaseAction extends SimpleCommand {
                 dialogService,
                 preferencesService,
                 stateManager,
-                frame,
+                tabContainer,
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager,
                 taskExecutor);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
+        tabContainer.addTab(newTab, true);
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
@@ -218,7 +219,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService, fileUpdateMonitor)
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService, fileUpdateMonitor, stateManager)
                                           .orElse(null);
         }
 
@@ -244,7 +245,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (parserResult.getDatabase().isShared()) {
                          openSharedDatabase(
                                  parserResult,
-                                 frame,
+                                 tabContainer,
                                  dialogService,
                                  preferencesService,
                                  stateManager,
@@ -264,7 +265,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     public static void openSharedDatabase(ParserResult parserResult,
-                                          JabRefFrame frame,
+                                          LibraryTabContainer tabContainer,
                                           DialogService dialogService,
                                           PreferencesService preferencesService,
                                           StateManager stateManager,
@@ -275,7 +276,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
         try {
             new SharedDatabaseUIManager(
-                    frame,
+                    tabContainer,
                     dialogService,
                     preferencesService,
                     stateManager,

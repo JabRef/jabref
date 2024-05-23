@@ -11,7 +11,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.LuceneIndexer;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -27,20 +26,21 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
     private final GetCurrentLibraryTab currentLibraryTab;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
 
     private BibDatabaseContext databaseContext;
 
     private boolean shouldContinue = true;
 
-    public RebuildFulltextSearchIndexAction(StateManager stateManager, GetCurrentLibraryTab currentLibraryTab, DialogService dialogService, PreferencesService preferences, FilePreferences filePreferences,
+    public RebuildFulltextSearchIndexAction(StateManager stateManager,
+                                            GetCurrentLibraryTab currentLibraryTab,
+                                            DialogService dialogService,
+                                            PreferencesService preferences,
                                             TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.currentLibraryTab = currentLibraryTab;
         this.dialogService = dialogService;
         this.preferencesService = preferences;
-        this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(stateManager));

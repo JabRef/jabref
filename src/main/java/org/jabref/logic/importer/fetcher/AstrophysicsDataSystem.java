@@ -17,7 +17,7 @@ import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
@@ -31,7 +31,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -82,16 +81,6 @@ public class AstrophysicsDataSystem
     @Override
     public String getName() {
         return "SAO/NASA ADS";
-    }
-
-    private String getApiKey() {
-        return importerPreferences.getApiKeys()
-                                  .stream()
-                                  .filter(key -> key.getName().equalsIgnoreCase(this.getName()))
-                                  .filter(FetcherApiKey::shouldUse)
-                                  .findFirst()
-                                  .map(FetcherApiKey::getKey)
-                                  .orElse(API_KEY);
     }
 
     /**
@@ -160,9 +149,9 @@ public class AstrophysicsDataSystem
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveEnclosingBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
 
@@ -171,7 +160,7 @@ public class AstrophysicsDataSystem
         // Move adsurl to url field
         new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL).cleanup(entry);
         entry.getField(StandardField.ABSTRACT)
-             .filter(abstractText -> "Not Available <P />".equals(abstractText))
+             .filter("Not Available <P />"::equals)
              .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT));
 
         entry.getField(StandardField.ABSTRACT)
@@ -238,7 +227,7 @@ public class AstrophysicsDataSystem
                 LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
                         + ". We will use the first entry.");
             }
-            BibEntry entry = fetchedEntries.get(0);
+            BibEntry entry = fetchedEntries.getFirst();
             return Optional.of(entry);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
@@ -259,7 +248,7 @@ public class AstrophysicsDataSystem
         try {
             String postData = buildPostData(ids);
             URLDownload download = new URLDownload(getURLforExport());
-            download.addHeader("Authorization", "Bearer " + this.getApiKey());
+            download.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
             download.addHeader("ContentType", "application/json");
             download.setPostData(postData);
             String content = download.asString();
@@ -297,8 +286,7 @@ public class AstrophysicsDataSystem
             throw new FetcherException("A network error occurred", e);
         }
         List<String> bibCodes = fetchBibcodes(urlForQuery);
-        List<BibEntry> results = performSearchByIds(bibCodes);
-        return results;
+        return performSearchByIds(bibCodes);
     }
 
     @Override
@@ -320,7 +308,7 @@ public class AstrophysicsDataSystem
     @Override
     public URLDownload getUrlDownload(URL url) {
         URLDownload urlDownload = new URLDownload(url);
-        urlDownload.addHeader("Authorization", "Bearer " + this.getApiKey());
+        urlDownload.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
         return urlDownload;
     }
 }

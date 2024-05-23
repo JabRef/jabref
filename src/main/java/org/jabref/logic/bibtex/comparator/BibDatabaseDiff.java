@@ -16,14 +16,14 @@ import org.jabref.model.entry.field.StandardField;
 public class BibDatabaseDiff {
 
     private static final double MATCH_THRESHOLD = 0.4;
-    private final MetaDataDiff metaDataDiff;
-    private final PreambleDiff preambleDiff;
+    private final Optional<MetaDataDiff> metaDataDiff;
+    private final Optional<PreambleDiff> preambleDiff;
     private final List<BibStringDiff> bibStringDiffs;
     private final List<BibEntryDiff> entryDiffs;
 
     private BibDatabaseDiff(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase, boolean includeEmptyEntries) {
-        metaDataDiff = MetaDataDiff.compare(originalDatabase.getMetaData(), newDatabase.getMetaData()).orElse(null);
-        preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase).orElse(null);
+        metaDataDiff = MetaDataDiff.compare(originalDatabase.getMetaData(), newDatabase.getMetaData());
+        preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase);
         bibStringDiffs = BibStringDiff.compare(originalDatabase.getDatabase(), newDatabase.getDatabase());
 
         // Sort both databases according to a common sort key.
@@ -48,6 +48,11 @@ public class BibDatabaseDiff {
 
     private static List<BibEntryDiff> compareEntries(List<BibEntry> originalEntries, List<BibEntry> newEntries, BibDatabaseMode mode) {
         List<BibEntryDiff> differences = new ArrayList<>();
+
+        // Prevent IndexOutOfBoundException
+        if (newEntries.isEmpty()) {
+            return differences;
+        }
 
         // Create a HashSet where we can put references to entries in the new
         // database that we have matched. This is to avoid matching them twice.
@@ -88,7 +93,6 @@ public class BibDatabaseDiff {
                     }
                 }
             }
-
             BibEntry bestEntry = newEntries.get(bestMatchIndex);
             if (bestMatch > MATCH_THRESHOLD
                     || hasEqualCitationKey(originalEntry, bestEntry)
@@ -119,11 +123,11 @@ public class BibDatabaseDiff {
     }
 
     public Optional<MetaDataDiff> getMetaDataDifferences() {
-        return Optional.ofNullable(metaDataDiff);
+        return metaDataDiff;
     }
 
     public Optional<PreambleDiff> getPreambleDifferences() {
-        return Optional.ofNullable(preambleDiff);
+        return preambleDiff;
     }
 
     public List<BibStringDiff> getBibStringDifferences() {

@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -33,23 +33,22 @@ import org.apache.pdfbox.text.PDFTextStripper;
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
  * <p>
- * Currently, Springer and IEEE formats are supported.
+ * Currently, Springer, and IEEE formats are supported.
  * <p>
  */
 public class PdfContentImporter extends Importer {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
-    private final ImportFormatPreferences importFormatPreferences;
+
     // input lines into several lines
     private String[] lines;
+
     // current index in lines
     private int lineIndex;
-    private String curString;
-    private String year;
 
-    public PdfContentImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
-    }
+    private String curString;
+
+    private String year;
 
     /**
      * Removes all non-letter characters at the end
@@ -102,7 +101,7 @@ public class PdfContentImporter extends Importer {
                     }
                 }
 
-                if (!"".equals(curName)) {
+                if (!curName.isEmpty()) {
                     if ("et al.".equalsIgnoreCase(curName)) {
                         curName = "others";
                     }
@@ -150,9 +149,7 @@ public class PdfContentImporter extends Importer {
                         }
                     }
                 } else {
-                    if ("and".equalsIgnoreCase(splitNames[i])) {
-                        // do nothing, just increment i at the end of this iteration
-                    } else {
+                    if (!"and".equalsIgnoreCase(splitNames[i])) {
                         if (isFirst) {
                             isFirst = false;
                         } else {
@@ -166,7 +163,7 @@ public class PdfContentImporter extends Importer {
                             res = res.concat(splitNames[i]).concat(" ");
                             workedOnFirstOrMiddle = true;
                         }
-                    }
+                    }  // do nothing, just increment i at the end of this iteration
                 }
                 i++;
             } while (i < splitNames.length);
@@ -191,15 +188,8 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(String data) throws IOException {
-        Objects.requireNonNull(data);
-        throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(String data)."
-                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
-    }
-
-    @Override
     public ParserResult importDatabase(Path filePath) {
-        final ArrayList<BibEntry> result = new ArrayList<>(1);
+        List<BibEntry> result = new ArrayList<>(1);
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
             Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
@@ -292,11 +282,9 @@ public class PdfContentImporter extends Importer {
             if (author == null) {
                 author = curString;
             } else {
-                if ("".equals(curString)) {
-                    // if lines[i] is "and" then "" is returned by streamlineNames -> do nothing
-                } else {
+                if (!"".equals(curString)) {
                     author = author.concat(" and ").concat(curString);
-                }
+                }  // if lines[i] is "and" then "" is returned by streamlineNames -> do nothing
             }
             lineIndex++;
         }
@@ -526,7 +514,7 @@ public class PdfContentImporter extends Importer {
      * proceed to next non-empty line
      */
     private void proceedToNextNonEmptyLine() {
-        while ((lineIndex < lines.length) && "".equals(lines[lineIndex].trim())) {
+        while ((lineIndex < lines.length) && lines[lineIndex].trim().isEmpty()) {
             lineIndex++;
         }
     }
@@ -546,7 +534,7 @@ public class PdfContentImporter extends Importer {
         curString = curString.trim();
         while ((lineIndex < lines.length) && !"".equals(lines[lineIndex])) {
             String curLine = lines[lineIndex].trim();
-            if (!"".equals(curLine)) {
+            if (!curLine.isEmpty()) {
                 if (!curString.isEmpty()) {
                     // insert separating space if necessary
                     curString = curString.concat(" ");
@@ -567,7 +555,7 @@ public class PdfContentImporter extends Importer {
      * invariant before/after: i points to line before the last handled block
      */
     private void readLastBlock() {
-        while ((lineIndex >= 0) && "".equals(lines[lineIndex].trim())) {
+        while ((lineIndex >= 0) && lines[lineIndex].trim().isEmpty()) {
             lineIndex--;
         }
         // i is now at the end of a block

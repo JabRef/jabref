@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CitationEntryTest {
 
     @Test
-    void testCitationEntryInitialPageInfo() {
+    void citationEntryInitialPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
         assertTrue(citationEntry.getPageInfo().isPresent());
         assertEquals("Info", citationEntry.getPageInfo().get());
@@ -20,7 +20,7 @@ class CitationEntryTest {
     }
 
     @Test
-    void testCitationEntryOptionalInitialPageInfo() {
+    void citationEntryOptionalInitialPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", Optional.of("Info"));
 
         assertEquals(Optional.of("Info"), citationEntry.getPageInfo());
@@ -29,30 +29,30 @@ class CitationEntryTest {
     }
 
     @Test
-    void testCitationEntryInitalPageInfoChanged() {
+    void citationEntryInitalPageInfoChanged() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context", "Info");
         assertEquals(Optional.of("Info"), citationEntry.getPageInfo());
     }
 
     @Test
-    void testCitationEntryNoInitialPageInfo() {
+    void citationEntryNoInitialPageInfo() {
         CitationEntry citationEntry = new CitationEntry("RefMark", "Context");
         assertEquals(Optional.empty(), citationEntry.getPageInfo());
     }
 
     @Test
-    void testCitationEntryEquals() {
+    void citationEntryEquals() {
         CitationEntry citationEntry1 = new CitationEntry("RefMark", "Context", "Info");
         CitationEntry citationEntry2 = new CitationEntry("RefMark2", "Context", "Info");
         CitationEntry citationEntry3 = new CitationEntry("RefMark", "Other Context", "Other Info");
         assertEquals(citationEntry1, citationEntry1);
         assertEquals(citationEntry1, citationEntry3);
         assertNotEquals(citationEntry1, citationEntry2);
-        assertNotEquals(citationEntry1, "Random String");
+        assertNotEquals("Random String", citationEntry1);
     }
 
     @Test
-    void testCitationEntryCompareTo() {
+    void citationEntryCompareTo() {
         CitationEntry citationEntry1 = new CitationEntry("RefMark", "Context", "Info");
         CitationEntry citationEntry2 = new CitationEntry("RefMark2", "Context", "Info");
         CitationEntry citationEntry3 = new CitationEntry("RefMark", "Other Context", "Other Info");

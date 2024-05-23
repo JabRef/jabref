@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.preview;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
@@ -52,22 +54,25 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is Preferences -> Entry Preview tab model
  * <p>
- *     {@link PreviewTab} is the controller of Entry Preview tab
+ * {@link PreviewTab} is the controller of Entry Preview tab
  * </p>
  *
  * @see PreviewTab
- * */
+ */
 public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
 
     private final BooleanProperty showAsExtraTabProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty showPreviewInEntryTableTooltip = new SimpleBooleanProperty(false);
 
     private final ListProperty<PreviewLayout> availableListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final FilteredList<PreviewLayout> filteredAvailableLayouts = new FilteredList<>(this.availableListProperty());
     private final ListProperty<PreviewLayout> chosenListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
+
+    private final ListProperty<Path> bstStylesPaths = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
     private final ObjectProperty<PreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
@@ -101,7 +106,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         chosenListValidator = new FunctionBasedValidator<>(
                 chosenListProperty,
                 input -> !chosenListProperty.getValue().isEmpty(),
-                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                ValidationMessage.error("%s > %s %n %n %s".formatted(
                                 Localization.lang("Entry preview"),
                                 Localization.lang("Selected"),
                                 Localization.lang("Selected Layouts can not be empty")
@@ -113,6 +118,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         showAsExtraTabProperty.set(previewPreferences.shouldShowPreviewAsExtraTab());
+        showPreviewInEntryTableTooltip.set(previewPreferences.shouldShowPreviewEntryTableTooltip());
         chosenListProperty().getValue().clear();
         chosenListProperty.getValue().addAll(previewPreferences.getLayoutCycle());
 
@@ -133,6 +139,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                           dialogService.showErrorDialogAndWait(Localization.lang("Error adding discovered CitationStyles"), ex);
                       })
                       .executeWith(taskExecutor);
+        bstStylesPaths.clear();
+        bstStylesPaths.addAll(previewPreferences.getBstPreviewLayoutPaths());
+        bstStylesPaths.forEach(path -> {
+            BstPreviewLayout layout = new BstPreviewLayout(path);
+            availableListProperty.add(layout);
+        });
     }
 
     public void setPreviewLayout(PreviewLayout selectedLayout) {
@@ -151,13 +163,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression"), exception);
         }
 
-        if (selectedLayout instanceof TextBasedPreviewLayout layout) {
-            sourceTextProperty.setValue(layout.getText().replace("__NEWLINE__", "\n"));
-            selectedIsEditableProperty.setValue(true);
-        } else {
-            sourceTextProperty.setValue(((CitationStylePreviewLayout) selectedLayout).getSource());
-            selectedIsEditableProperty.setValue(false);
-        }
+        boolean isEditingAllowed = selectedLayout instanceof TextBasedPreviewLayout;
+        setContentForPreview(selectedLayout.getText(), isEditingAllowed);
+    }
+
+    private void setContentForPreview(String text, boolean editable) {
+        sourceTextProperty.setValue(text);
+        selectedIsEditableProperty.setValue(editable);
     }
 
     public void refreshPreview() {
@@ -190,11 +202,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         previewPreferences.getLayoutCycle().clear();
         previewPreferences.getLayoutCycle().addAll(chosenListProperty);
         previewPreferences.setShowPreviewAsExtraTab(showAsExtraTabProperty.getValue());
+        previewPreferences.setShowPreviewEntryTableTooltip(showPreviewInEntryTableTooltip.getValue());
         previewPreferences.setCustomPreviewLayout((TextBasedPreviewLayout) customLayout);
+        previewPreferences.setBstPreviewLayoutPaths(bstStylesPaths);
 
         if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
             previewPreferences.setLayoutCyclePosition(chosenListProperty.getValue().indexOf(
-                    chosenSelectionModelProperty.getValue().getSelectedItems().get(0)));
+                    chosenSelectionModelProperty.getValue().getSelectedItems().getFirst()));
         }
     }
 
@@ -241,13 +255,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         for (int oldIndex : selected) {
             boolean alreadyTaken = newIndices.contains(oldIndex - 1);
-            int newIndex = ((oldIndex > 0) && !alreadyTaken) ? oldIndex - 1 : oldIndex;
+            int newIndex = (oldIndex > 0) && !alreadyTaken ? oldIndex - 1 : oldIndex;
             chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));
             newIndices.add(newIndex);
         }
 
         newIndices.forEach(index -> chosenSelectionModelProperty.getValue().select(index));
-        chosenSelectionModelProperty.getValue().select(newIndices.get(0));
+        chosenSelectionModelProperty.getValue().select(newIndices.getFirst());
         refreshPreview();
     }
 
@@ -263,13 +277,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         for (int i = selected.size() - 1; i >= 0; i--) {
             int oldIndex = selected.get(i);
             boolean alreadyTaken = newIndices.contains(oldIndex + 1);
-            int newIndex = ((oldIndex < (chosenListProperty.size() - 1)) && !alreadyTaken) ? oldIndex + 1 : oldIndex;
+            int newIndex = (oldIndex < (chosenListProperty.size() - 1)) && !alreadyTaken ? oldIndex + 1 : oldIndex;
             chosenListProperty.add(newIndex, chosenListProperty.remove(oldIndex));
             newIndices.add(newIndex);
         }
 
         newIndices.forEach(index -> chosenSelectionModelProperty.getValue().select(index));
-        chosenSelectionModelProperty.getValue().select(newIndices.get(0));
+        chosenSelectionModelProperty.getValue().select(newIndices.getFirst());
         refreshPreview();
     }
 
@@ -439,6 +453,10 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return showAsExtraTabProperty;
     }
 
+    public BooleanProperty showPreviewInEntryTableTooltip() {
+        return showPreviewInEntryTableTooltip;
+    }
+
     public ListProperty<PreviewLayout> availableListProperty() {
         return availableListProperty;
     }
@@ -475,5 +493,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty sourceTextProperty() {
         return sourceTextProperty;
+    }
+
+    public void addBstStyle(Path bstFile) {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(bstFile);
+        bstStylesPaths.add(bstFile);
+        availableListProperty().add(bstPreviewLayout);
+        chosenListProperty().add(bstPreviewLayout);
     }
 }

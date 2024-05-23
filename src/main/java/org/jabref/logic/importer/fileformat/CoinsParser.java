@@ -65,7 +65,7 @@ public class CoinsParser implements Parser {
             String author = matcherAuthors.group(1);
             authors.add(author);
         }
-        entry.setField(StandardField.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
+        entry.setField(StandardField.AUTHOR, String.join(" and ", authors));
 
         return Collections.singletonList(entry);
     }

@@ -26,37 +26,36 @@ public class TitleFetcherTest {
     public void setUp() {
         fetcher = new TitleFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
-        bibEntryBischof2009 = new BibEntry();
-        bibEntryBischof2009.setType(StandardEntryType.InProceedings);
-        bibEntryBischof2009.setCitationKey("Bischof_2009");
-        bibEntryBischof2009.setField(StandardField.AUTHOR, "Marc Bischof and Oliver Kopp and Tammo van Lessen and Frank Leymann");
-        bibEntryBischof2009.setField(StandardField.BOOKTITLE, "2009 35th Euromicro Conference on Software Engineering and Advanced Applications");
-        bibEntryBischof2009.setField(StandardField.PUBLISHER, "{IEEE}");
-        bibEntryBischof2009.setField(StandardField.TITLE, "{BPELscript}: A Simplified Script Syntax for {WS}-{BPEL} 2.0");
-        bibEntryBischof2009.setField(StandardField.YEAR, "2009");
-        bibEntryBischof2009.setField(StandardField.MONTH, "aug");
-        bibEntryBischof2009.setField(StandardField.DOI, "10.1109/seaa.2009.21");
+        bibEntryBischof2009 = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("Bischof_2009")
+                .withField(StandardField.AUTHOR, "Bischof, Marc and Kopp, Oliver and van Lessen, Tammo and Leymann, Frank")
+                .withField(StandardField.BOOKTITLE, "2009 35th Euromicro Conference on Software Engineering and Advanced Applications")
+                .withField(StandardField.PUBLISHER, "IEEE")
+                .withField(StandardField.TITLE, "BPELscript: A Simplified Script Syntax for WS-BPEL 2.0")
+                .withField(StandardField.YEAR, "2009")
+                .withField(StandardField.MONTH, "#aug#")
+                .withField(StandardField.DOI, "10.1109/seaa.2009.21");
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("Title", fetcher.getName());
     }
 
     @Test
-    public void testPerformSearchKopp2007() throws FetcherException {
+    public void performSearchKopp2007() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("BPELscript: A simplified script syntax for WS-BPEL 2.0");
         assertEquals(Optional.of(bibEntryBischof2009), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchEmptyTitle() throws FetcherException {
+    public void performSearchEmptyTitle() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchInvalidTitle() throws FetcherException {
+    public void performSearchInvalidTitle() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("An unknown title where noi DOI can be determined");
         assertEquals(Optional.empty(), fetchedEntry);
     }

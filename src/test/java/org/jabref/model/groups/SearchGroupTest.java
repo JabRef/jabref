@@ -1,9 +1,11 @@
 package org.jabref.model.groups;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.rules.SearchRules;
 
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,32 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SearchGroupTest {
+
+    private static BibEntry entry1D = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry1")
+            .withField(StandardField.AUTHOR, "Test")
+            .withField(StandardField.TITLE, "Case")
+            .withField(StandardField.GROUPS, "A");
+
+    private static BibEntry entry2D = new BibEntry(StandardEntryType.Misc)
+            .withCitationKey("entry2")
+            .withField(StandardField.AUTHOR, "TEST")
+            .withField(StandardField.TITLE, "CASE")
+            .withField(StandardField.GROUPS, "A");
+
+    @Test
+    public void containsFindsWords() {
+        SearchGroup groupPositive = new SearchGroup("A", GroupHierarchyType.INDEPENDENT, "Test", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        List<BibEntry> positiveResult = List.of(entry1D, entry2D);
+        assertTrue(groupPositive.containsAll(positiveResult));
+    }
+
+    @Test
+    public void containsDoesNotFindWords() {
+        SearchGroup groupNegative = new SearchGroup("A", GroupHierarchyType.INDEPENDENT, "Unknown", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        List<BibEntry> positiveResult = List.of(entry1D, entry2D);
+        assertFalse(groupNegative.containsAny(positiveResult));
+    }
 
     @Test
     public void containsFindsWordWithRegularExpression() {

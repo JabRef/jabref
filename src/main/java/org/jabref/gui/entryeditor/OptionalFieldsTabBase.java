@@ -1,8 +1,8 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.Set;
+import java.util.SequencedSet;
 
 import javax.swing.undo.UndoManager;
 
@@ -27,10 +27,10 @@ import org.jabref.preferences.PreferencesService;
 
 public class OptionalFieldsTabBase extends FieldsEditorTab {
     private final BibEntryTypesManager entryTypesManager;
-    private final boolean isPrimaryOptionalFields;
+    private final boolean isImportantOptionalFields;
 
     public OptionalFieldsTabBase(String title,
-                                 boolean isPrimaryOptionalFields,
+                                 boolean isImportantOptionalFields,
                                  BibDatabaseContext databaseContext,
                                  SuggestionProviders suggestionProviders,
                                  UndoManager undoManager,
@@ -54,25 +54,25 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                 journalAbbreviationRepository,
                 indexingTaskManager);
         this.entryTypesManager = entryTypesManager;
-        this.isPrimaryOptionalFields = isPrimaryOptionalFields;
+        this.isImportantOptionalFields = isImportantOptionalFields;
         setText(title);
         setTooltip(new Tooltip(Localization.lang("Show optional fields")));
         setGraphic(IconTheme.JabRefIcons.OPTIONAL.getGraphicNode());
     }
 
     @Override
-    protected Set<Field> determineFieldsToShow(BibEntry entry) {
+    protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         BibDatabaseMode mode = databaseContext.getMode();
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
-            if (isPrimaryOptionalFields) {
-                return entryType.get().getPrimaryOptionalFields();
+            if (isImportantOptionalFields) {
+                return entryType.get().getImportantOptionalFields();
             } else {
-                return entryType.get().getSecondaryOptionalNotDeprecatedFields(mode);
+                return entryType.get().getDetailOptionalNotDeprecatedFields(mode);
             }
         } else {
-            // Entry type unknown -> treat all fields as required
-            return Collections.emptySet();
+            // Entry type unknown -> treat all fields as required (thus no optional fields)
+            return new LinkedHashSet<>();
         }
     }
 }

@@ -67,7 +67,7 @@ abstract class ServerTest extends JerseyTest {
         when(guiPreferences.getLastFilesOpened()).thenReturn(
                 FXCollections.observableArrayList(
                         files.stream()
-                             .map(file -> file.path.toString())
+                             .map(file -> file.path)
                              .collect(Collectors.toList())));
     }
 
@@ -93,6 +93,6 @@ abstract class ServerTest extends JerseyTest {
         guiPreferences = mock(GuiPreferences.class);
         when(preferencesService.getGuiPreferences()).thenReturn(guiPreferences);
 
-        when(guiPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path.toString()));
+        when(guiPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path));
     }
 }

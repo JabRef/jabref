@@ -2,12 +2,13 @@ package org.jabref.gui.integrity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
@@ -25,24 +26,23 @@ public class IntegrityCheckAction extends SimpleCommand {
 
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
-    private final JabRefFrame frame;
+    private final Supplier<LibraryTab> tabSupplier;
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
     private final JournalAbbreviationRepository abbreviationRepository;
 
-    public IntegrityCheckAction(JabRefFrame frame,
+    public IntegrityCheckAction(Supplier<LibraryTab> tabSupplier,
                                 PreferencesService preferencesService,
                                 DialogService dialogService,
                                 StateManager stateManager,
                                 TaskExecutor taskExecutor,
                                 JournalAbbreviationRepository abbreviationRepository) {
-        this.frame = frame;
+        this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.abbreviationRepository = abbreviationRepository;
-
         this.executable.bind(needsDatabase(this.stateManager));
     }
 
@@ -58,10 +58,8 @@ public class IntegrityCheckAction extends SimpleCommand {
         Task<List<IntegrityMessage>> task = new Task<>() {
             @Override
             protected List<IntegrityMessage> call() {
-                List<IntegrityMessage> result = new ArrayList<>();
-
                 ObservableList<BibEntry> entries = database.getDatabase().getEntries();
-                result.addAll(check.checkDatabase(database.getDatabase()));
+                List<IntegrityMessage> result = new ArrayList<>(check.checkDatabase(database.getDatabase()));
                 for (int i = 0; i < entries.size(); i++) {
                     if (isCancelled()) {
                         break;
@@ -80,7 +78,7 @@ public class IntegrityCheckAction extends SimpleCommand {
             if (messages.isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, frame.getCurrentLibraryTab()));
+                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, tabSupplier.get()));
             }
         });
         task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));

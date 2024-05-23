@@ -10,15 +10,15 @@ This page lists some software we consider useful.
 * [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on steroids
 * [GitHub Issue Link Status](https://github.com/fregante/github-issue-link-status) - proper coloring of linked issues and PRs.
 * [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
-* [Sourcegraph Browser Extension](https://docs.sourcegraph.com/integration/browser\_extension) - Navigate through source on GitHub
+* [Sourcegraph Browser Extension](https://sourcegraph.com/docs/integration/browser_extension) - Navigate through source on GitHub
 
 ## git hints
 
 Here, we collect some helpful git hints
 
-* [https://github.com/blog/2019-how-to-undo-almost-anything-with-git](https://github.com/blog/2019-how-to-undo-almost-anything-with-git)
-* [https://github.com/RichardLitt/docs/blob/master/amending-a-commit-guide.md](https://github.com/RichardLitt/docs/blob/master/amending-a-commit-guide.md)
-* awesome hints and tools regarding git: [https://github.com/dictcp/awesome-git](https://github.com/dictcp/awesome-git)
+* <https://github.com/blog/2019-how-to-undo-almost-anything-with-git>
+* [So you need to change your commit](https://github.com/RichardLitt/knowledge/blob/master/github/amending-a-commit-guide.md#so-you-need-to-change-your-commit)
+* awesome hints and tools regarding git: <https://github.com/dictcp/awesome-git>
 
 ### Rebase everything as one commit on main
 
@@ -70,10 +70,3 @@ Then, each weak do `choco upgrade all` to ensure all tooling is kept updated.
 ### Tools for working with XMP
 
 * Validate XMP: [https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator/](https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator/)
-
-### Some useful keyboard shortcuts
-
-* [AutoHotkey](http://autohotkey.com) - Preparation for the next step
-* [https://github.com/koppor/autohotkey-scripts](https://github.com/koppor/autohotkey-scripts) - Aim: Have Win+C opening ConEmu
-  1. Clone the repository locally.
-  2. Then link `ConEmu.ahk` and `WindowsExplorer.ahk` at the startup menu (Link creation works with drag'n'drop using the right mouse key and then choosing "Create link" when dropping). Hint: Startup is in the folder `Startup` (German: `Autostart`) at `%APPDATA%\Microsoft\Windows\Start Menu\Programs\` - accessible via <kbd>Win</kbd>+<kbd>R</kbd>: `shell:startup`

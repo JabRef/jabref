@@ -276,7 +276,7 @@ public class SourceTab extends EntryEditorTab {
             if (!database.hasEntries()) {
                 if (parserResult.hasWarnings()) {
                     // put the warning into as exception text -> it will be displayed to the user
-                    throw new IllegalStateException(parserResult.warnings().get(0));
+                    throw new IllegalStateException(parserResult.warnings().getFirst());
                 } else {
                     throw new IllegalStateException("No entries found.");
                 }

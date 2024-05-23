@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;

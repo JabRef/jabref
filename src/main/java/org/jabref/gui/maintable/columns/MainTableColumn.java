@@ -9,7 +9,7 @@ import org.jabref.gui.util.BindingsHelper;
 
 public class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
 
-    private MainTableColumnModel model;
+    private final MainTableColumnModel model;
 
     public MainTableColumn(MainTableColumnModel model) {
         this.model = model;

@@ -1,9 +1,12 @@
 package org.jabref.gui.slr;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
@@ -70,6 +73,8 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableColumn<StudyCatalogItem, Boolean> catalogEnabledColumn;
     @FXML private TableColumn<StudyCatalogItem, String> catalogColumn;
 
+    @FXML private Label directoryWarning;
+
     @Inject private DialogService dialogService;
     @Inject private PreferencesService prefs;
     @Inject private ThemeManager themeManager;
@@ -130,12 +135,13 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
             saveSurveyButton.setText(Localization.lang("Start survey"));
         }
 
-        saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
-                                Bindings.isEmpty(viewModel.getQueries()),
-                                Bindings.isEmpty(viewModel.getCatalogs())),
-                                Bindings.isEmpty(viewModel.getAuthors())),
-                                viewModel.getTitle().isEmpty()),
-                                viewModel.getDirectory().isEmpty()));
+        saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
+                                                Bindings.isEmpty(viewModel.getQueries()),
+                                                Bindings.isEmpty(viewModel.getCatalogs())),
+                                                Bindings.isEmpty(viewModel.getAuthors())),
+                                                viewModel.getTitle().isEmpty()),
+                                                viewModel.getDirectory().isEmpty()),
+                                                directoryWarning.visibleProperty()));
 
         setResultConverter(button -> {
             if (button == saveSurveyButtonType) {
@@ -174,6 +180,26 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         initQuestionsTab();
         initQueriesTab();
         initCatalogsTab();
+    }
+
+    private void updateDirectoryWarning(Path directory) {
+        if (!Files.isDirectory(directory)) {
+            directoryWarning.setText(Localization.lang("Warning: The selected directory is not a valid directory."));
+            directoryWarning.setVisible(true);
+        } else {
+            try (Stream<Path> entries = Files.list(directory)) {
+                if (entries.findAny().isPresent()) {
+                    directoryWarning.setText(Localization.lang("Warning: The selected directory is not empty."));
+                    directoryWarning.setVisible(true);
+                } else {
+                    directoryWarning.setVisible(false);
+                }
+            } catch (
+                    IOException e) {
+                directoryWarning.setText(Localization.lang("Warning: Failed to check if the directory is empty."));
+                directoryWarning.setVisible(true);
+            }
+        }
     }
 
     private void initAuthorTab() {
@@ -278,6 +304,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 .withInitialDirectory(pathToStudyDataDirectory)
                 .build();
 
-        viewModel.setStudyDirectory(dialogService.showDirectorySelectionDialog(directoryDialogConfiguration));
+        Optional<Path> selectedDirectoryOptional = dialogService.showDirectorySelectionDialog(directoryDialogConfiguration);
+        selectedDirectoryOptional.ifPresent(selectedDirectory -> {
+            viewModel.setStudyDirectory(Optional.of(selectedDirectory));
+            updateDirectoryWarning(selectedDirectory);
+        });
     }
 }

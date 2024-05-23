@@ -158,12 +158,12 @@ class DatabaseMergerTest {
         new DatabaseMerger(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).mergeMetaData(target, other, "unknown", List.of());
 
         // Assert that content selectors are all merged
-        assertEquals(expectedContentSelectors, target.getContentSelectorList());
+        assertEquals(expectedContentSelectors, target.getContentSelectorsSorted().stream().toList());
 
         // Assert that groups of other are children of root node of target
         assertEquals(targetRootGroup, target.getGroups().get());
-        assertEquals(target.getGroups().get().getChildren().size(), 1);
-        assertEquals(otherRootGroup, target.getGroups().get().getChildren().get(0));
+        assertEquals(1, target.getGroups().get().getChildren().size());
+        assertEquals(otherRootGroup, target.getGroups().get().getChildren().getFirst());
     }
 
     @Test
@@ -185,8 +185,8 @@ class DatabaseMergerTest {
 
         // Assert that groups of other are children of root node of target
         assertEquals(targetRootGroup, target.getGroups().get());
-        assertEquals(target.getGroups().get().getChildren().size(), 1);
-        assertEquals(expectedImportedGroupNode, target.getGroups().get().getChildren().get(0));
-        assertEquals(expectedContentSelectors, target.getContentSelectorList());
+        assertEquals(1, target.getGroups().get().getChildren().size());
+        assertEquals(expectedImportedGroupNode, target.getGroups().get().getChildren().getFirst());
+        assertEquals(expectedContentSelectors, target.getContentSelectorsSorted().stream().toList());
     }
 }

@@ -9,7 +9,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -41,8 +43,8 @@ public final class SearchResult {
     private List<String> annotationsResultStringsHtml = List.of();
 
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
-        this.luceneScore = scoreDoc.score;
         this.path = getFieldContents(searcher, scoreDoc, PATH);
+        this.luceneScore = scoreDoc.score;
         if (this.path.length() > 0) {
             // pdf result
             this.pageNumber = Integer.parseInt(getFieldContents(searcher, scoreDoc, PAGE_NUMBER));
@@ -55,14 +57,16 @@ public final class SearchResult {
 
             Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(query));
 
-            try (TokenStream contentStream = new EnglishStemAnalyzer().tokenStream(CONTENT, content)) {
+            try (Analyzer analyzer = new EnglishAnalyzer();
+             TokenStream contentStream = analyzer.tokenStream(CONTENT, content)) {
                 TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
                 this.contentResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
             } catch (InvalidTokenOffsetsException e) {
                 this.contentResultStringsHtml = List.of();
             }
 
-            try (TokenStream annotationStream = new EnglishStemAnalyzer().tokenStream(ANNOTATIONS, annotations)) {
+            try (Analyzer analyzer = new EnglishAnalyzer();
+             TokenStream annotationStream = analyzer.tokenStream(ANNOTATIONS, annotations)) {
                 TextFragment[] frags = highlighter.getBestTextFragments(annotationStream, annotations, true, 10);
                 this.annotationsResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
             } catch (InvalidTokenOffsetsException e) {
@@ -89,7 +93,7 @@ public final class SearchResult {
     }
 
     private String getFieldContents(IndexSearcher searcher, ScoreDoc scoreDoc, String field) throws IOException {
-        IndexableField indexableField = searcher.doc(scoreDoc.doc).getField(field);
+        IndexableField indexableField = searcher.storedFields().document(scoreDoc.doc).getField(field);
         if (indexableField == null) {
             return "";
         }

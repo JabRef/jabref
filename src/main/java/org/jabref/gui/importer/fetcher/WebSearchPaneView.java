@@ -12,6 +12,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
@@ -48,26 +49,34 @@ public class WebSearchPaneView extends VBox {
         fetchers.itemsProperty().bind(viewModel.fetchersProperty());
         fetchers.valueProperty().bindBidirectional(viewModel.selectedFetcherProperty());
         fetchers.setMaxWidth(Double.POSITIVE_INFINITY);
-
-        // Create help button for currently selected fetcher
-        StackPane helpButtonContainer = new StackPane();
-        ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
-        EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -> {
-            if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
-                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService, preferences.getFilePreferences()));
-                helpButtonContainer.getChildren().setAll(helpButton);
-            } else {
-                helpButtonContainer.getChildren().clear();
-            }
-        });
-        HBox fetcherContainer = new HBox(fetchers, helpButtonContainer);
         HBox.setHgrow(fetchers, Priority.ALWAYS);
 
-        // Create text field for query input
-        TextField query = SearchTextField.create();
-        query.getStyleClass().add("searchBar");
+        StackPane helpButtonContainer = createHelpButtonContainer();
+        HBox fetcherContainer = new HBox(fetchers, helpButtonContainer);
+        TextField query = SearchTextField.create(preferences.getKeyBindingRepository());
+        getChildren().addAll(fetcherContainer, query, createSearchButton());
 
         viewModel.queryProperty().bind(query.textProperty());
+
+        addQueryValidationHints(query);
+
+        enableEnterToTriggerSearch(query);
+
+        ClipBoardManager.addX11Support(query);
+    }
+
+    /**
+     * Allows triggering search on pressing enter
+     */
+    private void enableEnterToTriggerSearch(TextField query) {
+        query.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                viewModel.search();
+            }
+        });
+    }
+
+    private void addQueryValidationHints(TextField query) {
         EasyBind.subscribe(viewModel.queryValidationStatus().validProperty(),
                 valid -> {
                     if (!valid && viewModel.queryValidationStatus().getHighestMessage().isPresent()) {
@@ -78,21 +87,35 @@ public class WebSearchPaneView extends VBox {
                         query.pseudoClassStateChanged(QUERY_INVALID, false);
                     }
                 });
+    }
 
-        // Allows triggering search on pressing enter
-        query.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                viewModel.search();
-            }
-        });
-
-        // Create button that triggers search
+    /**
+     * Create button that triggers search
+     */
+    private Button createSearchButton() {
         BooleanExpression importerEnabled = preferences.getImporterPreferences().importerEnabledProperty();
         Button search = new Button(Localization.lang("Search"));
         search.setDefaultButton(false);
         search.setOnAction(event -> viewModel.search());
         search.setMaxWidth(Double.MAX_VALUE);
         search.disableProperty().bind(importerEnabled.not());
-        getChildren().addAll(fetcherContainer, query, search);
+        return search;
+    }
+
+    /**
+     * Creatse help button for currently selected fetcher
+     */
+    private StackPane createHelpButtonContainer() {
+        StackPane helpButtonContainer = new StackPane();
+        ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
+        EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -> {
+            if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
+                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService, preferences.getFilePreferences()));
+                helpButtonContainer.getChildren().setAll(helpButton);
+            } else {
+                helpButtonContainer.getChildren().clear();
+            }
+        });
+        return helpButtonContainer;
     }
 }

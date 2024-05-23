@@ -9,8 +9,9 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -28,17 +29,15 @@ import org.testfx.framework.junit5.Start;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @GUITest
 @ExtendWith(ApplicationExtension.class)
 public class GlobalSearchBarTest {
-    private Stage stage;
-    private Scene scene;
     private HBox hBox;
 
-    private GlobalSearchBar searchBar;
     private StateManager stateManager;
 
     @Start
@@ -48,23 +47,27 @@ public class GlobalSearchBarTest {
         PreferencesService prefs = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         when(prefs.getSearchPreferences()).thenReturn(searchPreferences);
 
+        KeyBindingRepository keyBindingRepository = mock(KeyBindingRepository.class);
+        when(keyBindingRepository.matches(any(), any())).thenReturn(false);
+        when(prefs.getKeyBindingRepository()).thenReturn(keyBindingRepository);
+
         stateManager = new StateManager();
         // Need for active database, otherwise the searchField will be disabled
         stateManager.setActiveDatabase(new BibDatabaseContext());
 
         // Instantiate GlobalSearchBar class, so the change listener is registered
-        searchBar = new GlobalSearchBar(
-                mock(JabRefFrame.class),
+        GlobalSearchBar searchBar = new GlobalSearchBar(
+                mock(LibraryTabContainer.class),
                 stateManager,
                 prefs,
                 mock(CountingUndoManager.class),
-                mock(DialogService.class)
+                mock(DialogService.class),
+                SearchType.NORMAL_SEARCH
         );
 
         hBox = new HBox(searchBar);
 
-        scene = new Scene(hBox, 400, 400);
-        this.stage = stage;
+        Scene scene = new Scene(hBox, 400, 400);
         stage.setScene(scene);
 
         stage.show();

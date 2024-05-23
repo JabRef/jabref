@@ -28,6 +28,8 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     @FXML private CheckBox allowIntegerEdition;
     @FXML private CheckBox journalPopupEnabled;
     @FXML private CheckBox autoLinkFilesEnabled;
+    @FXML private CheckBox enableSciteTab;
+    @FXML private CheckBox showUserCommentsField;
 
     @FXML private Button generalFieldsHelp;
     @FXML private TextArea fieldsTextArea;
@@ -57,6 +59,8 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
         journalPopupEnabled.selectedProperty().bindBidirectional(viewModel.journalPopupProperty());
         autoLinkFilesEnabled.selectedProperty().bindBidirectional(viewModel.autoLinkFilesEnabledProperty());
+        enableSciteTab.selectedProperty().bindBidirectional(viewModel.enableSciteTabProperty());
+        showUserCommentsField.selectedProperty().bindBidirectional(viewModel.showUserCommentsProperty());
 
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
 

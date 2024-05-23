@@ -7,10 +7,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.model.search.rules.SearchRules;
 
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
@@ -45,7 +45,7 @@ public class SearchQuery {
             }
         }
 
-        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishStemAnalyzer(), boosts);
+        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishAnalyzer(), boosts);
         queryParser.setAllowLeadingWildcard(true);
         if (!query.contains("\"") && !query.contains(":") && !query.contains("*") && !query.contains("~") & query.length() > 0) {
             query = Arrays.stream(query.split(" ")).map(s -> "*" + s + "*").collect(Collectors.joining(" "));

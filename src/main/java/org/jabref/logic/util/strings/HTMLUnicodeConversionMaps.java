@@ -292,6 +292,12 @@ public class HTMLUnicodeConversionMaps {
             {"978", "upsih", "{{$\\Upsilon$}}"}, // greek upsilon with hook symbol,
             //                                   U+03D2 NEW
             {"982", "piv", "$\\varphi$"}, // greek pi symbol, U+03D6 ISOgrk3
+            /* Letters with Dot Below */
+            {"7751", "", "{\\d{n}}"}, // Latin Small Letter N with Dot Below, U+1E47
+            {"7789", "", "{\\d{t}}"}, // Latin Small Letter T with Dot Below, U+1E6D
+            {"7717", "", "{\\d{h}}"}, // Latin Small Letter H with Dot Below, U+1E25
+            {"7747", "", "{\\d{m}}"}, // Latin Small Letter M with Dot Below, U+1E43
+            {"7771", "", "{\\d{r}}"}, // Latin Small Letter R with Dot Below, U+1E5B
 
             /* General Punctuation */
             {"8211", "ndash", "$\\textendash$"},
@@ -855,17 +861,17 @@ public class HTMLUnicodeConversionMaps {
 
     static {
         for (String[] aConversionList : CONVERSION_LIST) {
-            if (!(aConversionList[2].isEmpty())) {
+            if (!aConversionList[2].isEmpty()) {
                 String strippedLaTeX = cleanLaTeX(aConversionList[2]);
-                if (!(aConversionList[1].isEmpty())) {
+                if (!aConversionList[1].isEmpty()) {
                     HTML_LATEX_CONVERSION_MAP.put("&" + aConversionList[1] + ";", aConversionList[2]);
                     if (!strippedLaTeX.isEmpty()) {
                         LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&" + aConversionList[1] + ";");
                     }
-                } else if (!(aConversionList[0].isEmpty()) && !strippedLaTeX.isEmpty()) {
+                } else if (!aConversionList[0].isEmpty() && !strippedLaTeX.isEmpty()) {
                     LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&#" + aConversionList[0] + ";");
                 }
-                if (!(aConversionList[0].isEmpty())) {
+                if (!aConversionList[0].isEmpty()) {
                     NUMERICAL_LATEX_CONVERSION_MAP.put(Integer.decode(aConversionList[0]), aConversionList[2]);
                     if (Integer.decode(aConversionList[0]) > 128) {
                         String unicodeSymbol = String.valueOf(Character.toChars(Integer.decode(aConversionList[0])));

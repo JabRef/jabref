@@ -47,7 +47,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
         ViewLoader.view(this)
                   .load()
-                  .setAsContent(this.getDialogPane());
+                  .setAsDialogPane(this);
 
         // Remove button bar at bottom, but add close button to keep the dialog closable by clicking the "x" window symbol
         getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
@@ -65,9 +65,21 @@ public class DocumentViewerView extends BaseDialog<Void> {
         setupModeButtons();
     }
 
-    private void setupModeButtons() {
-        viewModel.liveModeProperty().bind(modeLive.selectedProperty());
-        modeLock.selectedProperty().bind(modeLive.selectedProperty().not());
+    private void setupModeButtons() throws RuntimeException {
+        viewModel.liveModeProperty().addListener((observable, oldValue, newValue) -> {
+            modeLive.setSelected(newValue);
+        });
+
+        modeLive.setOnAction(event -> {
+            if (!viewModel.liveModeProperty().get()) {
+                viewModel.setLiveMode(true);
+            }
+        });
+        modeLock.setOnAction(event -> {
+            if (viewModel.liveModeProperty().get()) {
+                viewModel.setLiveMode(false);
+            }
+        });
     }
 
     private void setupScrollbar() {

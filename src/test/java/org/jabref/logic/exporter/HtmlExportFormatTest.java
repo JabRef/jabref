@@ -57,6 +57,6 @@ public class HtmlExportFormatTest {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         exportFormat.export(databaseContext, path, entries);
         List<String> lines = Files.readAllLines(path);
-        assertEquals("</html>", lines.get(lines.size() - 1));
+        assertEquals("</html>", lines.getLast());
     }
 }

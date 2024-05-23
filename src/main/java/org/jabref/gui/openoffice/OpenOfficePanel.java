@@ -27,7 +27,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -274,7 +273,7 @@ public class OpenOfficePanel {
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase.get());
             LibraryTab libraryTab = LibraryTab.createLibraryTab(
                     databaseContext,
-                    JabRefGUI.getMainFrame(),
+                    tabContainer,
                     dialogService,
                     preferencesService,
                     stateManager,

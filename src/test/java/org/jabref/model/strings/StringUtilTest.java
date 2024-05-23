@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -30,38 +31,38 @@ class StringUtilTest {
     }
 
     @Test
-    void testBooleanToBinaryString() {
+    void booleanToBinaryString() {
         assertEquals("0", StringUtil.booleanToBinaryString(false));
         assertEquals("1", StringUtil.booleanToBinaryString(true));
     }
 
     @Test
-    void testQuoteSimple() {
+    void quoteSimple() {
         assertEquals("a::", StringUtil.quote("a:", "", ':'));
     }
 
     @Test
-    void testQuoteNullQuotation() {
+    void quoteNullQuotation() {
         assertEquals("a::", StringUtil.quote("a:", null, ':'));
     }
 
     @Test
-    void testQuoteNullString() {
+    void quoteNullString() {
         assertEquals("", StringUtil.quote(null, ";", ':'));
     }
 
     @Test
-    void testQuoteQuotationCharacter() {
+    void quoteQuotationCharacter() {
         assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
     }
 
     @Test
-    void testQuoteMoreComplicated() {
+    void quoteMoreComplicated() {
         assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
     }
 
     @Test
-    void testUnifyLineBreaks() {
+    void unifyLineBreaks() {
         // Mac < v9
         String result = StringUtil.unifyLineBreaks("\r", "newline");
         assertEquals("newline", result);
@@ -74,7 +75,7 @@ class StringUtilTest {
     }
 
     @Test
-    void testGetCorrectFileName() {
+    void getCorrectFileName() {
         assertEquals("aa.bib", StringUtil.getCorrectFileName("aa", "bib"));
         assertEquals(".login.bib", StringUtil.getCorrectFileName(".login", "bib"));
         assertEquals("a.bib", StringUtil.getCorrectFileName("a.bib", "bib"));
@@ -85,13 +86,13 @@ class StringUtilTest {
     }
 
     @Test
-    void testQuoteForHTML() {
+    void quoteForHTML() {
         assertEquals("&#33;", StringUtil.quoteForHTML("!"));
         assertEquals("&#33;&#33;&#33;", StringUtil.quoteForHTML("!!!"));
     }
 
     @Test
-    void testRemoveBracesAroundCapitals() {
+    void removeBracesAroundCapitals() {
         assertEquals("ABC", StringUtil.removeBracesAroundCapitals("{ABC}"));
         assertEquals("ABC", StringUtil.removeBracesAroundCapitals("{{ABC}}"));
         assertEquals("{abc}", StringUtil.removeBracesAroundCapitals("{abc}"));
@@ -99,7 +100,7 @@ class StringUtilTest {
     }
 
     @Test
-    void testPutBracesAroundCapitals() {
+    void putBracesAroundCapitals() {
         assertEquals("{ABC}", StringUtil.putBracesAroundCapitals("ABC"));
         assertEquals("{ABC}", StringUtil.putBracesAroundCapitals("{ABC}"));
         assertEquals("abc", StringUtil.putBracesAroundCapitals("abc"));
@@ -108,7 +109,7 @@ class StringUtilTest {
     }
 
     @Test
-    void testShaveString() {
+    void shaveString() {
         assertEquals("", StringUtil.shaveString(null));
         assertEquals("", StringUtil.shaveString(""));
         assertEquals("aaa", StringUtil.shaveString("   aaa\t\t\n\r"));
@@ -120,7 +121,7 @@ class StringUtilTest {
     }
 
     @Test
-    void testJoin() {
+    void join() {
         String[] s = {"ab", "cd", "ed"};
         assertEquals("ab\\cd\\ed", StringUtil.join(s, "\\", 0, s.length));
 
@@ -134,7 +135,7 @@ class StringUtilTest {
     }
 
     @Test
-    void testStripBrackets() {
+    void stripBrackets() {
         assertEquals("foo", StringUtil.stripBrackets("[foo]"));
         assertEquals("[foo]", StringUtil.stripBrackets("[[foo]]"));
         assertEquals("", StringUtil.stripBrackets(""));
@@ -142,11 +143,11 @@ class StringUtilTest {
         assertEquals("]", StringUtil.stripBrackets("]"));
         assertEquals("", StringUtil.stripBrackets("[]"));
         assertEquals("f[]f", StringUtil.stripBrackets("f[]f"));
-        assertEquals(null, StringUtil.stripBrackets(null));
+        assertNull(StringUtil.stripBrackets(null));
     }
 
     @Test
-    void testGetPart() {
+    void getPart() {
         // Get word between braces
         assertEquals("{makes}", StringUtil.getPart("Practice {makes} perfect", 8, false));
         // When the string is empty and start Index equal zero
@@ -158,12 +159,12 @@ class StringUtilTest {
     }
 
     @Test
-    void testFindEncodingsForString() {
+    void findEncodingsForString() {
         // Unused in JabRef, but should be added in case it finds some use
     }
 
     @Test
-    void testWrap() {
+    void wrap() {
         String newline = "newline";
         assertEquals("aaaaa" + newline + "\tbbbbb" + newline + "\tccccc",
                 StringUtil.wrap("aaaaa bbbbb ccccc", 5, newline));
@@ -180,7 +181,7 @@ class StringUtilTest {
     }
 
     @Test
-    void testDecodeStringDoubleArray() {
+    void decodeStringDoubleArray() {
         assertArrayEquals(new String[][]{{"a", "b"}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:b;c:d"));
         assertArrayEquals(new String[][]{{"a", ""}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:;c:d"));
         // arrays first differed at element [0][1]; expected: null<null> but was: java.lang.String<null>
@@ -189,7 +190,7 @@ class StringUtilTest {
     }
 
     @Test
-    void testIsInCurlyBrackets() {
+    void isInCurlyBrackets() {
         assertFalse(StringUtil.isInCurlyBrackets(""));
         assertFalse(StringUtil.isInCurlyBrackets(null));
         assertTrue(StringUtil.isInCurlyBrackets("{}"));
@@ -203,7 +204,7 @@ class StringUtilTest {
     }
 
     @Test
-    void testIsInSquareBrackets() {
+    void isInSquareBrackets() {
         assertFalse(StringUtil.isInSquareBrackets(""));
         assertFalse(StringUtil.isInSquareBrackets(null));
         assertTrue(StringUtil.isInSquareBrackets("[]"));
@@ -214,7 +215,7 @@ class StringUtilTest {
     }
 
     @Test
-    void testIsInCitationMarks() {
+    void isInCitationMarks() {
         assertFalse(StringUtil.isInCitationMarks(""));
         assertFalse(StringUtil.isInCitationMarks(null));
         assertTrue(StringUtil.isInCitationMarks("\"\""));
@@ -224,87 +225,87 @@ class StringUtilTest {
     }
 
     @Test
-    void testIntValueOfSingleDigit() {
+    void intValueOfSingleDigit() {
         assertEquals(1, StringUtil.intValueOf("1"));
         assertEquals(2, StringUtil.intValueOf("2"));
         assertEquals(8, StringUtil.intValueOf("8"));
     }
 
     @Test
-    void testIntValueOfLongString() {
+    void intValueOfLongString() {
         assertEquals(1234567890, StringUtil.intValueOf("1234567890"));
     }
 
     @Test
-    void testIntValueOfStartWithZeros() {
+    void intValueOfStartWithZeros() {
         assertEquals(1234, StringUtil.intValueOf("001234"));
     }
 
     @Test
-    void testIntValueOfExceptionIfStringContainsLetter() {
+    void intValueOfExceptionIfStringContainsLetter() {
         assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf("12A2"));
     }
 
     @Test
-    void testIntValueOfExceptionIfStringNull() {
+    void intValueOfExceptionIfStringNull() {
         assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(null));
     }
 
     @Test
-    void testIntValueOfExceptionfIfStringEmpty() {
+    void intValueOfExceptionfIfStringEmpty() {
         assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(""));
     }
 
     @Test
-    void testIntValueOfWithNullSingleDigit() {
+    void intValueOfWithNullSingleDigit() {
         assertEquals(Optional.of(1), StringUtil.intValueOfOptional("1"));
         assertEquals(Optional.of(2), StringUtil.intValueOfOptional("2"));
         assertEquals(Optional.of(8), StringUtil.intValueOfOptional("8"));
     }
 
     @Test
-    void testIntValueOfWithNullLongString() {
+    void intValueOfWithNullLongString() {
         assertEquals(Optional.of(1234567890), StringUtil.intValueOfOptional("1234567890"));
     }
 
     @Test
-    void testIntValueOfWithNullStartWithZeros() {
+    void intValueOfWithNullStartWithZeros() {
         assertEquals(Optional.of(1234), StringUtil.intValueOfOptional("001234"));
     }
 
     @Test
-    void testIntValueOfWithNullExceptionIfStringContainsLetter() {
+    void intValueOfWithNullExceptionIfStringContainsLetter() {
         assertEquals(Optional.empty(), StringUtil.intValueOfOptional("12A2"));
     }
 
     @Test
-    void testIntValueOfWithNullExceptionIfStringNull() {
+    void intValueOfWithNullExceptionIfStringNull() {
         assertEquals(Optional.empty(), StringUtil.intValueOfOptional(null));
     }
 
     @Test
-    void testIntValueOfWithNullExceptionfIfStringEmpty() {
+    void intValueOfWithNullExceptionfIfStringEmpty() {
         assertEquals(Optional.empty(), StringUtil.intValueOfOptional(""));
     }
 
     @Test
-    void testLimitStringLengthShort() {
+    void limitStringLengthShort() {
         assertEquals("Test", StringUtil.limitStringLength("Test", 20));
     }
 
     @Test
-    void testLimitStringLengthLimiting() {
+    void limitStringLengthLimiting() {
         assertEquals("TestTes...", StringUtil.limitStringLength("TestTestTestTestTest", 10));
         assertEquals(10, StringUtil.limitStringLength("TestTestTestTestTest", 10).length());
     }
 
     @Test
-    void testLimitStringLengthNullInput() {
+    void limitStringLengthNullInput() {
         assertEquals("", StringUtil.limitStringLength(null, 10));
     }
 
     @Test
-    void testReplaceSpecialCharacters() {
+    void replaceSpecialCharacters() {
         assertEquals("Hallo Arger", StringUtil.replaceSpecialCharacters("Hallo Arger"));
         assertEquals("aaAeoeeee", StringUtil.replaceSpecialCharacters("åÄöéèë"));
     }
@@ -325,41 +326,41 @@ class StringUtilTest {
 
     @ParameterizedTest
     @MethodSource("testRepeatSpacesData")
-    void testRepeatSpaces(String result, int count) {
+    void repeatSpaces(String result, int count) {
         assertEquals(result, StringUtil.repeatSpaces(count));
     }
 
     @Test
-    void testRepeat() {
+    void repeat() {
         assertEquals("", StringUtil.repeat(0, 'a'));
         assertEquals("a", StringUtil.repeat(1, 'a'));
         assertEquals("aaaaaaa", StringUtil.repeat(7, 'a'));
     }
 
     @Test
-    void testBoldHTML() {
+    void boldHTML() {
         assertEquals("<b>AA</b>", StringUtil.boldHTML("AA"));
     }
 
     @Test
-    void testBoldHTMLReturnsOriginalTextIfNonNull() {
+    void boldHTMLReturnsOriginalTextIfNonNull() {
         assertEquals("<b>AA</b>", StringUtil.boldHTML("AA", "BB"));
     }
 
     @Test
-    void testBoldHTMLReturnsAlternativeTextIfNull() {
+    void boldHTMLReturnsAlternativeTextIfNull() {
         assertEquals("<b>BB</b>", StringUtil.boldHTML(null, "BB"));
     }
 
     @Test
-    void testUnquote() {
+    void unquote() {
         assertEquals("a:", StringUtil.unquote("a::", ':'));
         assertEquals("a:;", StringUtil.unquote("a:::;", ':'));
         assertEquals("a:b%c;", StringUtil.unquote("a::b:%c:;", ':'));
     }
 
     @Test
-    void testCapitalizeFirst() {
+    void capitalizeFirst() {
         assertEquals("", StringUtil.capitalizeFirst(""));
         assertEquals("Hello world", StringUtil.capitalizeFirst("Hello World"));
         assertEquals("A", StringUtil.capitalizeFirst("a"));
@@ -377,17 +378,17 @@ class StringUtilTest {
 
     @ParameterizedTest
     @MethodSource("getQuoteStringIfSpaceIsContainedData")
-    void testGuoteStringIfSpaceIsContained(String expected, String source) {
+    void guoteStringIfSpaceIsContained(String expected, String source) {
         assertEquals(expected, StringUtil.quoteStringIfSpaceIsContained(source));
     }
 
     @Test
-    void testStripAccents() {
+    void stripAccents() {
         assertEquals("aAoeee", StringUtil.stripAccents("åÄöéèë"));
         assertEquals("Muhlbach", StringUtil.stripAccents("Mühlbach"));
     }
 
-    static Stream<Arguments> testContainsWhitespace() {
+    static Stream<Arguments> containsWhitespace() {
         return Stream.of(
                 Arguments.of(true, "file url"),
                 Arguments.of(true, "file\nurl"),
@@ -405,7 +406,7 @@ class StringUtilTest {
 
     @ParameterizedTest
     @MethodSource
-    void testContainsWhitespace(Boolean expected, String input) {
+    void containsWhitespace(Boolean expected, String input) {
         assertEquals(expected, StringUtil.containsWhitespace(input));
     }
 }

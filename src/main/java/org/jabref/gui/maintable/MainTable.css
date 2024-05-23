@@ -14,6 +14,7 @@
 
 .table-row-cell:hover .empty-special-field {
     visibility: visible;
+    -fx-icon-color: -jr-gray-2;
     -fx-fill: -jr-gray-2;
 }
 

@@ -49,7 +49,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
-    private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().get(0);
+    private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().getFirst();
 
     /**
      * The file we want to create/replace.
@@ -61,7 +61,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      */
     private final Path temporaryFile;
 
-    private final FileLock temporaryFileLock;
+    private FileLock temporaryFileLock;
 
     /**
      * A backup of the target file (if it exists), created when the stream is closed
@@ -106,7 +106,13 @@ public class AtomicFileOutputStream extends FilterOutputStream {
         try {
             // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
             if (out instanceof FileOutputStream stream) {
-                temporaryFileLock = stream.getChannel().lock();
+                try {
+                    temporaryFileLock = stream.getChannel().tryLock();
+                } catch (IOException ex) {
+                    // workaround for https://bugs.openjdk.org/browse/JDK-8167023
+                    LOGGER.warn("Could not acquire file lock. Maybe we are on a network drive?", ex);
+                    temporaryFileLock = null;
+                }
             } else {
                 temporaryFileLock = null;
             }
@@ -160,12 +166,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private void cleanup() {
         try {
-            if (temporaryFileLock != null) {
+            if (temporaryFileLock != null && temporaryFileLock.isValid()) {
                 temporaryFileLock.release();
             }
         } catch (IOException exception) {
-            // Currently, we always get the exception:
-            // Unable to release lock on file C:\Users\koppor\AppData\Local\Temp\junit11976839611279549873\error-during-save.txt.tmp: java.nio.channels.ClosedChannelException
+            // In case we still get an exception
             LOGGER.debug("Unable to release lock on file {}", temporaryFile, exception);
         }
         try {

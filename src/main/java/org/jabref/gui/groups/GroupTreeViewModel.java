@@ -57,6 +57,19 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
             .getName()
             .compareToIgnoreCase(v2.getName());
+    private final Comparator<GroupTreeNode> compAlphabetIgnoreCaseReverse = (GroupTreeNode v1, GroupTreeNode v2) -> v2
+            .getName()
+            .compareToIgnoreCase(v1.getName());
+    private final Comparator<GroupTreeNode> compEntries = (GroupTreeNode v1, GroupTreeNode v2) -> {
+        int numChildren1 = v1.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
+        int numChildren2 = v2.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
+        return Integer.compare(numChildren2, numChildren1);
+    };
+    private final Comparator<GroupTreeNode> compEntriesReverse = (GroupTreeNode v1, GroupTreeNode v2) -> {
+        int numChildren1 = v1.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
+        int numChildren2 = v2.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();
+        return Integer.compare(numChildren1, numChildren2);
+    };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
     public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
@@ -160,6 +173,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
                     database,
+                    parent.getGroupNode(),
                     null,
                     groupDialogHeader));
 
@@ -244,6 +258,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
                     database,
+                    oldGroup.getGroupNode().getParent().orElse(null),
                     oldGroup.getGroupNode().getGroup(),
                     GroupDialogHeader.SUBGROUP));
             newGroup.ifPresent(group -> {
@@ -559,5 +574,17 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
     public void sortAlphabeticallyRecursive(GroupTreeNode group) {
         group.sortChildren(compAlphabetIgnoreCase, true);
+    }
+
+    public void sortReverseAlphabeticallyRecursive(GroupTreeNode group) {
+        group.sortChildren(compAlphabetIgnoreCaseReverse, true);
+    }
+
+    public void sortEntriesRecursive(GroupTreeNode group) {
+        group.sortChildren(compEntries, true);
+    }
+
+    public void sortReverseEntriesRecursive(GroupTreeNode group) {
+        group.sortChildren(compEntriesReverse, true);
     }
 }

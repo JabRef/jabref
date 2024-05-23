@@ -63,7 +63,7 @@ public class EditMerge {
                                                      .flatMap(group -> group.citationsInStorageOrder.stream())
                                                      .collect(Collectors.toList());
 
-                CitationType citationType = groups.get(0).citationType;
+                CitationType citationType = groups.getFirst().citationType;
                 List<Optional<OOText>> pageInfos = frontend.backend.combinePageInfos(groups);
 
                 frontend.removeCitationGroups(groups, doc);
@@ -186,7 +186,7 @@ public class EditMerge {
                                         + " but %s",
                                 state.prevRange.getString(),
                                 currentRange.getString(),
-                                ((textOrder == 0)
+                                (textOrder == 0
                                         ? "they start at the same position"
                                         : "the start of the latter precedes the start of the first"));
                 LOGGER.warn(msg);

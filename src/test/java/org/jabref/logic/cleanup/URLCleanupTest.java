@@ -15,7 +15,7 @@ public class URLCleanupTest {
 
     @ParameterizedTest
     @MethodSource("provideURL")
-    public void testChangeURL(BibEntry expected, BibEntry urlInputField) {
+    public void changeURL(BibEntry expected, BibEntry urlInputField) {
         URLCleanup cleanUp = new URLCleanup();
         cleanUp.cleanup(urlInputField);
 
@@ -170,7 +170,12 @@ public class URLCleanupTest {
                               .withField(StandardField.NOTE,
                                     "cited by Kramer"),
                 new BibEntry().withField(StandardField.NOTE,
-                                    "\\url{https://example.org}, cited by Kramer, accessed on 2023-04-11"))
+                                    "\\url{https://example.org}, cited by Kramer, accessed on 2023-04-11"),
+            // test with no fields present
+            Arguments.of(
+                    new BibEntry(),
+                    new BibEntry())
+            )
         );
     }
 }

@@ -10,9 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,21 +52,21 @@ public class BibStringDiffTest {
     @Test
     void identicalObjectsAreEqual() {
         BibStringDiff other = diff;
-        assertTrue(other.equals(diff));
+        assertEquals(other, diff);
     }
 
     @Test
     void compareToNullObjectIsFalse() {
-        assertFalse(diff.equals(null));
+        assertNotEquals(null, diff);
     }
 
     @Test
     void compareToDifferentClassIsFalse() {
-        assertFalse(diff.equals(new Object()));
+        assertNotEquals(diff, new Object());
     }
 
     @Test
-    void testGetters() {
+    void getters() {
         BibtexString bsOne = new BibtexString("aKahle", "Kahle, Brewster");
         BibtexString bsTwo = new BibtexString("iMIT", "Institute of Technology");
         BibStringDiff diff = new BibStringDiff(bsOne, bsTwo);
@@ -77,7 +75,7 @@ public class BibStringDiffTest {
     }
 
     @Test
-    void testCompareEmptyDatabases() {
+    void compareEmptyDatabases() {
         when(originalDataBase.hasNoStrings()).thenReturn(true);
         when(newDataBase.hasNoStrings()).thenReturn(true);
 
@@ -85,7 +83,7 @@ public class BibStringDiffTest {
     }
 
     @Test
-    void testCompareNameChange() {
+    void compareNameChange() {
         when(originalDataBase.getStringValues()).thenReturn(List.of(new BibtexString("name", "content")));
         when(newDataBase.getStringValues()).thenReturn(List.of(new BibtexString("name2", "content")));
 
@@ -95,7 +93,7 @@ public class BibStringDiffTest {
     }
 
     @Test
-    void testCompareNoDiff() {
+    void compareNoDiff() {
         when(originalDataBase.getStringValues()).thenReturn(List.of(new BibtexString("name", "content")));
         when(newDataBase.getStringValues()).thenReturn(List.of(new BibtexString("name", "content")));
 
@@ -104,7 +102,7 @@ public class BibStringDiffTest {
     }
 
     @Test
-    void testCompareRemovedString() {
+    void compareRemovedString() {
         when(originalDataBase.getStringValues()).thenReturn(List.of(new BibtexString("name", "content")));
         when(newDataBase.getStringValues()).thenReturn(Collections.emptyList());
 
@@ -114,7 +112,7 @@ public class BibStringDiffTest {
     }
 
     @Test
-    void testCompareAddString() {
+    void compareAddString() {
         when(originalDataBase.getStringValues()).thenReturn(Collections.emptyList());
         when(newDataBase.getStringValues()).thenReturn(List.of(new BibtexString("name", "content")));
 

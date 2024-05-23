@@ -146,3 +146,21 @@
 .description {
     -fx-font-style: italic;
 }
+
+.scite-tallies-label {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
+.scite-error-box {
+    -fx-padding: 30 0 0 30;
+}
+.scite-message-box {
+    -fx-padding: 30 0 0 30;
+}
+
+.scite-error-label {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-accent;
+}

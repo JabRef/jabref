@@ -13,17 +13,19 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 
 /**
- * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
+ * Formats the DOI (e.g. removes http part) and also infers DOIs from the note, url, eprint or ee fields.
  */
 public class DoiCleanup implements CleanupJob {
 
     /**
      * Fields to check for DOIs.
      */
-    private static final List<Field> FIELDS = Arrays.asList(StandardField.NOTE, StandardField.URL, new UnknownField("ee"));
+    private static final List<Field> FIELDS = Arrays.asList(StandardField.NOTE, StandardField.URL, StandardField.EPRINT,
+            new UnknownField("ee"));
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
@@ -57,13 +59,24 @@ public class DoiCleanup implements CleanupJob {
         } else {
             // As the Doi field is empty we now check if note, url, or ee field contains a Doi
             for (Field field : FIELDS) {
-                Optional<DOI> doi = entry.getField(field).flatMap(DOI::parse);
+                Optional<String> fieldContentOpt = entry.getField(field);
+
+                Optional<DOI> doi = fieldContentOpt.flatMap(DOI::parse);
 
                 if (doi.isPresent()) {
                     // Update Doi
                     Optional<FieldChange> change = entry.setField(StandardField.DOI, doi.get().getDOI());
                     change.ifPresent(changes::add);
                     removeFieldValue(entry, field, changes);
+                }
+
+                if (StandardField.EPRINT == field) {
+                    fieldContentOpt.flatMap(ArXivIdentifier::parse)
+                                   .flatMap(ArXivIdentifier::inferDOI)
+                                   .ifPresent(inferredDoi -> {
+                                       Optional<FieldChange> change = entry.setField(StandardField.DOI, inferredDoi.getDOI());
+                                       change.ifPresent(changes::add);
+                                   });
                 }
             }
         }

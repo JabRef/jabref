@@ -16,6 +16,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
@@ -32,7 +33,6 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -64,28 +64,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ArgumentProcessor {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
+
+    public enum Mode { INITIAL_START, REMOTE_START }
+
     private final JabRefCLI cli;
 
-    // Written once by processArguments()
-    private List<ParserResult> parserResults = List.of();
-
     private final Mode startupMode;
+
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
-    private boolean noGUINeeded;
+
+    private boolean guiNeeded;
+    private final List<UiCommand> uiCommands = new ArrayList<>();
 
     /**
      * First call the constructor, then call {@link #processArguments()}.
-     * Afterward, you can access the {@link #getParserResults()} and other getters.
+     * Afterward, you can access the {@link #getUiCommands()}.
      */
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
                              PreferencesService preferencesService,
                              FileUpdateMonitor fileUpdateMonitor,
-                             BibEntryTypesManager entryTypesManager) throws org.apache.commons.cli.ParseException {
+                             BibEntryTypesManager entryTypesManager)
+            throws org.apache.commons.cli.ParseException {
         this.cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         this.preferencesService = preferencesService;
@@ -121,6 +124,7 @@ public class ArgumentProcessor {
     }
 
     private Optional<ParserResult> importFile(String argument) {
+        LOGGER.debug("Importing file {}", argument);
         String[] data = argument.split(",");
 
         String address = data[0];
@@ -151,8 +155,7 @@ public class ArgumentProcessor {
         Optional<ParserResult> importResult = importFile(file, importFormat);
         importResult.ifPresent(result -> {
             if (result.hasWarnings()) {
-                OutputPrinter printer = new SystemOutputPrinter();
-                printer.showMessage(result.getErrorMessage());
+                System.out.println(result.getErrorMessage());
             }
         });
         return importResult;
@@ -163,7 +166,9 @@ public class ArgumentProcessor {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     preferencesService.getImporterPreferences(),
                     preferencesService.getImportFormatPreferences(),
-                    fileUpdateMonitor);
+                    preferencesService.getCitationKeyPatternPreferences(),
+                    fileUpdateMonitor
+            );
 
             if (!"*".equals(importFormat)) {
                 System.out.println(Localization.lang("Importing %0", file));
@@ -185,21 +190,20 @@ public class ArgumentProcessor {
         }
     }
 
-    public List<ParserResult> getParserResults() {
-        return parserResults;
-    }
-
     public void processArguments() {
+        uiCommands.clear();
+
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
             cli.displayVersion();
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
             JabRefCLI.printUsage(preferencesService);
-            noGUINeeded = true;
-            this.parserResults = Collections.emptyList();
+            guiNeeded = false;
             return;
         }
+
+        guiNeeded = true;
 
         // Check if we should reset all preferences to default values:
         if (cli.isPreferencesReset()) {
@@ -211,7 +215,6 @@ public class ArgumentProcessor {
             importPreferences();
         }
 
-        // List to put imported/loaded database(s) in.
         List<ParserResult> loaded = importAndOpenFiles();
 
         if (!cli.isBlank() && cli.isFetcherEngine()) {
@@ -221,7 +224,6 @@ public class ArgumentProcessor {
         if (cli.isExportMatches()) {
             if (!loaded.isEmpty()) {
                 if (!exportMatches(loaded)) {
-                    this.parserResults = Collections.emptyList();
                     return;
                 }
             } else {
@@ -277,7 +279,17 @@ public class ArgumentProcessor {
             doAuxImport(loaded);
         }
 
-        this.parserResults = loaded;
+        if (cli.isBlank()) {
+            uiCommands.add(new UiCommand.BlankWorkspace());
+        }
+
+        if (!cli.isBlank() && cli.isJumpToKey()) {
+            uiCommands.add(new UiCommand.JumpToEntryKey(cli.getJumpToKey()));
+        }
+
+        if (!cli.isBlank() && !loaded.isEmpty()) {
+            uiCommands.add(new UiCommand.OpenDatabases(loaded));
+        }
     }
 
     private void writeMetadataToPdf(List<ParserResult> loaded,
@@ -294,7 +306,7 @@ public class ArgumentProcessor {
             LOGGER.error("The write xmp option depends on a valid import option.");
             return;
         }
-        ParserResult pr = loaded.get(loaded.size() - 1);
+        ParserResult pr = loaded.getLast();
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
 
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
@@ -439,7 +451,7 @@ public class ArgumentProcessor {
         String[] data = cli.getExportMatches().split(",");
         String searchTerm = data[0].replace("\\$", " "); // enables blanks within the search term:
         // $ stands for a blank
-        ParserResult pr = loaded.get(loaded.size() - 1);
+        ParserResult pr = loaded.getLast();
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
 
@@ -460,7 +472,7 @@ public class ArgumentProcessor {
                 default -> {
                     System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
                                                    .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
-                    noGUINeeded = true;
+                    guiNeeded = false;
                     return false;
                 }
             }
@@ -510,6 +522,9 @@ public class ArgumentProcessor {
         }
     }
 
+    /**
+     * @return List of opened files (could be .bib, but also other formats). May also contain error results.
+     */
     private List<ParserResult> importAndOpenFiles() {
         List<ParserResult> loaded = new ArrayList<>();
         List<String> toImport = new ArrayList<>();
@@ -527,6 +542,7 @@ public class ArgumentProcessor {
                                 Path.of(aLeftOver),
                                 preferencesService.getImportFormatPreferences(),
                                 fileUpdateMonitor);
+                        // In contrast to org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed, we do not execute OpenDatabaseAction.performPostOpenActions(result, dialogService);
                     } catch (IOException ex) {
                         pr = ParserResult.fromError(ex);
                         LOGGER.error("Error opening file '{}'", aLeftOver, ex);
@@ -572,7 +588,7 @@ public class ArgumentProcessor {
 
     private boolean generateAux(List<ParserResult> loaded, String[] data) {
         if (data.length == 2) {
-            ParserResult pr = loaded.get(0);
+            ParserResult pr = loaded.getFirst();
             AuxCommandLine acl = new AuxCommandLine(data[0], pr.getDatabase());
             BibDatabase newBase = acl.perform();
 
@@ -625,7 +641,7 @@ public class ArgumentProcessor {
             // This signals that the latest import should be stored in BibTeX
             // format to the given file.
             if (!loaded.isEmpty()) {
-                ParserResult pr = loaded.get(loaded.size() - 1);
+                ParserResult pr = loaded.getLast();
                 if (!pr.isInvalid()) {
                     saveDatabase(pr.getDatabase(), data[0]);
                 }
@@ -635,7 +651,7 @@ public class ArgumentProcessor {
         } else if (data.length == 2) {
             // This signals that the latest import should be stored in the given
             // format to the given file.
-            ParserResult parserResult = loaded.get(loaded.size() - 1);
+            ParserResult parserResult = loaded.getLast();
 
             Path path = parserResult.getPath().get().toAbsolutePath();
             BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
@@ -773,15 +789,11 @@ public class ArgumentProcessor {
         }
     }
 
-    public boolean isBlank() {
-        return cli.isBlank();
-    }
-
     public boolean shouldShutDown() {
-        return cli.isDisableGui() || cli.isShowVersion() || noGUINeeded;
+        return cli.isDisableGui() || cli.isShowVersion() || !guiNeeded;
     }
 
-    public enum Mode {
-        INITIAL_START, REMOTE_START
+    public List<UiCommand> getUiCommands() {
+        return uiCommands;
     }
 }

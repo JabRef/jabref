@@ -17,5 +17,5 @@ public class SearchFieldConstants {
     public static final String[] PDF_FIELDS = new String[]{PATH, CONTENT, ANNOTATIONS};
     public static Set<String> searchableBibFields = new HashSet<>();
 
-    public static final String VERSION = "95";
+    public static final String VERSION = "99";
 }

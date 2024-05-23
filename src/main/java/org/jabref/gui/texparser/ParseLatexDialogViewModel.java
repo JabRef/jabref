@@ -145,7 +145,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     private void handleFailure(Exception exception) {
         final boolean permissionProblem = (exception instanceof IOException) && (exception.getCause() instanceof FileSystemException) && exception.getCause().getMessage().endsWith("Operation not permitted");
         if (permissionProblem) {
-            dialogService.showErrorDialogAndWait(String.format(Localization.lang("JabRef does not have permission to access %s"), exception.getCause().getMessage()));
+            dialogService.showErrorDialogAndWait(Localization.lang("JabRef does not have permission to access %s").formatted(exception.getCause().getMessage()));
         } else {
             dialogService.showErrorDialogAndWait(exception);
         }
@@ -153,7 +153,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
     private FileNodeViewModel searchDirectory(Path directory) throws IOException {
         if ((directory == null) || !directory.toFile().isDirectory()) {
-            throw new IOException(String.format("Invalid directory for searching: %s", directory));
+            throw new IOException("Invalid directory for searching: %s".formatted(directory));
         }
 
         FileNodeViewModel parent = new FileNodeViewModel(directory);
@@ -162,7 +162,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         try (Stream<Path> filesStream = Files.list(directory)) {
             fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
-            LOGGER.error(String.format("%s while searching files: %s", e.getClass().getName(), e.getMessage()));
+            LOGGER.error("%s while searching files: %s".formatted(e.getClass().getName(), e.getMessage()));
             return parent;
         }
 
@@ -170,7 +170,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         List<Path> files = fileListPartition.get(false)
                                             .stream()
                                             .filter(path -> path.toString().endsWith(TEX_EXT))
-                                            .collect(Collectors.toList());
+                                            .toList();
         int fileCount = 0;
 
         for (Path subDirectory : subDirectories) {
@@ -185,7 +185,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         parent.setFileCount(files.size() + fileCount);
         parent.getChildren().addAll(files.stream()
                                          .map(FileNodeViewModel::new)
-                                         .collect(Collectors.toList()));
+                                         .toList());
         return parent;
     }
 
@@ -196,7 +196,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         List<Path> fileList = checkedFileList.stream()
                                              .map(item -> item.getValue().getPath())
                                              .filter(path -> path.toFile().isFile())
-                                             .collect(Collectors.toList());
+                                             .toList();
         if (fileList.isEmpty()) {
             LOGGER.warn("There are no valid files checked");
             return;
@@ -204,7 +204,6 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(
                 databaseContext.getDatabase(),
-                preferencesService.getLibraryPreferences(),
                 preferencesService.getImportFormatPreferences(),
                 fileMonitor);
 

@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.LinkedHashSet;
+import java.util.SequencedSet;
 import java.util.Set;
 
 import javax.swing.undo.UndoManager;
@@ -42,7 +43,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected Set<Field> determineFieldsToShow(BibEntry entry) {
+    protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
         return fields;
     }
 }

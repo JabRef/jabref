@@ -1,7 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.concurrent.Callable;
 
 import javafx.beans.property.ListProperty;
@@ -15,8 +14,8 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.Telemetry;
 import org.jabref.gui.importer.ImportEntriesDialog;
+import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
@@ -57,10 +56,9 @@ public class WebSearchPaneViewModel {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
-        SortedSet<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(
+        fetchers.setAll(WebFetchers.getSearchBasedFetchers(
                 preferencesService.getImportFormatPreferences(),
-                preferencesService.getImporterPreferences());
-        fetchers.setAll(allFetchers);
+                preferencesService.getImporterPreferences()));
 
         // Choose last-selected fetcher as default
         SidePanePreferences sidePanePreferences = preferencesService.getSidePanePreferences();

@@ -1,7 +1,9 @@
 package org.jabref.model.entry.field;
 
-import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -13,7 +15,6 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
  * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
  */
 public enum StandardField implements Field {
-
     ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
     ADDENDUM("addendum"),
     ADDRESS("address"),
@@ -31,12 +32,14 @@ public enum StandardField implements Field {
     BOOKTITLEADDON("booktitleaddon"),
     CHAPTER("chapter"),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
-    COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT),
+    // Comments of users are handled at {@link org.jabref.model.entry.field.UserSpecificCommentField}
+    COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
+    CITES("cites", FieldProperty.MULTIPLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
     DAY("day"),
     DAYFILED("dayfiled"),
-    DOI("doi", "DOI", FieldProperty.DOI),
+    DOI("doi", "DOI", FieldProperty.DOI, FieldProperty.VERBATIM),
     EDITION("edition", FieldProperty.NUMERIC),
     EDITOR("editor", FieldProperty.PERSON_NAMES),
     EDITORA("editora", FieldProperty.PERSON_NAMES),
@@ -48,7 +51,7 @@ public enum StandardField implements Field {
     EDITORCTYPE("editorctype", FieldProperty.EDITOR_TYPE),
     EID("eid"),
     ENTRYSET("entryset", FieldProperty.MULTIPLE_ENTRY_LINK),
-    EPRINT("eprint", FieldProperty.EPRINT),
+    EPRINT("eprint", FieldProperty.EPRINT, FieldProperty.VERBATIM),
     EPRINTCLASS("eprintclass"),
     EPRINTTYPE("eprinttype"),
     EVENTDATE("eventdate", FieldProperty.DATE),
@@ -63,9 +66,9 @@ public enum StandardField implements Field {
     IDS("ids", FieldProperty.MULTIPLE_ENTRY_LINK),
     INSTITUTION("institution"),
     INTRODUCTION("introduction", FieldProperty.PERSON_NAMES),
-    ISBN("isbn", "ISBN", FieldProperty.ISBN),
-    ISRN("isrn", "ISRN"),
-    ISSN("issn", "ISSN"),
+    ISBN("isbn", "ISBN", FieldProperty.ISBN, FieldProperty.VERBATIM),
+    ISRN("isrn", "ISRN", FieldProperty.VERBATIM),
+    ISSN("issn", "ISSN", FieldProperty.ISSN, FieldProperty.VERBATIM),
     ISSUE("issue"),
     ISSUETITLE("issuetitle"),
     ISSUESUBTITLE("issuesubtitle"),
@@ -75,6 +78,7 @@ public enum StandardField implements Field {
     KEY("key"),
     KEYWORDS("keywords"),
     LANGUAGE("language", FieldProperty.LANGUAGE),
+    LANGUAGEID("langid", FieldProperty.LANGUAGE),
     LABEL("label"),
     LIBRARY("library"),
     LOCATION("location"),
@@ -102,7 +106,7 @@ public enum StandardField implements Field {
     PRIMARYCLASS("primaryclass"),
     RELATED("related", FieldProperty.MULTIPLE_ENTRY_LINK),
     REPORTNO("reportno"),
-    REVIEW("review", FieldProperty.MULTILINE_TEXT),
+    REVIEW("review", FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN),
     REVISION("revision"),
     SCHOOL("school"),
     SERIES("series"),
@@ -116,7 +120,7 @@ public enum StandardField implements Field {
     TITLEADDON("titleaddon"),
     TRANSLATOR("translator", FieldProperty.PERSON_NAMES),
     TYPE("type", FieldProperty.TYPE),
-    URI("uri", "URI"),
+    URI("uri", "URI", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
     URL("url", "URL", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
     URLDATE("urldate", FieldProperty.DATE),
     VENUE("venue"),
@@ -139,9 +143,17 @@ public enum StandardField implements Field {
 
     public static Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
 
+    private static final Map<String, StandardField> NAME_TO_STANDARD_FIELD = new HashMap<>();
+
     private final String name;
     private final String displayName;
-    private final Set<FieldProperty> properties;
+    private final EnumSet<FieldProperty> properties;
+
+    static {
+        for (StandardField field : StandardField.values()) {
+            NAME_TO_STANDARD_FIELD.put(field.getName().toLowerCase(Locale.ROOT), field);
+        }
+    }
 
     StandardField(String name) {
         this.name = name;
@@ -168,13 +180,11 @@ public enum StandardField implements Field {
     }
 
     public static Optional<StandardField> fromName(String name) {
-        return Arrays.stream(StandardField.values())
-                     .filter(field -> field.getName().equalsIgnoreCase(name))
-                     .findAny();
+        return Optional.ofNullable(NAME_TO_STANDARD_FIELD.get(name.toLowerCase(Locale.ROOT)));
     }
 
     @Override
-    public Set<FieldProperty> getProperties() {
+    public EnumSet<FieldProperty> getProperties() {
         return properties;
     }
 

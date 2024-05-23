@@ -48,4 +48,3 @@ Chosen option: "SLF4J with Log4j2 binding", because comes out best \(see below\)
 * Good, because native implementation of slf4j
 * Bad, because Java 9 support only available in alpha
 * Bad, because different syntax than log4j/commons logging
-

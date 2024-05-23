@@ -2,9 +2,10 @@ package org.jabref.gui.slr;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -35,23 +36,23 @@ public class ExistingStudySearchAction extends SimpleCommand {
 
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
-    private final JabRefFrame frame;
-    private final OpenDatabaseAction openDatabaseAction;
+    private final LibraryTabContainer tabContainer;
+    private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
 
     /**
-     * @param frame Required to close the tab before the study is updated
-     * @param openDatabaseAction Required to open the tab after the study is exectued
+     * @param tabContainer Required to close the tab before the study is updated
+     * @param openDatabaseActionSupplier Required to open the tab after the study is executed
      */
     public ExistingStudySearchAction(
-            JabRefFrame frame,
-            OpenDatabaseAction openDatabaseAction,
+            LibraryTabContainer tabContainer,
+            Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
             DialogService dialogService,
             FileUpdateMonitor fileUpdateMonitor,
             TaskExecutor taskExecutor,
             PreferencesService preferencesService,
             StateManager stateManager) {
-        this(frame,
-                openDatabaseAction,
+        this(tabContainer,
+                openDatabaseActionSupplier,
                 dialogService,
                 fileUpdateMonitor,
                 taskExecutor,
@@ -61,16 +62,16 @@ public class ExistingStudySearchAction extends SimpleCommand {
     }
 
     protected ExistingStudySearchAction(
-            JabRefFrame frame,
-            OpenDatabaseAction openDatabaseAction,
+            LibraryTabContainer tabContainer,
+            Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
             DialogService dialogService,
             FileUpdateMonitor fileUpdateMonitor,
             TaskExecutor taskExecutor,
             PreferencesService preferencesService,
             StateManager stateManager,
             boolean isNew) {
-        this.frame = frame;
-        this.openDatabaseAction = openDatabaseAction;
+        this.tabContainer = tabContainer;
+        this.openDatabaseActionSupplier = openDatabaseActionSupplier;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
@@ -132,7 +133,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
                       })
                       .onSuccess(unused -> {
                           dialogService.notify(Localization.lang("Finished Searching"));
-                          openDatabaseAction.openFile(Path.of(this.studyDirectory.toString(), Crawler.FILENAME_STUDY_RESULT_BIB));
+                          openDatabaseActionSupplier.get().openFile(Path.of(this.studyDirectory.toString(), Crawler.FILENAME_STUDY_RESULT_BIB));
                       })
                       .executeWith(taskExecutor);
     }
@@ -146,6 +147,6 @@ public class ExistingStudySearchAction extends SimpleCommand {
         // The user focused an SLR
         // We hard close the tab
         // Future work: Properly close the tab (with saving, ...)
-        frame.closeCurrentTab();
+        tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
     }
 }

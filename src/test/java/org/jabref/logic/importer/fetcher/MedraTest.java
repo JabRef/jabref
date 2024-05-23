@@ -3,8 +3,8 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -72,23 +72,23 @@ public class MedraTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals("mEDRA", fetcher.getName());
     }
 
     @Test
-    public void testPerformSearchEmptyDOI() throws FetcherException {
+    public void performSearchEmptyDOI() throws FetcherException {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 
     @Test
-    public void testPerformNonExistent() throws FetcherException {
-        assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1016/j.bjoms.2007.08.004"));
+    public void performNonExistent() throws FetcherException {
+        assertThrows(FetcherServerException.class, () -> fetcher.performSearchById("10.1016/j.bjoms.2007.08.004"));
     }
 
     @ParameterizedTest
     @MethodSource("getDoiBibEntryPairs")
-    public void testDoiBibEntryPairs(String identifier, Optional<BibEntry> expected) throws FetcherException {
+    public void doiBibEntryPairs(String identifier, Optional<BibEntry> expected) throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById(identifier);
         assertEquals(expected, fetchedEntry);
     }

@@ -3,9 +3,11 @@ package org.jabref.logic.formatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
@@ -20,9 +22,11 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveWordEnclosingAndOuterEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
@@ -39,6 +43,12 @@ import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 
 public class Formatters {
     private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
+
+    private static Map<String, Formatter> keyToFormatterMap;
+
+    static {
+        keyToFormatterMap = getAll().stream().collect(Collectors.toMap(Formatter::getKey, f -> f));
+    }
 
     private Formatters() {
     }
@@ -73,12 +83,14 @@ public class Formatters {
                 new NormalizeNamesFormatter(),
                 new NormalizePagesFormatter(),
                 new OrdinalsToSuperscriptFormatter(),
-                new RemoveBracesFormatter(),
+                new RemoveEnclosingBracesFormatter(),
+                new RemoveWordEnclosingAndOuterEnclosingBracesFormatter(),
                 new UnitsToLatexFormatter(),
                 new EscapeUnderscoresFormatter(),
                 new EscapeAmpersandsFormatter(),
                 new EscapeDollarSignFormatter(),
                 new ShortenDOIFormatter(),
+                new NormalizeUnicodeFormatter(),
                 new ReplaceUnicodeLigaturesFormatter(),
                 new UnprotectTermsFormatter()
         );
@@ -90,6 +102,11 @@ public class Formatters {
         all.addAll(getCaseChangers());
         all.addAll(getOthers());
         return all;
+    }
+
+    public static Optional<Formatter> getFormatterForKey(String name) {
+        Objects.requireNonNull(name);
+        return keyToFormatterMap.containsKey(name) ? Optional.of(keyToFormatterMap.get(name)) : Optional.empty();
     }
 
     public static Optional<Formatter> getFormatterForModifier(String modifier) {
@@ -115,7 +132,7 @@ public class Formatters {
             int truncateAfter = Integer.parseInt(modifier.substring(8));
             return Optional.of(new TruncateFormatter(truncateAfter));
         } else {
-            return getAll().stream().filter(f -> f.getKey().equals(modifier)).findAny();
+            return getFormatterForKey(modifier);
         }
     }
 }

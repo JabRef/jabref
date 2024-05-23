@@ -145,7 +145,7 @@ public class IacrEprintFetcherTest {
     }
 
     @Test
-    public void testGetName() {
+    public void getName() {
         assertEquals(IacrEprintFetcher.NAME, fetcher.getName());
     }
 
@@ -168,7 +168,7 @@ public class IacrEprintFetcherTest {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById(id);
         assertTrue(fetchedEntry.isPresent(), "Expected to get an entry for id " + id);
         assertNotEquals(Optional.empty(), fetchedEntry.get().getField(StandardField.DATE), "Expected non empty date field, entry is\n" + fetchedEntry.toString());
-        assertTrue(fetchedEntry.get().getField(StandardField.DATE).get().length() == 10, "Expected yyyy-MM-dd date format, entry is\n" + fetchedEntry.toString());
+        assertEquals(10, fetchedEntry.get().getField(StandardField.DATE).get().length(), "Expected yyyy-MM-dd date format, entry is\n" + fetchedEntry.toString());
         assertNotEquals(Optional.empty(), fetchedEntry.get().getField(StandardField.ABSTRACT), "Expected non empty abstract field, entry is\n" + fetchedEntry.toString());
     }
 
@@ -182,7 +182,7 @@ public class IacrEprintFetcherTest {
     private static List<String> getIdsFor(int year, int maxId) {
         List<String> result = new ArrayList<>();
         for (int i = 1; i <= maxId; i++) {
-            result.add(String.format("%04d/%03d", year, i));
+            result.add("%04d/%03d".formatted(year, i));
         }
         return result;
     }

@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -11,7 +10,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -46,28 +45,28 @@ import static org.mockito.Mockito.when;
 class IntegrityCheckTest {
 
     @Test
-    void bibTexAcceptsStandardEntryType() {
+    void bibTexAcceptsStandardEntryType() throws Exception {
         assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBTEX));
     }
 
     @Test
-    void bibTexDoesNotAcceptIEEETranEntryType() {
+    void bibTexDoesNotAcceptIEEETranEntryType() throws Exception {
         assertWrong(withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBTEX));
     }
 
     @Test
-    void bibLaTexAcceptsIEEETranEntryType() {
+    void bibLaTexAcceptsIEEETranEntryType() throws Exception {
         assertCorrect((withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBLATEX)));
     }
 
     @Test
-    void bibLaTexAcceptsStandardEntryType() {
+    void bibLaTexAcceptsStandardEntryType() throws Exception {
         assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBLATEX));
     }
 
     @ParameterizedTest
     @MethodSource("provideCorrectFormat")
-    void authorNameChecksCorrectFormat(String input) {
+    void authorNameChecksCorrectFormat(String input) throws Exception {
         for (Field field : FieldFactory.getPersonNameFields()) {
             assertCorrect(withMode(createContext(field, input), BibDatabaseMode.BIBLATEX));
         }
@@ -75,7 +74,7 @@ class IntegrityCheckTest {
 
     @ParameterizedTest
     @MethodSource("provideIncorrectFormat")
-    void authorNameChecksIncorrectFormat(String input) {
+    void authorNameChecksIncorrectFormat(String input) throws Exception {
         for (Field field : FieldFactory.getPersonNameFields()) {
             assertWrong(withMode(createContext(field, input), BibDatabaseMode.BIBLATEX));
         }
@@ -93,7 +92,7 @@ class IntegrityCheckTest {
     }
 
     @Test
-    void testFileChecks() {
+    void fileChecks() throws Exception {
         MetaData metaData = mock(MetaData.class);
         Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
         Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
@@ -106,7 +105,7 @@ class IntegrityCheckTest {
     }
 
     @Test
-    void fileCheckFindsFilesRelativeToBibFile(@TempDir Path testFolder) throws IOException {
+    void fileCheckFindsFilesRelativeToBibFile(@TempDir Path testFolder) throws Exception {
         Path bibFile = testFolder.resolve("lit.bib");
         Files.createFile(bibFile);
         Path pdfFile = testFolder.resolve("file.pdf");
@@ -119,7 +118,7 @@ class IntegrityCheckTest {
     }
 
     @Test
-    void testEntryIsUnchangedAfterChecks() {
+    void entryIsUnchangedAfterChecks() throws Exception {
         BibEntry entry = new BibEntry();
 
         // populate with all known fields
@@ -139,7 +138,8 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(), false)
+                JournalAbbreviationLoader.loadBuiltInRepository(),
+                false)
                 .check();
 
         assertEquals(clonedEntry, entry);
@@ -167,23 +167,31 @@ class IntegrityCheckTest {
         return createContext(field, value, metaData);
     }
 
-    private void assertWrong(BibDatabaseContext context) {
-        List<IntegrityMessage> messages = new IntegrityCheck(context,
+    private void assertWrong(BibDatabaseContext context) throws Exception {
+        List<IntegrityMessage> messages;
+
+        messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(), false)
+                JournalAbbreviationLoader.loadBuiltInRepository(),
+                false)
                 .check();
+
         assertNotEquals(Collections.emptyList(), messages);
     }
 
-    private void assertCorrect(BibDatabaseContext context) {
+    private void assertCorrect(BibDatabaseContext context) throws Exception {
         FilePreferences filePreferencesMock = mock(FilePreferences.class);
         when(filePreferencesMock.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-        List<IntegrityMessage> messages = new IntegrityCheck(context,
+        List<IntegrityMessage> messages;
+
+        messages = new IntegrityCheck(context,
                 filePreferencesMock,
                 createCitationKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(), false
-        ).check();
+                JournalAbbreviationLoader.loadBuiltInRepository(),
+                false)
+                .check();
+
         assertEquals(Collections.emptyList(), messages);
     }
 
@@ -196,7 +204,7 @@ class IntegrityCheckTest {
                 "",
                 "",
                 CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
-                GlobalCitationKeyPattern.fromPattern("[auth][year]"),
+                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
                 "",
                 ',');
     }

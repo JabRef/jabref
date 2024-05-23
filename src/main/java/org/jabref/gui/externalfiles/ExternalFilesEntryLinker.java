@@ -110,7 +110,7 @@ public class ExternalFilesEntryLinker {
         try {
             indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService), entry);
         } catch (IOException e) {
-            LOGGER.error("Could not access Fulltext-Index", e);
+            LOGGER.error("Could not access fulltext index", e);
         }
     }
 

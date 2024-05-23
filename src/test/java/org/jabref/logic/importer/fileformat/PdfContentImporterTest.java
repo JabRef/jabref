@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 class PdfContentImporterTest {
 
@@ -24,16 +22,16 @@ class PdfContentImporterTest {
 
     @BeforeEach
     void setUp() {
-        importer = new PdfContentImporter(mock(ImportFormatPreferences.class));
+        importer = new PdfContentImporter();
     }
 
     @Test
-    void testsGetExtensions() {
+    void sGetExtensions() {
         assertEquals(StandardFileType.PDF, importer.getFileType());
     }
 
     @Test
-    void testGetDescription() {
+    void getDescription() {
         assertEquals("PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.",
                      importer.getDescription());
     }
@@ -61,7 +59,7 @@ class PdfContentImporterTest {
     }
 
     @Test
-    void testParsingEditorWithoutPagesorSeriesInformation() {
+    void parsingEditorWithoutPagesorSeriesInformation() {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings);
         entry.setField(StandardField.AUTHOR, "Anke Lüdeling and Merja Kytö (Eds.)");
         entry.setField(StandardField.EDITOR, "Anke Lüdeling and Merja Kytö");
@@ -88,7 +86,7 @@ class PdfContentImporterTest {
     }
 
     @Test
-    void testParsingWithoutActualDOINumber() {
+    void parsingWithoutActualDOINumber() {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings);
         entry.withField(StandardField.AUTHOR, "Link to record in KAR and http://kar.kent.ac.uk/51043/  and Document Version and UNSPECIFIED  and Master of Research (MRes) thesis and University of Kent")
              .withField(StandardField.TITLE, "Kent Academic Repository Full text document (pdf) Citation for published version Smith, Lucy Anna (2014) Mortality in the Ornamental Fish Retail Sector: an Analysis of Stock Losses and Stakeholder Opinions. DOI")
