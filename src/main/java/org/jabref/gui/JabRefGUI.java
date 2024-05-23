@@ -16,6 +16,7 @@ import javafx.stage.WindowEvent;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.remote.CLIMessageHandler;
@@ -80,6 +81,8 @@ public class JabRefGUI extends Application {
         WebViewStore.init();
 
         JabRefGUI.stateManager = new StateManager();
+
+        Injector.setModelOrService(KeyBindingRepository.class, preferencesService.getKeyBindingRepository());
 
         JabRefGUI.themeManager = new ThemeManager(
                 preferencesService.getWorkspacePreferences(),
@@ -266,13 +269,12 @@ public class JabRefGUI extends Application {
                 preferencesService.getGuiPreferences().getPositionY());
     }
 
-
     // Background tasks
     public void startBackgroundTasks() {
-        // TODO Currently deactivated due to incompatibilities in XML
-      /*  if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
-            Telemetry.start(prefs.getTelemetryPreferences());
-        } */
+        // TODO: Currently deactivated due to incompatibilities in XML
+        // if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
+        //     Telemetry.start(prefs.getTelemetryPreferences());
+        // }
         RemotePreferences remotePreferences = preferencesService.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
             Globals.REMOTE_LISTENER.openAndStart(

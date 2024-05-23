@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.util.function.Function;
 
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -22,9 +21,7 @@ public class DefaultInjector implements PresenterFactory {
      * Dependencies without default constructor are constructed by hand.
      */
     private static Object createDependency(Class<?> clazz) {
-        if (clazz == KeyBindingRepository.class) {
-            return Globals.getKeyPrefs();
-        } else if (clazz == JournalAbbreviationRepository.class) {
+        if (clazz == JournalAbbreviationRepository.class) {
             return Globals.journalAbbreviationRepository;
         } else if (clazz == FileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();

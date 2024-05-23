@@ -71,7 +71,6 @@ public class SourceTab extends EntryEditorTab {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
-    private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
@@ -117,7 +116,6 @@ public class SourceTab extends EntryEditorTab {
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
-        this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 

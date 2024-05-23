@@ -10,7 +10,6 @@ import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 
@@ -42,7 +41,6 @@ public class Globals {
     public static ProtectedTermsLoader protectedTermsLoader;
 
     private static ClipBoardManager clipBoardManager = null;
-    private static KeyBindingRepository keyBindingRepository;
 
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static DefaultDirectoryMonitor directoryMonitor;
@@ -52,11 +50,7 @@ public class Globals {
 
     // Key binding preferences
     public static synchronized KeyBindingRepository getKeyPrefs() {
-        if (keyBindingRepository == null) {
-            PreferencesService preferences = Injector.instantiateModelOrService(PreferencesService.class);
-            keyBindingRepository = preferences.getKeyBindingRepository();
-        }
-        return keyBindingRepository;
+        return Injector.instantiateModelOrService(KeyBindingRepository.class);
     }
 
     public static synchronized ClipBoardManager getClipboardManager() {

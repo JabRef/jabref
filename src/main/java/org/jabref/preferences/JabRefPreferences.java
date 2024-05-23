@@ -129,6 +129,7 @@ import org.jabref.model.strings.StringUtil;
 import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
+import com.google.common.annotations.VisibleForTesting;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
 import org.jvnet.hk2.annotations.Service;
@@ -511,6 +512,8 @@ public class JabRefPreferences implements PreferencesService {
     private FieldPreferences fieldPreferences;
     private MergeDialogPreferences mergeDialogPreferences;
 
+    private KeyBindingRepository keyBindingRepository;
+
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
         try {
@@ -867,11 +870,13 @@ public class JabRefPreferences implements PreferencesService {
     // Common serializer logic
     //*************************************************************************************************************
 
-    private static String convertListToString(List<String> value) {
+    @VisibleForTesting
+    static String convertListToString(List<String> value) {
         return value.stream().map(val -> StringUtil.quote(val, STRINGLIST_DELIMITER.toString(), '\\')).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
     }
 
-    private static List<String> convertStringToList(String toConvert) {
+    @VisibleForTesting
+    static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
             return Collections.emptyList();
         }
@@ -1220,13 +1225,18 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public KeyBindingRepository getKeyBindingRepository() {
-        return new KeyBindingRepository(getStringList(BIND_NAMES), getStringList(BINDINGS));
-    }
+        if (keyBindingRepository != null) {
+            return keyBindingRepository;
+        }
 
-    @Override
-    public void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository) {
-        putStringList(BIND_NAMES, keyBindingRepository.getBindNames());
-        putStringList(BINDINGS, keyBindingRepository.getBindings());
+        keyBindingRepository = new KeyBindingRepository(getStringList(BIND_NAMES), getStringList(BINDINGS));
+
+        EasyBind.listen(keyBindingRepository.getBindingsProperty(), (obs, oldValue, newValue) -> {
+            putStringList(BIND_NAMES, keyBindingRepository.getBindNames());
+            putStringList(BINDINGS, keyBindingRepository.getBindings());
+        });
+
+        return keyBindingRepository;
     }
 
     @Override
