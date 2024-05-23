@@ -24,9 +24,7 @@ public class DefaultInjector implements PresenterFactory {
      * Dependencies without default constructor are constructed by hand.
      */
     private static Object createDependency(Class<?> clazz) {
-        if (clazz == DialogService.class) {
-            return JabRefGUI.getDialogService();
-        } else if (clazz == TaskExecutor.class) {
+        if (clazz == TaskExecutor.class) {
             return Globals.TASK_EXECUTOR;
         } else if (clazz == KeyBindingRepository.class) {
             return Globals.getKeyPrefs();

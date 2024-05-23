@@ -81,6 +81,7 @@ public class JabRefGUI extends Application {
                 Runnable::run);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
+        Injector.setModelOrService(DialogService.class, dialogService);
 
         JabRefGUI.countingUndoManager = new CountingUndoManager();
         Injector.setModelOrService(UndoManager.class, countingUndoManager);
@@ -286,10 +287,6 @@ public class JabRefGUI extends Application {
 
     public static JabRefFrame getMainFrame() {
         return mainFrame;
-    }
-
-    public static DialogService getDialogService() {
-        return dialogService;
     }
 
     public static ThemeManager getThemeManager() {
