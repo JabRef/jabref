@@ -66,7 +66,7 @@ class KeyBindingsTabModelTest {
 
         model.storeSettings();
 
-        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.IMPORT_INTO_NEW_DATABASE,shortcutKeyEvent));
+        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.IMPORT_INTO_NEW_DATABASE, shortcutKeyEvent));
     }
 
     @Test
