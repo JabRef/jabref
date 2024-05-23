@@ -14,6 +14,8 @@ import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
+
 /**
  * @deprecated try to use {@link StateManager} and {@link org.jabref.preferences.PreferencesService}
  */
@@ -34,11 +36,6 @@ public class Globals {
     public static StateManager stateManager = new StateManager();
 
     public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor(stateManager);
-
-    /**
-     * Each test case initializes this field if required
-     */
-    public static PreferencesService prefs;
 
     /**
      * This field is initialized upon startup.
@@ -65,14 +62,15 @@ public class Globals {
     // Key binding preferences
     public static synchronized KeyBindingRepository getKeyPrefs() {
         if (keyBindingRepository == null) {
-            keyBindingRepository = prefs.getKeyBindingRepository();
+            PreferencesService preferences = Injector.instantiateModelOrService(PreferencesService.class);
+            keyBindingRepository = preferences.getKeyBindingRepository();
         }
         return keyBindingRepository;
     }
 
     public static synchronized ClipBoardManager getClipboardManager() {
         if (clipBoardManager == null) {
-            clipBoardManager = new ClipBoardManager(prefs);
+            clipBoardManager = new ClipBoardManager();
         }
         return clipBoardManager;
     }

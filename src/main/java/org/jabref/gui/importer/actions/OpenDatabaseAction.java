@@ -88,10 +88,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      *
      * @param result     The result of the BIB file parse operation.
      */
-    public static void performPostOpenActions(ParserResult result, DialogService dialogService) {
+    public static void performPostOpenActions(ParserResult result, DialogService dialogService, PreferencesService preferencesService) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
-            if (action.isActionNecessary(result)) {
-                action.performAction(result, dialogService);
+            if (action.isActionNecessary(result, preferencesService)) {
+                action.performAction(result, dialogService, preferencesService);
             }
         }
     }

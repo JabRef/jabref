@@ -131,7 +131,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         FontIcon copyIcon = FontIcon.of(MaterialDesignC.CONTENT_COPY);
         copyIcon.getStyleClass().add("action-icon");
 
-        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(preferencesService, getText()));
+        Button copyButton = factory.createIconButton(() -> Localization.lang("Copy"), new CopyFieldValueCommand(getText()));
         copyButton.setGraphic(copyIcon);
         copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         copyButton.setMaxHeight(Double.MAX_VALUE);

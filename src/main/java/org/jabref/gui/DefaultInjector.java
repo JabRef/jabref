@@ -8,7 +8,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.injection.PresenterFactory;
@@ -29,8 +28,6 @@ public class DefaultInjector implements PresenterFactory {
             return JabRefGUI.getDialogService();
         } else if (clazz == TaskExecutor.class) {
             return Globals.TASK_EXECUTOR;
-        } else if (clazz == PreferencesService.class) {
-            return Globals.prefs;
         } else if (clazz == KeyBindingRepository.class) {
             return Globals.getKeyPrefs();
         } else if (clazz == JournalAbbreviationRepository.class) {

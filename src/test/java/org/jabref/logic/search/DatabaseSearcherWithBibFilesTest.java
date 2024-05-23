@@ -25,6 +25,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -92,7 +93,7 @@ public class DatabaseSearcherWithBibFilesTest {
         Globals.stateManager.setActiveDatabase(context);
         PreferencesService preferencesService = mock(PreferencesService.class);
         when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
-        Globals.prefs = preferencesService;
+        Injector.setModelOrService(PreferencesService.class, preferencesService);
 
         pdfIndexer = PdfIndexerManager.getIndexer(context, filePreferences);
         // Alternative - For debugging with Luke (part of the Apache Lucene distribution)

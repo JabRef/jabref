@@ -252,7 +252,7 @@ public class JabRefFrameViewModel {
         // if we found new entry types that can be imported, or checking
         // if the database contents should be modified due to new features
         // in this version of JabRef.
-        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, dialogService));
+        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, dialogService, prefs));
 
         LOGGER.debug("Finished adding panels");
     }

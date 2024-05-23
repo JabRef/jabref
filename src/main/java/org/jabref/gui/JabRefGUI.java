@@ -262,6 +262,28 @@ public class JabRefGUI extends Application {
                 preferencesService.getGuiPreferences().getPositionY());
     }
 
+    // Background tasks
+    public void startBackgroundTasks() {
+        // TODO Currently deactivated due to incompatibilities in XML
+      /*  if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
+            Telemetry.start(prefs.getTelemetryPreferences());
+        } */
+        RemotePreferences remotePreferences = preferencesService.getRemotePreferences();
+        if (remotePreferences.useRemoteServer()) {
+            Globals.REMOTE_LISTENER.openAndStart(
+                    new CLIMessageHandler(
+                            preferencesService,
+                            Globals.getFileUpdateMonitor(),
+                            Injector.instantiateModelOrService(BibEntryTypesManager.class)),
+                    remotePreferences.getPort());
+        }
+    }
+
+    public void stopBackgroundTasks() {
+        Telemetry.shutdown();
+        Unirest.shutDown();
+    }
+
     public static JabRefFrame getMainFrame() {
         return mainFrame;
     }
@@ -272,27 +294,5 @@ public class JabRefGUI extends Application {
 
     public static ThemeManager getThemeManager() {
         return themeManager;
-    }
-
-    // Background tasks
-    public static void startBackgroundTasks() {
-        // TODO Currently deactivated due to incompatibilities in XML
-      /*  if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
-            Telemetry.start(prefs.getTelemetryPreferences());
-        } */
-        RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
-        if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(
-                    new CLIMessageHandler(
-                            Globals.prefs,
-                            Globals.getFileUpdateMonitor(),
-                            Injector.instantiateModelOrService(BibEntryTypesManager.class)),
-                    remotePreferences.getPort());
-        }
-    }
-
-    public static void stopBackgroundTasks() {
-        Telemetry.shutdown();
-        Unirest.shutDown();
     }
 }

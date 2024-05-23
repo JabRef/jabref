@@ -70,13 +70,13 @@ public class Launcher {
 
             // Initialize preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
+            Injector.setModelOrService(PreferencesService.class, preferences);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
                 return;
             }
 
-            Globals.prefs = preferences;
             PreferencesMigrations.runMigrations(preferences, entryTypesManager);
 
             // Initialize rest of preferences
