@@ -23,7 +23,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -47,7 +46,6 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
-    @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
 
@@ -96,7 +94,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         });
 
         ContextMenu contextMenu = new ContextMenu();
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new TagContextAction(StandardActions.COPY, entryLink)),
                 factory.createMenuItem(StandardActions.CUT, new TagContextAction(StandardActions.CUT, entryLink)),

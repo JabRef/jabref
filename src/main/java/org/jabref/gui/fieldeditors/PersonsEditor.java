@@ -33,7 +33,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
         decoratedStringProperty = new UiThreadStringProperty(viewModel.textProperty());
         textInput.textProperty().bindBidirectional(decoratedStringProperty);
-        ((ContextMenuAddable) textInput).initContextMenu(EditorMenus.getNameMenu(textInput));
+        ((ContextMenuAddable) textInput).initContextMenu(EditorMenus.getNameMenu(textInput), preferencesService.getKeyBindingRepository());
         this.getChildren().add(textInput);
 
         AutoCompletionTextInputBinding.autoComplete(textInput, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());

@@ -19,7 +19,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.gui.icon.IconTheme;
@@ -63,7 +62,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         super(text, rowIndex);
 
         this.preferencesService = preferencesService;
-        this.factory = new ActionFactory(Globals.getKeyPrefs());
+        this.factory = new ActionFactory();
         this.viewModel = new FieldValueCellViewModel(text);
 
         EasyBind.listen(viewModel.selectedProperty(), (observable, old, isSelected) -> {

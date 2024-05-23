@@ -51,7 +51,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                 undoManager);
 
         textField.textProperty().bindBidirectional(viewModel.textProperty());
-        textField.initContextMenu(new DefaultMenu(textField));
+        textField.initContextMenu(new DefaultMenu(textField), preferencesService.getKeyBindingRepository());
 
         AutoCompletionTextInputBinding.autoComplete(textField, viewModel::complete);
 

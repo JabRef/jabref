@@ -25,7 +25,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preview.PreviewViewer;
@@ -66,7 +65,6 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
-    @Inject private KeyBindingRepository keyBindingRepository;
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -135,7 +133,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         searchBox.setPromptText(Localization.lang("Search") + "...");
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY)),

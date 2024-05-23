@@ -404,7 +404,7 @@ public class EntryEditor extends BorderPane {
         typeLabel.setText(typedEntry.getTypeForDisplay());
 
         // Add type change menu
-        ContextMenu typeMenu = new ChangeEntryTypeMenu(Collections.singletonList(entry), databaseContext, undoManager, keyBindingRepository, bibEntryTypesManager).asContextMenu();
+        ContextMenu typeMenu = new ChangeEntryTypeMenu(Collections.singletonList(entry), databaseContext, undoManager, bibEntryTypesManager).asContextMenu();
         typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(event -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
 

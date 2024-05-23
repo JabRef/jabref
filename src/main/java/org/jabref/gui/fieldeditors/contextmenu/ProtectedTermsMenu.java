@@ -24,7 +24,7 @@ class ProtectedTermsMenu extends Menu {
 
     private static final Formatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
     private final TextInputControl textInputControl;
-    private final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+    private final ActionFactory factory = new ActionFactory();
 
     private final Action protectSelectionActionInformation = new Action() {
         @Override

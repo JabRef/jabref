@@ -190,7 +190,7 @@ public class SourceTab extends EntryEditorTab {
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),

@@ -6,12 +6,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 /**
  * Field editor that provides various pre-defined options as a drop-down combobox.
@@ -20,6 +21,8 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
 
     @FXML private final OptionEditorViewModel<T> viewModel;
     @FXML private ComboBox<T> comboBox;
+
+    @Inject private KeyBindingRepository keyBindingRepository;
 
     public OptionEditor(OptionEditorViewModel<T> viewModel) {
         ViewLoader.view(this)
@@ -35,7 +38,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
 
         comboBox.getEditor().setOnContextMenuRequested(event -> {
             ContextMenu contextMenu = new ContextMenu();
-            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(comboBox.getEditor(), Globals.getKeyPrefs()));
+            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(comboBox.getEditor()));
             TextInputControlBehavior.showContextMenu(comboBox.getEditor(), contextMenu, event);
         });
     }

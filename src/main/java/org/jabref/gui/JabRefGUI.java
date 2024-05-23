@@ -186,7 +186,10 @@ public class JabRefGUI extends Application {
         themeManager.installCss(scene);
 
         // Handle TextEditor key bindings
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(scene, event));
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(
+                scene,
+                event,
+                preferencesService.getKeyBindingRepository()));
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());

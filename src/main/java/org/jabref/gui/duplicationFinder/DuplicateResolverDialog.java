@@ -76,7 +76,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        this.actionFactory = new ActionFactory();
         init(one, two, type);
     }
 

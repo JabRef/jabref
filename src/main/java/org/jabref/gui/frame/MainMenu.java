@@ -129,7 +129,7 @@ public class MainMenu extends MenuBar {
     }
 
     private void createMenu() {
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory factory = new ActionFactory();
         Menu file = new Menu(Localization.lang("File"));
         Menu edit = new Menu(Localization.lang("Edit"));
         Menu library = new Menu(Localization.lang("Library"));

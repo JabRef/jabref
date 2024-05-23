@@ -1,7 +1,6 @@
 package org.jabref.gui;
 
 import org.jabref.architecture.AllowedToUseAwt;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -10,8 +9,6 @@ import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-
-import com.airhacks.afterburner.injection.Injector;
 
 /**
  * @deprecated try to use {@link StateManager} and {@link org.jabref.preferences.PreferencesService}
@@ -46,11 +43,6 @@ public class Globals {
     private static DefaultDirectoryMonitor directoryMonitor;
 
     private Globals() {
-    }
-
-    // Key binding preferences
-    public static synchronized KeyBindingRepository getKeyPrefs() {
-        return Injector.instantiateModelOrService(KeyBindingRepository.class);
     }
 
     public static synchronized ClipBoardManager getClipboardManager() {

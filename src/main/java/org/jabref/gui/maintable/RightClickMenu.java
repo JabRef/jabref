@@ -50,7 +50,7 @@ public class RightClickMenu {
                                      TaskExecutor taskExecutor,
                                      JournalAbbreviationRepository abbreviationRepository,
                                      BibEntryTypesManager entryTypesManager) {
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
 
         MenuItem extractFileReferencesOnline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_ONLINE, new ExtractReferencesAction(true, dialogService, stateManager, preferencesService, taskExecutor));
@@ -89,7 +89,7 @@ public class RightClickMenu {
 
                 new SeparatorMenuItem(),
 
-                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, keyBindingRepository, entryTypesManager).asSubMenu(),
+                new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, entryTypesManager).asSubMenu(),
                 factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferencesService, undoManager))
         );
 

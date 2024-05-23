@@ -18,7 +18,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.util.StringConverter;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.fieldeditors.TextInputControlBehavior;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.util.BindingsHelper;
@@ -57,7 +56,7 @@ public class TemporalAccessorPicker extends DatePicker {
 
         getEditor().setOnContextMenuRequested(event -> {
             ContextMenu contextMenu = new ContextMenu();
-            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(getEditor(), Globals.getKeyPrefs()));
+            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(getEditor()));
             TextInputControlBehavior.showContextMenu(getEditor(), contextMenu, event);
         });
     }

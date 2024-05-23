@@ -34,7 +34,6 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
@@ -101,7 +100,6 @@ public class OpenOfficePanel {
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            PreferencesService preferencesService,
-                           KeyBindingRepository keyBindingRepository,
                            JournalAbbreviationRepository abbreviationRepository,
                            TaskExecutor taskExecutor,
                            DialogService dialogService,
@@ -112,12 +110,13 @@ public class OpenOfficePanel {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
+
+        ActionFactory factory = new ActionFactory();
 
         connect = new Button();
         connect.setGraphic(IconTheme.JabRefIcons.CONNECT_OPEN_OFFICE.getGraphicNode());

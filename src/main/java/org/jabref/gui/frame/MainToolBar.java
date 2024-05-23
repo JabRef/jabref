@@ -14,7 +14,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
@@ -87,7 +86,7 @@ public class MainToolBar extends ToolBar {
     }
 
     private void createToolBar() {
-        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        final ActionFactory factory = new ActionFactory();
 
         final Region leftSpacer = new Region();
         final Region rightSpacer = new Region();

@@ -37,7 +37,6 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
@@ -242,7 +241,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     private void initKeyBindings() {
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
+            Optional<KeyBinding> keyBinding = prefs.getKeyBindingRepository().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case FOCUS_ENTRY_TABLE:
@@ -442,14 +441,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             tabbedPane.requestFocus();
         }
 
-        libraryTab.setContextMenu(createTabContextMenuFor(libraryTab, Globals.getKeyPrefs()));
+        libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
 
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
-    private ContextMenu createTabContextMenuFor(LibraryTab tab, KeyBindingRepository keyBindingRepository) {
+    private ContextMenu createTabContextMenuFor(LibraryTab tab) {
         ContextMenu contextMenu = new ContextMenu();
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(tab::getBibDatabaseContext, stateManager)),
