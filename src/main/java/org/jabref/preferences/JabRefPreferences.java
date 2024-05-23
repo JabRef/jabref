@@ -128,9 +128,9 @@ import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Splitter;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
-import org.apache.commons.lang3.StringUtils;
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -880,7 +880,7 @@ public class JabRefPreferences implements PreferencesService {
             return Collections.emptyList();
         }
 
-        return Arrays.asList(StringUtils.splitPreserveAllTokens(toConvert, STRINGLIST_DELIMITER));
+        return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
     }
 
     //*************************************************************************************************************
