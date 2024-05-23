@@ -7,8 +7,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.search.indexing.LuceneIndexer;
-import org.jabref.logic.search.retrieval.LuceneSearcher;
+import org.jabref.logic.pdf.search.LuceneIndexer;
+import org.jabref.logic.pdf.search.LuceneSearcher;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
