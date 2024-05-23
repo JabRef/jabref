@@ -31,7 +31,7 @@ class KeyBindingRepositoryTest {
         List<String> bindNames = keybindings.stream().map(KeyBinding::getConstant).toList();
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(bindNames, bindings);
 
-        assertEquals(keyBindingRepository.get(bindNames.get(0)), bindings.get(0));
+        assertEquals(keyBindingRepository.get(bindNames.getFirst()), bindings.getFirst());
         assertEquals(keyBindingRepository.get(bindNames.get(1)), bindings.get(1));
     }
 }

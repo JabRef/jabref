@@ -27,35 +27,35 @@ public class MainTableColumnModelTest {
     public void mainTableColumnModelParserRetrievesCorrectType() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testQualifier);
 
-        assertEquals(testColumnModel.getType(), testType);
+        assertEquals(testType, testColumnModel.getType());
     }
 
     @Test
     public void mainTableColumnModelParserRetrievesCorrectQualifier() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testQualifier);
 
-        assertEquals(testColumnModel.getQualifier(), testQualifier);
+        assertEquals(testQualifier, testColumnModel.getQualifier());
     }
 
     @Test
     public void fullMainTableColumnModelParserRetrievesCorrectType() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testName);
 
-        assertEquals(testColumnModel.getType(), testType);
+        assertEquals(testType, testColumnModel.getType());
     }
 
     @Test
     public void fullMainTableColumnModelParserRetrievesCorrectQualifier() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testName);
 
-        assertEquals(testColumnModel.getQualifier(), testQualifier);
+        assertEquals(testQualifier, testColumnModel.getQualifier());
     }
 
     @Test
     public void typeOnlyMainTableColumnModelParserRetrievesCorrectType() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testTypeOnlyName);
 
-        assertEquals(testColumnModel.getType(), testTypeOnlyType);
+        assertEquals(testTypeOnlyType, testColumnModel.getType());
     }
 
     @Test
