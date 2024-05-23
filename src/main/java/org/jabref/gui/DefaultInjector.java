@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.util.function.Function;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -23,9 +22,7 @@ public class DefaultInjector implements PresenterFactory {
      * Dependencies without default constructor are constructed by hand.
      */
     private static Object createDependency(Class<?> clazz) {
-        if (clazz == TaskExecutor.class) {
-            return Globals.TASK_EXECUTOR;
-        } else if (clazz == KeyBindingRepository.class) {
+        if (clazz == KeyBindingRepository.class) {
             return Globals.getKeyPrefs();
         } else if (clazz == JournalAbbreviationRepository.class) {
             return Globals.journalAbbreviationRepository;

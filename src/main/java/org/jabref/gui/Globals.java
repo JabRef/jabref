@@ -4,8 +4,6 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
-import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
@@ -29,8 +27,6 @@ public class Globals {
     public static final BuildInfo BUILD_INFO = new BuildInfo();
 
     public static final RemoteListenerServerManager REMOTE_LISTENER = new RemoteListenerServerManager();
-
-    public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor();
 
     /**
      * This field is initialized upon startup.
@@ -83,18 +79,5 @@ public class Globals {
             directoryMonitor = new DefaultDirectoryMonitor();
         }
         return directoryMonitor;
-    }
-
-    public static void shutdownThreadPools() {
-        TASK_EXECUTOR.shutdown();
-        if (fileUpdateMonitor != null) {
-            fileUpdateMonitor.shutdown();
-        }
-
-        if (directoryMonitor != null) {
-            directoryMonitor.shutdown();
-        }
-
-        JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 }

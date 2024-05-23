@@ -22,6 +22,8 @@ import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -55,6 +57,7 @@ public class JabRefGUI extends Application {
     private static StateManager stateManager;
 
     private static CountingUndoManager countingUndoManager;
+    private static TaskExecutor taskExecutor;
 
     private boolean correctedWindowPos = false;
     private Stage mainStage;
@@ -91,6 +94,9 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(UndoManager.class, countingUndoManager);
         Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
 
+        JabRefGUI.taskExecutor = new DefaultTaskExecutor();
+        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
+
         JabRefGUI.mainFrame = new JabRefFrame(
                 mainStage,
                 dialogService,
@@ -99,7 +105,7 @@ public class JabRefGUI extends Application {
                 stateManager,
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                Globals.TASK_EXECUTOR);
+                taskExecutor);
 
         openWindow();
 
@@ -114,20 +120,13 @@ public class JabRefGUI extends Application {
             if (enabled) {
                 new VersionWorker(Globals.BUILD_INFO.version,
                         dialogService,
-                        Globals.TASK_EXECUTOR,
+                        taskExecutor,
                         preferencesService)
                         .checkForNewVersionDelayed();
             }
         });
 
         setupProxy();
-    }
-
-    @Override
-    public void stop() {
-        OOBibBaseConnect.closeOfficeConnection();
-        stopBackgroundTasks();
-        Globals.shutdownThreadPools();
     }
 
     private void setupProxy() {
@@ -267,6 +266,7 @@ public class JabRefGUI extends Application {
                 preferencesService.getGuiPreferences().getPositionY());
     }
 
+
     // Background tasks
     public void startBackgroundTasks() {
         // TODO Currently deactivated due to incompatibilities in XML
@@ -284,9 +284,23 @@ public class JabRefGUI extends Application {
         }
     }
 
+    @Override
+    public void stop() {
+        OOBibBaseConnect.closeOfficeConnection();
+        stopBackgroundTasks();
+        shutdownThreadPools();
+    }
+
     public void stopBackgroundTasks() {
         Telemetry.shutdown();
         Unirest.shutDown();
+    }
+
+    public static void shutdownThreadPools() {
+        taskExecutor.shutdown();
+        Globals.getFileUpdateMonitor().shutdown();
+        Globals.getDirectoryMonitor().shutdown();
+        JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 
     public static JabRefFrame getMainFrame() {
