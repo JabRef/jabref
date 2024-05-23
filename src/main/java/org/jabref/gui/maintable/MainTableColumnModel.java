@@ -78,7 +78,6 @@ public class MainTableColumnModel {
             LOGGER.warn("Column type '{}' is unknown.", text);
             return NORMALFIELD;
         }
-
     }
 
     private final ObjectProperty<Type> typeProperty = new SimpleObjectProperty<>();
