@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -132,6 +130,7 @@ import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -881,61 +880,7 @@ public class JabRefPreferences implements PreferencesService {
             return Collections.emptyList();
         }
 
-        StringReader reader = new StringReader(toConvert);
-        List<String> result = new ArrayList<>();
-        Optional<String> rs;
-        try {
-            while ((rs = getNextUnit(reader)).isPresent()) {
-                result.add(rs.get());
-            }
-        } catch (IOException e) {
-            LOGGER.warn("Unable to convert String to List", e);
-        }
-        return result;
-    }
-
-    private static Optional<String> getNextUnit(Reader data) throws IOException {
-        // character last read
-        // -1 if end of stream
-        // initialization necessary, because of Java compiler
-        int c = -1;
-
-        // last character was escape symbol
-        boolean escape = false;
-
-        // true if a STRINGLIST_DELIMITER is found
-        boolean done = false;
-
-        StringBuilder res = new StringBuilder();
-        while (!done && ((c = data.read()) != -1)) {
-            if (c == '\\') {
-                if (escape) {
-                    escape = false;
-                    res.append('\\');
-                } else {
-                    escape = true;
-                }
-            } else {
-                if (c == STRINGLIST_DELIMITER) {
-                    if (escape) {
-                        res.append(STRINGLIST_DELIMITER);
-                    } else {
-                        done = true;
-                    }
-                } else {
-                    res.append((char) c);
-                }
-                escape = false;
-            }
-        }
-        if (!res.isEmpty()) {
-            return Optional.of(res.toString());
-        } else if (c == -1) {
-            // end of stream
-            return Optional.empty();
-        } else {
-            return Optional.of("");
-        }
+        return Arrays.asList(StringUtils.splitPreserveAllTokens(toConvert, STRINGLIST_DELIMITER));
     }
 
     //*************************************************************************************************************
