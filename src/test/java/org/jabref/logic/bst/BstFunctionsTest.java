@@ -213,7 +213,8 @@ class BstFunctionsTest {
             "abc, abcd, -2, 2147483647",
             "b, abcd, -3, 1",
             "a, abcd, -4, 1",
-            "'', abcd, -5, 1" // invalid number -5
+            "'', abcd, -5, 1",                    // invalid number -5
+            "'', abcd, -2147483647, 2147483647",  // invalid number
     })
     void substringPlain(String expected, String full, Integer start, Integer length) {
         BstVMContext bstVMContext = new BstVMContext(List.of(), new BibDatabase(), Path.of("404.bst"));
