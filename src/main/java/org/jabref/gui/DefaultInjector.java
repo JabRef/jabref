@@ -51,9 +51,9 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.undoManager;
         } else {
             try {
-                return clazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException ex) {
-                LOGGER.error("Cannot instantiate dependency: " + clazz, ex);
+                return clazz.getDeclaredConstructor().newInstance();
+            } catch (ReflectiveOperationException ex) {
+                LOGGER.error("Cannot instantiate dependency: {}", clazz, ex);
                 return null;
             }
         }
