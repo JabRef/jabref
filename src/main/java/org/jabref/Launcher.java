@@ -17,6 +17,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -48,26 +49,11 @@ import org.tinylog.configuration.Configuration;
  */
 public class Launcher {
     private static Logger LOGGER;
-    private static boolean isDebugEnabled;
 
     public static void main(String[] args) {
-        routeLoggingToSlf4J();
+        initLogging(args);
 
-        // We must configure logging as soon as possible, which is why we cannot wait for the usual
-        // argument parsing workflow to parse logging options .e.g. --debug
-        JabRefCLI jabRefCLI;
         try {
-            jabRefCLI = new JabRefCLI(args);
-            isDebugEnabled = jabRefCLI.isDebugLogging();
-        } catch (ParseException e) {
-            isDebugEnabled = false;
-        }
-
-        addLogToDisk();
-        try {
-            Injector.setModelOrService(BibEntryTypesManager.class, new BibEntryTypesManager());
-            BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-
             // Initialize preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
             Injector.setModelOrService(PreferencesService.class, preferences);
@@ -77,12 +63,17 @@ public class Launcher {
                 return;
             }
 
+            BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
+            Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
+
             PreferencesMigrations.runMigrations(preferences, entryTypesManager);
 
-            // Initialize rest of preferences
+            Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
+            Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
+
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
-            initGlobals(preferences);
+
             clearOldSearchIndices();
 
             try {
@@ -115,17 +106,26 @@ public class Launcher {
         }
     }
 
-    private static void routeLoggingToSlf4J() {
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-    }
-
     /**
      * This needs to be called as early as possible. After the first log write, it
-     * is not possible to alter
-     * the log configuration programmatically anymore.
+     * is not possible to alter the log configuration programmatically anymore.
      */
-    private static void addLogToDisk() {
+    private static void initLogging(String[] args) {
+        // routeLoggingToSlf4J
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+
+        // We must configure logging as soon as possible, which is why we cannot wait for the usual
+        // argument parsing workflow to parse logging options .e.g. --debug
+        boolean isDebugEnabled;
+        try {
+            JabRefCLI jabRefCLI = new JabRefCLI(args);
+            isDebugEnabled = jabRefCLI.isDebugLogging();
+        } catch (ParseException e) {
+            isDebugEnabled = false;
+        }
+
+        // addLogToDisk
         Path directory = OS.getNativeDesktop().getLogDirectory();
         try {
             Files.createDirectories(directory);
@@ -182,14 +182,6 @@ public class Launcher {
             }
         }
         return true;
-    }
-
-    private static void initGlobals(PreferencesService preferences) {
-        // Read list(s) of journal names and abbreviations
-        Globals.journalAbbreviationRepository = JournalAbbreviationLoader
-                .loadRepository(preferences.getJournalAbbreviationPreferences());
-        Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
-        Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {
