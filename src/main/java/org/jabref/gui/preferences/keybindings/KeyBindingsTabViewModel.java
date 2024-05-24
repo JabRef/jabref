@@ -127,4 +127,8 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     public ObjectProperty<KeyBindingViewModel> rootKeyBindingProperty() {
         return rootKeyBinding;
     }
+
+    public KeyBindingRepository getKeyBindingRepository() {
+        return keyBindingRepository;
+    }
 }
