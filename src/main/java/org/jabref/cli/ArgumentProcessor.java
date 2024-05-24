@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.JabRefException;
@@ -253,7 +252,7 @@ public class ArgumentProcessor {
                         preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
                         Injector.instantiateModelOrService(BibEntryTypesManager.class),
                         preferencesService.getFieldPreferences(),
-                        Globals.journalAbbreviationRepository,
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         cli.isWriteXMPtoPdf() || cli.isWriteMetadatatoPdf(),
                         cli.isEmbeddBibfileInPdf() || cli.isWriteMetadatatoPdf());
             }
@@ -495,7 +494,12 @@ public class ArgumentProcessor {
                     // We have an TemplateExporter instance:
                     try {
                         System.out.println(Localization.lang("Exporting %0", data[1]));
-                        exporter.get().export(databaseContext, Path.of(data[1]), matches, Collections.emptyList(), Globals.journalAbbreviationRepository);
+                        exporter.get().export(
+                                databaseContext,
+                                Path.of(data[1]),
+                                matches,
+                                Collections.emptyList(),
+                                Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
                     } catch (Exception ex) {
                         System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", data[1], Throwables.getStackTraceAsString(ex)));
                     }
@@ -674,7 +678,7 @@ public class ArgumentProcessor {
                             Path.of(data[0]),
                             parserResult.getDatabaseContext().getDatabase().getEntries(),
                             fileDirForDatabase,
-                            Globals.journalAbbreviationRepository);
+                            Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", data[0], Throwables.getStackTraceAsString(ex)));
                 }

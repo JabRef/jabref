@@ -36,7 +36,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
@@ -83,6 +82,7 @@ import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -2387,7 +2387,10 @@ public class JabRefPreferences implements PreferencesService {
         this.previewPreferences = new PreviewPreferences(
                 layouts,
                 getPreviewCyclePosition(layouts),
-                new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(), Globals.journalAbbreviationRepository),
+                new TextBasedPreviewLayout(
+                        style,
+                        getLayoutFormatterPreferences(),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
                 (String) defaults.get(PREVIEW_STYLE),
                 getBoolean(PREVIEW_AS_TAB),
                 getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP),
@@ -2432,7 +2435,10 @@ public class JabRefPreferences implements PreferencesService {
                                                                           .findFirst()
                                                                           .orElse(null);
                         } else {
-                            return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(), Globals.journalAbbreviationRepository);
+                            return new TextBasedPreviewLayout(
+                                    style,
+                                    getLayoutFormatterPreferences(),
+                                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
                         }
                     }).filter(Objects::nonNull)
                     .collect(Collectors.toList());

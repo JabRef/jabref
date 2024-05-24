@@ -60,6 +60,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
@@ -600,7 +601,10 @@ public class LibraryTab extends Tab {
     private void setupAutoCompletion() {
         AutoCompletePreferences autoCompletePreferences = preferencesService.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
-            suggestionProviders = new SuggestionProviders(getDatabase(), Globals.journalAbbreviationRepository, autoCompletePreferences);
+            suggestionProviders = new SuggestionProviders(
+                    getDatabase(),
+                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
+                    autoCompletePreferences);
         } else {
             // Create empty suggestion providers if auto-completion is deactivated
             suggestionProviders = new SuggestionProviders();

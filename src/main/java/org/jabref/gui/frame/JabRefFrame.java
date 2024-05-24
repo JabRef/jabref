@@ -46,6 +46,7 @@ import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
@@ -56,6 +57,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
@@ -145,7 +147,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         this.sidePane = new SidePane(
                 this,
                 prefs,
-                Globals.journalAbbreviationRepository,
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 taskExecutor,
                 dialogService,
                 stateManager,
@@ -200,7 +202,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 fileUpdateMonitor,
                 taskExecutor,
                 dialogService,
-                Globals.journalAbbreviationRepository,
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 entryTypesManager,
                 undoManager,
                 Globals.getClipboardManager(),

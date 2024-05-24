@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.util.function.Function;
 
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -20,9 +19,7 @@ public class DefaultInjector implements PresenterFactory {
      * Dependencies without default constructor are constructed by hand.
      */
     private static Object createDependency(Class<?> clazz) {
-        if (clazz == JournalAbbreviationRepository.class) {
-            return Globals.journalAbbreviationRepository;
-        } else if (clazz == FileUpdateMonitor.class) {
+        if (clazz == FileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
         } else if (clazz == ClipBoardManager.class) {
             return Globals.getClipboardManager();
