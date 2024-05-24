@@ -15,15 +15,15 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.logic.pdf.search.LuceneSearcher;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
-import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -114,7 +114,7 @@ public class MainTableDataModel {
     }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        if (query.isEmpty() || !query.get().getSearchFlags().contains(SearchRules.SearchFlags.FILTERING_SEARCH)) {
+        if (query.isEmpty() || !query.get().getSearchFlags().contains(SearchFlags.FILTERING_SEARCH)) {
             return true;
         }
         return entry.getSearchScore() > 0;

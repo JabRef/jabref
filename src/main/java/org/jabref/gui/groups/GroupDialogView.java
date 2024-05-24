@@ -45,7 +45,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 

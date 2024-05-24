@@ -8,7 +8,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.SearchFlags;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DatabaseSearcherTest {
 
-    public static final SearchQuery INVALID_SEARCH_QUERY = new SearchQuery("\\asd123{}asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION));
+    public static final SearchQuery INVALID_SEARCH_QUERY = new SearchQuery("\\asd123{}asdf", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
 
     private BibDatabase database;
 
@@ -28,7 +28,7 @@ public class DatabaseSearcherTest {
 
     @Test
     public void noMatchesFromEmptyDatabase() {
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
@@ -41,7 +41,7 @@ public class DatabaseSearcherTest {
     @Test
     public void getDatabaseFromMatchesDatabaseWithEmptyEntries() {
         database.insertEntry(new BibEntry());
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
@@ -50,7 +50,7 @@ public class DatabaseSearcherTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "harrer");
         database.insertEntry(entry);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", EnumSet.of(SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
@@ -59,13 +59,13 @@ public class DatabaseSearcherTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "harrer");
         database.insertEntry(entry);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("harrer", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("harrer", EnumSet.of(SearchFlags.REGULAR_EXPRESSION)), database).getMatches();
         assertEquals(Collections.singletonList(entry), matches);
     }
 
     @Test
     public void noMatchesFromEmptyDatabaseWithInvalidQuery() {
-        SearchQuery query = new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchQuery query = new SearchQuery("asdf[", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
         assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
     }
@@ -76,7 +76,7 @@ public class DatabaseSearcherTest {
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
-        SearchQuery query = new SearchQuery("tonho", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchQuery query = new SearchQuery("tonho", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         List<BibEntry> matches = new DatabaseSearcher(query, database).getMatches();
 
         assertEquals(Collections.singletonList(entry), matches);
@@ -91,7 +91,7 @@ public class DatabaseSearcherTest {
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
-        SearchQuery query = new SearchQuery("tonho", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchQuery query = new SearchQuery("tonho", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
         assertEquals(Collections.singletonList(entry), databaseSearcher.getMatches());
@@ -103,7 +103,7 @@ public class DatabaseSearcherTest {
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
-        SearchQuery query = new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchQuery query = new SearchQuery("asdf", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
         assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
@@ -114,7 +114,7 @@ public class DatabaseSearcherTest {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
 
-        SearchQuery query = new SearchQuery("tonho", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchQuery query = new SearchQuery("tonho", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
         assertEquals(Collections.emptyList(), databaseSearcher.getMatches());

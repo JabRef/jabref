@@ -34,7 +34,6 @@ import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
@@ -143,7 +142,7 @@ public class SaveDatabaseAction {
             // Close AutosaveManager, BackupManager, and PdfIndexer for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
-            PdfIndexerManager.shutdownIndexer(context);
+            // PdfIndexerManager.shutdownIndexer(context);
         }
 
         // Set new location

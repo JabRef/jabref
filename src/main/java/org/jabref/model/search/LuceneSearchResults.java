@@ -1,4 +1,4 @@
-package org.jabref.model.pdf.search;
+package org.jabref.model.search;
 
 import java.util.ArrayList;
 import java.util.Collections;

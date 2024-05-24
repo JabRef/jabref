@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search;
+package org.jabref.logic.search.indexing;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.jabref.logic.pdf.search.DocumentReader;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;

@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search;
+package org.jabref.logic.search.retrieval;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -7,8 +7,8 @@ import java.util.Objects;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.pdf.search.LuceneSearchResults;
-import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.model.search.LuceneSearchResults;
+import org.jabref.model.search.SearchResult;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;

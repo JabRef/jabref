@@ -10,9 +10,9 @@ import java.util.Optional;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.matchers.AndMatcher;
 import org.jabref.model.search.matchers.OrMatcher;
-import org.jabref.model.search.rules.SearchRules;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -83,7 +83,7 @@ public class GroupTreeNodeTest {
     }
 
     private static AbstractGroup getSearchGroup(String name) {
-        return new SearchGroup(name, GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        return new SearchGroup(name, GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.noneOf(SearchFlags.class));
     }
 
     private static AbstractGroup getExplict(String name) {
@@ -255,7 +255,7 @@ public class GroupTreeNodeTest {
         ExplicitGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT, ',');
         oldGroup.add(entry);
         GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
-        AbstractGroup newGroup = new SearchGroup("NewGroup", GroupHierarchyType.INDEPENDENT, "test", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        AbstractGroup newGroup = new SearchGroup("NewGroup", GroupHierarchyType.INDEPENDENT, "test", EnumSet.noneOf(SearchFlags.class));
 
         node.setGroup(newGroup, true, true, entries);
 
@@ -333,7 +333,7 @@ public class GroupTreeNodeTest {
 
     @Test
     void addEntriesToGroupWorksNotForGroupsNotSupportingExplicitAddingOfEntries() {
-        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.noneOf(SearchFlags.class)));
         List<FieldChange> fieldChanges = searchGroup.addEntriesToGroup(entries);
 
         assertEquals(Collections.emptyList(), fieldChanges);
@@ -341,7 +341,7 @@ public class GroupTreeNodeTest {
 
     @Test
     void removeEntriesFromGroupWorksNotForGroupsNotSupportingExplicitRemovalOfEntries() {
-        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.noneOf(SearchRules.SearchFlags.class)));
+        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.noneOf(SearchFlags.class)));
         List<FieldChange> fieldChanges = searchGroup.removeEntriesFromGroup(entries);
 
         assertEquals(Collections.emptyList(), fieldChanges);

@@ -47,9 +47,9 @@ class GroupTreeViewModelTest {
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
 
         when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
-                        EnumSet.of(GroupViewMode.FILTER),
-                        true,
-                        true,
+                EnumSet.of(GroupViewMode.FILTER),
+                true,
+                true,
                 GroupHierarchyType.INDEPENDENT));
         groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
     }

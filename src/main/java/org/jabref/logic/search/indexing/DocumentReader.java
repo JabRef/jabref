@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search;
+package org.jabref.logic.search.indexing;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,11 +30,11 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.pdf.search.SearchFieldConstants.ANNOTATIONS;
-import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
-import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
-import static org.jabref.model.pdf.search.SearchFieldConstants.PAGE_NUMBER;
-import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
+import static org.jabref.model.search.SearchFieldConstants.ANNOTATIONS;
+import static org.jabref.model.search.SearchFieldConstants.CONTENT;
+import static org.jabref.model.search.SearchFieldConstants.MODIFIED;
+import static org.jabref.model.search.SearchFieldConstants.PAGE_NUMBER;
+import static org.jabref.model.search.SearchFieldConstants.PATH;
 
 /**
  * Utility class for reading the data from LinkedFiles of a BibEntry for Lucene.

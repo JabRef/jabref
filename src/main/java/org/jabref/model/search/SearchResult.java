@@ -1,4 +1,4 @@
-package org.jabref.model.pdf.search;
+package org.jabref.model.search;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -22,13 +22,6 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TextFragment;
 
-import static org.jabref.model.pdf.search.SearchFieldConstants.ANNOTATIONS;
-import static org.jabref.model.pdf.search.SearchFieldConstants.BIB_ENTRY_ID_HASH;
-import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
-import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
-import static org.jabref.model.pdf.search.SearchFieldConstants.PAGE_NUMBER;
-import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
-
 public final class SearchResult {
 
     private final String path;
@@ -43,22 +36,22 @@ public final class SearchResult {
     private List<String> annotationsResultStringsHtml = List.of();
 
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
-        this.path = getFieldContents(searcher, scoreDoc, PATH);
+        this.path = getFieldContents(searcher, scoreDoc, SearchFieldConstants.PATH);
         this.luceneScore = scoreDoc.score;
         if (this.path.length() > 0) {
             // pdf result
-            this.pageNumber = Integer.parseInt(getFieldContents(searcher, scoreDoc, PAGE_NUMBER));
-            this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
+            this.pageNumber = Integer.parseInt(getFieldContents(searcher, scoreDoc, SearchFieldConstants.PAGE_NUMBER));
+            this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, SearchFieldConstants.MODIFIED));
             this.hash = 0;
 
-            String content = getFieldContents(searcher, scoreDoc, CONTENT);
-            String annotations = getFieldContents(searcher, scoreDoc, ANNOTATIONS);
+            String content = getFieldContents(searcher, scoreDoc, SearchFieldConstants.CONTENT);
+            String annotations = getFieldContents(searcher, scoreDoc, SearchFieldConstants.ANNOTATIONS);
             this.hasFulltextResults = !(content.isEmpty() && annotations.isEmpty());
 
             Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(query));
 
             try (Analyzer analyzer = new EnglishAnalyzer();
-             TokenStream contentStream = analyzer.tokenStream(CONTENT, content)) {
+             TokenStream contentStream = analyzer.tokenStream(SearchFieldConstants.CONTENT, content)) {
                 TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
                 this.contentResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
             } catch (InvalidTokenOffsetsException e) {
@@ -66,7 +59,7 @@ public final class SearchResult {
             }
 
             try (Analyzer analyzer = new EnglishAnalyzer();
-             TokenStream annotationStream = analyzer.tokenStream(ANNOTATIONS, annotations)) {
+             TokenStream annotationStream = analyzer.tokenStream(SearchFieldConstants.ANNOTATIONS, annotations)) {
                 TextFragment[] frags = highlighter.getBestTextFragments(annotationStream, annotations, true, 10);
                 this.annotationsResultStringsHtml = Arrays.stream(frags).map(TextFragment::toString).collect(Collectors.toList());
             } catch (InvalidTokenOffsetsException e) {
@@ -74,7 +67,7 @@ public final class SearchResult {
             }
         } else {
             // Found somewhere in the bib entry
-            this.hash = Integer.parseInt(getFieldContents(searcher, scoreDoc, BIB_ENTRY_ID_HASH));
+            this.hash = Integer.parseInt(getFieldContents(searcher, scoreDoc, SearchFieldConstants.BIB_ENTRY_ID_HASH));
             this.pageNumber = -1;
             this.modified = -1;
             this.hasFulltextResults = false;

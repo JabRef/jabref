@@ -15,7 +15,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 import org.jabref.testutils.category.GUITest;
@@ -43,7 +43,7 @@ public class GlobalSearchBarTest {
     @Start
     public void onStart(Stage stage) {
         SearchPreferences searchPreferences = mock(SearchPreferences.class);
-        when(searchPreferences.getSearchFlags()).thenReturn(EnumSet.noneOf(SearchRules.SearchFlags.class));
+        when(searchPreferences.getSearchFlags()).thenReturn(EnumSet.noneOf(SearchFlags.class));
         PreferencesService prefs = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         when(prefs.getSearchPreferences()).thenReturn(searchPreferences);
 

@@ -1,4 +1,6 @@
 package org.jabref.gui.groups;
 
-public enum GroupViewMode { INTERSECTION, FILTER, INVERT }
+public enum GroupViewMode {
+    INTERSECTION, UNION, FILTER, INVERT
+}
 

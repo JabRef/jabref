@@ -65,8 +65,8 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.pdf.search.LuceneSearchResults;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.LuceneSearchResults;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
@@ -244,7 +244,7 @@ public class GlobalSearchBar extends HBox {
                     // Async update
                     searchTask.restart();
                 },
-                query -> setSearchTerm(query.orElse(new SearchQuery("", EnumSet.noneOf(SearchRules.SearchFlags.class)))));
+                query -> setSearchTerm(query.orElse(new SearchQuery("", EnumSet.noneOf(SearchFlags.class)))));
 
         this.stateManager.getSearchResults().addListener((MapChangeListener<BibDatabaseContext, Map<BibEntry, LuceneSearchResults>>) change -> {
             stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery);
@@ -273,7 +273,7 @@ public class GlobalSearchBar extends HBox {
         regularExpressionButton.setTooltip(new Tooltip(Localization.lang("regular expression")));
         initSearchModifierButton(regularExpressionButton);
         regularExpressionButton.setOnAction(event -> {
-            searchPreferences.setSearchFlag(SearchRules.SearchFlags.REGULAR_EXPRESSION, regularExpressionButton.isSelected());
+            searchPreferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, regularExpressionButton.isSelected());
             updateSearchQuery();
         });
 
@@ -281,7 +281,7 @@ public class GlobalSearchBar extends HBox {
         fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
         initSearchModifierButton(fulltextButton);
         fulltextButton.setOnAction(event -> {
-            searchPreferences.setSearchFlag(SearchRules.SearchFlags.FULLTEXT, fulltextButton.isSelected());
+            searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, fulltextButton.isSelected());
             updateSearchQuery();
         });
 
@@ -289,7 +289,7 @@ public class GlobalSearchBar extends HBox {
         keepSearchString.setTooltip(new Tooltip(Localization.lang("Keep search string across libraries")));
         initSearchModifierButton(keepSearchString);
         keepSearchString.setOnAction(evt -> {
-            searchPreferences.setSearchFlag(SearchRules.SearchFlags.KEEP_SEARCH_STRING, keepSearchString.isSelected());
+            searchPreferences.setSearchFlag(SearchFlags.KEEP_SEARCH_STRING, keepSearchString.isSelected());
             updateSearchQuery();
         });
 
@@ -297,7 +297,7 @@ public class GlobalSearchBar extends HBox {
         filterModeButton.setTooltip(new Tooltip(Localization.lang("Filter search results")));
         initSearchModifierButton(filterModeButton);
         filterModeButton.setOnAction(event -> {
-            searchPreferences.setSearchFlag(SearchRules.SearchFlags.FILTERING_SEARCH, filterModeButton.isSelected());
+            searchPreferences.setSearchFlag(SearchFlags.FILTERING_SEARCH, filterModeButton.isSelected());
             updateSearchQuery();
         });
 
@@ -305,7 +305,7 @@ public class GlobalSearchBar extends HBox {
         sortByScoreButton.setTooltip(new Tooltip(Localization.lang("Always sort by score")));
         initSearchModifierButton(sortByScoreButton);
         sortByScoreButton.setOnAction(event -> {
-            searchPreferences.setSearchFlag(SearchRules.SearchFlags.SORT_BY_SCORE, sortByScoreButton.isSelected());
+            searchPreferences.setSearchFlag(SearchFlags.SORT_BY_SCORE, sortByScoreButton.isSelected());
             updateSearchQuery();
         });
 

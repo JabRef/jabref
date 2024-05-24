@@ -1,8 +1,7 @@
 package org.jabref.logic.search;
 
-import org.jabref.model.pdf.search.EnglishStemAnalyzer;
-
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
@@ -19,7 +18,7 @@ import org.apache.lucene.store.Directory;
 public class LuceneTest {
     public static void main(String[] args) throws Exception {
         // Setup the analyzer
-        Analyzer analyzer = new EnglishStemAnalyzer();
+        Analyzer analyzer = new StandardAnalyzer();
 
         // Store the index in memory
         Directory directory = new ByteBuffersDirectory();
@@ -47,7 +46,7 @@ public class LuceneTest {
 
         for (ScoreDoc scoreDoc : hits) {
             Document doc = searcher.doc(scoreDoc.doc);
-            System.out.println(doc.get("content"));
+//            System.out.println(doc.get("content"));
         }
     }
 }

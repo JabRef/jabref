@@ -13,7 +13,7 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
-import org.jabref.model.pdf.search.SearchFieldConstants;
+import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.FilePreferences;
 

@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search;
+package org.jabref.logic.search.indexing;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -152,7 +152,7 @@ public class LuceneIndexerTest {
     }
 
     @Test
-    public void testFlushIndex() throws IOException {
+    public void flushIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setCitationKey("Example2017");

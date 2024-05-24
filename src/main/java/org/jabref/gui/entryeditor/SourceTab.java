@@ -124,6 +124,11 @@ public class SourceTab extends EntryEditorTab {
             // searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords); TODO btut: Pattern-Highlighting with lucene
             highlightSearchPattern();
         });
+
+        stateManager.activeGlobalSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
+            // searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+            highlightSearchPattern();
+        });
     }
 
     private void highlightSearchPattern() {

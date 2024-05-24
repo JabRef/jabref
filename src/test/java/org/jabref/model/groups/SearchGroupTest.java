@@ -6,7 +6,7 @@ import java.util.List;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.SearchFlags;
 
 import org.junit.jupiter.api.Test;
 
@@ -29,21 +29,21 @@ public class SearchGroupTest {
 
     @Test
     public void containsFindsWords() {
-        SearchGroup groupPositive = new SearchGroup("A", GroupHierarchyType.INDEPENDENT, "Test", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        SearchGroup groupPositive = new SearchGroup("A", GroupHierarchyType.INDEPENDENT, "Test", EnumSet.noneOf(SearchFlags.class));
         List<BibEntry> positiveResult = List.of(entry1D, entry2D);
         assertTrue(groupPositive.containsAll(positiveResult));
     }
 
     @Test
     public void containsDoesNotFindWords() {
-        SearchGroup groupNegative = new SearchGroup("A", GroupHierarchyType.INDEPENDENT, "Unknown", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        SearchGroup groupNegative = new SearchGroup("A", GroupHierarchyType.INDEPENDENT, "Unknown", EnumSet.noneOf(SearchFlags.class));
         List<BibEntry> positiveResult = List.of(entry1D, entry2D);
         assertFalse(groupNegative.containsAny(positiveResult));
     }
 
     @Test
     public void containsFindsWordWithRegularExpression() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=rev*", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=rev*", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         BibEntry entry = new BibEntry();
         entry.addKeyword("review", ',');
 
@@ -52,7 +52,7 @@ public class SearchGroupTest {
 
     @Test
     public void containsDoesNotFindsWordWithInvalidRegularExpression() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=*rev*", EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=*rev*", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         BibEntry entry = new BibEntry();
         entry.addKeyword("review", ',');
 
@@ -61,7 +61,7 @@ public class SearchGroupTest {
 
     @Test
     public void notQueryWorksWithLeftPartOfQuery() {
-        SearchGroup groupToBeClassified = new SearchGroup("to-be-classified", GroupHierarchyType.INDEPENDENT, "NOT(groups=alpha) AND NOT(groups=beta)", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        SearchGroup groupToBeClassified = new SearchGroup("to-be-classified", GroupHierarchyType.INDEPENDENT, "NOT(groups=alpha) AND NOT(groups=beta)", EnumSet.noneOf(SearchFlags.class));
 
         BibEntry alphaEntry = new BibEntry()
                 .withCitationKey("alpha")
@@ -71,7 +71,7 @@ public class SearchGroupTest {
 
     @Test
     public void notQueryWorksWithLRightPartOfQuery() {
-        SearchGroup groupToBeClassified = new SearchGroup("to-be-classified", GroupHierarchyType.INDEPENDENT, "NOT(groups=alpha) AND NOT(groups=beta)", EnumSet.noneOf(SearchRules.SearchFlags.class));
+        SearchGroup groupToBeClassified = new SearchGroup("to-be-classified", GroupHierarchyType.INDEPENDENT, "NOT(groups=alpha) AND NOT(groups=beta)", EnumSet.noneOf(SearchFlags.class));
 
         BibEntry betaEntry = new BibEntry()
                 .withCitationKey("beta")

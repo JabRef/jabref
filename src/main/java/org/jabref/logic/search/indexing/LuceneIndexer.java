@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search;
+package org.jabref.logic.search.indexing;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +22,7 @@ import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.pdf.search.SearchFieldConstants;
+import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
