@@ -31,8 +31,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.LuceneSearchResults;
-import org.jabref.model.search.SearchResult;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.SearchResult;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;

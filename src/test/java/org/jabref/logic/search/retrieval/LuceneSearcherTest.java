@@ -65,7 +65,7 @@ public class LuceneSearcherTest {
         initIndexer();
 
         HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("", EnumSet.noneOf(SearchFlags.class)));
-        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        int hits = searchResults.keySet().stream().mapToInt(key -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(8, hits);
     }
 
@@ -75,7 +75,7 @@ public class LuceneSearcherTest {
         initIndexer();
 
         HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("University", EnumSet.noneOf(SearchFlags.class)));
-        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        int hits = searchResults.keySet().stream().mapToInt(key -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(1, hits);
     }
 
@@ -85,7 +85,7 @@ public class LuceneSearcherTest {
         initIndexer();
 
         HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("and", EnumSet.noneOf(SearchFlags.class)));
-        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        int hits = searchResults.keySet().stream().mapToInt(key -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(0, hits);
     }
 
@@ -95,7 +95,7 @@ public class LuceneSearcherTest {
         initIndexer();
 
         HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("second", EnumSet.noneOf(SearchFlags.class)));
-        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        int hits = searchResults.keySet().stream().mapToInt(key -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(4, hits);
     }
 
@@ -105,7 +105,7 @@ public class LuceneSearcherTest {
         initIndexer();
 
         HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("annotation", EnumSet.noneOf(SearchFlags.class)));
-        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        int hits = searchResults.keySet().stream().mapToInt(key -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(2, hits);
     }
 
@@ -115,7 +115,7 @@ public class LuceneSearcherTest {
         initIndexer();
 
         HashMap<BibEntry, LuceneSearchResults> searchResults = searcher.search(new SearchQuery("", EnumSet.noneOf(SearchFlags.class)));
-        int hits = searchResults.keySet().stream().mapToInt((key) -> searchResults.get(key).numSearchResults()).sum();
+        int hits = searchResults.keySet().stream().mapToInt(key -> searchResults.get(key).numSearchResults()).sum();
         assertEquals(0, hits);
     }
 
