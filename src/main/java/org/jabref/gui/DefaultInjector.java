@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.util.function.Function;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -25,8 +24,6 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.journalAbbreviationRepository;
         } else if (clazz == FileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
-        } else if (clazz == ProtectedTermsLoader.class) {
-            return Globals.protectedTermsLoader;
         } else if (clazz == ClipBoardManager.class) {
             return Globals.getClipboardManager();
         } else {
