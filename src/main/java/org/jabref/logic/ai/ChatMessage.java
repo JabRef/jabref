@@ -22,6 +22,14 @@ public class ChatMessage {
         this.content = content;
     }
 
+    public static ChatMessage user(String content) {
+        return new ChatMessage(ChatMessageType.USER, content);
+    }
+
+    public static ChatMessage assistant(String content) {
+        return new ChatMessage(ChatMessageType.ASSISTANT, content);
+    }
+
     public ChatMessageType getType() {
         return type;
     }
@@ -33,10 +41,10 @@ public class ChatMessage {
     public static Optional<ChatMessage> fromLangchain(dev.langchain4j.data.message.ChatMessage chatMessage) {
         switch (chatMessage) {
             case UserMessage userMessage -> {
-                return Optional.of(new ChatMessage(ChatMessageType.USER, userMessage.singleText()));
+                return Optional.of(ChatMessage.user(userMessage.singleText()));
             }
             case AiMessage aiMessage -> {
-                return Optional.of(new ChatMessage(ChatMessageType.ASSISTANT, aiMessage.text()));
+                return Optional.of(ChatMessage.assistant(aiMessage.text()));
             }
             default -> {
                 LOGGER.error("Unable to convert langchain4j chat message to JabRef chat message, the type is {}", chatMessage.getClass());

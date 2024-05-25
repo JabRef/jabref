@@ -23,6 +23,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.AiIngestor;
+import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -34,7 +35,6 @@ import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageType;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
@@ -173,7 +173,7 @@ public class AiChatTab extends EntryEditorTab {
 
     private void buildChatUI(BibEntry entry) {
         aiChatComponent = new AiChatComponent((userPrompt) -> {
-            UserMessage userMessage = new UserMessage(userPrompt);
+            ChatMessage userMessage = ChatMessage.user(userPrompt);
             aiChatComponent.addMessage(new ChatMessageComponent(userMessage));
             entry.getAiChatMessages().add(userMessage);
 
@@ -182,7 +182,7 @@ public class AiChatTab extends EntryEditorTab {
 
             BackgroundTask.wrap(() -> aiChat.execute(userPrompt))
                     .onSuccess(aiMessageText -> {
-                        AiMessage aiMessage = new AiMessage(aiMessageText);
+                        ChatMessage aiMessage = ChatMessage.assistant(aiMessageText);
                         aiChatMessageComponent.setMessage(aiMessage);
                         entry.getAiChatMessages().add(aiMessage);
                     })

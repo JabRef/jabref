@@ -1,28 +1,20 @@
 package org.jabref.gui.entryeditor.aichattab;
 
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.service.V;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import oracle.jdbc.driver.Const;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.ai.AiChat;
+
+import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntry;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class AiChatComponent {
     private final Consumer<String> sendMessageCallback;

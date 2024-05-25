@@ -1,6 +1,5 @@
 package org.jabref.gui.entryeditor.aichattab;
 
-import dev.langchain4j.data.message.*;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
@@ -9,6 +8,9 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import org.jabref.logic.ai.ChatMessage;
+import org.jabref.logic.ai.ChatMessageType;
 import org.jabref.logic.l10n.Localization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +49,7 @@ public class ChatMessageComponent {
     }
 
     public void setMessage(ChatMessage chatMessage) {
-        if (!(chatMessage instanceof UserMessage) && !(chatMessage instanceof AiMessage)) {
-            return;
-        }
-
-        boolean isUser = chatMessage instanceof UserMessage;
+        boolean isUser = chatMessage.getType() == ChatMessageType.USER;
 
         if (isUser) {
             pane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
@@ -64,7 +62,7 @@ public class ChatMessageComponent {
         contentPane.getChildren().clear();
         contentPane.setStyle("");
 
-        contentPane.getChildren().add(makeMessageTextArea(getChatMessageText(chatMessage)));
+        contentPane.getChildren().add(makeMessageTextArea(chatMessage.getContent()));
     }
 
     public void setError(String message) {
@@ -91,38 +89,6 @@ public class ChatMessageComponent {
         message.setWrapText(true);
         message.setEditable(false);
         return message;
-    }
-
-    // Safely gets text from a chat message.
-    private static String getChatMessageText(ChatMessage chatMessage) {
-        // This mangling is needed because ChatMessage.text() is deprecated.
-
-        switch (chatMessage) {
-            case AiMessage aiChatMessage -> {
-                return aiChatMessage.text();
-            }
-
-            case UserMessage userChatMessage -> {
-                if (userChatMessage.hasSingleText()) {
-                    return userChatMessage.singleText();
-                } else {
-                    return "";
-                }
-            }
-
-            case SystemMessage systemChatMessage -> {
-                return systemChatMessage.text();
-            }
-
-            case ToolExecutionResultMessage toolChatMessage -> {
-                return toolChatMessage.text();
-            }
-
-            case null, default -> {
-                LOGGER.error("Unimplemented getChatMessageText for a new kind of ChatMessage");
-                return "";
-            }
-        }
     }
 
     public Node getNode() {
