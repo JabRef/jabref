@@ -24,8 +24,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
-import org.jabref.gui.importer.actions.loadchathistory.AiChatFile;
-import org.jabref.gui.importer.actions.loadchathistory.AiChatFileMessage;
 import org.jabref.gui.importer.actions.LoadChatHistoryAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
