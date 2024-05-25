@@ -1,23 +1,14 @@
 package org.jabref.gui.entryeditor.aichattab;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Optional;
 
-import javafx.geometry.Insets;
-import javafx.geometry.NodeOrientation;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 
-import org.checkerframework.checker.units.qual.C;
-import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.entryeditor.aichattab.components.AiChatComponentOld;
+import org.jabref.gui.entryeditor.aichattab.components.aichat.AiChatComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChat;
@@ -34,14 +25,10 @@ import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessageType;
-import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import org.slf4j.LoggerFactory;
-import org.tinylog.Logger;
 
 public class AiChatTab extends EntryEditorTab {
     public static final String NAME = "AI chat";
@@ -174,28 +161,29 @@ public class AiChatTab extends EntryEditorTab {
     private void buildChatUI(BibEntry entry) {
         aiChatComponent = new AiChatComponent((userPrompt) -> {
             ChatMessage userMessage = ChatMessage.user(userPrompt);
-            aiChatComponent.addMessage(new ChatMessageComponent(userMessage));
+            aiChatComponent.addMessage(userMessage);
             entry.getAiChatMessages().add(userMessage);
-
-            ChatMessageComponent aiChatMessageComponent = new ChatMessageComponent();
-            aiChatComponent.addMessage(aiChatMessageComponent);
+            aiChatComponent.setLoading(true);
 
             BackgroundTask.wrap(() -> aiChat.execute(userPrompt))
                     .onSuccess(aiMessageText -> {
+                        aiChatComponent.setLoading(false);
+
                         ChatMessage aiMessage = ChatMessage.assistant(aiMessageText);
-                        aiChatMessageComponent.setMessage(aiMessage);
+                        aiChatComponent.addMessage(aiMessage);
                         entry.getAiChatMessages().add(aiMessage);
                     })
                     .onFailure(e -> {
                         // TODO: User-friendly error message.
                         LOGGER.error("Got an error while sending a message to AI", e);
-                        aiChatMessageComponent.setError(e.getMessage());
+                        aiChatComponent.setLoading(false);
+                        aiChatComponent.addError(e.getMessage());
                     })
                     .executeWith(taskExecutor);
         });
 
-        aiChatComponent.restoreMessages(entry.getAiChatMessages());
+        entry.getAiChatMessages().forEach(aiChatComponent::addMessage);
 
-        setContent(aiChatComponent.getNode());
+        setContent(aiChatComponent);
     }
 }

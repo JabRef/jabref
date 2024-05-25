@@ -2,6 +2,8 @@ package org.jabref.logic.ai;
 
 import java.util.Optional;
 
+import org.jabref.logic.l10n.Localization;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.langchain4j.data.message.AiMessage;
@@ -32,6 +34,15 @@ public class ChatMessage {
 
     public ChatMessageType getType() {
         return type;
+    }
+
+    public String getTypeLabel() {
+        return switch (type) {
+            case USER ->
+                    Localization.lang("User");
+            case ASSISTANT ->
+                    Localization.lang("AI");
+        };
     }
 
     public String getContent() {

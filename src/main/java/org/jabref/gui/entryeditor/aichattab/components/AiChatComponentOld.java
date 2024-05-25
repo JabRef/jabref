@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.aichattab;
+package org.jabref.gui.entryeditor.aichattab.components;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,20 +10,21 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.entryeditor.aichattab.components.chatmessage.ChatMessageComponent;
 import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.l10n.Localization;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-public class AiChatComponent {
+public class AiChatComponentOld {
     private final Consumer<String> sendMessageCallback;
 
     private final VBox aiChatBox = new VBox(10);
     private final VBox chatVBox = new VBox(10);
     private final TextField userPromptTextField = new TextField();
 
-    public AiChatComponent(Consumer<String> sendMessageCallback) {
+    public AiChatComponentOld(Consumer<String> sendMessageCallback) {
         this.sendMessageCallback = sendMessageCallback;
 
         buildUI();
@@ -68,8 +69,8 @@ public class AiChatComponent {
         return userPromptHBox;
     }
 
-    public void addMessage(ChatMessageComponent chatMessageComponent) {
-        chatVBox.getChildren().add(chatMessageComponent.getNode());
+    public void addMessage(ChatMessage chatMessage) {
+        chatVBox.getChildren().add(new ChatMessageComponent().withChatMessage(chatMessage));
     }
 
     private void internalSendMessageEvent() {
@@ -79,7 +80,7 @@ public class AiChatComponent {
     }
 
     public void restoreMessages(List<ChatMessage> messages) {
-        messages.forEach(message -> addMessage(new ChatMessageComponent(message)));
+        messages.forEach(this::addMessage);
     }
 
     public Node getNode() {
