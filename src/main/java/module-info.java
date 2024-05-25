@@ -154,4 +154,7 @@ open module org.jabref {
     requires de.saxsys.mvvmfx.validation;
     requires dd.plist;
     requires mslinks;
+    requires langchain4j.embeddings.all.minilm.l6.v2;
+    requires langchain4j.core;
+    requires langchain4j.open.ai;
 }

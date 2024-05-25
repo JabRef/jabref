@@ -1,11 +1,11 @@
 package org.jabref.logic.ai;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
@@ -70,6 +70,6 @@ public class AiChat {
     }
 
     public void restoreMessages(List<ChatMessage> messages) {
-        messages.forEach(this.chatMemory::add);
+        messages.stream().map(ChatMessage::toLangchainMessage).filter(Optional::isPresent).map(Optional::get).forEach(this.chatMemory::add);
     }
 }

@@ -68,9 +68,9 @@ public class ChatMessageComponent {
     }
 
     public void setError(String message) {
-        contentPane.setStyle("-fx-background-color: -jr-red");
         contentPane.getChildren().clear();
         contentPane.setStyle("");
+        contentPane.setStyle("-fx-background-color: -jr-red");
 
         VBox paneVBox = new VBox(10);
         paneVBox.setMaxWidth(500);

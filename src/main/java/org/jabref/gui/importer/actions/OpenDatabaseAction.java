@@ -20,7 +20,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
-import org.jabref.gui.importer.actions.loadchathistory.LoadChatHistoryAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.undo.CountingUndoManager;

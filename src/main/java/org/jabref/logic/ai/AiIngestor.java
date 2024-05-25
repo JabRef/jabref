@@ -1,13 +1,9 @@
 package org.jabref.logic.ai;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.logic.JabRefException;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.database.BibDatabaseContext;

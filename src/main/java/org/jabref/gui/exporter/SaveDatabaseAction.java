@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,11 +26,13 @@ import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.importer.actions.loadchathistory.AiChatFile;
 import org.jabref.gui.importer.actions.loadchathistory.AiChatFileMessage;
-import org.jabref.gui.importer.actions.loadchathistory.LoadChatHistoryAction;
+import org.jabref.gui.importer.actions.LoadChatHistoryAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.ai.AiChatsFile;
+import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
@@ -296,7 +299,7 @@ public class SaveDatabaseAction {
                 // TODO: What to do with selectedOnly?
 
                 ObjectMapper objectMapper = new ObjectMapper();
-                AiChatFile aiChatFile = makeAiChatFile(bibDatabaseContext.getDatabase());
+                AiChatsFile aiChatFile = makeAiChatsFile(bibDatabaseContext.getDatabase());
                 objectMapper.writeValue(fileWriter, aiChatFile);
 
                 if (fileWriter.hasEncodingProblems()) {
@@ -312,19 +315,18 @@ public class SaveDatabaseAction {
         }
     }
 
-    private AiChatFile makeAiChatFile(BibDatabase bibDatabase) {
-        AiChatFile aiChatFile = new AiChatFile();
-        aiChatFile.chatHistoryMap = new HashMap<>();
+    private AiChatsFile makeAiChatsFile(BibDatabase bibDatabase) {
+        Map<String, List<ChatMessage>> chatHistoryMap = new HashMap<>();
 
         bibDatabase.getEntries().forEach(entry ->
             entry.getCitationKey().ifPresent(citationKey -> {
-                    List<AiChatFileMessage> aiChatFileMessages = entry.getAiChatMessages().stream().map(AiChatFileMessage::fromLangchain).toList();
-                    aiChatFile.chatHistoryMap.put(citationKey, aiChatFileMessages);
+                    List<ChatMessage> aiChatFileMessages = entry.getAiChatMessages();
+                    chatHistoryMap.put(citationKey, aiChatFileMessages);
                 }
             )
         );
 
-        return aiChatFile;
+        return new AiChatsFile(chatHistoryMap);
     }
 
     private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
