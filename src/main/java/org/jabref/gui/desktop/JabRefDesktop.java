@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -31,6 +32,7 @@ import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -306,7 +308,8 @@ public class JabRefDesktop {
         try {
             openBrowser(url, filePreferences);
         } catch (IOException exception) {
-            Globals.getClipboardManager().setContent(url);
+            ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
+            clipBoardManager.setContent(url);
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);

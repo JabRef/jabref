@@ -152,6 +152,7 @@ public class LibraryTab extends Tab {
 
     private BackgroundTask<ParserResult> dataLoadingTask;
 
+    private final ClipBoardManager clipBoardManager;
     private final IndexingTaskManager indexingTaskManager;
     private final TaskExecutor taskExecutor;
     private final DirectoryMonitorManager directoryMonitorManager;
@@ -164,6 +165,7 @@ public class LibraryTab extends Tab {
                       FileUpdateMonitor fileUpdateMonitor,
                       BibEntryTypesManager entryTypesManager,
                       CountingUndoManager undoManager,
+                      ClipBoardManager clipBoardManager,
                       TaskExecutor taskExecutor) {
         this.tabContainer = Objects.requireNonNull(tabContainer);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
@@ -173,6 +175,7 @@ public class LibraryTab extends Tab {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
+        this.clipBoardManager = clipBoardManager;
         this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
         this.taskExecutor = taskExecutor;
         this.directoryMonitorManager = new DirectoryMonitorManager(Globals.getDirectoryMonitor());
@@ -549,7 +552,7 @@ public class LibraryTab extends Tab {
                 dialogService,
                 stateManager,
                 preferencesService.getKeyBindingRepository(),
-                Globals.getClipboardManager(),
+                clipBoardManager,
                 entryTypesManager,
                 taskExecutor,
                 fileUpdateMonitor);
@@ -983,6 +986,7 @@ public class LibraryTab extends Tab {
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
                                               CountingUndoManager undoManager,
+                                              ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
@@ -996,6 +1000,7 @@ public class LibraryTab extends Tab {
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager,
+                clipBoardManager,
                 taskExecutor);
 
         newTab.setDataLoadingTask(dataLoadingTask);
@@ -1015,6 +1020,7 @@ public class LibraryTab extends Tab {
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
                                               UndoManager undoManager,
+                                              ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         Objects.requireNonNull(databaseContext);
 
@@ -1027,6 +1033,7 @@ public class LibraryTab extends Tab {
                 fileUpdateMonitor,
                 entryTypesManager,
                 (CountingUndoManager) undoManager,
+                clipBoardManager,
                 taskExecutor);
     }
 

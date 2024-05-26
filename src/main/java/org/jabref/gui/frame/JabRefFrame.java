@@ -24,8 +24,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -91,6 +91,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
+    private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
     private final JabRefFrameViewModel viewModel;
@@ -107,6 +108,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                        StateManager stateManager,
                        CountingUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
+                       ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
@@ -115,6 +117,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         this.stateManager = stateManager;
         this.undoManager = undoManager;
         this.entryTypesManager = entryTypesManager;
+        this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
 
         setId("frame");
@@ -128,6 +131,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 entryTypesManager,
                 fileUpdateMonitor,
                 undoManager,
+                clipBoardManager,
                 taskExecutor);
 
         this.frameDndHandler = new FrameDndHandler(
@@ -153,6 +157,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
+                clipBoardManager,
                 undoManager);
 
         this.pushToApplicationCommand = new PushToApplicationCommand(
@@ -190,6 +195,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 fileUpdateMonitor,
                 taskExecutor,
                 entryTypesManager,
+                clipBoardManager,
                 undoManager);
 
         MainMenu mainMenu = new MainMenu(
@@ -205,7 +211,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 entryTypesManager,
                 undoManager,
-                Globals.getClipboardManager(),
+                clipBoardManager,
                 this::getOpenDatabaseAction);
 
         VBox head = new VBox(mainMenu, mainToolBar);
@@ -432,6 +438,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager,
+                clipBoardManager,
                 taskExecutor);
         addTab(libraryTab, raisePanel);
     }
@@ -508,6 +515,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager,
+                clipBoardManager,
                 taskExecutor);
     }
 

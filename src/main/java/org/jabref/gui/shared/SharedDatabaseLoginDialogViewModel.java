@@ -22,6 +22,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -85,6 +86,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
+    private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
     private final Validator databaseValidator;
@@ -102,6 +104,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               UndoManager undoManager,
+                                              ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
@@ -110,6 +113,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
+        this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
@@ -188,6 +192,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     entryTypesManager,
                     fileUpdateMonitor,
                     undoManager,
+                    clipBoardManager,
                     taskExecutor);
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();

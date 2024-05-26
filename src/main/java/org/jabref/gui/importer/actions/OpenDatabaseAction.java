@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -63,6 +64,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final CountingUndoManager undoManager;
+    private final ClipBoardManager clipboardManager;
     private final TaskExecutor taskExecutor;
 
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
@@ -72,6 +74,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                               FileUpdateMonitor fileUpdateMonitor,
                               BibEntryTypesManager entryTypesManager,
                               CountingUndoManager undoManager,
+                              ClipBoardManager clipBoardManager,
                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.preferencesService = preferencesService;
@@ -80,6 +83,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.undoManager = undoManager;
+        this.clipboardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
     }
 
@@ -202,6 +206,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager,
+                clipboardManager,
                 taskExecutor);
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
         tabContainer.addTab(newTab, true);
@@ -252,6 +257,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                  entryTypesManager,
                                  fileUpdateMonitor,
                                  undoManager,
+                                 clipboardManager,
                                  taskExecutor);
         }
         return parserResult;
@@ -272,6 +278,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
                                           UndoManager undoManager,
+                                          ClipBoardManager clipBoardManager,
                                           TaskExecutor taskExecutor)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
         try {
@@ -283,6 +290,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                     entryTypesManager,
                     fileUpdateMonitor,
                     undoManager,
+                    clipBoardManager,
                     taskExecutor)
                     .openSharedDatabaseFromParserResult(parserResult);
         } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |

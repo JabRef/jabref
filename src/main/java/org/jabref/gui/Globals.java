@@ -22,18 +22,10 @@ public class Globals {
 
     public static final RemoteListenerServerManager REMOTE_LISTENER = new RemoteListenerServerManager();
 
-    private static ClipBoardManager clipBoardManager = null;
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static DefaultDirectoryMonitor directoryMonitor;
 
     private Globals() {
-    }
-
-    public static synchronized ClipBoardManager getClipboardManager() {
-        if (clipBoardManager == null) {
-            clipBoardManager = new ClipBoardManager();
-        }
-        return clipBoardManager;
     }
 
     public static synchronized FileUpdateMonitor getFileUpdateMonitor() {

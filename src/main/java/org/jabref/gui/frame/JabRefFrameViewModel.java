@@ -16,6 +16,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -51,6 +52,7 @@ public class JabRefFrameViewModel {
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
+    private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
     public JabRefFrameViewModel(PreferencesService preferencesService,
@@ -60,6 +62,7 @@ public class JabRefFrameViewModel {
                                 BibEntryTypesManager entryTypesManager,
                                 FileUpdateMonitor fileUpdateMonitor,
                                 UndoManager undoManager,
+                                ClipBoardManager clipBoardManager,
                                 TaskExecutor taskExecutor) {
         this.prefs = preferencesService;
         this.stateManager = stateManager;
@@ -68,6 +71,7 @@ public class JabRefFrameViewModel {
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
+        this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
     }
 
@@ -200,6 +204,7 @@ public class JabRefFrameViewModel {
                             entryTypesManager,
                             fileUpdateMonitor,
                             undoManager,
+                            clipBoardManager,
                             taskExecutor);
                 } catch (
                         SQLException |

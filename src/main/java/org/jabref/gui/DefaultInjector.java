@@ -21,8 +21,6 @@ public class DefaultInjector implements PresenterFactory {
     private static Object createDependency(Class<?> clazz) {
         if (clazz == FileUpdateMonitor.class) {
             return Globals.getFileUpdateMonitor();
-        } else if (clazz == ClipBoardManager.class) {
-            return Globals.getClipboardManager();
         } else {
             try {
                 return clazz.getDeclaredConstructor().newInstance();

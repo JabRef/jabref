@@ -26,6 +26,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -89,6 +90,7 @@ public class OpenOfficePanel {
 
     private final PreferencesService preferencesService;
     private final StateManager stateManager;
+    private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
     private final TaskExecutor taskExecutor;
     private final StyleLoader loader;
@@ -106,6 +108,7 @@ public class OpenOfficePanel {
                            StateManager stateManager,
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager entryTypesManager,
+                           ClipBoardManager clipBoardManager,
                            UndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -114,6 +117,7 @@ public class OpenOfficePanel {
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
 
         ActionFactory factory = new ActionFactory();
@@ -279,6 +283,7 @@ public class OpenOfficePanel {
                     fileUpdateMonitor,
                     entryTypesManager,
                     undoManager,
+                    clipBoardManager,
                     taskExecutor);
             tabContainer.addTab(libraryTab, true);
         }
