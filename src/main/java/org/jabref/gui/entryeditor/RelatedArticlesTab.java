@@ -19,13 +19,13 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
@@ -46,12 +46,15 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final BuildInfo buildInfo;
     private final TaskExecutor taskExecutor;
 
-    public RelatedArticlesTab(EntryEditorPreferences preferences,
+    public RelatedArticlesTab(BuildInfo buildInfo,
+                              EntryEditorPreferences preferences,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               TaskExecutor taskExecutor) {
+        this.buildInfo = buildInfo;
         this.taskExecutor = taskExecutor;
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
@@ -72,8 +75,10 @@ public class RelatedArticlesTab extends EntryEditorTab {
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
-        MrDLibFetcher fetcher = new MrDLibFetcher(preferencesService.getWorkspacePreferences().getLanguage().name(),
-                Globals.BUILD_INFO.version, preferencesService.getMrDlibPreferences());
+        MrDLibFetcher fetcher = new MrDLibFetcher(
+                preferencesService.getWorkspacePreferences().getLanguage().name(),
+                buildInfo.version,
+                preferencesService.getMrDlibPreferences());
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))

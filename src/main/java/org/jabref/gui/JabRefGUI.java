@@ -30,6 +30,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
@@ -105,9 +106,10 @@ public class JabRefGUI extends Application {
                             "with this session."));
         }
 
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
         EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
-                new VersionWorker(Globals.BUILD_INFO.version,
+                new VersionWorker(buildInfo.version,
                         dialogService,
                         taskExecutor,
                         preferencesService)

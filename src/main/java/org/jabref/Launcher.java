@@ -26,6 +26,7 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -54,6 +55,8 @@ public class Launcher {
         initLogging(args);
 
         try {
+            Injector.setModelOrService(BuildInfo.class, new BuildInfo());
+
             // Initialize preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
             Injector.setModelOrService(PreferencesService.class, preferences);
@@ -130,10 +133,11 @@ public class Launcher {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
-            initializeLogger();
+            LOGGER = LoggerFactory.getLogger(Launcher.class);
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }
+
         // The "Shared File Writer" is explained at
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
@@ -145,12 +149,8 @@ public class Launcher {
                 "writerFile.charset", "UTF-8",
                 "writerFile.policies", "startup",
                 "writerFile.backups", "30");
-
         configuration.forEach(Configuration::set);
-        initializeLogger();
-    }
 
-    private static void initializeLogger() {
         LOGGER = LoggerFactory.getLogger(Launcher.class);
     }
 

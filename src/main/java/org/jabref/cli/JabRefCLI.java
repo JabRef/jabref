@@ -5,10 +5,10 @@ import java.util.Objects;
 
 import javafx.util.Pair;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
@@ -343,7 +343,8 @@ public class JabRefCLI {
     }
 
     private String getVersionInfo() {
-        return "JabRef %s".formatted(Globals.BUILD_INFO.version);
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        return "JabRef %s".formatted(buildInfo.version);
     }
 
     public List<String> getLeftOver() {
