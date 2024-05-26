@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents the inner frame of the JabRef window
  */
-public class JabRefFrame extends BorderPane implements LibraryTabContainer {
+public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMessageHandler {
 
     public static final String FRAME_TITLE = "JabRef";
 
@@ -541,6 +541,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return mainStage;
     }
 
+    @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
         viewModel.handleUiCommands(uiCommands);
     }

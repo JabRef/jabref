@@ -3,7 +3,6 @@ package org.jabref.gui;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
-import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -19,8 +18,6 @@ public class Globals {
      * JabRef version info
      */
     public static final BuildInfo BUILD_INFO = new BuildInfo();
-
-    public static final RemoteListenerServerManager REMOTE_LISTENER = new RemoteListenerServerManager();
 
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static DefaultDirectoryMonitor directoryMonitor;

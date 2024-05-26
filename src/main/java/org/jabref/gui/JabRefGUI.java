@@ -29,6 +29,7 @@ import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
@@ -61,6 +62,8 @@ public class JabRefGUI extends Application {
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
 
+    private static RemoteListenerServerManager remoteListenerServerManager;
+
     private boolean correctedWindowPos = false;
     private Stage mainStage;
 
@@ -77,7 +80,6 @@ public class JabRefGUI extends Application {
         this.mainStage = stage;
 
         FallbackExceptionHandler.installExceptionHandler();
-        startBackgroundTasks();
 
         initialize();
 
@@ -93,6 +95,8 @@ public class JabRefGUI extends Application {
                 taskExecutor);
 
         openWindow();
+
+        startBackgroundTasks();
 
         if (!fileUpdateMonitor.isActive()) {
             dialogService.showErrorDialogAndWait(
@@ -116,6 +120,9 @@ public class JabRefGUI extends Application {
 
     public void initialize() {
         WebViewStore.init();
+
+        JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
+        Injector.setModelOrService(RemoteListenerServerManager.class, remoteListenerServerManager);
 
         JabRefGUI.stateManager = new StateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
@@ -290,8 +297,9 @@ public class JabRefGUI extends Application {
         // }
         RemotePreferences remotePreferences = preferencesService.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(
+            remoteListenerServerManager.openAndStart(
                     new CLIMessageHandler(
+                            mainFrame,
                             preferencesService,
                             Globals.getFileUpdateMonitor(),
                             Injector.instantiateModelOrService(BibEntryTypesManager.class)),
@@ -316,9 +324,5 @@ public class JabRefGUI extends Application {
         Globals.getFileUpdateMonitor().shutdown();
         Globals.getDirectoryMonitor().shutdown();
         JabRefExecutorService.INSTANCE.shutdownEverything();
-    }
-
-    public static JabRefFrame getMainFrame() {
-        return mainFrame;
     }
 }

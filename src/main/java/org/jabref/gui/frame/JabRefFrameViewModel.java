@@ -42,7 +42,7 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JabRefFrameViewModel {
+public class JabRefFrameViewModel implements UiMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);
 
     private final PreferencesService prefs;
@@ -136,6 +136,7 @@ public class JabRefFrameViewModel {
      *
      * @param uiCommands to be handled
      */
+    @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);
         if (uiCommands.isEmpty()) {
