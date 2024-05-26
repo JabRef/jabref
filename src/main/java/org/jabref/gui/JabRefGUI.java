@@ -52,13 +52,13 @@ public class JabRefGUI extends Application {
     private static List<UiCommand> uiCommands;
     private static JabRefPreferences preferencesService;
     private static FileUpdateMonitor fileUpdateMonitor;
-    private static JabRefFrame mainFrame;
-    private static DialogService dialogService;
-    private static ThemeManager themeManager;
-    private static StateManager stateManager;
 
+    private static StateManager stateManager;
+    private static ThemeManager themeManager;
     private static CountingUndoManager countingUndoManager;
     private static TaskExecutor taskExecutor;
+    private static DialogService dialogService;
+    private static JabRefFrame mainFrame;
 
     private boolean correctedWindowPos = false;
     private Stage mainStage;
@@ -78,27 +78,7 @@ public class JabRefGUI extends Application {
         FallbackExceptionHandler.installExceptionHandler();
         startBackgroundTasks();
 
-        WebViewStore.init();
-
-        JabRefGUI.stateManager = new StateManager();
-
-        Injector.setModelOrService(KeyBindingRepository.class, preferencesService.getKeyBindingRepository());
-
-        JabRefGUI.themeManager = new ThemeManager(
-                preferencesService.getWorkspacePreferences(),
-                fileUpdateMonitor,
-                Runnable::run);
-        Injector.setModelOrService(ThemeManager.class, themeManager);
-
-        JabRefGUI.dialogService = new JabRefDialogService(mainStage);
-        Injector.setModelOrService(DialogService.class, dialogService);
-
-        JabRefGUI.countingUndoManager = new CountingUndoManager();
-        Injector.setModelOrService(UndoManager.class, countingUndoManager);
-        Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
-
-        JabRefGUI.taskExecutor = new DefaultTaskExecutor();
-        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
+        initialize();
 
         JabRefGUI.mainFrame = new JabRefFrame(
                 mainStage,
@@ -130,6 +110,34 @@ public class JabRefGUI extends Application {
         });
 
         setupProxy();
+    }
+
+    public void initialize() {
+        WebViewStore.init();
+
+        JabRefGUI.stateManager = new StateManager();
+        Injector.setModelOrService(StateManager.class, stateManager);
+
+        Injector.setModelOrService(KeyBindingRepository.class, preferencesService.getKeyBindingRepository());
+
+        JabRefGUI.themeManager = new ThemeManager(
+                preferencesService.getWorkspacePreferences(),
+                fileUpdateMonitor,
+                Runnable::run);
+        Injector.setModelOrService(ThemeManager.class, themeManager);
+
+        JabRefGUI.countingUndoManager = new CountingUndoManager();
+        Injector.setModelOrService(UndoManager.class, countingUndoManager);
+        Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
+
+        JabRefGUI.taskExecutor = new DefaultTaskExecutor();
+        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
+
+        JabRefGUI.dialogService = new JabRefDialogService(mainStage);
+        Injector.setModelOrService(DialogService.class, dialogService);
+
+        JabRefGUI.clipBoardManager = new ClipBoardManager();
+        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
     }
 
     private void setupProxy() {
