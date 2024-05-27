@@ -259,6 +259,17 @@ public class FileUtil {
     }
 
     /**
+     * Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
+     * possible.
+     *
+     * @param path the file path to be shortened
+     */
+    public static Path relativize(Path path, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
+        return relativize(path, fileDirectories);
+    }
+
+    /**
      * Returns the list of linked files. The files have the absolute filename
      *
      * @param bes      list of BibTeX entries
