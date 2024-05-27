@@ -46,6 +46,27 @@ class BstPreviewLayoutTest {
     }
 
     @Test
+    public void generatePreviewForUnicodeUsingAbbr() throws Exception {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
+        String preview = bstPreviewLayout.generatePreview(new BibEntry().withField(StandardField.AUTHOR, "{\\O}ie, Gunvor"), bibDatabaseContext);
+        assertEquals("G. Øie.", preview);
+    }
+
+    @Test
+    public void generatePreviewForUnicodeNameUsingIeee() throws Exception {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(ClassLoader.getSystemResource("bst/IEEEtran.bst").toURI()));
+        String preview = bstPreviewLayout.generatePreview(new BibEntry().withField(StandardField.AUTHOR, "{\\O}ie, Gunvor"), bibDatabaseContext);
+        assertEquals("G. Øie.", preview);
+    }
+
+    @Test
+    public void generatePreviewForUnicodeTitleUsingIeee() throws Exception {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(ClassLoader.getSystemResource("bst/IEEEtran.bst").toURI()));
+        String preview = bstPreviewLayout.generatePreview(new BibEntry().withField(StandardField.TITLE, "Linear programming design of semi-digital {FIR} filter and {\\(\\Sigma\\)}{\\(\\Delta\\)} modulator for {VDSL2} transmitter"), bibDatabaseContext);
+        assertEquals("Linear programming design of semi-digital FIR filter and σδ modulator for VDSL2 transmitter", preview);
+    }
+
+    @Test
     public void generatePreviewForSliceTheoremPaperUsingIEEE() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(ClassLoader.getSystemResource("bst/IEEEtran.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);

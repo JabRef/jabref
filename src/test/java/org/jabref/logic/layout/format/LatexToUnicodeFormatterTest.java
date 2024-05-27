@@ -53,8 +53,43 @@ class LatexToUnicodeFormatterTest {
     }
 
     @Test
+    void curlyBracesAreRemoved() {
+        assertEquals("test", formatter.format("{test}"));
+    }
+
+    @Test
+    void curlyBracesAreRemovedInLongerText() {
+        assertEquals("a longer test there", formatter.format("a longer {test} there"));
+    }
+
+    @Test
     void equationsMoreComplicatedFormatting() {
         assertEquals("A 32 mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
+    }
+
+    @Test
+    void equationsMoreComplicatedFormattingSigmaDeltaBraceVariant() {
+        assertEquals("ΣΔ", formatter.format("{\\(\\Sigma\\)}{\\(\\Delta\\)}"));
+    }
+
+    @Test
+    void equationsMoreComplicatedFormattingSigmaDeltaDollarVariant() {
+        assertEquals("ΣΔ", formatter.format("{{$\\Sigma$}}{{$\\Delta$}}"));
+    }
+
+    @Test
+    void longTitle() {
+        assertEquals("Linear programming design of semi-digital FIR filter and ΣΔ modulator for VDSL2 transmitter", formatter.format("Linear programming design of semi-digital {FIR} filter and {\\(\\Sigma\\)}{\\(\\Delta\\)} modulator for {VDSL2} transmitter"));
+    }
+
+    @Test
+    void longConference() {
+        assertEquals("IEEE International Symposium on Circuits and Systems, ISCAS 2014, Melbourne, Victoria, Australia, June 1-5, 2014", formatter.format("{IEEE} International Symposium on Circuits and Systems, {ISCAS} 2014, Melbourne, Victoria, Australia, June 1-5, 2014"));
+    }
+
+    @Test
+    void longLatexedConferenceKeepsLatexCommands() {
+        assertEquals("in \\emph{{IEEE} International Symposium on Circuits and Systems, {ISCAS} 2014, Melbourne, Victoria, Australia, June 1-5, 2014.}", formatter.format("in \\emph{{IEEE} International Symposium on Circuits and Systems, {ISCAS} 2014, Melbourne, Victoria, Australia, June 1-5, 2014.}"));
     }
 
     @Test
@@ -205,5 +240,10 @@ class LatexToUnicodeFormatterTest {
     @Test
     void conversionOfOrdinal9th() {
         assertEquals("9ᵗʰ", formatter.format("9\\textsuperscript{th}"));
+    }
+
+    @Test
+    public void unicodeNames() {
+        assertEquals("Øie, Gunvor", formatter.format("{\\O}ie, Gunvor"));
     }
 }

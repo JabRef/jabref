@@ -23,6 +23,9 @@ public class LatexToUnicodeFormatter extends Formatter implements LayoutFormatte
 
     @Override
     public String format(String inField) {
+        // Formatter is not able to handle round braces
+        inField = inField.replace("\\(", "$");
+        inField = inField.replace("\\)", "$");
         return LatexToUnicodeAdapter.format(inField);
     }
 

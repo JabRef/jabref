@@ -9,7 +9,6 @@ import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.StandardFileType;
@@ -79,7 +78,6 @@ public final class BstPreviewLayout implements PreviewLayout {
         result = result.replace("''", "\"");
         // Final cleanup
         result = new RemoveNewlinesFormatter().format(result);
-        result = new RemoveLatexCommandsFormatter().format(result);
         result = new RemoveTilde().format(result);
         result = result.trim().replaceAll("  +", " ");
         return result;
