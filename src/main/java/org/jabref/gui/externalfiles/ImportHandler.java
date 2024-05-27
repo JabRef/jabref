@@ -53,7 +53,6 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -134,7 +133,7 @@ public class ImportHandler {
 
                             if (!pdfEntriesInFile.isEmpty()) {
                                 for (BibEntry entry : pdfEntriesInFile) {
-                                    entry.setField(StandardField.FILE,relPath.toString());
+                                    entry.setField(StandardField.FILE, relPath.toString());
                                 }
                                 entriesToAdd.addAll(pdfEntriesInFile);
                                 addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
