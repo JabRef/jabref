@@ -387,9 +387,10 @@ public class URLDownload {
         }
 
         if (connection instanceof HttpURLConnection lConnection) {
-            // normally, 3xx is redirect
+            // this does network i/o: GET + read returned headers
             int status = lConnection.getResponseCode();
 
+            // normally, 3xx is redirect
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
                 || (status == HttpURLConnection.HTTP_MOVED_PERM)
                 || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
@@ -399,13 +400,14 @@ public class URLDownload {
                 connection = new URLDownload(newUrl).openConnection();
             }
             if ((status >= 400) && (status < 500)) {
-                throw new IOException(new FetcherClientException("Encountered HTTP Status code " + status));
+                LOGGER.info("HTTP {}, details: {}, {}", status, lConnection.getResponseMessage(), lConnection.getContentLength() > 0 ? lConnection.getContent() : "");
+                throw new IOException(new FetcherClientException("Encountered HTTP %s %s".formatted(status, lConnection.getResponseMessage())));
             }
             if (status >= 500) {
-                throw new IOException(new FetcherServerException("Encountered HTTP Status Code " + status));
+                LOGGER.info("HTTP {}, details: {}, {}", status, lConnection.getResponseMessage(), lConnection.getContentLength() > 0 ? lConnection.getContent() : "");
+                throw new IOException(new FetcherServerException("Encountered HTTP %s %s".formatted(status, lConnection.getResponseMessage())));
             }
         }
-        // this does network i/o: GET + read returned headers
         return connection;
     }
 
