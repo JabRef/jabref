@@ -57,9 +57,6 @@ public class AiChatTab extends EntryEditorTab {
 
     private BibEntry currentBibEntry = null;
 
-    // TODO: Proper embeddings.
-    private EmbeddingStore<TextSegment> embeddingStore = null;
-
     public AiChatTab(PreferencesService preferencesService, AiService aiService,
                      BibDatabaseContext bibDatabaseContext, TaskExecutor taskExecutor) {
         this.filePreferences = preferencesService.getFilePreferences();
@@ -117,12 +114,12 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void createAiChat() {
-        aiChat = new AiChat(aiService, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.getFiles()));
+        aiChat = new AiChat(aiService, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.getFiles().stream().map(LinkedFile::getLink).toList()));
         aiChat.setSystemMessage(QA_SYSTEM_MESSAGE);
     }
 
     private void ingestFiles(BibEntry entry) {
-        AiIngestor aiIngestor = new AiIngestor(embeddingStore, aiService.getEmbeddingModel());
+        AiIngestor aiIngestor = new AiIngestor(aiService.getEmbeddingStore(), aiService.getEmbeddingModel());
         entry.getFiles().forEach(file -> {
             aiIngestor.ingestLinkedFile(file, bibDatabaseContext, filePreferences);
         });

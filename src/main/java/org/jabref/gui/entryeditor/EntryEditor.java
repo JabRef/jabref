@@ -46,6 +46,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -87,6 +88,9 @@ public class EntryEditor extends BorderPane {
     private final EntryEditorPreferences entryEditorPreferences;
     private final ExternalFilesEntryLinker fileLinker;
     private final DirectoryMonitorManager directoryMonitorManager;
+
+    // TODO: Move this out.
+    private final AiService aiService;
 
     private Subscription typeSubscription;
 
@@ -131,6 +135,8 @@ public class EntryEditor extends BorderPane {
         ViewLoader.view(this)
                   .root(this)
                   .load();
+
+        this.aiService = new AiService(preferencesService.getAiPreferences());
 
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), databaseContext, dialogService);
@@ -315,7 +321,7 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(sourceTab);
         entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
         entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
-        entryEditorTabs.add(new AiChatTab(preferencesService, databaseContext, taskExecutor));
+        entryEditorTabs.add(new AiChatTab(preferencesService, aiService, databaseContext, taskExecutor));
 
         return entryEditorTabs;
     }

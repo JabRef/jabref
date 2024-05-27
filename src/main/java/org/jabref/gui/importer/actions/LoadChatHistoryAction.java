@@ -17,6 +17,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,10 @@ public class LoadChatHistoryAction implements GUIPostOpenAction {
         File chatFile = chatPath.toFile();
         try {
             InputStream inputStream = new FileInputStream(chatFile);
+
             ObjectMapper objectMapper = new ObjectMapper();
+            // Jackson JSON adds an unknown field "typeLabel".
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             AiChatsFile aiChatFile = objectMapper.readValue(inputStream, AiChatsFile.class);
             loadAiChatHistory(bibDatabase, aiChatFile);
         } catch (FileNotFoundException e) {

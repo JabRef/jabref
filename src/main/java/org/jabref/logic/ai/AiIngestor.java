@@ -53,7 +53,7 @@ public class AiIngestor {
     public void ingestLinkedFile(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
         if (path.isPresent()) {
-            ingestFile(path.get(), new Metadata().add("linkedFile", linkedFile));
+            ingestFile(path.get(), new Metadata().add("linkedFile", linkedFile.getLink()));
         } else {
             LOGGER.error("Could not find path for a linked file: " + linkedFile.getLink());
         }

@@ -32,6 +32,10 @@ public class AiService {
     private final EventBus eventBus = new EventBus();
 
     public AiService(AiPreferences aiPreferences) {
+        if (aiPreferences.getEnableChatWithFiles() && !aiPreferences.getOpenAiToken().isEmpty()) {
+            setOpenAiToken(aiPreferences.getOpenAiToken());
+        }
+
         EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (property, oldValue, newValue) -> {
             if (newValue) {
                 if (!aiPreferences.getOpenAiToken().isEmpty()) {
