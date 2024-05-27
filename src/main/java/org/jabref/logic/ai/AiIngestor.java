@@ -55,7 +55,7 @@ public class AiIngestor {
         if (path.isPresent()) {
             ingestFile(path.get(), new Metadata().add("linkedFile", linkedFile.getLink()));
         } else {
-            LOGGER.error("Could not find path for a linked file: " + linkedFile.getLink());
+            LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
         }
     }
 
@@ -63,7 +63,7 @@ public class AiIngestor {
         if (FileUtil.isPDFFile(path)) {
             ingestPDFFile(path, metadata);
         } else {
-            LOGGER.info("Usupported file type of file: " + path + ". For now, only PDF files are supported");
+            LOGGER.info("Unsupported file type of file: {}. For now, only PDF files are supported", path);
         }
     }
 
@@ -80,7 +80,7 @@ public class AiIngestor {
 
             ingestString(writer.toString(), metadata);
         } catch (Exception e) {
-            LOGGER.error("An error occurred while reading a PDF file: " + path, e);
+            LOGGER.error("An error occurred while reading a PDF file: {}", path, e);
         }
     }
 
