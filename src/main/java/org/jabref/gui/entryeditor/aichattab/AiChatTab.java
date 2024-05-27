@@ -15,6 +15,8 @@ import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.AiIngestor;
 import org.jabref.logic.ai.ChatMessage;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -46,6 +48,7 @@ public class AiChatTab extends EntryEditorTab {
     private final FilePreferences filePreferences;
     private final AiPreferences aiPreferences;
     private final EntryEditorPreferences entryEditorPreferences;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
 
@@ -61,6 +64,7 @@ public class AiChatTab extends EntryEditorTab {
                      BibDatabaseContext bibDatabaseContext, TaskExecutor taskExecutor) {
         this.filePreferences = preferencesService.getFilePreferences();
         this.aiPreferences = preferencesService.getAiPreferences();
+        this.citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
 
         this.aiService = aiService;
@@ -82,10 +86,11 @@ public class AiChatTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (!aiPreferences.getEnableChatWithFiles()) {
             setContent(new Label(Localization.lang("JabRef uses OpenAI to enable \"chatting\" with PDF files. OpenAI is an external service. To enable JabRef chatgting with PDF files, the content of the PDF files need to be shared with OpenAI. As soon as you ask a question, the text content of all PDFs attached to the entry are send to OpenAI. The privacy policy of OpenAI applies. You find it at <https://openai.com/policies/privacy-policy/>.")));
-        } else if (entry.getCitationKey().isEmpty()) {
-            setContent(new Label(Localization.lang("Please provide a citation key for the entry in order to enable chatting with PDF files.")));
-        } else if (!checkIfCitationKeyIsUnique(bibDatabaseContext, entry.getCitationKey().get())) {
-            setContent(new Label(Localization.lang("Please provide a unique citation key for the entry in order to enable chatting with PDF files.")));
+        } else if (!checkIfCitationKeyIsAppropriate(bibDatabaseContext, entry)) {
+            CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
+            if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
+                setContent(new Label(Localization.lang("Citation key could not be generated. Please provide a non-empty and unique citation key for this entry")));
+            }
         } else if (entry.getFiles().isEmpty()) {
             setContent(new Label(Localization.lang("No files attached")));
         } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
@@ -93,6 +98,15 @@ public class AiChatTab extends EntryEditorTab {
         } else {
             bindToCorrectEntry(entry);
         }
+    }
+
+    private static boolean checkIfCitationKeyIsAppropriate(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
+        //noinspection OptionalGetWithoutIsPresent
+        return !checkIfCitationKeyIsEmpty(bibEntry) && checkIfCitationKeyIsUnique(bibDatabaseContext, bibEntry.getCitationKey().get());
+    }
+
+    private static boolean checkIfCitationKeyIsEmpty(BibEntry bibEntry) {
+        return bibEntry.getCitationKey().isEmpty() || bibEntry.getCitationKey().get().isEmpty();
     }
 
     private static boolean checkIfCitationKeyIsUnique(BibDatabaseContext bibDatabaseContext, String citationKey) {
