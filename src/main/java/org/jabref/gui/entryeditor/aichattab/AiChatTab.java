@@ -27,6 +27,8 @@ import org.jabref.preferences.PreferencesService;
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import dev.langchain4j.store.embedding.filter.Filter;
+import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +51,8 @@ public class AiChatTab extends EntryEditorTab {
 
     private AiChatComponent aiChatComponent = null;
 
-    private AiService aiService = null;
+    private final AiService aiService;
+
     private AiChat aiChat = null;
 
     private BibEntry currentBibEntry = null;
@@ -57,11 +60,13 @@ public class AiChatTab extends EntryEditorTab {
     // TODO: Proper embeddings.
     private EmbeddingStore<TextSegment> embeddingStore = null;
 
-    public AiChatTab(PreferencesService preferencesService,
+    public AiChatTab(PreferencesService preferencesService, AiService aiService,
                      BibDatabaseContext bibDatabaseContext, TaskExecutor taskExecutor) {
         this.filePreferences = preferencesService.getFilePreferences();
         this.aiPreferences = preferencesService.getAiPreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+
+        this.aiService = aiService;
 
         this.bibDatabaseContext = bibDatabaseContext;
 
@@ -69,40 +74,6 @@ public class AiChatTab extends EntryEditorTab {
 
         setText(Localization.lang(NAME));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
-
-        setUpAiConnection();
-    }
-
-    private void setUpAiConnection() {
-        if (aiPreferences.getEnableChatWithFiles()) {
-            aiService = new AiService(aiPreferences.getOpenAiToken());
-        }
-
-        EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> {
-            if (newValue && !aiPreferences.getOpenAiToken().isEmpty()) {
-                aiService = new AiService(aiPreferences.getOpenAiToken());
-                rebuildAiChat();
-            } else {
-                aiService = null;
-                aiChat = null;
-            }
-        });
-
-        EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> {
-            if (!newValue.isEmpty()) {
-                aiService = new AiService(newValue);
-                rebuildAiChat();
-            }
-        });
-    }
-
-    private void rebuildAiChat() {
-        if (aiChat != null) {
-            createAiChat();
-            if (currentBibEntry != null) {
-                aiChat.restoreMessages(currentBibEntry.getAiChatMessages());
-            }
-        }
     }
 
     @Override
@@ -146,8 +117,7 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void createAiChat() {
-        embeddingStore = new InMemoryEmbeddingStore<>();
-        aiChat = new AiChat(aiService, embeddingStore);
+        aiChat = new AiChat(aiService, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.getFiles()));
         aiChat.setSystemMessage(QA_SYSTEM_MESSAGE);
     }
 

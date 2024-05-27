@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.google.common.eventbus.Subscribe;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -11,9 +12,13 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import dev.langchain4j.store.embedding.filter.Filter;
+
+import org.jabref.logic.ai.events.ChatModelChangedEvent;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -28,20 +33,17 @@ public class AiChat {
     public static final int RAG_MAX_RESULTS = 10;
     public static final double RAG_MIN_SCORE = 0.5;
 
+    private final AiService aiService;
+    private final Filter filter;
+
     // The main class that executes user prompts. Maintains API calls and retrieval augmented generation (RAG).
-    private final ConversationalRetrievalChain chain;
+    private ConversationalRetrievalChain chain;
 
     private final ChatMemory chatMemory;
 
-    public AiChat(AiService aiService, EmbeddingStore<TextSegment> embeddingStore) {
-        // This class is basically an "algorithm class" for retrieving the relevant contents of documents.
-        ContentRetriever contentRetriever = EmbeddingStoreContentRetriever
-                .builder()
-                .embeddingStore(embeddingStore)
-                .embeddingModel(aiService.getEmbeddingModel())
-                .maxResults(RAG_MAX_RESULTS)
-                .minScore(RAG_MIN_SCORE)
-                .build();
+    public AiChat(AiService aiService, Filter filter) {
+        this.aiService = aiService;
+        this.filter = filter;
 
         // This class is also an "algorithm class" that maintains the chat history.
         // An algorithm for managing chat history is needed because you cannot stuff the whole history for the AI:
@@ -51,12 +53,42 @@ public class AiChat {
                 .maxMessages(MESSAGE_WINDOW_SIZE) // This was the default value in the original implementation.
                 .build();
 
+        // When the user turns off the AI features all AiChat classes should be destroyed.
+        // So this assert should never fail.
+        assert aiService.getChatModel() != null;
+
         this.chain = ConversationalRetrievalChain
                 .builder()
                 .chatLanguageModel(aiService.getChatModel())
-                .contentRetriever(contentRetriever)
+                .contentRetriever(makeContentRetriever())
                 .chatMemory(chatMemory)
                 .build();
+
+        aiService.registerListener(this);
+    }
+
+    private ContentRetriever makeContentRetriever() {
+        // This class is basically an "algorithm class" for retrieving the relevant contents of documents.
+        return EmbeddingStoreContentRetriever
+                .builder()
+                .embeddingStore(aiService.getEmbeddingStore())
+                .filter(filter)
+                .embeddingModel(aiService.getEmbeddingModel())
+                .maxResults(RAG_MAX_RESULTS)
+                .minScore(RAG_MIN_SCORE)
+                .build();
+    }
+
+    @Subscribe
+    public void listen(ChatModelChangedEvent event) {
+        if (event.getChatModel() != null) {
+            this.chain = ConversationalRetrievalChain
+                    .builder()
+                    .chatLanguageModel(event.getChatModel())
+                    .contentRetriever(makeContentRetriever())
+                    .chatMemory(chatMemory)
+                    .build();
+        }
     }
 
     public void setSystemMessage(String message) {

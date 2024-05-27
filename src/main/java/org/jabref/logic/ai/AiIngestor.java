@@ -12,11 +12,13 @@ import org.jabref.preferences.FilePreferences;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
+import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
+import org.apache.lucene.util.packed.DirectMonotonicReader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
@@ -49,27 +51,23 @@ public class AiIngestor {
     }
 
     public void ingestLinkedFile(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
-        // TODO: Ingest not only the contents of documents, but also their metadata.
-        // This will help the AI to identify a document while performing a QA session over several bib entries.
-        // Useful link: https://docs.langchain4j.dev/tutorials/rag/#metadata.
-
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
         if (path.isPresent()) {
-            ingestFile(path.get());
+            ingestFile(path.get(), new Metadata().add("linkedFile", linkedFile));
         } else {
             LOGGER.error("Could not find path for a linked file: " + linkedFile.getLink());
         }
     }
 
-    public void ingestFile(Path path) {
+    public void ingestFile(Path path, Metadata metadata) {
         if (FileUtil.isPDFFile(path)) {
-            ingestPDFFile(path);
+            ingestPDFFile(path, metadata);
         } else {
             LOGGER.info("Usupported file type of file: " + path + ". For now, only PDF files are supported");
         }
     }
 
-    public void ingestPDFFile(Path path) {
+    public void ingestPDFFile(Path path, Metadata metadata) {
         try {
             PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(path);
             PDFTextStripper stripper = new PDFTextStripper();
@@ -80,14 +78,14 @@ public class AiIngestor {
             StringWriter writer = new StringWriter();
             stripper.writeText(document, writer);
 
-            ingestString(writer.toString());
+            ingestString(writer.toString(), metadata);
         } catch (Exception e) {
             LOGGER.error("An error occurred while reading a PDF file: " + path, e);
         }
     }
 
-    public void ingestString(String string) {
-        ingestDocument(new Document(string));
+    public void ingestString(String string, Metadata metadata) {
+        ingestDocument(new Document(string, metadata));
     }
 
     public void ingestDocument(Document document) {

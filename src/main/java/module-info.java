@@ -154,5 +154,4 @@ open module org.jabref {
     requires de.saxsys.mvvmfx.validation;
     requires dd.plist;
     requires mslinks;
-    requires jakarta.validation;
 }
