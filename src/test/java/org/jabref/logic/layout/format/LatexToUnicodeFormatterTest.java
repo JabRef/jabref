@@ -11,239 +11,63 @@ class LatexToUnicodeFormatterTest {
 
     final LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
 
-    @Test
-    void plainFormat() {
-        assertEquals("aaa", formatter.format("aaa"));
-    }
-
-    @Test
-    void formatUmlaut() {
-        assertEquals("ä", formatter.format("{\\\"{a}}"));
-        assertEquals("Ä", formatter.format("{\\\"{A}}"));
-    }
-
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0}")
     @CsvSource({
-            "ı, \\i",
-            "ı, {\\i}"
+            "plainFormat, aaa, aaa",
+            "formatUmlautLi, ä, {\\\"{a}}",
+            "formatUmlautCa, Ä, {\\\"{A}}",
+            "formatUmlautLi, ı, \\i",
+            "formatUmlautCi, ı, {\\i}",
+            "preserveUnknownCommand, '\\mbox{-}', '\\mbox{-}'",
+            "formatTextit, \uD835\uDC61\uD835\uDC52\uD835\uDC65\uD835\uDC61, \\textit{text}",
+            "escapedDollarSign, $, \\$",
+            "equationsSingleSymbol, σ, $\\sigma$",
+            "curlyBracesAreRemoved, test, {test}",
+            "curlyBracesAreRemovedInLongerText, a longer test there, a longer {test} there",
+            "equationsMoreComplicatedFormatting, A 32 mA ΣΔ-modulator, A 32~{mA} {$\\Sigma\\Delta$}-modulator",
+            "equationsMoreComplicatedFormattingSigmaDeltaBraceVariant, ΣΔ, {\\(\\Sigma\\)}{\\(\\Delta\\)}",
+            "equationsMoreComplicatedFormattingSigmaDeltaDollarVariant, ΣΔ, {{$\\Sigma$}}{{$\\Delta$}}",
+            "longTitle, Linear programming design of semi-digital FIR filter and ΣΔ modulator for VDSL2 transmitter, Linear programming design of semi-digital {FIR} filter and {\\(\\Sigma\\)}{\\(\\Delta\\)} modulator for {VDSL2} transmitter",
+            "longConference, 'IEEE International Symposium on Circuits and Systems, ISCAS 2014, Melbourne, Victoria, Australia, June 1-5, 2014', '{IEEE} International Symposium on Circuits and Systems, {ISCAS} 2014, Melbourne, Victoria, Australia, June 1-5, 2014'",
+            "longLatexedConferenceKeepsLatexCommands, 'in \\emph{{IEEE} International Symposium on Circuits and Systems, {ISCAS} 2014, Melbourne, Victoria, Australia, June 1-5, 2014.}', 'in \\emph{{IEEE} International Symposium on Circuits and Systems, {ISCAS} 2014, Melbourne, Victoria, Australia, June 1-5, 2014.}'",
+            "formatExample, Mönch, Mönch",
+            "chi, χ, $\\chi$",
+            "sWithCaron, Š, {\\v{S}}",
+            "iWithDiaresis, ï, \\\"{i}",
+            "iWithDiaresisAndEscapedI, ı̈, \\\"{\\i}",
+            "iWithDiaresisAndUnnecessaryBraces, ï, {\\\"{i}}",
+            "upperCaseIWithDiaresis, Ï, \\\"{I}",
+            "polishName, Łęski, \\L\\k{e}ski",
+            "doubleCombiningAccents, ώ, $\\acute{\\omega}$",
+            "combiningAccentsCase1, ḩ, {\\c{h}}",
+            "keepUnknownCommandWithoutArgument, \\aaaa, \\aaaa",
+            "keepUnknownCommandWithArgument, \\aaaa{bbbb}, \\aaaa{bbbb}",
+            "keepUnknownCommandWithEmptyArgument, \\aaaa{}, \\aaaa{}",
+            "tildeN, Montaña, Monta\\~{n}a",
+            "acuteNLongVersion, Maliński, Mali\\'{n}ski",
+            "acuteNLongVersion, MaliŃski, Mali\\'{N}ski",
+            "acuteNShortVersion, Maliński, Mali\\'nski",
+            "acuteNShortVersion, MaliŃski, Mali\\'Nski",
+            "apostrophN, Mali'nski, Mali'nski",
+            "apostrophN, Mali'Nski, Mali'Nski",
+            "apostrophO, L'oscillation, L'oscillation",
+            "apostrophC, O'Connor, O'Connor",
+            "preservationOfSingleUnderscore, Lorem ipsum_lorem ipsum, Lorem ipsum_lorem ipsum",
+            "conversionOfUnderscoreWithBraces, Lorem ipsum_(lorem ipsum), Lorem ipsum_{lorem ipsum}",
+            "conversionOfOrdinal1st, 1ˢᵗ, 1\\textsuperscript{st}",
+            "conversionOfOrdinal2nd, 2ⁿᵈ, 2\\textsuperscript{nd}",
+            "conversionOfOrdinal3rd, 3ʳᵈ, 3\\textsuperscript{rd}",
+            "conversionOfOrdinal4th, 4ᵗʰ, 4\\textsuperscript{th}",
+            "conversionOfOrdinal9th, 9ᵗʰ, 9\\textsuperscript{th}",
+            "unicodeNames, 'Øie, Gunvor', '{\\O}ie, Gunvor'"
     })
-    void smallIwithoutDot(String expected, String input) {
+    void formatterTest(String name, String expected, String input) {
         assertEquals(expected, formatter.format(input));
-    }
-
-    @Test
-    void preserveUnknownCommand() {
-        assertEquals("\\mbox{-}", formatter.format("\\mbox{-}"));
-    }
-
-    @Test
-    void formatTextit() {
-        // See #1464
-        assertEquals("\uD835\uDC61\uD835\uDC52\uD835\uDC65\uD835\uDC61", formatter.format("\\textit{text}"));
-    }
-
-    @Test
-    void escapedDollarSign() {
-        assertEquals("$", formatter.format("\\$"));
-    }
-
-    @Test
-    void equationsSingleSymbol() {
-        assertEquals("σ", formatter.format("$\\sigma$"));
-    }
-
-    @Test
-    void curlyBracesAreRemoved() {
-        assertEquals("test", formatter.format("{test}"));
-    }
-
-    @Test
-    void curlyBracesAreRemovedInLongerText() {
-        assertEquals("a longer test there", formatter.format("a longer {test} there"));
-    }
-
-    @Test
-    void equationsMoreComplicatedFormatting() {
-        assertEquals("A 32 mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
-    }
-
-    @Test
-    void equationsMoreComplicatedFormattingSigmaDeltaBraceVariant() {
-        assertEquals("ΣΔ", formatter.format("{\\(\\Sigma\\)}{\\(\\Delta\\)}"));
-    }
-
-    @Test
-    void equationsMoreComplicatedFormattingSigmaDeltaDollarVariant() {
-        assertEquals("ΣΔ", formatter.format("{{$\\Sigma$}}{{$\\Delta$}}"));
-    }
-
-    @Test
-    void longTitle() {
-        assertEquals("Linear programming design of semi-digital FIR filter and ΣΔ modulator for VDSL2 transmitter", formatter.format("Linear programming design of semi-digital {FIR} filter and {\\(\\Sigma\\)}{\\(\\Delta\\)} modulator for {VDSL2} transmitter"));
-    }
-
-    @Test
-    void longConference() {
-        assertEquals("IEEE International Symposium on Circuits and Systems, ISCAS 2014, Melbourne, Victoria, Australia, June 1-5, 2014", formatter.format("{IEEE} International Symposium on Circuits and Systems, {ISCAS} 2014, Melbourne, Victoria, Australia, June 1-5, 2014"));
-    }
-
-    @Test
-    void longLatexedConferenceKeepsLatexCommands() {
-        assertEquals("in \\emph{{IEEE} International Symposium on Circuits and Systems, {ISCAS} 2014, Melbourne, Victoria, Australia, June 1-5, 2014.}", formatter.format("in \\emph{{IEEE} International Symposium on Circuits and Systems, {ISCAS} 2014, Melbourne, Victoria, Australia, June 1-5, 2014.}"));
-    }
-
-    @Test
-    void formatExample() {
-        assertEquals("Mönch", formatter.format(formatter.getExampleInput()));
-    }
-
-    @Test
-    void chi() {
-        // See #1464
-        assertEquals("χ", formatter.format("$\\chi$"));
-    }
-
-    @Test
-    void sWithCaron() {
-        // Bug #1264
-        assertEquals("Š", formatter.format("{\\v{S}}"));
-    }
-
-    @Test
-    void iWithDiaresis() {
-        assertEquals("ï", formatter.format("\\\"{i}"));
-    }
-
-    @Test
-    void iWithDiaresisAndEscapedI() {
-        // this might look strange in the test, but is actually a correct translation and renders identically to the above example in the UI
-        assertEquals("ı̈", formatter.format("\\\"{\\i}"));
-    }
-
-    @Test
-    void iWithDiaresisAndUnnecessaryBraces() {
-        assertEquals("ï", formatter.format("{\\\"{i}}"));
-    }
-
-    @Test
-    void upperCaseIWithDiaresis() {
-        assertEquals("Ï", formatter.format("\\\"{I}"));
-    }
-
-    @Test
-    void polishName() {
-        assertEquals("Łęski", formatter.format("\\L\\k{e}ski"));
-    }
-
-    @Test
-    void doubleCombiningAccents() {
-        assertEquals("ώ", formatter.format("$\\acute{\\omega}$"));
-    }
-
-    @Test
-    void combiningAccentsCase1() {
-        assertEquals("ḩ", formatter.format("{\\c{h}}"));
     }
 
     @Disabled("This is not a standard LaTeX command. It is debatable why we should convert this.")
     @Test
     void combiningAccentsCase2() {
         assertEquals("a͍", formatter.format("\\spreadlips{a}"));
-    }
-
-    @Test
-    void keepUnknownCommandWithoutArgument() {
-        assertEquals("\\aaaa", formatter.format("\\aaaa"));
-    }
-
-    @Test
-    void keepUnknownCommandWithArgument() {
-        assertEquals("\\aaaa{bbbb}", formatter.format("\\aaaa{bbbb}"));
-    }
-
-    @Test
-    void keepUnknownCommandWithEmptyArgument() {
-        assertEquals("\\aaaa{}", formatter.format("\\aaaa{}"));
-    }
-
-    @Test
-    void tildeN() {
-        assertEquals("Montaña", formatter.format("Monta\\~{n}a"));
-    }
-
-    @Test
-    void acuteNLongVersion() {
-        assertEquals("Maliński", formatter.format("Mali\\'{n}ski"));
-        assertEquals("MaliŃski", formatter.format("Mali\\'{N}ski"));
-    }
-
-    @Test
-    void acuteNShortVersion() {
-        assertEquals("Maliński", formatter.format("Mali\\'nski"));
-        assertEquals("MaliŃski", formatter.format("Mali\\'Nski"));
-    }
-
-    @Test
-    void apostrophN() {
-        assertEquals("Mali'nski", formatter.format("Mali'nski"));
-        assertEquals("Mali'Nski", formatter.format("Mali'Nski"));
-    }
-
-    @Test
-    void apostrophO() {
-        assertEquals("L'oscillation", formatter.format("L'oscillation"));
-    }
-
-    @Test
-    void apostrophC() {
-        assertEquals("O'Connor", formatter.format("O'Connor"));
-    }
-
-    @Test
-    void preservationOfSingleUnderscore() {
-        assertEquals("Lorem ipsum_lorem ipsum", formatter.format("Lorem ipsum_lorem ipsum"));
-    }
-
-    @Test
-    void conversionOfUnderscoreWithBraces() {
-        assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
-    }
-
-    /**
-     * <a href="https://github.com/JabRef/jabref/issues/5547">Issue 5547</a>
-     */
-    @Test
-    void twoDifferentMacrons() {
-        assertEquals("Puṇya-pattana-vidyā-pı̄ṭhādhi-kṛtaiḥ prā-kaśyaṃ nı̄taḥ", formatter.format("Pu{\\d{n}}ya-pattana-vidy{\\={a}}-p{\\={\\i}}{\\d{t}}h{\\={a}}dhi-k{\\d{r}}tai{\\d{h}} pr{\\={a}}-ka{{\\'{s}}}ya{\\d{m}} n{\\={\\i}}ta{\\d{h}}"));
-    }
-
-    @Test
-    void conversionOfOrdinal1st() {
-        assertEquals("1ˢᵗ", formatter.format("1\\textsuperscript{st}"));
-    }
-
-    @Test
-    void conversionOfOrdinal2nd() {
-        assertEquals("2ⁿᵈ", formatter.format("2\\textsuperscript{nd}"));
-    }
-
-    @Test
-    void conversionOfOrdinal3rd() {
-        assertEquals("3ʳᵈ", formatter.format("3\\textsuperscript{rd}"));
-    }
-
-    @Test
-    void conversionOfOrdinal4th() {
-        assertEquals("4ᵗʰ", formatter.format("4\\textsuperscript{th}"));
-    }
-
-    @Test
-    void conversionOfOrdinal9th() {
-        assertEquals("9ᵗʰ", formatter.format("9\\textsuperscript{th}"));
-    }
-
-    @Test
-    public void unicodeNames() {
-        assertEquals("Øie, Gunvor", formatter.format("{\\O}ie, Gunvor"));
     }
 }
