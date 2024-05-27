@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -39,20 +40,34 @@ public class AiChat {
     // The main class that executes user prompts. Maintains API calls and retrieval augmented generation (RAG).
     private ConversationalRetrievalChain chain;
 
-    private final ChatMemory chatMemory;
+    // This class is also an "algorithm class" that maintains the chat history.
+    // An algorithm for managing chat history is needed because you cannot stuff the whole history for the AI:
+    // there would be too many tokens. This class, for example, sends only the 10 last messages.
+    private final ChatMemory chatMemory = MessageWindowChatMemory
+            .builder()
+            .maxMessages(MESSAGE_WINDOW_SIZE) // This was the default value in the original implementation.
+            .build();
 
     public AiChat(AiService aiService, Filter filter) {
         this.aiService = aiService;
         this.filter = filter;
 
-        // This class is also an "algorithm class" that maintains the chat history.
-        // An algorithm for managing chat history is needed because you cannot stuff the whole history for the AI:
-        // there would be too many tokens. This class, for example, sends only the 10 last messages.
-        this.chatMemory = MessageWindowChatMemory
-                .builder()
-                .maxMessages(MESSAGE_WINDOW_SIZE) // This was the default value in the original implementation.
-                .build();
+        buildChain();
 
+        EasyBind.listen(aiService.chatModelProperty(), (obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                buildChain();
+            }
+        });
+
+        EasyBind.listen(aiService.embeddingModelProperty(), (obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                buildChain();
+            }
+        });
+    }
+
+    private void buildChain() {
         // When the user turns off the AI features all AiChat classes should be destroyed.
         // So this assert should never fail.
         assert aiService.getChatModel() != null;
@@ -63,8 +78,6 @@ public class AiChat {
                 .contentRetriever(makeContentRetriever())
                 .chatMemory(chatMemory)
                 .build();
-
-        aiService.registerListener(this);
     }
 
     private ContentRetriever makeContentRetriever() {
@@ -77,18 +90,6 @@ public class AiChat {
                 .maxResults(RAG_MAX_RESULTS)
                 .minScore(RAG_MIN_SCORE)
                 .build();
-    }
-
-    @Subscribe
-    public void listen(ChatModelChangedEvent event) {
-        if (event.getChatModel() != null) {
-            this.chain = ConversationalRetrievalChain
-                    .builder()
-                    .chatLanguageModel(event.getChatModel())
-                    .contentRetriever(makeContentRetriever())
-                    .chatMemory(chatMemory)
-                    .build();
-        }
     }
 
     public void setSystemMessage(String message) {
