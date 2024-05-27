@@ -22,8 +22,6 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
     @FXML private final OptionEditorViewModel<T> viewModel;
     @FXML private ComboBox<T> comboBox;
 
-    @Inject private KeyBindingRepository keyBindingRepository;
-
     public OptionEditor(OptionEditorViewModel<T> viewModel) {
         ViewLoader.view(this)
                   .root(this)
@@ -39,7 +37,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
         comboBox.getEditor().setOnContextMenuRequested(event -> {
             ContextMenu contextMenu = new ContextMenu();
             contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(comboBox.getEditor()));
-            TextInputControlBehavior.showContextMenu(comboBox.getEditor(), contextMenu, event);
+            contextMenu.show(comboBox, event.getScreenX(), event.getScreenY());
         });
     }
 
