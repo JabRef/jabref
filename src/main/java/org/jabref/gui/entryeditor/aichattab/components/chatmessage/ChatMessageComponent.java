@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.l10n.Localization;
 
+import com.airhacks.afterburner.views.ViewLoader;
 
 public class ChatMessageComponent extends HBox {
     @FXML private VBox vBox;
@@ -23,12 +24,11 @@ public class ChatMessageComponent extends HBox {
     @FXML private TextArea contentTextArea;
 
     public ChatMessageComponent() {
-        /* Does not work:
         ViewLoader.view(this)
-                .root(this)
-                .load();
-         */
+                  .root(this)
+                  .load();
 
+        /*
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
                 "ChatMessageComponent.fxml"));
         fxmlLoader.setRoot(this);
@@ -38,15 +38,15 @@ public class ChatMessageComponent extends HBox {
             fxmlLoader.load();
         } catch (IOException exception) {
             throw new RuntimeException(exception);
+
         }
+         */
     }
 
     public ChatMessageComponent withChatMessage(ChatMessage chatMessage) {
         sourceLabel.setText(chatMessage.getTypeLabel());
         contentTextArea.setText(chatMessage.getContent());
 
-        // Unfortunately, alignment and node orientation parameters does not work here.
-        // Even a spacer.
         switch (chatMessage.getType()) {
             case USER:
                 vBox.setStyle("-fx-background-color: -jr-ai-message-user;");
