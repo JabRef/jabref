@@ -19,9 +19,6 @@ import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.filter.Filter;
 
-import org.jabref.logic.ai.events.ChatModelChangedEvent;
-import org.jabref.model.entry.BibEntry;
-
 /**
  * This class maintains an AI chat.
  * It depends on the {@link AiService}, which holds embedding and chat models.
