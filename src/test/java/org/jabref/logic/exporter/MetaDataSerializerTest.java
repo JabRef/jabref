@@ -148,26 +148,26 @@ public class MetaDataSerializerTest {
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE),
-                        "jabref-entrytype-v2: test: req[author;title] opt[]"
+                        "v2-jabref-entrytype: test: req[author;title] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(StandardField.AUTHOR)
                                 .withImportantFields(StandardField.TITLE),
-                        "jabref-entrytype-v2: test: req[author] opt[title]"
+                        "v2-jabref-entrytype: test: req[author] opt[title]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(UnknownField.fromDisplayName("Test1"), UnknownField.fromDisplayName("Test2")),
-                        "jabref-entrytype-v2: test: req[Test1;Test2] opt[]"
+                        "v2-jabref-entrytype: test: req[Test1;Test2] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(UnknownField.fromDisplayName("tEST"), UnknownField.fromDisplayName("tEsT2")),
-                        "jabref-entrytype-v2: test: req[tEST;tEsT2] opt[]"
+                        "v2-jabref-entrytype: test: req[tEST;tEsT2] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
@@ -177,19 +177,19 @@ public class MetaDataSerializerTest {
                                         new UnknownField("Googlescholar", FieldProperty.EXTERNAL),
                                         new UnknownField("Orcid", FieldProperty.EXTERNAL)
                                 ),
-                        "jabref-entrytype-v2: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]"
+                        "v2-jabref-entrytype: person: req[Name|PERSON_NAMES] opt[Googlescholar|EXTERNAL;Orcid|EXTERNAL]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(new UnknownField("custom1", "custom1", FieldProperty.MULTILINE_TEXT, FieldProperty.COMMENT, FieldProperty.EXTERNAL)),
-                        "jabref-entrytype-v2: test: req[custom1|EXTERNAL,MULTILINE_TEXT,COMMENT] opt[]"
+                        "v2-jabref-entrytype: test: req[custom1|EXTERNAL,MULTILINE_TEXT,COMMENT] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
                                 .withRequiredFields(new UnknownField("custom2", "custom2")),
-                        "jabref-entrytype-v2: test: req[custom2] opt[]"
+                        "v2-jabref-entrytype: test: req[custom2] opt[]"
                 )
         );
     }
