@@ -18,7 +18,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import kong.unirest.UnirestException;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -44,6 +43,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
+import kong.unirest.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
