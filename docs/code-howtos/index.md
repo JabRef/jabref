@@ -41,7 +41,7 @@ Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.
 
 `String path` Can be the files name or a relative path to it. The Preferences should only be directly accessed in the GUI. For the usage in logic pass them as parameter
 
-## Setting a Database Directory for a .bib File
+## Setting a Directory for a .bib File
 
 * `@comment{jabref-meta: fileDirectory:<directory>`
 * “fileDirectory” is determined by Globals.pref.get(“userFileDir”) (which defaults to “fileDirectory”
