@@ -3,7 +3,6 @@ package org.jabref.gui.linkedfile;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -147,7 +146,6 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     private String relativize(Path filePath) {
-        List<Path> fileDirectories = database.getFileDirectories(filePreferences);
-        return FileUtil.relativize(filePath, fileDirectories).toString();
+        return FileUtil.relativize(filePath, database, filePreferences).toString();
     }
 }
