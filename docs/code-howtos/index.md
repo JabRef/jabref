@@ -54,7 +54,7 @@ This is implemented in `FileUtil`:
 org.jabref.logic.util.io.FileUtil.relativize(java.nio.file.Path, org.jabref.model.database.BibDatabaseContext, org.jabref.preferences.FilePreferences)
 ```
 
-## Setting a Database Directory for a .bib File
+## Setting a Directory for a .bib File
 
 * `@comment{jabref-meta: fileDirectory:<directory>`
 * “fileDirectory” is determined by Globals.pref.get(“userFileDir”) (which defaults to “fileDirectory”
