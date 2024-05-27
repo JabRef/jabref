@@ -163,7 +163,7 @@ public class URLDownload {
         String contentType;
         // Try to use HEAD request to avoid downloading the whole file
         try {
-            contentType = Unirest.head(source.toString()).asString().getHeaders().get("Content-Type").get(0);
+            contentType = Unirest.head(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
             if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }
@@ -173,7 +173,7 @@ public class URLDownload {
 
         // Use GET request as alternative if no HEAD request is available
         try {
-            contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").get(0);
+            contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
             if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }

@@ -90,7 +90,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         tagLabel.getGraphic().setOnMouseClicked(event -> entryLinkField.removeTags(entryLink));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         tagLabel.setOnMouseClicked(event -> {
-            if ((event.getClickCount() == 2 || event.isControlDown()) && event.getButton().equals(MouseButton.PRIMARY)) {
+            if ((event.getClickCount() == 2 || event.isControlDown()) && event.getButton() == MouseButton.PRIMARY) {
                 viewModel.jumpToEntry(entryLink);
             }
         });

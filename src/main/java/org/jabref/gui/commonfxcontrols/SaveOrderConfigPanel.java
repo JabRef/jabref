@@ -55,7 +55,7 @@ public class SaveOrderConfigPanel extends VBox {
             while (change.next()) {
                 if (change.wasReplaced()) {
                         clearCriterionRow(change.getFrom());
-                        createCriterionRow(change.getAddedSubList().get(0), change.getFrom());
+                        createCriterionRow(change.getAddedSubList().getFirst(), change.getFrom());
                 } else if (change.wasAdded()) {
                     for (SortCriterionViewModel criterionViewModel : change.getAddedSubList()) {
                         int row = change.getFrom() + change.getAddedSubList().indexOf(criterionViewModel);

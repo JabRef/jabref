@@ -108,9 +108,9 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
             JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
             JSONObject queryParamsObject = urlMetadata.getJSONObject("queryParams");
             String queryParameters = queryParamsObject.keySet().stream()
-                                                      .map(key -> String.format("%s=%s", key, queryParamsObject.getString(key)))
+                                                      .map(key -> "%s=%s".formatted(key, queryParamsObject.getString(key)))
                                                       .collect(Collectors.joining("&"));
-            fullLinkToPdf = String.format("https://www.sciencedirect.com/%s/%s%s?%s",
+            fullLinkToPdf = "https://www.sciencedirect.com/%s/%s%s?%s".formatted(
                     urlMetadata.getString("path"),
                     urlMetadata.getString("pii"),
                     urlMetadata.getString("pdfExtension"),
@@ -150,7 +150,7 @@ public class ScienceDirect implements FulltextFetcher, CustomizableKeyFetcher {
 
             for (int i = 0; i < links.length(); i++) {
                 JSONObject link = links.getJSONObject(i);
-                if (link.getString("@rel").equals("scidir")) {
+                if ("scidir".equals(link.getString("@rel"))) {
                     sciLink = link.getString("@href");
                 }
             }

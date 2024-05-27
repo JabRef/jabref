@@ -294,7 +294,7 @@ public class SourceTab extends EntryEditorTab {
             }
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
-            BibEntry newEntry = database.getEntries().get(0);
+            BibEntry newEntry = database.getEntries().getFirst();
             String newKey = newEntry.getCitationKey().orElse(null);
 
             if (newKey != null) {

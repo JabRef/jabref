@@ -85,10 +85,10 @@ public class PushToApplicationCommand extends SimpleCommand {
         this.application = Objects.requireNonNull(application);
 
         reconfigurableControls.forEach(object -> {
-            if (object instanceof MenuItem) {
-                factory.configureMenuItem(application.getAction(), this, (MenuItem) object);
-            } else if (object instanceof ButtonBase) {
-                factory.configureIconButton(application.getAction(), this, (ButtonBase) object);
+            if (object instanceof MenuItem item) {
+                factory.configureMenuItem(application.getAction(), this, item);
+            } else if (object instanceof ButtonBase base) {
+                factory.configureIconButton(application.getAction(), this, base);
             }
         });
     }
