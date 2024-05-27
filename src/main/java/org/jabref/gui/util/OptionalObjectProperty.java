@@ -35,7 +35,7 @@ public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>>
     }
 
     public BooleanExpression isPresent() {
-        return BooleanExpression.booleanExpression(new PreboundBinding<Boolean>(this) {
+        return BooleanExpression.booleanExpression(new PreboundBinding<>(this) {
             @Override
             protected Boolean computeValue() {
                 return OptionalObjectProperty.this.getValue().isPresent();

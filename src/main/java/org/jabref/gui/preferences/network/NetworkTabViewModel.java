@@ -146,11 +146,11 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             sslCertificatesChanged.set(true);
             while (c.next()) {
                 if (c.wasAdded()) {
-                    CustomCertificateViewModel certificate = c.getAddedSubList().get(0);
+                    CustomCertificateViewModel certificate = c.getAddedSubList().getFirst();
                     certificate.getPath().ifPresent(path -> trustStoreManager
                             .addCertificate(formatCustomAlias(certificate.getThumbprint()), Path.of(path)));
                 } else if (c.wasRemoved()) {
-                    CustomCertificateViewModel certificate = c.getRemoved().get(0);
+                    CustomCertificateViewModel certificate = c.getRemoved().getFirst();
                     trustStoreManager.deleteCertificate(formatCustomAlias(certificate.getThumbprint()));
                 }
             }

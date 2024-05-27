@@ -18,6 +18,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import kong.unirest.UnirestException;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -222,7 +223,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     private boolean checkSSLHandshake(URLDownload urlDownload) {
         try {
             urlDownload.canBeReached();
-        } catch (kong.unirest.UnirestException ex) {
+        } catch (UnirestException ex) {
             if (ex.getCause() instanceof SSLHandshakeException) {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",

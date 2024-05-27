@@ -90,7 +90,7 @@ public class FileNodeViewModel {
 
     @Override
     public String toString() {
-        return String.format("FileNodeViewModel{path=%s, children=%s, fileCount=%s}",
+        return "FileNodeViewModel{path=%s, children=%s, fileCount=%s}".formatted(
                 this.path,
                 this.children,
                 this.fileCount);

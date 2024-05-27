@@ -78,11 +78,11 @@ public final class TextExtractor {
     }
 
     private float toFloat(Object cosNumber) {
-        if (cosNumber instanceof COSFloat) {
-            return ((COSFloat) cosNumber).floatValue();
+        if (cosNumber instanceof COSFloat float1) {
+            return float1.floatValue();
         }
-        if (cosNumber instanceof COSInteger) {
-            return ((COSInteger) cosNumber).floatValue();
+        if (cosNumber instanceof COSInteger integer) {
+            return integer.floatValue();
         }
         throw new IllegalArgumentException("The number type of the annotation is not supported!");
     }

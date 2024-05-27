@@ -463,7 +463,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 if (parserResult.isInvalid() || parserResult.isEmpty() || !parserResult.getDatabase().hasEntries()) {
                     return null;
                 }
-                return parserResult.getDatabase().getEntries().get(0);
+                return parserResult.getDatabase().getEntries().getFirst();
             } catch (IOException e) {
                 return null;
             }

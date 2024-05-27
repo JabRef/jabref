@@ -58,7 +58,7 @@ public class CustomExporterTabViewModel implements PreferenceTabViewModel {
             return;
         }
 
-        ExporterViewModel exporterToModify = selectedExporters.get(0);
+        ExporterViewModel exporterToModify = selectedExporters.getFirst();
         CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(exporterToModify);
         Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
         if ((exporter != null) && exporter.isPresent()) {

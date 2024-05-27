@@ -26,11 +26,12 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.strings.StringUtil;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BibEntryWriter {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(BibEntryWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryWriter.class);
 
     private final BibEntryTypesManager entryTypesManager;
     private final FieldWriter fieldWriter;
