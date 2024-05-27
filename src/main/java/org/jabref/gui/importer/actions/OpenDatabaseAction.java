@@ -27,6 +27,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -59,6 +60,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;
+    private final AiService aiService;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
@@ -68,6 +70,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
                               PreferencesService preferencesService,
+                              AiService aiService,
                               DialogService dialogService,
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
@@ -76,6 +79,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.preferencesService = preferencesService;
+        this.aiService = aiService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -198,6 +202,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 file,
                 dialogService,
                 preferencesService,
+                aiService,
                 stateManager,
                 tabContainer,
                 fileUpdateMonitor,
@@ -249,6 +254,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                  tabContainer,
                                  dialogService,
                                  preferencesService,
+                                 aiService,
                                  stateManager,
                                  entryTypesManager,
                                  fileUpdateMonitor,
@@ -269,6 +275,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           LibraryTabContainer tabContainer,
                                           DialogService dialogService,
                                           PreferencesService preferencesService,
+                                          AiService aiService,
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
@@ -280,6 +287,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                     tabContainer,
                     dialogService,
                     preferencesService,
+                    aiService,
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
