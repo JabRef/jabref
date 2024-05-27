@@ -9,12 +9,13 @@ import java.util.function.Supplier;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
-public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable, ContextMenuAddable {
+public class EditorTextArea extends TextArea implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
     /**

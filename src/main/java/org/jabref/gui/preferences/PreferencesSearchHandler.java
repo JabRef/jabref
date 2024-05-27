@@ -76,8 +76,7 @@ class PreferencesSearchHandler {
         ArrayListMultimap<PreferencesTab, Labeled> prefsTabLabelMap = ArrayListMultimap.create();
         for (PreferencesTab preferencesTab : preferenceTabs) {
             Node builder = preferencesTab.getBuilder();
-            if (builder instanceof Parent) {
-                Parent parentBuilder = (Parent) builder;
+            if (builder instanceof Parent parentBuilder) {
                 scanLabeledControls(parentBuilder, prefsTabLabelMap, preferencesTab);
             }
         }

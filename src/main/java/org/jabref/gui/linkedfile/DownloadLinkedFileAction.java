@@ -43,6 +43,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
+import kong.unirest.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -222,7 +223,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
     private boolean checkSSLHandshake(URLDownload urlDownload) {
         try {
             urlDownload.canBeReached();
-        } catch (kong.unirest.UnirestException ex) {
+        } catch (UnirestException ex) {
             if (ex.getCause() instanceof SSLHandshakeException) {
                 if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
                         Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
