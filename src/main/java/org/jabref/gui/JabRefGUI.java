@@ -19,6 +19,7 @@ import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.util.WebViewStore;
@@ -40,6 +41,7 @@ public class JabRefGUI extends Application {
 
     private static List<UiCommand> uiCommands;
     private static JabRefPreferences preferencesService;
+    private static AiService aiService;
     private static FileUpdateMonitor fileUpdateMonitor;
     private static JabRefFrame mainFrame;
     private static DialogService dialogService;
@@ -50,9 +52,11 @@ public class JabRefGUI extends Application {
 
     public static void setup(List<UiCommand> uiCommands,
                              JabRefPreferences preferencesService,
+                             AiService aiService,
                              FileUpdateMonitor fileUpdateMonitor) {
         JabRefGUI.uiCommands = uiCommands;
         JabRefGUI.preferencesService = preferencesService;
+        JabRefGUI.aiService = aiService;
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
     }
 
@@ -75,6 +79,7 @@ public class JabRefGUI extends Application {
                 dialogService,
                 fileUpdateMonitor,
                 preferencesService,
+                aiService,
                 Globals.stateManager,
                 Globals.undoManager,
                 Globals.entryTypesManager,

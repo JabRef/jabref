@@ -46,6 +46,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -113,6 +114,7 @@ public class EntryEditor extends BorderPane {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
+    @Inject private AiService aiService;
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
@@ -315,7 +317,7 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(sourceTab);
         entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
         entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
-        entryEditorTabs.add(new AiChatTab(preferencesService, databaseContext, taskExecutor));
+        entryEditorTabs.add(new AiChatTab(preferencesService, aiService, databaseContext, taskExecutor));
 
         return entryEditorTabs;
     }

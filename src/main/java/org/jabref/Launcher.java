@@ -16,6 +16,7 @@ import org.jabref.cli.JabRefCLI;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
@@ -70,6 +71,9 @@ public class Launcher {
             // Initialize preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
 
+            // Initialize AI service.
+            final AiService aiService = new AiService(preferences.getAiPreferences());
+
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
                 return;
@@ -103,7 +107,7 @@ public class Launcher {
                 }
 
                 List<UiCommand> uiCommands = new ArrayList<>(argumentProcessor.getUiCommands());
-                JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);
+                JabRefGUI.setup(uiCommands, preferences, aiService, fileUpdateMonitor);
                 JabRefGUI.launch(JabRefGUI.class, args);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
