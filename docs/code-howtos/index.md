@@ -23,9 +23,7 @@ JabRef uses a [fork](https://github.com/JabRef/afterburner.fx) of the [afterburn
 
 The main idea is to get instances by using `Injector.instantiateModelOrService(X.class)`, where `X` is the instance one needs.
 The method `instantiateModelOrService` checks if there is already an instance of the given class. If yes, it returns it. If not, it creates a new one.
-
-In case a class needs parameters in the constructor, one needs to modify `org.jabref.gui.DefaultInjector#createDependency` to call the constructor with the appropriate parameters.
-In case this way is not applicable, one can use `com.airhacks.afterburner.injection.Injector#registerExistingAndInject(T)` to register an existing instance with the injector.
+A singleton can be added by `com.airhacks.afterburner.injection.Injector#setModelOrService(X.class, y)`, where X is the class and y the instance you want to inject.
 
 ## Cleanup and Formatters
 
