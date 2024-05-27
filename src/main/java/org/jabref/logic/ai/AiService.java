@@ -1,15 +1,10 @@
 package org.jabref.logic.ai;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import org.jabref.logic.ai.events.ChatModelChangedEvent;
 import org.jabref.preferences.AiPreferences;
 
-import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -18,7 +13,6 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
-import org.checkerframework.checker.units.qual.A;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -28,7 +22,7 @@ import org.jspecify.annotations.Nullable;
  * An outer class is responsible for synchronizing objects of this class with {@link org.jabref.preferences.AiPreferences} changes.
  */
 public class AiService {
-    private final ObjectProperty<@Nullable ChatLanguageModel> chatModelProperty = new SimpleObjectProperty<>(null); // <p>
+    private final ObjectProperty<ChatLanguageModel> chatModelProperty = new SimpleObjectProperty<>(null); // <p>
     private final ObjectProperty<EmbeddingModel> embeddingModelProperty = new SimpleObjectProperty<>(new AllMiniLmL6V2EmbeddingModel());
 
     private final EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
