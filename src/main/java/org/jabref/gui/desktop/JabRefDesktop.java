@@ -123,14 +123,14 @@ public class JabRefDesktop {
                 try {
                     NATIVE_DESKTOP.openFile(link, PS.getName(), preferencesService.getFilePreferences());
                 } catch (IOException e) {
-                    LOGGER.error("An error occurred on the command: " + link, e);
+                    LOGGER.error("An error occurred on the command: {}", link, e);
                 }
             }
             case PDF -> {
                 try {
                     NATIVE_DESKTOP.openFile(link, PDF.getName(), preferencesService.getFilePreferences());
                 } catch (IOException e) {
-                    LOGGER.error("An error occurred on the command: " + link, e);
+                    LOGGER.error("An error occurred on the command: {}", link, e);
                 }
             }
             case null, default ->
@@ -238,7 +238,7 @@ public class JabRefDesktop {
 
     /**
      * Opens a new console starting on the given file location
-     * <p>
+     *
      * @param file Location the console should be opened at.
      */
     public static void openConsole(Path file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
