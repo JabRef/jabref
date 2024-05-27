@@ -36,7 +36,8 @@ class AuthorListParserTest {
                 Arguments.of("{Society of Automotive Engineers}", new Author("", "", null, "{Society of Automotive Engineers}", null)),
 
                 // Demonstrate the "von" part parsing of a non-braced name
-                Arguments.of("Society of Automotive Engineers", new Author("Society", "S.", "of", "Automotive Engineers", null)));
+                Arguments.of("Society of Automotive Engineers", new Author("Society", "S.", "of", "Automotive Engineers", null))
+        );
     }
 
     @ParameterizedTest
@@ -45,24 +46,22 @@ class AuthorListParserTest {
         assertEquals(AuthorList.of(authorsParsed), parser.parse(authorsString));
     }
 
-    /*
-       Arguments.of(
-                            AuthorList.of(
-                                    new Author("Alexander", "A.", null, "Artemenko", null),
-                                    Author.OTHERS
-                            ),
-                            "Alexander Artemenko and others"),
-                    Arguments.of(
-                            AuthorList.of(
-                                    new Author("I.", "I.", null, "Podadera", null),
-                                    new Author("J. M.", "J. M.", null, "Carmona", null),
-                                    new Author("A.", "A.", null, "Ibarra", null),
-                                    new Author("J.", "J.", null, "Molla", null)
-                            ),
-                            "I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla"),
-     */
     private static Stream<Arguments> parseMultipleCorrectly() {
         return Stream.of(
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("Alexander", "A.", null, "Artemenko", null),
+                                Author.OTHERS
+                        ),
+                        "Alexander Artemenko and others"),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("I.", "I.", null, "Podadera", null),
+                                new Author("J. M.", "J. M.", null, "Carmona", null),
+                                new Author("A.", "A.", null, "Ibarra", null),
+                                new Author("J.", "J.", null, "Molla", null)
+                        ),
+                        "I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla"),
                 Arguments.of(AuthorList.of(
                                 new Author("Vivian", "V.", null, "U", null),
                                 new Author("Thomas", "T.", null, "Lai", null)
