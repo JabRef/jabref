@@ -7,12 +7,10 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import jakarta.inject.Inject;
 
 /**
  * Field editor that provides various pre-defined options as a drop-down combobox.
