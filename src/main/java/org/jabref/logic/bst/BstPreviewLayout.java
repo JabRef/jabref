@@ -6,10 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
-import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import org.jabref.logic.layout.format.RemoveTilde;
+import org.jabref.logic.layout.format.LatexToHtmlFormatter;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,6 +19,8 @@ import org.slf4j.LoggerFactory;
 public final class BstPreviewLayout implements PreviewLayout {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BstPreviewLayout.class);
+
+    private final LatexToHtmlFormatter latexToHtmlFormatter = new LatexToHtmlFormatter();
 
     private final String name;
     private String source;
@@ -58,28 +58,23 @@ public final class BstPreviewLayout implements PreviewLayout {
         BibEntry entry = (BibEntry) originalEntry.clone();
         new ConvertToBibtexCleanup().cleanup(entry);
         String result = bstVM.render(List.of(entry));
-        // Remove all comments
-        result = result.replaceAll("%.*", "");
-        // Remove all LaTeX comments
-        // The RemoveLatexCommandsFormatter keeps the words inside latex environments. Therefore, we remove them manually
+        LOGGER.trace("Render result: {}", result);
+
+        // Environment not supported by SnuggleTeX. Therefore, we remove it
         result = result.replace("\\begin{thebibliography}{1}", "");
         result = result.replace("\\end{thebibliography}", "");
-        // The RemoveLatexCommandsFormatter keeps the word inside the latex command, but we want to remove that completely
-        result = result.replaceAll("\\\\bibitem[{].*[}]", "");
+
+        // The interesting thing is the text after \bibitem
+        // result = result.replaceAll(".*\\\\bibitem\\{[^}]*\\}(.*)", "\1");
+        result = result.replaceAll("(?s).*?\\\\bibitem\\{[^}]*\\}(.*)", "$1");
+
+        LOGGER.trace("Without \\bibitem {}", result);
+
         // We want to replace \newblock by a space instead of completely removing it
         result = result.replace("\\newblock", " ");
-        // remove all latex commands statements - assumption: command in a separate line
-        result = result.replaceAll("(?m)^\\\\.*$", "");
-        // remove some IEEEtran.bst output (resulting from a multiline \providecommand)
-        result = result.replace("#2}}", "");
-        // Have quotes right - and more
-        result = new LatexToUnicodeFormatter().format(result);
-        result = result.replace("``", "\"");
-        result = result.replace("''", "\"");
-        // Final cleanup
-        result = new RemoveNewlinesFormatter().format(result);
-        result = new RemoveTilde().format(result);
-        result = result.trim().replaceAll("  +", " ");
+
+        result = latexToHtmlFormatter.format(result);
+
         return result;
     }
 

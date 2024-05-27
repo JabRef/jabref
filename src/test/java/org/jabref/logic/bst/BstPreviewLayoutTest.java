@@ -2,7 +2,6 @@ package org.jabref.logic.bst;
 
 import java.nio.file.Path;
 
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -11,7 +10,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 class BstPreviewLayoutTest {
 
@@ -22,7 +20,6 @@ class BstPreviewLayoutTest {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "Thoughts on Development");
-        BibDatabase bibDatabase = mock(BibDatabase.class);
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
         assertEquals("O. Kopp. Thoughts on development.", preview);
     }
@@ -33,7 +30,6 @@ class BstPreviewLayoutTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "Thoughts on Development")
                                        .withField(StandardField.MONTH, "#May#");
-        BibDatabase bibDatabase = mock(BibDatabase.class);
         String preview = bstPreviewLayout.generatePreview(entry, bibDatabaseContext);
         assertEquals("O. Kopp. Thoughts on development, May.", preview);
     }
@@ -63,6 +59,29 @@ class BstPreviewLayoutTest {
     public void generatePreviewForUnicodeTitleUsingIeee() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(ClassLoader.getSystemResource("bst/IEEEtran.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(new BibEntry().withField(StandardField.TITLE, "Linear programming design of semi-digital {FIR} filter and {\\(\\Sigma\\)}{\\(\\Delta\\)} modulator for {VDSL2} transmitter"), bibDatabaseContext);
+        assertEquals("Linear programming design of semi-digital FIR filter and σδ modulator for VDSL2 transmitter", preview);
+    }
+
+    @Test
+    public void generatePreviewForComplexEntryUsingIeee() throws Exception {
+        BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(ClassLoader.getSystemResource("bst/IEEEtran.bst").toURI()));
+
+        BibEntry testEntry = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("DBLP:conf/iscas/SadeghifarWG14")
+                // .withField(StandardField.AUTHOR, "Mohammad Reza Sadeghifar and J. Jacob Wikner and Oscar Gustafsson")
+                //.withField(StandardField.TITLE, "Linear programming design of semi-digital {FIR} filter and {\\(\\Sigma\\)}{\\(\\Delta\\)} modulator for {VDSL2} transmitter")
+                .withField(StandardField.BOOKTITLE, "{IEEE} International Symposium on Circuits and Systems, {ISCAS} 2014, Melbourne, Victoria, Australia, June 1-5, 2014")
+                // .withField(StandardField.PAGES, "2465--2468")
+                // .withField(StandardField.PUBLISHER, "{IEEE}")
+                // .withField(StandardField.YEAR, "2014")
+                // .withField(StandardField.URL, "https://doi.org/10.1109/ISCAS.2014.6865672")
+                // .withField(StandardField.DOI, "10.1109/ISCAS.2014.6865672")
+                // .withField(StandardField.TIMESTAMP, "Sat, 05 Sep 2020 18:07:30 +0200")
+                // .withField(new UnknownField("biburl"), "https://dblp.org/rec/conf/iscas/SadeghifarWG14.bib")
+                // .withField(new UnknownField("bibsource"), "dblp computer science bibliography, https://dblp.org");
+                ;
+
+        String preview = bstPreviewLayout.generatePreview(testEntry, bibDatabaseContext);
         assertEquals("Linear programming design of semi-digital FIR filter and σδ modulator for VDSL2 transmitter", preview);
     }
 

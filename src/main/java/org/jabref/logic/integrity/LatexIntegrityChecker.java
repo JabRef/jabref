@@ -43,6 +43,7 @@ public class LatexIntegrityChecker implements EntryChecker {
     private static final ResourceBundle ERROR_MESSAGES = ENGINE.getPackages().get(0).getErrorMessageBundle();
     private static final Set<ErrorCode> EXCLUDED_ERRORS = new HashSet<>();
 
+    // if something changes here, please also adapt org.jabref.logic.layout.format.LatexToHtmlFormatter
     static {
         SnugglePackage snugglePackage = ENGINE.getPackages().get(0);
         snugglePackage.addComplexCommand("textgreater", false, 0, TEXT_MODE_ONLY, null, null, null);
