@@ -42,8 +42,7 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
         setOnContextMenuRequested(event -> {
             contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this, Globals.getKeyPrefs()));
             contextMenu.getItems().addAll(0, items.get());
-
-            TextInputControlBehavior.showContextMenu(this, contextMenu, event);
+            contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
     }
 

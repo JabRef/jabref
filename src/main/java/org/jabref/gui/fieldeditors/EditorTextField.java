@@ -38,8 +38,7 @@ public class EditorTextField extends javafx.scene.control.TextField implements I
         setOnContextMenuRequested(event -> {
             contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this, Globals.getKeyPrefs()));
             contextMenu.getItems().addAll(0, items.get());
-
-            TextInputControlBehavior.showContextMenu(this, contextMenu, event);
+            contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
     }
 
