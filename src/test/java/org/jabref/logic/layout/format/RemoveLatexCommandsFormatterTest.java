@@ -15,16 +15,16 @@ class RemoveLatexCommandsFormatterTest {
         assertEquals("http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf", formatter.format("http://pi.informatik.uni-siegen.de/stt/36\\_2/./03\\_Technische\\_Beitraege/ZEUS2016/beitrag\\_2.pdf"));
     }
 
-    @ParameterizedTest(name = "expected={0}, input={1}")
+    @ParameterizedTest(name = "{0}")
     @CsvSource({
-            "some text, some text",                 // withoutLatexCommandsUnmodified
-            "'', \\sometext",                       // singleCommandWiped
-            "text, \\some text",                    // singleSpaceAfterCommandRemoved
-            "text, \\some     text",                // multipleSpacesAfterCommandRemoved
-            "\\, \\\\",                             // escapedBackslashBecomesBackslash
-            "\\some text, \\\\some text",           // escapedBackslashFollowedByTextBecomesBackslashFollowedByText
-            "\\some text\\, \\\\some text\\\\",     // escapedBackslashKept
-            "some_text, some\\_text"                // escapedUnderscoreReplaces
+            "withoutLatexCommandsUnmodified, some text, some text",
+            "singleCommandWiped, '', \\sometext",
+            "singleSpaceAfterCommandRemoved, text, \\some text",
+            "multipleSpacesAfterCommandRemoved, text, \\some     text",
+            "escapedBackslashBecomesBackslash, \\, \\\\",
+            "escapedBackslashFollowedByTextBecomesBackslashFollowedByText, \\some text, \\\\some text",
+            "escapedBackslashKept, \\some text\\, \\\\some text\\\\",
+            "escapedUnderscoreReplaces, some_text, some\\_text"
     })
     public void formatterTest(String expected, String input) {
         assertEquals(expected, formatter.format(input));
