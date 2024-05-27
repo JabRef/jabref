@@ -13,8 +13,10 @@ import java.util.Map;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
-import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.util.DefaultDirectoryMonitor;
+import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -30,6 +32,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -80,7 +83,12 @@ public class Launcher {
             clearOldSearchIndices();
 
             try {
-                FileUpdateMonitor fileUpdateMonitor = Globals.getFileUpdateMonitor();
+                DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
+                Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
+                JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+
+                DirectoryMonitor directoryMonitor = new DefaultDirectoryMonitor();
+                Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
                 // Process arguments
                 ArgumentProcessor argumentProcessor = new ArgumentProcessor(

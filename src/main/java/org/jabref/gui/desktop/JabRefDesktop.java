@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -240,8 +239,6 @@ public class JabRefDesktop {
     /**
      * Opens a new console starting on the given file location
      * <p>
-     * If no command is specified in {@link Globals}, the default system console will be executed.
-     *
      * @param file Location the console should be opened at.
      */
     public static void openConsole(Path file, PreferencesService preferencesService, DialogService dialogService) throws IOException {

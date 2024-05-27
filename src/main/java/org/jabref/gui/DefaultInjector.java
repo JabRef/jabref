@@ -2,8 +2,6 @@ package org.jabref.gui;
 
 import java.util.function.Function;
 
-import org.jabref.model.util.FileUpdateMonitor;
-
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.injection.PresenterFactory;
 import org.slf4j.Logger;
@@ -19,15 +17,11 @@ public class DefaultInjector implements PresenterFactory {
      * Dependencies without default constructor are constructed by hand.
      */
     private static Object createDependency(Class<?> clazz) {
-        if (clazz == FileUpdateMonitor.class) {
-            return Globals.getFileUpdateMonitor();
-        } else {
-            try {
-                return clazz.getDeclaredConstructor().newInstance();
-            } catch (ReflectiveOperationException ex) {
-                LOGGER.error("Cannot instantiate dependency: {}", clazz, ex);
-                return null;
-            }
+        try {
+            return clazz.getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException ex) {
+            LOGGER.error("Cannot instantiate dependency: {}", clazz, ex);
+            return null;
         }
     }
 

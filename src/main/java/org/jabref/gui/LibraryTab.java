@@ -85,6 +85,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -178,7 +179,7 @@ public class LibraryTab extends Tab {
         this.clipBoardManager = clipBoardManager;
         this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
         this.taskExecutor = taskExecutor;
-        this.directoryMonitorManager = new DirectoryMonitorManager(Globals.getDirectoryMonitor());
+        this.directoryMonitorManager = new DirectoryMonitorManager(Injector.instantiateModelOrService(DirectoryMonitor.class));
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);

@@ -34,6 +34,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.JabRefPreferences;
@@ -298,13 +299,14 @@ public class JabRefGUI extends Application {
         //     Telemetry.start(prefs.getTelemetryPreferences());
         // }
         RemotePreferences remotePreferences = preferencesService.getRemotePreferences();
+        BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         if (remotePreferences.useRemoteServer()) {
             remoteListenerServerManager.openAndStart(
                     new CLIMessageHandler(
                             mainFrame,
                             preferencesService,
-                            Globals.getFileUpdateMonitor(),
-                            Injector.instantiateModelOrService(BibEntryTypesManager.class)),
+                            fileUpdateMonitor,
+                            bibEntryTypesManager),
                     remotePreferences.getPort());
         }
     }
@@ -323,8 +325,11 @@ public class JabRefGUI extends Application {
 
     public static void shutdownThreadPools() {
         taskExecutor.shutdown();
-        Globals.getFileUpdateMonitor().shutdown();
-        Globals.getDirectoryMonitor().shutdown();
+        fileUpdateMonitor.shutdown();
+        DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
+        if (directoryMonitor != null) {
+            directoryMonitor.shutdown();
+        }
         JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 }
