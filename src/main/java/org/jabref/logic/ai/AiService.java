@@ -1,12 +1,10 @@
 package org.jabref.logic.ai;
 
-import java.util.ArrayList;
-import java.util.List;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
-import org.jabref.logic.ai.events.ChatModelChangedEvent;
 import org.jabref.preferences.AiPreferences;
 
-import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -24,12 +22,10 @@ import org.jspecify.annotations.Nullable;
  * An outer class is responsible for synchronizing objects of this class with {@link org.jabref.preferences.AiPreferences} changes.
  */
 public class AiService {
-    private @Nullable ChatLanguageModel chatModel = null;
-    private final EmbeddingModel embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+    private final ObjectProperty<ChatLanguageModel> chatModelProperty = new SimpleObjectProperty<>(null); // <p>
+    private final ObjectProperty<EmbeddingModel> embeddingModelProperty = new SimpleObjectProperty<>(new AllMiniLmL6V2EmbeddingModel());
 
     private final EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
-
-    private final EventBus eventBus = new EventBus();
 
     public AiService(AiPreferences aiPreferences) {
         if (aiPreferences.getEnableChatWithFiles() && !aiPreferences.getOpenAiToken().isEmpty()) {
@@ -65,23 +61,26 @@ public class AiService {
     }
 
     public void setChatModel(ChatLanguageModel chatModel) {
-        this.chatModel = chatModel;
-        eventBus.post(new ChatModelChangedEvent(chatModel));
-    }
-
-    public void registerListener(Object listener) {
-        eventBus.register(listener);
+        this.chatModelProperty.set(chatModel);
     }
 
     public @Nullable ChatLanguageModel getChatModel() {
-        return chatModel;
+        return chatModelProperty.get();
+    }
+
+    public ObjectProperty<ChatLanguageModel> chatModelProperty() {
+        return chatModelProperty;
     }
 
     public EmbeddingModel getEmbeddingModel() {
-        return embeddingModel;
+        return embeddingModelProperty.get();
     }
 
     public EmbeddingStore<TextSegment> getEmbeddingStore() {
         return embeddingStore;
+    }
+
+    public ObjectProperty<EmbeddingModel> embeddingModelProperty() {
+        return embeddingModelProperty;
     }
 }
