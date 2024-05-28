@@ -5,9 +5,12 @@ import java.util.Optional;
 
 import javafx.scene.control.*;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.aichattab.components.aichat.AiChatComponent;
+import org.jabref.gui.entryeditor.aichattab.components.errorstate.ErrorStateComponent;
+import org.jabref.gui.entryeditor.aichattab.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChat;
@@ -37,6 +40,7 @@ public class AiChatTab extends EntryEditorTab {
             Answer the question only by using the relevant information. Don't make up the answer.
             If you can't answer the user question using the provided information, then reply that you couldn't do it.""";
 
+    private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final AiPreferences aiPreferences;
     private final EntryEditorPreferences entryEditorPreferences;
@@ -51,8 +55,9 @@ public class AiChatTab extends EntryEditorTab {
 
     private BibEntry currentBibEntry = null;
 
-    public AiChatTab(PreferencesService preferencesService, AiService aiService,
+    public AiChatTab(DialogService dialogService, PreferencesService preferencesService, AiService aiService,
                      BibDatabaseContext bibDatabaseContext, TaskExecutor taskExecutor) {
+        this.dialogService = dialogService;
         this.filePreferences = preferencesService.getFilePreferences();
         this.aiPreferences = preferencesService.getAiPreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
@@ -75,15 +80,17 @@ public class AiChatTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (!aiPreferences.getEnableChatWithFiles()) {
-            setContent(new Label(Localization.lang("JabRef uses OpenAI to enable \"chatting\" with PDF files. OpenAI is an external service. To enable JabRef chatgting with PDF files, the content of the PDF files need to be shared with OpenAI. As soon as you ask a question, the text content of all PDFs attached to the entry are send to OpenAI. The privacy policy of OpenAI applies. You find it at <https://openai.com/policies/privacy-policy/>.")));
+            setContent(new PrivacyNoticeComponent(dialogService, aiPreferences, filePreferences, () -> {
+                bindToEntry(entry);
+            }));
         } else if (entry.getCitationKey().isEmpty()) {
-            setContent(new Label(Localization.lang("Please provide a citation key for the entry in order to enable chatting with PDF files.")));
+            setContent(new ErrorStateComponent(Localization.lang("Error"), Localization.lang("Please provide a citation key for the entry in order to enable chatting with PDF files.")));
         } else if (!checkIfCitationKeyIsUnique(bibDatabaseContext, entry.getCitationKey().get())) {
-            setContent(new Label(Localization.lang("Please provide a unique citation key for the entry in order to enable chatting with PDF files.")));
+            setContent(new ErrorStateComponent(Localization.lang("Error"), Localization.lang("Please provide a unique citation key for the entry in order to enable chatting with PDF files.")));
         } else if (entry.getFiles().isEmpty()) {
-            setContent(new Label(Localization.lang("No files attached")));
+            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")));
         } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
-            setContent(new Label(Localization.lang("Only PDF files are supported")));
+            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Only PDF files are supported")));
         } else {
             bindToCorrectEntry(entry);
         }
