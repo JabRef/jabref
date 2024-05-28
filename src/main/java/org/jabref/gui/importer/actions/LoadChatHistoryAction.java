@@ -44,8 +44,6 @@ public class LoadChatHistoryAction implements GUIPostOpenAction {
             InputStream inputStream = new FileInputStream(chatFile);
 
             ObjectMapper objectMapper = new ObjectMapper();
-            // Jackson JSON adds an unknown field "typeLabel".
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             AiChatsFile aiChatFile = objectMapper.readValue(inputStream, AiChatsFile.class);
             loadAiChatHistory(bibDatabase, aiChatFile);
         } catch (FileNotFoundException e) {
