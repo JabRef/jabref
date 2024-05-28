@@ -7,7 +7,6 @@ import javafx.scene.control.*;
 
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.gui.entryeditor.aichattab.components.AiChatComponentOld;
 import org.jabref.gui.entryeditor.aichattab.components.aichat.AiChatComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -24,12 +23,7 @@ import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.store.embedding.EmbeddingStore;
-import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
-import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import org.slf4j.LoggerFactory;
 
 public class AiChatTab extends EntryEditorTab {
