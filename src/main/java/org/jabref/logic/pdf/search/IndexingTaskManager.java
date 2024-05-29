@@ -56,10 +56,8 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     private void updateProgress() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            updateMessage(Localization.lang("%0 of %1 linked files added to the index", numOfIndexedFiles, numOfIndexedFiles + taskQueue.size()));
-            updateProgress(numOfIndexedFiles, numOfIndexedFiles + taskQueue.size());
-        });
+        updateMessage(Localization.lang("%0 of %1 linked files added to the index", numOfIndexedFiles, numOfIndexedFiles + taskQueue.size()));
+        updateProgress(numOfIndexedFiles, numOfIndexedFiles + taskQueue.size());
     }
 
     private void enqueueTask(Runnable indexingTask) {
