@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.jabref.logic.l10n.Localization;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.UserMessage;
@@ -36,6 +37,7 @@ public class ChatMessage {
         return type;
     }
 
+    @JsonIgnore
     public String getTypeLabel() {
         return switch (type) {
             case USER ->
