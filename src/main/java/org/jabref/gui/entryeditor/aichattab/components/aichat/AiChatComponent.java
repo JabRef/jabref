@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor.aichattab.components.aichat;
 
 import java.util.function.Consumer;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
@@ -32,6 +33,11 @@ public class AiChatComponent extends VBox {
         ViewLoader.view(this)
                 .root(this)
                 .load();
+    }
+
+    @FXML
+    public void initialize() {
+        Platform.runLater(() -> userPromptTextField.requestFocus());
     }
 
     @FXML
