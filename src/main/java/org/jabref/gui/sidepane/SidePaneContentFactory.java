@@ -11,6 +11,7 @@ import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -19,6 +20,7 @@ import org.jabref.preferences.PreferencesService;
 public class SidePaneContentFactory {
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferences;
+    private final AiService aiService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
@@ -29,6 +31,7 @@ public class SidePaneContentFactory {
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
                                   PreferencesService preferences,
+                                  AiService aiService,
                                   JournalAbbreviationRepository abbreviationRepository,
                                   TaskExecutor taskExecutor,
                                   DialogService dialogService,
@@ -38,6 +41,7 @@ public class SidePaneContentFactory {
                                   UndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
+        this.aiService = aiService;
         this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
@@ -57,6 +61,7 @@ public class SidePaneContentFactory {
             case OPEN_OFFICE -> new OpenOfficePanel(
                     tabContainer,
                     preferences,
+                    aiService,
                     preferences.getKeyBindingRepository(),
                     abbreviationRepository,
                     taskExecutor,

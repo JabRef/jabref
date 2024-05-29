@@ -117,6 +117,7 @@ public class EntryEditor extends BorderPane {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
+    @Inject private AiService aiService;
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
