@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.14.0'
+    id 'org.openrewrite.rewrite' version '6.15.1'
 }
 
 // Enable following for debugging
@@ -172,8 +172,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.7.0'
 
-    implementation 'org.libreoffice:unoloader:7.6.4'
-    implementation 'org.libreoffice:libreoffice:7.6.4'
+    implementation 'org.libreoffice:unoloader:24.2.3'
+    implementation 'org.libreoffice:libreoffice:24.2.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.12'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -270,7 +270,7 @@ dependencies {
     // API
     implementation 'jakarta.ws.rs:jakarta.ws.rs-api:4.0.0'
     // Implementation of the API
-    implementation 'org.glassfish.jersey.core:jersey-server:3.1.6'
+    implementation 'org.glassfish.jersey.core:jersey-server:3.1.7'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.6'
     implementation 'org.glassfish.hk2:hk2-api:3.1.0'
@@ -280,7 +280,7 @@ dependencies {
     // HTTP server
     // implementation 'org.glassfish.jersey.containers:jersey-container-netty-http:3.1.1'
     implementation 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.6'
-    testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.6'
+    testImplementation 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.7'
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
 
@@ -311,7 +311,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.16.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.17.0'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'

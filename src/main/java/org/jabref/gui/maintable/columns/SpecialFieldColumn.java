@@ -100,10 +100,10 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
         }
 
         ranking.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2) {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                 ranking.setRating(0);
                 event.consume();
-            } else if (event.getButton().equals(MouseButton.SECONDARY)) {
+            } else if (event.getButton() == MouseButton.SECONDARY) {
                 event.consume();
             }
         });

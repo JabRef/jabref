@@ -64,7 +64,7 @@ public class WebSearchPaneViewModel {
         SidePanePreferences sidePanePreferences = preferencesService.getSidePanePreferences();
         int defaultFetcherIndex = sidePanePreferences.getWebSearchFetcherSelected();
         if ((defaultFetcherIndex <= 0) || (defaultFetcherIndex >= fetchers.size())) {
-            selectedFetcherProperty().setValue(fetchers.get(0));
+            selectedFetcherProperty().setValue(fetchers.getFirst());
         } else {
             selectedFetcherProperty().setValue(fetchers.get(defaultFetcherIndex));
         }

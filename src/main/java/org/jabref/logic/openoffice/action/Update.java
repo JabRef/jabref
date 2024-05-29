@@ -13,6 +13,7 @@ import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 
+import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 
@@ -38,7 +39,7 @@ public class Update {
             CreationException,
             NoDocumentException,
             WrappedTargetException,
-            com.sun.star.lang.IllegalArgumentException {
+            IllegalArgumentException {
 
         final boolean useLockControllers = true;
 
@@ -100,7 +101,7 @@ public class Update {
             CreationException,
             NoDocumentException,
             WrappedTargetException,
-            com.sun.star.lang.IllegalArgumentException {
+            IllegalArgumentException {
 
         return Update.updateDocument(doc,
                 frontend,
@@ -122,7 +123,7 @@ public class Update {
             CreationException,
             NoDocumentException,
             WrappedTargetException,
-            com.sun.star.lang.IllegalArgumentException {
+            IllegalArgumentException {
 
         OOFrontend frontend = new OOFrontend(doc);
 

@@ -241,7 +241,7 @@ public class GroupDialogViewModel {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
-                                .map(extension -> extension.equalsIgnoreCase("aux"))
+                                .map(extension -> "aux".equalsIgnoreCase(extension))
                                 .orElse(false);
                     }
                 },
