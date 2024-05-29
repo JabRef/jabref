@@ -448,7 +448,13 @@ public class JabRefPreferences implements PreferencesService {
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
-    private static final String USE_AI = "useAi";
+    private static final String AI_ENABLE_CHAT = "aiEnableChat";
+    private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
+    private static final String AI_MESSAGE_WINDOW_SIZE = "aiMessageWindowSize";
+    private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
+    private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
+    private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
+    private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
@@ -836,7 +842,12 @@ public class JabRefPreferences implements PreferencesService {
         setLanguageDependentDefaultValues();
 
         // AI
-        defaults.put(USE_AI, Boolean.FALSE);
+        defaults.put(AI_ENABLE_CHAT, Boolean.FALSE);
+        defaults.put(AI_MESSAGE_WINDOW_SIZE, 10);
+        defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, 300);
+        defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, 100);
+        defaults.put(AI_RAG_MAX_RESULTS_COUNT, 10);
+        defaults.put(AI_RAG_MIN_SCORE, 0.5);
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -2718,7 +2729,7 @@ public class JabRefPreferences implements PreferencesService {
             return aiPreferences;
         }
 
-        boolean useAi = getBoolean(USE_AI);
+        boolean useAi = getBoolean(AI_ENABLE_CHAT);
 
         String token = getOpenAiTokenFromKeyring();
 
@@ -2728,10 +2739,18 @@ public class JabRefPreferences implements PreferencesService {
             token = "";
         }
 
-        aiPreferences = new AiPreferences(useAi, token);
+        aiPreferences = new AiPreferences(
+                useAi,
+                token,
+                get(AI_SYSTEM_MESSAGE),
+                getInt(AI_MESSAGE_WINDOW_SIZE),
+                getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE),
+                getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE),
+                getInt(AI_RAG_MAX_RESULTS_COUNT),
+                getDouble(AI_RAG_MIN_SCORE));
 
         EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
-        EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(USE_AI, newValue));
+        EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE_CHAT, newValue));
 
         return aiPreferences;
     }
