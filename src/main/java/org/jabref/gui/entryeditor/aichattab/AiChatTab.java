@@ -95,10 +95,6 @@ public class AiChatTab extends EntryEditorTab {
             setContent(new PrivacyNoticeComponent(dialogService, aiPreferences, filePreferences, () -> {
                 bindToEntry(entry);
             }));
-        } else if (entry.getCitationKey().isEmpty()) {
-            setContent(new ErrorStateComponent(Localization.lang("Error"), Localization.lang("Please provide a citation key for the entry in order to enable chatting with PDF files.")));
-        } else if (!checkIfCitationKeyIsUnique(bibDatabaseContext, entry.getCitationKey().get())) {
-            setContent(new ErrorStateComponent(Localization.lang("Error"), Localization.lang("Please provide a unique citation key for the entry in order to enable chatting with PDF files.")));
         } else if (entry.getFiles().isEmpty()) {
             setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")));
         } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
