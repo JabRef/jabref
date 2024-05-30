@@ -17,7 +17,6 @@ import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
-import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 
@@ -31,26 +30,21 @@ import org.slf4j.LoggerFactory;
  * We cannot use {@link Task} directly since it runs certain update notifications on the JavaFX thread,
  * and so makes testing harder.
  * We take the opportunity and implement a fluid interface.
- *
+ * <p>
  * A task created here is to be submitted to {@link org.jabref.gui.Globals#TASK_EXECUTOR}: Use {@link TaskExecutor#execute(BackgroundTask)} to submit.
- *
+ * <p>
  * Example (for using the fluent interface)
- *
- * <code>
- *             BackgroundTask
- *                 .wrap(() -> ...)
- *                 .showToUser(true)
- *                 .onRunning(() -> ...)
- *                 .onSuccess(() -> ...)
- *                 .onFailure(exception -> {
- *                     LOGGER.error("Error while generating citation style", exception);
- *                 })
- *                 .executeWith(taskExecutor);
- * </code>
- *
- * Baacgkround: The task executor one takes care to show it in the UI. See {@link StateManager#addBackgroundTask(BackgroundTask, Task)} for details.*
- *
- *
+ * <pre>{@code
+ * BackgroundTask
+ *     .wrap(() -> ...)
+ *     .showToUser(true)
+ *     .onRunning(() -> ...)
+ *     .onSuccess(() -> ...)
+ *     .onFailure(() -> ...)
+ *     .executeWith(taskExecutor);
+ * }</pre>
+ * Background: The task executor one takes care to show it in the UI. See {@link org.jabref.gui.StateManager#addBackgroundTask(BackgroundTask, Task)} for details.
+ * <p>
  * TODO: Think of migrating to <a href="https://github.com/ReactiveX/RxJava#simple-background-computation">RxJava</a>;
  *       <a href="https://www.baeldung.com/java-completablefuture">CompletableFuture</a> do not seem to support everything.
  *       If this is not possible, add an @implNote why.
