@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -30,6 +31,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
+import org.controlsfx.control.textfield.CustomTextField;
 
 public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
@@ -44,6 +46,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private TableColumn<StyleSelectItemViewModel, Boolean> colDeleteIcon;
     @FXML private Button add;
     @FXML private VBox vbox;
+    @FXML private ListView<String> availableListView;
+    @FXML private CustomTextField searchBox;
 
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
@@ -74,7 +78,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
     @FXML
     private void initialize() {
-        viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
+        viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService, taskExecutor);
 
         previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewArticle.setEntry(TestEntry.getTestEntry());
@@ -128,6 +132,10 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
             previewArticle.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat(StandardEntryType.Article)));
             previewBook.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat(StandardEntryType.Book)));
         });
+
+        availableListView.setItems(viewModel.getAvailableStyles());
+        searchBox.textProperty().addListener((observable, oldValue, newValue) ->
+                viewModel.setAvailableStylesFilter(newValue));
     }
 
     private ContextMenu createContextMenu() {

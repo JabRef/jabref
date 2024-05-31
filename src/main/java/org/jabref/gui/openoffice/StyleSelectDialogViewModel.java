@@ -11,6 +11,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.ScrollPane;
@@ -20,7 +22,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.OOBibStyle;
@@ -38,8 +43,10 @@ public class StyleSelectDialogViewModel {
     private final FilePreferences filePreferences;
     private final ListProperty<StyleSelectItemViewModel> styles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<StyleSelectItemViewModel> selectedItem = new SimpleObjectProperty<>();
+    private final ObservableList<String> availableStyles = FXCollections.observableArrayList();
+    private final FilteredList<String> filteredAvailableStyles = new FilteredList<>(availableStyles);
 
-    public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService) {
+    public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.filePreferences = preferencesService.getFilePreferences();
         this.openOfficePreferences = preferencesService.getOpenOfficePreferences();
@@ -49,6 +56,17 @@ public class StyleSelectDialogViewModel {
 
         String currentStyle = openOfficePreferences.getCurrentStyle();
         selectedItem.setValue(getStyleOrDefault(currentStyle));
+
+        BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
+                      .onSuccess(styles -> {
+                          availableStyles.setAll(styles.stream()
+                                                       .map(CitationStyle::getTitle)
+                                                       .collect(Collectors.toList()));
+                      })
+                      .onFailure(ex -> {
+                          dialogService.showErrorDialogAndWait("Error discovering citation styles", ex);
+                      })
+                      .executeWith(taskExecutor);
     }
 
     public StyleSelectItemViewModel fromOOBibStyle(OOBibStyle style) {
@@ -129,5 +147,14 @@ public class StyleSelectDialogViewModel {
 
     private StyleSelectItemViewModel getStyleOrDefault(String stylePath) {
         return styles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(styles.getFirst());
+    }
+
+    public ObservableList<String> getAvailableStyles() {
+        return filteredAvailableStyles;
+    }
+
+    public void setAvailableStylesFilter(String searchTerm) {
+        filteredAvailableStyles.setPredicate(style ->
+                searchTerm.isEmpty() || style.toLowerCase().contains(searchTerm.toLowerCase()));
     }
 }
