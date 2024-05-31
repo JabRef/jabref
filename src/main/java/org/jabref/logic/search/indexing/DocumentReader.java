@@ -6,12 +6,12 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.LibraryTab;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -41,26 +41,19 @@ import static org.jabref.model.search.SearchFieldConstants.PATH;
  */
 public final class DocumentReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentReader.class);
 
     private static final Pattern HYPHEN_LINEBREAK_PATTERN = Pattern.compile("\\-\n");
     private static final Pattern LINEBREAK_WITHOUT_PERIOD_PATTERN = Pattern.compile("([^\\\\.])\\n");
 
-    private final BibEntry entry;
     private final FilePreferences filePreferences;
 
     /**
      * Creates a new DocumentReader using a BibEntry.
      *
-     * @param bibEntry Must not be null and must have at least one LinkedFile.
      */
-    public DocumentReader(BibEntry bibEntry, FilePreferences filePreferences) {
+    public DocumentReader(FilePreferences filePreferences) {
         this.filePreferences = filePreferences;
-        if (bibEntry.getFiles().isEmpty()) {
-            throw new IllegalStateException("There are no linked PDF files to this BibEntry.");
-        }
-
-        this.entry = bibEntry;
     }
 
     /**
@@ -70,10 +63,7 @@ public final class DocumentReader {
      */
     public Optional<List<Document>> readLinkedPdf(BibDatabaseContext databaseContext, LinkedFile pdf) {
         Optional<Path> pdfPath = pdf.findIn(databaseContext, filePreferences);
-        if (pdfPath.isPresent()) {
-            return Optional.of(readPdfContents(pdf, pdfPath.get()));
-        }
-        return Optional.empty();
+        return pdfPath.map(path -> readPdfContents(pdf, path));
     }
 
     /**
@@ -81,7 +71,7 @@ public final class DocumentReader {
      *
      * @return A List of Documents with the (meta)data. Can be empty if there is a problem reading the LinkedFile.
      */
-    public List<Document> readLinkedPdfs(BibDatabaseContext databaseContext) {
+    public List<Document> readLinkedPdfs(BibDatabaseContext databaseContext, BibEntry entry) {
         return entry.getFiles().stream()
                     .map(pdf -> readLinkedPdf(databaseContext, pdf))
                     .filter(Optional::isPresent)
@@ -90,18 +80,16 @@ public final class DocumentReader {
                     .collect(Collectors.toList());
     }
 
-    private List<Document> readPdfContents(LinkedFile pdf, Path resolvedPdfPath) {
+    public List<Document> readPdfContents(LinkedFile pdf, Path resolvedPdfPath) {
         List<Document> pages = new ArrayList<>();
         try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
-            for (int pageNumber = 0; pageNumber < pdfDocument.getNumberOfPages(); pageNumber++) {
+            int numberOfPages = pdfDocument.getNumberOfPages();
+            for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
                 Document newDocument = new Document();
                 addIdentifiers(newDocument, pdf.getLink());
                 addMetaData(newDocument, resolvedPdfPath, pageNumber);
-                try {
-                    addContentIfNotEmpty(pdfDocument, newDocument, pageNumber);
-                } catch (IOException e) {
-                    LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPdfPath.toAbsolutePath(), e);
-                }
+                addContentIfNotEmpty(pdfDocument, newDocument, resolvedPdfPath, pageNumber);
+
                 pages.add(newDocument);
             }
         } catch (IOException e) {
@@ -110,20 +98,10 @@ public final class DocumentReader {
         if (pages.isEmpty()) {
             Document newDocument = new Document();
             addIdentifiers(newDocument, pdf.getLink());
-            addMetaData(newDocument, resolvedPdfPath, 0);
+            addMetaData(newDocument, resolvedPdfPath, 1);
             pages.add(newDocument);
         }
         return pages;
-    }
-
-    private void addMetaData(Document newDocument, Path resolvedPdfPath, int pageNumber) {
-        try {
-            BasicFileAttributes attributes = Files.readAttributes(resolvedPdfPath, BasicFileAttributes.class);
-            addStringField(newDocument, MODIFIED, String.valueOf(attributes.lastModifiedTime().to(TimeUnit.SECONDS)));
-        } catch (IOException e) {
-            LOGGER.error("Could not read timestamp for {}", resolvedPdfPath, e);
-        }
-        addStringField(newDocument, PAGE_NUMBER, String.valueOf(pageNumber));
     }
 
     private void addStringField(Document newDocument, String field, String value) {
@@ -142,21 +120,41 @@ public final class DocumentReader {
         return LINEBREAK_WITHOUT_PERIOD_PATTERN.matcher(mergedHyphenNewlines).replaceAll("$1 ");
     }
 
-    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, int pageNumber) throws IOException {
+    private void addMetaData(Document newDocument, Path resolvedPdfPath, int pageNumber) {
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(resolvedPdfPath, BasicFileAttributes.class);
+            addStringField(newDocument, MODIFIED, String.valueOf(attributes.lastModifiedTime().to(TimeUnit.SECONDS)));
+        } catch (IOException e) {
+            LOGGER.error("Could not read timestamp for {}", resolvedPdfPath, e);
+        }
+        addStringField(newDocument, PAGE_NUMBER, String.valueOf(pageNumber));
+    }
+
+    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, Path resolvedPath, int pageNumber) {
         PDFTextStripper pdfTextStripper = new PDFTextStripper();
         pdfTextStripper.setLineSeparator("\n");
-        // Apache PDFTextStripper is 1-based. See {@link org.apache.pdfbox.text.PDFTextStripper.processPages}
-        pdfTextStripper.setStartPage(pageNumber + 1);
-        pdfTextStripper.setEndPage(pageNumber + 1);
+        pdfTextStripper.setStartPage(pageNumber);
+        pdfTextStripper.setEndPage(pageNumber);
 
-        String pdfContent = pdfTextStripper.getText(pdfDocument);
-        if (StringUtil.isNotBlank(pdfContent)) {
-            newDocument.add(new TextField(CONTENT, mergeLines(pdfContent), Field.Store.YES));
-        }
-        PDPage page = pdfDocument.getPage(pageNumber);
-        List<String> annotations = page.getAnnotations().stream().filter(annotation -> annotation.getContents() != null).map(PDAnnotation::getContents).collect(Collectors.toList());
-        if (!annotations.isEmpty()) {
-            newDocument.add(new TextField(ANNOTATIONS, annotations.stream().collect(Collectors.joining("\n")), Field.Store.YES));
+        try {
+            String pdfContent = pdfTextStripper.getText(pdfDocument);
+            if (StringUtil.isNotBlank(pdfContent)) {
+                newDocument.add(new TextField(CONTENT, mergeLines(pdfContent), Field.Store.YES));
+            }
+
+            // Apache PDFTextStripper is 1-based. See {@link org.apache.pdfbox.text.PDFTextStripper.processPages}
+            PDPage page = pdfDocument.getPage(pageNumber - 1);
+            List<String> annotations = page.getAnnotations()
+                                           .stream()
+                                           .map(PDAnnotation::getContents)
+                                           .filter(Objects::nonNull)
+                                           .toList();
+
+            if (!annotations.isEmpty()) {
+                newDocument.add(new TextField(ANNOTATIONS, String.join("\n", annotations), Field.Store.YES));
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPath.toAbsolutePath(), e);
         }
     }
 

@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.LibraryTab;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -48,22 +47,20 @@ import org.apache.lucene.store.NIOFSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Indexes the text of PDF files and adds it into the lucene search index.
- */
 public class LuceneIndexer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LuceneIndexer.class);
 
     private final Directory directoryToIndex;
     private final BibDatabaseContext databaseContext;
-
     private final PreferencesService preferences;
+    private final DocumentReader documentReader;
 
     public LuceneIndexer(BibDatabaseContext databaseContext, PreferencesService preferences) throws IOException {
         this.databaseContext = databaseContext;
-        this.directoryToIndex = new NIOFSDirectory(databaseContext.getFulltextIndexPath());
         this.preferences = preferences;
+        documentReader = new DocumentReader(preferences.getFilePreferences());
+        this.directoryToIndex = new NIOFSDirectory(databaseContext.getFulltextIndexPath());
     }
 
     public static LuceneIndexer of(BibDatabaseContext databaseContext, PreferencesService preferences) throws IOException {
@@ -227,7 +224,7 @@ public class LuceneIndexer {
                 // if there is no index yet, don't need to check anything!
             }
             // If no document was found, add the new one
-            Optional<List<Document>> pages = new DocumentReader(entry, preferences.getFilePreferences()).readLinkedPdf(this.databaseContext, linkedFile);
+            Optional<List<Document>> pages = documentReader.readLinkedPdf(this.databaseContext, linkedFile);
             if (pages.isPresent()) {
                 try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
                                                                new IndexWriterConfig(
