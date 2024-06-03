@@ -156,6 +156,8 @@ public class AiChatTab extends EntryEditorTab {
                         ChatMessage aiMessage = ChatMessage.assistant(aiMessageText);
                         aiChatComponent.addMessage(aiMessage);
                         entry.getAiChatMessages().add(aiMessage);
+
+                        aiChatComponent.requestUserPromptTextFieldFocus();
                     })
                     .onFailure(e -> {
                         // TODO: User-friendly error message.

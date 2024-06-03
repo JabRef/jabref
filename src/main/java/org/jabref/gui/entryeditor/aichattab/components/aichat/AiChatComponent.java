@@ -75,4 +75,8 @@ public class AiChatComponent extends VBox {
     public void addError(String message) {
         chatVBox.getChildren().add(new ChatMessageComponent().withError(message));
     }
+
+    public void requestUserPromptTextFieldFocus() {
+        userPromptTextField.requestFocus();
+    }
 }
