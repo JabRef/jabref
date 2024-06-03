@@ -13,7 +13,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -31,10 +30,9 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
                                 PreferencesService preferences,
                                 StateManager stateManager,
                                 ThemeManager themeManager,
-                                IndexingTaskManager indexingTaskManager,
                                 TaskExecutor taskExecutor,
                                 JournalAbbreviationRepository journalAbbreviationRepository) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
+        super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository);
 
         this.fields = new LinkedHashSet<>(fields);
 

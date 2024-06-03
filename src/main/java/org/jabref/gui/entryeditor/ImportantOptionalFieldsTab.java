@@ -9,7 +9,6 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
@@ -25,7 +24,6 @@ public class ImportantOptionalFieldsTab extends OptionalFieldsTabBase {
                                       PreferencesService preferences,
                                       StateManager stateManager,
                                       ThemeManager themeManager,
-                                      IndexingTaskManager indexingTaskManager,
                                       BibEntryTypesManager entryTypesManager,
                                       TaskExecutor taskExecutor,
                                       JournalAbbreviationRepository journalAbbreviationRepository) {
@@ -39,7 +37,6 @@ public class ImportantOptionalFieldsTab extends OptionalFieldsTabBase {
                 preferences,
                 stateManager,
                 themeManager,
-                indexingTaskManager,
                 entryTypesManager,
                 taskExecutor,
                 journalAbbreviationRepository

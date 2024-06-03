@@ -15,7 +15,6 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.indexing.IndexingTaskManager;
 import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -79,7 +78,7 @@ public class ExternalFilesEntryLinker {
         }
     }
 
-    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
+    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files) {
 //        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
             addFilesToEntry(entry, files);
             moveLinkedFilesToFileDir(entry);
@@ -95,7 +94,7 @@ public class ExternalFilesEntryLinker {
 //        }
     }
 
-    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
+    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
 //        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
             for (Path file : files) {
                 copyFileToFileDir(file)

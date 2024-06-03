@@ -16,7 +16,6 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -38,12 +37,11 @@ public class RequiredFieldsTab extends FieldsEditorTab {
                              PreferencesService preferences,
                              StateManager stateManager,
                              ThemeManager themeManager,
-                             IndexingTaskManager indexingTaskManager,
                              BibEntryTypesManager entryTypesManager,
                              TaskExecutor taskExecutor,
                              JournalAbbreviationRepository journalAbbreviationRepository) {
         super(false, databaseContext, suggestionProviders, undoManager, dialogService,
-                preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
+                preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository);
         this.entryTypesManager = entryTypesManager;
         setText(Localization.lang("Required fields"));
         setTooltip(new Tooltip(Localization.lang("Show required fields")));

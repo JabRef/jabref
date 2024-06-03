@@ -34,7 +34,6 @@ import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -58,7 +57,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final StateManager stateManager;
-    private final IndexingTaskManager indexingTaskManager;
     private PreviewPanel previewPanel;
     private final UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
@@ -73,8 +71,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                            StateManager stateManager,
                            ThemeManager themeManager,
                            TaskExecutor taskExecutor,
-                           JournalAbbreviationRepository journalAbbreviationRepository,
-                           IndexingTaskManager indexingTaskManager) {
+                           JournalAbbreviationRepository journalAbbreviationRepository) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
@@ -85,7 +82,6 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.stateManager = stateManager;
-        this.indexingTaskManager = indexingTaskManager;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -253,8 +249,8 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                     preferences,
                     stateManager,
                     themeManager,
-                    indexingTaskManager,
-                    taskExecutor);
+                    taskExecutor
+            );
             EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
                 if (show) {
                     container.getItems().remove(previewPanel);

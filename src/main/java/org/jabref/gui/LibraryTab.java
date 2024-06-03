@@ -63,7 +63,6 @@ import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.search.indexing.IndexingTaskManager;
 import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.UpdateField;
@@ -1074,10 +1073,6 @@ public class LibraryTab extends Tab {
                 luceneIndexer.indexLinkedFiles(toAdd);
             }
         }
-    }
-
-    public IndexingTaskManager getIndexingTaskManager() {
-        return null;
     }
 
     public LuceneIndexer getLuceneIndexer() {

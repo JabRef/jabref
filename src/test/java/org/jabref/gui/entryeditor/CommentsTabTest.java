@@ -13,7 +13,6 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.OwnerPreferences;
-import org.jabref.logic.search.indexing.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -70,8 +69,6 @@ class CommentsTabTest {
     @Mock
     private JournalAbbreviationRepository journalAbbreviationRepository;
     @Mock
-    private IndexingTaskManager indexingTaskManager;
-    @Mock
     private OwnerPreferences ownerPreferences;
 
     @Mock
@@ -97,7 +94,6 @@ class CommentsTabTest {
                 dialogService,
                 stateManager,
                 themeManager,
-                indexingTaskManager,
                 taskExecutor,
                 journalAbbreviationRepository
         );
