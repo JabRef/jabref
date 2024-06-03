@@ -32,10 +32,9 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         this.taskExecutor = taskExecutor;
         showToUser(true);
         willBeRecoveredAutomatically(true);
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            this.updateProgress(1, 1);
-            this.titleProperty().set(Localization.lang("Indexing pdf files"));
-        });
+        // runs on fx thread, no need to wrap
+        this.updateProgress(1, 1);
+        this.titleProperty().set(Localization.lang("Indexing pdf files"));
     }
 
     @Override
