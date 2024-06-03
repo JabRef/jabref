@@ -31,12 +31,17 @@ public class BibDatabaseDiff {
         preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase);
         bibStringDiffs = BibStringDiff.compare(originalDatabase.getDatabase(), newDatabase.getDatabase());
         entryDiffs = getBibEntryDiffs(originalDatabase, newDatabase);
-        if (LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled() && !isEmpty()) {
+            LOGGER.debug("Differences detected");
             metaDataDiff.ifPresent(diff -> LOGGER.debug("Metadata differences: {}", diff));
             preambleDiff.ifPresent(diff -> LOGGER.debug("Premble differences: {}", diff));
             LOGGER.debug("BibString differences: {}", bibStringDiffs);
             LOGGER.debug("Entry differences: {}", entryDiffs);
         }
+    }
+
+    private boolean isEmpty() {
+        return !metaDataDiff.isPresent() && !preambleDiff.isPresent() && bibStringDiffs.isEmpty() && entryDiffs.isEmpty();
     }
 
     private List<BibEntryDiff> getBibEntryDiffs(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase) {
