@@ -46,6 +46,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private TableColumn<StyleSelectItemViewModel, Boolean> colDeleteIcon;
     @FXML private Button add;
     @FXML private VBox vbox;
+    @FXML private VBox previewVbox;
     @FXML private ListView<String> availableListView;
     @FXML private CustomTextField searchBox;
 
@@ -79,6 +80,13 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML
     private void initialize() {
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService, taskExecutor);
+
+        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+        previewViewer.setEntry(TestEntry.getTestEntry());
+        EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
+        previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
+                                                      .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
+        previewVbox.getChildren().add(previewViewer);
 
         previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewArticle.setEntry(TestEntry.getTestEntry());

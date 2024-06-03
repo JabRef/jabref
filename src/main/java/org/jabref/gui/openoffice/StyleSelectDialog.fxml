@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.DialogPane?>
@@ -11,19 +12,29 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.preview.PreviewViewer?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
-<DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0"
-            prefWidth="701.0" xmlns="http://javafx.com/javafx/8.0.171"
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0"
+            prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171"
             fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView">
     <content>
-        <TabPane tabClosingPolicy="UNAVAILABLE">
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
             <tabs>
                 <Tab text="CSL Styles">
                     <content>
-                        <VBox spacing="4.0">
-                            <Label text="%Available" styleClass="sectionHeader"/>
-                            <CustomTextField fx:id="searchBox" promptText="%Filter" prefHeight="20.0"/>
-                            <ListView fx:id="availableListView" minHeight="150.0" prefHeight="250.0"/>
+                        <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                            <padding>
+                                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                            </padding>
+                            <VBox spacing="4.0" VBox.vgrow="ALWAYS">
+                                <Label text="%Available" styleClass="sectionHeader"/>
+                                <CustomTextField fx:id="searchBox" promptText="%Filter" prefHeight="20.0"/>
+                                <ListView fx:id="availableListView" VBox.vgrow="ALWAYS"/>
+                            </VBox>
+                            <VBox spacing="4.0">
+                                <Label text="%Preview" styleClass="sectionHeader"/>
+                                <VBox fx:id="previewVbox" prefHeight="200.0"/>
+                            </VBox>
                         </VBox>
                     </content>
                 </Tab>

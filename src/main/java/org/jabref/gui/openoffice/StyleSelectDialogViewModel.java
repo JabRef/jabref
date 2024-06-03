@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 
@@ -24,12 +25,14 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
@@ -45,6 +48,9 @@ public class StyleSelectDialogViewModel {
     private final ObjectProperty<StyleSelectItemViewModel> selectedItem = new SimpleObjectProperty<>();
     private final ObservableList<String> availableStyles = FXCollections.observableArrayList();
     private final FilteredList<String> filteredAvailableStyles = new FilteredList<>(availableStyles);
+    private final ObjectProperty<PreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
+    private final ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
 
     public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
@@ -156,5 +162,17 @@ public class StyleSelectDialogViewModel {
     public void setAvailableStylesFilter(String searchTerm) {
         filteredAvailableStyles.setPredicate(style ->
                 searchTerm.isEmpty() || style.toLowerCase().contains(searchTerm.toLowerCase()));
+    }
+
+    public ObjectProperty<PreviewLayout> selectedLayoutProperty() {
+        return selectedLayoutProperty;
+    }
+
+    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty() {
+        return chosenSelectionModelProperty;
+    }
+
+    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty() {
+        return availableSelectionModelProperty;
     }
 }
