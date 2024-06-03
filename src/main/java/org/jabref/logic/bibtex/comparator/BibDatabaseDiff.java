@@ -30,7 +30,17 @@ public class BibDatabaseDiff {
         metaDataDiff = MetaDataDiff.compare(originalDatabase.getMetaData(), newDatabase.getMetaData());
         preambleDiff = PreambleDiff.compare(originalDatabase, newDatabase);
         bibStringDiffs = BibStringDiff.compare(originalDatabase.getDatabase(), newDatabase.getDatabase());
+        entryDiffs = getBibEntryDiffs(originalDatabase, newDatabase);
+        if (LOGGER.isDebugEnabled()) {
+            metaDataDiff.ifPresent(diff -> LOGGER.debug("Metadata differences: {}", diff));
+            preambleDiff.ifPresent(diff -> LOGGER.debug("Premble differences: {}", diff));
+            LOGGER.debug("BibString differences: {}", bibStringDiffs);
+            LOGGER.debug("Entry differences: {}", entryDiffs);
+        }
+    }
 
+    private List<BibEntryDiff> getBibEntryDiffs(BibDatabaseContext originalDatabase, BibDatabaseContext newDatabase) {
+        final List<BibEntryDiff> entryDiffs;
         // Sort both databases according to a common sort key.
         EntryComparator comparator = getEntryComparator();
         List<BibEntry> originalEntriesSorted = originalDatabase.getDatabase().getEntriesSorted(comparator);
@@ -41,6 +51,7 @@ public class BibDatabaseDiff {
         newEntriesSorted.removeIf(BibEntry::isEmpty);
 
         entryDiffs = compareEntries(originalEntriesSorted, newEntriesSorted, originalDatabase.getMode());
+        return entryDiffs;
     }
 
     private static EntryComparator getEntryComparator() {
@@ -103,7 +114,6 @@ public class BibDatabaseDiff {
                     || duplicateCheck.isDuplicate(originalEntry, bestEntry, mode)) {
                 matchedEntries.add(bestMatchIndex);
                 differences.add(new BibEntryDiff(originalEntry, newEntries.get(bestMatchIndex)));
-                LOGGER.debug("Matched {} with {}", originalEntry, newEntries.get(bestMatchIndex));
             } else {
                 differences.add(new BibEntryDiff(originalEntry, null));
             }

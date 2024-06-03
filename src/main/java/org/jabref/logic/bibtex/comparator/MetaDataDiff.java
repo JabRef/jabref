@@ -75,8 +75,7 @@ public class MetaDataDiff {
                 if (isDefaultContentSelectors(originalContentSelectors) && isDefaultContentSelectors(newContentSelectors)) {
                     return;
                 }
-            }
-            if (differenceType == DifferenceType.GROUPS) {
+            } else if (differenceType == DifferenceType.GROUPS) {
                 Optional<GroupTreeNode> originalGroups = (Optional<GroupTreeNode>) originalObject;
                 Optional<GroupTreeNode> newGroups = (Optional<GroupTreeNode>) newObject;
                 if (isDefaultGroup(originalGroups) && isDefaultGroup(newGroups)) {
@@ -137,6 +136,7 @@ public class MetaDataDiff {
                 "groupDiff=" + groupDiff +
                 ", originalMetaData=" + originalMetaData +
                 ", newMetaData=" + getNewMetaData() +
+                ", getDifferences()=" + getDifferences(new GlobalCitationKeyPatterns(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) +
                 '}';
     }
 }
