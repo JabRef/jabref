@@ -12,6 +12,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.PdfIndexer;
 import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
     private final GetCurrentLibraryTab currentLibraryTab;
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
+    private final AiPreferences aiPreferences;
     private final TaskExecutor taskExecutor;
 
     private BibDatabaseContext databaseContext;
@@ -37,11 +39,13 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
                                             GetCurrentLibraryTab currentLibraryTab,
                                             DialogService dialogService,
                                             FilePreferences filePreferences,
+                                            AiPreferences aiPreferences,
                                             TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.currentLibraryTab = currentLibraryTab;
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
+        this.aiPreferences = aiPreferences;
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(stateManager));
@@ -75,7 +79,7 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
             return;
         }
         try {
-            PdfIndexer indexer = PdfIndexerManager.getIndexer(databaseContext, filePreferences);
+            PdfIndexer indexer = PdfIndexerManager.getIndexer(databaseContext, filePreferences, aiPreferences);
             currentLibraryTab.get().getIndexingTaskManager().rebuildIndex(indexer);
         } catch (IOException e) {
             dialogService.notify(Localization.lang("Failed to access fulltext search index"));

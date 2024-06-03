@@ -12,15 +12,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.ai.AiIngestor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.SearchFieldConstants;
+import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.inject.Inject;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexNotFoundException;
@@ -42,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Indexes the text of PDF files and adds it into the lucene search index.
+ * Also generates embeddings.
  */
 public class PdfIndexer {
 
@@ -60,7 +65,12 @@ public class PdfIndexer {
 
     private IndexReader reader;
 
-    private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences) {
+    @Inject
+    private AiService aiService;
+
+    private AiPreferences aiPreferences;
+
+    private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences, AiPreferences aiPreferences) {
         this.databaseContext = databaseContext;
         if (indexDirectory == null) {
             // FIXME: This should never happen, but was reported at https://github.com/JabRef/jabref/issues/10781.
@@ -76,22 +86,24 @@ public class PdfIndexer {
         } else {
             this.indexDirectory = indexDirectory;
         }
+
         this.filePreferences = filePreferences;
+        this.aiPreferences = aiPreferences;
     }
 
     /**
      * Method is public, because DatabaseSearcherWithBibFilesTest resides in another package
      */
     @VisibleForTesting
-    public static PdfIndexer of(BibDatabaseContext databaseContext, Path indexDirectory, FilePreferences filePreferences) throws IOException {
-        return new PdfIndexer(databaseContext, new NIOFSDirectory(indexDirectory), filePreferences);
+    public static PdfIndexer of(BibDatabaseContext databaseContext, Path indexDirectory, FilePreferences filePreferences, AiPreferences aiPreferences) throws IOException {
+        return new PdfIndexer(databaseContext, new NIOFSDirectory(indexDirectory), filePreferences, aiPreferences);
     }
 
     /**
      * Method is public, because DatabaseSearcherWithBibFilesTest resides in another package
      */
-    public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
-        return new PdfIndexer(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences);
+    public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiPreferences aiPreferences) throws IOException {
+        return new PdfIndexer(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences, aiPreferences);
     }
 
     /**
@@ -118,6 +130,7 @@ public class PdfIndexer {
         } else {
             LOGGER.trace("Using existing index writer");
         }
+
         return Optional.ofNullable(indexWriter);
     }
 
@@ -269,6 +282,12 @@ public class PdfIndexer {
                         (!linkedFile.getLink().endsWith(".pdf") && !linkedFile.getLink().endsWith(".PDF")))) {
             return;
         }
+
+        if (aiPreferences.getEnableChatWithFiles() && !aiService.haveIngestedFile(linkedFile.getLink())) {
+            AiIngestor aiIngestor = new AiIngestor(aiService);
+            aiIngestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
+        }
+
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
             LOGGER.debug("Could not find {}", linkedFile.getLink());

@@ -38,28 +38,33 @@ public class AiIngestor {
     // Another "algorithm class" that ingests the contents of the file into the embedding store.
     private final EmbeddingStoreIngestor ingestor;
 
-    public AiIngestor(EmbeddingStore<TextSegment> embeddingStore, EmbeddingModel embeddingModel) {
+    private final AiService aiService;
+
+    public AiIngestor(AiService aiService) {
         DocumentSplitter documentSplitter = DocumentSplitters
                 .recursive(DOCUMENT_SPLITTER_MAX_SEGMENT_SIZE_IN_CHARS, DOCUMENT_SPLITTER_MAX_OVERLAP_SIZE_IN_CHARS);
 
         this.ingestor = EmbeddingStoreIngestor
                 .builder()
-                .embeddingStore(embeddingStore)
-                .embeddingModel(embeddingModel)
+                .embeddingStore(aiService.getEmbeddingStore())
+                .embeddingModel(aiService.getEmbeddingModel())
                 .documentSplitter(documentSplitter)
                 .build();
+
+        this.aiService = aiService;
     }
 
     public void ingestLinkedFile(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
         if (path.isPresent()) {
             ingestFile(path.get(), new Metadata().add("linkedFile", linkedFile.getLink()));
+            aiService.registerIngestedFile(linkedFile.getLink());
         } else {
             LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
         }
     }
 
-    public void ingestFile(Path path, Metadata metadata) {
+    private void ingestFile(Path path, Metadata metadata) {
         if (FileUtil.isPDFFile(path)) {
             ingestPDFFile(path, metadata);
         } else {
@@ -67,7 +72,7 @@ public class AiIngestor {
         }
     }
 
-    public void ingestPDFFile(Path path, Metadata metadata) {
+    private void ingestPDFFile(Path path, Metadata metadata) {
         try {
             PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(path);
             PDFTextStripper stripper = new PDFTextStripper();
@@ -84,11 +89,11 @@ public class AiIngestor {
         }
     }
 
-    public void ingestString(String string, Metadata metadata) {
+    private void ingestString(String string, Metadata metadata) {
         ingestDocument(new Document(string, metadata));
     }
 
-    public void ingestDocument(Document document) {
+    private void ingestDocument(Document document) {
         LOGGER.trace("Ingesting: {}", document);
         ingestor.ingest(document);
     }

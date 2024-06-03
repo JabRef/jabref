@@ -126,20 +126,12 @@ public class AiChatTab extends EntryEditorTab {
 
         createAiChat();
         aiChat.restoreMessages(entry.getAiChatMessages());
-        ingestFiles(entry);
         buildChatUI(entry);
     }
 
     private void createAiChat() {
         aiChat = new AiChat(aiService, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.getFiles().stream().map(LinkedFile::getLink).toList()));
         aiChat.setSystemMessage(QA_SYSTEM_MESSAGE);
-    }
-
-    private void ingestFiles(BibEntry entry) {
-        AiIngestor aiIngestor = new AiIngestor(aiService.getEmbeddingStore(), aiService.getEmbeddingModel());
-        entry.getFiles().forEach(file -> {
-            aiIngestor.ingestLinkedFile(file, bibDatabaseContext, filePreferences);
-        });
     }
 
     private void buildChatUI(BibEntry entry) {

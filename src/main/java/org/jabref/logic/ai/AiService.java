@@ -1,5 +1,9 @@
 package org.jabref.logic.ai;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -27,6 +31,9 @@ public class AiService {
 
     private final EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
 
+    // Used in order to check if the PdfIndexer has already ingested the file.
+    private final List<String> ingestedFiles = new ArrayList<>();
+
     public AiService(AiPreferences aiPreferences) {
         if (aiPreferences.getEnableChatWithFiles() && !aiPreferences.getOpenAiToken().isEmpty()) {
             setOpenAiToken(aiPreferences.getOpenAiToken());
@@ -49,6 +56,14 @@ public class AiService {
                 setChatModel(null);
             }
         });
+    }
+
+    public void registerIngestedFile(String path) {
+        ingestedFiles.add(path);
+    }
+
+    public boolean haveIngestedFile(String path) {
+        return ingestedFiles.contains(path);
     }
 
     public void setOpenAiToken(String token) {
