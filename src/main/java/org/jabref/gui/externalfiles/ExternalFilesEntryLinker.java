@@ -16,7 +16,6 @@ import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.indexing.IndexingTaskManager;
-import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -81,37 +80,37 @@ public class ExternalFilesEntryLinker {
     }
 
     public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
-        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
+//        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
             addFilesToEntry(entry, files);
             moveLinkedFilesToFileDir(entry);
             renameLinkedFilesToPattern(entry);
-        } catch (Exception e) {
-            LOGGER.error("Could not block IndexingTaskManager", e);
-        }
+//        } catch (Exception e) {
+//            LOGGER.error("Could not block IndexingTaskManager", e);
+//        }
 
-        try {
-            indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService), entry);
-        } catch (IOException e) {
-            LOGGER.error("Could not access Fulltext-Index", e);
-        }
+//        try {
+//            indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService), entry);
+//        } catch (IOException e) {
+//            LOGGER.error("Could not access Fulltext-Index", e);
+//        }
     }
 
     public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
-        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
+//        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
             for (Path file : files) {
                 copyFileToFileDir(file)
                         .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
             }
             renameLinkedFilesToPattern(entry);
-        } catch (Exception e) {
-            LOGGER.error("Could not block IndexingTaskManager", e);
-        }
+//        } catch (Exception e) {
+//            LOGGER.error("Could not block IndexingTaskManager", e);
+//        }
 
-        try {
-            indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService), entry);
-        } catch (IOException e) {
-            LOGGER.error("Could not access fulltext index", e);
-        }
+//        try {
+//            indexingTaskManager.addToIndex(LuceneIndexer.of(bibDatabaseContext, preferencesService), entry);
+//        } catch (IOException e) {
+//            LOGGER.error("Could not access fulltext index", e);
+//        }
     }
 
     private List<Path> getValidFileNames(List<Path> filesToAdd) {

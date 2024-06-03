@@ -1,7 +1,5 @@
 package org.jabref.gui.search;
 
-import java.io.IOException;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -9,7 +7,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
@@ -73,13 +70,7 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
         if (!shouldContinue || stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
-        try {
-            currentLibraryTab.get().getIndexingTaskManager().createIndex(LuceneIndexer.of(databaseContext, preferencesService));
-            currentLibraryTab.get().getIndexingTaskManager().updateIndex(LuceneIndexer.of(databaseContext, preferencesService));
-        } catch (IOException e) {
-            dialogService.notify(Localization.lang("Failed to access fulltext search index"));
-            LOGGER.error("Failed to access fulltext search index", e);
-        }
+        currentLibraryTab.get().getLuceneIndexer().rebuildIndex();
     }
 
     public interface GetCurrentLibraryTab {
