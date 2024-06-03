@@ -36,6 +36,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         enableChat.selectedProperty().bindBidirectional(viewModel.useAiProperty());
         openAiToken.textProperty().bindBidirectional(viewModel.openAiTokenProperty());
+        systemMessageTextArea.textProperty().bindBidirectional(viewModel.systemMessageProperty());
         messageWindowSizeTextField.valueProperty().bindBidirectional(viewModel.messageWindowSizeProperty().asObject());
         documentSplitterChunkSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterChunkSizeProperty().asObject());
         documentSplitterOverlapSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterOverlapSizeProperty().asObject());

@@ -843,6 +843,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // AI
         defaults.put(AI_ENABLE_CHAT, Boolean.FALSE);
+        defaults.put(AI_SYSTEM_MESSAGE, "You are an AI assistant.");
         defaults.put(AI_MESSAGE_WINDOW_SIZE, 10);
         defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, 300);
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, 100);
@@ -2751,6 +2752,13 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
         EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE_CHAT, newValue));
+
+        EasyBind.listen(aiPreferences.systemMessageProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
+        EasyBind.listen(aiPreferences.messageWindowSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_MESSAGE_WINDOW_SIZE, newValue));
+        EasyBind.listen(aiPreferences.documentSplitterChunkSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, newValue));
+        EasyBind.listen(aiPreferences.documentSplitterOverlapSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, newValue));
+        EasyBind.listen(aiPreferences.ragMaxResultsCountProperty(), (obs, oldValue, newValue) -> putInt(AI_RAG_MAX_RESULTS_COUNT, newValue));
+        EasyBind.listen(aiPreferences.ragMinScoreProperty(), (obs, oldValue, newValue) -> putDouble(AI_RAG_MIN_SCORE, (Double) newValue));
 
         return aiPreferences;
     }
