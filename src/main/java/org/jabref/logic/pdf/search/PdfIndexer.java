@@ -283,6 +283,7 @@ public class PdfIndexer {
             return;
         }
 
+        assert this.aiService != null;
         if (aiPreferences.getEnableChatWithFiles() && !aiService.haveIngestedFile(linkedFile.getLink())) {
             AiIngestor aiIngestor = new AiIngestor(aiService);
             aiIngestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
