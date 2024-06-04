@@ -34,12 +34,12 @@ public class ReferenceViewModel {
      * Return a string for displaying an entry key and its number of uses.
      */
     public String getDisplayText() {
-        return String.format("%s (%s)", entry, citationList.size());
+        return "%s (%s)".formatted(entry, citationList.size());
     }
 
     @Override
     public String toString() {
-        return String.format("ReferenceViewModel{entry='%s', highlighted=%s, citationList=%s}",
+        return "ReferenceViewModel{entry='%s', highlighted=%s, citationList=%s}".formatted(
                 this.entry,
                 this.highlighted,
                 this.citationList);

@@ -34,6 +34,7 @@ import com.sun.star.beans.XMultiPropertyStates;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.beans.XPropertySetInfo;
 import com.sun.star.beans.XPropertyState;
+import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.Locale;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.style.CaseMap;
@@ -372,7 +373,7 @@ public class OOTextIntoOO {
             if (knownToFail.contains(p.Name)) {
                 continue;
             }
-            LOGGER.warn(String.format("OOTextIntoOO.removeDirectFormatting failed on '%s'", p.Name));
+            LOGGER.warn("OOTextIntoOO.removeDirectFormatting failed on '%s'".formatted(p.Name));
         }
     }
 
@@ -749,7 +750,7 @@ public class OOTextIntoOO {
             return PASS;
         } catch (UnknownPropertyException
                 | PropertyVetoException
-                | com.sun.star.lang.IllegalArgumentException
+                | IllegalArgumentException
                 | WrappedTargetException ex) {
             return FAIL;
         }
@@ -758,7 +759,7 @@ public class OOTextIntoOO {
     private static void insertParagraphBreak(XText text, XTextCursor cursor) {
         try {
             text.insertControlCharacter(cursor, ControlCharacter.PARAGRAPH_BREAK, true);
-        } catch (com.sun.star.lang.IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             // Assuming it means wrong code for ControlCharacter.
             // https://api.libreoffice.org/docs/idl/ref/  does not tell.
             // If my assumption is correct, we never get here.

@@ -142,6 +142,13 @@ public class DefaultTaskExecutor implements TaskExecutor {
         return throttler;
     }
 
+    /**
+     * Generates a wrapper JavaFX {@link Task} monitoring the progress based on the data given from the task.
+     * <code>call</code> is routed to the given task object.
+     *
+     * @param task the BackgroundTask to wrap
+     * @return a new Task object
+     */
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<>() {
             {

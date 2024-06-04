@@ -131,7 +131,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
         Tooltip.install(fileLinkText, fileLinkTooltip);
         fileLinkText.setOnMouseClicked(event -> {
-            if (MouseButton.PRIMARY.equals(event.getButton())) {
+            if (MouseButton.PRIMARY == event.getButton()) {
                 try {
                     JabRefDesktop.openBrowser(resolvedPath.toUri(), preferencesService.getFilePreferences());
                 } catch (IOException e) {
@@ -149,7 +149,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         pageLink.setStyle("-fx-font-style: italic; -fx-font-weight: bold;");
 
         pageLink.setOnMouseClicked(event -> {
-            if (MouseButton.PRIMARY.equals(event.getButton())) {
+            if (MouseButton.PRIMARY == event.getButton()) {
                 documentViewerView.gotoPage(pageNumber);
                 documentViewerView.setLiveMode(false);
                 documentViewerView.show();

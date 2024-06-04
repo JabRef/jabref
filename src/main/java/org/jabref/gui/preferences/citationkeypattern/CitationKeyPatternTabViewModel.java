@@ -73,7 +73,7 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
                 new GlobalCitationKeyPatterns(keyPatternPreferences.getKeyPatterns().getDefaultValue());
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
-            if (!item.getEntryType().getName().equals("default")) {
+            if (!"default".equals(item.getEntryType().getName())) {
                 if (!patternString.trim().isEmpty()) {
                     newKeyPattern.addCitationKeyPattern(item.getEntryType(), patternString);
                 }
