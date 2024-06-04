@@ -19,8 +19,13 @@ class JabRefPreferencesTest {
 
     @ParameterizedTest
     @MethodSource("provideTestData")
-    void roundTrip(List<String> sampleList, String sampleString) {
-        assertEquals(sampleString, JabRefPreferences.convertListToString(sampleList));
+    void convertStringToList(List<String> sampleList, String sampleString) {
         assertEquals(sampleList, JabRefPreferences.convertStringToList(sampleString));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTestData")
+    void convertListToString(List<String> sampleList, String sampleString) {
+        assertEquals(sampleString, JabRefPreferences.convertListToString(sampleList));
     }
 }
