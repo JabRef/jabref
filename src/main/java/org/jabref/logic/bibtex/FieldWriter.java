@@ -102,7 +102,7 @@ public class FieldWriter {
     private String formatAndResolveStrings(String content, Field field) throws InvalidFieldValueException {
         checkBraces(content);
 
-        content = content.replace("##", "");
+        content = content.replace("##", "").trim();
 
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -190,8 +190,7 @@ public class FieldWriter {
         checkBraces(content);
 
         StringBuilder stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
-        // Whitespace at the beginning/end is trimmed here because within the formatter it gets complicated in the case if strings are used.
-        stringBuilder.append(formatter.format(content, field).trim());
+        stringBuilder.append(formatter.format(content, field));
         stringBuilder.append(FIELD_END);
         return stringBuilder.toString();
     }

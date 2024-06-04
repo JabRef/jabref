@@ -173,9 +173,15 @@ class FieldWriterTest {
     }
 
     @Test
-    void spacesAreTrimmed() throws Exception {
+    void spacesAreTrimmedAtSingleLineFields() throws Exception {
         String text = "  text      ";
         assertEquals("{text}", writer.write(StandardField.MONTH, text));
+    }
+
+    @Test
+    void spacesAreTrimmedAtMultilineField() throws Exception {
+        String text = "  text      ";
+        assertEquals("{text}", writer.write(StandardField.COMMENT, text));
     }
 
     @Test
@@ -185,14 +191,8 @@ class FieldWriterTest {
     }
 
     @Test
-    void leadingSpacesAreKeptAtMultilineField() throws Exception {
-        String text = "  text      ";
-        assertEquals("{  text}", writer.write(StandardField.COMMENT, text));
-    }
-
-    @Test
     void finalNewLineIsRemovedAtMultilineField() throws Exception {
         String text = "  text      " + OS.NEWLINE;
-        assertEquals("{  text}", writer.write(StandardField.COMMENT, text));
+        assertEquals("{text}", writer.write(StandardField.COMMENT, text));
     }
 }
