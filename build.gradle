@@ -531,7 +531,7 @@ testlogger {
 tasks.withType(Test) {
     reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
     // Enable parallel tests. See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
-    maxParallelForks = Runtime.runtime.availableProcessors() - 1
+    maxParallelForks = Math.max(Runtime.runtime.availableProcessors() - 1, 1)
 }
 
 tasks.register('databaseTest', Test) {
