@@ -7,7 +7,7 @@ parent: Decision Records
 
 ## Context and Problem Statement
 
-Because we store chat messages not inside a BIB entry in BIB database, the chats file is represented as a map to
+Because we store chat messages not inside a BIB entry in `.bib` filecc, the chats file is represented as a map to
 BIB entry and a list of messages. We need to specify the key of this map. Turns out, it is not that easy.
 
 ## Decision Drivers
@@ -21,11 +21,11 @@ BIB entry and a list of messages. We need to specify the key of this map. Turns 
 * `BibEntry` Java object
 * `BibEntry` ID
 * Citation key
+* Use `ShareId`
 
 ## Decision Outcome
 
-Chosen option: "Citation key", because
-this is the only choice that complains to the third point in Decision Drivers.
+Chosen option: "Citation key", because this is the only choice that complains to the third point in Decision Drivers.
 
 ### Positive Consequences
 
@@ -40,15 +40,29 @@ this is the only choice that complains to the third point in Decision Drivers.
 ## Pros and Cons of the Options
 
 ### `BibEntry` Java object
+
 Very bad, because it works only at run-time and is not stable.
 
 ### `BibEntry` ID
+
+JabRef stores a unique identifier for each BibEntry.
+This identifier is created on each load of a library (and not stored permanently).
+
 Very bad, for the same reasons as `BibEntry` Java object.
 
 ### Citation key
+
 * Good, because it is cross-platform, stable (meaning stays the same across launches of JabRef)
 * Bad, because it is not guaranteed that citation key exists on BIB entry, and that it is unique across other 
 BIB entries in the library
+
+### Use `ShareId`
+
+[ADR-0027](0027-synchronization.md) describes the procedure of synchronization of a Bib(La)TeX library with a server.
+Thereby, also local and remote entries need to be kept consistent.
+The solution chosen there is that the **server** creates a UUID for each entry.
+
+This approach cannot be used here, because there is no server running which we can ask for an UUID of an entry. 
 
 ## More Information
 

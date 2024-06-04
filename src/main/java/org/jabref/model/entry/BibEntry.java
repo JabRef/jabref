@@ -138,6 +138,7 @@ public class BibEntry implements Cloneable {
      */
     private boolean changed;
 
+    // TODO: Future work: move this out of this class (maybe HashMap)
     private final List<ChatMessage> aiChatMessages = new ArrayList<>();
 
     /**
