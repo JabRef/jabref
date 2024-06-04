@@ -535,7 +535,6 @@ tasks.withType(Test) {
 
     if (!providers.environmentVariable("CI").isPresent()) {
         maxParallelForks = Math.max(Runtime.runtime.availableProcessors() - 1, 1)
-        forkEvery = 1000
     }
 }
 
