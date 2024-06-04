@@ -32,10 +32,9 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         this.taskExecutor = taskExecutor;
         showToUser(true);
         willBeRecoveredAutomatically(true);
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            this.updateProgress(1, 1);
-            this.titleProperty().set(Localization.lang("Indexing pdf files"));
-        });
+        // runs on fx thread, no need to wrap
+        this.updateProgress(1, 1);
+        this.titleProperty().set(Localization.lang("Indexing pdf files"));
     }
 
     @Override
@@ -56,10 +55,8 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     private void updateProgress() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            updateMessage(Localization.lang("%0 of %1 linked files added to the index", numOfIndexedFiles, numOfIndexedFiles + taskQueue.size()));
-            updateProgress(numOfIndexedFiles, numOfIndexedFiles + taskQueue.size());
-        });
+        updateMessage(Localization.lang("%0 of %1 linked files added to the index", numOfIndexedFiles, numOfIndexedFiles + taskQueue.size()));
+        updateProgress(numOfIndexedFiles, numOfIndexedFiles + taskQueue.size());
     }
 
     private void enqueueTask(Runnable indexingTask) {
