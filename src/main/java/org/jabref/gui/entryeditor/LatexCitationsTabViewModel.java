@@ -167,7 +167,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
         if (citationKey.isPresent()) {
             citationList.setAll(latexFiles.getCitationsByKey(citationKey.get()));
-            if (!status.get().equals(Status.IN_PROGRESS)) {
+            if (status.get() != Status.IN_PROGRESS) {
                 updateStatus();
             }
         } else {

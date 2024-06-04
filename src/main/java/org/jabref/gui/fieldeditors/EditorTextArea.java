@@ -9,12 +9,13 @@ import java.util.function.Supplier;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.Globals;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 
-public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable, ContextMenuAddable {
+public class EditorTextArea extends TextArea implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
     /**
@@ -42,8 +43,7 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
         setOnContextMenuRequested(event -> {
             contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this, Globals.getKeyPrefs()));
             contextMenu.getItems().addAll(0, items.get());
-
-            TextInputControlBehavior.showContextMenu(this, contextMenu, event);
+            contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
     }
 

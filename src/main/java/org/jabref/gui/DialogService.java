@@ -12,6 +12,7 @@ import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
 import javafx.util.StringConverter;
@@ -208,7 +209,7 @@ public interface DialogService {
      * @param dialog dialog to show
      * @param <R>    type of result
      */
-    <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog);
+    <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
 
     /**
      * Constructs and shows a cancelable {@link ProgressDialog}.
