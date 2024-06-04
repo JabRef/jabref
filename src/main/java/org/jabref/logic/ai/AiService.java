@@ -51,7 +51,7 @@ public class AiService {
         });
     }
 
-    public void setOpenAiToken(String token) {
+    private void setOpenAiToken(String token) {
         ChatLanguageModel newChatModel = OpenAiChatModel
                 .builder()
                 .apiKey(token)
@@ -60,7 +60,7 @@ public class AiService {
         setChatModel(newChatModel);
     }
 
-    public void setChatModel(ChatLanguageModel chatModel) {
+    private void setChatModel(ChatLanguageModel chatModel) {
         this.chatModelProperty.set(chatModel);
     }
 
