@@ -27,13 +27,17 @@ The actual usage might look like:
     Localization.menuTitle("Used for Menus only");
 ```
 
-General hints:
+## General hints
 
 * Use the String you want to localize directly, do not use members or local variables: `Localization.lang("Translate me");` instead of `Localization.lang(someVariable)` (possibly in the form `someVariable = Localization.lang("Translate me")`
 * Use `%x`-variables where appropriate: `Localization.lang("Exported %0 entries.", number)` instead of `Localization.lang("Exported ") + number + Localization.lang(" entries.");`
 * Use a full stop/period (".") to end full sentences
 
-The tests check whether translation strings appear correctly in the resource bundles.
+## Checking for correctness
+
+The tests in `org.jabref.logic.l10n.LocalizationConsistencyTest` check whether translation strings appear correctly in the resource bundles.
+
+## Adding a new key
 
 1. Add new `Localization.lang("KEY")` to Java file. Run the `org.jabref.logic.LocalizationConsistencyTest`.
 2. Tests fail. In the test output a snippet is generated which must be added to the English translation file.
