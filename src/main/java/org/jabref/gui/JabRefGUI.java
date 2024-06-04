@@ -327,9 +327,7 @@ public class JabRefGUI extends Application {
         taskExecutor.shutdown();
         fileUpdateMonitor.shutdown();
         DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
-        if (directoryMonitor != null) {
-            directoryMonitor.shutdown();
-        }
+        directoryMonitor.shutdown();
         JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 }
