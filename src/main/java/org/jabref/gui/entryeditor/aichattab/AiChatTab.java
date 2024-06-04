@@ -84,17 +84,16 @@ public class AiChatTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (!aiPreferences.getEnableChatWithFiles()) {
-            setContent(new Label(Localization.lang("JabRef uses OpenAI to enable \"chatting\" with PDF files. OpenAI is an external service. To enable JabRef chatgting with PDF files, the content of the PDF files need to be shared with OpenAI. As soon as you ask a question, the text content of all PDFs attached to the entry are send to OpenAI. The privacy policy of OpenAI applies. You find it at <https://openai.com/policies/privacy-policy/>.")));
-        } else if (!checkIfCitationKeyIsAppropriate(bibDatabaseContext, entry)) {
-            CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
-            if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
-                setContent(new Label(Localization.lang("Citation key could not be generated. Please provide a non-empty and unique citation key for this entry")));
-            } else {
-                bindToEntry(entry);
-            }
             setContent(new PrivacyNoticeComponent(dialogService, aiPreferences, filePreferences, () -> {
                 bindToEntry(entry);
             }));
+        } else if (!checkIfCitationKeyIsAppropriate(bibDatabaseContext, entry)) {
+            CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
+            if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
+                setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please provide a non-empty and unique citation key for this entry")));
+            } else {
+                bindToEntry(entry);
+            }
         } else if (entry.getFiles().isEmpty()) {
             setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")));
         } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
@@ -157,6 +156,8 @@ public class AiChatTab extends EntryEditorTab {
                         ChatMessage aiMessage = ChatMessage.assistant(aiMessageText);
                         aiChatComponent.addMessage(aiMessage);
                         entry.getAiChatMessages().add(aiMessage);
+
+                        aiChatComponent.requestUserPromptTextFieldFocus();
                     })
                     .onFailure(e -> {
                         // TODO: User-friendly error message.

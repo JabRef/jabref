@@ -89,9 +89,6 @@ public class EntryEditor extends BorderPane {
     private final ExternalFilesEntryLinker fileLinker;
     private final DirectoryMonitorManager directoryMonitorManager;
 
-    // TODO: Move this out.
-    private final AiService aiService;
-
     private Subscription typeSubscription;
 
     /*
@@ -136,8 +133,6 @@ public class EntryEditor extends BorderPane {
         ViewLoader.view(this)
                   .root(this)
                   .load();
-
-        this.aiService = new AiService(preferencesService.getAiPreferences());
 
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), databaseContext, dialogService);

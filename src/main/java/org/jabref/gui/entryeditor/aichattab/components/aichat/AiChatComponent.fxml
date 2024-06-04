@@ -3,6 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <fx:root spacing="10.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.entryeditor.aichattab.components.aichat.AiChatComponent">
    <padding>
@@ -26,5 +27,10 @@
             <Button fx:id="submitButton" mnemonicParsing="false" onAction="#internalSendMessageEvent" text="%Submit" />
          </children>
       </HBox>
+      <BorderPane>
+         <center>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%The AI may generate inaccurate or inappropriate responses. Please verify any information provided." BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
    </children>
 </fx:root>
