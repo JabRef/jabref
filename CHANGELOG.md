@@ -19,6 +19,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Added a formatter to remove word enclosing braces. [#11222](https://github.com/JabRef/jabref/issues/11222)
 - We added the ability to add a keyword/crossref when typing the separator character (e.g., comma) in the keywords/crossref fields. [#11178](https://github.com/JabRef/jabref/issues/11178)
 - We added an exporter and improved the importer for Endnote XML format. [#11137](https://github.com/JabRef/jabref/issues/11137)
+- We added support for using BibTeX Style files (BST) in the Preview. [#11102](https://github.com/JabRef/jabref/issues/11102)
 - We added support for automatically update LaTeX citations when a LaTeX file is created, removed, or modified. [#10585](https://github.com/JabRef/jabref/issues/10585)
 
 ### Changed
@@ -27,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We slightly improved the duplicate check if ISBNs are present. [#8885](https://github.com/JabRef/jabref/issues/8885)
 - JabRef no longer downloads HTML files of websites when a PDF was not found. [#10149](https://github.com/JabRef/jabref/issues/10149)
 - Leading and trailing whitespaces are automatically removed from single-line fields. [#11282](https://github.com/JabRef/jabref/pull/11282)
+- We added the HTTP message (in addition to the response code) if an error is encountered. [#11341](https://github.com/JabRef/jabref/pull/11341)
 
 ### Fixed
 
@@ -43,6 +45,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Cursor does not jump to the beginning of the line when multiple spaces or spaces at the beginning or end of the field are contained. [#5904](https://github.com/JabRef/jabref/issues/5904)
 - We fixed an issue where a new entry was not added to the selected group [#8933](https://github.com/JabRef/jabref/issues/8933)
 - We fixed an issue where the horizontal position of the Entry Preview inside the entry editor was not remembered across restarts [#11281](https://github.com/JabRef/jabref/issues/11281)
+- We fixed an issue where the search index was not updated after linking PDF files. [#11317](https://github.com/JabRef/jabref/pull/11317)
+- We fixed rendering of (first) author with a single letter surname. [forum#4330](https://discourse.jabref.org/t/correct-rendering-of-first-author-with-a-single-letter-surname/4330)
+- We fixed an issue where the entry editor context menu was not shown correctly when JabRef is opened on a second, extended screen [#11323](https://github.com/JabRef/jabref/issues/11323), [#11174](https://github.com/JabRef/jabref/issues/11174)
+- We fixe an issue where the value of "Override default font settings" was not applied on startup [#11344](https://github.com/JabRef/jabref/issues/11344)
 
 ### Removed
 

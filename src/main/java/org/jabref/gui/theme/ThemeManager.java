@@ -99,6 +99,7 @@ public class ThemeManager {
                 styleSheet -> addStylesheetToWatchlist(styleSheet, this::additionalCssLiveUpdate));
 
         additionalCssLiveUpdate();
+        updateFontSettings();
     }
 
     private void updateFontSettings() {

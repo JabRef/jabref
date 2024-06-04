@@ -9,6 +9,8 @@ import org.jabref.gui.icon.JabRefIcon;
  * This class defines a type of external files that can be linked to from JabRef.
  * The class contains enough information to provide an icon, a standard extension
  * and a link to which application handles files of this type.
+ *
+ * TODO: Move to model (and then adapt {@link org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel#fromFile(java.nio.file.Path, java.util.List, org.jabref.preferences.FilePreferences)}).
  */
 public class CustomExternalFileType implements ExternalFileType {
 

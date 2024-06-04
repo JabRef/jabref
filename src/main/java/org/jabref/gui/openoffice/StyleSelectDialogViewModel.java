@@ -128,6 +128,6 @@ public class StyleSelectDialogViewModel {
     }
 
     private StyleSelectItemViewModel getStyleOrDefault(String stylePath) {
-        return styles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(styles.get(0));
+        return styles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(styles.getFirst());
     }
 }

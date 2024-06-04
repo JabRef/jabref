@@ -1,5 +1,6 @@
 package org.jabref.preferences;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -24,19 +25,22 @@ public class PreviewPreferences {
     private final StringProperty defaultCustomPreviewLayout;
     private final BooleanProperty showPreviewAsExtraTab;
     private final BooleanProperty showPreviewEntryTableTooltip;
+    private final ObservableList<Path> bstPreviewLayoutPaths;
 
     public PreviewPreferences(List<PreviewLayout> layoutCycle,
                               int layoutCyclePosition,
                               TextBasedPreviewLayout customPreviewLayout,
                               String defaultCustomPreviewLayout,
                               boolean showPreviewAsExtraTab,
-                              boolean showPreviewEntryTableTooltip) {
+                              boolean showPreviewEntryTableTooltip,
+                              List<Path> bstPreviewLayoutPaths) {
         this.layoutCycle = FXCollections.observableArrayList(layoutCycle);
         this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);
         this.customPreviewLayout = new SimpleObjectProperty<>(customPreviewLayout);
         this.defaultCustomPreviewLayout = new SimpleStringProperty(defaultCustomPreviewLayout);
         this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);
         this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);
+        this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
     }
 
     public ObservableList<PreviewLayout> getLayoutCycle() {
@@ -111,5 +115,13 @@ public class PreviewPreferences {
 
     public BooleanProperty showPreviewEntryTableTooltip() {
         return showPreviewEntryTableTooltip;
+    }
+
+    public ObservableList<Path> getBstPreviewLayoutPaths() {
+        return bstPreviewLayoutPaths;
+    }
+
+    public void setBstPreviewLayoutPaths(List<Path> bstPreviewLayoutPaths) {
+        this.bstPreviewLayoutPaths.setAll(bstPreviewLayoutPaths);
     }
 }

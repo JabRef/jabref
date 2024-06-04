@@ -308,6 +308,7 @@ public class LibraryTab extends Tab {
         setupMainPanel();
         setupAutoCompletion();
 
+        this.getDatabase().registerListener(new IndexUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -1085,9 +1086,9 @@ public class LibraryTab extends Tab {
                     List<LinkedFile> newFileList = FileFieldParser.parse(fieldChangedEvent.getNewValue());
 
                     List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
-                    addedFiles.remove(oldFileList);
+                    addedFiles.removeAll(oldFileList);
                     List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
-                    removedFiles.remove(newFileList);
+                    removedFiles.removeAll(newFileList);
 
                     try {
                         PdfIndexer indexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences());

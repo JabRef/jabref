@@ -98,9 +98,9 @@ public class DOABFetcher implements SearchBasedParserFetcher {
             JSONArray array = bitstreamObject.getJSONArray("metadata");
             for (int k = 0; k < array.length(); k++) {
                 JSONObject metadataInBitstreamObject = array.getJSONObject(k);
-                if (metadataInBitstreamObject.getString("key").equals("dc.identifier.isbn")) {
+                if ("dc.identifier.isbn".equals(metadataInBitstreamObject.getString("key"))) {
                     entry.setField(StandardField.ISBN, metadataInBitstreamObject.getString("value"));
-                } else if (metadataInBitstreamObject.getString("key").equals("oapen.relation.isbn")) {
+                } else if ("oapen.relation.isbn".equals(metadataInBitstreamObject.getString("key"))) {
                     entry.setField(StandardField.ISBN, metadataInBitstreamObject.getString("value"));
                 }
             }
@@ -117,8 +117,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                     }
                 }
                 case "dc.type" -> entry.setType(StandardEntryType.Book);
-                case "dc.date.issued" -> entry.setField(StandardField.DATE, String.valueOf(
-                        dataObject.getString("value")));
+                case "dc.date.issued" -> entry.setField(StandardField.DATE, dataObject.getString("value"));
                 case "oapen.identifier.doi" -> entry.setField(StandardField.DOI,
                         dataObject.getString("value"));
                 case "dc.title" -> entry.setField(StandardField.TITLE,

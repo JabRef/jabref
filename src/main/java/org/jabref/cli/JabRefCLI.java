@@ -322,7 +322,7 @@ public class JabRefCLI {
                 .map(format -> new Pair<>(format.getName(), format.getId()))
                 .toList();
         String importFormatsIntro = Localization.lang("Available import formats");
-        String importFormatsList = String.format("%s:%n%s%n", importFormatsIntro, alignStringTable(importFormats));
+        String importFormatsList = "%s:%n%s%n".formatted(importFormatsIntro, alignStringTable(importFormats));
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferencesService,
@@ -332,7 +332,7 @@ public class JabRefCLI {
                 .map(format -> new Pair<>(format.getName(), format.getId()))
                 .toList();
         String outFormatsIntro = Localization.lang("Available export formats");
-        String outFormatsList = String.format("%s:%n%s%n", outFormatsIntro, alignStringTable(exportFormats));
+        String outFormatsList = "%s:%n%s%n".formatted(outFormatsIntro, alignStringTable(exportFormats));
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 

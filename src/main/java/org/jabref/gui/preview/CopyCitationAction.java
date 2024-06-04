@@ -83,7 +83,7 @@ public class CopyCitationAction extends SimpleCommand {
         PreviewLayout previewLayout = preferencesService.getPreviewPreferences().getSelectedPreviewLayout();
 
         if (previewLayout instanceof CitationStylePreviewLayout citationStyleLayout) {
-            styleSource = citationStyleLayout.getSource();
+            styleSource = citationStyleLayout.getText();
         }
 
         if (styleSource != null) {
