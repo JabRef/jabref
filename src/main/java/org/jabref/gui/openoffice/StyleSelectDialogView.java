@@ -18,20 +18,23 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+
 import jakarta.inject.Inject;
-import org.controlsfx.control.textfield.CustomTextField;
 
 public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
@@ -47,14 +50,14 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private Button add;
     @FXML private VBox jstylePreviewBox;
     @FXML private VBox cslPreviewBox;
-    @FXML private ListView<String> availableListView;
-    @FXML private CustomTextField searchBox;
+    @FXML private ListView<CitationStylePreviewLayout> availableListView;
 
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private BibEntryTypesManager bibEntryTypesManager;
 
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
@@ -79,14 +82,19 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
     @FXML
     private void initialize() {
-        viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService, taskExecutor);
+        viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService, taskExecutor, bibEntryTypesManager);
 
-        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
-        previewViewer.setEntry(TestEntry.getTestEntry());
-        EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
-        previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
-                                                      .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
-        cslPreviewBox.getChildren().add(previewViewer);
+        availableListView.setItems(viewModel.getAvailableLayouts());
+        new ViewModelListCellFactory<CitationStylePreviewLayout>()
+                .withText(CitationStylePreviewLayout::getDisplayName)
+                .install(availableListView);
+        availableListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                viewModel.selectedLayoutProperty().set(newValue));
+
+        PreviewViewer cslPreviewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+        cslPreviewViewer.setEntry(TestEntry.getTestEntry());
+        EasyBind.subscribe(viewModel.selectedLayoutProperty(), cslPreviewViewer::setLayout);
+        cslPreviewBox.getChildren().add(cslPreviewViewer);
 
         previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewArticle.setEntry(TestEntry.getTestEntry());
@@ -140,10 +148,6 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
             previewArticle.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat(StandardEntryType.Article)));
             previewBook.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat(StandardEntryType.Book)));
         });
-
-        availableListView.setItems(viewModel.getAvailableStyles());
-        searchBox.textProperty().addListener((observable, oldValue, newValue) ->
-                viewModel.setAvailableStylesFilter(newValue));
     }
 
     private ContextMenu createContextMenu() {
