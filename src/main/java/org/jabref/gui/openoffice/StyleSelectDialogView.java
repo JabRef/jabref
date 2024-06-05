@@ -45,8 +45,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private TableColumn<StyleSelectItemViewModel, String> colFile;
     @FXML private TableColumn<StyleSelectItemViewModel, Boolean> colDeleteIcon;
     @FXML private Button add;
-    @FXML private VBox vbox;
-    @FXML private VBox previewVbox;
+    @FXML private VBox jstylePreviewBox;
+    @FXML private VBox cslPreviewBox;
     @FXML private ListView<String> availableListView;
     @FXML private CustomTextField searchBox;
 
@@ -86,15 +86,15 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), previewViewer::setLayout);
         previewViewer.visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull()
                                                       .or(viewModel.availableSelectionModelProperty().getValue().selectedItemProperty().isNotNull()));
-        previewVbox.getChildren().add(previewViewer);
+        cslPreviewBox.getChildren().add(previewViewer);
 
         previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewArticle.setEntry(TestEntry.getTestEntry());
-        vbox.getChildren().add(previewArticle);
+        jstylePreviewBox.getChildren().add(previewArticle);
 
         previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewBook.setEntry(TestEntry.getTestEntryBook());
-        vbox.getChildren().add(previewBook);
+        jstylePreviewBox.getChildren().add(previewBook);
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());

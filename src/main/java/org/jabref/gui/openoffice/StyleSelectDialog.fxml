@@ -33,7 +33,7 @@
                             </VBox>
                             <VBox spacing="4.0">
                                 <Label text="%Preview" styleClass="sectionHeader"/>
-                                <VBox fx:id="previewVbox" prefHeight="200.0"/>
+                                <VBox fx:id="cslPreviewBox" prefHeight="200.0"/>
                             </VBox>
                         </VBox>
                     </content>
@@ -59,7 +59,7 @@
                                         text="%Add style file" BorderPane.alignment="CENTER"/>
                             </right>
                             <bottom>
-                                <VBox fx:id="vbox" prefHeight="84.0" prefWidth="665.0" BorderPane.alignment="CENTER"/>
+                                <VBox fx:id="jstylePreviewBox" prefHeight="84.0" prefWidth="665.0" BorderPane.alignment="CENTER"/>
                             </bottom>
                         </BorderPane>
                     </content>
