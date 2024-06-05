@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.ScrollPane;
@@ -42,18 +43,17 @@ public class StyleSelectDialogViewModel {
     private final StyleLoader styleLoader;
     private final OpenOfficePreferences openOfficePreferences;
     private final FilePreferences filePreferences;
-    private final BibEntryTypesManager bibEntryTypesManager;
     private final ListProperty<StyleSelectItemViewModel> styles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<StyleSelectItemViewModel> selectedItem = new SimpleObjectProperty<>();
     private final ObservableList<CitationStylePreviewLayout> availableLayouts = FXCollections.observableArrayList();
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
+    private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
 
     public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService, TaskExecutor taskExecutor, BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
         this.filePreferences = preferencesService.getFilePreferences();
         this.openOfficePreferences = preferencesService.getOpenOfficePreferences();
         this.styleLoader = styleLoader;
-        this.bibEntryTypesManager = bibEntryTypesManager;
 
         styles.addAll(loadStyles());
 
@@ -153,10 +153,15 @@ public class StyleSelectDialogViewModel {
     }
 
     public ObservableList<CitationStylePreviewLayout> getAvailableLayouts() {
-        return availableLayouts;
+        return filteredAvailableLayouts;
     }
 
     public ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty() {
         return selectedLayoutProperty;
+    }
+
+    public void setAvailableLayoutsFilter(String searchTerm) {
+        filteredAvailableLayouts.setPredicate(layout ->
+                searchTerm.isEmpty() || layout.getDisplayName().toLowerCase().contains(searchTerm.toLowerCase()));
     }
 }

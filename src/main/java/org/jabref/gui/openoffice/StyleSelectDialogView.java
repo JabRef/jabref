@@ -34,6 +34,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
+import org.controlsfx.control.textfield.CustomTextField;
 
 public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
@@ -50,6 +51,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private VBox jstylePreviewBox;
     @FXML private VBox cslPreviewBox;
     @FXML private ListView<CitationStylePreviewLayout> availableListView;
+    @FXML private CustomTextField searchBox;
 
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
@@ -147,6 +149,10 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
             previewArticle.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat(StandardEntryType.Article)));
             previewBook.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat(StandardEntryType.Book)));
         });
+
+        availableListView.setItems(viewModel.getAvailableLayouts());
+        searchBox.textProperty().addListener((observable, oldValue, newValue) ->
+                viewModel.setAvailableLayoutsFilter(newValue));
     }
 
     private ContextMenu createContextMenu() {
