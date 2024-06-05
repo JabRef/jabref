@@ -33,7 +33,6 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-
 import jakarta.inject.Inject;
 
 public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
