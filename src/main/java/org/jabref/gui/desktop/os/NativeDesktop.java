@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.pdf.search.SearchFieldConstants;
@@ -106,7 +107,7 @@ public abstract class NativeDesktop {
     public Path getEmbeddingsCacheDirectory() {
         return Path.of(AppDirsFactory.getInstance()
                 .getUserDataDir(OS.APP_DIR_APP_NAME,
-                        "embeddings" + File.separator + SearchFieldConstants.VERSION,
+                        "embeddings" + File.separator + AiService.VERSION,
                         OS.APP_DIR_APP_AUTHOR));
     }
 

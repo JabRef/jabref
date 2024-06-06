@@ -36,13 +36,15 @@ import org.slf4j.LoggerFactory;
  * An outer class is responsible for synchronizing objects of this class with {@link org.jabref.preferences.AiPreferences} changes.
  */
 public class AiService {
+    public static final String VERSION = "1";
+
     private final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
 
     private final ObjectProperty<ChatLanguageModel> chatModelProperty = new SimpleObjectProperty<>(null); // <p>
     private final ObjectProperty<EmbeddingModel> embeddingModelProperty = new SimpleObjectProperty<>(new AllMiniLmL6V2EmbeddingModel());
 
-    private static final String STORE_FILE_NAME = "mvstore";
-    private static final String INGESTED_FILE_NAME = "ingested";
+    private static final String STORE_FILE_NAME = "embeddingsStore.mv";
+    private static final String INGESTED_FILE_NAME = "ingested.ArrayList";
 
     private final MVStore mvStore;
     private final EmbeddingStore<TextSegment> embeddingStore;
@@ -52,15 +54,14 @@ public class AiService {
     private final List<Path> filesUnderIngesting = new ArrayList<>();
 
     public AiService(AiPreferences aiPreferences) {
-        Path storePath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(STORE_FILE_NAME);
         try {
-            Files.createDirectories(storePath);
+            Files.createDirectories(JabRefDesktop.getEmbeddingsCacheDirectory());
         } catch (IOException e) {
             LOGGER.error("An error occurred while creating directories for embedding store. Will use an in-memory store", e);
-            storePath = null;
         }
 
-        mvStore = MVStore.open(storePath == null ? null : String.valueOf(storePath));
+        Path storePath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(STORE_FILE_NAME);
+        mvStore = MVStore.open(String.valueOf(storePath));
         embeddingStore = new MVStoreEmbeddingStore(mvStore);
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(String.valueOf(JabRefDesktop.getEmbeddingsCacheDirectory().resolve(INGESTED_FILE_NAME))))){
