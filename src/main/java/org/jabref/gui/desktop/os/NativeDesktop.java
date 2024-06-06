@@ -103,6 +103,13 @@ public abstract class NativeDesktop {
                                              OS.APP_DIR_APP_AUTHOR));
     }
 
+    public Path getEmbeddingsCacheDirectory() {
+        return Path.of(AppDirsFactory.getInstance()
+                .getUserDataDir(OS.APP_DIR_APP_NAME,
+                        "embeddings" + File.separator + SearchFieldConstants.VERSION,
+                        OS.APP_DIR_APP_AUTHOR));
+    }
+
     public Path getSslDirectory() {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(OS.APP_DIR_APP_NAME,

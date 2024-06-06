@@ -476,6 +476,8 @@ compileJava {
                 'langchain4j/dev.langchain4j.store.memory.chat' : 'org.jabref',
                 'langchain4j/dev.langchain4j.data.message' : 'org.jabref',
                 'langchain4j/dev.langchain4j.store.embedding.filter' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.embedding.filter.comparison' : 'org.jabref',
+                'langchain4j/dev.langchain4j.data.embedding' : 'org.jabref',
         ]
     }
 }

@@ -90,16 +90,25 @@ public class AiChatTab extends EntryEditorTab {
         } else if (!checkIfCitationKeyIsAppropriate(bibDatabaseContext, entry)) {
             CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
             if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
-                setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please provide a non-empty and unique citation key for this entry")));
+                setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please provide a non-empty and unique citation key for this entry.")));
             } else {
                 bindToEntry(entry);
             }
         } else if (entry.getFiles().isEmpty()) {
             setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")));
         } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
-            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Only PDF files are supported")));
+            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Only PDF files are supported.")));
         } else {
-            bindToCorrectEntry(entry);
+            LinkedFile linkedFile = entry.getFiles().getFirst();
+            Optional<Path> resolvedPath = linkedFile.findIn(bibDatabaseContext, filePreferences);
+
+            if (resolvedPath.isEmpty()) {
+                setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Could not resolve the path of the linked file.")));
+            } else if (!aiService.haveIngestedFile(resolvedPath.get())) {
+                setContent(new ErrorStateComponent(Localization.lang("Please wait"), Localization.lang("The embeeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")));
+            } else {
+                bindToCorrectEntry(entry);
+            }
         }
     }
 

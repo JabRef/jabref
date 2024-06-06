@@ -112,6 +112,7 @@ public class JabRefGUI extends Application {
         OOBibBaseConnect.closeOfficeConnection();
         Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
+        aiService.close();
     }
 
     private void setupProxy() {

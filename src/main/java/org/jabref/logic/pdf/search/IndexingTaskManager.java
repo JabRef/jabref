@@ -36,6 +36,10 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
             this.updateProgress(1, 1);
             this.titleProperty().set(Localization.lang("Indexing pdf files"));
         });
+
+        onFailure(err -> {
+            throw new RuntimeException(err);
+        });
     }
 
     @Override

@@ -58,15 +58,17 @@ public class AiIngestor {
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
         if (path.isPresent()) {
             ingestFile(path.get(), new Metadata().add("linkedFile", linkedFile.getLink()));
-            aiService.registerIngestedFile(linkedFile.getLink());
         } else {
             LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
         }
     }
 
     private void ingestFile(Path path, Metadata metadata) {
+        aiService.startIngestingFile(path);
+
         if (FileUtil.isPDFFile(path)) {
             ingestPDFFile(path, metadata);
+            aiService.endIngestingFile(path);
         } else {
             LOGGER.info("Unsupported file type of file: {}. For now, only PDF files are supported", path);
         }

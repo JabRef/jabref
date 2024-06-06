@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.ai.AiIngestor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.StandardFileType;
@@ -66,7 +68,7 @@ public class PdfIndexer {
     private IndexReader reader;
 
     @Inject
-    private AiService aiService;
+    private AiService aiService = JabRefGUI.getAiService();
 
     private AiPreferences aiPreferences;
 
@@ -283,18 +285,19 @@ public class PdfIndexer {
             return;
         }
 
-        assert this.aiService != null;
-        if (aiPreferences.getEnableChatWithFiles() && !aiService.haveIngestedFile(linkedFile.getLink())) {
-            AiIngestor aiIngestor = new AiIngestor(aiService);
-            aiIngestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
-        }
-
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
             LOGGER.debug("Could not find {}", linkedFile.getLink());
             return;
         }
+
         LOGGER.debug("Adding {} to index", linkedFile.getLink());
+
+        if (aiPreferences.getEnableChatWithFiles() && !aiService.haveIngestedFile(resolvedPath.get())) {
+            AiIngestor aiIngestor = new AiIngestor(aiService);
+            aiIngestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
+        }
+
         try {
             // Check if a document with this path is already in the index
             try {
