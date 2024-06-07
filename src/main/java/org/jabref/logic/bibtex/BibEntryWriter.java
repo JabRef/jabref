@@ -127,12 +127,12 @@ public class BibEntryWriter {
             }
             written.addAll(optionalFields);
         }
+
         // Then write remaining fields in alphabetic order.
         SortedSet<Field> remainingFields = entry.getFields()
                                                 .stream()
                                                 .filter(key -> !written.contains(key))
                                                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
-
         for (Field field : remainingFields) {
             writeField(entry, out, field, indent);
         }
