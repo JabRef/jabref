@@ -909,8 +909,9 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void trimFieldContents() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.NOTE, "        some note    \t");
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.NOTE, "        some note    \t")
+                .withChanged(true);
         database.insertEntry(entry);
 
         databaseWriter.saveDatabase(bibtexContext);
