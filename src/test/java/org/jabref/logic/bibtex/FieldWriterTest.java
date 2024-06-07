@@ -173,15 +173,16 @@ class FieldWriterTest {
     }
 
     @Test
-    void spacesAreTrimmedAtSingleLineFields() throws Exception {
+    void doubleSpacesAreReplacedBySingleSpaces() throws Exception {
         String text = "  text      ";
-        assertEquals("{text}", writer.write(StandardField.MONTH, text));
+        assertEquals("{ text }", writer.write(StandardField.MONTH, text));
     }
 
     @Test
-    void spacesAreTrimmedAtMultilineField() throws Exception {
+    void spacesAreNotTrimmedAtMultilineField() throws Exception {
         String text = "  text      ";
-        assertEquals("{text}", writer.write(StandardField.COMMENT, text));
+        assertEquals("{  text      }", writer.write(StandardField.COMMENT, text));
+        // Note: Spaces are trimmed at BibDatabaseWriter#applySaveActions
     }
 
     @Test
@@ -191,8 +192,9 @@ class FieldWriterTest {
     }
 
     @Test
-    void finalNewLineIsRemovedAtMultilineField() throws Exception {
+    void finalNewLineIsKeptAtMultilineField() throws Exception {
         String text = "  text      " + OS.NEWLINE;
-        assertEquals("{text}", writer.write(StandardField.COMMENT, text));
+        assertEquals("{" + text + "}", writer.write(StandardField.COMMENT, text));
+        // Note: Spaces are trimmed at BibDatabaseWriter#applySaveActions
     }
 }

@@ -29,8 +29,6 @@ public class FieldContentFormatter {
      * For instance, for <code>#kopp# and #breit#"</code>, <code> and </code> is passed.
      * Also depends on the caller whether strings have been resolved.
      *
-     * Mutliline fields are just right trimmed.
-     *
      * @param fieldContent the content to format.
      * @param field        the name of the bibtex field
      * @return the formatted field content.
@@ -38,10 +36,9 @@ public class FieldContentFormatter {
     public String format(String fieldContent, Field field) {
         if (FieldFactory.isMultiLineField(field, preferences.getNonWrappableFields())) {
             // In general, keep the field as is.
-            // However, we need to trim the field for a nice display in the .bib file
             // Newlines are normalized at org.jabref.logic.exporter.BibWriter
             // Alternative: StringUtil.unifyLineBreaks(fieldContent, OS.NEWLINE)
-            return fieldContent.trim();
+            return fieldContent;
         }
 
         // Replace multiple whitespaces by one. We need to keep the leading and trailing whitespace to enable constructs such as "#kopp# and #breit#"

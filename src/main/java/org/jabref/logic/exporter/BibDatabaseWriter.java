@@ -24,7 +24,9 @@ import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -81,6 +83,12 @@ public abstract class BibDatabaseWriter {
                 changes.addAll(actions.applySaveActions(entry));
             }
         });
+
+        // Trim all white spaces
+        FieldFormatterCleanup trimWhiteSpaces = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new TrimWhitespaceFormatter());
+        for (BibEntry entry : toChange) {
+            changes.addAll(trimWhiteSpaces.cleanup(entry));
+        }
 
         return changes;
     }

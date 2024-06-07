@@ -54,7 +54,6 @@ public class FieldFormatterCleanup implements CleanupJob {
         }
         String oldValue = entry.getField(fieldKey).orElse(null);
 
-        // Run formatter
         String newValue = formatter.format(oldValue);
 
         if (newValue.equals(oldValue)) {
@@ -67,7 +66,7 @@ public class FieldFormatterCleanup implements CleanupJob {
                 entry.setField(fieldKey, newValue, EntriesEventSource.SAVE_ACTION);
             }
             FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
-            return Collections.singletonList(change);
+            return List.of(change);
         }
     }
 

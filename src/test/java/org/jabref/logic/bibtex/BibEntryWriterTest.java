@@ -76,20 +76,17 @@ class BibEntryWriterTest {
         assertEquals(expected, stringWriter.toString());
     }
 
-    /**
-     * Shows strange behavior: One space is deleted in front of the field.
-     */
     @Test
-    void bibEntryContentSomehowTrimmed() throws Exception {
+    void bibEntryTwoSpacesBeforeAndAfterReplacedByOneSpace() throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "  two spaces before and after  ")
+                .withField(StandardField.AUTHOR, "  two spaces before and after (before)  ")
                 .withChanged(true);
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         String expected = """
                 @Article{,
-                  author = {two spaces before and after},
+                  author = { two spaces before and after (before) },
                 }
                 """.replace("\n", OS.NEWLINE);
 
