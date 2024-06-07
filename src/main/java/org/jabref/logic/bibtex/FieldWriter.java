@@ -190,7 +190,7 @@ public class FieldWriter {
         checkBraces(content);
 
         StringBuilder stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
-        stringBuilder.append(formatter.format(content, field));
+        stringBuilder.append(formatter.format(content, field).trim());
         stringBuilder.append(FIELD_END);
         return stringBuilder.toString();
     }
