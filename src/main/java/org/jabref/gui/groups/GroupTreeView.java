@@ -499,7 +499,7 @@ public class GroupTreeView extends BorderPane {
             return;
         }
 
-        double heightOfOneNode = groupTree.getChildrenUnmodifiable().get(0).getLayoutBounds().getHeight();
+        double heightOfOneNode = groupTree.getChildrenUnmodifiable().getFirst().getLayoutBounds().getHeight();
         // heightOfOneNode is the size of text. We need including surroundings.
         // We found no way to get this. We can only do a heuristics here.
         // 2.0 is backed by measurement using the screen ruler utility (https://learn.microsoft.com/en-us/windows/powertoys/screen-ruler)
@@ -519,7 +519,7 @@ public class GroupTreeView extends BorderPane {
     private Optional<ScrollBar> getVerticalScrollbar() {
         for (Node node : groupTree.lookupAll(".scroll-bar")) {
             if (node instanceof ScrollBar scrollbar
-                    && scrollbar.getOrientation().equals(Orientation.VERTICAL)) {
+                    && scrollbar.getOrientation() == Orientation.VERTICAL) {
                 return Optional.of(scrollbar);
             }
         }

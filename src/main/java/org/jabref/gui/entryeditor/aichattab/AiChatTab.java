@@ -36,12 +36,6 @@ public class AiChatTab extends EntryEditorTab {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AiChatTab.class.getName());
 
-    private static final String QA_SYSTEM_MESSAGE = """
-            You are an AI research assistant. You read and analyze scientific articles.
-            The user will send you a question regarding a paper. You will be supplied also with the relevant information found in the article.
-            Answer the question only by using the relevant information. Don't make up the answer.
-            If you can't answer the user question using the provided information, then reply that you couldn't do it.""";
-
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final AiPreferences aiPreferences;
@@ -139,8 +133,7 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void createAiChat() {
-        aiChat = new AiChat(aiService, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.getFiles().stream().map(LinkedFile::getLink).toList()));
-        aiChat.setSystemMessage(QA_SYSTEM_MESSAGE);
+        aiChat = new AiChat(aiService, aiPreferences, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.getFiles().stream().map(LinkedFile::getLink).toList()));
     }
 
     private void buildChatUI(BibEntry entry) {
@@ -157,6 +150,8 @@ public class AiChatTab extends EntryEditorTab {
                         ChatMessage aiMessage = ChatMessage.assistant(aiMessageText);
                         aiChatComponent.addMessage(aiMessage);
                         entry.getAiChatMessages().add(aiMessage);
+
+                        aiChatComponent.requestUserPromptTextFieldFocus();
                     })
                     .onFailure(e -> {
                         // TODO: User-friendly error message.

@@ -17,7 +17,7 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%JabRef uses OpenAI to enable &quot;chatting&quot; with PDF files. OpenAI is an external service. To enable JabRef chatgting with PDF files, the content of the PDF files need to be shared with OpenAI.">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%JabRef uses OpenAI to enable 'chatting' with PDF files. OpenAI is an external service. To enable JabRef chatting with PDF files, the content of the PDF files need to be shared with OpenAI.">
                <font>
                   <Font size="14.0" />
                </font>

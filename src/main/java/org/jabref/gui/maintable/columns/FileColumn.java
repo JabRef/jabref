@@ -64,7 +64,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                 .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
                     if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
                         // Only one linked file -> open directly
-                        LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.get(0),
+                        LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFiles.getFirst(),
                                 entry.getEntry(),
                                 database,
                                 taskExecutor,

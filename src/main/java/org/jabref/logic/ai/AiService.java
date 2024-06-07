@@ -133,7 +133,7 @@ public class AiService {
         setChatModel(newChatModel);
     }
 
-    public void setChatModel(ChatLanguageModel chatModel) {
+    private void setChatModel(ChatLanguageModel chatModel) {
         this.chatModelProperty.set(chatModel);
     }
 

@@ -80,7 +80,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 return false;
             }
         } catch (IllegalArgumentException e) {
-            LOGGER.debug(String.format("Could not parse the FileAnnotation %s into any known FileAnnotationType. It was %s!", annotation, annotation.getSubtype()));
+            LOGGER.debug("Could not parse the FileAnnotation {} into any known FileAnnotationType. It was {}.", annotation, annotation.getSubtype());
         }
         return true;
     }

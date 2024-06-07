@@ -24,6 +24,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -282,7 +283,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog) {
+    public <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog) {
         if (dialog.getOwner() == null) {
             dialog.initOwner(mainWindow);
         }
@@ -291,7 +292,7 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public Optional<String> showPasswordDialogAndWait(String title, String header, String content) {
-        javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();
+        Dialog<String> dialog = new Dialog<>();
         dialog.setTitle(title);
         dialog.setHeaderText(header);
 

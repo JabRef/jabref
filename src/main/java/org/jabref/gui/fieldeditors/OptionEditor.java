@@ -36,7 +36,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
         comboBox.getEditor().setOnContextMenuRequested(event -> {
             ContextMenu contextMenu = new ContextMenu();
             contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(comboBox.getEditor(), Globals.getKeyPrefs()));
-            TextInputControlBehavior.showContextMenu(comboBox.getEditor(), contextMenu, event);
+            contextMenu.show(comboBox, event.getScreenX(), event.getScreenY());
         });
     }
 
