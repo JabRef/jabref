@@ -207,7 +207,7 @@ public class AuthorListParser {
      * @return Preformatted author name; <CODE>Optional.empty()</CODE> if author name is empty.
      */
     private Optional<Author> getAuthor() {
-        List<Object> tokens = new ArrayList<>(); // initialization
+        List<Object> tokens = new ArrayList<>();
         int vonStart = -1;
         int lastStart = -1;
         int commaFirst = -1;
@@ -267,10 +267,10 @@ public class AuthorListParser {
             }
         }
 
-        // Second step: split name into parts (here: calculate indices
-        // of parts in 'tokens' Vector)
+        // Second step: split name into parts (here: calculate indices of parts in 'tokens' Vector)
         if (tokens.isEmpty()) {
-            return Optional.empty(); // no author information
+            // no author information
+            return Optional.empty();
         }
 
         // the following negatives indicate absence of the corresponding part
@@ -364,9 +364,11 @@ public class AuthorListParser {
         String lastPart = lastPartStart < 0 ? null : concatTokens(tokens, lastPartStart, lastPartEnd, OFFSET_TOKEN, false);
         String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
 
-        if ((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)
+        if ((commaFirst < 0) && (firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)
                 && (Character.UnicodeScript.of(lastPart.charAt(0)) != Character.UnicodeScript.HAN)) {
-            // The last part is a small string in complete upper case, so interpret it as initial of the first name
+            // In case there is NO comma (e.g., Obama B) AND
+            // the last part is a small string in complete upper case,
+            // we interpret it as initial of the first name
             // This is the case for example in "Smith SH" which we think of as lastname=Smith and firstname=SH
             // The length < 5 constraint should allow for "Smith S.H." as input
             return Optional.of(new Author(lastPart, lastPart, vonPart, firstPart, jrPart));

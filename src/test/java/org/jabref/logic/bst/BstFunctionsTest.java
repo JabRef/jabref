@@ -1,5 +1,6 @@
 package org.jabref.logic.bst;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -198,6 +201,29 @@ class BstFunctionsTest {
         assertEquals("456789", vm.getStack().pop());
         assertEquals("2", vm.getStack().pop());
         assertEquals(0, vm.getStack().size());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "d, abcd, -1, 1",
+            "cd, abcd, -1, 2",
+            "bcd, abcd, -1, 3",
+            "c, abcd, -2, 1",
+            "abc, abcd, -2, 100",
+            "abc, abcd, -2, 2147483647",
+            "b, abcd, -3, 1",
+            "a, abcd, -4, 1",
+            "'', abcd, -5, 1",                    // invalid number -5
+            "'', abcd, -2147483647, 2147483647",  // invalid number
+    })
+    void substringPlain(String expected, String full, Integer start, Integer length) {
+        BstVMContext bstVMContext = new BstVMContext(List.of(), new BibDatabase(), Path.of("404.bst"));
+        BstFunctions bstFunctions = new BstFunctions(bstVMContext, new StringBuilder());
+        bstVMContext.stack().push(full);
+        bstVMContext.stack().push(start);
+        bstVMContext.stack().push(length);
+        bstFunctions.bstSubstring(null, null);
+        assertEquals(expected, bstVMContext.stack().pop());
     }
 
     @Test

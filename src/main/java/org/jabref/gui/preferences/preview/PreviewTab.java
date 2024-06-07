@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -19,21 +20,23 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -63,6 +66,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
+    @Inject private KeyBindingRepository keyBindingRepository;
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -89,10 +93,14 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         public void execute() {
             if (editArea != null) {
                 switch (command) {
-                    case COPY -> editArea.copy();
-                    case CUT -> editArea.cut();
-                    case PASTE -> editArea.paste();
-                    case SELECT_ALL -> editArea.selectAll();
+                    case COPY ->
+                            editArea.copy();
+                    case CUT ->
+                            editArea.cut();
+                    case PASTE ->
+                            editArea.paste();
+                    case SELECT_ALL ->
+                            editArea.selectAll();
                 }
                 editArea.requestFocus();
             }
@@ -102,6 +110,19 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @Override
     public String getTabName() {
         return Localization.lang("Entry preview");
+    }
+
+    @FXML
+    private void selectBstFile(ActionEvent event) {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.BST)
+                .withDefaultExtension(StandardFileType.BST)
+                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
+                .build();
+
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(bstFile -> {
+            viewModel.addBstStyle(bstFile);
+        });
     }
 
     public void initialize() {
@@ -114,7 +135,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         searchBox.setPromptText(Localization.lang("Search") + "...");
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
 
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory factory = new ActionFactory(keyBindingRepository);
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY)),
@@ -193,7 +214,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
         readOnlyLabel.visibleProperty().bind(viewModel.selectedIsEditableProperty().not());
         resetDefaultButton.disableProperty().bind(viewModel.selectedIsEditableProperty().not());
-        contextMenu.getItems().get(0).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
+        contextMenu.getItems().getFirst().disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         contextMenu.getItems().get(2).disableProperty().bind(viewModel.selectedIsEditableProperty().not());
         editArea.editableProperty().bind(viewModel.selectedIsEditableProperty());
 

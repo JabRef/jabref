@@ -6,7 +6,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public class RemoveBracesFormatter extends Formatter {
+public class RemoveEnclosingBracesFormatter extends Formatter {
 
     @Override
     public String getName() {
@@ -16,6 +16,16 @@ public class RemoveBracesFormatter extends Formatter {
     @Override
     public String getKey() {
         return "remove_braces";
+    }
+
+    @Override
+    public String getDescription() {
+        return Localization.lang("Removes braces encapsulating the complete field content.");
+    }
+
+    @Override
+    public String getExampleInput() {
+        return "{In CDMA}";
     }
 
     @Override
@@ -35,16 +45,6 @@ public class RemoveBracesFormatter extends Formatter {
             }
         }
         return formatted;
-    }
-
-    @Override
-    public String getDescription() {
-        return Localization.lang("Removes braces encapsulating the complete field content.");
-    }
-
-    @Override
-    public String getExampleInput() {
-        return "{In CDMA}";
     }
 
     /**

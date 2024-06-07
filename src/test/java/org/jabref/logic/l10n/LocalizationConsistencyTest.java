@@ -134,7 +134,7 @@ class LocalizationConsistencyTest {
                                    """
 
                                            DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE
-                                           PASTE THESE INTO THE ENGLISH LANGUAGE FILE
+                                           PASTE THESE INTO THE ENGLISH LANGUAGE FILE "JabRef_en.properties"
 
                                            """,
                                    "\n\n")));
@@ -149,7 +149,7 @@ class LocalizationConsistencyTest {
                         """
 
                                 1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE
-                                2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE
+                                2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE "JabRef_en.properties"
 
                                 """))
         );

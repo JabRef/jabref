@@ -346,8 +346,8 @@ class NamedRangeReferenceMark implements NamedRange {
         if (leftLength > 0) {
             alpha.goLeft(leftLength, true);
             if (!left.equals(alpha.getString())) {
-                String msg = String.format("checkFillCursor:"
-                                + " ('%s') is not prefixed with REFERENCE_MARK_LEFT_BRACKET, has '%s'",
+                String msg = ("checkFillCursor:"
+                        + " ('%s') is not prefixed with REFERENCE_MARK_LEFT_BRACKET, has '%s'").formatted(
                         cursor.getString(), alpha.getString());
                 throw new IllegalStateException(msg);
             }
@@ -358,8 +358,8 @@ class NamedRangeReferenceMark implements NamedRange {
         if (rightLength > 0) {
             omega.goRight(rightLength, true);
             if (!right.equals(omega.getString())) {
-                String msg = String.format("checkFillCursor:"
-                                + " ('%s') is not followed by REFERENCE_MARK_RIGHT_BRACKET, has '%s'",
+                String msg = ("checkFillCursor:"
+                        + " ('%s') is not followed by REFERENCE_MARK_RIGHT_BRACKET, has '%s'").formatted(
                         cursor.getString(), omega.getString());
                 throw new IllegalStateException(msg);
             }

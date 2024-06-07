@@ -40,11 +40,11 @@ public class LatexIntegrityChecker implements EntryChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(SnuggleSession.class);
     private static final SnuggleEngine ENGINE = new SnuggleEngine();
     private static final SnuggleSession SESSION;
-    private static final ResourceBundle ERROR_MESSAGES = ENGINE.getPackages().get(0).getErrorMessageBundle();
+    private static final ResourceBundle ERROR_MESSAGES = ENGINE.getPackages().getFirst().getErrorMessageBundle();
     private static final Set<ErrorCode> EXCLUDED_ERRORS = new HashSet<>();
 
     static {
-        SnugglePackage snugglePackage = ENGINE.getPackages().get(0);
+        SnugglePackage snugglePackage = ENGINE.getPackages().getFirst();
         snugglePackage.addComplexCommand("textgreater", false, 0, TEXT_MODE_ONLY, null, null, null);
         snugglePackage.addComplexCommand("textless", false, 0, TEXT_MODE_ONLY, null, null, null);
         snugglePackage.addComplexCommand("textbackslash", false, 0, TEXT_MODE_ONLY, null, null, null);
@@ -87,7 +87,7 @@ public class LatexIntegrityChecker implements EntryChecker {
         // Retrieve the first error only because it is likely to be more meaningful.
         // Displaying all (subsequent) faults may lead to confusion.
         // We further get a slight performance benefit from failing fast (see static config in class header).
-        InputError error = SESSION.getErrors().get(0);
+        InputError error = SESSION.getErrors().getFirst();
         return Stream.of(new Pair<>(entry.getKey(), error));
     }
 
