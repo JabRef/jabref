@@ -933,7 +933,7 @@ public class BibEntry implements Cloneable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(commentsBeforeEntry, type.getValue(), fields);
+        return Objects.hash(type.getValue(), fields, commentsBeforeEntry);
     }
 
     public void registerListener(Object object) {
