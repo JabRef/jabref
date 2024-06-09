@@ -293,10 +293,12 @@ public class PdfIndexer {
         LOGGER.debug("Adding {} to index", linkedFile.getLink());
         LOGGER.error("ADDDING {}", linkedFile.getLink());
 
-        if (aiPreferences.getEnableChatWithFiles() && !aiService.haveIngestedFile(resolvedPath.get())) {
+        if (aiPreferences.getEnableChatWithFiles() && !aiService.haveIngestedFile(linkedFile.getLink())) {
+            LOGGER.error("INSIDE ADDDING {}", linkedFile.getLink());
             AiIngestor aiIngestor = new AiIngestor(aiService);
             aiIngestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
         }
+        LOGGER.error("OUTSIDE ADDDING {}", linkedFile.getLink());
 
         try {
             // Check if a document with this path is already in the index

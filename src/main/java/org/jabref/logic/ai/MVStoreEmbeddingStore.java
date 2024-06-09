@@ -34,7 +34,7 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
     private final MVMap<String, String> contentsMap;
 
     public MVStoreEmbeddingStore(MVStore mvStore) {
-        // TODO: Will this work efficiently?
+        // TODO: Will this work efficiently? Does optimizations work on map level or entry level?
         this.embeddingsMap = mvStore.openMap("embeddingsMap");
         this.fileMap = mvStore.openMap("fileMap");
         this.contentsMap = mvStore.openMap("contentsMap");
@@ -80,21 +80,20 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
     @Override
     public void remove(String id) {
         embeddingsMap.remove(id);
+        contentsMap.remove(id);
         fileMap.remove(id);
     }
 
     @Override
     public void removeAll(Filter filter) {
-        applyFilter(filter).forEach(id -> {
-            // TODO: Will this even work?
-            embeddingsMap.remove(id);
-            fileMap.remove(id);
-        });
+        List<String> idsToRemove = applyFilter(filter).toList();
+        idsToRemove.forEach(this::remove);
     }
 
     @Override
     public void removeAll() {
         embeddingsMap.clear();
+        contentsMap.clear();
         fileMap.clear();
     }
 
@@ -115,8 +114,8 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
             double score = RelevanceScore.fromCosineSimilarity(cosineSimilarity);
 
             if (score >= request.minScore()) {
-                // TODO: All metadata lost.
                 matches.add(new EmbeddingMatch<>(score, id, embedding, new TextSegment(contentsMap.get(id), new Metadata())));
+
                 if (matches.size() > request.maxResults()) {
                     matches.poll();
                 }
@@ -133,6 +132,7 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
     @Override
     public void removeAll(Collection ids) {
         embeddingsMap.entrySet().removeIf(entry -> ids.contains(entry.getKey()));
+        contentsMap.entrySet().removeIf(entry -> ids.contains(entry.getKey()));
         fileMap.entrySet().removeIf(entry -> ids.contains(entry.getKey()));
     }
 

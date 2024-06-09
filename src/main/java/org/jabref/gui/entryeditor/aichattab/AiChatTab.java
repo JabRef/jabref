@@ -68,6 +68,14 @@ public class AiChatTab extends EntryEditorTab {
 
         setText(Localization.lang(NAME));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
+
+        aiService.getIngestedFilesProperty().addListener((observableValue, paths, t1) -> {
+            if (currentBibEntry != null) {
+                if (aiService.haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
+                    bindToEntry(currentBibEntry);
+                }
+            }
+        });
     }
 
     @Override
@@ -77,6 +85,8 @@ public class AiChatTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+        currentBibEntry = entry;
+
         if (!aiPreferences.getEnableChatWithFiles()) {
             setContent(new PrivacyNoticeComponent(dialogService, aiPreferences, filePreferences, () -> {
                 bindToEntry(entry);
@@ -93,12 +103,7 @@ public class AiChatTab extends EntryEditorTab {
         } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
             setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Only PDF files are supported.")));
         } else {
-            LinkedFile linkedFile = entry.getFiles().getFirst();
-            Optional<Path> resolvedPath = linkedFile.findIn(bibDatabaseContext, filePreferences);
-
-            if (resolvedPath.isEmpty()) {
-                setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Could not resolve the path of the linked file.")));
-            } else if (!aiService.haveIngestedFile(resolvedPath.get())) {
+            if (!aiService.haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
                 setContent(new ErrorStateComponent(Localization.lang("Please wait"), Localization.lang("The embeeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")));
             } else {
                 bindToCorrectEntry(entry);
@@ -125,8 +130,6 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void bindToCorrectEntry(BibEntry entry) {
-        currentBibEntry = entry;
-
         createAiChat();
         aiChat.restoreMessages(entry.getAiChatMessages());
         buildChatUI(entry);

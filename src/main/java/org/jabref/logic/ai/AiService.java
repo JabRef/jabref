@@ -9,12 +9,20 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.AiPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -44,14 +52,13 @@ public class AiService {
     private final ObjectProperty<EmbeddingModel> embeddingModelProperty = new SimpleObjectProperty<>(new AllMiniLmL6V2EmbeddingModel());
 
     private static final String STORE_FILE_NAME = "embeddingsStore.mv";
-    private static final String INGESTED_FILE_NAME = "ingested.ArrayList";
+    private static final String INGESTED_FILE_NAME = "ingested.array";
 
     private final MVStore mvStore;
     private final EmbeddingStore<TextSegment> embeddingStore;
 
-    // Used in order to check if the PdfIndexer has already ingested the file.
-    private ArrayList<Path> ingestedFiles;
-    private final List<Path> filesUnderIngesting = new ArrayList<>();
+    private ListProperty<String> ingestedFiles;
+    private final List<String> filesUnderIngesting = new ArrayList<>();
 
     public AiService(AiPreferences aiPreferences) {
         try {
@@ -65,13 +72,14 @@ public class AiService {
         embeddingStore = new MVStoreEmbeddingStore(mvStore);
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(String.valueOf(JabRefDesktop.getEmbeddingsCacheDirectory().resolve(INGESTED_FILE_NAME))))){
-            ingestedFiles = (ArrayList<Path>) ois.readObject();
+            List<String> ingestedFilesList = Arrays.stream(((String[]) ois.readObject())).toList();
+            ingestedFiles = new SimpleListProperty<>(FXCollections.observableList(ingestedFilesList));
         } catch (FileNotFoundException e) {
             LOGGER.info("No ingested files cache. Will create a new one");
-            ingestedFiles = new ArrayList<>();
+            ingestedFiles = new SimpleListProperty<>();
         } catch (IOException | ClassNotFoundException e) {
             LOGGER.error("An error occurred while reading paths of ingested files", e);
-            ingestedFiles = new ArrayList<>();
+            ingestedFiles = new SimpleListProperty<>();
         }
 
         if (aiPreferences.getEnableChatWithFiles() && !aiPreferences.getOpenAiToken().isEmpty()) {
@@ -97,24 +105,36 @@ public class AiService {
         });
     }
 
-    public void startIngestingFile(Path path) {
+    public void startIngestingFile(String path) {
         filesUnderIngesting.add(path);
     }
 
-    public void endIngestingFile(Path path) {
+    public void endIngestingFile(String path) {
         assert filesUnderIngesting.contains(path);
 
         filesUnderIngesting.remove(path);
         ingestedFiles.add(path);
     }
 
-    public boolean haveIngestedFile(Path path) {
+    public boolean haveIngestedFile(String path) {
         return ingestedFiles.contains(path);
+    }
+
+    public boolean haveIngestedFiles(Collection<String> paths) {
+        return new HashSet<>(ingestedFiles).containsAll(paths);
+    }
+
+    public boolean haveIngestedLinkedFiles(Collection<LinkedFile> linkedFiles) {
+        return haveIngestedFiles(linkedFiles.stream().map(LinkedFile::getLink).toList());
+    }
+
+    public ReadOnlyListProperty<String> getIngestedFilesProperty() {
+        return ingestedFiles;
     }
 
     public void close() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(String.valueOf(JabRefDesktop.getEmbeddingsCacheDirectory().resolve(INGESTED_FILE_NAME))))) {
-            oos.writeObject(ingestedFiles);
+            oos.writeObject(ingestedFiles.toArray());
         } catch (IOException e) {
             LOGGER.error("An error occurred while saving the paths of ingested files", e);
         }
