@@ -69,7 +69,6 @@ public class AiService {
         }
 
         Path storePath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(STORE_FILE_NAME);
-        LOGGER.error("STORE: {}", storePath);
         mvStore = MVStore.open(String.valueOf(storePath));
         embeddingStore = new MVStoreEmbeddingStore(mvStore);
 
