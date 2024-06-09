@@ -88,27 +88,45 @@ public class AiChatTab extends EntryEditorTab {
         currentBibEntry = entry;
 
         if (!aiPreferences.getEnableChatWithFiles()) {
-            setContent(new PrivacyNoticeComponent(dialogService, aiPreferences, filePreferences, () -> {
-                bindToEntry(entry);
-            }));
+            showPrivacyNotice(entry);
         } else if (!checkIfCitationKeyIsAppropriate(bibDatabaseContext, entry)) {
-            CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
-            if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
-                setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please provide a non-empty and unique citation key for this entry.")));
-            } else {
-                bindToEntry(entry);
-            }
+            tryToGenerateCitationKey(entry);
         } else if (entry.getFiles().isEmpty()) {
-            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")));
+            showErrorNoFiles();
         } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
-            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Only PDF files are supported.")));
+            showErrorNotPdfs();
+        } else if (!aiService.haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
+            showErrorNotIngested();
         } else {
-            if (!aiService.haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
-                setContent(new ErrorStateComponent(Localization.lang("Please wait"), Localization.lang("The embeeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")));
-            } else {
-                bindToCorrectEntry(entry);
-            }
+            bindToCorrectEntry(entry);
         }
+    }
+
+    private void showErrorNotIngested() {
+        setContent(new ErrorStateComponent(Localization.lang("Please wait"), Localization.lang("The embeeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")));
+    }
+
+    private void showErrorNotPdfs() {
+        setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Only PDF files are supported.")));
+    }
+
+    private void showErrorNoFiles() {
+        setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")));
+    }
+
+    private void tryToGenerateCitationKey(BibEntry entry) {
+        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
+        if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
+            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please provide a non-empty and unique citation key for this entry.")));
+        } else {
+            bindToEntry(entry);
+        }
+    }
+
+    private void showPrivacyNotice(BibEntry entry) {
+        setContent(new PrivacyNoticeComponent(dialogService, aiPreferences, filePreferences, () -> {
+            bindToEntry(entry);
+        }));
     }
 
     private static boolean checkIfCitationKeyIsAppropriate(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
