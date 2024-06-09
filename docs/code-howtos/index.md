@@ -35,13 +35,26 @@ For accessing or putting data into the Clipboard use the `ClipboardManager`.
 
 ## Get Absolute Filename or Path for file in File directory
 
+JabRef stores files relative to one of [multiple possible directories](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files).
+The convert the relative path to an absolute one, there is the `find` method in `FileUtil`:
+
 ```java
-Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFilePreferences());
+org.jabref.logic.util.io.FileUtil.find(org.jabref.model.database.BibDatabaseContext, java.lang.String, org.jabref.preferences.FilePreferences)
 ```
 
 `String path` Can be the files name or a relative path to it. The Preferences should only be directly accessed in the GUI. For the usage in logic pass them as parameter
 
-## Setting a Database Directory for a .bib File
+## Get a relative filename (or path) for a file
+
+[JabRef offers multiple directories per library to store a file.](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files).
+When adding a file to a library, the path should be stored relative to "the best matching" directory of these.
+This is implemented in `FileUtil`:
+
+```java
+org.jabref.logic.util.io.FileUtil.relativize(java.nio.file.Path, org.jabref.model.database.BibDatabaseContext, org.jabref.preferences.FilePreferences)
+```
+
+## Setting a Directory for a .bib File
 
 * `@comment{jabref-meta: fileDirectory:<directory>`
 * “fileDirectory” is determined by Globals.pref.get(“userFileDir”) (which defaults to “fileDirectory”

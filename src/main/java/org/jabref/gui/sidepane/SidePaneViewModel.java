@@ -65,9 +65,9 @@ public class SidePaneViewModel extends AbstractViewModel {
         getPanes().addListener((ListChangeListener<? super SidePaneType>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    preferencesService.getSidePanePreferences().visiblePanes().add(change.getAddedSubList().get(0));
+                    preferencesService.getSidePanePreferences().visiblePanes().add(change.getAddedSubList().getFirst());
                 } else if (change.wasRemoved()) {
-                    preferencesService.getSidePanePreferences().visiblePanes().remove(change.getRemoved().get(0));
+                    preferencesService.getSidePanePreferences().visiblePanes().remove(change.getRemoved().getFirst());
                 }
             }
         });

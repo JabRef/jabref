@@ -25,6 +25,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.google.common.base.Strings;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
@@ -70,7 +71,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
 
         // Guess publication type
         String isbn = springerJsonEntry.optString("isbn");
-        if (com.google.common.base.Strings.isNullOrEmpty(isbn)) {
+        if (Strings.isNullOrEmpty(isbn)) {
             // Probably article
             entry.setType(StandardEntryType.Article);
             nametype = StandardField.JOURNAL;
@@ -130,7 +131,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
             } else {
                 urls.forEach(data -> {
                     JSONObject url = (JSONObject) data;
-                    if (url.optString("format").equalsIgnoreCase("pdf")) {
+                    if ("pdf".equalsIgnoreCase(url.optString("format"))) {
                         try {
                             entry.addFile(new LinkedFile(new URL(url.optString("value")), "PDF"));
                         } catch (MalformedURLException e) {

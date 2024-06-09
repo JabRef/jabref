@@ -27,7 +27,7 @@ public class DOABFetcherTest {
         assertEquals("DOAB", fetcher.getName());
     }
 
-    public static Stream<Arguments> testPerformSearch() {
+    public static Stream<Arguments> performSearch() {
         return Stream.of(
                 Arguments.of(
                         new BibEntry(StandardEntryType.Book)

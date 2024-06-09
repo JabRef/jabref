@@ -177,8 +177,8 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     private void removeSpecialFieldColumns() {
-        columnsListProperty.getValue().removeIf(column -> column.getType().equals(MainTableColumnModel.Type.SPECIALFIELD));
-        availableColumnsProperty.getValue().removeIf(column -> column.getType().equals(MainTableColumnModel.Type.SPECIALFIELD));
+        columnsListProperty.getValue().removeIf(column -> column.getType() == MainTableColumnModel.Type.SPECIALFIELD);
+        availableColumnsProperty.getValue().removeIf(column -> column.getType() == MainTableColumnModel.Type.SPECIALFIELD);
     }
 
     private void insertExtraFileColumns() {
@@ -189,8 +189,8 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     private void removeExtraFileColumns() {
-        columnsListProperty.getValue().removeIf(column -> column.getType().equals(MainTableColumnModel.Type.EXTRAFILE));
-        availableColumnsProperty.getValue().removeIf(column -> column.getType().equals(MainTableColumnModel.Type.EXTRAFILE));
+        columnsListProperty.getValue().removeIf(column -> column.getType() == MainTableColumnModel.Type.EXTRAFILE);
+        availableColumnsProperty.getValue().removeIf(column -> column.getType() == MainTableColumnModel.Type.EXTRAFILE);
     }
 
     public void insertColumnInList() {
