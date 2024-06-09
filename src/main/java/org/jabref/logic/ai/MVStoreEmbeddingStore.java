@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -22,7 +23,9 @@ import dev.langchain4j.store.embedding.EmbeddingSearchResult;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.RelevanceScore;
 import dev.langchain4j.store.embedding.filter.Filter;
+import dev.langchain4j.store.embedding.filter.comparison.IsEqualTo;
 import dev.langchain4j.store.embedding.filter.comparison.IsIn;
+import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
@@ -136,13 +139,21 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
         fileMap.entrySet().removeIf(entry -> ids.contains(entry.getKey()));
     }
 
-    private Stream<String> applyFilter(Filter filter) {
-        if (filter == null) {
-            return embeddingsMap.keySet().stream();
-        } else if (filter instanceof IsIn isInFilter && Objects.equals(isInFilter.key(), "linkedFile")) {
-            return fileMap.entrySet().stream().filter(entry -> isInFilter.comparisonValues().contains(entry.getValue())).map(Map.Entry::getKey);
-        } else {
-            throw new IllegalArgumentException("Wrong filter passed to MVStoreEmbeddingStore");
-        }
+    private Stream<String> applyFilter(@Nullable Filter filter) {
+        return switch (filter) {
+            case null -> embeddingsMap.keySet().stream();
+
+            case IsIn isInFilter when Objects.equals(isInFilter.key(), "linkedFile") ->
+                    filterEntries(entry -> isInFilter.comparisonValues().contains(entry.getValue()));
+
+            case IsEqualTo isEqualToFilter when Objects.equals(isEqualToFilter.key(), "linkedFile") ->
+                    filterEntries(entry -> isEqualToFilter.comparisonValue().equals(entry.getValue()));
+
+            default -> throw new IllegalArgumentException("Wrong filter passed to MVStoreEmbeddingStore");
+        };
+    }
+
+    private Stream<String> filterEntries(Predicate<Map.Entry<String, String>> predicate) {
+        return fileMap.entrySet().stream().filter(predicate).map(Map.Entry::getKey);
     }
 }

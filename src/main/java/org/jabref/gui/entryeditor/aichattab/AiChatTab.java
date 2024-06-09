@@ -12,6 +12,7 @@ import org.jabref.gui.entryeditor.aichattab.components.aichat.AiChatComponent;
 import org.jabref.gui.entryeditor.aichattab.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.entryeditor.aichattab.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.ai.AiService;
@@ -72,7 +73,7 @@ public class AiChatTab extends EntryEditorTab {
         aiService.getIngestedFilesProperty().addListener((observableValue, paths, t1) -> {
             if (currentBibEntry != null) {
                 if (aiService.haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
-                    bindToEntry(currentBibEntry);
+                    DefaultTaskExecutor.runInJavaFXThread(() -> bindToEntry(currentBibEntry));
                 }
             }
         });
@@ -103,7 +104,7 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void showErrorNotIngested() {
-        setContent(new ErrorStateComponent(Localization.lang("Please wait"), Localization.lang("The embeeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")));
+        setContent(new ErrorStateComponent(Localization.lang("Please wait"), Localization.lang("The embeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")));
     }
 
     private void showErrorNotPdfs() {

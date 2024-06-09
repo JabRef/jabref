@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
@@ -52,7 +53,7 @@ public class AiService {
     private final ObjectProperty<EmbeddingModel> embeddingModelProperty = new SimpleObjectProperty<>(new AllMiniLmL6V2EmbeddingModel());
 
     private static final String STORE_FILE_NAME = "embeddingsStore.mv";
-    private static final String INGESTED_FILE_NAME = "ingested.array";
+    private static final String INGESTED_FILE_NAME = "ingested.ArrayList";
 
     private final MVStore mvStore;
     private final EmbeddingStore<TextSegment> embeddingStore;
@@ -68,11 +69,12 @@ public class AiService {
         }
 
         Path storePath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(STORE_FILE_NAME);
+        LOGGER.error("STORE: {}", storePath);
         mvStore = MVStore.open(String.valueOf(storePath));
         embeddingStore = new MVStoreEmbeddingStore(mvStore);
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(String.valueOf(JabRefDesktop.getEmbeddingsCacheDirectory().resolve(INGESTED_FILE_NAME))))){
-            List<String> ingestedFilesList = Arrays.stream(((String[]) ois.readObject())).toList();
+            ArrayList<String> ingestedFilesList = (ArrayList<String>) ois.readObject();
             ingestedFiles = new SimpleListProperty<>(FXCollections.observableList(ingestedFilesList));
         } catch (FileNotFoundException e) {
             LOGGER.info("No ingested files cache. Will create a new one");
@@ -132,9 +134,14 @@ public class AiService {
         return ingestedFiles;
     }
 
+    public void removeIngestedFile(String path) {
+        embeddingStore.removeAll(MetadataFilterBuilder.metadataKey("linkedFile").isEqualTo(path));
+        ingestedFiles.remove(path);
+    }
+
     public void close() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(String.valueOf(JabRefDesktop.getEmbeddingsCacheDirectory().resolve(INGESTED_FILE_NAME))))) {
-            oos.writeObject(ingestedFiles.toArray());
+            oos.writeObject(new ArrayList<>(ingestedFiles.stream().toList()));
         } catch (IOException e) {
             LOGGER.error("An error occurred while saving the paths of ingested files", e);
         }

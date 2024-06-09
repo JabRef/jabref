@@ -230,7 +230,8 @@ public class PdfIndexer {
      * @param linkedFilePath the path to the file to be removed
      */
     public void removeFromIndex(String linkedFilePath) {
-        LOGGER.error("REMOVING {}", linkedFilePath);
+        aiService.removeIngestedFile(linkedFilePath);
+
         try {
             getIndexWriter().ifPresent(Unchecked.consumer(writer -> {
                 writer.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
@@ -291,14 +292,11 @@ public class PdfIndexer {
         }
 
         LOGGER.debug("Adding {} to index", linkedFile.getLink());
-        LOGGER.error("ADDDING {}", linkedFile.getLink());
 
         if (aiPreferences.getEnableChatWithFiles() && !aiService.haveIngestedFile(linkedFile.getLink())) {
-            LOGGER.error("INSIDE ADDDING {}", linkedFile.getLink());
             AiIngestor aiIngestor = new AiIngestor(aiService);
             aiIngestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
         }
-        LOGGER.error("OUTSIDE ADDDING {}", linkedFile.getLink());
 
         try {
             // Check if a document with this path is already in the index
