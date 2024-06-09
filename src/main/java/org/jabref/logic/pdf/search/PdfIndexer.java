@@ -20,7 +20,6 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
@@ -67,9 +66,9 @@ public class PdfIndexer {
 
     private IndexReader reader;
 
-    private AiService aiService = JabRefGUI.getAiService();
+    private final AiService aiService = JabRefGUI.getAiService();
 
-    private AiPreferences aiPreferences;
+    private final AiPreferences aiPreferences;
 
     private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences, AiPreferences aiPreferences) {
         this.databaseContext = databaseContext;
