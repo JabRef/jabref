@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<fx:root type="Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.entryeditor.aichattab.components.errorstate.ErrorStateComponent">
-   <children>
-      <VBox spacing="10.0">
+<fx:root prefHeight="200.0" prefWidth="500.0" type="BorderPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.entryeditor.aichattab.components.errorstate.ErrorStateComponent">
+   <center>
+      <VBox alignment="CENTER" spacing="10.0">
          <children>
             <Text fx:id="titleText" strokeType="OUTSIDE" strokeWidth="0.0" text="Title">
                <font>
@@ -23,5 +24,5 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
       </VBox>
-   </children>
+   </center>
 </fx:root>
