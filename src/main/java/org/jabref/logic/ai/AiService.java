@@ -77,10 +77,10 @@ public class AiService {
             ingestedFiles = new SimpleListProperty<>(FXCollections.observableList(ingestedFilesList));
         } catch (FileNotFoundException e) {
             LOGGER.info("No ingested files cache. Will create a new one");
-            ingestedFiles = new SimpleListProperty<>();
+            ingestedFiles = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
         } catch (IOException | ClassNotFoundException e) {
             LOGGER.error("An error occurred while reading paths of ingested files", e);
-            ingestedFiles = new SimpleListProperty<>();
+            ingestedFiles = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
         }
 
         if (aiPreferences.getEnableChatWithFiles() && !aiPreferences.getOpenAiToken().isEmpty()) {
