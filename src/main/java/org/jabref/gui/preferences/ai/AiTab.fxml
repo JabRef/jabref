@@ -37,38 +37,29 @@
             <IntegerInputField fx:id="messageWindowSizeTextField" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
-      <HBox spacing="10.0">
+          <VBox>
+              <children>
+                  <Label text="%RAG - maximum results count" />
+                  <IntegerInputField fx:id="ragMaxResultsCountTextField" />
+              </children>
+          </VBox>
+          <VBox>
+              <children>
+                  <Label text="%RAG - minimum score" />
+                  <DoubleInputField fx:id="ragMinScoreTextField" />
+              </children>
+          </VBox>
+      <VBox>
          <children>
-            <VBox HBox.hgrow="ALWAYS">
-               <children>
-                  <Label text="%Document splitter - chunk size" />
-                  <IntegerInputField fx:id="documentSplitterChunkSizeTextField" />
-               </children>
-            </VBox>
-            <VBox HBox.hgrow="ALWAYS">
-               <children>
-                  <Label text="%Document splitter - overlap size" />
-                  <IntegerInputField fx:id="documentSplitterOverlapSizeTextField" />
-               </children>
-            </VBox>
+            <Label text="%Document splitter - chunk size" />
+            <IntegerInputField fx:id="documentSplitterChunkSizeTextField" />
          </children>
-      </HBox>
-
-        <HBox spacing="10.0">
-            <children>
-                <VBox HBox.hgrow="ALWAYS">
-                    <children>
-                        <Label text="%RAG - maximum results count" />
-                        <IntegerInputField fx:id="ragMaxResultsCountTextField" />
-                    </children>
-                </VBox>
-                <VBox HBox.hgrow="ALWAYS">
-                    <children>
-                        <Label text="%RAG - minimum score" />
-                        <DoubleInputField fx:id="ragMinScoreTextField" />
-                    </children>
-                </VBox>
-            </children>
-        </HBox>
+      </VBox>
+      <VBox>
+         <children>
+            <Label text="%Document splitter - overlap size" />
+            <IntegerInputField fx:id="documentSplitterOverlapSizeTextField" />
+         </children>
+      </VBox>
     </children>
 </fx:root>
