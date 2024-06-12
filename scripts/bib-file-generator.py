@@ -32,11 +32,13 @@ def int_to_roman(num):
 
 with open("generated-large-library.bib", 'w', encoding='utf-8') as file:
     for i in range(1, number_of_entries + 1):
-        entry = f"""@article{{id{i},
+        year = 1900 + (i - 1) % (2025 - 1900)
+        entry = f"""@article{{id{i:06d},
   title   = {{This is my title{i}}},
   author  = {{FirstnameA{i} LastnameA{i} and FirstnameB{i} LastnameB{i} and FirstnameC{i} LastnameC{i}}},
   journal = {{Journal Title {int_to_roman(i)}}},
-  year    = {{{i}}},
+  volume  = {{{i}}},
+  year    = {{{year}}},
 }}
 
 """
