@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors.optioneditors.mapbased;
 
+import java.util.Map;
+
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -7,32 +9,16 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
-public class PaginationEditorViewModel extends MapBasedEditorViewModel<String> {
-
-    private BiMap<String, String> itemMap = HashBiMap.create(7);
+public class PaginationEditorViewModel extends StringMapBasedEditorViewModel {
 
     public PaginationEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
-        super(field, suggestionProvider, fieldCheckers, undoManager);
-
-        itemMap.put("page", Localization.lang("Page"));
-        itemMap.put("column", Localization.lang("Column"));
-        itemMap.put("line", Localization.lang("Line"));
-        itemMap.put("verse", Localization.lang("Verse"));
-        itemMap.put("section", Localization.lang("Section"));
-        itemMap.put("paragraph", Localization.lang("Paragraph"));
-        itemMap.put("none", Localization.lang("None"));
-    }
-
-    @Override
-    protected BiMap<String, String> getItemMap() {
-        return itemMap;
-    }
-
-    @Override
-    public String convertToDisplayText(String object) {
-        return object;
+        super(field, suggestionProvider, fieldCheckers, undoManager, Map.of(
+                "page", Localization.lang("Page"),
+                "column", Localization.lang("Column"),
+                "line", Localization.lang("Line"),
+                "verse", Localization.lang("Verse"),
+                "section", Localization.lang("Section"),
+                "paragraph", Localization.lang("Paragraph"),
+                "none", Localization.lang("None")));
     }
 }

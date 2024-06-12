@@ -1,6 +1,6 @@
 package org.jabref.gui.fieldeditors.optioneditors;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.swing.undo.UndoManager;
 
@@ -25,7 +25,7 @@ public abstract class OptionEditorViewModel<T> extends AbstractEditorViewModel {
     /**
      * Returns all available items
      */
-    public abstract List<T> getItems();
+    public abstract Collection<T> getItems();
 
     /**
      * Used for filling the ComboBox for selecting a value. Needs to return something meaningful for each item in {@link #getItems()}

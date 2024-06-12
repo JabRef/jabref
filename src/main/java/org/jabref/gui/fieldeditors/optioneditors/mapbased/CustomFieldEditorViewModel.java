@@ -1,6 +1,8 @@
 package org.jabref.gui.fieldeditors.optioneditors.mapbased;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.undo.UndoManager;
 
@@ -9,31 +11,19 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
-public class CustomFieldEditorViewModel extends MapBasedEditorViewModel<String> {
-
-    private BiMap<String, String> itemMap;
+public class CustomFieldEditorViewModel extends StringMapBasedEditorViewModel {
 
     public CustomFieldEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider,
                                       FieldCheckers fieldCheckers, UndoManager undoManager, BibDatabaseContext databaseContext) {
-        super(field, suggestionProvider, fieldCheckers, undoManager);
+        super(field, suggestionProvider, fieldCheckers, undoManager, getMap(databaseContext, field));
+    }
 
+    private static Map<String, String> getMap(BibDatabaseContext databaseContext, Field field) {
         List<String> values = databaseContext.getMetaData().getContentSelectorValuesForField(field);
-        itemMap = HashBiMap.create(values.size());
+        Map<String, String> map = new HashMap<>();
         for (String value : values) {
-            itemMap.put(value, value);
+            map.put(value, value);
         }
-    }
-
-    @Override
-    protected BiMap<String, String> getItemMap() {
-        return itemMap;
-    }
-
-    @Override
-    public String convertToDisplayText(String object) {
-        return object;
+        return map;
     }
 }

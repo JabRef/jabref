@@ -1,7 +1,6 @@
 package org.jabref.gui.fieldeditors.optioneditors.mapbased;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import javax.swing.undo.UndoManager;
 
@@ -70,7 +69,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
     }
 
     @Override
-    public List<T> getItems() {
-        return new ArrayList<>(getItemMap().values());
+    public Collection<T> getItems() {
+        return getItemMap().values();
     }
 }
