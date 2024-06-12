@@ -55,8 +55,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Warning for migrating the Review into the Comment field
             new MergeReviewIntoCommentAction(),
             // Check for new custom entry types loaded from the BIB file:
-            new CheckForNewEntryTypesAction(),
-            new LoadChatHistoryAction());
+            new CheckForNewEntryTypesAction());
 
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;

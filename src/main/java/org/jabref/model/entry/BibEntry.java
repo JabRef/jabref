@@ -139,9 +139,6 @@ public class BibEntry implements Cloneable {
      */
     private boolean changed;
 
-    // TODO: Future work: move this out of this class (maybe HashMap)
-    private final List<ChatMessage> aiChatMessages = new ArrayList<>();
-
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
@@ -1200,9 +1197,5 @@ public class BibEntry implements Cloneable {
             return true;
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
-    }
-
-    public List<ChatMessage> getAiChatMessages() {
-        return aiChatMessages;
     }
 }
