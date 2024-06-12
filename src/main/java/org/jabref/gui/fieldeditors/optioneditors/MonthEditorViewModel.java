@@ -1,4 +1,4 @@
-package org.jabref.gui.fieldeditors;
+package org.jabref.gui.fieldeditors.optioneditors;
 
 import java.util.Arrays;
 import java.util.List;
