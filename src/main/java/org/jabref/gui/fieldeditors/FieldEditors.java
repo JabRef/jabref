@@ -107,11 +107,16 @@ public class FieldEditors {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {
             return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager);
-        } else if (fieldProperties.contains(FieldProperty.CUSTOM_FIELD) && !isMultiLine) {
-            return new OptionEditor<>(new CustomFieldEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager, databaseContext));
         } else {
             // There was no specific editor found
-            return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
+
+            // Check whether there are selectors defined for the field at hand
+            List<String> selectorValues = databaseContext.getMetaData().getContentSelectorValuesForField(field);
+            if (!isMultiLine && !selectorValues.isEmpty()) {
+                return new OptionEditor<>(new CustomFieldEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager, selectorValues));
+            } else {
+                return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
+            }
         }
     }
 

@@ -8,20 +8,18 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 
 public class CustomFieldEditorViewModel extends StringMapBasedEditorViewModel {
 
     public CustomFieldEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider,
-                                      FieldCheckers fieldCheckers, UndoManager undoManager, BibDatabaseContext databaseContext) {
-        super(field, suggestionProvider, fieldCheckers, undoManager, getMap(databaseContext, field));
+                                      FieldCheckers fieldCheckers, UndoManager undoManager, List<String> selectorValues) {
+        super(field, suggestionProvider, fieldCheckers, undoManager, getMap(selectorValues));
     }
 
-    private static Map<String, String> getMap(BibDatabaseContext databaseContext, Field field) {
-        List<String> values = databaseContext.getMetaData().getContentSelectorValuesForField(field);
+    private static Map<String, String> getMap(List<String> selectorValues) {
         Map<String, String> map = new HashMap<>();
-        for (String value : values) {
+        for (String value : selectorValues) {
             map.put(value, value);
         }
         return map;
