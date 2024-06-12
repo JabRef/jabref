@@ -101,7 +101,7 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.CUSTOM_FIELD) && !isMultiLine) {
             return new OptionEditor<>(new CustomFieldEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager, databaseContext));
         } else {
-            // default
+            // There was no specific editor found
             return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
         }
     }
