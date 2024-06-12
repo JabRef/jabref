@@ -29,7 +29,7 @@
               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%Leave these fields as is, if you are not sure of their purpose." />
          </children>
       </VBox>
-      <Label text="%System message" />
+      <Label text="%Instruction for AI (also known as 'system message')" />
       <TextArea fx:id="systemMessageTextArea" wrapText="true" />
       <HBox alignment="CENTER_LEFT" spacing="10.0">
          <children>
