@@ -1,7 +1,6 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -50,14 +49,14 @@ public class FieldFormatterCleanup implements CleanupJob {
     private List<FieldChange> cleanupSingleField(Field fieldKey, BibEntry entry) {
         if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do
-            return Collections.emptyList();
+            return List.of();
         }
-        String oldValue = entry.getField(fieldKey).orElse(null);
 
+        String oldValue = entry.getField(fieldKey).orElse(null);
         String newValue = formatter.format(oldValue);
 
         if (newValue.equals(oldValue)) {
-            return Collections.emptyList();
+            return List.of();
         } else {
             if (newValue.isEmpty()) {
                 entry.clearField(fieldKey);

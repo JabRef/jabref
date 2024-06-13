@@ -42,8 +42,7 @@ public class FieldContentFormatter {
         }
 
         // Replace multiple whitespaces by one. We need to keep the leading and trailing whitespace to enable constructs such as "#kopp# and #breit#"
-        String result = WHITESPACE.matcher(fieldContent).replaceAll(" ");
-        return result;
+        return WHITESPACE.matcher(fieldContent).replaceAll(" ");
     }
 
     /**
