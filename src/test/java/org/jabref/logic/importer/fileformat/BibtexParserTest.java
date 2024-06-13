@@ -869,9 +869,9 @@ class BibtexParserTest {
         assertEquals(List.of(), result.getDatabase().getEntries());
     }
 
-    // FIXME: We should keep @comment
+    // TODO: We should keep @comment if it is the only "thing" in the file
     @Test
-    void parseIgnoresUpercaseComments() throws IOException {
+    void parseIgnoresUppercaseComments() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@COMMENT{some text and \\latex}"));
         assertFalse(result.hasWarnings()); // FIXME: We silently remove @COMMENT
