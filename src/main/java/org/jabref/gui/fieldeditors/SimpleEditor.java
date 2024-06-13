@@ -40,7 +40,8 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         textInput = createTextInputControl();
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
-        establishBindings();
+        textInput.textProperty().bindBidirectional(viewModel.textProperty());
+        preventCursorJumping();
 
         ((ContextMenuAddable) textInput).initContextMenu(new DefaultMenu(textInput));
         this.getChildren().add(textInput);
@@ -56,30 +57,27 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
     }
 
-    private void establishBindings() {
-        viewModel.textProperty().bind(textInput.textProperty());
-
+    private void preventCursorJumping() {
         // We need some more sophisticated handling to avoid cursor jumping
         // https://github.com/JabRef/jabref/issues/5904
 
-        viewModel.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!textInput.getText().equals(newValue)) {
-                int oldCaretPosition = textInput.getCaretPosition();
-                List<String> oldValueCharacters = Arrays.asList(oldValue.split(""));
-                List<String> newValueCharacters = Arrays.asList(newValue.split(""));
-                List<AbstractDelta<String>> deltaList = DiffUtils.diff(oldValueCharacters, newValueCharacters).getDeltas();
-                AbstractDelta<String> lastDelta = null;
-                for (AbstractDelta<String> delta : deltaList) {
-                    if (delta.getSource().getPosition() > oldCaretPosition) {
-                        break;
-                    }
-                    lastDelta = delta;
+        textInput.textProperty().addListener((observable, oldValue, newValue) -> {
+            int oldCaretPosition = textInput.getCaretPosition();
+            if (oldCaretPosition == 0) {
+                return;
+            }
+            List<String> oldValueCharacters = Arrays.asList(oldValue.split(""));
+            List<String> newValueCharacters = Arrays.asList(newValue.split(""));
+            List<AbstractDelta<String>> deltaList = DiffUtils.diff(oldValueCharacters, newValueCharacters).getDeltas();
+            AbstractDelta<String> lastDelta = null;
+            for (AbstractDelta<String> delta : deltaList) {
+                if (delta.getSource().getPosition() > oldCaretPosition) {
+                    break;
                 }
-                int offset = 0;
-                if (lastDelta != null) {
-                    offset = lastDelta.getTarget().getPosition() - lastDelta.getSource().getPosition();
-                }
-                textInput.setText(newValue);
+                lastDelta = delta;
+            }
+            if (lastDelta != null) {
+                int offset = lastDelta.getTarget().getPosition() - lastDelta.getSource().getPosition();
                 textInput.positionCaret(oldCaretPosition + offset);
             }
         });
