@@ -1,5 +1,8 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.Parent;
@@ -15,6 +18,9 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
+
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.AbstractDelta;
 
 public class SimpleEditor extends HBox implements FieldEditorFX {
 
@@ -34,7 +40,8 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         textInput = createTextInputControl();
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
-        textInput.textProperty().bindBidirectional(viewModel.textProperty());
+        establishBindings();
+
         ((ContextMenuAddable) textInput).initContextMenu(new DefaultMenu(textInput));
         this.getChildren().add(textInput);
 
@@ -49,12 +56,33 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
     }
 
-    public SimpleEditor(final Field field,
-                        final SuggestionProvider<?> suggestionProvider,
-                        final FieldCheckers fieldCheckers,
-                        final PreferencesService preferences,
-                        UndoManager undoManager) {
-        this(field, suggestionProvider, fieldCheckers, preferences, false, undoManager);
+    private void establishBindings() {
+        viewModel.textProperty().bind(textInput.textProperty());
+
+        // We need some more sophisticated handling to avoid cursor jumping
+        // https://github.com/JabRef/jabref/issues/5904
+
+        viewModel.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!textInput.getText().equals(newValue)) {
+                int oldCaretPosition = textInput.getCaretPosition();
+                List<String> oldValueCharacters = Arrays.asList(oldValue.split(""));
+                List<String> newValueCharacters = Arrays.asList(newValue.split(""));
+                List<AbstractDelta<String>> deltaList = DiffUtils.diff(oldValueCharacters, newValueCharacters).getDeltas();
+                AbstractDelta<String> lastDelta = null;
+                for (AbstractDelta<String> delta : deltaList) {
+                    if (delta.getSource().getPosition() > oldCaretPosition) {
+                        break;
+                    }
+                    lastDelta = delta;
+                }
+                int offset = 0;
+                if (lastDelta != null) {
+                    offset = lastDelta.getTarget().getPosition() - lastDelta.getSource().getPosition();
+                }
+                textInput.setText(newValue);
+                textInput.positionCaret(oldCaretPosition + offset);
+            }
+        });
     }
 
     protected TextInputControl createTextInputControl() {
