@@ -11,6 +11,15 @@ import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.identifier.IdentifierEditor;
+import org.jabref.gui.fieldeditors.optioneditors.MonthEditorViewModel;
+import org.jabref.gui.fieldeditors.optioneditors.OptionEditor;
+import org.jabref.gui.fieldeditors.optioneditors.mapbased.CustomFieldEditorViewModel;
+import org.jabref.gui.fieldeditors.optioneditors.mapbased.EditorTypeEditorViewModel;
+import org.jabref.gui.fieldeditors.optioneditors.mapbased.GenderEditorViewModel;
+import org.jabref.gui.fieldeditors.optioneditors.mapbased.PaginationEditorViewModel;
+import org.jabref.gui.fieldeditors.optioneditors.mapbased.PatentTypeEditorViewModel;
+import org.jabref.gui.fieldeditors.optioneditors.mapbased.TypeEditorViewModel;
+import org.jabref.gui.fieldeditors.optioneditors.mapbased.YesNoEditorViewModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -98,11 +107,16 @@ public class FieldEditors {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {
             return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager);
-        } else if (fieldProperties.contains(FieldProperty.CUSTOM_FIELD) && !isMultiLine) {
-            return new OptionEditor<>(new CustomFieldEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager, databaseContext));
         } else {
-            // default
-            return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
+            // There was no specific editor found
+
+            // Check whether there are selectors defined for the field at hand
+            List<String> selectorValues = databaseContext.getMetaData().getContentSelectorValuesForField(field);
+            if (!isMultiLine && !selectorValues.isEmpty()) {
+                return new OptionEditor<>(new CustomFieldEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager, selectorValues));
+            } else {
+                return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
+            }
         }
     }
 
