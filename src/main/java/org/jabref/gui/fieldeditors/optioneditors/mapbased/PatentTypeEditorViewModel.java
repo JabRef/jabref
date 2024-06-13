@@ -1,4 +1,7 @@
-package org.jabref.gui.fieldeditors;
+package org.jabref.gui.fieldeditors.optioneditors.mapbased;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.undo.UndoManager;
 
@@ -7,16 +10,14 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
-public class PatentTypeEditorViewModel extends MapBasedEditorViewModel<String> {
-
-    private BiMap<String, String> itemMap = HashBiMap.create(12);
+public class PatentTypeEditorViewModel extends StringMapBasedEditorViewModel {
 
     public PatentTypeEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, UndoManager undoManager) {
-        super(field, suggestionProvider, fieldCheckers, undoManager);
+        super(field, suggestionProvider, fieldCheckers, undoManager, getMap());
+    }
 
+    private static Map<String, String> getMap() {
+        Map<String, String> itemMap = new HashMap<>();
         itemMap.put("patent", Localization.lang("Patent"));
         itemMap.put("patentde", Localization.lang("German patent"));
         itemMap.put("patenteu", Localization.lang("European patent"));
@@ -29,15 +30,6 @@ public class PatentTypeEditorViewModel extends MapBasedEditorViewModel<String> {
         itemMap.put("patreqfr", Localization.lang("French patent request"));
         itemMap.put("patrequk", Localization.lang("British patent request"));
         itemMap.put("patrequs", Localization.lang("U.S. patent request"));
-    }
-
-    @Override
-    protected BiMap<String, String> getItemMap() {
         return itemMap;
-    }
-
-    @Override
-    public String convertToDisplayText(String object) {
-        return object;
     }
 }

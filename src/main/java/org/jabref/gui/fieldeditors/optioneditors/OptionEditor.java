@@ -1,4 +1,4 @@
-package org.jabref.gui.fieldeditors;
+package org.jabref.gui.fieldeditors.optioneditors;
 
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -7,6 +7,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.Globals;
+import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.model.entry.BibEntry;
