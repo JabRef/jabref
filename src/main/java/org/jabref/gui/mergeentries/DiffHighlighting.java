@@ -20,9 +20,10 @@ public class DiffHighlighting {
     }
 
     public static List<Text> generateDiffHighlighting(String baseString, String modifiedString, String separator) {
-        List<String> stringList = Arrays.asList(baseString.split(separator));
-        List<Text> result = stringList.stream().map(text -> forUnchanged(text + separator)).toList();
-        List<AbstractDelta<String>> deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
+        List<String> baseStringSplit = Arrays.asList(baseString.split(separator));
+        List<String> modifiedStringSplit = Arrays.asList(modifiedString.split(separator));
+        List<AbstractDelta<String>> deltaList = DiffUtils.diff(baseStringSplit, modifiedStringSplit).getDeltas();
+        List<Text> result = baseStringSplit.stream().map(text -> forUnchanged(text + separator)).toList();
         for (AbstractDelta<String> delta : deltaList.reversed()) {
             int startPos = delta.getSource().getPosition();
             List<String> lines = delta.getSource().getLines();
@@ -33,7 +34,7 @@ public class DiffHighlighting {
                         result.set(startPos + offset, forRemoved(line + separator));
                         offset++;
                     }
-                    result.set(startPos + offset - 1, forRemoved(stringList.get((startPos + offset) - 1) + separator));
+                    result.set(startPos + offset - 1, forRemoved(baseStringSplit.get((startPos + offset) - 1) + separator));
                     result.add(startPos + offset, forAdded(String.join(separator, delta.getTarget().getLines())));
                     break;
                 case DELETE:
