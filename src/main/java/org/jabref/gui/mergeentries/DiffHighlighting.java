@@ -21,10 +21,9 @@ public class DiffHighlighting {
 
     public static List<Text> generateDiffHighlighting(String baseString, String modifiedString, String separator) {
         List<String> stringList = Arrays.asList(baseString.split(separator));
-        List<Text> result = stringList.stream().map(text -> forUnchanged(text + separator)).collect(Collectors.toList());
+        List<Text> result = stringList.stream().map(text -> forUnchanged(text + separator)).toList();
         List<AbstractDelta<String>> deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
-        Collections.reverse(deltaList);
-        for (AbstractDelta<String> delta : deltaList) {
+        for (AbstractDelta<String> delta : deltaList.reversed()) {
             int startPos = delta.getSource().getPosition();
             List<String> lines = delta.getSource().getLines();
             int offset = 0;
