@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
+import java.util.Map;
+import java.util.HashMap;
 import org.jabref.model.entry.field.StandardField;
 
 /**
@@ -20,10 +21,20 @@ public class ExplicitGroup extends WordKeywordGroup {
      * file. These keys are still parsed and stored in this field.
      */
     private final List<String> legacyEntryKeys = new ArrayList<>();
+    public static Map<String,Boolean> branchCoverage = new HashMap<>();
+    static{
+        branchCoverage.put("equals_branch_1",false);
+        branchCoverage.put("equals_branch_2",false);
+        branchCoverage.put("equals_branch_3",false);
+    }
 
     public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator) {
         super(name, context, StandardField.GROUPS, name, true, keywordSeparator, true);
+
     }
+
+
+
 
     public void addLegacyEntryKey(String key) {
         this.legacyEntryKeys.add(key);
@@ -39,20 +50,33 @@ public class ExplicitGroup extends WordKeywordGroup {
     @Override
     public boolean equals(Object o) {
         if (this == o) {
+            branchCoverage.put("equals_branch_1", true);
             return true;
         }
         if (!(o instanceof ExplicitGroup)) {
+            branchCoverage.put("equals_branch_2", true);
             return false;
         }
         ExplicitGroup other = (ExplicitGroup) o;
-        return Objects.equals(getName(), other.getName())
+
+        boolean result = Objects.equals(getName(), other.getName())
                 && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
                 && Objects.equals(getIconName(), other.getIconName())
                 && Objects.equals(getDescription(), other.getDescription())
                 && Objects.equals(getColor(), other.getColor())
                 && Objects.equals(isExpanded(), other.isExpanded())
                 && Objects.equals(getLegacyEntryKeys(), other.getLegacyEntryKeys());
+        branchCoverage.put("equals_branch_3", true);
+        return result;
     }
+
+
+    public static void printCoverage(){
+        for(Map.Entry<String, Boolean> entry: branchCoverage.entrySet()){
+            System.out.println("test equals()" +entry.getKey() + "was" + (entry.getValue()?"hit":"not hit"));
+        }
+    }
+
 
     public void clearLegacyEntryKeys() {
         legacyEntryKeys.clear();
