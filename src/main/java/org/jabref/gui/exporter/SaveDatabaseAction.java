@@ -24,7 +24,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
-import org.jabref.gui.importer.actions.LoadChatHistoryAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.BackgroundTask;
@@ -292,41 +291,9 @@ public class SaveDatabaseAction {
                 throw new SaveException("Problems saving: " + ex, ex);
             }
 
-            // TODO: What to do with chat backups? Should we do it?
-            try (AtomicFileWriter fileWriter = new AtomicFileWriter(FileUtil.addExtension(file, LoadChatHistoryAction.AI_CHAT_HISTORY_EXTENSION), encoding, saveConfiguration.shouldMakeBackup())) {
-                // TODO: What to do with selectedOnly?
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                AiChatsFile aiChatFile = makeAiChatsFile(bibDatabaseContext.getDatabase());
-                objectMapper.writeValue(fileWriter, aiChatFile);
-
-                if (fileWriter.hasEncodingProblems()) {
-                    saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType, saveOrder);
-                }
-            } catch (UnsupportedCharsetException ex) {
-                throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
-            } catch (IOException ex) {
-                throw new SaveException("Problems saving: " + ex, ex);
-            }
-
             return true;
         }
     }
-
-    private AiChatsFile makeAiChatsFile(BibDatabase bibDatabase) {
-        Map<String, List<ChatMessage>> chatHistoryMap = new HashMap<>();
-
-        bibDatabase.getEntries().forEach(entry ->
-            entry.getCitationKey().ifPresent(citationKey -> {
-                    List<ChatMessage> aiChatFileMessages = entry.getAiChatMessages();
-                    chatHistoryMap.put(citationKey, aiChatFileMessages);
-                }
-            )
-        );
-
-        return new AiChatsFile(chatHistoryMap);
-    }
-
     private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
         DialogPane pane = new DialogPane();
         VBox vbox = new VBox();

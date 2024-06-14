@@ -1,8 +1,15 @@
 package org.jabref.logic.ai;
 
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabases;
 import org.jabref.preferences.AiPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -14,6 +21,8 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class maintains the connection to AI services.
@@ -22,10 +31,14 @@ import org.jspecify.annotations.Nullable;
  * An outer class is responsible for synchronizing objects of this class with {@link org.jabref.preferences.AiPreferences} changes.
  */
 public class AiService {
+    private final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
+
     private final ObjectProperty<ChatLanguageModel> chatModelProperty = new SimpleObjectProperty<>(null); // <p>
     private final ObjectProperty<EmbeddingModel> embeddingModelProperty = new SimpleObjectProperty<>(new AllMiniLmL6V2EmbeddingModel());
 
     private final EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+
+    private final Map<Path, BibDatabaseChats> bibDatabaseChatsMap = new HashMap<>();
 
     public AiService(AiPreferences aiPreferences) {
         if (aiPreferences.getEnableChatWithFiles() && !aiPreferences.getOpenAiToken().isEmpty()) {
@@ -49,6 +62,31 @@ public class AiService {
                 setChatModel(null);
             }
         });
+    }
+
+    public @Nullable BibDatabaseChats openBibDatabaseChats(BibDatabaseContext bibDatabaseContext) {
+        if (bibDatabaseContext.getDatabasePath().isPresent()) {
+            Path path = bibDatabaseContext.getDatabasePath().get();
+
+            if (bibDatabaseChatsMap.containsKey(path)) {
+                return bibDatabaseChatsMap.get(path);
+            }
+
+            // TODO: Error handling??????
+            BibDatabaseChats bibDatabaseChats = new BibDatabaseChats(path);
+
+            bibDatabaseChatsMap.put(path, bibDatabaseChats);
+
+            return bibDatabaseChats;
+        } else {
+            LOGGER.warn("Unable to open (or create) bib database chats file. No database path is present");
+            return null;
+        }
+    }
+
+    public void close() {
+        bibDatabaseChatsMap.values().forEach(BibDatabaseChats::close);
+        bibDatabaseChatsMap.clear();
     }
 
     private void setOpenAiToken(String token) {

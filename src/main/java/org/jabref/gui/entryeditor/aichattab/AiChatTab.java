@@ -16,6 +16,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.AiIngestor;
+import org.jabref.logic.ai.BibDatabaseChats;
 import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -29,6 +30,7 @@ import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 public class AiChatTab extends EntryEditorTab {
@@ -52,6 +54,8 @@ public class AiChatTab extends EntryEditorTab {
 
     private BibEntry currentBibEntry = null;
 
+    private final @Nullable BibDatabaseChats bibDatabaseChats;
+
     public AiChatTab(DialogService dialogService, PreferencesService preferencesService, AiService aiService,
                      BibDatabaseContext bibDatabaseContext, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
@@ -63,6 +67,8 @@ public class AiChatTab extends EntryEditorTab {
         this.aiService = aiService;
 
         this.bibDatabaseContext = bibDatabaseContext;
+
+        this.bibDatabaseChats = aiService.openBibDatabaseChats(bibDatabaseContext);
 
         this.taskExecutor = taskExecutor;
 
@@ -119,7 +125,12 @@ public class AiChatTab extends EntryEditorTab {
         currentBibEntry = entry;
 
         createAiChat();
-        aiChat.restoreMessages(entry.getAiChatMessages());
+
+        if (bibDatabaseChats != null) {
+            assert entry.getCitationKey().isPresent();
+            aiChat.restoreMessages(bibDatabaseChats.getAllMessagesForEntry(entry.getCitationKey().get()));
+        }
+
         ingestFiles(entry);
         buildChatUI(entry);
     }
@@ -139,7 +150,12 @@ public class AiChatTab extends EntryEditorTab {
         aiChatComponent = new AiChatComponent((userPrompt) -> {
             ChatMessage userMessage = ChatMessage.user(userPrompt);
             aiChatComponent.addMessage(userMessage);
-            entry.getAiChatMessages().add(userMessage);
+
+            if (bibDatabaseChats != null) {
+                assert entry.getCitationKey().isPresent();
+                bibDatabaseChats.addMessage(entry.getCitationKey().get(), userMessage);
+            }
+
             aiChatComponent.setLoading(true);
 
             BackgroundTask.wrap(() -> aiChat.execute(userPrompt))
@@ -148,7 +164,10 @@ public class AiChatTab extends EntryEditorTab {
 
                         ChatMessage aiMessage = ChatMessage.assistant(aiMessageText);
                         aiChatComponent.addMessage(aiMessage);
-                        entry.getAiChatMessages().add(aiMessage);
+
+                        if (bibDatabaseChats != null) {
+                            bibDatabaseChats.addMessage(entry.getCitationKey().get(), aiMessage);
+                        }
 
                         aiChatComponent.requestUserPromptTextFieldFocus();
                     })
@@ -161,7 +180,9 @@ public class AiChatTab extends EntryEditorTab {
                     .executeWith(taskExecutor);
         });
 
-        entry.getAiChatMessages().forEach(aiChatComponent::addMessage);
+        if (bibDatabaseChats != null) {
+            bibDatabaseChats.getAllMessagesForEntry(entry.getCitationKey().get()).forEach(aiChatComponent::addMessage);
+        }
 
         setContent(aiChatComponent);
     }
