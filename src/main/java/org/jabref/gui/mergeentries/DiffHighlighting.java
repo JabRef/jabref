@@ -2,6 +2,7 @@ package org.jabref.gui.mergeentries;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.scene.text.Text;
 
@@ -17,7 +18,7 @@ public class DiffHighlighting {
         List<String> baseStringSplit = Arrays.asList(baseString.split(separator));
         List<String> modifiedStringSplit = Arrays.asList(modifiedString.split(separator));
         List<AbstractDelta<String>> deltaList = DiffUtils.diff(baseStringSplit, modifiedStringSplit).getDeltas();
-        List<Text> result = baseStringSplit.stream().map(text -> forUnchanged(text + separator)).toList();
+        List<Text> result = baseStringSplit.stream().map(text -> forUnchanged(text + separator)).collect(Collectors.toList());
         for (AbstractDelta<String> delta : deltaList.reversed()) {
             int startPos = delta.getSource().getPosition();
             List<String> lines = delta.getSource().getLines();
