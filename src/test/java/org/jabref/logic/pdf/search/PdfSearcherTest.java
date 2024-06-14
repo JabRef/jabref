@@ -13,6 +13,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -33,6 +34,7 @@ public class PdfSearcherTest {
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
+        AiPreferences aiPreferences = mock(AiPreferences.class);
 
         BibDatabase database = new BibDatabase();
 
@@ -56,7 +58,7 @@ public class PdfSearcherTest {
                 .withFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(exampleThesis);
 
-        PdfIndexer indexer = PdfIndexer.of(context, filePreferences);
+        PdfIndexer indexer = PdfIndexer.of(context, filePreferences, aiPreferences);
         search = PdfSearcher.of(indexer);
 
         indexer.rebuildIndex();

@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 
+import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +32,7 @@ public class PdfIndexerManager {
     // We store the file preferences for each path, so that we can update the indexer when the preferences change
     private static Map<Path, FilePreferences> pathFilePreferencesMap = new HashMap<>();
 
-    public static @NonNull PdfIndexer getIndexer(BibDatabaseContext context, FilePreferences filePreferences) throws IOException {
+    public static @NonNull PdfIndexer getIndexer(BibDatabaseContext context, FilePreferences filePreferences, AiPreferences aiPreferences) throws IOException {
         Path fulltextIndexPath = context.getFulltextIndexPath();
         PdfIndexer indexer = indexerMap.get(fulltextIndexPath);
         if (indexer != null) {
@@ -42,13 +44,13 @@ public class PdfIndexerManager {
             }
             LOGGER.debug("File preferences have changed, updating indexer");
             indexer.close();
-            indexer = PdfIndexer.of(context, filePreferences);
+            indexer = PdfIndexer.of(context, filePreferences, aiPreferences);
             indexerMap.put(fulltextIndexPath, indexer);
             pathFilePreferencesMap.put(fulltextIndexPath, filePreferences);
             return indexer;
         }
         LOGGER.debug("No indexer found for context {}, creating new one", context);
-        indexer = PdfIndexer.of(context, filePreferences);
+        indexer = PdfIndexer.of(context, filePreferences, aiPreferences);
         indexerMap.put(fulltextIndexPath, indexer);
         pathFilePreferencesMap.put(fulltextIndexPath, filePreferences);
         return indexer;

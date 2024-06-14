@@ -12,11 +12,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.logic.ai.AiIngestor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.SearchFieldConstants;
+import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -42,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Indexes the text of PDF files and adds it into the lucene search index.
+ * Also generates embeddings.
  */
 public class PdfIndexer {
 
@@ -60,7 +66,11 @@ public class PdfIndexer {
 
     private IndexReader reader;
 
-    private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences) {
+    private final AiService aiService = JabRefGUI.getAiService();
+
+    private final AiPreferences aiPreferences;
+
+    private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences, AiPreferences aiPreferences) {
         this.databaseContext = databaseContext;
         if (indexDirectory == null) {
             // FIXME: This should never happen, but was reported at https://github.com/JabRef/jabref/issues/10781.
@@ -76,22 +86,24 @@ public class PdfIndexer {
         } else {
             this.indexDirectory = indexDirectory;
         }
+
         this.filePreferences = filePreferences;
+        this.aiPreferences = aiPreferences;
     }
 
     /**
      * Method is public, because DatabaseSearcherWithBibFilesTest resides in another package
      */
     @VisibleForTesting
-    public static PdfIndexer of(BibDatabaseContext databaseContext, Path indexDirectory, FilePreferences filePreferences) throws IOException {
-        return new PdfIndexer(databaseContext, new NIOFSDirectory(indexDirectory), filePreferences);
+    public static PdfIndexer of(BibDatabaseContext databaseContext, Path indexDirectory, FilePreferences filePreferences, AiPreferences aiPreferences) throws IOException {
+        return new PdfIndexer(databaseContext, new NIOFSDirectory(indexDirectory), filePreferences, aiPreferences);
     }
 
     /**
      * Method is public, because DatabaseSearcherWithBibFilesTest resides in another package
      */
-    public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
-        return new PdfIndexer(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences);
+    public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiPreferences aiPreferences) throws IOException {
+        return new PdfIndexer(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences, aiPreferences);
     }
 
     /**
@@ -118,6 +130,7 @@ public class PdfIndexer {
         } else {
             LOGGER.trace("Using existing index writer");
         }
+
         return Optional.ofNullable(indexWriter);
     }
 
@@ -217,6 +230,8 @@ public class PdfIndexer {
      * @param linkedFilePath the path to the file to be removed
      */
     public void removeFromIndex(String linkedFilePath) {
+        aiService.removeIngestedFile(linkedFilePath);
+
         try {
             getIndexWriter().ifPresent(Unchecked.consumer(writer -> {
                 writer.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
@@ -269,11 +284,20 @@ public class PdfIndexer {
                         (!linkedFile.getLink().endsWith(".pdf") && !linkedFile.getLink().endsWith(".PDF")))) {
             return;
         }
+
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
             LOGGER.debug("Could not find {}", linkedFile.getLink());
             return;
         }
+
+        LOGGER.debug("Adding {} to index", linkedFile.getLink());
+
+        if (aiPreferences.getEnableChatWithFiles() && !aiService.haveIngestedFile(linkedFile.getLink())) {
+            AiIngestor aiIngestor = new AiIngestor(aiService);
+            aiIngestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
+        }
+
         try {
             // Check if a document with this path is already in the index
             try {

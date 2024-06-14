@@ -12,6 +12,7 @@ import org.jabref.gui.entryeditor.aichattab.components.aichat.AiChatComponent;
 import org.jabref.gui.entryeditor.aichattab.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.entryeditor.aichattab.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.ai.AiService;
@@ -74,6 +75,14 @@ public class AiChatTab extends EntryEditorTab {
 
         setText(Localization.lang(NAME));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
+
+        aiService.getIngestedFilesProperty().addListener((observableValue, paths, t1) -> {
+            if (currentBibEntry != null) {
+                if (aiService.haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
+                    DefaultTaskExecutor.runInJavaFXThread(() -> bindToEntry(currentBibEntry));
+                }
+            }
+        });
     }
 
     @Override
@@ -83,24 +92,48 @@ public class AiChatTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+        currentBibEntry = entry;
+
         if (!aiPreferences.getEnableChatWithFiles()) {
-            setContent(new PrivacyNoticeComponent(dialogService, aiPreferences, filePreferences, () -> {
-                bindToEntry(entry);
-            }));
+            showPrivacyNotice(entry);
         } else if (!checkIfCitationKeyIsAppropriate(bibDatabaseContext, entry)) {
-            CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
-            if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
-                setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please provide a non-empty and unique citation key for this entry")));
-            } else {
-                bindToEntry(entry);
-            }
+            tryToGenerateCitationKey(entry);
         } else if (entry.getFiles().isEmpty()) {
-            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")));
+            showErrorNoFiles();
         } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
-            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Only PDF files are supported")));
+            showErrorNotPdfs();
+        } else if (!aiService.haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
+            showErrorNotIngested();
         } else {
             bindToCorrectEntry(entry);
         }
+    }
+
+    private void showErrorNotIngested() {
+        setContent(ErrorStateComponent.withSpinner(Localization.lang("Please wait"), Localization.lang("The embeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")));
+    }
+
+    private void showErrorNotPdfs() {
+        setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Only PDF files are supported.")));
+    }
+
+    private void showErrorNoFiles() {
+        setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")));
+    }
+
+    private void tryToGenerateCitationKey(BibEntry entry) {
+        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
+        if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
+            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please provide a non-empty and unique citation key for this entry.")));
+        } else {
+            bindToEntry(entry);
+        }
+    }
+
+    private void showPrivacyNotice(BibEntry entry) {
+        setContent(new PrivacyNoticeComponent(dialogService, aiPreferences, filePreferences, () -> {
+            bindToEntry(entry);
+        }));
     }
 
     private static boolean checkIfCitationKeyIsAppropriate(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
@@ -122,28 +155,20 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void bindToCorrectEntry(BibEntry entry) {
-        currentBibEntry = entry;
-
         createAiChat();
-
+      
         if (bibDatabaseChats != null) {
             assert entry.getCitationKey().isPresent();
             aiChat.restoreMessages(bibDatabaseChats.getAllMessagesForEntry(entry.getCitationKey().get()));
         }
 
         ingestFiles(entry);
+      
         buildChatUI(entry);
     }
 
     private void createAiChat() {
         aiChat = new AiChat(aiService, aiPreferences, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.getFiles().stream().map(LinkedFile::getLink).toList()));
-    }
-
-    private void ingestFiles(BibEntry entry) {
-        AiIngestor aiIngestor = new AiIngestor(aiService.getEmbeddingStore(), aiService.getEmbeddingModel());
-        entry.getFiles().forEach(file -> {
-            aiIngestor.ingestLinkedFile(file, bibDatabaseContext, filePreferences);
-        });
     }
 
     private void buildChatUI(BibEntry entry) {

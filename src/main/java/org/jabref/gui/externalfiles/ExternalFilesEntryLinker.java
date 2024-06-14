@@ -22,6 +22,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
@@ -32,13 +33,15 @@ public class ExternalFilesEntryLinker {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFilesEntryLinker.class);
 
     private final FilePreferences filePreferences;
+    private final AiPreferences aiPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final MoveFilesCleanup moveFilesCleanup;
     private final RenamePdfCleanup renameFilesCleanup;
     private final DialogService dialogService;
 
-    public ExternalFilesEntryLinker(FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
+    public ExternalFilesEntryLinker(FilePreferences filePreferences, AiPreferences aiPreferences, BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
         this.filePreferences = filePreferences;
+        this.aiPreferences = aiPreferences;
         this.bibDatabaseContext = bibDatabaseContext;
         this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences);
         this.renameFilesCleanup = new RenamePdfCleanup(false, bibDatabaseContext, filePreferences);
@@ -87,7 +90,7 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences), entry);
+            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences, aiPreferences), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access Fulltext-Index", e);
         }
@@ -105,7 +108,7 @@ public class ExternalFilesEntryLinker {
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences), entry);
+            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences, aiPreferences), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access fulltext index", e);
         }
