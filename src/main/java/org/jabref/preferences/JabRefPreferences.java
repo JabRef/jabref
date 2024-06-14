@@ -454,13 +454,14 @@ public class JabRefPreferences implements PreferencesService {
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
-    private static final String AI_ENABLE_CHAT = "aiEnableChat";
-    private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
-    private static final String AI_MESSAGE_WINDOW_SIZE = "aiMessageWindowSize";
-    private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
-    private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
-    private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
-    private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
+    public static final String AI_ENABLE_CHAT = "aiEnableChat";
+    public static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
+    public static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
+    public static final String AI_MESSAGE_WINDOW_SIZE = "aiMessageWindowSize";
+    public static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
+    public static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
+    public static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
+    public static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
@@ -850,6 +851,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // AI
         defaults.put(AI_ENABLE_CHAT, Boolean.FALSE);
+        defaults.put(AI_CUSTOMIZE_SETTINGS, false);
         defaults.put(AI_SYSTEM_MESSAGE, "You are an AI assistant.");
         defaults.put(AI_MESSAGE_WINDOW_SIZE, 10);
         defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, 300);
@@ -2765,6 +2767,7 @@ public class JabRefPreferences implements PreferencesService {
         aiPreferences = new AiPreferences(
                 useAi,
                 token,
+                getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_SYSTEM_MESSAGE),
                 getInt(AI_MESSAGE_WINDOW_SIZE),
                 getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE),
@@ -2774,6 +2777,8 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
         EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE_CHAT, newValue));
+
+        EasyBind.listen(aiPreferences.customizeSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
         EasyBind.listen(aiPreferences.systemMessageProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
         EasyBind.listen(aiPreferences.messageWindowSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_MESSAGE_WINDOW_SIZE, newValue));

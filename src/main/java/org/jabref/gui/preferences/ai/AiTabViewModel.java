@@ -16,6 +16,7 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.dlsc.unitfx.DoubleInputField;
@@ -26,6 +27,9 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty useAi = new SimpleBooleanProperty();
     private final StringProperty openAiToken = new SimpleStringProperty();
+
+    private final BooleanProperty customizeSettings = new SimpleBooleanProperty();
+
     private final StringProperty systemMessage = new SimpleStringProperty();
     private final IntegerProperty messageWindowSize = new SimpleIntegerProperty();
     private final IntegerProperty documentSplitterChunkSize = new SimpleIntegerProperty();
@@ -81,6 +85,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         useAi.setValue(aiPreferences.getEnableChatWithFiles());
         openAiToken.setValue(aiPreferences.getOpenAiToken());
 
+        customizeSettings.setValue(aiPreferences.getCustomizeSettings());
+
         systemMessage.setValue(aiPreferences.getSystemMessage());
         messageWindowSize.setValue(aiPreferences.getMessageWindowSize());
         documentSplitterChunkSize.setValue(aiPreferences.getDocumentSplitterChunkSize());
@@ -94,12 +100,39 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setEnableChatWithFiles(useAi.get());
         aiPreferences.setOpenAiToken(openAiToken.get());
 
-        aiPreferences.setSystemMessage(systemMessage.get());
-        aiPreferences.setMessageWindowSize(messageWindowSize.get());
-        aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
-        aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
-        aiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());
-        aiPreferences.setRagMinScore(ragMinScore.get());
+        aiPreferences.setCustomizeSettings(customizeSettings.get());
+
+        if (customizeSettings.get()) {
+            aiPreferences.setSystemMessage(systemMessage.get());
+            aiPreferences.setMessageWindowSize(messageWindowSize.get());
+            aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
+            aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
+            aiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());
+            aiPreferences.setRagMinScore(ragMinScore.get());
+        } else {
+            resetExpertSettings();
+        }
+    }
+
+    public void resetExpertSettings() {
+        // TODO: How to access default settings?
+        aiPreferences.setSystemMessage(JabRefPreferences.getInstance().get(JabRefPreferences.AI_SYSTEM_MESSAGE));
+        systemMessage.set(JabRefPreferences.getInstance().get(JabRefPreferences.AI_SYSTEM_MESSAGE));
+
+        aiPreferences.setMessageWindowSize(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_MESSAGE_WINDOW_SIZE));
+        messageWindowSize.set(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_MESSAGE_WINDOW_SIZE));
+
+        aiPreferences.setDocumentSplitterChunkSize(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_DOCUMENT_SPLITTER_CHUNK_SIZE));
+        documentSplitterChunkSize.set(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_DOCUMENT_SPLITTER_CHUNK_SIZE));
+
+        aiPreferences.setDocumentSplitterOverlapSize(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE));
+        documentSplitterOverlapSize.set(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE));
+
+        aiPreferences.setRagMaxResultsCount(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_RAG_MAX_RESULTS_COUNT));
+        ragMaxResultsCount.set(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_RAG_MAX_RESULTS_COUNT));
+
+        aiPreferences.setRagMinScore(JabRefPreferences.getInstance().getDouble(JabRefPreferences.AI_RAG_MIN_SCORE));
+        ragMinScore.set(JabRefPreferences.getInstance().getDouble(JabRefPreferences.AI_RAG_MIN_SCORE));
     }
 
     @Override
@@ -113,6 +146,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty useAiProperty() {
         return useAi;
+    }
+
+    public BooleanProperty customizeSettingsProperty() {
+        return customizeSettings;
     }
 
     public StringProperty systemMessageProperty() {

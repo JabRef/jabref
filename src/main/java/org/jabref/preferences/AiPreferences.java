@@ -15,6 +15,8 @@ public class AiPreferences {
     private final BooleanProperty enableChatWithFiles;
     private final StringProperty openAiToken;
 
+    private final BooleanProperty customizeSettings;
+
     private final StringProperty systemMessage;
     private final IntegerProperty messageWindowSize;
     private final IntegerProperty documentSplitterChunkSize;
@@ -22,9 +24,11 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles, String openAiToken, String systemMessage, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
+    public AiPreferences(boolean enableChatWithFiles, String openAiToken, boolean customizeSettings, String systemMessage, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
         this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
         this.openAiToken = new SimpleStringProperty(openAiToken);
+
+        this.customizeSettings = new SimpleBooleanProperty(customizeSettings);
 
         this.systemMessage = new SimpleStringProperty(systemMessage);
         this.messageWindowSize = new SimpleIntegerProperty(messageWindowSize);
@@ -56,6 +60,18 @@ public class AiPreferences {
 
     public void setOpenAiToken(String openAiToken) {
         this.openAiToken.set(openAiToken);
+    }
+
+    public BooleanProperty customizeSettingsProperty() {
+        return customizeSettings;
+    }
+
+    public boolean getCustomizeSettings() {
+        return customizeSettings.get();
+    }
+
+    public void setCustomizeSettings(boolean customizeSettings) {
+        this.customizeSettings.set(customizeSettings);
     }
 
     public StringProperty systemMessageProperty() {
