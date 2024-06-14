@@ -50,7 +50,7 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
                 undoManager,
                 dialogService);
 
-        textField.textProperty().bindBidirectional(viewModel.textProperty());
+        establishBinding(textField, viewModel.textProperty());
 
         textField.initContextMenu(Collections::emptyList);
 
