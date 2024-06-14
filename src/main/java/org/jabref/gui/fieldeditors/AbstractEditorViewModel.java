@@ -68,7 +68,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                         // Thus, we need to normalize the line endings.
                         // Note: Normalizing for the .bib file is done during writing of the .bib file (see org.jabref.logic.exporter.BibWriter.BibWriter).
                         String oldValue = entry.getField(field).map(value -> value.replace("\r\n", "\n")).orElse(null);
-                        if (!(newValue.equals(oldValue))) {
+                        if (!newValue.equals(oldValue)) {
                             entry.setField(field, newValue);
                             undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
                         }
