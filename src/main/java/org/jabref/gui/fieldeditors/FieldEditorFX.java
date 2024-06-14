@@ -58,7 +58,11 @@ public interface FieldEditorFX {
                 }
                 lastDelta = delta;
             }
-            if (lastDelta != null) {
+            if (lastDelta == null) {
+                // Change happened after current caret position
+                // Thus, simply restore the old position
+                textInputControl.positionCaret(lastCaretPosition);
+            } else {
                 logger.trace("Last Delta: {}", lastDelta);
                 logger.trace("Last Delta source: {}", lastDelta.getSource());
                 logger.trace("Last Delta target: {}", lastDelta.getTarget());
