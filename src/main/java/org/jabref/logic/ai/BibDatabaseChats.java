@@ -46,7 +46,7 @@ public class BibDatabaseChats {
     }
 
     private int getMaxInt() {
-        return messageContent.keySet().stream().max(Integer::compareTo).orElse(0);
+        return messageContent.size();
     }
 }
 
