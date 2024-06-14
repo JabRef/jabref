@@ -9,7 +9,6 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.List;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import javafx.beans.property.ListProperty;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,9 +27,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabases;
 import org.jabref.preferences.AiPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -54,7 +50,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AiService {
     public static final String VERSION = "1";
-  
+
     private final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
 
     private final ObjectProperty<ChatLanguageModel> chatModelProperty = new SimpleObjectProperty<>(null); // <p>
@@ -63,7 +59,7 @@ public class AiService {
     private static final String STORE_FILE_NAME = "embeddingsStore.mv";
     private static final String INGESTED_FILE_NAME = "ingested.ArrayList";
 
-    private final MVStore mvStore;
+    private final MVStore embeddingsMvStore;
     private final EmbeddingStore<TextSegment> embeddingStore;
 
     private ListProperty<String> ingestedFiles;
@@ -79,8 +75,8 @@ public class AiService {
         }
 
         Path storePath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(STORE_FILE_NAME);
-        mvStore = MVStore.open(String.valueOf(storePath));
-        embeddingStore = new MVStoreEmbeddingStore(mvStore);
+        embeddingsMvStore = MVStore.open(String.valueOf(storePath));
+        embeddingStore = new MVStoreEmbeddingStore(embeddingsMvStore);
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(String.valueOf(JabRefDesktop.getEmbeddingsCacheDirectory().resolve(INGESTED_FILE_NAME))))){
             ArrayList<String> ingestedFilesList = (ArrayList<String>) ois.readObject();
@@ -155,7 +151,10 @@ public class AiService {
             LOGGER.error("An error occurred while saving the paths of ingested files", e);
         }
 
-        mvStore.close();
+        embeddingsMvStore.close();
+
+        bibDatabaseChatsMap.values().forEach(BibDatabaseChats::close);
+        bibDatabaseChatsMap.clear();
     }
 
     public @Nullable BibDatabaseChats openBibDatabaseChats(BibDatabaseContext bibDatabaseContext) {
@@ -176,11 +175,6 @@ public class AiService {
             LOGGER.warn("Unable to open (or create) bib database chats file. No database path is present");
             return null;
         }
-    }
-
-    public void close() {
-        bibDatabaseChatsMap.values().forEach(BibDatabaseChats::close);
-        bibDatabaseChatsMap.clear();
     }
 
     private void setOpenAiToken(String token) {

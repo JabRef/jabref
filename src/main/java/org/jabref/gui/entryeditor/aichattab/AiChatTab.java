@@ -16,7 +16,6 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.AiIngestor;
 import org.jabref.logic.ai.BibDatabaseChats;
 import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -156,14 +155,12 @@ public class AiChatTab extends EntryEditorTab {
 
     private void bindToCorrectEntry(BibEntry entry) {
         createAiChat();
-      
+
         if (bibDatabaseChats != null) {
             assert entry.getCitationKey().isPresent();
             aiChat.restoreMessages(bibDatabaseChats.getAllMessagesForEntry(entry.getCitationKey().get()));
         }
 
-        ingestFiles(entry);
-      
         buildChatUI(entry);
     }
 
