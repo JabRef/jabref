@@ -46,7 +46,9 @@ public class BibDatabaseChats {
     }
 
     private int getMaxInt() {
-        return messageContent.size();
+        synchronized (messageContent) {
+            return messageContent.size();
+        }
     }
 }
 
