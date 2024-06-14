@@ -457,6 +457,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String AI_ENABLE_CHAT = "aiEnableChat";
     private static final String AI_MODEL = "aiModel";
     private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
+    private static final String AI_TEMPERATURE = "aiTemperature";
     private static final String AI_MESSAGE_WINDOW_SIZE = "aiMessageWindowSize";
     private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
     private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
@@ -853,6 +854,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AI_ENABLE_CHAT, Boolean.FALSE);
         defaults.put(AI_MODEL, AiPreferences.AiModel.GPT_3_5_TURBO.getName());
         defaults.put(AI_SYSTEM_MESSAGE, "You are an AI assistant.");
+        defaults.put(AI_TEMPERATURE, 0.7);
         defaults.put(AI_MESSAGE_WINDOW_SIZE, 10);
         defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, 300);
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, 100);
@@ -2769,6 +2771,7 @@ public class JabRefPreferences implements PreferencesService {
                 token,
                 AiPreferences.AiModel.fromString(get(AI_MODEL)),
                 get(AI_SYSTEM_MESSAGE),
+                getDouble(AI_TEMPERATURE),
                 getInt(AI_MESSAGE_WINDOW_SIZE),
                 getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE),
                 getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE),
@@ -2780,6 +2783,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(aiPreferences.modelProperty(), (obs, oldValue, newValue) -> put(AI_MODEL, aiPreferences.getModel().getName()));
 
         EasyBind.listen(aiPreferences.systemMessageProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
+        EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, (double)newValue));
         EasyBind.listen(aiPreferences.messageWindowSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_MESSAGE_WINDOW_SIZE, newValue));
         EasyBind.listen(aiPreferences.documentSplitterChunkSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, newValue));
         EasyBind.listen(aiPreferences.documentSplitterOverlapSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, newValue));

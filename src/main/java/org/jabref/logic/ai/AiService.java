@@ -122,6 +122,10 @@ public class AiService {
         EasyBind.listen(aiPreferences.modelProperty(), (property, oldValue, newValue) -> {
             rebuildChatModel();
         });
+
+        EasyBind.listen(aiPreferences.temperatureProperty(), (property, oldValue, newValue) -> {
+            rebuildChatModel();
+        });
     }
 
     public void startIngestingFile(String path) {
@@ -195,6 +199,7 @@ public class AiService {
                 .builder()
                 .apiKey(aiPreferences.getOpenAiToken())
                 .modelName(aiPreferences.getModel().getName())
+                .temperature(aiPreferences.getTemperature())
                 .logRequests(true)
                 .logResponses(true)
                 .build();

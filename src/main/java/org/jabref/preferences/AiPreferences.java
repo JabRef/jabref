@@ -54,18 +54,20 @@ public class AiPreferences {
     private final ObjectProperty<AiModel> model;
 
     private final StringProperty systemMessage;
+    private final DoubleProperty temperature;
     private final IntegerProperty messageWindowSize;
     private final IntegerProperty documentSplitterChunkSize;
     private final IntegerProperty documentSplitterOverlapSize;
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles, String openAiToken, AiModel aiModel, String systemMessage, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
+    public AiPreferences(boolean enableChatWithFiles, String openAiToken, AiModel aiModel, String systemMessage, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
         this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
         this.openAiToken = new SimpleStringProperty(openAiToken);
         this.model = new SimpleObjectProperty<>(aiModel);
 
         this.systemMessage = new SimpleStringProperty(systemMessage);
+        this.temperature = new SimpleDoubleProperty(temperature);
         this.messageWindowSize = new SimpleIntegerProperty(messageWindowSize);
         this.documentSplitterChunkSize = new SimpleIntegerProperty(documentSplitterChunkSize);
         this.documentSplitterOverlapSize = new SimpleIntegerProperty(documentSplitterOverlapSize);
@@ -119,6 +121,18 @@ public class AiPreferences {
 
     public void setSystemMessage(String systemMessage) {
         this.systemMessage.set(systemMessage);
+    }
+
+    public DoubleProperty temperatureProperty() {
+        return temperature;
+    }
+
+    public double getTemperature() {
+        return temperature.get();
+    }
+
+    public void setTemperature(double temperature) {
+        this.temperature.set(temperature);
     }
 
     public IntegerProperty messageWindowSizeProperty() {

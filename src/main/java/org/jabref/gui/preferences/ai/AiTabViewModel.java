@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.ai;
 
+import java.util.Arrays;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.FloatProperty;
@@ -32,6 +34,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<AiPreferences.AiModel> modelProperty = new SimpleObjectProperty<>();
 
     private final StringProperty systemMessage = new SimpleStringProperty();
+    private final DoubleProperty temperature = new SimpleDoubleProperty();
     private final IntegerProperty messageWindowSize = new SimpleIntegerProperty();
     private final IntegerProperty documentSplitterChunkSize = new SimpleIntegerProperty();
     private final IntegerProperty documentSplitterOverlapSize = new SimpleIntegerProperty();
@@ -42,6 +45,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final Validator openAiTokenValidator;
     private final Validator systemMessageValidator;
+    private final Validator temperatureValidator;
     private final Validator messageWindowSizeValidator;
     private final Validator documentSplitterChunkSizeValidator;
     private final Validator documentSplitterOverlapSizeValidator;
@@ -60,6 +64,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 systemMessage,
                 (message) -> !StringUtil.isBlank(message),
                 ValidationMessage.error(Localization.lang("The system message cannot be empty")));
+
+        this.temperatureValidator = new FunctionBasedValidator<>(
+                temperature,
+                (temp) -> (double)temp >= 0 && (double)temp <= 2,
+                ValidationMessage.error(Localization.lang("Temperature must be between 0 and 2")));
 
         this.messageWindowSizeValidator = new FunctionBasedValidator<>(
                 messageWindowSize,
@@ -94,6 +103,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         modelProperty.setValue(aiPreferences.getModel());
 
         systemMessage.setValue(aiPreferences.getSystemMessage());
+        temperature.setValue(aiPreferences.getTemperature());
         messageWindowSize.setValue(aiPreferences.getMessageWindowSize());
         documentSplitterChunkSize.setValue(aiPreferences.getDocumentSplitterChunkSize());
         documentSplitterOverlapSize.setValue(aiPreferences.getDocumentSplitterOverlapSize());
@@ -108,6 +118,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setModel(modelProperty.get());
 
         aiPreferences.setSystemMessage(systemMessage.get());
+        aiPreferences.setTemperature(temperature.get());
         aiPreferences.setMessageWindowSize(messageWindowSize.get());
         aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
         aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
@@ -117,7 +128,18 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        return openAiTokenValidator.getValidationStatus().isValid() && systemMessageValidator.getValidationStatus().isValid() && messageWindowSizeValidator.getValidationStatus().isValid() && documentSplitterChunkSizeValidator.getValidationStatus().isValid() && documentSplitterOverlapSizeValidator.getValidationStatus().isValid() && ragMaxResultsCountValidator.getValidationStatus().isValid() && ragMinScoreValidator.getValidationStatus().isValid();
+        Validator[] validators = {
+                openAiTokenValidator,
+                systemMessageValidator,
+                temperatureValidator,
+                messageWindowSizeValidator,
+                documentSplitterChunkSizeValidator,
+                documentSplitterOverlapSizeValidator,
+                ragMaxResultsCountValidator,
+                ragMinScoreValidator
+        };
+
+        return Arrays.stream(validators).map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
     }
 
     public StringProperty openAiTokenProperty() {
@@ -134,6 +156,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty systemMessageProperty() {
         return systemMessage;
+    }
+
+    public DoubleProperty temperatureProperty() {
+        return temperature;
     }
 
     public IntegerProperty messageWindowSizeProperty() {
@@ -162,6 +188,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus getSystemMessageValidatorStatus() {
         return systemMessageValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getTemperatureValidatorStatus() {
+        return temperatureValidator.getValidationStatus();
     }
 
     public ValidationStatus getMessageWindowSizeValidatorStatus() {

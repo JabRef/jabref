@@ -43,6 +43,12 @@
             <IntegerInputField fx:id="messageWindowSizeTextField" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
+      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="448.0" spacing="10.0">
+         <children>
+            <Label alignment="BASELINE_CENTER" text="%Temperature" />
+             <DoubleInputField fx:id="temperatureTextField" HBox.hgrow="ALWAYS"/>
+         </children>
+      </HBox>
           <VBox>
               <children>
                   <Label text="%RAG - maximum results count" />

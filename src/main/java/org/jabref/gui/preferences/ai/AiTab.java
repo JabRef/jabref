@@ -16,7 +16,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.unitfx.DoubleInputField;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import scala.Int;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
     @FXML private CheckBox enableChat;
@@ -24,6 +23,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private ComboBox<AiPreferences.AiModel> modelComboBox;
 
     @FXML private TextArea systemMessageTextArea;
+    @FXML private DoubleInputField temperatureTextField;
     @FXML private IntegerInputField messageWindowSizeTextField;
     @FXML private IntegerInputField documentSplitterChunkSizeTextField;
     @FXML private IntegerInputField documentSplitterOverlapSizeTextField;
@@ -47,6 +47,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         openAiToken.textProperty().bindBidirectional(viewModel.openAiTokenProperty());
         modelComboBox.valueProperty().bindBidirectional(viewModel.modelProperty());
         systemMessageTextArea.textProperty().bindBidirectional(viewModel.systemMessageProperty());
+        temperatureTextField.valueProperty().bindBidirectional(viewModel.temperatureProperty().asObject());
         messageWindowSizeTextField.valueProperty().bindBidirectional(viewModel.messageWindowSizeProperty().asObject());
         documentSplitterChunkSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterChunkSizeProperty().asObject());
         documentSplitterOverlapSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterOverlapSizeProperty().asObject());
@@ -56,6 +57,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         openAiToken.setDisable(!enableChat.isSelected());
         modelComboBox.setDisable(!enableChat.isSelected());
         systemMessageTextArea.setDisable(!enableChat.isSelected());
+        temperatureTextField.setDisable(!enableChat.isSelected());
         messageWindowSizeTextField.setDisable(!enableChat.isSelected());
         documentSplitterChunkSizeTextField.setDisable(!enableChat.isSelected());
         documentSplitterOverlapSizeTextField.setDisable(!enableChat.isSelected());
@@ -67,6 +69,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             modelComboBox.setDisable(!newValue);
 
             systemMessageTextArea.setDisable(!newValue);
+            temperatureTextField.setDisable(!newValue);
             messageWindowSizeTextField.setDisable(!newValue);
             documentSplitterChunkSizeTextField.setDisable(!newValue);
             documentSplitterOverlapSizeTextField.setDisable(!newValue);
@@ -77,6 +80,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         Platform.runLater(() -> {
             visualizer.initVisualization(viewModel.getOpenAiTokenValidatorStatus(), openAiToken);
             visualizer.initVisualization(viewModel.getSystemMessageValidatorStatus(), systemMessageTextArea);
+            visualizer.initVisualization(viewModel.getTemperatureValidatorStatus(), temperatureTextField);
             visualizer.initVisualization(viewModel.getMessageWindowSizeValidatorStatus(), messageWindowSizeTextField);
             visualizer.initVisualization(viewModel.getDocumentSplitterChunkSizeValidatorStatus(), documentSplitterChunkSizeTextField);
             visualizer.initVisualization(viewModel.getDocumentSplitterOverlapSizeValidatorStatus(), documentSplitterOverlapSizeTextField);
