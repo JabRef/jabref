@@ -16,6 +16,11 @@ import java.util.List;
 
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import javafx.beans.property.ListProperty;
+
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -24,6 +29,9 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabases;
 import org.jabref.preferences.AiPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -46,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AiService {
     public static final String VERSION = "1";
-
+  
     private final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
 
     private final ObjectProperty<ChatLanguageModel> chatModelProperty = new SimpleObjectProperty<>(null); // <p>
@@ -60,6 +68,8 @@ public class AiService {
 
     private ListProperty<String> ingestedFiles;
     private final List<String> filesUnderIngesting = new ArrayList<>();
+
+    private final Map<Path, BibDatabaseChats> bibDatabaseChatsMap = new HashMap<>();
 
     public AiService(AiPreferences aiPreferences) {
         try {
@@ -148,7 +158,32 @@ public class AiService {
         mvStore.close();
     }
 
-    public void setOpenAiToken(String token) {
+    public @Nullable BibDatabaseChats openBibDatabaseChats(BibDatabaseContext bibDatabaseContext) {
+        if (bibDatabaseContext.getDatabasePath().isPresent()) {
+            Path path = bibDatabaseContext.getDatabasePath().get();
+
+            if (bibDatabaseChatsMap.containsKey(path)) {
+                return bibDatabaseChatsMap.get(path);
+            }
+
+            // TODO: Error handling??????
+            BibDatabaseChats bibDatabaseChats = new BibDatabaseChats(path);
+
+            bibDatabaseChatsMap.put(path, bibDatabaseChats);
+
+            return bibDatabaseChats;
+        } else {
+            LOGGER.warn("Unable to open (or create) bib database chats file. No database path is present");
+            return null;
+        }
+    }
+
+    public void close() {
+        bibDatabaseChatsMap.values().forEach(BibDatabaseChats::close);
+        bibDatabaseChatsMap.clear();
+    }
+
+    private void setOpenAiToken(String token) {
         ChatLanguageModel newChatModel = OpenAiChatModel
                 .builder()
                 .apiKey(token)

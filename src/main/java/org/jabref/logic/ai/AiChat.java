@@ -3,30 +3,24 @@ package org.jabref.logic.ai;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.stream.Stream;
 
-import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
-import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
-import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.filter.Filter;
 import org.jabref.preferences.AiPreferences;
 
 /**
  * This class maintains an AI chat.
  * It depends on the {@link AiService}, which holds embedding and chat models.
- * This class was created for maintaining (hiding) the langchain4j state.
+ * This class was created for hiding the langchain4j state and listening to parameters change.
  * <p>
- * An outer class is responsible for synchronizing objects of this class with {@link org.jabref.preferences.AiPreferences} changes.
+ * This class doesn't record the chat history.
  */
 public class AiChat {
     private final AiService aiService;
@@ -45,11 +39,14 @@ public class AiChat {
     public AiChat(AiService aiService, AiPreferences aiPreferences, Filter filter) {
         this.aiService = aiService;
         this.aiPreferences = aiPreferences;
-
         this.filter = filter;
 
         rebuild();
 
+        listenToPreferences(aiService, aiPreferences);
+    }
+
+    private void listenToPreferences(AiService aiService, AiPreferences aiPreferences) {
         EasyBind.listen(aiService.chatModelProperty(), (obs, oldValue, newValue) -> {
             if (newValue != null) {
                 rebuild();
@@ -131,7 +128,7 @@ public class AiChat {
         return chain.execute(prompt);
     }
 
-    public void restoreMessages(List<ChatMessage> messages) {
-        messages.stream().map(ChatMessage::toLangchainMessage).filter(Optional::isPresent).map(Optional::get).forEach(this.chatMemory::add);
+    public void restoreMessages(Stream<ChatMessage> messages) {
+        messages.map(ChatMessage::toLangchainMessage).filter(Optional::isPresent).map(Optional::get).forEach(this.chatMemory::add);
     }
 }
