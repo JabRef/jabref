@@ -21,6 +21,7 @@ import org.jabref.preferences.PreferencesService;
 import com.dlsc.unitfx.DoubleInputField;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
@@ -36,6 +37,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final AiPreferences aiPreferences;
 
     private final Validator openAiTokenValidator;
+    private final Validator systemMessageValidator;
     private final Validator messageWindowSizeValidator;
     private final Validator documentSplitterChunkSizeValidator;
     private final Validator documentSplitterOverlapSizeValidator;
@@ -49,6 +51,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 openAiToken,
                 (token) -> !StringUtil.isBlank(token),
                 ValidationMessage.error(Localization.lang("The OpenAI token cannot be empty")));
+
+        this.systemMessageValidator = new FunctionBasedValidator<>(
+                systemMessage,
+                (message) -> !StringUtil.isBlank(message),
+                ValidationMessage.error(Localization.lang("The system message cannot be empty")));
 
         this.messageWindowSizeValidator = new FunctionBasedValidator<>(
                 messageWindowSize,
@@ -104,7 +111,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        return openAiTokenValidator.getValidationStatus().isValid() && messageWindowSizeValidator.getValidationStatus().isValid() && documentSplitterChunkSizeValidator.getValidationStatus().isValid() && documentSplitterOverlapSizeValidator.getValidationStatus().isValid() && ragMaxResultsCountValidator.getValidationStatus().isValid() && ragMinScoreValidator.getValidationStatus().isValid();
+        return openAiTokenValidator.getValidationStatus().isValid() && systemMessageValidator.getValidationStatus().isValid() && messageWindowSizeValidator.getValidationStatus().isValid() && documentSplitterChunkSizeValidator.getValidationStatus().isValid() && documentSplitterOverlapSizeValidator.getValidationStatus().isValid() && ragMaxResultsCountValidator.getValidationStatus().isValid() && ragMinScoreValidator.getValidationStatus().isValid();
     }
 
     public StringProperty openAiTokenProperty() {
@@ -137,5 +144,33 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public DoubleProperty ragMinScoreProperty() {
         return ragMinScore;
+    }
+
+    public ValidationStatus getOpenAiTokenValidatorStatus() {
+        return openAiTokenValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getSystemMessageValidatorStatus() {
+        return systemMessageValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getMessageWindowSizeValidatorStatus() {
+        return messageWindowSizeValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getDocumentSplitterChunkSizeValidatorStatus() {
+        return documentSplitterChunkSizeValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getDocumentSplitterOverlapSizeValidatorStatus() {
+        return documentSplitterOverlapSizeValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getRagMaxResultsCountValidatorStatus() {
+        return ragMaxResultsCountValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getRagMinScoreValidatorStatus() {
+        return ragMinScoreValidator.getValidationStatus();
     }
 }

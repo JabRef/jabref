@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.ai;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
@@ -12,6 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.unitfx.DoubleInputField;
 import com.dlsc.unitfx.IntegerInputField;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import scala.Int;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
@@ -24,6 +26,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private IntegerInputField documentSplitterOverlapSizeTextField;
     @FXML private IntegerInputField ragMaxResultsCountTextField;
     @FXML private DoubleInputField ragMinScoreTextField;
+
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public AiTab() {
         ViewLoader.view(this)
@@ -60,6 +64,16 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             documentSplitterOverlapSizeTextField.setDisable(!newValue);
             ragMaxResultsCountTextField.setDisable(!newValue);
             ragMinScoreTextField.setDisable(!newValue);
+        });
+
+        Platform.runLater(() -> {
+            visualizer.initVisualization(viewModel.getOpenAiTokenValidatorStatus(), openAiToken);
+            visualizer.initVisualization(viewModel.getSystemMessageValidatorStatus(), systemMessageTextArea);
+            visualizer.initVisualization(viewModel.getMessageWindowSizeValidatorStatus(), messageWindowSizeTextField);
+            visualizer.initVisualization(viewModel.getDocumentSplitterChunkSizeValidatorStatus(), documentSplitterChunkSizeTextField);
+            visualizer.initVisualization(viewModel.getDocumentSplitterOverlapSizeValidatorStatus(), documentSplitterOverlapSizeTextField);
+            visualizer.initVisualization(viewModel.getRagMaxResultsCountValidatorStatus(), ragMaxResultsCountTextField);
+            visualizer.initVisualization(viewModel.getRagMinScoreValidatorStatus(), ragMinScoreTextField);
         });
     }
 
