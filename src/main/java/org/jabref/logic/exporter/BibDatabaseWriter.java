@@ -176,6 +176,9 @@ public abstract class BibDatabaseWriter {
 
         // Write database entries.
         List<BibEntry> sortedEntries = getSortedEntries(entries, saveConfiguration.getSelfContainedSaveOrder());
+
+        // FIXME: "Clean" architecture violation: We modify the entries here, which should not happen during a write
+        //        The cleanup should be done before the write operation
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
         if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
