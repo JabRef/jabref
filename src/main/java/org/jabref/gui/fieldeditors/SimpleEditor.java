@@ -21,8 +21,13 @@ import org.jabref.preferences.PreferencesService;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
+import com.tobiasdiez.easybind.EasyBind;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SimpleEditor extends HBox implements FieldEditorFX {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleEditor.class);
 
     private final SimpleEditorViewModel viewModel;
     private final TextInputControl textInput;
@@ -40,7 +45,6 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         textInput = createTextInputControl();
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
-        textInput.textProperty().bindBidirectional(viewModel.textProperty());
         preventCursorJumping();
 
         ((ContextMenuAddable) textInput).initContextMenu(new DefaultMenu(textInput));
@@ -61,25 +65,67 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         // We need some more sophisticated handling to avoid cursor jumping
         // https://github.com/JabRef/jabref/issues/5904
 
-        textInput.textProperty().addListener((observable, oldValue, newValue) -> {
-            int oldCaretPosition = textInput.getCaretPosition();
-            if (oldCaretPosition == 0) {
+        EasyBind.subscribe(viewModel.textProperty(), newText -> {
+            int lastCaretPosition = textInput.getCaretPosition();
+            LOGGER.trace("Caret at position {}", lastCaretPosition);
+            String oldText = textInput.getText();
+            textInput.setText(newText);
+            LOGGER.trace("listener triggered: '{}' -> '{}'", oldText, newText);
+            if (oldText == null) {
+                LOGGER.trace("Empty field");
                 return;
             }
-            List<String> oldValueCharacters = Arrays.asList(oldValue.split(""));
-            List<String> newValueCharacters = Arrays.asList(newValue.split(""));
+            if (newText == null) {
+                LOGGER.trace("Field cleared");
+                return;
+            }
+            if (oldText.equals(newText)) {
+                LOGGER.trace("No change, returned.");
+                return;
+            }
+            LOGGER.trace("Trying to adapt...");
+            // This is a special case when the text is set to a new value
+            // In this case, we want to adjust the caret position
+            List<String> oldValueCharacters = Arrays.asList(oldText.split(""));
+            List<String> newValueCharacters = Arrays.asList(newText.split(""));
             List<AbstractDelta<String>> deltaList = DiffUtils.diff(oldValueCharacters, newValueCharacters).getDeltas();
+            LOGGER.trace("Deltas: {}", deltaList);
             AbstractDelta<String> lastDelta = null;
             for (AbstractDelta<String> delta : deltaList) {
-                if (delta.getSource().getPosition() > oldCaretPosition) {
+                if (delta.getSource().getPosition() > lastCaretPosition) {
                     break;
                 }
                 lastDelta = delta;
             }
             if (lastDelta != null) {
+                LOGGER.trace("Last Delta: {}", lastDelta);
+                LOGGER.trace("Last Delta source: {}", lastDelta.getSource());
+                LOGGER.trace("Last Delta target: {}", lastDelta.getTarget());
                 int offset = lastDelta.getTarget().getPosition() - lastDelta.getSource().getPosition();
-                textInput.positionCaret(oldCaretPosition + offset);
+                LOGGER.trace("Offset before patching: {}", offset);
+
+                switch (lastDelta.getType()) {
+                    case DELETE:
+                        offset -= lastDelta.getSource().size();
+                        break;
+                    case INSERT:
+                        offset += lastDelta.getTarget().size();
+                        break;
+                    case CHANGE:
+                        offset += lastDelta.getTarget().size() - lastDelta.getSource().size();
+                        break;
+                    default:
+                        break;
+                }
+                LOGGER.trace("Offset after patching: {}", offset);
+
+                int newCaretPosition = lastCaretPosition + offset;
+                textInput.positionCaret(newCaretPosition);
+                LOGGER.trace("newCaretPosition: {}", newCaretPosition);
             }
+        });
+        EasyBind.subscribe(textInput.textProperty(), newText -> {
+            viewModel.textProperty().set(newText);
         });
     }
 
