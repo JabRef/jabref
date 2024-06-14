@@ -53,6 +53,8 @@ public class AiService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
 
+    private final AiPreferences aiPreferences;
+
     private final ObjectProperty<ChatLanguageModel> chatModelProperty = new SimpleObjectProperty<>(null); // <p>
     private final ObjectProperty<EmbeddingModel> embeddingModelProperty = new SimpleObjectProperty<>(new AllMiniLmL6V2EmbeddingModel());
 
@@ -68,6 +70,8 @@ public class AiService {
     private final Map<Path, BibDatabaseChats> bibDatabaseChatsMap = new HashMap<>();
 
     public AiService(AiPreferences aiPreferences) {
+        this.aiPreferences = aiPreferences;
+
         try {
             Files.createDirectories(JabRefDesktop.getEmbeddingsCacheDirectory());
         } catch (IOException e) {
@@ -89,14 +93,18 @@ public class AiService {
             ingestedFiles = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
         }
 
-        if (aiPreferences.getEnableChatWithFiles() && !aiPreferences.getOpenAiToken().isEmpty()) {
-            setOpenAiToken(aiPreferences.getOpenAiToken());
+        if (aiPreferences.getEnableChatWithFiles()) {
+            rebuildChatModel();
         }
 
+        bindToPreferences();
+    }
+
+    private void bindToPreferences() {
         EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (property, oldValue, newValue) -> {
             if (newValue) {
                 if (!aiPreferences.getOpenAiToken().isEmpty()) {
-                    setOpenAiToken(aiPreferences.getOpenAiToken());
+                    rebuildChatModel();
                 }
             } else {
                 setChatModel(null);
@@ -105,10 +113,14 @@ public class AiService {
 
         EasyBind.listen(aiPreferences.openAiTokenProperty(), (property, oldValue, newValue) -> {
             if (!newValue.isEmpty()) {
-                setOpenAiToken(newValue);
+                rebuildChatModel();
             } else {
                 setChatModel(null);
             }
+        });
+
+        EasyBind.listen(aiPreferences.modelProperty(), (property, oldValue, newValue) -> {
+            rebuildChatModel();
         });
     }
 
@@ -177,15 +189,17 @@ public class AiService {
         }
     }
 
-    private void setOpenAiToken(String token) {
-        ChatLanguageModel newChatModel = OpenAiChatModel
+    private void rebuildChatModel() {
+        ChatLanguageModel chatLanguageModel =
+                OpenAiChatModel
                 .builder()
-                .apiKey(token)
+                .apiKey(aiPreferences.getOpenAiToken())
+                .modelName(aiPreferences.getModel().getName())
                 .logRequests(true)
                 .logResponses(true)
                 .build();
 
-        setChatModel(newChatModel);
+        setChatModel(chatLanguageModel);
     }
 
     private void setChatModel(ChatLanguageModel chatModel) {

@@ -455,6 +455,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
     private static final String AI_ENABLE_CHAT = "aiEnableChat";
+    private static final String AI_MODEL = "aiModel";
     private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
     private static final String AI_MESSAGE_WINDOW_SIZE = "aiMessageWindowSize";
     private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
@@ -850,6 +851,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // AI
         defaults.put(AI_ENABLE_CHAT, Boolean.FALSE);
+        defaults.put(AI_MODEL, AiPreferences.AiModel.GPT_3_5_TURBO.getName());
         defaults.put(AI_SYSTEM_MESSAGE, "You are an AI assistant.");
         defaults.put(AI_MESSAGE_WINDOW_SIZE, 10);
         defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, 300);
@@ -2765,6 +2767,7 @@ public class JabRefPreferences implements PreferencesService {
         aiPreferences = new AiPreferences(
                 useAi,
                 token,
+                AiPreferences.AiModel.fromString(get(AI_MODEL)),
                 get(AI_SYSTEM_MESSAGE),
                 getInt(AI_MESSAGE_WINDOW_SIZE),
                 getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE),
@@ -2772,8 +2775,9 @@ public class JabRefPreferences implements PreferencesService {
                 getInt(AI_RAG_MAX_RESULTS_COUNT),
                 getDouble(AI_RAG_MIN_SCORE));
 
-        EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
         EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE_CHAT, newValue));
+        EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
+        EasyBind.listen(aiPreferences.modelProperty(), (obs, oldValue, newValue) -> put(AI_MODEL, aiPreferences.getModel().getName()));
 
         EasyBind.listen(aiPreferences.systemMessageProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
         EasyBind.listen(aiPreferences.messageWindowSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_MESSAGE_WINDOW_SIZE, newValue));

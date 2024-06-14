@@ -155,4 +155,5 @@ open module org.jabref {
     requires dd.plist;
     requires mslinks;
     requires com.dlsc.unitfx;
+    requires org.checkerframework.checker.qual;
 }

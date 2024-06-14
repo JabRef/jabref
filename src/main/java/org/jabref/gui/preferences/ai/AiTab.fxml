@@ -20,6 +20,12 @@
                 <CustomPasswordField fx:id="openAiToken" HBox.hgrow="ALWAYS" />
             </children>
         </HBox>
+      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="91.0" spacing="10.0">
+         <children>
+            <Label alignment="BASELINE_CENTER" text="%OpenAI model" />
+            <ComboBox fx:id="modelComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
 
         <Label styleClass="sectionHeader" text="%Expert settings" />
       <VBox>
