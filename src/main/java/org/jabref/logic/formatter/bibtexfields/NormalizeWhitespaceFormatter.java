@@ -1,24 +1,26 @@
-package org.jabref.logic.bibtex;
+package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 /**
- * This class provides the reformatting needed when reading BibTeX fields formatted
- * in JabRef style. The reformatting must undo all formatting done by JabRef when
- * writing the same fields.
+ * Replaces two subsequent whitespaces (and tabs) to one space in case of single-line fields. In case of multine fields,
+ * the field content is kept as is.
+ *
+ * Due to the distinction between single line and multiline fields, this formatter does not implement the interface {@link org.jabref.logic.cleanup.Formatter}.
  */
-public class FieldContentFormatter {
+public class NormalizeWhitespaceFormatter {
 
     // 's' matches a space, tab, new line, carriage return.
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     private final FieldPreferences preferences;
 
-    public FieldContentFormatter(FieldPreferences preferences) {
+    public NormalizeWhitespaceFormatter(FieldPreferences preferences) {
         Objects.requireNonNull(preferences);
         this.preferences = preferences;
     }
