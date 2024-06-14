@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jabref.logic.bibtex.FieldContentFormatter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
@@ -93,7 +92,6 @@ public class BibtexParser implements Parser {
     private static final Integer LOOKAHEAD = 1024;
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-    private final FieldContentFormatter fieldContentFormatter;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
@@ -109,7 +107,6 @@ public class BibtexParser implements Parser {
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        this.fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldPreferences());
         this.metaDataParser = new MetaDataParser(fileMonitor);
         this.parsedBibdeskGroups = new HashMap<>();
     }
@@ -778,13 +775,13 @@ public class BibtexParser implements Parser {
             }
             if (character == '"') {
                 StringBuilder text = parseQuotedFieldExactly();
-                value.append(fieldContentFormatter.format(text, field));
+                value.append(text.toString());
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside a field, so we need to count the
                 // brackets to know when the string is finished.
                 StringBuilder text = parseBracketedFieldContent();
-                value.append(fieldContentFormatter.format(text, field));
+                value.append(text.toString());
             } else if (Character.isDigit((char) character)) { // value is a number
                 String number = parseTextToken();
                 value.append(number);

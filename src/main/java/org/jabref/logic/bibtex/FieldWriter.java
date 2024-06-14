@@ -21,7 +21,6 @@ public class FieldWriter {
 
     private final boolean neverFailOnHashes;
     private final FieldPreferences preferences;
-    private final FieldContentFormatter formatter;
 
     public FieldWriter(FieldPreferences preferences) {
         this(true, preferences);
@@ -30,8 +29,6 @@ public class FieldWriter {
     private FieldWriter(boolean neverFailOnHashes, FieldPreferences preferences) {
         this.neverFailOnHashes = neverFailOnHashes;
         this.preferences = preferences;
-
-        formatter = new FieldContentFormatter(preferences);
     }
 
     public static FieldWriter buildIgnoreHashes(FieldPreferences prefs) {
@@ -157,7 +154,7 @@ public class FieldWriter {
             }
         }
 
-        return formatter.format(stringBuilder, field);
+        return stringBuilder.toString();
     }
 
     /**
@@ -188,9 +185,8 @@ public class FieldWriter {
 
     private String formatWithoutResolvingStrings(String content, Field field) throws InvalidFieldValueException {
         checkBraces(content);
-
         StringBuilder stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
-        stringBuilder.append(formatter.format(content, field));
+        stringBuilder.append(content);
         stringBuilder.append(FIELD_END);
         return stringBuilder.toString();
     }
