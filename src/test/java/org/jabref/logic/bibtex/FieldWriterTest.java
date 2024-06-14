@@ -103,9 +103,14 @@ class FieldWriterTest {
     }
 
     @Test
-    void removeWhitespaceFromNonMultiLineFields() throws Exception {
+    void whitespaceFromNonMultiLineFieldsKept() throws Exception {
+        // This was a decision on 2024-06-15 when fixing https://github.com/JabRef/jabref/issues/4877
+        // We want to have a clean architecture for reading and writing
+        // Normalizing is done during write (and not during read)
+        // Furthermore, normalizing is done in the BibDatabaseWriter#applySaveActions and not in the fielld writer
+
         String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
-        String expected = "{I should not include additional whitespaces or tabs.}";
+        String expected = "{" + original + "}";
 
         String title = writer.write(StandardField.TITLE, original);
         String any = writer.write(new UnknownField("anyotherfield"), original);
@@ -167,15 +172,15 @@ class FieldWriterTest {
     }
 
     @Test
-    void multipleSpacesShrunkOnSingleLineField() throws Exception {
+    void multipleSpacesNotShrunkOnSingleLineField() throws Exception {
         String text = "t  w  o";
-        assertEquals("{t w o}", writer.write(StandardField.MONTH, text));
+        assertEquals("{t  w  o}", writer.write(StandardField.MONTH, text));
     }
 
     @Test
-    void doubleSpacesAreReplacedBySingleSpaces() throws Exception {
+    void doubleSpacesAreKept() throws Exception {
         String text = "  text      ";
-        assertEquals("{ text }", writer.write(StandardField.MONTH, text));
+        assertEquals("{  text      }", writer.write(StandardField.MONTH, text));
     }
 
     @Test

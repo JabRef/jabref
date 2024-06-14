@@ -941,51 +941,51 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseConvertsNewlineToSpace() throws IOException {
+    void parsKeesNewlines() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,a = {a\nb}}"));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("a")));
+        assertEquals(Optional.of("a\nb"), parsedEntry.getField(new UnknownField("a")));
     }
 
     @Test
-    void parseConvertsMultipleNewlinesToSpace() throws IOException {
+    void parsKeepsMultipleNewlines() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,a = {a\n\nb}," + "b = {a\n \nb}," + "c = {a \n \n b}}"));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("a")));
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("b")));
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("c")));
+        assertEquals(Optional.of("a\n\nb"), parsedEntry.getField(new UnknownField("a")));
+        assertEquals(Optional.of("a\n \nb"), parsedEntry.getField(new UnknownField("b")));
+        assertEquals(Optional.of("a \n \n b"), parsedEntry.getField(new UnknownField("c")));
     }
 
     @Test
-    void parseConvertsTabToSpace() throws IOException {
+    void parseKeepsTabs() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,a = {a\tb}}"));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("a")));
+        assertEquals(Optional.of("a\tb"), parsedEntry.getField(new UnknownField("a")));
     }
 
     @Test
-    void parseConvertsMultipleTabsToSpace() throws IOException {
+    void parsKeepsMultipleTabs() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,a = {a\t\tb}," + "b = {a\t \tb}," + "c = {a \t \t b}}"));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
 
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("a")));
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("b")));
-        assertEquals(Optional.of("a b"), parsedEntry.getField(new UnknownField("c")));
+        assertEquals(Optional.of("a\t\tb"), parsedEntry.getField(new UnknownField("a")));
+        assertEquals(Optional.of("a\t \tb"), parsedEntry.getField(new UnknownField("b")));
+        assertEquals(Optional.of("a \t \t b"), parsedEntry.getField(new UnknownField("c")));
     }
 
     @Test

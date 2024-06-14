@@ -93,8 +93,11 @@ public abstract class BibDatabaseWriter {
         FieldFormatterCleanup trimWhiteSpaces = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new TrimWhitespaceFormatter());
         NormalizeWhitespacesCleanup normalizeWhitespacesCleanup = new NormalizeWhitespacesCleanup(fieldPreferences);
         for (BibEntry entry : toChange) {
-            changes.addAll(trimWhiteSpaces.cleanup(entry));
-            changes.addAll(normalizeWhitespacesCleanup.cleanup(entry));
+            // Only apply the trimming if the entry itself has other changes (e.g., by the user or by save actions)
+            if (entry.hasChanged()) {
+                changes.addAll(trimWhiteSpaces.cleanup(entry));
+                changes.addAll(normalizeWhitespacesCleanup.cleanup(entry));
+            }
         }
 
         return changes;

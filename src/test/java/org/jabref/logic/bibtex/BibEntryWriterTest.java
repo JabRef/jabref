@@ -77,7 +77,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void bibEntryTwoSpacesBeforeAndAfterReplacedByOneSpace() throws Exception {
+    void bibEntryTwoSpacesBeforeAndAfterKept() throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "  two spaces before and after (before)  ")
                 .withChanged(true);
@@ -86,7 +86,7 @@ class BibEntryWriterTest {
 
         String expected = """
                 @Article{,
-                  author = { two spaces before and after (before) },
+                  author = {  two spaces before and after (before)  },
                 }
                 """.replace("\n", OS.NEWLINE);
 
