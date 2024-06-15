@@ -44,13 +44,13 @@ public class PdfIndexerManager {
             }
             LOGGER.debug("File preferences have changed, updating indexer");
             indexer.close();
-            indexer = PdfIndexer.of(context, filePreferences, aiPreferences);
+            indexer = PdfIndexer.of(context, filePreferences);
             indexerMap.put(fulltextIndexPath, indexer);
             pathFilePreferencesMap.put(fulltextIndexPath, filePreferences);
             return indexer;
         }
         LOGGER.debug("No indexer found for context {}, creating new one", context);
-        indexer = PdfIndexer.of(context, filePreferences, aiPreferences);
+        indexer = PdfIndexer.of(context, filePreferences);
         indexerMap.put(fulltextIndexPath, indexer);
         pathFilePreferencesMap.put(fulltextIndexPath, filePreferences);
         return indexer;

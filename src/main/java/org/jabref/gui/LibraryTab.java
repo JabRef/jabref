@@ -58,6 +58,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.EmbeddingsGenerationTaskManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -153,6 +154,8 @@ public class LibraryTab extends Tab {
     private BackgroundTask<ParserResult> dataLoadingTask;
 
     private final IndexingTaskManager indexingTaskManager;
+    private final EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager;
+
     private final TaskExecutor taskExecutor;
     private final DirectoryMonitorManager directoryMonitorManager;
 
@@ -176,6 +179,7 @@ public class LibraryTab extends Tab {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
+        this.embeddingsGenerationTaskManager = new EmbeddingsGenerationTaskManager(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
         this.taskExecutor = taskExecutor;
         this.directoryMonitorManager = new DirectoryMonitorManager(Globals.getDirectoryMonitor());
 
@@ -191,6 +195,7 @@ public class LibraryTab extends Tab {
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
+        this.getDatabase().registerListener(new EmbeddingsUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -268,6 +273,10 @@ public class LibraryTab extends Tab {
             }
         }
 
+        if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
+            embeddingsGenerationTaskManager.updateEmbeddings(bibDatabaseContext);
+        }
+
         LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;
@@ -313,6 +322,7 @@ public class LibraryTab extends Tab {
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
+        this.getDatabase().registerListener(new EmbeddingsUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -1105,6 +1115,40 @@ public class LibraryTab extends Tab {
                     } catch (IOException e) {
                         LOGGER.warn("I/O error when writing lucene index", e);
                     }
+                }
+            }
+        }
+    }
+
+    private class EmbeddingsUpdateListener {
+        @Subscribe
+        public void listen(EntriesAddedEvent event) {
+            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
+                embeddingsGenerationTaskManager.addToProcess(event.getBibEntries());
+            }
+        }
+
+        @Subscribe
+        public void listen(EntriesRemovedEvent event) {
+            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
+                embeddingsGenerationTaskManager.removeFromProcess(event.getBibEntries());
+            }
+        }
+
+        @Subscribe
+        public void listen(FieldChangedEvent event) {
+            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
+                if (event.getField().equals(StandardField.FILE)) {
+                    List<LinkedFile> oldFileList = FileFieldParser.parse(event.getOldValue());
+                    List<LinkedFile> newFileList = FileFieldParser.parse(event.getNewValue());
+
+                    List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
+                    addedFiles.removeAll(oldFileList);
+                    List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
+                    removedFiles.removeAll(newFileList);
+
+                    embeddingsGenerationTaskManager.addToProcess(addedFiles);
+                    embeddingsGenerationTaskManager.removeFromProcess(removedFiles);
                 }
             }
         }

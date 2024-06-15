@@ -66,11 +66,7 @@ public class PdfIndexer {
 
     private IndexReader reader;
 
-    private final AiService aiService = JabRefGUI.getAiService();
-
-    private final AiPreferences aiPreferences;
-
-    private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences, AiPreferences aiPreferences) {
+    private PdfIndexer(BibDatabaseContext databaseContext, Directory indexDirectory, FilePreferences filePreferences) {
         this.databaseContext = databaseContext;
         if (indexDirectory == null) {
             // FIXME: This should never happen, but was reported at https://github.com/JabRef/jabref/issues/10781.
@@ -88,22 +84,21 @@ public class PdfIndexer {
         }
 
         this.filePreferences = filePreferences;
-        this.aiPreferences = aiPreferences;
     }
 
     /**
      * Method is public, because DatabaseSearcherWithBibFilesTest resides in another package
      */
     @VisibleForTesting
-    public static PdfIndexer of(BibDatabaseContext databaseContext, Path indexDirectory, FilePreferences filePreferences, AiPreferences aiPreferences) throws IOException {
-        return new PdfIndexer(databaseContext, new NIOFSDirectory(indexDirectory), filePreferences, aiPreferences);
+    public static PdfIndexer of(BibDatabaseContext databaseContext, Path indexDirectory, FilePreferences filePreferences) throws IOException {
+        return new PdfIndexer(databaseContext, new NIOFSDirectory(indexDirectory), filePreferences);
     }
 
     /**
      * Method is public, because DatabaseSearcherWithBibFilesTest resides in another package
      */
-    public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiPreferences aiPreferences) throws IOException {
-        return new PdfIndexer(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences, aiPreferences);
+    public static PdfIndexer of(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
+        return new PdfIndexer(databaseContext, new NIOFSDirectory(databaseContext.getFulltextIndexPath()), filePreferences);
     }
 
     /**
@@ -230,8 +225,6 @@ public class PdfIndexer {
      * @param linkedFilePath the path to the file to be removed
      */
     public void removeFromIndex(String linkedFilePath) {
-        aiService.removeIngestedFile(linkedFilePath);
-
         try {
             getIndexWriter().ifPresent(Unchecked.consumer(writer -> {
                 writer.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFilePath));
@@ -292,11 +285,6 @@ public class PdfIndexer {
         }
 
         LOGGER.debug("Adding {} to index", linkedFile.getLink());
-
-        if (aiPreferences.getEnableChatWithFiles() && !aiService.haveIngestedFile(linkedFile.getLink())) {
-            AiIngestor aiIngestor = new AiIngestor(aiService);
-            aiIngestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
-        }
 
         try {
             // Check if a document with this path is already in the index

@@ -19,6 +19,8 @@ import javafx.beans.property.ListProperty;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.property.ObjectProperty;
@@ -28,6 +30,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.search.SearchTextField;
 import org.jabref.logic.ai.events.FileIngestedEvent;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.database.BibDatabaseContext;
@@ -63,13 +66,13 @@ public class AiService {
     private final ObjectProperty<EmbeddingModel> embeddingModelProperty = new SimpleObjectProperty<>(new AllMiniLmL6V2EmbeddingModel());
 
     private static final String STORE_FILE_NAME = "embeddingsStore.mv";
-    private static final String INGESTED_FILE_NAME = "ingested.mv";
+    private static final String INGESTED_FILE_NAME = "ingestedFiles.mv";
 
     private final MVStore embeddingsMvStore;
     private final EmbeddingStore<TextSegment> embeddingStore;
 
     private final MVStore ingestedMvStore;
-    private final MVMap<String, Boolean> ingestedMap;
+    private final MVMap<String, Long> ingestedMap;
 
     private final Map<Path, BibDatabaseChats> bibDatabaseChatsMap = new HashMap<>();
 
@@ -130,20 +133,17 @@ public class AiService {
         });
     }
 
-    public void startIngestingFile(String link) {
-        ingestedMap.put(link, false);
-        // TODO: Is there any need to use both start and end method? Will the end method be enough?
-    }
-
-    public void endIngestingFile(String link) {
-        ingestedMap.put(link, true);
+    public void endIngestingFile(String link, long modificationTimeInSeconds) {
+        ingestedMap.put(link, modificationTimeInSeconds);
         eventBus.post(new FileIngestedEvent(link));
     }
 
     public boolean haveIngestedFile(String link) {
-        Boolean bool = ingestedMap.get(link);
-        // We really need this expression to look like this.
-        return bool != null && bool;
+        return ingestedMap.get(link) != null;
+    }
+
+    public long getIngestedFileModificationTime(String link) {
+        return ingestedMap.get(link);
     }
 
     public boolean haveIngestedFiles(Stream<String> links) {
@@ -157,6 +157,10 @@ public class AiService {
     public void removeIngestedFile(String link) {
         embeddingStore.removeAll(MetadataFilterBuilder.metadataKey("linkedFile").isEqualTo(link));
         ingestedMap.remove(link);
+    }
+
+    public Set<String> getListOfIngestedFilesLinks() {
+        return new HashSet<>(ingestedMap.keySet());
     }
 
     public void registerListener(Object listener) {

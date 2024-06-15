@@ -1,8 +1,12 @@
 package org.jabref.logic.ai;
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilReader;
@@ -55,16 +59,21 @@ public class AiIngestor {
     }
 
     public void ingestLinkedFile(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
-        aiService.startIngestingFile(linkedFile.getLink());
-
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
+
         if (path.isPresent()) {
-            ingestFile(path.get(), new Metadata().add("linkedFile", linkedFile.getLink()));
+            try {
+                BasicFileAttributes attributes = Files.readAttributes(path.get(), BasicFileAttributes.class);
+
+                ingestFile(path.get(), new Metadata().put("linkedFile", linkedFile.getLink()));
+
+                aiService.endIngestingFile(linkedFile.getLink(), attributes.lastModifiedTime().to(TimeUnit.SECONDS));
+            } catch (IOException e) {
+                LOGGER.error("An error occurred while reading attributes of a linked file: {}", linkedFile.getLink(), e);
+            }
         } else {
             LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
         }
-
-        aiService.endIngestingFile(linkedFile.getLink());
     }
 
     private void ingestFile(Path path, Metadata metadata) {
