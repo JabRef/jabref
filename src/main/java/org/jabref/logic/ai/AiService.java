@@ -13,11 +13,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import com.google.common.eventbus.EventBus;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import javafx.beans.property.ListProperty;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
@@ -26,6 +28,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.logic.ai.events.FileIngestedEvent;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.AiPreferences;
@@ -37,6 +40,7 @@ import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -59,39 +63,37 @@ public class AiService {
     private final ObjectProperty<EmbeddingModel> embeddingModelProperty = new SimpleObjectProperty<>(new AllMiniLmL6V2EmbeddingModel());
 
     private static final String STORE_FILE_NAME = "embeddingsStore.mv";
-    private static final String INGESTED_FILE_NAME = "ingested.ArrayList";
+    private static final String INGESTED_FILE_NAME = "ingested.mv";
 
     private final MVStore embeddingsMvStore;
     private final EmbeddingStore<TextSegment> embeddingStore;
 
-    private ListProperty<String> ingestedFiles;
-    private final List<String> filesUnderIngesting = new ArrayList<>();
+    private final MVStore ingestedMvStore;
+    private final MVMap<String, Boolean> ingestedMap;
 
     private final Map<Path, BibDatabaseChats> bibDatabaseChatsMap = new HashMap<>();
 
+    private final EventBus eventBus = new EventBus();
+
     public AiService(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
+
+        Path storePath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(STORE_FILE_NAME);
+        Path ingestedPath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(INGESTED_FILE_NAME);
 
         try {
             Files.createDirectories(JabRefDesktop.getEmbeddingsCacheDirectory());
         } catch (IOException e) {
             LOGGER.error("An error occurred while creating directories for embedding store. Will use an in-memory store", e);
+            storePath = null;
+            ingestedPath = null;
         }
 
-        Path storePath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(STORE_FILE_NAME);
-        embeddingsMvStore = MVStore.open(String.valueOf(storePath));
-        embeddingStore = new MVStoreEmbeddingStore(embeddingsMvStore);
+        this.embeddingsMvStore = MVStore.open(storePath == null ? null : storePath.toString());
+        this.embeddingStore = new MVStoreEmbeddingStore(embeddingsMvStore);
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(String.valueOf(JabRefDesktop.getEmbeddingsCacheDirectory().resolve(INGESTED_FILE_NAME))))){
-            ArrayList<String> ingestedFilesList = (ArrayList<String>) ois.readObject();
-            ingestedFiles = new SimpleListProperty<>(FXCollections.observableList(ingestedFilesList));
-        } catch (FileNotFoundException e) {
-            LOGGER.info("No ingested files cache. Will create a new one");
-            ingestedFiles = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
-        } catch (IOException | ClassNotFoundException e) {
-            LOGGER.error("An error occurred while reading paths of ingested files", e);
-            ingestedFiles = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
-        }
+        this.ingestedMvStore = MVStore.open(ingestedPath == null ? null : ingestedPath.toString());
+        this.ingestedMap = ingestedMvStore.openMap("ingested");
 
         if (aiPreferences.getEnableChatWithFiles()) {
             rebuildChatModel();
@@ -128,46 +130,42 @@ public class AiService {
         });
     }
 
-    public void startIngestingFile(String path) {
-        filesUnderIngesting.add(path);
+    public void startIngestingFile(String link) {
+        ingestedMap.put(link, false);
+        // TODO: Is there any need to use both start and end method? Will the end method be enough?
     }
 
-    public void endIngestingFile(String path) {
-        assert filesUnderIngesting.contains(path);
-
-        filesUnderIngesting.remove(path);
-        ingestedFiles.add(path);
+    public void endIngestingFile(String link) {
+        ingestedMap.put(link, true);
+        eventBus.post(new FileIngestedEvent(link));
     }
 
-    public boolean haveIngestedFile(String path) {
-        return ingestedFiles.contains(path);
+    public boolean haveIngestedFile(String link) {
+        Boolean bool = ingestedMap.get(link);
+        // We really need this expression to look like this.
+        return bool != null && bool;
     }
 
-    public boolean haveIngestedFiles(Collection<String> paths) {
-        return new HashSet<>(ingestedFiles).containsAll(paths);
+    public boolean haveIngestedFiles(Stream<String> links) {
+        return links.allMatch(this::haveIngestedFile);
     }
 
     public boolean haveIngestedLinkedFiles(Collection<LinkedFile> linkedFiles) {
-        return haveIngestedFiles(linkedFiles.stream().map(LinkedFile::getLink).toList());
+        return haveIngestedFiles(linkedFiles.stream().map(LinkedFile::getLink));
     }
 
-    public ReadOnlyListProperty<String> getIngestedFilesProperty() {
-        return ingestedFiles;
+    public void removeIngestedFile(String link) {
+        embeddingStore.removeAll(MetadataFilterBuilder.metadataKey("linkedFile").isEqualTo(link));
+        ingestedMap.remove(link);
     }
 
-    public void removeIngestedFile(String path) {
-        embeddingStore.removeAll(MetadataFilterBuilder.metadataKey("linkedFile").isEqualTo(path));
-        ingestedFiles.remove(path);
+    public void registerListener(Object listener) {
+        eventBus.register(listener);
     }
 
     public void close() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(String.valueOf(JabRefDesktop.getEmbeddingsCacheDirectory().resolve(INGESTED_FILE_NAME))))) {
-            oos.writeObject(new ArrayList<>(ingestedFiles.stream().toList()));
-        } catch (IOException e) {
-            LOGGER.error("An error occurred while saving the paths of ingested files", e);
-        }
-
         embeddingsMvStore.close();
+        ingestedMvStore.close();
 
         bibDatabaseChatsMap.values().forEach(BibDatabaseChats::close);
         bibDatabaseChatsMap.clear();

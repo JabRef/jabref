@@ -18,6 +18,7 @@ import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.BibDatabaseChats;
 import org.jabref.logic.ai.ChatMessage;
+import org.jabref.logic.ai.events.FileIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -29,6 +30,7 @@ import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import com.google.common.eventbus.Subscribe;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
@@ -75,13 +77,18 @@ public class AiChatTab extends EntryEditorTab {
         setText(Localization.lang(NAME));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
 
-        aiService.getIngestedFilesProperty().addListener((observableValue, paths, t1) -> {
+        aiService.registerListener(new FileIngestedListener());
+    }
+
+    private class FileIngestedListener {
+        @Subscribe
+        public void listen(FileIngestedEvent event) {
             if (currentBibEntry != null) {
                 if (aiService.haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
                     DefaultTaskExecutor.runInJavaFXThread(() -> bindToEntry(currentBibEntry));
                 }
             }
-        });
+        }
     }
 
     @Override
