@@ -42,7 +42,7 @@ Click "OK" to store the changes.
 
 ## Configure the Build System
 
-Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select a JDK 21.
+Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select JDK 21.
 
 {% figure caption:"Gradle JVM is project SDK (showing JDK 21 as example)" %}
 ![Gradle JVM is project SDK](guidelines-intellij-settings-gradle-gradlejvm-is-projectjvm.png)
@@ -66,14 +66,14 @@ Then double click inside the cell "Compilation options" and enter following para
 ```
 
 Press <kbd>Enter</kbd> to have the value really stored.
-Otherwise, it seems like the setting is stored, but it is not there if you re-open this preference dialog.
+Otherwise, it seems like the setting is stored, but it is not there if you reopen this preference dialog.
 Then click on "Apply" to store the setting.
 
 {% figure caption:"Resulting settings for module JabRef.main" %}
 ![Overridden compiler parameters](guidelines-overridden-compiler-parameters.png)
 {% endfigure %}
 
-If this step is omited, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`.
+If this step is omitted, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`.
 
 Enable annotation processors by navigating to **Build, Execution, Deployment > Compiler > Annotation processors** and check "Enable annotation processing"
 
@@ -84,7 +84,7 @@ Enable annotation processors by navigating to **Build, Execution, Deployment > C
 ## Using Gradle from within IntelliJ IDEA
 
 {: .note }
-Ensuring JabRef builds with Gradle should always the first step because, e.g. it generates additional sources that are required for compiling the code.
+Ensuring JabRef builds with Gradle should always be the first step because, e.g. it generates additional sources that are required for compiling the code.
 
 Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to **View > Tool Windows > Gradle**.
 In the Gradle Tool Window, press the "Reload All Gradle Projects" button to ensure that all settings are up-to-date with the setting changes.
@@ -93,7 +93,7 @@ In the Gradle Tool Window, press the "Reload All Gradle Projects" button to ensu
 ![Highlighted reload button](guidelines-gradle-tool-windows-refresh.png)
 {% endfigure %}
 
-After that, you can use the Gradle Tool Window to build all parts JabRef and run it.
+After that, you can use the Gradle Tool Window to build all parts of JabRef and run it.
 To do so, expand the JabRef project in the Gradle Tool Window and navigate to Tasks.
 From there, you can build and run JabRef by double-clicking **JabRef > Tasks > application > run**.
 
@@ -102,7 +102,7 @@ From there, you can build and run JabRef by double-clicking **JabRef > Tasks > a
 {% endfigure %}
 
 The Gradle run window opens, shows compilation and then the output of JabRef.
-The spinner will run as long as JabRef is opened.
+The spinner will run as long as JabRef is open.
 
 {% figure caption:"Gradle run Window" %}
 ![Gradle run window](guidelines-gradle-run-output.png)
@@ -129,7 +129,7 @@ In case there are difficulties later, this is the place to switch back to gradle
 
 Click "OK" to close the preference dialog.
 
-In the menubar, select **Build > Rebuild project**.
+In the menu bar, select **Build > Rebuild project**.
 
 IntelliJ now compiles JabRef.
 This should happen without any error.
@@ -143,7 +143,7 @@ To run an example test from IntelliJ, we let IntelliJ create a launch configurat
 Locate the class `BibEntryTest`:
 Press <kbd>Ctrl</kbd>+<kbd>N</kbd>.
 Then, the "Search for classes dialog" pops up.
-Enter `bibenrytest`.
+Enter `bibentrytest`.
 Now, `BibEntryTest` should appear first:
 
 {% figure caption:"IntelliJ search for class “BibEntryTest”" %}
@@ -177,7 +177,7 @@ You can also click on the debug symbol next to it to enable stopping at breakpoi
 
 The tests are green after the run.
 You can also use the play button there to re-execute the tests.
-A right-click on "BibEntryTests" enables to start the debugger.
+A right-click on "BibEntryTests" enables the debugger to start.
 
 {% figure caption:"Run window for the BibEntry test case" %}
 ![Run window for the BibEntry test case](guidelines-intellij-tests-are-green.png)
