@@ -175,15 +175,14 @@ public class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
 
         assertEquals("@Article{," + OS.NEWLINE
-                     + "  keywords = {asdf,asdf,asdf}," + OS.NEWLINE
-                     + "}" + OS.NEWLINE,
+                        + "  keywords = {asdf,asdf,asdf}," + OS.NEWLINE
+                        + "}" + OS.NEWLINE,
                 stringWriter.toString());
     }
 
     @Test
     void putKeyWordsRemovesDuplicateKeywordsIsVisibleDuringWrite() throws Exception {
-        BibEntry entry = new BibEntry();
-        entry.setType(StandardEntryType.Article);
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.putKeywords(List.of("asdf", "asdf", "asdf"), ',');
 
         database.insertEntry(entry);
@@ -191,8 +190,8 @@ public class BibtexDatabaseWriterTest {
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
 
         assertEquals("@Article{," + OS.NEWLINE
-                     + "  keywords = {asdf}," + OS.NEWLINE
-                     + "}" + OS.NEWLINE,
+                        + "  keywords = {asdf}," + OS.NEWLINE
+                        + "}" + OS.NEWLINE,
                 stringWriter.toString());
     }
 
@@ -458,7 +457,7 @@ public class BibtexDatabaseWriterTest {
                 "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
-       assertEquals(expected, stringWriter.toString());
+        assertEquals(expected, stringWriter.toString());
     }
 
     @Test
@@ -691,9 +690,8 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     void writeSavedSerializationOfEntryIfUnchanged() throws Exception {
-        BibEntry entry = new BibEntry();
-        entry.setType(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "Mr. author");
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Mr. author");
         entry.setParsedSerialization("presaved serialization");
         entry.setChanged(false);
         database.insertEntry(entry);
@@ -755,12 +753,12 @@ public class BibtexDatabaseWriterTest {
 
         // The order should be kept (the cleanups are a list, not a set)
         assertEquals("@Comment{jabref-meta: saveActions:enabled;"
-                        + OS.NEWLINE
-                        + "title[lower_case]" + OS.NEWLINE
-                        + "journal[title_case]" + OS.NEWLINE
-                        + "day[upper_case]" + OS.NEWLINE
-                        + ";}"
-                        + OS.NEWLINE, stringWriter.toString());
+                + OS.NEWLINE
+                + "title[lower_case]" + OS.NEWLINE
+                + "journal[title_case]" + OS.NEWLINE
+                + "day[upper_case]" + OS.NEWLINE
+                + ";}"
+                + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test
@@ -908,6 +906,25 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
+    void normalizeWhitespacesCleanupOnlyInTextFields() throws Exception {
+        BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Firstname1 Lastname1   and   Firstname2 Lastname2")
+                .withField(StandardField.FILE, "some  --  filename  -- spaces.pdf")
+                .withChanged(true);
+
+        database.insertEntry(firstEntry);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries());
+
+        assertEquals("""
+                @Article{,
+                  author = {Firstname1 Lastname1 and Firstname2 Lastname2},
+                  file   = {some  --  filename  -- spaces.pdf},
+                }
+                """.replace("\n", OS.NEWLINE), stringWriter.toString());
+    }
+
+    @Test
     void trimFieldContents() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.NOTE, "        some note    \t")
@@ -998,8 +1015,7 @@ public class BibtexDatabaseWriterTest {
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
                 "  note    = {some note}," + OS.NEWLINE +
                 "  number  = {1}," + OS.NEWLINE +
-                "}" + OS.NEWLINE +
-                "" + OS.NEWLINE +
+                "}" + OS.NEWLINE + OS.NEWLINE +
                 "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
     }
 

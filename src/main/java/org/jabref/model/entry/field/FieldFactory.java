@@ -62,7 +62,7 @@ public class FieldFactory {
      */
     public static Collection<Field> getNotTextFields() {
         Set<Field> result = Arrays.stream(StandardField.values())
-              .filter(field -> Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.MULTIPLE_ENTRY_LINK)))
+              .filter(field -> !Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.MULTIPLE_ENTRY_LINK)))
                 .collect(Collectors.toSet());
 
         // These fields are not marked as verbatim, because they could include LaTeX code
@@ -172,9 +172,9 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a  List with all standard fields and the citation key field
+     * Returns a list with all standard fields and the citation key field
      */
-    public static Set<Field> getStandardFieldsWithCitationKey() {
+    public static SequencedSet<Field> getStandardFieldsWithCitationKey() {
         EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
 
         LinkedHashSet<Field> standardFieldsWithBibtexKey = new LinkedHashSet<>(allFields.size() + 1);
