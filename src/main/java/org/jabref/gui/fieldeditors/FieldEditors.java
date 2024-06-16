@@ -71,9 +71,9 @@ public class FieldEditors {
             return new UrlEditor(field, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
             return new JournalEditor(field, suggestionProvider, fieldCheckers);
-        } else if (fieldProperties.contains(FieldProperty.DOI) || fieldProperties.contains(FieldProperty.EPRINT) || fieldProperties.contains(FieldProperty.ISBN)) {
+        } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN) {
             return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
-        } else if (fieldProperties.contains(FieldProperty.ISSN)) {
+        } else if (field == StandardField.ISSN) {
             return new ISSNEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.OWNER) {
             return new OwnerEditor(field, suggestionProvider, fieldCheckers);
@@ -85,7 +85,7 @@ public class FieldEditors {
             return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.MONTH)) {
             return new OptionEditor<>(new MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
-        } else if (fieldProperties.contains(FieldProperty.GENDER)) {
+        } else if (field == StandardField.GENDER) {
             return new OptionEditor<>(new GenderEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.EDITOR_TYPE)) {
             return new OptionEditor<>(new EditorTypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));

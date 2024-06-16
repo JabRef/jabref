@@ -3,6 +3,7 @@ package org.jabref.model.entry.field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -49,12 +50,26 @@ public class FieldFactory {
         return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));
     }
 
-    public static Collection<Field> getNotTextFields() {
-        return Set.of(StandardField.DOI, StandardField.FILE, StandardField.URL, StandardField.URI, StandardField.ISBN, StandardField.ISSN, StandardField.MONTH, StandardField.DATE, StandardField.YEAR);
+    /**
+     * Checks whether the given field contains LaTeX code or something else
+     */
+    public static boolean isLatexField(Field field) {
+        return Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.MARKDOWN));
     }
 
-    public static Collection<Field> getIdentifierFields() {
-        return Set.of(StandardField.DOI, StandardField.EPRINT, StandardField.PMID);
+    /**
+     * Returns a collection of StandardFields which do not contain LaTeX code
+     */
+    public static Collection<Field> getNotTextFields() {
+        Set<Field> result = Arrays.stream(StandardField.values())
+              .filter(field -> Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.MULTIPLE_ENTRY_LINK)))
+                .collect(Collectors.toSet());
+
+        // These fields are not marked as verbatim, because they could include LaTeX code
+        result.add(StandardField.MONTH);
+        result.add(StandardField.DATE);
+        result.add(StandardField.YEAR);
+        return result;
     }
 
     public static OrFields parseOrFields(String fieldNames) {
