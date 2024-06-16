@@ -1,19 +1,14 @@
-package org.jabref.logic.ai;
+package org.jabref.logic.ai.embeddings;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -31,6 +26,8 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
 
+    private final AiIngestor aiIngestor;
+
     private final Queue<LinkedFile> linkedFileQueue = new ConcurrentLinkedQueue<>();
     private final Object lock = new Object();
     private boolean isRunning = false;
@@ -43,6 +40,12 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
         this.aiService = aiService;
         this.taskExecutor = taskExecutor;
 
+        this.aiIngestor = new AiIngestor(aiService);
+
+        configure();
+    }
+
+    private void configure() {
         showToUser(true);
         willBeRecoveredAutomatically(true);
         updateProgress(1, 1);
@@ -89,7 +92,7 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
     }
 
     public void removeFromProcess(LinkedFile linkedFile) {
-        aiService.removeIngestedFile(linkedFile.getLink());
+        aiService.getEmbeddingsManager().removeIngestedFile(linkedFile.getLink());
     }
 
     public void removeFromProcess(Set<String> linksToRemove) {
@@ -97,11 +100,11 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
     }
 
     public void removeFromProcess(String link) {
-        aiService.removeIngestedFile(link);
+        aiService.getEmbeddingsManager().removeIngestedFile(link);
     }
 
     public void updateEmbeddings(BibDatabaseContext bibDatabaseContext) {
-        Set<String> linksToRemove = aiService.getListOfIngestedFilesLinks();
+        Set<String> linksToRemove = aiService.getEmbeddingsManager().getIngestedFilesTracker().getListOfIngestedFilesLinks();
         bibDatabaseContext.getEntries().stream()
                        .flatMap(entry -> entry.getFiles().stream())
                        .map(LinkedFile::getLink)
@@ -138,31 +141,6 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
     }
 
     private void ingestLinkedFile(LinkedFile linkedFile) {
-        if (aiService.haveIngestedFile(linkedFile.getLink())) {
-            return;
-        }
-
-        Optional<Path> path = linkedFile.findIn(databaseContext, filePreferences);
-        if (path.isEmpty()) {
-            LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
-            return;
-        }
-
-        try {
-            BasicFileAttributes attributes = Files.readAttributes(path.get(), BasicFileAttributes.class);
-
-            long currentModificationTimeInSeconds = attributes.lastModifiedTime().to(TimeUnit.SECONDS);
-            long ingestedModificationTimeInSeconds = aiService.getIngestedFileModificationTime(linkedFile.getLink());
-
-            if (currentModificationTimeInSeconds <= ingestedModificationTimeInSeconds) {
-                return;
-            }
-        } catch (IOException e) {
-            LOGGER.error("Couldn't retrieve attributes of a linked file: {}", linkedFile.getLink(), e);
-            LOGGER.warn("Regenerating embeddings for linked file: {}", linkedFile.getLink());
-        }
-
-        AiIngestor aiIngestor = new AiIngestor(aiService);
         aiIngestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
     }
 

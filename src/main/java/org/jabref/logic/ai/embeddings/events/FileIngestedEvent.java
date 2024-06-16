@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.events;
+package org.jabref.logic.ai.embeddings.events;
 
 public class FileIngestedEvent {
     private final String link;

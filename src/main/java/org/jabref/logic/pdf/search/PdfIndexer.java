@@ -12,16 +12,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.jabref.gui.JabRefGUI;
-import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.logic.ai.AiIngestor;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.SearchFieldConstants;
-import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 
 import com.google.common.annotations.VisibleForTesting;

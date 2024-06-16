@@ -156,4 +156,5 @@ open module org.jabref {
     requires mslinks;
     requires com.dlsc.unitfx;
     requires org.checkerframework.checker.qual;
+    requires jakarta.validation;
 }

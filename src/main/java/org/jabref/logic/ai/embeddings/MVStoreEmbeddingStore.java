@@ -1,4 +1,4 @@
-package org.jabref.logic.ai;
+package org.jabref.logic.ai.embeddings;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +38,7 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
 
     public MVStoreEmbeddingStore(MVStore mvStore) {
         // TODO: Will this work efficiently? Does optimizations work on map level or entry level?
+
         this.embeddingsMap = mvStore.openMap("embeddingsMap");
         this.fileMap = mvStore.openMap("fileMap");
         this.contentsMap = mvStore.openMap("contentsMap");

@@ -4,19 +4,15 @@ import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.NodeOrientation;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.entryeditor.aichattab.components.chatmessage.ChatMessageComponent;
-import org.jabref.logic.ai.ChatMessage;
+import org.jabref.logic.ai.chathistory.ChatMessage;
 
 import com.airhacks.afterburner.views.ViewLoader;
 

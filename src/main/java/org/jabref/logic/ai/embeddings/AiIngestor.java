@@ -1,4 +1,4 @@
-package org.jabref.logic.ai;
+package org.jabref.logic.ai.embeddings;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -8,6 +8,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.database.BibDatabaseContext;
@@ -18,61 +19,73 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
-import org.apache.lucene.util.packed.DirectMonotonicReader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class contains a bunch of methods that are useful for loading the documents to AI.
- * <p>
- * This class is an "algorithm class". Meaning it is used in one place and is thrown away quickly.
- */
 public class AiIngestor {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiIngestor.class.getName());
 
-    public static final int DOCUMENT_SPLITTER_MAX_SEGMENT_SIZE_IN_CHARS = 300;
-    public static final int DOCUMENT_SPLITTER_MAX_OVERLAP_SIZE_IN_CHARS = 30;
-
-    // Another "algorithm class" that ingests the contents of the file into the embedding store.
-    private final EmbeddingStoreIngestor ingestor;
-
     private final AiService aiService;
 
-    public AiIngestor(AiService aiService) {
-        DocumentSplitter documentSplitter = DocumentSplitters
-                .recursive(DOCUMENT_SPLITTER_MAX_SEGMENT_SIZE_IN_CHARS, DOCUMENT_SPLITTER_MAX_OVERLAP_SIZE_IN_CHARS);
+    private EmbeddingStoreIngestor ingestor;
 
-        this.ingestor = EmbeddingStoreIngestor
+    public AiIngestor(AiService aiService) {
+        this.aiService = aiService;
+        this.ingestor = rebuild(aiService);
+
+        listenToPreferences();
+    }
+
+    private EmbeddingStoreIngestor rebuild(AiService aiService) {
+        DocumentSplitter documentSplitter = DocumentSplitters
+                .recursive(aiService.getPreferences().getDocumentSplitterChunkSize(),
+                           aiService.getPreferences().getDocumentSplitterOverlapSize());
+
+        return EmbeddingStoreIngestor
                 .builder()
-                .embeddingStore(aiService.getEmbeddingStore())
-                .embeddingModel(aiService.getEmbeddingModel())
+                .embeddingStore(aiService.getEmbeddingsManager().getEmbeddingsStore())
+                .embeddingModel(aiService.getEmbeddingModel().getEmbeddingModel())
                 .documentSplitter(documentSplitter)
                 .build();
+    }
 
-        this.aiService = aiService;
+    private void listenToPreferences() {
+        aiService.getPreferences().documentSplitterChunkSizeProperty().addListener(obs -> ingestor = rebuild(aiService));
+        aiService.getPreferences().documentSplitterOverlapSizeProperty().addListener(obs -> ingestor = rebuild(aiService));
     }
 
     public void ingestLinkedFile(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
+        AiIngestedFilesTracker ingestedFilesTracker = aiService.getEmbeddingsManager().getIngestedFilesTracker();
+
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
 
-        if (path.isPresent()) {
-            try {
-                BasicFileAttributes attributes = Files.readAttributes(path.get(), BasicFileAttributes.class);
-
-                ingestFile(path.get(), new Metadata().put("linkedFile", linkedFile.getLink()));
-
-                aiService.endIngestingFile(linkedFile.getLink(), attributes.lastModifiedTime().to(TimeUnit.SECONDS));
-            } catch (IOException e) {
-                LOGGER.error("An error occurred while reading attributes of a linked file: {}", linkedFile.getLink(), e);
-            }
-        } else {
+        if (path.isEmpty()) {
             LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
+            return;
+        }
+
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(path.get(), BasicFileAttributes.class);
+
+            long currentModificationTimeInSeconds = attributes.lastModifiedTime().to(TimeUnit.SECONDS);
+
+            Long ingestedModificationTimeInSeconds = ingestedFilesTracker.getIngestedFileModificationTime(linkedFile.getLink());
+
+            if (ingestedModificationTimeInSeconds != null && currentModificationTimeInSeconds <= ingestedModificationTimeInSeconds) {
+                return;
+            }
+
+            ingestFile(path.get(), new Metadata().put("linkedFile", linkedFile.getLink()));
+            ingestedFilesTracker.endIngestingFile(linkedFile.getLink(), attributes.lastModifiedTime().to(TimeUnit.SECONDS));
+        } catch (IOException e) {
+            LOGGER.error("Couldn't retrieve attributes of a linked file: {}", linkedFile.getLink(), e);
+            LOGGER.warn("Regenerating embeddings for linked file: {}", linkedFile.getLink());
+
+            ingestFile(path.get(), new Metadata().put("linkedFile", linkedFile.getLink()));
+            ingestedFilesTracker.endIngestingFile(linkedFile.getLink(), 0);
         }
     }
 
