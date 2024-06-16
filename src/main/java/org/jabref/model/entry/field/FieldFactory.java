@@ -137,10 +137,6 @@ public class FieldFactory {
         return parseField(null, fieldName);
     }
 
-    public static Set<Field> getKeyFields() {
-        return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) || field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK));
-    }
-
     public static boolean isInternalField(Field field) {
         return field.getName().startsWith("__");
     }
@@ -210,7 +206,6 @@ public class FieldFactory {
         fields.addAll(EnumSet.allOf(InternalField.class));
         fields.addAll(EnumSet.allOf(SpecialField.class));
         fields.addAll(EnumSet.allOf(StandardField.class));
-        fields.removeIf(field -> field instanceof UserSpecificCommentField);
         return fields;
     }
 

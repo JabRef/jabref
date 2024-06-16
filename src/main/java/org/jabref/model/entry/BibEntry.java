@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
@@ -455,6 +456,13 @@ public class BibEntry implements Cloneable {
      */
     public SequencedSet<Field> getFields() {
         return new LinkedHashSet<>(fields.keySet());
+    }
+
+    /**
+     * Returns an unmodifiable sequence containing the names of all fields that are a) set for this particular entry and b) matching the given predicate
+     */
+    public SequencedSet<Field> getFields(Predicate<Field> selector) {
+        return getFields().stream().filter(selector).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
