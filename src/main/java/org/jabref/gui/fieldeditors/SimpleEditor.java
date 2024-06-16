@@ -16,12 +16,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class SimpleEditor extends HBox implements FieldEditorFX {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleEditor.class);
 
     private final SimpleEditorViewModel viewModel;
     private final TextInputControl textInput;

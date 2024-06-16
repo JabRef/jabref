@@ -8,7 +8,6 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 
-import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
@@ -111,10 +110,6 @@ public interface FieldEditorFX {
                  .findFirst()
                  .orElse(getNode())
                  .requestFocus();
-    }
-
-    default boolean childIsFocused() {
-        return ControlHelper.childIsFocused(getNode());
     }
 
     /**
