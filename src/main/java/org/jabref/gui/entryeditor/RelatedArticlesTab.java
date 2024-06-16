@@ -78,6 +78,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
                 .onSuccess(relatedArticles -> {
+                    // FIXME: mode should be fetched from BibDatabaseContext (which should be available somehow at the library tab)
                     ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
                     cleanup.doPostCleanup(relatedArticles);
                     progress.setVisible(false);
