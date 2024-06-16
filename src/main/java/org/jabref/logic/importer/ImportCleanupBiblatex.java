@@ -3,7 +3,7 @@ package org.jabref.logic.importer;
 import org.jabref.logic.cleanup.ConvertToBiblatexCleanup;
 import org.jabref.model.entry.BibEntry;
 
-public class ImportCleanupBiblatex implements ImportCleanup {
+public class ImportCleanupBiblatex extends ImportCleanup {
 
     private final ConvertToBiblatexCleanup convertToBiblatexCleanup = new ConvertToBiblatexCleanup();
 
@@ -15,6 +15,7 @@ public class ImportCleanupBiblatex implements ImportCleanup {
      */
     @Override
     public BibEntry doPostCleanup(BibEntry entry) {
+        entry = super.doPostCleanup(entry);
          convertToBiblatexCleanup.cleanup(entry);
          return entry;
     }
