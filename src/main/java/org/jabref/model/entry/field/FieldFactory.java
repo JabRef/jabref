@@ -58,7 +58,7 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a collection of StandardFields which do not contain LaTeX code
+     * Returns a collection of StandardFields where the content should not be interpreted as "plain" text, but something else (such as links to other fields, numbers, ...)
      */
     public static Collection<Field> getNotTextFields() {
         Set<Field> result = Arrays.stream(StandardField.values())
@@ -68,7 +68,6 @@ public class FieldFactory {
         // These fields are not marked as verbatim, because they could include LaTeX code
         result.add(StandardField.MONTH);
         result.add(StandardField.DATE);
-        result.add(StandardField.YEAR);
         return result;
     }
 

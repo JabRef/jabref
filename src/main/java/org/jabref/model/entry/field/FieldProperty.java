@@ -21,17 +21,16 @@ public enum FieldProperty {
     MARKDOWN,
 
     MONTH,
-    MULTIPLE_ENTRY_LINK,
+
     MULTILINE_TEXT,
     NUMERIC,
-    PAGES,
     PAGINATION,
     PERSON_NAMES,
-    PUBLICATION_STATE,
-    SINGLE_ENTRY_LINK,
-    TYPE,
 
-    // Field content should treated as data
+    SINGLE_ENTRY_LINK,
+    MULTIPLE_ENTRY_LINK,
+
+    // Field content should be treated as data
     VERBATIM,
 
     YES_NO

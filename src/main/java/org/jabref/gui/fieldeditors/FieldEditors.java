@@ -79,7 +79,7 @@ public class FieldEditors {
             return new OwnerEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.GROUPS) {
             return new GroupEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
-        } else if (fieldProperties.contains(FieldProperty.FILE_EDITOR)) {
+        } else if (field == StandardField.FILE) {
             return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
             return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
@@ -91,7 +91,7 @@ public class FieldEditors {
             return new OptionEditor<>(new EditorTypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.PAGINATION)) {
             return new OptionEditor<>(new PaginationEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
-        } else if (fieldProperties.contains(FieldProperty.TYPE)) {
+        } else if (field == StandardField.TYPE) {
             if (entryType.equals(IEEETranEntryType.Patent)) {
                 return new OptionEditor<>(new PatentTypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
             } else {
