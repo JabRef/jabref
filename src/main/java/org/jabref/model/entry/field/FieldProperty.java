@@ -25,7 +25,5 @@ public enum FieldProperty {
     SINGLE_ENTRY_LINK,
     TYPE,
     VERBATIM,
-    YES_NO,
-    COMMENT,
-    CUSTOM_FIELD
+    YES_NO
 }

@@ -49,12 +49,12 @@ public class FieldFactory {
         return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));
     }
 
-    public static List<Field> getNotTextFieldNames() {
-        return Arrays.asList(StandardField.DOI, StandardField.FILE, StandardField.URL, StandardField.URI, StandardField.ISBN, StandardField.ISSN, StandardField.MONTH, StandardField.DATE, StandardField.YEAR);
+    public static Collection<Field> getNotTextFields() {
+        return Set.of(StandardField.DOI, StandardField.FILE, StandardField.URL, StandardField.URI, StandardField.ISBN, StandardField.ISSN, StandardField.MONTH, StandardField.DATE, StandardField.YEAR);
     }
 
-    public static List<Field> getIdentifierFieldNames() {
-        return Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.PMID);
+    public static Collection<Field> getIdentifierFields() {
+        return Set.of(StandardField.DOI, StandardField.EPRINT, StandardField.PMID);
     }
 
     public static OrFields parseOrFields(String fieldNames) {

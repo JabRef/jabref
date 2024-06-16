@@ -22,7 +22,7 @@ public class NormalizeWhitespacesCleanup implements CleanupJob {
         List<FieldChange> changes = new ArrayList<>();
         for (Field field : entry.getFields()) {
             // We are sure that the field is set, because this is the assertion of getFields()
-            String oldValue = entry.getField(field).get();
+            String oldValue = entry.getField(field).orElseThrow();
             String newValue = formatter.format(oldValue, field);
             if (!newValue.equals(oldValue)) {
                 entry.setField(field, newValue).ifPresent(changes::add);

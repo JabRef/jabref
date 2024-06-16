@@ -84,7 +84,7 @@ public class FieldFormatterCleanup implements CleanupJob {
     private List<FieldChange> cleanupAllTextFields(BibEntry entry) {
         List<FieldChange> fieldChanges = new ArrayList<>();
         Set<Field> fields = new HashSet<>(entry.getFields());
-        FieldFactory.getNotTextFieldNames().forEach(fields::remove);
+        FieldFactory.getNotTextFields().forEach(fields::remove);
         for (Field fieldKey : fields) {
             if (!fieldKey.equals(InternalField.KEY_FIELD)) {
                 fieldChanges.addAll(cleanupSingleField(fieldKey, entry));

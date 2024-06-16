@@ -76,7 +76,7 @@ public class DuplicateCheck {
     }
 
     private static boolean haveSameIdentifier(final BibEntry one, final BibEntry two) {
-        for (final Field name : FieldFactory.getIdentifierFieldNames()) {
+        for (final Field name : FieldFactory.getIdentifierFields()) {
             if (one.getField(name).isPresent() && one.getField(name).equals(two.getField(name))) {
                 return true;
             }
