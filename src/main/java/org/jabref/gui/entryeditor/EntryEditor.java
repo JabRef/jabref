@@ -126,9 +126,8 @@ public class EntryEditor extends BorderPane {
                   .load();
         setupKeyBindings();
 
-        CreateTabsResult createTabsResult = createTabs();
-        this.allPossibleTabs = createTabsResult.tabs;
-        this.previewTabs = createTabsResult.previewTabs;
+        this.allPossibleTabs = createTabs();
+        this.previewTabs = this.allPossibleTabs.stream().filter(OffersPreview.class::isInstance).map(OffersPreview.class::cast).toList()
 
         setupDragAndDrop(libraryTab);
 
@@ -255,10 +254,7 @@ public class EntryEditor extends BorderPane {
         libraryTab.selectNextEntry();
     }
 
-    private record CreateTabsResult(List<EntryEditorTab> tabs, Collection<OffersPreview> previewTabs) {
-    }
-
-    private CreateTabsResult createTabs() {
+    private List<EntryEditorTab> createTabs() {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
         tabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor));
@@ -298,7 +294,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
 
-        return new CreateTabsResult(tabs, tabs.stream().filter(OffersPreview.class::isInstance).map(OffersPreview.class::cast).toList());
+        return tabs;
     }
 
     /**
