@@ -358,9 +358,6 @@ public class EntryEditor extends BorderPane {
         }
     }
 
-    /**
-     * @return the currently edited entry
-     */
     public BibEntry getCurrentlyEditedEntry() {
         return currentlyEditedEntry;
     }
