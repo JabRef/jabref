@@ -283,7 +283,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(new SciteTab(preferencesService, taskExecutor, dialogService));
         tabs.add(new CitationRelationsTab(dialogService, databaseContext,
                 undoManager, stateManager, fileMonitor, preferencesService, libraryTab, taskExecutor));
-        tabs.add(new RelatedArticlesTab(buildInfo, preferencesService, dialogService, taskExecutor));
+        tabs.add(new RelatedArticlesTab(buildInfo, databaseContext, preferencesService, dialogService, taskExecutor));
         sourceTab = new SourceTab(
                 databaseContext,
                 undoManager,
@@ -362,9 +362,6 @@ public class EntryEditor extends BorderPane {
         }
     }
 
-    /**
-     * @return the currently edited entry
-     */
     public BibEntry getCurrentlyEditedEntry() {
         return currentlyEditedEntry;
     }

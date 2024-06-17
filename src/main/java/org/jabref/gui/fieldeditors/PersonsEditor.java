@@ -32,7 +32,9 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
         textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
 
         decoratedStringProperty = new UiThreadStringProperty(viewModel.textProperty());
-        textInput.textProperty().bindBidirectional(decoratedStringProperty);
+
+        establishBinding(textInput, decoratedStringProperty);
+
         ((ContextMenuAddable) textInput).initContextMenu(EditorMenus.getNameMenu(textInput), preferencesService.getKeyBindingRepository());
         this.getChildren().add(textInput);
 
