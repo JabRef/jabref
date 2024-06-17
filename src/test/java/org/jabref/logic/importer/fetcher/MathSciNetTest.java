@@ -3,6 +3,10 @@ package org.jabref.logic.importer.fetcher;
 import java.io.InputStream;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -23,12 +27,16 @@ import static org.mockito.Mockito.when;
 class MathSciNetTest {
     private MathSciNet fetcher;
     private BibEntry ratiuEntry;
+    private NormalizeWhitespacesCleanup normalizeWhitespacesCleanup;
 
     @BeforeEach
     void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         fetcher = new MathSciNet(importFormatPreferences);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        normalizeWhitespacesCleanup = new NormalizeWhitespacesCleanup(fieldPreferences);
 
         ratiuEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("MR3537908")
@@ -53,25 +61,33 @@ class MathSciNetTest {
                 .withField(StandardField.JOURNAL, "fluid");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+        if (!fetchedEntries.isEmpty()) {
+            normalizeWhitespacesCleanup.cleanup(fetchedEntries.getFirst());
+        }
         assertEquals(List.of(ratiuEntry), fetchedEntries);
     }
 
     @Test
-    @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response")
+    @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response. One single call goes through, but subsequent calls fail.")
     void searchByIdInEntryFindsEntry() throws Exception {
         BibEntry searchEntry = new BibEntry()
                 .withField(StandardField.MR_NUMBER, "3537908");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+        if (!fetchedEntries.isEmpty()) {
+            normalizeWhitespacesCleanup.cleanup(fetchedEntries.getFirst());
+        }
         assertEquals(List.of(ratiuEntry), fetchedEntries);
     }
 
     @Test
-    @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response")
+    @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response. One single call goes through, but subsequent calls fail.")
     void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Existence and uniqueness theorems Two-Dimensional Ericksen Leslie System");
         assertFalse(fetchedEntries.isEmpty());
-        assertEquals(ratiuEntry, fetchedEntries.get(1));
+        BibEntry secondEntry = fetchedEntries.get(1);
+        normalizeWhitespacesCleanup.cleanup(secondEntry);
+        assertEquals(ratiuEntry, secondEntry);
     }
 
     @Test
@@ -79,7 +95,6 @@ class MathSciNetTest {
         String fileName = "mathscinet.json";
         try (InputStream is = MathSciNetTest.class.getResourceAsStream(fileName)) {
             List<BibEntry> entries = fetcher.getParser().parseEntries(is);
-
             assertEquals(
                     new BibEntry(StandardEntryType.Article)
                             .withField(StandardField.TITLE, "On the weights of general MDS codes")
