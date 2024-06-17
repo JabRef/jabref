@@ -46,7 +46,7 @@ import com.tobiasdiez.easybind.Subscription;
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-abstract class FieldsEditorTab extends EntryEditorTab {
+abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     protected final BibDatabaseContext databaseContext;
     protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     protected GridPane gridPane;
@@ -213,14 +213,14 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     }
 
     @Override
-    protected void nextPreviewStyle() {
+    public void nextPreviewStyle() {
         if (previewPanel != null) {
             previewPanel.nextPreviewStyle();
         }
     }
 
     @Override
-    protected void previousPreviewStyle() {
+    public void previousPreviewStyle() {
         if (previewPanel != null) {
             previewPanel.previousPreviewStyle();
         }
