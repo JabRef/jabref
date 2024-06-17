@@ -559,7 +559,7 @@ public class LibraryTab extends Tab {
             stateManager.setSelectedEntries(entries);
             if (!entries.isEmpty()) {
                 // Update entry editor and preview according to selected entries
-                entryEditor.setEntry(entries.getFirst());
+                entryEditor.setCurrentlyEditedEntry(entries.getFirst());
             }
         });
     }
@@ -630,7 +630,7 @@ public class LibraryTab extends Tab {
 
         // We use != instead of equals because of performance reasons
         if (entry != showing) {
-            entryEditor.setEntry(entry);
+            entryEditor.setCurrentlyEditedEntry(entry);
             showing = entry;
         }
         entryEditor.requestFocus();
@@ -673,14 +673,14 @@ public class LibraryTab extends Tab {
     private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
         // This method is not able to close the bottom pane currently
 
-        if ((mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
+        if ((mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) && (entriesToCheck.contains(entryEditor.getCurrentlyEditedEntry()))) {
             closeBottomPane();
         }
     }
 
     public void updateEntryEditorIfShowing() {
         if (mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
-            BibEntry currentEntry = entryEditor.getEntry();
+            BibEntry currentEntry = entryEditor.getCurrentlyEditedEntry();
             showAndEdit(currentEntry);
         }
     }
