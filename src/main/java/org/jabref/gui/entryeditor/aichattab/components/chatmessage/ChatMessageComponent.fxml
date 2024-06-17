@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
+<?import one.jpro.platform.mdfx.MarkdownView?>
 <fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.entryeditor.aichattab.components.chatmessage.ChatMessageComponent">
     <children>
         <VBox fx:id="vBox" maxWidth="500.0" spacing="10.0">
@@ -17,7 +18,7 @@
                         <Font name="System Bold" size="12.0" />
                     </font>
                 </Label>
-                <TextArea fx:id="contentTextArea" editable="false" text="Content" wrapText="true" />
+                <MarkdownView fx:id="contentMarkdownView" mdString="Content" />
             </children>
       </VBox>
     </children>
