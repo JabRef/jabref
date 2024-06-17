@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Random;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.BibWriter;
@@ -31,7 +30,9 @@ import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.openjdk.jmh.Main;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
@@ -51,7 +52,7 @@ public class Benchmarks {
 
     @Setup
     public void init() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
+        Injector.setModelOrService(PreferencesService.class, JabRefPreferences.getInstance());
 
         Random randomizer = new Random();
         for (int i = 0; i < 1000; i++) {
@@ -88,7 +89,8 @@ public class Benchmarks {
 
     @Benchmark
     public ParserResult parse() throws IOException {
-        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
+        PreferencesService preferencesService = Injector.instantiateModelOrService(PreferencesService.class);
+        BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences());
         return parser.parse(new StringReader(bibtexString));
     }
 

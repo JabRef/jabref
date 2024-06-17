@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,7 @@ class PreferencesMigrationsTest {
     @BeforeEach
     void setUp() {
         prefs = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        Injector.setModelOrService(PreferencesService.class, prefs);
         mainPrefsNode = mock(Preferences.class);
     }
 

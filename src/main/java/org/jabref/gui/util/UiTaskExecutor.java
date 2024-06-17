@@ -18,29 +18,29 @@ import javafx.concurrent.Task;
 
 import org.jabref.gui.StateManager;
 import org.jabref.logic.util.DelayTaskThrottler;
+import org.jabref.logic.util.HeadlessExecutorService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A very simple implementation of the {@link TaskExecutor} interface.
  * Every submitted task is invoked in a separate thread.
+ * <p>
+ * In case something does not interact well with JavaFX, you can use the {@link HeadlessExecutorService}
  */
-public class DefaultTaskExecutor implements TaskExecutor {
+public class UiTaskExecutor implements TaskExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTaskExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UiTaskExecutor.class);
 
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
     private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
     private final WeakHashMap<DelayTaskThrottler, Void> throttlers = new WeakHashMap<>();
 
-    private final StateManager stateManager;
-
-    public DefaultTaskExecutor(StateManager stateManager) {
-        super();
-        this.stateManager = stateManager;
-    }
-
+    /**
+     *
+     */
     public static <V> V runInJavaFXThread(Callable<V> callable) {
         if (Platform.isFxApplicationThread()) {
             try {
@@ -103,7 +103,12 @@ public class DefaultTaskExecutor implements TaskExecutor {
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
         if (task.showToUser()) {
-            stateManager.addBackgroundTask(task, javafxTask);
+            StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+            if (stateManager != null) {
+                stateManager.addBackgroundTask(task, javafxTask);
+            } else {
+                LOGGER.info("Background task visible without GUI");
+            }
         }
         return execute(javafxTask);
     }
@@ -124,7 +129,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
      */
     @Override
     public void shutdown() {
-        stateManager.getBackgroundTasks().stream().filter(task -> !task.isDone()).forEach(Task::cancel);
+        StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+        if (stateManager != null) {
+            stateManager.getBackgroundTasks().stream().filter(task -> !task.isDone()).forEach(Task::cancel);
+        }
         executor.shutdownNow();
         scheduledExecutor.shutdownNow();
         throttlers.forEach((throttler, aVoid) -> throttler.shutdown());

@@ -8,6 +8,7 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -23,6 +24,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
 
     @Inject private PreferencesService preferencesService;
     @Inject private UndoManager undoManager;
+    @Inject private KeyBindingRepository keyBindingRepository;
 
     public OwnerEditor(Field field,
                        SuggestionProvider<?> suggestionProvider,
@@ -33,8 +35,9 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
 
         this.viewModel = new OwnerEditorViewModel(field, suggestionProvider, preferencesService, fieldCheckers, undoManager);
 
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        textArea.initContextMenu(EditorMenus.getNameMenu(textArea));
+        establishBinding(textArea, viewModel.textProperty());
+
+        textArea.initContextMenu(EditorMenus.getNameMenu(textArea), keyBindingRepository);
 
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }

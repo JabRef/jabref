@@ -12,8 +12,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.Globals;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 
 public class EditorTextArea extends TextArea implements Initializable, ContextMenuAddable {
 
@@ -39,9 +39,9 @@ public class EditorTextArea extends TextArea implements Initializable, ContextMe
     }
 
     @Override
-    public void initContextMenu(final Supplier<List<MenuItem>> items) {
+    public void initContextMenu(final Supplier<List<MenuItem>> items, KeyBindingRepository keyBindingRepository) {
         setOnContextMenuRequested(event -> {
-            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this, Globals.getKeyPrefs()));
+            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this));
             contextMenu.getItems().addAll(0, items.get());
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
@@ -78,7 +77,7 @@ public class ExternalFilesEntryLinker {
     }
 
     public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files) {
-        LuceneManager luceneManager = Globals.luceneMangers.get(bibDatabaseContext);
+        LuceneManager luceneManager = null;
         try (AutoCloseable blocker = luceneManager.blockLinkedFileIndexer()) {
             addFilesToEntry(entry, files);
             moveLinkedFilesToFileDir(entry);
@@ -90,7 +89,7 @@ public class ExternalFilesEntryLinker {
     }
 
     public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
-        LuceneManager luceneManager = Globals.luceneMangers.get(bibDatabaseContext);
+        LuceneManager luceneManager = null;
         try (AutoCloseable blocker = luceneManager.blockLinkedFileIndexer()) {
             for (Path file : files) {
                 copyFileToFileDir(file)

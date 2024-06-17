@@ -29,7 +29,6 @@ import javafx.scene.input.TransferMode;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -43,12 +42,13 @@ import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
@@ -59,6 +59,7 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -152,7 +153,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         undoManager,
                         clipBoardManager,
                         taskExecutor,
-                        Globals.journalAbbreviationRepository,
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
                 .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search"), entry -> stateManager.activeSearchQueryProperty().isPresent().and(entry.searchScoreProperty().isEqualTo(0)))
                 .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-groups"), entry -> {
@@ -248,7 +249,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 taskExecutor);
 
         // Enable the header right-click menu.
-        new MainTableHeaderContextMenu(this, rightClickMenuFactory, tabContainer, keyBindingRepository, dialogService).show(true);
+        new MainTableHeaderContextMenu(this, rightClickMenuFactory, tabContainer, dialogService).show(true);
     }
 
     private void updateSortOrder() {
@@ -296,7 +297,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     @Subscribe
     public void listen(EntriesAddedEvent event) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getFirstEntry()));
+        UiTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getFirstEntry()));
     }
 
     public void clearAndSelect(BibEntry bibEntry) {

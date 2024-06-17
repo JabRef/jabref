@@ -10,7 +10,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
@@ -100,7 +99,7 @@ public class MainTableDataModel {
         stateManager.getSearchResults().remove(bibDatabaseContext);
         if (query.isPresent() && !query.get().toString().isEmpty()) {
             // TODO btut: maybe do in background?
-            stateManager.getSearchResults().put(bibDatabaseContext, Globals.luceneMangers.get(bibDatabaseContext).search(query.get()));
+//            stateManager.getSearchResults().put(bibDatabaseContext, Globals.luceneMangers.get(bibDatabaseContext).search(query.get()));
         }
     }
 

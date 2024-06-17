@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
@@ -53,14 +54,17 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private Connection currentConnection;
     private final Character keywordSeparator;
     private final GlobalCitationKeyPatterns globalCiteKeyPattern;
+    private final FieldPreferences fieldPreferences;
     private final FileUpdateMonitor fileMonitor;
     private Optional<BibEntry> lastEntryChanged;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
+                            FieldPreferences fieldPreferences,
                             GlobalCitationKeyPatterns globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
+        this.fieldPreferences = fieldPreferences;
         this.fileMonitor = fileMonitor;
         this.eventBus = new EventBus();
         this.keywordSeparator = keywordSeparator;
@@ -243,7 +247,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
         try {
-            BibDatabaseWriter.applySaveActions(bibEntry, metaData); // perform possibly existing save actions
+            BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences); // perform possibly existing save actions
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
@@ -294,7 +298,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         for (BibEntry bibEntry : bibDatabase.getEntries()) {
             try {
                 // synchronize only if changes were present
-                if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData).isEmpty()) {
+                if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences).isEmpty()) {
                     dbmsProcessor.updateEntry(bibEntry);
                 }
             } catch (OfflineLockException exception) {

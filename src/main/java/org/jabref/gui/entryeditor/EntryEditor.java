@@ -44,14 +44,15 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -100,6 +101,7 @@ public class EntryEditor extends BorderPane {
     @FXML private Button fetcherButton;
     @FXML private Label typeLabel;
 
+    @Inject private BuildInfo buildInfo;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
@@ -119,7 +121,6 @@ public class EntryEditor extends BorderPane {
         this.databaseContext = libraryTab.getBibDatabaseContext();
         this.directoryMonitorManager = libraryTab.getDirectoryMonitorManager();
 
-        // inject variables
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -282,7 +283,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(new SciteTab(preferencesService, taskExecutor, dialogService));
         tabs.add(new CitationRelationsTab(dialogService, databaseContext,
                 undoManager, stateManager, fileMonitor, preferencesService, libraryTab, taskExecutor));
-        tabs.add(new RelatedArticlesTab(entryEditorPreferences, preferencesService, dialogService, taskExecutor));
+        tabs.add(new RelatedArticlesTab(buildInfo, databaseContext, preferencesService, dialogService, taskExecutor));
         sourceTab = new SourceTab(
                 databaseContext,
                 undoManager,
@@ -361,9 +362,6 @@ public class EntryEditor extends BorderPane {
         }
     }
 
-    /**
-     * @return the currently edited entry
-     */
     public BibEntry getCurrentlyEditedEntry() {
         return currentlyEditedEntry;
     }
@@ -401,7 +399,7 @@ public class EntryEditor extends BorderPane {
         typeLabel.setText(typedEntry.getTypeForDisplay());
 
         // Add type change menu
-        ContextMenu typeMenu = new ChangeEntryTypeMenu(Collections.singletonList(currentlyEditedEntry), databaseContext, undoManager, keyBindingRepository, bibEntryTypesManager).asContextMenu();
+        ContextMenu typeMenu = new ChangeEntryTypeMenu(Collections.singletonList(currentlyEditedEntry), databaseContext, undoManager, bibEntryTypesManager).asContextMenu();
         typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(event -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
 
@@ -439,7 +437,7 @@ public class EntryEditor extends BorderPane {
     }
 
     public void setFocusToField(Field field) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             for (Tab tab : tabbed.getTabs()) {
                 if ((tab instanceof FieldsEditorTab fieldsEditorTab)
                         && fieldsEditorTab.getShownFields().contains(field)) {

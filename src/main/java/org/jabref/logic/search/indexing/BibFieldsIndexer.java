@@ -6,11 +6,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
@@ -192,7 +192,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
     @Override
     public void close() {
         LOGGER.info("Closing index");
-        JabRefExecutorService.INSTANCE.execute(() -> {
+        HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
                 searcherManager.close();
                 indexWriter.close();

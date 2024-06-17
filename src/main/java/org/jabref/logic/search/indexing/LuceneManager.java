@@ -9,7 +9,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
@@ -47,7 +46,6 @@ public class LuceneManager {
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
         this.isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
         this.luceneSearcher = new LuceneSearcher(databaseContext);
-        Globals.luceneMangers.put(databaseContext, this);
 
         try {
             bibFieldsIndexer = new BibFieldsIndexer(databaseContext, executor, preferences);
@@ -131,7 +129,6 @@ public class LuceneManager {
         if (linkedFilesIndexer != null) {
             linkedFilesIndexer.close();
         }
-        Globals.luceneMangers.remove(databaseContext);
     }
 
     public AutoCloseable blockLinkedFileIndexer() {

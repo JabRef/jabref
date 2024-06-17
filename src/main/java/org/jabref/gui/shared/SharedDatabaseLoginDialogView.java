@@ -12,6 +12,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -47,6 +48,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private PasswordField passwordKeystore;
     @FXML private Button browseKeystore;
     @FXML private TextField serverTimezone;
+    @FXML private TextField jdbcUrl;
+    @FXML private CheckBox expertMode;
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
@@ -54,6 +57,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private UndoManager undoManager;
+    @Inject private ClipBoardManager clipBoardManager;
     @Inject private TaskExecutor taskExecutor;
 
     private final LibraryTabContainer tabContainer;
@@ -96,6 +100,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 entryTypesManager,
                 fileUpdateMonitor,
                 undoManager,
+                clipBoardManager,
                 taskExecutor);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);
@@ -116,6 +121,10 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         useSSL.selectedProperty().bindBidirectional(viewModel.useSSLProperty());
 
         fileKeystore.textProperty().bindBidirectional(viewModel.keyStoreProperty());
+
+        expertMode.selectedProperty().bindBidirectional(viewModel.expertModeProperty());
+        jdbcUrl.textProperty().bindBidirectional(viewModel.jdbcUrlProperty());
+        jdbcUrl.disableProperty().bind(viewModel.expertModeProperty().not());
 
         browseKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
         passwordKeystore.disableProperty().bind(viewModel.useSSLProperty().not());

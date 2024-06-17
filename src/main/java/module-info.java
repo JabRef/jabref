@@ -36,8 +36,6 @@ open module org.jabref {
 
     provides com.airhacks.afterburner.views.ResourceLocator
             with org.jabref.gui.util.JabRefResourceLocator;
-    provides com.airhacks.afterburner.injection.PresenterFactory
-            with org.jabref.gui.DefaultInjector;
 
     // Logging
     requires org.slf4j;

@@ -6,7 +6,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -36,7 +35,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
 
         comboBox.getEditor().setOnContextMenuRequested(event -> {
             ContextMenu contextMenu = new ContextMenu();
-            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(comboBox.getEditor(), Globals.getKeyPrefs()));
+            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(comboBox.getEditor()));
             contextMenu.show(comboBox, event.getScreenX(), event.getScreenY());
         });
     }

@@ -65,7 +65,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.context = context;
-        this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
 
         content = new TextFlow();
@@ -82,7 +82,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         return this.stateManager.activeSearchQueryProperty().isPresent().get() &&
                 this.stateManager.activeSearchQueryProperty().get().isPresent() &&
                 this.stateManager.activeSearchQueryProperty().get().get().getSearchFlags().contains(SearchFlags.FULLTEXT) &&
-                this.stateManager.activeSearchQueryProperty().get().get().toString().length() > 0;
+                !this.stateManager.activeSearchQueryProperty().get().get().toString().isEmpty();
     }
 
     @Override

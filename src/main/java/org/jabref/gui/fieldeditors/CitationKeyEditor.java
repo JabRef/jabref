@@ -50,9 +50,9 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
                 undoManager,
                 dialogService);
 
-        textField.textProperty().bindBidirectional(viewModel.textProperty());
+        establishBinding(textField, viewModel.textProperty());
 
-        textField.initContextMenu(Collections::emptyList);
+        textField.initContextMenu(Collections::emptyList, preferencesService.getKeyBindingRepository());
 
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
@@ -66,11 +66,10 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
         viewModel.bindToEntry(entry);
 
         // Configure button to generate citation key
-        new ActionFactory(preferencesService.getKeyBindingRepository())
-                .configureIconButton(
-                        StandardActions.GENERATE_CITE_KEY,
-                        viewModel.getGenerateCiteKeyCommand(),
-                        generateCitationKeyButton);
+        new ActionFactory().configureIconButton(
+                StandardActions.GENERATE_CITE_KEY,
+                viewModel.getGenerateCiteKeyCommand(),
+                generateCitationKeyButton);
     }
 
     @Override

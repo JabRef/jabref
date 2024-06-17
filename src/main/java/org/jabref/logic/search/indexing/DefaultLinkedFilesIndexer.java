@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -349,7 +349,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     @Override
     public void close() {
         LOGGER.info("Closing index");
-        JabRefExecutorService.INSTANCE.execute(() -> {
+        HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
                 searcherManager.close();
                 optimizeIndex();

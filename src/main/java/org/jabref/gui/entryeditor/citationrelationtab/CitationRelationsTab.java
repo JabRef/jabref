@@ -26,7 +26,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -77,13 +76,17 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final DuplicateCheck duplicateCheck;
 
     public CitationRelationsTab(DialogService dialogService,
-                                BibDatabaseContext databaseContext, UndoManager undoManager,
-                                StateManager stateManager, FileUpdateMonitor fileUpdateMonitor,
-                                PreferencesService preferencesService, LibraryTab lTab, TaskExecutor taskExecutor) {
+                                BibDatabaseContext databaseContext,
+                                UndoManager undoManager,
+                                StateManager stateManager,
+                                FileUpdateMonitor fileUpdateMonitor,
+                                PreferencesService preferencesService,
+                                LibraryTab libraryTab,
+                                TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.preferencesService = preferencesService;
-        this.libraryTab = lTab;
+        this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
@@ -91,7 +94,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferencesService.getImporterPreferences()),
                 new BibEntryRelationsCache());
-        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService, fileUpdateMonitor, Globals.TASK_EXECUTOR);
+        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService, fileUpdateMonitor, taskExecutor);
     }
 
     /**

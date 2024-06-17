@@ -15,8 +15,8 @@ public enum InternalField implements Field {
 
     /**
      * field which indicates the entrytype
-     *
-     * Example: @misc{key}
+     * <p>
+     * Example: <code>@misc{key}</code>
      */
     TYPE_HEADER("entrytype"),
 

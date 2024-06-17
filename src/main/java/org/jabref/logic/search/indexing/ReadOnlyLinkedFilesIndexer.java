@@ -3,7 +3,7 @@ package org.jabref.logic.search.indexing;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.jabref.gui.JabRefExecutorService;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.LuceneIndexer;
@@ -70,7 +70,7 @@ public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
 
     @Override
     public void close() {
-        JabRefExecutorService.INSTANCE.execute(() -> {
+        HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
                 searcherManager.close();
                 indexDirectory.close();
