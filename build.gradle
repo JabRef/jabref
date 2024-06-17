@@ -193,6 +193,10 @@ dependencies {
 
     implementation 'org.postgresql:postgresql:42.7.3'
 
+    // Support unix socket connection types
+    implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.9.1'
+    implementation 'com.kohlschutter.junixsocket:junixsocket-mysql:2.9.1'
+
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
         exclude module: 'oraclepki'

@@ -48,6 +48,8 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private PasswordField passwordKeystore;
     @FXML private Button browseKeystore;
     @FXML private TextField serverTimezone;
+    @FXML private TextField jdbcUrl;
+    @FXML private CheckBox expertMode;
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
@@ -119,6 +121,10 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         useSSL.selectedProperty().bindBidirectional(viewModel.useSSLProperty());
 
         fileKeystore.textProperty().bindBidirectional(viewModel.keyStoreProperty());
+
+        expertMode.selectedProperty().bindBidirectional(viewModel.expertModeProperty());
+        jdbcUrl.textProperty().bindBidirectional(viewModel.jdbcUrlProperty());
+        jdbcUrl.disableProperty().bind(viewModel.expertModeProperty().not());
 
         browseKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
         passwordKeystore.disableProperty().bind(viewModel.useSSLProperty().not());

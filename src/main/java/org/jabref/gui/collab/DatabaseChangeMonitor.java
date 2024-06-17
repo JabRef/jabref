@@ -35,6 +35,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final LibraryTab.DatabaseNotification notificationPane;
+    private final StateManager stateManager;
     private LibraryTab saveState;
 
     public DatabaseChangeMonitor(BibDatabaseContext database,
@@ -50,6 +52,8 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.notificationPane = notificationPane;
+        this.stateManager = stateManager;
 
         this.listeners = new ArrayList<>();
 
@@ -61,7 +65,12 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
             }
         });
 
-        addListener(changes -> notificationPane.notify(
+        addListener(this::notifyOnChange);
+    }
+
+    private void notifyOnChange(List<DatabaseChange> changes) {
+        // The changes come from {@link org.jabref.gui.collab.DatabaseChangeList.compareAndGetChanges}
+        notificationPane.notify(
                 IconTheme.JabRefIcons.SAVE.getGraphicNode(),
                 Localization.lang("The library has been modified by another program."),
                 List.of(new Action(Localization.lang("Dismiss changes"), event -> notificationPane.hide()),
@@ -83,7 +92,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                             }
                             notificationPane.hide();
                         })),
-                Duration.ZERO));
+                Duration.ZERO);
     }
 
     @Override
