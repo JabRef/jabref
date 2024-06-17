@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -301,13 +300,13 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
     @Test
     void searchEntryByPartOfTitle() throws Exception {
-        assertEquals(Collections.singletonList(mainResultPaper),
+        assertEquals(List.of(mainResultPaper),
                 fetcher.performSearch("title:\"the architecture of mr. dLib's\""));
     }
 
     @Test
     void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
-        assertEquals(Collections.singletonList(sliceTheoremPaper),
+        assertEquals(List.of(sliceTheoremPaper),
                 fetcher.performSearch("title:\"slice theorem for Fréchet\""));
     }
 
@@ -446,7 +445,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
 
         // There is only a single paper found by searching that contains the exact sequence "Taxonomy of Distributed" in the title.
-        assertEquals(Collections.singletonList(expected), resultWithPhraseSearch);
+        assertEquals(List.of(expected), resultWithPhraseSearch);
     }
 
     @Test
@@ -477,7 +476,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         List<BibEntry> result = fetcher.performSearch("author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\"");
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
-        assertEquals(Collections.singletonList(expected), result);
+        assertEquals(List.of(expected), result);
     }
 
     @Test
