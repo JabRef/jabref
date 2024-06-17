@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.aichattab.components.chatmessage;
+package org.jabref.gui.ai.components.chatmessage;
 
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;

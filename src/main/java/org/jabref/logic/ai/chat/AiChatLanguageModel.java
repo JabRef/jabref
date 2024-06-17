@@ -37,7 +37,7 @@ public class AiChatLanguageModel {
                 OpenAiChatModel
                         .builder()
                         .apiKey(aiPreferences.getOpenAiToken())
-                        .modelName(aiPreferences.getModel().getName())
+                        .modelName(aiPreferences.getChatModel().getName())
                         .temperature(aiPreferences.getTemperature())
                         .logRequests(true)
                         .logResponses(true)
@@ -65,7 +65,7 @@ public class AiChatLanguageModel {
             }
         });
 
-        aiPreferences.modelProperty().addListener(obs -> {
+        aiPreferences.chatModelProperty().addListener(obs -> {
             rebuild();
         });
 

@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.aichattab;
+package org.jabref.gui.entryeditor;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -6,11 +6,9 @@ import java.util.Optional;
 import javafx.scene.control.*;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
-import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.gui.entryeditor.aichattab.components.aichat.AiChatComponent;
-import org.jabref.gui.entryeditor.aichattab.components.errorstate.ErrorStateComponent;
-import org.jabref.gui.entryeditor.aichattab.components.privacynotice.PrivacyNoticeComponent;
+import org.jabref.gui.ai.components.aichat.AiChatComponent;
+import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
+import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;

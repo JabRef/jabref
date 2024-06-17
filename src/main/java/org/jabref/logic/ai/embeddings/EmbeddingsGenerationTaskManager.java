@@ -29,10 +29,11 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
     private final AiIngestor aiIngestor;
 
     private final Queue<LinkedFile> linkedFileQueue = new ConcurrentLinkedQueue<>();
+    private int numOfProcessedFiles = 0;
+
     private final Object lock = new Object();
     private boolean isRunning = false;
-
-    private int numOfProcessedFiles = 0;
+    private boolean isBlockingNewTasks = false;
 
     public EmbeddingsGenerationTaskManager(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiService aiService, TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
@@ -43,6 +44,8 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
         this.aiIngestor = new AiIngestor(aiService);
 
         configure();
+
+        listenToPreferences();
     }
 
     private void configure() {
@@ -54,6 +57,14 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
         this.onFailure(e -> {
             throw new RuntimeException(e);
         });
+    }
+
+    private void listenToPreferences() {
+        // TODO: Will these listeners align with AiIngestor preference listeners?
+
+        aiService.getPreferences().embeddingModelProperty().addListener(obs -> invalidate());
+        aiService.getPreferences().documentSplitterOverlapSizeProperty().addListener(obs -> invalidate());
+        aiService.getPreferences().documentSplitterChunkSizeProperty().addListener(obs -> invalidate());
     }
 
     public void addToProcess(Collection<BibEntry> bibEntries) {
@@ -81,14 +92,28 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
     }
 
     public void addToProcess(LinkedFile linkedFile) {
-        linkedFileQueue.add(linkedFile);
+        if (!isBlockingNewTasks) {
+            linkedFileQueue.add(linkedFile);
 
-        synchronized (lock) {
-            if (!isRunning) {
-                this.executeWith(taskExecutor);
-                showToUser(false);
+            synchronized (lock) {
+                if (!isRunning) {
+                    this.executeWith(taskExecutor);
+                    showToUser(false);
+                }
             }
         }
+    }
+
+    public AutoCloseable blockNewTasks() {
+        synchronized (lock) {
+            isBlockingNewTasks = true;
+        }
+
+        return () -> {
+            synchronized (lock) {
+                isBlockingNewTasks = false;
+            }
+        };
     }
 
     public void removeFromProcess(LinkedFile linkedFile) {
@@ -147,5 +172,18 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
     private void updateProgress() {
         updateMessage(Localization.lang("Generated embeddings %0 of %1 linked files", numOfProcessedFiles, numOfProcessedFiles + linkedFileQueue.size()));
         updateProgress(numOfProcessedFiles, numOfProcessedFiles + linkedFileQueue.size());
+    }
+
+    public void invalidate() {
+        // TODO: Is this method right?
+        // 1. How to stop if running.
+        // 2. Is it okay to clear queue?
+        // 3. Is it okay to 1) remove, 2) add to queue everything?
+
+        linkedFileQueue.clear();
+        databaseContext.getEntries().forEach(entry -> {
+            removeFromProcess(entry);
+            addToProcess(entry);
+        });
     }
 }

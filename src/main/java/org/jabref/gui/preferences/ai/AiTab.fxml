@@ -1,77 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.dlsc.unitfx.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import org.controlsfx.control.textfield.*?>
-
-<fx:root spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.ai.AiTab">
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import com.dlsc.unitfx.DoubleInputField?>
+<?import com.dlsc.unitfx.IntegerInputField?>
+<?import org.controlsfx.control.textfield.CustomPasswordField?>
+<fx:root
+        spacing="10.0"
+        type="VBox"
+        xmlns="http://javafx.com/javafx/17.0.2-ea"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.jabref.gui.preferences.ai.AiTab">
     <children>
-        <Label styleClass="titleHeader" text="%AI" />
+        <Label styleClass="titleHeader"
+               text="%AI"/>
 
-        <Label styleClass="sectionHeader" text="%General" />
+        <Label styleClass="sectionHeader"
+               text="%General"/>
 
-        <CheckBox fx:id="enableChat" mnemonicParsing="false" text="%Enable chat with attached PDF files" />
+        <CheckBox
+                fx:id="enableChat"
+                mnemonicParsing="false"
+                text="%Enable chat with attached PDF files"/>
 
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <HBox alignment="CENTER_LEFT"
+              spacing="10.0">
             <children>
-                <Label alignment="BASELINE_CENTER" text="%OpenAI API token" />
-                <CustomPasswordField fx:id="openAiToken" HBox.hgrow="ALWAYS" />
+                <Label alignment="BASELINE_CENTER"
+                       text="%OpenAI API token"/>
+                <CustomPasswordField
+                        fx:id="openAiToken"
+                        HBox.hgrow="ALWAYS"/>
             </children>
         </HBox>
-      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="91.0" spacing="10.0">
-         <children>
-            <Label alignment="BASELINE_CENTER" text="%OpenAI model" />
-            <ComboBox fx:id="modelComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-         </children>
-      </HBox>
 
-        <Label styleClass="sectionHeader" text="%Expert settings" />
-      <VBox>
-         <children>
+        <Label styleClass="sectionHeader"
+               text="%Expert settings"/>
+        <VBox>
+            <children>
 
-                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%These parameters affect how AI will answer you questions." />
-              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%Leave these fields as is, if you are not sure of their purpose." />
-         </children>
-      </VBox>
-      <Label text="%Instruction for AI (also known as 'system message')" />
-      <TextArea fx:id="systemMessageTextArea" wrapText="true" />
-      <HBox alignment="CENTER_LEFT" spacing="10.0">
-         <children>
-            <Label alignment="BASELINE_CENTER" text="%Message window size" />
-            <IntegerInputField fx:id="messageWindowSizeTextField" HBox.hgrow="ALWAYS" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="448.0" spacing="10.0">
-         <children>
-            <Label alignment="BASELINE_CENTER" text="%Temperature" />
-             <DoubleInputField fx:id="temperatureTextField" HBox.hgrow="ALWAYS"/>
-         </children>
-      </HBox>
-          <VBox>
-              <children>
-                  <Label text="%RAG - maximum results count" />
-                  <IntegerInputField fx:id="ragMaxResultsCountTextField" />
-              </children>
-          </VBox>
-          <VBox>
-              <children>
-                  <Label text="%RAG - minimum score" />
-                  <DoubleInputField fx:id="ragMinScoreTextField" />
-              </children>
-          </VBox>
-      <VBox>
-         <children>
-            <Label text="%Document splitter - chunk size" />
-            <IntegerInputField fx:id="documentSplitterChunkSizeTextField" />
-         </children>
-      </VBox>
-      <VBox>
-         <children>
-            <Label text="%Document splitter - overlap size" />
-            <IntegerInputField fx:id="documentSplitterOverlapSizeTextField" />
-         </children>
-      </VBox>
+                <Text strokeType="OUTSIDE"
+                      strokeWidth="0.0"
+                      text="%These parameters affect how AI will answer you questions."/>
+                <Text strokeType="OUTSIDE"
+                      strokeWidth="0.0"
+                      text="%Leave these fields as is, if you are not sure of their purpose."/>
+            </children>
+        </VBox>
+
+        <HBox alignment="CENTER_LEFT"
+              spacing="10.0">
+            <children>
+                <Label alignment="BASELINE_CENTER"
+                       text="%OpenAI model"/>
+                <ComboBox
+                        fx:id="aiModelComboBox"
+                        maxWidth="1.7976931348623157E308"
+                        HBox.hgrow="ALWAYS"/>
+            </children>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT"
+              spacing="10.0">
+            <children>
+                <Label alignment="BASELINE_CENTER"
+                       text="%Embedding model"/>
+                <ComboBox
+                        fx:id="embeddingModelComboBox"
+                        maxWidth="1.7976931348623157E308"
+                        HBox.hgrow="ALWAYS"/>
+            </children>
+        </HBox>
+
+        <Label text="%Instruction for AI (also known as 'system message')"/>
+        <TextArea
+                fx:id="systemMessageTextArea"
+                wrapText="true"/>
+        <HBox alignment="CENTER_LEFT"
+              spacing="10.0">
+            <children>
+                <Label alignment="BASELINE_CENTER"
+                       text="%Message window size"/>
+                <IntegerInputField
+                        fx:id="messageWindowSizeTextField"
+                        HBox.hgrow="ALWAYS"/>
+            </children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT"
+              layoutX="10.0"
+              layoutY="448.0"
+              spacing="10.0">
+            <children>
+                <Label alignment="BASELINE_CENTER"
+                       text="%Temperature"/>
+                <DoubleInputField
+                        fx:id="temperatureTextField"
+                        HBox.hgrow="ALWAYS"/>
+            </children>
+        </HBox>
+        <VBox>
+            <children>
+                <Label text="%RAG - maximum results count"/>
+                <IntegerInputField
+                        fx:id="ragMaxResultsCountTextField"/>
+            </children>
+        </VBox>
+        <VBox>
+            <children>
+                <Label text="%RAG - minimum score"/>
+                <DoubleInputField
+                        fx:id="ragMinScoreTextField"/>
+            </children>
+        </VBox>
+        <VBox>
+            <children>
+                <Label text="%Document splitter - chunk size"/>
+                <IntegerInputField
+                        fx:id="documentSplitterChunkSizeTextField"/>
+            </children>
+        </VBox>
+        <VBox>
+            <children>
+                <Label text="%Document splitter - overlap size"/>
+                <IntegerInputField
+                        fx:id="documentSplitterOverlapSizeTextField"/>
+            </children>
+        </VBox>
     </children>
 </fx:root>

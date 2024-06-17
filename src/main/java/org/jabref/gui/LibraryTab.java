@@ -154,7 +154,7 @@ public class LibraryTab extends Tab {
     private BackgroundTask<ParserResult> dataLoadingTask;
 
     private final IndexingTaskManager indexingTaskManager;
-    private final EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager;
+    private EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager;
 
     private final TaskExecutor taskExecutor;
     private final DirectoryMonitorManager directoryMonitorManager;
@@ -267,7 +267,7 @@ public class LibraryTab extends Tab {
 
         if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
             try {
-                indexingTaskManager.updateIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences(), preferencesService.getAiPreferences()), bibDatabaseContext);
+                indexingTaskManager.updateIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
             } catch (IOException e) {
                 LOGGER.error("Cannot access lucene index", e);
             }
@@ -317,6 +317,7 @@ public class LibraryTab extends Tab {
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
+        this.embeddingsGenerationTaskManager = new EmbeddingsGenerationTaskManager(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
 
         setupMainPanel();
         setupAutoCompletion();
@@ -1074,7 +1075,7 @@ public class LibraryTab extends Tab {
         public void listen(EntriesAddedEvent addedEntryEvent) {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    PdfIndexer pdfIndexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences(), preferencesService.getAiPreferences());
+                    PdfIndexer pdfIndexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences());
                     indexingTaskManager.addToIndex(pdfIndexer, addedEntryEvent.getBibEntries());
                 } catch (IOException e) {
                     LOGGER.error("Cannot access lucene index", e);
@@ -1086,7 +1087,7 @@ public class LibraryTab extends Tab {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    PdfIndexer pdfIndexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences(), preferencesService.getAiPreferences());
+                    PdfIndexer pdfIndexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences());
                     for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
                         indexingTaskManager.removeFromIndex(pdfIndexer, removedEntry);
                     }
@@ -1109,7 +1110,7 @@ public class LibraryTab extends Tab {
                     removedFiles.removeAll(newFileList);
 
                     try {
-                        PdfIndexer indexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences(), preferencesService.getAiPreferences());
+                        PdfIndexer indexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences());
                         indexingTaskManager.addToIndex(indexer, fieldChangedEvent.getBibEntry(), addedFiles);
                         indexingTaskManager.removeFromIndex(indexer, removedFiles);
                     } catch (IOException e) {
@@ -1118,6 +1119,10 @@ public class LibraryTab extends Tab {
                 }
             }
         }
+    }
+
+    public IndexingTaskManager getIndexingTaskManager() {
+        return indexingTaskManager;
     }
 
     private class EmbeddingsUpdateListener {
@@ -1154,8 +1159,8 @@ public class LibraryTab extends Tab {
         }
     }
 
-    public IndexingTaskManager getIndexingTaskManager() {
-        return indexingTaskManager;
+    public EmbeddingsGenerationTaskManager getEmbeddingsGenerationTaskManager() {
+        return embeddingsGenerationTaskManager;
     }
 
     public static class DatabaseNotification extends NotificationPane {

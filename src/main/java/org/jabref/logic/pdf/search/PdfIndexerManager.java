@@ -32,7 +32,7 @@ public class PdfIndexerManager {
     // We store the file preferences for each path, so that we can update the indexer when the preferences change
     private static Map<Path, FilePreferences> pathFilePreferencesMap = new HashMap<>();
 
-    public static @NonNull PdfIndexer getIndexer(BibDatabaseContext context, FilePreferences filePreferences, AiPreferences aiPreferences) throws IOException {
+    public static @NonNull PdfIndexer getIndexer(BibDatabaseContext context, FilePreferences filePreferences) throws IOException {
         Path fulltextIndexPath = context.getFulltextIndexPath();
         PdfIndexer indexer = indexerMap.get(fulltextIndexPath);
         if (indexer != null) {

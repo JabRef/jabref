@@ -27,7 +27,7 @@ public class AiService {
 
         this.aiChatLanguageModel = new AiChatLanguageModel(aiPreferences);
         this.aiEmbeddingModel = new AiEmbeddingModel(aiPreferences);
-        this.aiEmbeddingsManager = new AiEmbeddingsManager();
+        this.aiEmbeddingsManager = new AiEmbeddingsManager(aiPreferences);
     }
 
     public void close() {

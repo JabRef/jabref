@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.aichattab.components.aichat;
+package org.jabref.gui.ai.components.aichat;
 
 import java.util.function.Consumer;
 
@@ -11,7 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.entryeditor.aichattab.components.chatmessage.ChatMessageComponent;
+import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
 import org.jabref.logic.ai.chathistory.ChatMessage;
 
 import com.airhacks.afterburner.views.ViewLoader;

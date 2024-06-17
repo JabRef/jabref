@@ -1,24 +1,18 @@
 package org.jabref.preferences;
 
-import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.FloatProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.checkerframework.checker.units.qual.A;
-
 public class AiPreferences {
-    public enum AiModel {
+    public enum ChatModel {
         GPT_3_5_TURBO("gpt-3.5-turbo"),
         GPT_4("gpt-4"),
         GPT_4_TURBO("gpt-4-turbo"),
@@ -26,12 +20,12 @@ public class AiPreferences {
 
         private final String name;
 
-        AiModel(String name) {
+        ChatModel(String name) {
             this.name = name;
         }
 
-        public static AiModel fromString(String text) {
-            for (AiModel b : AiModel.values()) {
+        public static ChatModel fromString(String text) {
+            for (ChatModel b : ChatModel.values()) {
                 if (b.name.equalsIgnoreCase(text)) {
                     return b;
                 }
@@ -49,9 +43,16 @@ public class AiPreferences {
         }
     }
 
+    public enum EmbeddingModel {
+        ALL_MINLM_l6_V2,
+        ALL_MINLM_l6_V2_Q,
+    }
+
     private final BooleanProperty enableChatWithFiles;
     private final StringProperty openAiToken;
-    private final ObjectProperty<AiModel> model;
+
+    private final ObjectProperty<ChatModel> chatModel;
+    private final ObjectProperty<EmbeddingModel> embeddingModel;
 
     private final StringProperty systemMessage;
     private final DoubleProperty temperature;
@@ -61,10 +62,12 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles, String openAiToken, AiModel aiModel, String systemMessage, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
+    public AiPreferences(boolean enableChatWithFiles, String openAiToken, ChatModel chatModel, EmbeddingModel embeddingModel, String systemMessage, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
         this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
         this.openAiToken = new SimpleStringProperty(openAiToken);
-        this.model = new SimpleObjectProperty<>(aiModel);
+
+        this.chatModel = new SimpleObjectProperty<>(chatModel);
+        this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
 
         this.systemMessage = new SimpleStringProperty(systemMessage);
         this.temperature = new SimpleDoubleProperty(temperature);
@@ -99,16 +102,28 @@ public class AiPreferences {
         this.openAiToken.set(openAiToken);
     }
 
-    public ObjectProperty<AiModel> modelProperty() {
-        return model;
+    public ObjectProperty<ChatModel> chatModelProperty() {
+        return chatModel;
     }
 
-    public AiModel getModel() {
-        return model.get();
+    public ChatModel getChatModel() {
+        return chatModel.get();
     }
 
-    public void setModel(AiModel model) {
-        this.model.set(model);
+    public void setChatModel(ChatModel chatModel) {
+        this.chatModel.set(chatModel);
+    }
+
+    public ObjectProperty<EmbeddingModel> embeddingModelProperty() {
+        return embeddingModel;
+    }
+
+    public EmbeddingModel getEmbeddingModel() {
+        return embeddingModel.get();
+    }
+
+    public void setEmbeddingModel(EmbeddingModel embeddingModel) {
+        this.embeddingModel.set(embeddingModel);
     }
 
     public StringProperty systemMessageProperty() {
