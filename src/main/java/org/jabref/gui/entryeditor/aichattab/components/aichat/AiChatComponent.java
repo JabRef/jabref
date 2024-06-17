@@ -7,8 +7,10 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -24,9 +26,11 @@ public class AiChatComponent extends VBox {
 
     private final DialogService dialogService;
 
+    @FXML private ScrollPane scrollPane;
     @FXML private VBox chatVBox;
     @FXML private TextField userPromptTextField;
     @FXML private Button submitButton;
+    @FXML private StackPane stackPane;
 
     public AiChatComponent(Consumer<String> sendMessageCallback, Runnable clearChatHistoryCallback, DialogService dialogService) {
         this.sendMessageCallback = sendMessageCallback;
@@ -41,35 +45,35 @@ public class AiChatComponent extends VBox {
 
     @FXML
     public void initialize() {
+        scrollPane.needsLayoutProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                scrollPane.setVvalue(1.0);
+            }
+        });
+
         Platform.runLater(() -> userPromptTextField.requestFocus());
     }
 
     @FXML
     private void internalSendMessageEvent() {
         String userPrompt = userPromptTextField.getText();
-        userPromptTextField.clear();
-        sendMessageCallback.accept(userPrompt);
+
+        if (!userPrompt.isEmpty()) {
+            userPromptTextField.clear();
+            sendMessageCallback.accept(userPrompt);
+        }
     }
 
-    /**
-     * This method pushes a progress indicator into the chat box on true, and pops the last element in chat box on false.
-     * Be careful while using this method. If you called setLoading(true), then don't add any chat messages before you call setLoading(false).
-     */
     public void setLoading(boolean loading) {
         userPromptTextField.setDisable(loading);
         submitButton.setDisable(loading);
 
         if (loading) {
-            chatVBox.getChildren().add(makeProgressComponent());
+            stackPane.getChildren().add(new BorderPane(new ProgressIndicator()));
         } else {
-            if (!chatVBox.getChildren().isEmpty() && !(chatVBox.getChildren().getLast() instanceof ChatMessageComponent)) {
-                chatVBox.getChildren().removeLast();
-            }
+            stackPane.getChildren().clear();
+            stackPane.getChildren().add(scrollPane);
         }
-    }
-
-    private Node makeProgressComponent() {
-        return new BorderPane(new ProgressIndicator());
     }
 
     public void addMessage(ChatMessage chatMessage) {
