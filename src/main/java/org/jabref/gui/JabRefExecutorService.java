@@ -146,8 +146,6 @@ public class JabRefExecutorService {
         gracefullyShutdown(this.executorService);
         gracefullyShutdown(this.lowPriorityExecutorService);
 
-        // PdfIndexerManager.shutdownAllIndexers();
-
         timer.cancel();
     }
 
