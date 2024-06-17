@@ -16,6 +16,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -41,7 +42,7 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JabRefFrameViewModel {
+public class JabRefFrameViewModel implements UiMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);
 
     private final PreferencesService preferences;
@@ -51,6 +52,7 @@ public class JabRefFrameViewModel {
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
+    private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
     public JabRefFrameViewModel(PreferencesService preferencesService,
@@ -60,6 +62,7 @@ public class JabRefFrameViewModel {
                                 BibEntryTypesManager entryTypesManager,
                                 FileUpdateMonitor fileUpdateMonitor,
                                 UndoManager undoManager,
+                                ClipBoardManager clipBoardManager,
                                 TaskExecutor taskExecutor) {
         this.preferences = preferencesService;
         this.stateManager = stateManager;
@@ -68,6 +71,7 @@ public class JabRefFrameViewModel {
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
+        this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
     }
 
@@ -132,6 +136,7 @@ public class JabRefFrameViewModel {
      *
      * @param uiCommands to be handled
      */
+    @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);
         if (uiCommands.isEmpty()) {
@@ -200,6 +205,7 @@ public class JabRefFrameViewModel {
                             entryTypesManager,
                             fileUpdateMonitor,
                             undoManager,
+                            clipBoardManager,
                             taskExecutor);
                 } catch (
                         SQLException |
@@ -252,7 +258,7 @@ public class JabRefFrameViewModel {
         // if we found new entry types that can be imported, or checking
         // if the database contents should be modified due to new features
         // in this version of JabRef.
-        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, dialogService));
+        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, dialogService, preferences));
 
         LOGGER.debug("Finished adding panels");
     }

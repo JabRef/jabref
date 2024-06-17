@@ -107,7 +107,7 @@ public class WebSearchPaneView extends VBox {
      */
     private StackPane createHelpButtonContainer() {
         StackPane helpButtonContainer = new StackPane();
-        ActionFactory factory = new ActionFactory(preferences.getKeyBindingRepository());
+        ActionFactory factory = new ActionFactory();
         EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -> {
             if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
                 Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService, preferences.getFilePreferences()));

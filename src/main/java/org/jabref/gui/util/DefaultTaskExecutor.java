@@ -19,6 +19,7 @@ import javafx.concurrent.Task;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.util.DelayTaskThrottler;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,13 +35,9 @@ public class DefaultTaskExecutor implements TaskExecutor {
     private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
     private final WeakHashMap<DelayTaskThrottler, Void> throttlers = new WeakHashMap<>();
 
-    private final StateManager stateManager;
-
-    public DefaultTaskExecutor(StateManager stateManager) {
-        super();
-        this.stateManager = stateManager;
-    }
-
+    /**
+     *
+     */
     public static <V> V runInJavaFXThread(Callable<V> callable) {
         if (Platform.isFxApplicationThread()) {
             try {
@@ -103,7 +100,12 @@ public class DefaultTaskExecutor implements TaskExecutor {
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
         if (task.showToUser()) {
-            stateManager.addBackgroundTask(task, javafxTask);
+            StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+            if (stateManager != null) {
+                stateManager.addBackgroundTask(task, javafxTask);
+            } else {
+                LOGGER.info("Background task visible without GUI");
+            }
         }
         return execute(javafxTask);
     }
@@ -124,7 +126,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
      */
     @Override
     public void shutdown() {
-        stateManager.getBackgroundTasks().stream().filter(task -> !task.isDone()).forEach(Task::cancel);
+        StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+        if (stateManager != null) {
+            stateManager.getBackgroundTasks().stream().filter(task -> !task.isDone()).forEach(Task::cancel);
+        }
         executor.shutdownNow();
         scheduledExecutor.shutdownNow();
         throttlers.forEach((throttler, aVoid) -> throttler.shutdown());

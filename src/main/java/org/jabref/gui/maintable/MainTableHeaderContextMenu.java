@@ -15,7 +15,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preferences.table.TableTab;
@@ -27,19 +26,16 @@ public class MainTableHeaderContextMenu extends ContextMenu {
     MainTable mainTable;
     MainTableColumnFactory factory;
     private final LibraryTabContainer tabContainer;
-    private final KeyBindingRepository keyBindingRepository;
     private final DialogService dialogService;
 
     public MainTableHeaderContextMenu(MainTable mainTable,
                                       MainTableColumnFactory factory,
                                       LibraryTabContainer tabContainer,
-                                      KeyBindingRepository keyBindingRepository,
                                       DialogService dialogService) {
         super();
         this.tabContainer = tabContainer;
         this.mainTable = mainTable;
         this.factory = factory;
-        this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
 
         constructItems();
@@ -93,7 +89,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         }
 
         this.getItems().add(new SeparatorMenuItem());
-        ActionFactory actionfactory = new ActionFactory(this.keyBindingRepository);
+        ActionFactory actionfactory = new ActionFactory();
         MenuItem showMoreItem = actionfactory.createMenuItem(
                 StandardActions.SHOW_PREFS.withText(Localization.lang("More options...")),
                 new ShowPreferencesAction(tabContainer, TableTab.class, dialogService));

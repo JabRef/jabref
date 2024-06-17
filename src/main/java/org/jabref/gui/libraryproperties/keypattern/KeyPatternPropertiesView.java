@@ -3,7 +3,6 @@ package org.jabref.gui.libraryproperties.keypattern;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel;
@@ -46,7 +45,7 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
         bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
         bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
 
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferencesService.getFilePreferences()), keyPatternHelp);
     }
 

@@ -11,7 +11,6 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -41,11 +40,11 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
     private List<NotificationPaneAdapter> notificationPanes = new ArrayList<>();
 
-    public AutomaticFieldEditorDialog(StateManager stateManager) {
+    public AutomaticFieldEditorDialog(StateManager stateManager, UndoManager undoManager) {
         this.selectedEntries = stateManager.getSelectedEntries();
         this.database = stateManager.getActiveDatabase().orElseThrow().getDatabase();
         this.stateManager = stateManager;
-        this.undoManager = Globals.undoManager;
+        this.undoManager = undoManager;
 
         this.setTitle(Localization.lang("Automatic field editor"));
 

@@ -19,13 +19,13 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -44,25 +44,25 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
 
     private final DialogService dialogService;
+    private final BuildInfo buildInfo;
     private final TaskExecutor taskExecutor;
 
     private final BibDatabaseContext databaseContext;
 
     private final PreferencesService preferencesService;
-    private final EntryEditorPreferences entryEditorPreferences;
 
-    public RelatedArticlesTab(BibDatabaseContext databaseContext,
-                              EntryEditorPreferences entryEditorPreferences,
+    public RelatedArticlesTab(BuildInfo buildInfo,
+                              BibDatabaseContext databaseContext,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
 
         this.dialogService = dialogService;
+        this.buildInfo = buildInfo;
         this.taskExecutor = taskExecutor;
 
         this.preferencesService = preferencesService;
-        this.entryEditorPreferences = entryEditorPreferences;
 
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
@@ -80,8 +80,10 @@ public class RelatedArticlesTab extends EntryEditorTab {
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
-        MrDLibFetcher fetcher = new MrDLibFetcher(preferencesService.getWorkspacePreferences().getLanguage().name(),
-                Globals.BUILD_INFO.version, preferencesService.getMrDlibPreferences());
+        MrDLibFetcher fetcher = new MrDLibFetcher(
+                preferencesService.getWorkspacePreferences().getLanguage().name(),
+                buildInfo.version,
+                preferencesService.getMrDlibPreferences());
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
@@ -244,6 +246,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
+        EntryEditorPreferences entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         return entryEditorPreferences.shouldShowRecommendationsTab();
     }
 

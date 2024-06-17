@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -135,7 +134,7 @@ public class AbbreviateAction extends SimpleCommand {
     }
 
     private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
-        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Globals.journalAbbreviationRepository);
+        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(abbreviationRepository);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
         int count = entries.stream().mapToInt(entry ->

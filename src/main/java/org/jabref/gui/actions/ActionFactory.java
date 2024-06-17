@@ -3,7 +3,6 @@ package org.jabref.gui.actions;
 import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Objects;
 
 import javafx.beans.binding.BooleanExpression;
 import javafx.scene.control.Button;
@@ -17,6 +16,7 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.model.strings.StringUtil;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.sun.javafx.scene.control.ContextMenuContent;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.commands.Command;
@@ -33,8 +33,8 @@ public class ActionFactory {
 
     private final KeyBindingRepository keyBindingRepository;
 
-    public ActionFactory(KeyBindingRepository keyBindingRepository) {
-        this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
+    public ActionFactory() {
+        this.keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
     }
 
     /**

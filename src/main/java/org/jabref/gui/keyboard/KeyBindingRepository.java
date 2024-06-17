@@ -11,11 +11,13 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.MapProperty;
+import javafx.beans.property.SimpleMapProperty;
+import javafx.collections.FXCollections;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.util.OS;
 
 public class KeyBindingRepository {
@@ -23,18 +25,18 @@ public class KeyBindingRepository {
     /**
      * sorted by localization
      */
-    private final SortedMap<KeyBinding, String> bindings;
+    private final MapProperty<KeyBinding, String> bindings;
 
     public KeyBindingRepository() {
         this(Collections.emptyList(), Collections.emptyList());
     }
 
     public KeyBindingRepository(SortedMap<KeyBinding, String> bindings) {
-        this.bindings = bindings;
+        this.bindings = new SimpleMapProperty<>(FXCollections.observableMap(bindings));
     }
 
     public KeyBindingRepository(List<String> bindNames, List<String> bindings) {
-        this.bindings = new TreeMap<>(Comparator.comparing(KeyBinding::getLocalization));
+        this.bindings = new SimpleMapProperty<>(FXCollections.observableMap(new TreeMap<>(Comparator.comparing(KeyBinding::getLocalization))));
 
         if ((bindNames.isEmpty()) || (bindings.isEmpty()) || (bindNames.size() != bindings.size())) {
             // Use default key bindings
@@ -141,11 +143,9 @@ public class KeyBindingRepository {
      * Used if a keyboard shortcut leads to multiple actions (e.g., ESC for closing a dialog and clearing the search).
      */
     public boolean matches(KeyEvent event, KeyBinding keyBinding) {
-        return Globals.getKeyPrefs().mapToKeyBindings(event)
-                      .stream()
-                      .filter(binding -> binding == keyBinding)
-                      .findFirst()
-                      .isPresent();
+        return mapToKeyBindings(event)
+                .stream()
+                .anyMatch(binding -> binding == keyBinding);
     }
 
     public Optional<KeyCombination> getKeyCombination(KeyBinding bindName) {
@@ -177,6 +177,10 @@ public class KeyBindingRepository {
 
     public List<String> getBindings() {
         return new ArrayList<>(bindings.values());
+    }
+
+    public MapProperty<KeyBinding, String> getBindingsProperty() {
+        return bindings;
     }
 
     @Override

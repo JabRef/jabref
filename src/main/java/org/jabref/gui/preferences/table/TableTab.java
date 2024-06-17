@@ -65,7 +65,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> imple
         setupTable();
         setupBindings();
 
-        ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS, dialogService, preferencesService.getFilePreferences()), specialFieldsHelp);
     }
 
