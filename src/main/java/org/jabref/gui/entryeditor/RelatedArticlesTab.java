@@ -26,8 +26,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseModeDetection;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.MrDlibPreferences;
@@ -46,12 +45,14 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
 
-    public RelatedArticlesTab(EntryEditorPreferences preferences,
+    public RelatedArticlesTab(BibDatabaseContext databaseContext, EntryEditorPreferences preferences,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               TaskExecutor taskExecutor) {
+        this.databaseContext = databaseContext;
         this.taskExecutor = taskExecutor;
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
@@ -78,8 +79,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
                 .onSuccess(relatedArticles -> {
-                    // FIXME: mode should be fetched from BibDatabaseContext (which should be available somehow at the library tab)
-                    ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
+                    ImportCleanup cleanup = ImportCleanup.targeting(databaseContext.getMode(), preferencesService.getFieldPreferences());
                     cleanup.doPostCleanup(relatedArticles);
                     progress.setVisible(false);
                     root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));

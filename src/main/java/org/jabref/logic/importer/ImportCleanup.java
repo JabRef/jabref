@@ -2,6 +2,8 @@ package org.jabref.logic.importer;
 
 import java.util.Collection;
 
+import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
@@ -10,16 +12,19 @@ import org.jabref.model.entry.BibEntry;
  */
 public abstract class ImportCleanup {
 
-    // TODO: Let "fieldPreferences" be passed through the constructor
-    // private final NormalizeWhitespacesCleanup normalizeWhitespacesCleanup = new NormalizeWhitespacesCleanup(fieldPreferences);
+    private final NormalizeWhitespacesCleanup normalizeWhitespacesCleanup;
+
+    protected ImportCleanup(FieldPreferences fieldPreferences) {
+        this.normalizeWhitespacesCleanup = new NormalizeWhitespacesCleanup(fieldPreferences);
+    }
 
     /**
      * Kind of builder for a cleanup
      */
-    public static ImportCleanup targeting(BibDatabaseMode mode) {
+    public static ImportCleanup targeting(BibDatabaseMode mode, FieldPreferences fieldPreferences) {
         return switch (mode) {
-            case BIBTEX -> new ImportCleanupBibtex();
-            case BIBLATEX -> new ImportCleanupBiblatex();
+            case BIBTEX -> new ImportCleanupBibtex(fieldPreferences);
+            case BIBLATEX -> new ImportCleanupBiblatex(fieldPreferences);
         };
     }
 
