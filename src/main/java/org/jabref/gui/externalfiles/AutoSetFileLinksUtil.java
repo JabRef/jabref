@@ -13,7 +13,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
@@ -90,7 +90,7 @@ public class AutoSetFileLinksUtil {
                     ce.addEdit(fieldChange);
                     changed = true;
 
-                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                    UiTaskExecutor.runInJavaFXThread(() -> {
                         entry.addFile(linkedFile);
                     });
                 }

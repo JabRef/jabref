@@ -20,8 +20,8 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.libraryproperties.constants.ConstantsItemModel;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
@@ -115,7 +115,7 @@ public class ImportHandler {
                         break;
                     }
 
-                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                    UiTaskExecutor.runInJavaFXThread(() -> {
                         updateMessage(Localization.lang("Processing file %0", file.getFileName()));
                         updateProgress(counter, files.size() - 1d);
                     });
@@ -152,11 +152,11 @@ public class ImportHandler {
                         LOGGER.error("Error importing", ex);
                         addResultToList(file, false, Localization.lang("Error from import: %0", ex.getLocalizedMessage()));
 
-                        DefaultTaskExecutor.runInJavaFXThread(() -> updateMessage(Localization.lang("Error")));
+                        UiTaskExecutor.runInJavaFXThread(() -> updateMessage(Localization.lang("Error")));
                     }
 
                     // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
-                    DefaultTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
+                    UiTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
 
                     ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
                     ce.end();

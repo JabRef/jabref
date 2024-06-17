@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.TimerTask;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -30,7 +30,7 @@ public class Telemetry {
             HeadlessExecutorService.INSTANCE.submit(new TimerTask() {
                 @Override
                 public void run() {
-                    DefaultTaskExecutor.runInJavaFXThread(() -> showTrackingNotification(dialogService, preferences));
+                    UiTaskExecutor.runInJavaFXThread(() -> showTrackingNotification(dialogService, preferences));
                 }
             }, 60000); // run in one minute
         }

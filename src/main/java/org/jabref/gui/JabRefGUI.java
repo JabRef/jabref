@@ -23,8 +23,8 @@ import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -143,7 +143,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(UndoManager.class, countingUndoManager);
         Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
 
-        JabRefGUI.taskExecutor = new DefaultTaskExecutor();
+        JabRefGUI.taskExecutor = new UiTaskExecutor();
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);

@@ -44,8 +44,8 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -437,7 +437,7 @@ public class EntryEditor extends BorderPane {
     }
 
     public void setFocusToField(Field field) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             for (Tab tab : tabbed.getTabs()) {
                 if ((tab instanceof FieldsEditorTab fieldsEditorTab)
                         && fieldsEditorTab.getShownFields().contains(field)) {

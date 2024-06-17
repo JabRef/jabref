@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * In case something does not interact well with JavaFX, you can use the {@link HeadlessExecutorService}
  */
-public class DefaultTaskExecutor implements TaskExecutor {
+public class UiTaskExecutor implements TaskExecutor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTaskExecutor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UiTaskExecutor.class);
 
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
     private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
