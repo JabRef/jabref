@@ -31,6 +31,7 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
@@ -328,6 +329,6 @@ public class JabRefGUI extends Application {
         fileUpdateMonitor.shutdown();
         DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
         directoryMonitor.shutdown();
-        JabRefExecutorService.INSTANCE.shutdownEverything();
+        HeadlessExecutorService.INSTANCE.shutdownEverything();
     }
 }

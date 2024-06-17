@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.logic.util;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.gui.FallbackExceptionHandler;
 import org.jabref.logic.pdf.search.PdfIndexerManager;
 
 import org.slf4j.Logger;
@@ -23,12 +24,17 @@ import org.slf4j.LoggerFactory;
  * Responsible for managing of all threads (<em>except</em> GUI threads) in JabRef.
  * <p>
  * GUI background tasks should run in {@link org.jabref.gui.util.DefaultTaskExecutor}.
+ * <p>
+ * This is a wrapper around {@link ExecutorService}
+ * <p>
+ *     Offers both high-priority and low-priority thread pools.
+ * </p>
  */
-public class JabRefExecutorService implements Executor {
+public class HeadlessExecutorService implements Executor {
 
-    public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
+    public static final HeadlessExecutorService INSTANCE = new HeadlessExecutorService();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefExecutorService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HeadlessExecutorService.class);
 
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
@@ -48,7 +54,7 @@ public class JabRefExecutorService implements Executor {
 
     private Thread remoteThread;
 
-    private JabRefExecutorService() {
+    private HeadlessExecutorService() {
    }
 
     public void execute(Runnable command) {

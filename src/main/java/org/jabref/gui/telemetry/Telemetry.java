@@ -4,10 +4,10 @@ import java.util.Optional;
 import java.util.TimerTask;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.HeadlessExecutorService;
 
 public class Telemetry {
     private Telemetry() {
@@ -27,7 +27,7 @@ public class Telemetry {
 
     public static void initTrackingNotification(DialogService dialogService, TelemetryPreferences preferences) {
         if (preferences.shouldAskToCollectTelemetry()) {
-            JabRefExecutorService.INSTANCE.submit(new TimerTask() {
+            HeadlessExecutorService.INSTANCE.submit(new TimerTask() {
                 @Override
                 public void run() {
                     DefaultTaskExecutor.runInJavaFXThread(() -> showTrackingNotification(dialogService, preferences));

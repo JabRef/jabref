@@ -18,6 +18,7 @@ import javafx.concurrent.Task;
 
 import org.jabref.gui.StateManager;
 import org.jabref.logic.util.DelayTaskThrottler;
+import org.jabref.logic.util.HeadlessExecutorService;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * A very simple implementation of the {@link TaskExecutor} interface.
  * Every submitted task is invoked in a separate thread.
  * <p>
- * In case something does not interact well with JavaFX, you can use the {@link org.jabref.gui.JabRefExecutorService}
+ * In case something does not interact well with JavaFX, you can use the {@link HeadlessExecutorService}
  */
 public class DefaultTaskExecutor implements TaskExecutor {
 
