@@ -35,7 +35,6 @@ public class ExternalFilesEntryLinker {
     private final BibDatabaseContext bibDatabaseContext;
     private final MoveFilesCleanup moveFilesCleanup;
     private final RenamePdfCleanup renameFilesCleanup;
-    private final LuceneManager luceneManager;
     private final DialogService dialogService;
 
     public ExternalFilesEntryLinker(FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
@@ -44,7 +43,6 @@ public class ExternalFilesEntryLinker {
         this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences);
         this.renameFilesCleanup = new RenamePdfCleanup(false, bibDatabaseContext, filePreferences);
         this.dialogService = dialogService;
-        this.luceneManager = Globals.luceneMangers.get(bibDatabaseContext);
     }
 
     public Optional<Path> copyFileToFileDir(Path file) {
@@ -80,6 +78,7 @@ public class ExternalFilesEntryLinker {
     }
 
     public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files) {
+        LuceneManager luceneManager = Globals.luceneMangers.get(bibDatabaseContext);
         try (AutoCloseable blocker = luceneManager.blockLinkedFileIndexer()) {
             addFilesToEntry(entry, files);
             moveLinkedFilesToFileDir(entry);
@@ -91,6 +90,7 @@ public class ExternalFilesEntryLinker {
     }
 
     public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
+        LuceneManager luceneManager = Globals.luceneMangers.get(bibDatabaseContext);
         try (AutoCloseable blocker = luceneManager.blockLinkedFileIndexer()) {
             for (Path file : files) {
                 copyFileToFileDir(file)

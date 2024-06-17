@@ -255,6 +255,9 @@ public class LibraryTab extends Tab {
     }
 
     private void setLuceneManager() {
+        if (luceneManager != null) {
+            luceneManager.close();
+        }
         if (bibDatabaseContext == null) {
             LOGGER.warn("BibDatabaseContext is null, cannot create LuceneIndexer");
         }
