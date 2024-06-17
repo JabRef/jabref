@@ -31,9 +31,13 @@ public class DBLPFetcherTest {
 
         entry.setType(StandardEntryType.Article);
         entry.setCitationKey("DBLP:journals/stt/GeigerHL16");
-        entry.setField(StandardField.TITLE,
-                "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards");
-        entry.setField(StandardField.AUTHOR, "Matthias Geiger and Simon Harrer and J{\\\"{o}}rg Lenhard");
+        entry.setField(StandardField.TITLE, """
+                Process Engine Benchmarking with Betsy in the Context of {ISO/IEC}
+                                  Quality Standards""");
+        entry.setField(StandardField.AUTHOR, """
+                Matthias Geiger and
+                                  Simon Harrer and
+                                  J{\\\"{o}}rg Lenhard""");
         entry.setField(StandardField.JOURNAL, "Softwaretechnik-Trends");
         entry.setField(StandardField.VOLUME, "36");
         entry.setField(StandardField.NUMBER, "2");
