@@ -26,8 +26,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseModeDetection;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.MrDlibPreferences;
@@ -47,13 +46,18 @@ public class RelatedArticlesTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
+    private final BibDatabaseContext databaseContext;
+
     private final PreferencesService preferencesService;
     private final EntryEditorPreferences entryEditorPreferences;
 
-    public RelatedArticlesTab(EntryEditorPreferences entryEditorPreferences,
+    public RelatedArticlesTab(BibDatabaseContext databaseContext,
+                              EntryEditorPreferences entryEditorPreferences,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               TaskExecutor taskExecutor) {
+        this.databaseContext = databaseContext;
+
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
@@ -82,7 +86,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
                 .onSuccess(relatedArticles -> {
-                    ImportCleanup cleanup = ImportCleanup.targeting(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
+                    ImportCleanup cleanup = ImportCleanup.targeting(databaseContext.getMode(), preferencesService.getFieldPreferences());
                     cleanup.doPostCleanup(relatedArticles);
                     progress.setVisible(false);
                     root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));

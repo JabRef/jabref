@@ -65,12 +65,10 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                 newValue -> {
                     if (newValue != null) {
                         // A file may be loaded using CRLF. ControlsFX uses hardcoded \n for multiline fields.
-                        // Normalizing is done during writing of the .bib file (see org.jabref.logic.exporter.BibWriter.BibWriter).
                         // Thus, we need to normalize the line endings.
-                        String oldValue = entry.getField(field).map(value -> value.replace("\r\n", "\n").trim()).orElse(null);
-                        // Autosave and save action trigger the entry editor to reload the fields, so we have to
-                        // check for changes here, otherwise the cursor position is annoyingly reset every few seconds
-                        if (!(newValue.trim()).equals(oldValue)) {
+                        // Note: Normalizing for the .bib file is done during writing of the .bib file (see org.jabref.logic.exporter.BibWriter.BibWriter).
+                        String oldValue = entry.getField(field).map(value -> value.replace("\r\n", "\n")).orElse(null);
+                        if (!newValue.equals(oldValue)) {
                             entry.setField(field, newValue);
                             undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
                         }

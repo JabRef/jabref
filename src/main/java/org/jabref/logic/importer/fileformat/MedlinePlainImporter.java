@@ -341,7 +341,7 @@ public class MedlinePlainImporter extends Importer {
                 // remove the copyright from the field since the name of the field is copyright
                 String copyrightInfo = value.substring(copyrightIndex).replace("Copyright ", "");
                 hm.put(new UnknownField("copyright"), copyrightInfo);
-                abstractValue = value.substring(0, copyrightIndex);
+                abstractValue = value.substring(0, copyrightIndex).trim();
             } else {
                 abstractValue = value;
             }

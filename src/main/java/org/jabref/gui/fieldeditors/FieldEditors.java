@@ -71,27 +71,28 @@ public class FieldEditors {
             return new UrlEditor(field, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
             return new JournalEditor(field, suggestionProvider, fieldCheckers);
-        } else if (fieldProperties.contains(FieldProperty.DOI) || fieldProperties.contains(FieldProperty.EPRINT) || fieldProperties.contains(FieldProperty.ISBN)) {
+        } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN) {
+            // Identifier editor does not support PMID, therefore excluded at the condition above
             return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
-        } else if (fieldProperties.contains(FieldProperty.ISSN)) {
+        } else if (field == StandardField.ISSN) {
             return new ISSNEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.OWNER) {
             return new OwnerEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.GROUPS) {
             return new GroupEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
-        } else if (fieldProperties.contains(FieldProperty.FILE_EDITOR)) {
+        } else if (field == StandardField.FILE) {
             return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
             return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.MONTH)) {
             return new OptionEditor<>(new MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
-        } else if (fieldProperties.contains(FieldProperty.GENDER)) {
+        } else if (field == StandardField.GENDER) {
             return new OptionEditor<>(new GenderEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.EDITOR_TYPE)) {
             return new OptionEditor<>(new EditorTypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.PAGINATION)) {
             return new OptionEditor<>(new PaginationEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
-        } else if (fieldProperties.contains(FieldProperty.TYPE)) {
+        } else if (field == StandardField.TYPE) {
             if (entryType.equals(IEEETranEntryType.Patent)) {
                 return new OptionEditor<>(new PatentTypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
             } else {
