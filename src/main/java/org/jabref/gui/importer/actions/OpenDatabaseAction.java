@@ -25,9 +25,9 @@ import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -239,7 +239,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             if (parserResult.hasWarnings()) {
                 String content = Localization.lang("Please check your library file for wrong syntax.")
                         + "\n\n" + parserResult.getErrorMessage();
-                DefaultTaskExecutor.runInJavaFXThread(() ->
+                UiTaskExecutor.runInJavaFXThread(() ->
                         dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
             }
         } catch (IOException e) {

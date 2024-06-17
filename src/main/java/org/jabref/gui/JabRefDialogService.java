@@ -43,9 +43,9 @@ import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
 
@@ -380,7 +380,7 @@ public class JabRefDialogService implements DialogService {
     public void notify(String message) {
         LOGGER.info(message);
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             Notifications.create()
                          .text(message)
                          .position(Pos.BOTTOM_CENTER)

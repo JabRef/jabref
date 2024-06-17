@@ -19,7 +19,7 @@ import org.jabref.gui.collab.DatabaseChangeList;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.collab.DatabaseChangesResolverDialog;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -70,7 +70,7 @@ public class BackupUIManager {
                                                                  ExternalApplicationsPreferences externalApplicationsPreferences,
                                                                  Path originalPath,
                                                                  Path backupDir) {
-        return DefaultTaskExecutor.runInJavaFXThread(
+        return UiTaskExecutor.runInJavaFXThread(
                 () -> dialogService.showCustomDialogAndWait(new BackupResolverDialog(originalPath, backupDir, externalApplicationsPreferences)));
     }
 
@@ -94,7 +94,7 @@ public class BackupUIManager {
 
             DatabaseChangeResolverFactory changeResolverFactory = new DatabaseChangeResolverFactory(dialogService, originalDatabase, preferencesService);
 
-            return DefaultTaskExecutor.runInJavaFXThread(() -> {
+            return UiTaskExecutor.runInJavaFXThread(() -> {
                 List<DatabaseChange> changes = DatabaseChangeList.compareAndGetChanges(originalDatabase, backupDatabase, changeResolverFactory);
                 DatabaseChangesResolverDialog reviewBackupDialog = new DatabaseChangesResolverDialog(
                         changes,
