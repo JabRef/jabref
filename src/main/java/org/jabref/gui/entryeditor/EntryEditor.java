@@ -127,7 +127,7 @@ public class EntryEditor extends BorderPane {
         setupKeyBindings();
 
         this.allPossibleTabs = createTabs();
-        this.previewTabs = this.allPossibleTabs.stream().filter(OffersPreview.class::isInstance).map(OffersPreview.class::cast).toList()
+        this.previewTabs = this.allPossibleTabs.stream().filter(OffersPreview.class::isInstance).map(OffersPreview.class::cast).toList();
 
         setupDragAndDrop(libraryTab);
 
