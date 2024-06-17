@@ -55,7 +55,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     private final Directory indexDirectory;
     private final IndexWriter indexWriter;
     private final SearcherManager searcherManager;
-    private final Map<String, Long> indexedFiles;
+    private Map<String, Long> indexedFiles;
     private IndexSearcher indexSearcher;
 
     public DefaultLinkedFilesIndexer(BibDatabaseContext databaseContext, TaskExecutor executor, PreferencesService preferences) throws IOException {
@@ -65,20 +65,21 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "untitled");
         this.documentReader = new DocumentReader();
 
-        Path indexDirectoryPath = databaseContext.getLinkedFilesIndexPath();
+        Path indexDirectoryPath = databaseContext.getFulltextIndexPath();
         IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.ANALYZER);
         if (indexDirectoryPath.getFileName().toString().equals("unsaved")) {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         }
 
-        this.indexDirectory = FSDirectory.open(databaseContext.getLinkedFilesIndexPath());
+        this.indexDirectory = FSDirectory.open(indexDirectoryPath);
         this.indexWriter = new IndexWriter(indexDirectory, config);
         this.searcherManager = new SearcherManager(indexWriter, null);
-        this.indexedFiles = getLinkedFilesFromIndex();
+        this.indexedFiles = new HashMap<>();
     }
 
     @Override
     public void updateOnStart() {
+        indexedFiles = getLinkedFilesFromIndex();
         Map<String, Pair<Long, Path>> currentFiles = getLinkedFilesFromEntries(databaseContext.getEntries());
 
         Set<String> filesToRemove = new HashSet<>();
@@ -341,7 +342,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
                 indexWriter.forceMerge(1, true);
             }
         } catch (IOException e) {
-            LOGGER.warn("Could read segment infos.", e);
+            LOGGER.warn("Could read segment infos.");
         }
     }
 

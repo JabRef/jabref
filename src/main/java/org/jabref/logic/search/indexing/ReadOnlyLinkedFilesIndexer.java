@@ -23,7 +23,7 @@ public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
 
     public ReadOnlyLinkedFilesIndexer(BibDatabaseContext databaseContext) {
         try {
-            indexDirectory = FSDirectory.open(databaseContext.getLinkedFilesIndexPath());
+            indexDirectory = FSDirectory.open(databaseContext.getFulltextIndexPath());
             searcherManager = new SearcherManager(indexDirectory, null);
         } catch (IOException e) {
             LOGGER.error("Error initializing read only linked files index", e);

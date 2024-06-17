@@ -78,6 +78,7 @@ public class LuceneManager {
         try {
             linkedFilesIndexer = new DefaultLinkedFilesIndexer(databaseContext, taskExecutor, preferences);
         } catch (IOException e) {
+            LOGGER.info("Error initializing linked files index - using read only index");
             linkedFilesIndexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
         }
     }
