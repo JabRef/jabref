@@ -118,12 +118,15 @@ public class EntryEditor extends BorderPane {
         this.libraryTab = libraryTab;
         this.databaseContext = libraryTab.getBibDatabaseContext();
         this.directoryMonitorManager = libraryTab.getDirectoryMonitorManager();
-        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), databaseContext, dialogService);
 
+        // inject variables
         ViewLoader.view(this)
                   .root(this)
                   .load();
+
+        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), databaseContext, dialogService);
+
         setupKeyBindings();
 
         this.allPossibleTabs = createTabs();
