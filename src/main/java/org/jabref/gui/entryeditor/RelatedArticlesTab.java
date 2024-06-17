@@ -26,7 +26,9 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.MrDlibPreferences;
@@ -36,29 +38,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * GUI for tab displaying article recommendations based on the currently selected BibEntry
+ * Tab displaying article recommendations based on the currently selected BibEntry
  */
 public class RelatedArticlesTab extends EntryEditorTab {
 
     public static final String NAME = "Related articles";
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
-    private final EntryEditorPreferences preferences;
+
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
-    private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
 
-    public RelatedArticlesTab(BibDatabaseContext databaseContext, EntryEditorPreferences preferences,
+    private final BibDatabaseContext databaseContext;
+
+    private final PreferencesService preferencesService;
+    private final EntryEditorPreferences entryEditorPreferences;
+
+    public RelatedArticlesTab(BibDatabaseContext databaseContext,
+                              EntryEditorPreferences entryEditorPreferences,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
+
+        this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+
+        this.preferencesService = preferencesService;
+        this.entryEditorPreferences = entryEditorPreferences;
+
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
-        this.preferences = preferences;
-        this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
     }
 
     /**
@@ -237,15 +246,15 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return preferences.shouldShowRecommendationsTab();
+        return entryEditorPreferences.shouldShowRecommendationsTab();
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        // Ask for consent to send data to Mr. DLib on first time to tab
         if (preferencesService.getMrDlibPreferences().shouldAcceptRecommendations()) {
             setContent(getRelatedArticlesPane(entry));
         } else {
+            // Ask for consent to send data to Mr. DLib on first time to tab
             setContent(getPrivacyDialog(entry));
         }
     }
