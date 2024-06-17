@@ -7,6 +7,8 @@ import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Cleanup of imported entries to be processable by JabRef
  */
@@ -21,7 +23,7 @@ public abstract class ImportCleanup {
     /**
      * Kind of builder for a cleanup
      */
-    public static ImportCleanup targeting(BibDatabaseMode mode, FieldPreferences fieldPreferences) {
+    public static ImportCleanup targeting(BibDatabaseMode mode, @NonNull FieldPreferences fieldPreferences) {
         return switch (mode) {
             case BIBTEX -> new ImportCleanupBibtex(fieldPreferences);
             case BIBLATEX -> new ImportCleanupBiblatex(fieldPreferences);
