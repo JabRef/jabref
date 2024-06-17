@@ -254,7 +254,7 @@ public class LibraryTab extends Tab {
         dataLoadingTask = null;
     }
 
-    private void setLuceneManager() {
+    public void setLuceneManager() {
         if (luceneManager != null) {
             luceneManager.close();
         }

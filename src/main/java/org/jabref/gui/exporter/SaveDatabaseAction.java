@@ -163,7 +163,7 @@ public class SaveDatabaseAction {
             // Reset (here: uninstall and install again) AutosaveManager and BackupManager for the new file name
             libraryTab.resetChangeMonitor();
             libraryTab.installAutosaveManagerAndBackupManager();
-            // PdfIndexerManager does not need to be called; the method {@link org.jabref.logic.pdf.search.PdfIndexerManager.get()} is called if a new indexer is needed
+            libraryTab.setLuceneManager();
 
             preferences.getGuiPreferences().getFileHistory().newFile(file);
         }

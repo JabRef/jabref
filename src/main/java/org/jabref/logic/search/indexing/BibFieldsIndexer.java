@@ -28,8 +28,8 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +53,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
         this.taskExecutor = executor;
         this.preferences = preferences;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "unsaved");
-        // will use ByteBufferDirectory
-        this.indexDirectory = FSDirectory.open(databaseContext.getBibFieldsIndexPath());
+        this.indexDirectory = new ByteBuffersDirectory();
         IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.ANALYZER);
 
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
