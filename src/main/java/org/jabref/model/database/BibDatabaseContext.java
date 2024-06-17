@@ -271,10 +271,6 @@ public class BibDatabaseContext {
         return getFulltextIndexPath().resolve("LinkedFiles");
     }
 
-    public Path getBibFieldsIndexPath() {
-        return getFulltextIndexPath().resolve("BibFields");
-    }
-
     @Override
     public String toString() {
         return "BibDatabaseContext{" +

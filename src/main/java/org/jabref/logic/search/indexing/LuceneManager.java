@@ -43,14 +43,11 @@ public class LuceneManager {
         this.taskExecutor = executor;
         this.preferences = preferences;
         this.shouldIndexLinkedFiles = preferences.getFilePreferences().fulltextIndexLinkedFilesProperty();
+        this.preferencesListener = (observable, oldValue, newValue) -> bindToPreferences(newValue);
+        this.shouldIndexLinkedFiles.addListener(preferencesListener);
         this.isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
         this.luceneSearcher = new LuceneSearcher(databaseContext);
         Globals.luceneMangers.put(databaseContext, this);
-
-        preferencesListener = (observable, oldValue, newValue) -> {
-            bindToPreferences(newValue);
-        };
-        shouldIndexLinkedFiles.addListener(preferencesListener);
 
         try {
             bibFieldsIndexer = new BibFieldsIndexer(databaseContext, executor, preferences);
@@ -58,8 +55,11 @@ public class LuceneManager {
             LOGGER.error("Error initializing bib fields index", e);
         }
 
-        if (shouldIndexLinkedFiles.get()) {
-            initializeLinkedFilesIndexer();
+        initializeLinkedFilesIndexer();
+        if (!shouldIndexLinkedFiles.get()) {
+            linkedFilesIndexer.removeAllFromIndex();
+            linkedFilesIndexer.close();
+            linkedFilesIndexer = null;
         }
     }
 

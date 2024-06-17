@@ -62,7 +62,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         this.databaseContext = databaseContext;
         this.taskExecutor = executor;
         this.preferences = preferences;
-        this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "unsaved");
+        this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "untitled");
         this.documentReader = new DocumentReader();
 
         Path indexDirectoryPath = databaseContext.getLinkedFilesIndexPath();
