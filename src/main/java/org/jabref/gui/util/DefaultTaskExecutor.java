@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 /**
  * A very simple implementation of the {@link TaskExecutor} interface.
  * Every submitted task is invoked in a separate thread.
+ * <p>
+ * In case something does not interact well with JavaFX, you can use the {@link org.jabref.gui.JabRefExecutorService}
  */
 public class DefaultTaskExecutor implements TaskExecutor {
 

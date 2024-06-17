@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -19,9 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Responsible for managing of all threads (except GUI threads) in JabRef
+ * Responsible for managing of all threads (<em>except</em> GUI threads) in JabRef.
+ * <p>
+ * GUI background tasks should run in {@link org.jabref.gui.util.DefaultTaskExecutor}.
  */
-public class JabRefExecutorService {
+public class JabRefExecutorService implements Executor {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
