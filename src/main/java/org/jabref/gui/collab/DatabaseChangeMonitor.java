@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
@@ -23,8 +25,6 @@ import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.gui.Globals.undoManager;
-
 public class DatabaseChangeMonitor implements FileUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
@@ -36,6 +36,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final LibraryTab.DatabaseNotification notificationPane;
+    private final UndoManager undoManager;
     private final StateManager stateManager;
     private LibraryTab saveState;
 
@@ -45,6 +46,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                                  DialogService dialogService,
                                  PreferencesService preferencesService,
                                  LibraryTab.DatabaseNotification notificationPane,
+                                 UndoManager undoManager,
                                  StateManager stateManager) {
         this.database = database;
         this.fileMonitor = fileMonitor;
@@ -52,6 +54,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.notificationPane = notificationPane;
+        this.undoManager = undoManager;
         this.stateManager = stateManager;
 
         this.listeners = new ArrayList<>();

@@ -6,18 +6,17 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
+
 public class SearchForUpdateAction extends SimpleCommand {
 
-    private final BuildInfo buildInfo;
     private final PreferencesService preferencesService;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
-    public SearchForUpdateAction(BuildInfo buildInfo,
-                                 PreferencesService preferencesService,
+    public SearchForUpdateAction(PreferencesService preferencesService,
                                  DialogService dialogService,
                                  TaskExecutor taskExecutor) {
-        this.buildInfo = buildInfo;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -27,6 +26,7 @@ public class SearchForUpdateAction extends SimpleCommand {
 
     @Override
     public void execute() {
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
         new VersionWorker(buildInfo.version, dialogService, taskExecutor, preferencesService)
                 .checkForNewVersionAsync();
     }

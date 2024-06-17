@@ -12,6 +12,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -56,6 +57,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private UndoManager undoManager;
+    @Inject private ClipBoardManager clipBoardManager;
     @Inject private TaskExecutor taskExecutor;
 
     private final LibraryTabContainer tabContainer;
@@ -98,6 +100,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 entryTypesManager,
                 fileUpdateMonitor,
                 undoManager,
+                clipBoardManager,
                 taskExecutor);
         databaseType.getItems().addAll(DBMSType.values());
         databaseType.getSelectionModel().select(0);

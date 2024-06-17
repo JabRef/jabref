@@ -20,8 +20,8 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.telemetry.TelemetryPreferences;
@@ -34,6 +34,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
+import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -46,6 +47,7 @@ import org.jabref.preferences.MergeDialogPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.WorkspacePreferences;
 
+import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -260,12 +262,15 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        // stop in all cases, because the port might have changed
-        Globals.REMOTE_LISTENER.stop();
+        UiMessageHandler uiMessageHandler = Injector.instantiateModelOrService(UiMessageHandler.class);
+        RemoteListenerServerManager remoteListenerServerManager = Injector.instantiateModelOrService(RemoteListenerServerManager.class);
+        remoteListenerServerManager.stop(); // stop in all cases, because the port might have changed
 
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
+            remoteListenerServerManager.openAndStart(
+                    new CLIMessageHandler(uiMessageHandler, preferences, fileUpdateMonitor, entryTypesManager),
+                    remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
         }
@@ -273,10 +278,12 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
-            Globals.REMOTE_LISTENER.openAndStart(new CLIMessageHandler(preferences, fileUpdateMonitor, entryTypesManager), remotePreferences.getPort());
+            remoteListenerServerManager.openAndStart(
+                    new CLIMessageHandler(uiMessageHandler, preferences, fileUpdateMonitor, entryTypesManager),
+                    remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
-            Globals.REMOTE_LISTENER.stop();
+            remoteListenerServerManager.stop();
         }
         trustStoreManager.flush();
     }

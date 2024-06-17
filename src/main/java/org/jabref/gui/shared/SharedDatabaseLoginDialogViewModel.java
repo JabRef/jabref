@@ -22,8 +22,8 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -48,6 +48,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -87,6 +88,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
+    private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
     private final Validator databaseValidator;
@@ -104,6 +106,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               UndoManager undoManager,
+                                              ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
@@ -112,6 +115,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
+        this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
 
         EasyBind.subscribe(selectedDBMSType, selected -> port.setValue(Integer.toString(selected.getDefaultPort())));
@@ -192,13 +196,19 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     entryTypesManager,
                     fileUpdateMonitor,
                     undoManager,
+                    clipBoardManager,
                     taskExecutor);
             LibraryTab libraryTab = manager.openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
 
             if (!folder.getValue().isEmpty() && autosave.get()) {
                 try {
-                    new SaveDatabaseAction(libraryTab, dialogService, preferencesService, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
+                    new SaveDatabaseAction(
+                            libraryTab,
+                            dialogService,
+                            preferencesService,
+                            Injector.instantiateModelOrService(BibEntryTypesManager.class)
+                    ).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }
