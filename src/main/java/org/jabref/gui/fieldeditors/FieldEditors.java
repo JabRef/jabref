@@ -72,6 +72,7 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
             return new JournalEditor(field, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN) {
+            // Identifier editor does not support PMID, therefore excluded at the condition above
             return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.ISSN) {
             return new ISSNEditor(field, suggestionProvider, fieldCheckers);
