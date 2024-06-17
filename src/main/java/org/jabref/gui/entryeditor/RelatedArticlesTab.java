@@ -37,30 +37,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * GUI for tab displaying article recommendations based on the currently selected BibEntry
+ * Tab displaying article recommendations based on the currently selected BibEntry
  */
 public class RelatedArticlesTab extends EntryEditorTab {
 
     public static final String NAME = "Related articles";
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
-    private final EntryEditorPreferences preferences;
+
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
     private final BuildInfo buildInfo;
     private final TaskExecutor taskExecutor;
 
+    private final PreferencesService preferencesService;
+
     public RelatedArticlesTab(BuildInfo buildInfo,
-                              EntryEditorPreferences preferences,
                               PreferencesService preferencesService,
                               DialogService dialogService,
                               TaskExecutor taskExecutor) {
+        this.dialogService = dialogService;
         this.buildInfo = buildInfo;
         this.taskExecutor = taskExecutor;
+
+        this.preferencesService = preferencesService;
+
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
-        this.preferences = preferences;
-        this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
     }
 
     /**
@@ -241,15 +242,16 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return preferences.shouldShowRecommendationsTab();
+        EntryEditorPreferences entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        return entryEditorPreferences.shouldShowRecommendationsTab();
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        // Ask for consent to send data to Mr. DLib on first time to tab
         if (preferencesService.getMrDlibPreferences().shouldAcceptRecommendations()) {
             setContent(getRelatedArticlesPane(entry));
         } else {
+            // Ask for consent to send data to Mr. DLib on first time to tab
             setContent(getPrivacyDialog(entry));
         }
     }

@@ -142,7 +142,7 @@ public class SharedDatabaseUIManager {
 
         libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.getBibEntries()));
 
-        if (entryEditor != null && (event.getBibEntries().contains(entryEditor.getEntry()))) {
+        if (entryEditor != null && (event.getBibEntries().contains(entryEditor.getCurrentlyEditedEntry()))) {
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")
                             + "\n"

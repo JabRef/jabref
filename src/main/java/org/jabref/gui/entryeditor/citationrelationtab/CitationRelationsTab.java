@@ -59,6 +59,8 @@ import org.slf4j.LoggerFactory;
  */
 public class CitationRelationsTab extends EntryEditorTab {
 
+    public static final String NAME = "Citation relations";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
     // Tasks used to implement asynchronous fetching of related articles
@@ -79,12 +81,12 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 StateManager stateManager,
                                 FileUpdateMonitor fileUpdateMonitor,
                                 PreferencesService preferencesService,
-                                LibraryTab lTab,
+                                LibraryTab libraryTab,
                                 TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.preferencesService = preferencesService;
-        this.libraryTab = lTab;
+        this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
