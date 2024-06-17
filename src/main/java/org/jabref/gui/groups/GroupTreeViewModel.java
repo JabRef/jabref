@@ -23,10 +23,12 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
@@ -83,15 +85,23 @@ public class GroupTreeViewModel extends AbstractViewModel {
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
+
         // Set-up bindings
         filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
-
+        var groupTreeChangedExternally = stateManager.activeTabProperty().flatMap(tab -> tab.map(LibraryTab::groupsTreeChangedProperty).orElse(new SimpleObjectProperty<>()));
+        EasyBind.subscribe(groupTreeChangedExternally, (metaData) -> {
+            if (metaData != null) {
+                System.out.println("Simulate database changed");
+                onActiveDatabaseChanged(stateManager.getActiveDatabase());
+            }
+        });
         // Init
-        refresh();
+        initRefreshListener();
     }
 
-    private void refresh() {
+    private void initRefreshListener() {
         onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
+
     }
 
     public ObjectProperty<GroupNodeViewModel> rootGroupProperty() {
@@ -293,7 +303,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                     writeGroupChangesToMetaData();
                     // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
-                    refresh();
+                    initRefreshListener();
                     return;
                 }
 
@@ -305,7 +315,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                             database.getEntries());
 
                     writeGroupChangesToMetaData();
-                    refresh();
+                    initRefreshListener();
                     return;
                 }
 
@@ -379,7 +389,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
                 // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
-                refresh();
+                initRefreshListener();
             });
         });
     }

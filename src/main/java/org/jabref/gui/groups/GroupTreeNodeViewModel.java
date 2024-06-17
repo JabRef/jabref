@@ -21,15 +21,10 @@ import org.jabref.model.groups.SearchGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GroupTreeNodeViewModel {
+public record GroupTreeNodeViewModel(
+        GroupTreeNode node) {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeNodeViewModel.class);
-
-    private final GroupTreeNode node;
-
-    public GroupTreeNodeViewModel(GroupTreeNode node) {
-        this.node = node;
-    }
 
     @Override
     public String toString() {
@@ -37,10 +32,6 @@ public class GroupTreeNodeViewModel {
         sb.append("node=").append(node);
         sb.append('}');
         return sb.toString();
-    }
-
-    public GroupTreeNode getNode() {
-        return node;
     }
 
     public List<GroupTreeNodeViewModel> getChildren() {
@@ -51,7 +42,7 @@ public class GroupTreeNodeViewModel {
         return children;
     }
 
-    protected boolean printInItalics() {
+    private boolean printInItalics() {
         return node.getGroup().isDynamic();
     }
 
@@ -59,28 +50,30 @@ public class GroupTreeNodeViewModel {
         AbstractGroup group = node.getGroup();
         String shortDescription = "";
         boolean showDynamic = true;
-        if (group instanceof ExplicitGroup explicitGroup) {
-            shortDescription = GroupDescriptions.getShortDescriptionExplicitGroup(explicitGroup);
-        } else if (group instanceof KeywordGroup keywordGroup) {
-            shortDescription = GroupDescriptions.getShortDescriptionKeywordGroup(keywordGroup, showDynamic);
-        } else if (group instanceof SearchGroup searchGroup) {
-            shortDescription = GroupDescriptions.getShortDescription(searchGroup, showDynamic);
-        } else {
-            shortDescription = GroupDescriptions.getShortDescriptionAllEntriesGroup();
-        }
+        shortDescription = switch (group) {
+            case ExplicitGroup explicitGroup ->
+                    GroupDescriptions.getShortDescriptionExplicitGroup(explicitGroup);
+            case KeywordGroup keywordGroup ->
+                    GroupDescriptions.getShortDescriptionKeywordGroup(keywordGroup, showDynamic);
+            case SearchGroup searchGroup ->
+                    GroupDescriptions.getShortDescription(searchGroup, showDynamic);
+            case null,
+                 default ->
+                    GroupDescriptions.getShortDescriptionAllEntriesGroup();
+        };
         return "<html>" + shortDescription + "</html>";
     }
 
     public boolean canAddEntries(List<BibEntry> entries) {
-        return (getNode().getGroup() instanceof GroupEntryChanger) && !getNode().getGroup().containsAll(entries);
+        return (node().getGroup() instanceof GroupEntryChanger) && !node().getGroup().containsAll(entries);
     }
 
     public boolean canRemoveEntries(List<BibEntry> entries) {
-        return (getNode().getGroup() instanceof GroupEntryChanger) && getNode().getGroup().containsAny(entries);
+        return (node().getGroup() instanceof GroupEntryChanger) && node().getGroup().containsAny(entries);
     }
 
     public void sortChildrenByName(boolean recursive) {
-        getNode().sortChildren(
+        node().sortChildren(
                 (node1, node2) -> node1.getGroup().getName().compareToIgnoreCase(node2.getGroup().getName()),
                 recursive);
     }
@@ -98,38 +91,33 @@ public class GroupTreeNodeViewModel {
         return node.equals(viewModel.node);
     }
 
-    @Override
-    public int hashCode() {
-        return node.hashCode();
-    }
-
     public String getName() {
-        return getNode().getGroup().getName();
+        return node().getGroup().getName();
     }
 
     public boolean canBeEdited() {
-        return getNode().getGroup() instanceof AllEntriesGroup;
+        return node().getGroup() instanceof AllEntriesGroup;
     }
 
     public boolean canMoveUp() {
-        return (getNode().getPreviousSibling() != null)
-                && !(getNode().getGroup() instanceof AllEntriesGroup);
+        return (node().getPreviousSibling().isPresent())
+                && !(node().getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveDown() {
-        return (getNode().getNextSibling() != null)
-                && !(getNode().getGroup() instanceof AllEntriesGroup);
+        return (node().getNextSibling().isPresent())
+                && !(node().getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveLeft() {
-        return !(getNode().getGroup() instanceof AllEntriesGroup)
+        return !(node().getGroup() instanceof AllEntriesGroup)
                 // TODO: Null!
-                && !(getNode().getParent().get().getGroup() instanceof AllEntriesGroup);
+                && !(node().getParent().get().getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveRight() {
-        return (getNode().getPreviousSibling() != null)
-                && !(getNode().getGroup() instanceof AllEntriesGroup);
+        return (node().getPreviousSibling().isPresent())
+                && !(node().getGroup() instanceof AllEntriesGroup);
     }
 
     public void changeEntriesTo(List<BibEntry> entries, UndoManager undoManager) {
@@ -179,12 +167,12 @@ public class GroupTreeNodeViewModel {
     }
 
     public boolean isAllEntriesGroup() {
-        return getNode().getGroup() instanceof AllEntriesGroup;
+        return node().getGroup() instanceof AllEntriesGroup;
     }
 
     public void addNewGroup(AbstractGroup newGroup, CountingUndoManager undoManager) {
         GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
-        this.getNode().addChild(newNode);
+        this.node().addChild(newNode);
 
         UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
                 this,
@@ -201,6 +189,6 @@ public class GroupTreeNodeViewModel {
     }
 
     public void subscribeToDescendantChanged(Consumer<GroupTreeNodeViewModel> subscriber) {
-        getNode().subscribeToDescendantChanged(node -> subscriber.accept(new GroupTreeNodeViewModel(node)));
+        node().subscribeToDescendantChanged(node -> subscriber.accept(new GroupTreeNodeViewModel(node)));
     }
 }

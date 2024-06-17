@@ -71,13 +71,13 @@ public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
         // storing a backup of the whole subtree is not required when children
         // are kept
         m_subtreeBackup = editType != UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN ?
-                editedNode.getNode()
+                editedNode.node()
                           .copySubtree()
-                : GroupTreeNode.fromGroup(editedNode.getNode().getGroup().deepCopy());
+                : GroupTreeNode.fromGroup(editedNode.node().getGroup().deepCopy());
         // remember path to edited node. this cannot be stored as a reference,
         // because the reference itself might change. the method below is more
         // robust.
-        m_pathToNode = editedNode.getNode().getIndexedPathFromRoot();
+        m_pathToNode = editedNode.node().getIndexedPathFromRoot();
     }
 
     @Override
@@ -108,7 +108,7 @@ public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
     }
 
     private void doOperation(boolean undo) {
-        GroupTreeNode cursor = m_groupsRootHandle.getNode();
+        GroupTreeNode cursor = m_groupsRootHandle.node();
         final int childIndex = m_pathToNode.getLast();
         // traverse path up to but last element
         for (int i = 0; i < (m_pathToNode.size() - 1); ++i) {

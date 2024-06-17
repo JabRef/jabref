@@ -32,9 +32,9 @@ public class UndoableModifySubtree extends AbstractUndoableJabRefEdit {
      */
     public UndoableModifySubtree(GroupTreeNodeViewModel groupRoot,
                                  GroupTreeNodeViewModel subtree, String name) {
-        m_subtreeBackup = subtree.getNode().copySubtree();
-        m_groupRoot = groupRoot.getNode();
-        m_subtreeRootPath = subtree.getNode().getIndexedPathFromRoot();
+        m_subtreeBackup = subtree.node().copySubtree();
+        m_groupRoot = groupRoot.node();
+        m_subtreeRootPath = subtree.node().getIndexedPathFromRoot();
         m_name = name;
     }
 
