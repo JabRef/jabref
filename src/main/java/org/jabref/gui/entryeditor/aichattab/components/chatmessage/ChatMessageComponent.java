@@ -13,6 +13,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.entryeditor.aichattab.components.JabRefMarkdownView;
 import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.l10n.Localization;
 
@@ -22,7 +23,7 @@ import one.jpro.platform.mdfx.MarkdownView;
 public class ChatMessageComponent extends HBox {
     @FXML private VBox vBox;
     @FXML private Label sourceLabel;
-    @FXML private MarkdownView contentMarkdownView;
+    @FXML private JabRefMarkdownView contentMarkdownView;
 
     public ChatMessageComponent() {
         ViewLoader.view(this)

@@ -4,31 +4,35 @@ import java.util.function.Consumer;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.NodeOrientation;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.aichattab.components.chatmessage.ChatMessageComponent;
 import org.jabref.logic.ai.ChatMessage;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jabref.logic.l10n.Localization;
 
 public class AiChatComponent extends VBox {
     private final Consumer<String> sendMessageCallback;
+    private final Runnable clearChatHistoryCallback;
+
+    private final DialogService dialogService;
 
     @FXML private VBox chatVBox;
     @FXML private TextField userPromptTextField;
     @FXML private Button submitButton;
 
-    public AiChatComponent(Consumer<String> sendMessageCallback) {
+    public AiChatComponent(Consumer<String> sendMessageCallback, Runnable clearChatHistoryCallback, DialogService dialogService) {
         this.sendMessageCallback = sendMessageCallback;
+        this.clearChatHistoryCallback = clearChatHistoryCallback;
+
+        this.dialogService = dialogService;
 
         ViewLoader.view(this)
                 .root(this)
@@ -78,5 +82,15 @@ public class AiChatComponent extends VBox {
 
     public void requestUserPromptTextFieldFocus() {
         userPromptTextField.requestFocus();
+    }
+
+    @FXML
+    private void onClearChatHistoryClick() {
+        boolean result = dialogService.showConfirmationDialogAndWait(Localization.lang("Clear chat history"), Localization.lang("Are you sure you want to clear the chat history with this library entry?"));
+
+        if (result) {
+            chatVBox.getChildren().clear();
+            clearChatHistoryCallback.run();
+        }
     }
 }

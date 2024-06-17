@@ -200,7 +200,12 @@ public class AiChatTab extends EntryEditorTab {
                         aiChatComponent.addError(e.getMessage());
                     })
                     .executeWith(taskExecutor);
-        });
+        }, () -> {
+            if (bibDatabaseChats != null) {
+                assert entry.getCitationKey().isPresent();
+                bibDatabaseChats.clearMessagesForEntry(entry.getCitationKey().get());
+            }
+        }, dialogService);
 
         if (bibDatabaseChats != null) {
             bibDatabaseChats.getAllMessagesForEntry(entry.getCitationKey().get()).forEach(aiChatComponent::addMessage);
