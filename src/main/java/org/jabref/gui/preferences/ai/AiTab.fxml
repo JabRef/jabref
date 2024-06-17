@@ -33,7 +33,7 @@
       <HBox alignment="CENTER_LEFT" spacing="10.0">
          <children>
             <Label maxWidth="1.7976931348623157E308" text="%Instruction for AI (also known as 'system message')" HBox.hgrow="ALWAYS" />
-            <Button fx:id="systemMessageHelp" prefWidth="20.0" />
+            <Button fx:id="systemMessageHelp" onAction="#openHelpPage" prefWidth="20.0" />
          </children>
       </HBox>
       <TextArea fx:id="systemMessageTextArea" wrapText="true" />
@@ -41,7 +41,7 @@
          <children>
             <Label alignment="BASELINE_CENTER" text="%Message window size" />
             <IntegerInputField fx:id="messageWindowSizeTextField" HBox.hgrow="ALWAYS" />
-            <Button fx:id="messageWindowSizeHelp" prefWidth="20.0" />
+            <Button fx:id="messageWindowSizeHelp" onAction="#openHelpPage" prefWidth="20.0" />
          </children>
       </HBox>
           <VBox>
@@ -49,7 +49,7 @@
             <HBox alignment="CENTER_LEFT" spacing="10.0">
                <children>
                   <Label maxWidth="1.7976931348623157E308" text="%RAG - maximum results count" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="ragMaxResultsCountHelp" prefWidth="20.0" />
+                  <Button fx:id="ragMaxResultsCountHelp" onAction="#openHelpPage" prefWidth="20.0" />
                </children>
             </HBox>
                   <IntegerInputField fx:id="ragMaxResultsCountTextField" />
@@ -60,7 +60,7 @@
             <HBox alignment="CENTER_LEFT" spacing="10.0">
                <children>
                   <Label maxWidth="1.7976931348623157E308" text="%RAG - minimum score" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="ragMinScoreHelp" prefWidth="20.0" />
+                  <Button fx:id="ragMinScoreHelp" onAction="#openHelpPage" prefWidth="20.0" />
                </children>
             </HBox>
                   <DoubleInputField fx:id="ragMinScoreTextField" />
@@ -71,7 +71,7 @@
             <HBox alignment="CENTER_LEFT" spacing="10.0">
                <children>
                   <Label maxWidth="1.7976931348623157E308" text="%Document splitter - chunk size" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="documentSplitterChunkSizeHelp" prefWidth="20.0" />
+                  <Button fx:id="documentSplitterChunkSizeHelp" onAction="#openHelpPage" prefWidth="20.0" />
                </children>
             </HBox>
             <IntegerInputField fx:id="documentSplitterChunkSizeTextField" />
@@ -82,7 +82,7 @@
             <HBox alignment="CENTER_LEFT" spacing="10.0">
                <children>
                   <Label maxWidth="1.7976931348623157E308" text="%Document splitter - overlap size" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="documentSplitterOverlapSizeHelp" prefWidth="20.0" />
+                  <Button fx:id="documentSplitterOverlapSizeHelp" onAction="#openHelpPage" prefWidth="20.0" />
                </children>
             </HBox>
             <IntegerInputField fx:id="documentSplitterOverlapSizeTextField" />
