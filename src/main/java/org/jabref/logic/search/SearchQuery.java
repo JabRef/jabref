@@ -5,12 +5,10 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.SearchFlags;
 
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
@@ -31,25 +29,25 @@ public class SearchQuery {
         this.searchFlags = searchFlags;
 
         HashMap<String, Float> boosts = new HashMap<>();
-        SearchFieldConstants.searchableBibFields.forEach(field -> boosts.put(field, Float.valueOf(4)));
+        SearchFieldConstants.SEARCHABLE_BIB_FIELDS.forEach(field -> boosts.put(field, 4F));
 
         if (searchFlags.contains(SearchFlags.FULLTEXT)) {
-            Arrays.stream(SearchFieldConstants.PDF_FIELDS).forEach(field -> boosts.put(field, Float.valueOf(1)));
+            Arrays.stream(SearchFieldConstants.PDF_FIELDS).forEach(field -> boosts.put(field, 1F));
         }
         String[] fieldsToSearchArray = new String[boosts.size()];
         boosts.keySet().toArray(fieldsToSearchArray);
 
         if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
-            if (query.length() > 0 && !(query.startsWith("/") && query.endsWith("/"))) {
+            if (!query.isEmpty() && !(query.startsWith("/") && query.endsWith("/"))) {
                 query = "/" + query + "/";
             }
         }
 
-        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, new EnglishAnalyzer(), boosts);
+        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, SearchFieldConstants.ANALYZER, boosts);
         queryParser.setAllowLeadingWildcard(true);
-        if (!query.contains("\"") && !query.contains(":") && !query.contains("*") && !query.contains("~") & query.length() > 0) {
-            query = Arrays.stream(query.split(" ")).map(s -> "*" + s + "*").collect(Collectors.joining(" "));
-        }
+//        if (!query.isEmpty() && !query.contains("\"") && !query.contains(":") && !query.contains("*") && !query.contains("~")) {
+//            query = Arrays.stream(query.split(" ")).map(s -> "*" + s + "*").collect(Collectors.joining(" "));
+//        }
         try {
             parsedQuery = queryParser.parse(query);
             parseError = null;

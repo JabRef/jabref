@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -209,8 +210,19 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
-    public Future<?> executeWith(TaskExecutor taskExecutor) {
+    public Future<V> executeWith(TaskExecutor taskExecutor) {
         return taskExecutor.execute(this);
+    }
+
+    public void executeWithAndWait(TaskExecutor taskExecutor) {
+        Future<V> future = taskExecutor.execute(this);
+        try {
+            future.get();
+        } catch (InterruptedException e) {
+            LOGGER.debug("The thread is waiting, occupied or interrupted", e);
+        } catch (ExecutionException e) {
+            LOGGER.error("Problem executing command", e);
+        }
     }
 
     public Future<?> scheduleWith(TaskExecutor taskExecutor, long delay, TimeUnit unit) {

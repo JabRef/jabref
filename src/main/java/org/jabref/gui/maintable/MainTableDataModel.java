@@ -1,6 +1,5 @@
 package org.jabref.gui.maintable;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,12 +10,12 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
@@ -99,13 +98,9 @@ public class MainTableDataModel {
         }
         lastSearchQuery = query;
         stateManager.getSearchResults().remove(bibDatabaseContext);
-        if (query.isPresent() && query.get().toString().length() > 0) {
-            try {
-                // TODO btut: maybe do in background?
-                stateManager.getSearchResults().put(bibDatabaseContext, LuceneSearcher.of(bibDatabaseContext).search(query.get()));
-            } catch (IOException e) {
-                LOGGER.debug("Failed to run database search '{}'", query.get(), e);
-            }
+        if (query.isPresent() && !query.get().toString().isEmpty()) {
+            // TODO btut: maybe do in background?
+            stateManager.getSearchResults().put(bibDatabaseContext, Globals.luceneMangers.get(bibDatabaseContext).search(query.get()));
         }
     }
 

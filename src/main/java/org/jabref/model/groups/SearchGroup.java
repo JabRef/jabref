@@ -1,12 +1,10 @@
 package org.jabref.model.groups;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.logic.search.retrieval.LuceneSearcher;
+import org.jabref.gui.Globals;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
@@ -87,10 +85,6 @@ public class SearchGroup extends AbstractGroup {
     }
 
     public void updateMatches(BibDatabaseContext context) {
-        try {
-            this.matches = LuceneSearcher.of(context).search(query).keySet();
-        } catch (IOException e) {
-            LOGGER.warn("Could not open Index for: '{}'!\n{}", context.getDatabasePath().orElse(Path.of("unsaved")).toAbsolutePath(), e.getMessage());
-        }
+        this.matches = Globals.luceneMangers.get(context).search(query).keySet();
     }
 }

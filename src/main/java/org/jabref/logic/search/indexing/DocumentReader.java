@@ -3,20 +3,13 @@ package org.jabref.logic.search.indexing;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -46,47 +39,14 @@ public final class DocumentReader {
     private static final Pattern HYPHEN_LINEBREAK_PATTERN = Pattern.compile("\\-\n");
     private static final Pattern LINEBREAK_WITHOUT_PERIOD_PATTERN = Pattern.compile("([^\\\\.])\\n");
 
-    private final FilePreferences filePreferences;
-
-    /**
-     * Creates a new DocumentReader using a BibEntry.
-     *
-     */
-    public DocumentReader(FilePreferences filePreferences) {
-        this.filePreferences = filePreferences;
-    }
-
-    /**
-     * Reads a LinkedFile of a BibEntry and converts it into a Lucene Document which is then returned.
-     *
-     * @return An Optional of a Lucene Document with the (meta)data. Can be empty if there is a problem reading the LinkedFile.
-     */
-    public Optional<List<Document>> readLinkedPdf(BibDatabaseContext databaseContext, LinkedFile pdf) {
-        Optional<Path> pdfPath = pdf.findIn(databaseContext, filePreferences);
-        return pdfPath.map(path -> readPdfContents(pdf, path));
-    }
-
-    /**
-     * Reads each LinkedFile of a BibEntry and converts them into Lucene Documents which are then returned.
-     *
-     * @return A List of Documents with the (meta)data. Can be empty if there is a problem reading the LinkedFile.
-     */
-    public List<Document> readLinkedPdfs(BibDatabaseContext databaseContext, BibEntry entry) {
-        return entry.getFiles().stream()
-                    .map(pdf -> readLinkedPdf(databaseContext, pdf))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .flatMap(List::stream)
-                    .collect(Collectors.toList());
-    }
-
-    public List<Document> readPdfContents(LinkedFile pdf, Path resolvedPdfPath) {
+    public List<Document> readPdfContents(String fileLink, Path resolvedPdfPath) {
         List<Document> pages = new ArrayList<>();
         try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
             int numberOfPages = pdfDocument.getNumberOfPages();
+            LOGGER.info("Reading file {} content with {} pages", resolvedPdfPath.toAbsolutePath(), numberOfPages);
             for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
                 Document newDocument = new Document();
-                addIdentifiers(newDocument, pdf.getLink());
+                addIdentifiers(newDocument, fileLink);
                 addMetaData(newDocument, resolvedPdfPath, pageNumber);
                 addContentIfNotEmpty(pdfDocument, newDocument, resolvedPdfPath, pageNumber);
 
@@ -97,7 +57,7 @@ public final class DocumentReader {
         }
         if (pages.isEmpty()) {
             Document newDocument = new Document();
-            addIdentifiers(newDocument, pdf.getLink());
+            addIdentifiers(newDocument, fileLink);
             addMetaData(newDocument, resolvedPdfPath, 1);
             pages.add(newDocument);
         }
@@ -122,8 +82,8 @@ public final class DocumentReader {
 
     private void addMetaData(Document newDocument, Path resolvedPdfPath, int pageNumber) {
         try {
-            BasicFileAttributes attributes = Files.readAttributes(resolvedPdfPath, BasicFileAttributes.class);
-            addStringField(newDocument, MODIFIED, String.valueOf(attributes.lastModifiedTime().to(TimeUnit.SECONDS)));
+            long modifiedTime = Files.getLastModifiedTime(resolvedPdfPath).to(TimeUnit.SECONDS);
+            addStringField(newDocument, MODIFIED, String.valueOf(modifiedTime));
         } catch (IOException e) {
             LOGGER.error("Could not read timestamp for {}", resolvedPdfPath, e);
         }

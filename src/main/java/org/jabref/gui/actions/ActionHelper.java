@@ -101,4 +101,8 @@ public class ActionHelper {
     public static BooleanExpression isOpenMultiDatabase(TabPane tabbedPane) {
         return Bindings.size(tabbedPane.getTabs()).greaterThan(1);
     }
+
+    public static BooleanExpression shouldIndexLinkedFiles(PreferencesService preferencesService) {
+        return preferencesService.getFilePreferences().fulltextIndexLinkedFilesProperty();
+    }
 }

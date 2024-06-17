@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.EnumSet;
 
-import org.jabref.logic.search.indexing.LuceneIndexer;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;

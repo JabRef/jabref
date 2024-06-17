@@ -97,7 +97,6 @@ public class BibEntry implements Cloneable {
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
     private final SharedBibEntryData sharedBibEntryData;
-    private int lastIndexHash;
 
     /**
      * Map to store the words in every field
@@ -935,15 +934,6 @@ public class BibEntry implements Cloneable {
     @Override
     public int hashCode() {
         return Objects.hash(commentsBeforeEntry, type.getValue(), fields);
-    }
-
-    public int getLastIndexHash() {
-        return lastIndexHash;
-    }
-
-    public int updateAndGetIndexHash() {
-        lastIndexHash = hashCode();
-        return lastIndexHash;
     }
 
     public void registerListener(Object object) {

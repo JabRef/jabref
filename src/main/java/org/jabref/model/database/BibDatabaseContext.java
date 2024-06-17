@@ -267,6 +267,14 @@ public class BibDatabaseContext {
         return indexPath;
     }
 
+    public Path getLinkedFilesIndexPath() {
+        return getFulltextIndexPath().resolve("LinkedFiles");
+    }
+
+    public Path getBibFieldsIndexPath() {
+        return getFulltextIndexPath().resolve("BibFields");
+    }
+
     @Override
     public String toString() {
         return "BibDatabaseContext{" +

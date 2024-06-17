@@ -384,8 +384,6 @@ public class GlobalSearchBar extends HBox {
     private void informUserAboutInvalidSearchQuery() {
         searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
 
-        stateManager.clearSearchQuery(searchQueryProperty);
-
         String illegalSearch = Localization.lang("Search failed: illegal search expression");
         currentResults.setText(illegalSearch);
     }

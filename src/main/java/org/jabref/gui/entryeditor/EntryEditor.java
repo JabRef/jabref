@@ -132,7 +132,7 @@ public class EntryEditor extends BorderPane {
                   .load();
 
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(preferencesService, preferencesService.getFilePreferences(), databaseContext, dialogService);
+        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), databaseContext, dialogService);
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;

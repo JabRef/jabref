@@ -4,7 +4,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -14,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+import static org.jabref.gui.actions.ActionHelper.shouldIndexLinkedFiles;
 
 public class RebuildFulltextSearchIndexAction extends SimpleCommand {
 
@@ -40,14 +40,13 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
         this.preferencesService = preferences;
         this.taskExecutor = taskExecutor;
 
-        this.executable.bind(needsDatabase(stateManager));
+        this.executable.bind(needsDatabase(stateManager).and(shouldIndexLinkedFiles(preferences)));
     }
 
     @Override
     public void execute() {
         init();
-        BackgroundTask.wrap(this::rebuildIndex)
-                      .executeWith(taskExecutor);
+        rebuildIndex();
     }
 
     public void init() {
@@ -70,7 +69,7 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
         if (!shouldContinue || stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
-        currentLibraryTab.get().getLuceneIndexer().rebuildIndex();
+        currentLibraryTab.get().getLuceneManager().rebuildIndex();
     }
 
     public interface GetCurrentLibraryTab {

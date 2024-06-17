@@ -2,12 +2,10 @@ package org.jabref.gui;
 
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -59,11 +57,10 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.search.indexing.LuceneIndexer;
+import org.jabref.logic.search.indexing.LuceneManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
@@ -89,7 +86,6 @@ import org.jabref.preferences.PreferencesService;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
-import org.apache.lucene.index.IndexWriterConfig;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
@@ -148,7 +144,7 @@ public class LibraryTab extends Tab {
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
     private BackgroundTask<ParserResult> dataLoadingTask;
-    private LuceneIndexer luceneIndexer;
+    private LuceneManager luceneManager;
     private final TaskExecutor taskExecutor;
     private final DirectoryMonitorManager directoryMonitorManager;
 
@@ -252,14 +248,18 @@ public class LibraryTab extends Tab {
         OpenDatabaseAction.performPostOpenActions(result, dialogService);
 
         setDatabaseContext(context);
-
-        luceneIndexer = new LuceneIndexer(context, taskExecutor, preferencesService);
-        luceneIndexer.initializeIndexWriterAndReader(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-        luceneIndexer.updateIndex();
-
+        setLuceneManager();
         LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;
+    }
+
+    private void setLuceneManager() {
+        if (bibDatabaseContext == null) {
+            LOGGER.warn("BibDatabaseContext is null, cannot create LuceneIndexer");
+        }
+        luceneManager = new LuceneManager(bibDatabaseContext, taskExecutor, preferencesService);
+        luceneManager.updateOnStart();
     }
 
     private void onDatabaseLoadingFailed(Exception ex) {
@@ -834,7 +834,7 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when closing directory monitor", e);
         }
         try {
-            luceneIndexer.close();
+            luceneManager.close();
         } catch (RuntimeException e) {
             LOGGER.error("Problem when closing lucene indexer", e);
         }
@@ -1005,7 +1005,7 @@ public class LibraryTab extends Tab {
                                               TaskExecutor taskExecutor) {
         Objects.requireNonNull(databaseContext);
 
-        return new LibraryTab(
+        LibraryTab libraryTab = new LibraryTab(
                 databaseContext,
                 tabContainer,
                 dialogService,
@@ -1015,6 +1015,9 @@ public class LibraryTab extends Tab {
                 entryTypesManager,
                 (CountingUndoManager) undoManager,
                 taskExecutor);
+
+        libraryTab.setLuceneManager();
+        return libraryTab;
     }
 
     private class GroupTreeListener {
@@ -1046,37 +1049,22 @@ public class LibraryTab extends Tab {
 
         @Subscribe
         public void listen(EntriesAddedEvent addedEntryEvent) {
-            luceneIndexer.indexEntries(addedEntryEvent.getBibEntries());
+            luceneManager.addToIndex(addedEntryEvent.getBibEntries());
         }
 
         @Subscribe
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
-            luceneIndexer.removeEntries(removedEntriesEvent.getBibEntries());
+            luceneManager.removeFromIndex(removedEntriesEvent.getBibEntries());
         }
 
         @Subscribe
         public void listen(FieldChangedEvent fieldChangedEvent) {
-            if (!fieldChangedEvent.getField().equals(StandardField.FILE)) {
-                luceneIndexer.removeBibFieldsFromIndex(fieldChangedEvent.getBibEntries());
-                luceneIndexer.indexBibFields(fieldChangedEvent.getBibEntries());
-            } else {
-                List<LinkedFile> oldFiles = FileFieldParser.parse(fieldChangedEvent.getOldValue());
-                List<LinkedFile> newFiles = FileFieldParser.parse(fieldChangedEvent.getNewValue());
-
-                Set<LinkedFile> toRemove = new HashSet<>(oldFiles);
-                Set<LinkedFile> toAdd = new HashSet<>(newFiles);
-
-                newFiles.forEach(toRemove::remove);
-                oldFiles.forEach(toAdd::remove);
-
-                luceneIndexer.removeLinkedFilesByLink(toRemove.stream().map(LinkedFile::getLink).collect(Collectors.toSet()));
-                luceneIndexer.indexLinkedFiles(toAdd);
-            }
+            luceneManager.updateEntry(fieldChangedEvent.getBibEntry(), fieldChangedEvent.getOldValue(), fieldChangedEvent.getNewValue(), fieldChangedEvent.getField().equals(StandardField.FILE));
         }
     }
 
-    public LuceneIndexer getLuceneIndexer() {
-        return luceneIndexer;
+    public LuceneManager getLuceneManager() {
+        return luceneManager;
     }
 
     public static class DatabaseNotification extends NotificationPane {

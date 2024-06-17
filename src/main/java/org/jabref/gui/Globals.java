@@ -1,5 +1,8 @@
 package org.jabref.gui;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.remote.CLIMessageHandler;
@@ -13,7 +16,9 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.search.indexing.LuceneManager;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -59,6 +64,7 @@ public class Globals {
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static ProtectedTermsLoader protectedTermsLoader;
+    public static Map<BibDatabaseContext, LuceneManager> luceneMangers = new HashMap<>();
 
     public static CountingUndoManager undoManager = new CountingUndoManager();
     public static BibEntryTypesManager entryTypesManager;
