@@ -36,6 +36,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final LibraryTab.DatabaseNotification notificationPane;
+    private final UndoManager undoManager;
     private final StateManager stateManager;
     private LibraryTab saveState;
 
@@ -53,6 +54,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.notificationPane = notificationPane;
+        this.undoManager = undoManager;
         this.stateManager = stateManager;
 
         this.listeners = new ArrayList<>();
