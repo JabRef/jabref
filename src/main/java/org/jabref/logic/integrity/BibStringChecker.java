@@ -10,7 +10,7 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.FieldFactory;
 
 /**
  * Checks, if there is an even number of unescaped # (FieldWriter.BIBTEX_STRING_START_END_SYMBOL)
@@ -27,7 +27,7 @@ public class BibStringChecker implements EntryChecker {
         Map<Field, String> fields = entry.getFieldMap();
 
         for (Map.Entry<Field, String> field : fields.entrySet()) {
-            if (!field.getKey().getProperties().contains(FieldProperty.VERBATIM)) {
+            if (FieldFactory.isLatexField(field.getKey())) {
                 Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());
                 int hashCount = 0;
                 while (hashMatcher.find()) {

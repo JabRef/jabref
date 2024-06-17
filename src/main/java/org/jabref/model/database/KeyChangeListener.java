@@ -9,7 +9,6 @@ import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 
@@ -43,15 +42,16 @@ public class KeyChangeListener {
 
     private void updateEntryLinks(String newKey, String oldKey) {
         for (BibEntry entry : database.getEntries()) {
-            for (Field field : FieldFactory.getKeyFields()) {
-                entry.getField(field).ifPresent(fieldContent -> {
-                    if (field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-                        replaceSingleKeyInField(newKey, oldKey, entry, field, fieldContent);
-                    } else { // MULTIPLE_ENTRY_LINK
-                        replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
-                    }
-                });
-            }
+            entry.getFields(field -> field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK))
+                 .forEach(field -> {
+                     String fieldContent = entry.getField(field).orElseThrow();
+                     replaceSingleKeyInField(newKey, oldKey, entry, field, fieldContent);
+                 });
+            entry.getFields(field -> field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK))
+                 .forEach(field -> {
+                     String fieldContent = entry.getField(field).orElseThrow();
+                     replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
+                 });
         }
     }
 

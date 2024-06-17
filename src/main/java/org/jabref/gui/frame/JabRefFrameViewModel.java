@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class JabRefFrameViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);
 
-    private final PreferencesService prefs;
+    private final PreferencesService preferences;
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final LibraryTabContainer tabContainer;
@@ -61,7 +61,7 @@ public class JabRefFrameViewModel {
                                 FileUpdateMonitor fileUpdateMonitor,
                                 UndoManager undoManager,
                                 TaskExecutor taskExecutor) {
-        this.prefs = preferencesService;
+        this.preferences = preferencesService;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.tabContainer = tabContainer;
@@ -72,14 +72,14 @@ public class JabRefFrameViewModel {
     }
 
     void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase) {
-        if (prefs.getWorkspacePreferences().shouldOpenLastEdited()) {
+        if (preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
-                prefs.getGuiPreferences().getLastFilesOpened().clear();
+                preferences.getGuiPreferences().getLastFilesOpened().clear();
             } else {
-                prefs.getGuiPreferences().setLastFilesOpened(filenames);
-                prefs.getGuiPreferences().setLastFocusedFile(focusedDatabase);
+                preferences.getGuiPreferences().setLastFilesOpened(filenames);
+                preferences.getGuiPreferences().setLastFocusedFile(focusedDatabase);
             }
         }
     }
@@ -177,8 +177,8 @@ public class JabRefFrameViewModel {
         Path focusedFile = parserResults.stream()
                                         .findFirst()
                                         .flatMap(ParserResult::getPath)
-                                        .orElse(prefs.getGuiPreferences()
-                                                     .getLastFocusedFile())
+                                        .orElse(preferences.getGuiPreferences()
+                                                           .getLastFocusedFile())
                                         .toAbsolutePath();
 
         // Add all bibDatabases databases to the frame:
@@ -195,7 +195,7 @@ public class JabRefFrameViewModel {
                             parserResult,
                             tabContainer,
                             dialogService,
-                            prefs,
+                            preferences,
                             stateManager,
                             entryTypesManager,
                             fileUpdateMonitor,
@@ -372,7 +372,7 @@ public class JabRefFrameViewModel {
      */
     void addImportedEntries(final LibraryTab tab, final ParserResult parserResult) {
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
-        ImportCleanup cleanup = ImportCleanup.targeting(tab.getBibDatabaseContext().getMode());
+        ImportCleanup cleanup = ImportCleanup.targeting(tab.getBibDatabaseContext().getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
         ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));

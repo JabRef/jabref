@@ -34,7 +34,8 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         textInput = createTextInputControl();
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
-        textInput.textProperty().bindBidirectional(viewModel.textProperty());
+        establishBinding(textInput, viewModel.textProperty());
+
         ((ContextMenuAddable) textInput).initContextMenu(new DefaultMenu(textInput));
         this.getChildren().add(textInput);
 
@@ -47,14 +48,6 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         }
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
-    }
-
-    public SimpleEditor(final Field field,
-                        final SuggestionProvider<?> suggestionProvider,
-                        final FieldCheckers fieldCheckers,
-                        final PreferencesService preferences,
-                        UndoManager undoManager) {
-        this(field, suggestionProvider, fieldCheckers, preferences, false, undoManager);
     }
 
     protected TextInputControl createTextInputControl() {

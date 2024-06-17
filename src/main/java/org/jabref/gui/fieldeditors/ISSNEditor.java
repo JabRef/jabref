@@ -53,7 +53,8 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
                 stateManager,
                 preferencesService);
 
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
+        establishBinding(textArea, viewModel.textProperty());
+
         textArea.initContextMenu(new DefaultMenu(textArea));
 
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
