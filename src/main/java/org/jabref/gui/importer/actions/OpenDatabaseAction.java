@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,7 +21,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -208,7 +206,6 @@ public class OpenDatabaseAction extends SimpleCommand {
                 undoManager,
                 clipboardManager,
                 taskExecutor);
-        backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
         tabContainer.addTab(newTab, true);
     }
 
@@ -261,13 +258,6 @@ public class OpenDatabaseAction extends SimpleCommand {
                                  taskExecutor);
         }
         return parserResult;
-    }
-
-    private void trackOpenNewDatabase(LibraryTab libraryTab) {
-        Telemetry.getTelemetryClient().ifPresent(client -> client.trackEvent(
-                "OpenNewDatabase",
-                Map.of(),
-                Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
     }
 
     public static void openSharedDatabase(ParserResult parserResult,

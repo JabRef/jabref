@@ -24,7 +24,6 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.remote.CLIMessageHandler;
-import org.jabref.gui.telemetry.TelemetryPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -78,7 +77,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
     private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
-    private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
 
     private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
     private final ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty = new SimpleObjectProperty<>();
@@ -92,7 +90,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final WorkspacePreferences workspacePreferences;
-    private final TelemetryPreferences telemetryPreferences;
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
     private final RemotePreferences remotePreferences;
@@ -115,7 +112,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.workspacePreferences = preferences.getWorkspacePreferences();
-        this.telemetryPreferences = preferences.getTelemetryPreferences();
         this.libraryPreferences = preferences.getLibraryPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.remotePreferences = preferences.getRemotePreferences();
@@ -195,8 +191,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
 
-        collectTelemetryProperty.setValue(telemetryPreferences.shouldCollectTelemetry());
-
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(libraryPreferences.getDefaultBibDatabaseMode());
 
@@ -237,8 +231,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());
 
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
-
-        telemetryPreferences.setCollectTelemetry(collectTelemetryProperty.getValue());
 
         libraryPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
 
@@ -382,10 +374,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty confirmDeleteProperty() {
         return this.confirmDeleteProperty;
-    }
-
-    public BooleanProperty collectTelemetryProperty() {
-        return this.collectTelemetryProperty;
     }
 
     public ListProperty<BibDatabaseMode> biblatexModeListProperty() {

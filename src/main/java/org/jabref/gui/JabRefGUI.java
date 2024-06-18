@@ -20,7 +20,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.remote.CLIMessageHandler;
-import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -230,8 +229,6 @@ public class JabRefGUI extends Application {
             && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
             mainFrame.openLastEditedDatabases();
         }
-
-        Telemetry.initTrackingNotification(dialogService, preferencesService.getTelemetryPreferences());
     }
 
     public void onCloseRequest(WindowEvent event) {
@@ -294,10 +291,6 @@ public class JabRefGUI extends Application {
 
     // Background tasks
     public void startBackgroundTasks() {
-        // TODO: Currently deactivated due to incompatibilities in XML
-        // if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
-        //     Telemetry.start(prefs.getTelemetryPreferences());
-        // }
         RemotePreferences remotePreferences = preferencesService.getRemotePreferences();
         BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         if (remotePreferences.useRemoteServer()) {
@@ -319,7 +312,6 @@ public class JabRefGUI extends Application {
     }
 
     public void stopBackgroundTasks() {
-        Telemetry.shutdown();
         Unirest.shutDown();
     }
 
