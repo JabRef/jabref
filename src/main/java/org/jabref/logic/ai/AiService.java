@@ -1,11 +1,13 @@
 package org.jabref.logic.ai;
 
+import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.chat.AiChatLanguageModel;
 import org.jabref.logic.ai.chathistory.ChatHistoryManager;
 import org.jabref.logic.ai.embeddings.AiEmbeddingModel;
 import org.jabref.logic.ai.embeddings.AiEmbeddingsManager;
 import org.jabref.preferences.AiPreferences;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

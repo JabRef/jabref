@@ -38,7 +38,16 @@ public class AiEmbeddingsManager {
             mvStorePath = null;
         }
 
-        this.mvStore = MVStore.open(mvStorePath == null ? null : mvStorePath.toString());
+        MVStore mvStoreTemp; // Strange Java...
+
+        try {
+            mvStoreTemp = MVStore.open(mvStorePath == null ? null : mvStorePath.toString());
+        } catch (Exception e) {
+            LOGGER.error("An error occurred while opening embedding store. Will use an in-memory store", e);
+            mvStoreTemp = MVStore.open(null);
+        }
+
+        this.mvStore = mvStoreTemp;
         this.embeddingStore = new MVStoreEmbeddingStore(this.mvStore);
         this.ingestedFilesTracker = new AiIngestedFilesTracker(this.mvStore);
 
