@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.SequencedMap;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -56,7 +55,6 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.telemetry.TelemetryPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -424,9 +422,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
 
-    // Telemetry collection
-    private static final String COLLECT_TELEMETRY = "collectTelemetry";
-    private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
+    // Protected terms
     private static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
     private static final String PROTECTED_TERMS_DISABLED_EXTERNAL = "protectedTermsDisabledExternal";
     private static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
@@ -471,7 +467,6 @@ public class JabRefPreferences implements PreferencesService {
     private String userAndHost;
 
     private LibraryPreferences libraryPreferences;
-    private TelemetryPreferences telemetryPreferences;
     private DOIPreferences doiPreferences;
     private OwnerPreferences ownerPreferences;
     private TimestampPreferences timestampPreferences;
@@ -774,8 +769,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
-        defaults.put(COLLECT_TELEMETRY, Boolean.FALSE);
-        defaults.put(ALREADY_ASKED_TO_COLLECT_TELEMETRY, Boolean.FALSE);
 
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
@@ -1316,35 +1309,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(libraryPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
 
         return libraryPreferences;
-    }
-
-    @Override
-    public TelemetryPreferences getTelemetryPreferences() {
-        if (telemetryPreferences != null) {
-            return telemetryPreferences;
-        }
-
-        telemetryPreferences = new TelemetryPreferences(
-                getBoolean(COLLECT_TELEMETRY),
-                !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY), // mind the !
-                getTelemetryUserId()
-        );
-
-        EasyBind.listen(telemetryPreferences.collectTelemetryProperty(), (obs, oldValue, newValue) -> putBoolean(COLLECT_TELEMETRY, newValue));
-        EasyBind.listen(telemetryPreferences.askToCollectTelemetryProperty(), (obs, oldValue, newValue) -> putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !newValue));
-
-        return telemetryPreferences;
-    }
-
-    private String getTelemetryUserId() {
-        Optional<String> userId = getAsOptional(USER_ID);
-        if (userId.isPresent()) {
-            return userId.get();
-        } else {
-            String newUserId = UUID.randomUUID().toString();
-            put(USER_ID, newUserId);
-            return newUserId;
-        }
     }
 
     @Override
