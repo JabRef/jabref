@@ -4,25 +4,21 @@ import java.util.Arrays;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.FloatProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.PreferencesService;
 
-import com.dlsc.unitfx.DoubleInputField;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -30,8 +26,11 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty useAi = new SimpleBooleanProperty();
+
     private final StringProperty openAiToken = new SimpleStringProperty();
-    private final ObjectProperty<AiPreferences.AiModel> modelProperty = new SimpleObjectProperty<>();
+
+    private final ObjectProperty<AiPreferences.ChatModel> aiModel = new SimpleObjectProperty<>();
+    private final ObjectProperty<AiPreferences.EmbeddingModel> embeddingModel = new SimpleObjectProperty<>();
 
     private final StringProperty systemMessage = new SimpleStringProperty();
     private final DoubleProperty temperature = new SimpleDoubleProperty();
@@ -99,8 +98,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         useAi.setValue(aiPreferences.getEnableChatWithFiles());
+
         openAiToken.setValue(aiPreferences.getOpenAiToken());
-        modelProperty.setValue(aiPreferences.getModel());
+
+        aiModel.setValue(aiPreferences.getChatModel());
+        embeddingModel.setValue(aiPreferences.getEmbeddingModel());
 
         systemMessage.setValue(aiPreferences.getSystemMessage());
         temperature.setValue(aiPreferences.getTemperature());
@@ -114,8 +116,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         aiPreferences.setEnableChatWithFiles(useAi.get());
+
         aiPreferences.setOpenAiToken(openAiToken.get());
-        aiPreferences.setModel(modelProperty.get());
+
+        aiPreferences.setChatModel(aiModel.get());
+        aiPreferences.setEmbeddingModel(embeddingModel.get());
 
         aiPreferences.setSystemMessage(systemMessage.get());
         aiPreferences.setTemperature(temperature.get());
@@ -150,8 +155,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return useAi;
     }
 
-    public ObjectProperty<AiPreferences.AiModel> modelProperty() {
-        return modelProperty;
+    public ObjectProperty<AiPreferences.ChatModel> aiModelProperty() {
+        return aiModel;
+    }
+
+    public ObjectProperty<AiPreferences.EmbeddingModel> embeddingModelProperty() {
+        return embeddingModel;
     }
 
     public StringProperty systemMessageProperty() {

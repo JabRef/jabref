@@ -12,6 +12,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
@@ -80,35 +82,43 @@ public class ExternalFilesEntryLinker {
         }
     }
 
-    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
+    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager) {
         try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
-            addFilesToEntry(entry, files);
-            moveLinkedFilesToFileDir(entry);
-            renameLinkedFilesToPattern(entry);
+            try (AutoCloseable blocker2 = embeddingsGenerationTaskManager.blockNewTasks()) {
+                addFilesToEntry(entry, files);
+                moveLinkedFilesToFileDir(entry);
+                renameLinkedFilesToPattern(entry);
+            } catch (Exception e) {
+                LOGGER.error("Could not block EmbeddingsGenerationTaskManager", e);
+            }
         } catch (Exception e) {
             LOGGER.error("Could not block IndexingTaskManager", e);
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences, aiPreferences), entry);
+            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access Fulltext-Index", e);
         }
     }
 
-    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
+    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager) {
         try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
-            for (Path file : files) {
-                copyFileToFileDir(file)
-                        .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
+            try (AutoCloseable blocker2 = embeddingsGenerationTaskManager.blockNewTasks()) {
+                for (Path file : files) {
+                    copyFileToFileDir(file)
+                            .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
+                }
+                renameLinkedFilesToPattern(entry);
+            } catch (Exception e) {
+                LOGGER.error("Could not block EmbeddingsGenerationTaskManager", e);
             }
-            renameLinkedFilesToPattern(entry);
         } catch (Exception e) {
             LOGGER.error("Could not block IndexingTaskManager", e);
         }
 
         try {
-            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences, aiPreferences), entry);
+            indexingTaskManager.addToIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, filePreferences), entry);
         } catch (IOException e) {
             LOGGER.error("Could not access fulltext index", e);
         }

@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.aichattab.components.privacynotice;
+package org.jabref.gui.ai.components.privacynotice;
 
 import java.io.IOException;
 

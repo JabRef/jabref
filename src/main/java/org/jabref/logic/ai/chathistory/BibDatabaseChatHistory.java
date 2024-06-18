@@ -1,4 +1,4 @@
-package org.jabref.logic.ai;
+package org.jabref.logic.ai.chathistory;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -7,20 +7,24 @@ import java.util.stream.Stream;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
-public class BibDatabaseChats {
+public class BibDatabaseChatHistory {
     private final MVStore mvStore;
 
-    private final MVMap<Integer, ChatMessageType> messageType;
+    private final MVMap<Integer, ChatMessage.Type> messageType;
     private final MVMap<Integer, String> messageContent;
     private final MVMap<Integer, String> messageCitationKey;
 
     public static final String AI_CHATS_FILE_EXTENSION = "aichats";
 
-    public BibDatabaseChats(Path bibDatabasePath) {
+    public BibDatabaseChatHistory(Path bibDatabasePath) {
         this.mvStore = MVStore.open(bibDatabasePath + "." + AI_CHATS_FILE_EXTENSION);
         this.messageType = this.mvStore.openMap("messageType");
         this.messageContent = this.mvStore.openMap("messageContent");
         this.messageCitationKey = this.mvStore.openMap("messageCitationKey");
+    }
+
+    public BibEntryChatHistory getChatHistoryForEntry(String citationKey) {
+        return new BibEntryChatHistory(this, citationKey);
     }
 
     public Stream<ChatMessage> getAllMessagesForEntry(String citationKey) {

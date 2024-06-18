@@ -58,6 +58,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -153,6 +154,8 @@ public class LibraryTab extends Tab {
     private BackgroundTask<ParserResult> dataLoadingTask;
 
     private final IndexingTaskManager indexingTaskManager;
+    private EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager;
+
     private final TaskExecutor taskExecutor;
     private final DirectoryMonitorManager directoryMonitorManager;
 
@@ -176,6 +179,7 @@ public class LibraryTab extends Tab {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
+        this.embeddingsGenerationTaskManager = new EmbeddingsGenerationTaskManager(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
         this.taskExecutor = taskExecutor;
         this.directoryMonitorManager = new DirectoryMonitorManager(Globals.getDirectoryMonitor());
 
@@ -191,6 +195,7 @@ public class LibraryTab extends Tab {
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
+        this.getDatabase().registerListener(new EmbeddingsUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -262,10 +267,14 @@ public class LibraryTab extends Tab {
 
         if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
             try {
-                indexingTaskManager.updateIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences(), preferencesService.getAiPreferences()), bibDatabaseContext);
+                indexingTaskManager.updateIndex(PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences()), bibDatabaseContext);
             } catch (IOException e) {
                 LOGGER.error("Cannot access lucene index", e);
             }
+        }
+
+        if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
+            embeddingsGenerationTaskManager.updateEmbeddings(bibDatabaseContext);
         }
 
         LOGGER.trace("loading.set(false);");
@@ -308,11 +317,13 @@ public class LibraryTab extends Tab {
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
+        this.embeddingsGenerationTaskManager = new EmbeddingsGenerationTaskManager(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
 
         setupMainPanel();
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
+        this.getDatabase().registerListener(new EmbeddingsUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -1064,7 +1075,7 @@ public class LibraryTab extends Tab {
         public void listen(EntriesAddedEvent addedEntryEvent) {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    PdfIndexer pdfIndexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences(), preferencesService.getAiPreferences());
+                    PdfIndexer pdfIndexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences());
                     indexingTaskManager.addToIndex(pdfIndexer, addedEntryEvent.getBibEntries());
                 } catch (IOException e) {
                     LOGGER.error("Cannot access lucene index", e);
@@ -1076,7 +1087,7 @@ public class LibraryTab extends Tab {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
                 try {
-                    PdfIndexer pdfIndexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences(), preferencesService.getAiPreferences());
+                    PdfIndexer pdfIndexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences());
                     for (BibEntry removedEntry : removedEntriesEvent.getBibEntries()) {
                         indexingTaskManager.removeFromIndex(pdfIndexer, removedEntry);
                     }
@@ -1099,7 +1110,7 @@ public class LibraryTab extends Tab {
                     removedFiles.removeAll(newFileList);
 
                     try {
-                        PdfIndexer indexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences(), preferencesService.getAiPreferences());
+                        PdfIndexer indexer = PdfIndexerManager.getIndexer(bibDatabaseContext, preferencesService.getFilePreferences());
                         indexingTaskManager.addToIndex(indexer, fieldChangedEvent.getBibEntry(), addedFiles);
                         indexingTaskManager.removeFromIndex(indexer, removedFiles);
                     } catch (IOException e) {
@@ -1112,6 +1123,44 @@ public class LibraryTab extends Tab {
 
     public IndexingTaskManager getIndexingTaskManager() {
         return indexingTaskManager;
+    }
+
+    private class EmbeddingsUpdateListener {
+        @Subscribe
+        public void listen(EntriesAddedEvent event) {
+            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
+                embeddingsGenerationTaskManager.addToProcess(event.getBibEntries());
+            }
+        }
+
+        @Subscribe
+        public void listen(EntriesRemovedEvent event) {
+            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
+                embeddingsGenerationTaskManager.removeFromProcess(event.getBibEntries());
+            }
+        }
+
+        @Subscribe
+        public void listen(FieldChangedEvent event) {
+            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
+                if (event.getField().equals(StandardField.FILE)) {
+                    List<LinkedFile> oldFileList = FileFieldParser.parse(event.getOldValue());
+                    List<LinkedFile> newFileList = FileFieldParser.parse(event.getNewValue());
+
+                    List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
+                    addedFiles.removeAll(oldFileList);
+                    List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
+                    removedFiles.removeAll(newFileList);
+
+                    embeddingsGenerationTaskManager.addToProcess(addedFiles);
+                    embeddingsGenerationTaskManager.removeFromProcess(removedFiles);
+                }
+            }
+        }
+    }
+
+    public EmbeddingsGenerationTaskManager getEmbeddingsGenerationTaskManager() {
+        return embeddingsGenerationTaskManager;
     }
 
     public static class DatabaseNotification extends NotificationPane {

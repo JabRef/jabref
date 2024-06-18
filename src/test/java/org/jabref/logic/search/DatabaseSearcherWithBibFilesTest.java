@@ -94,7 +94,7 @@ public class DatabaseSearcherWithBibFilesTest {
         when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
         Globals.prefs = preferencesService;
 
-        pdfIndexer = PdfIndexerManager.getIndexer(context, filePreferences, preferencesService.getAiPreferences());
+        pdfIndexer = PdfIndexerManager.getIndexer(context, filePreferences);
         // Alternative - For debugging with Luke (part of the Apache Lucene distribution)
         // pdfIndexer = PdfIndexer.of(context, Path.of("C:\\temp\\index"), filePreferences);
 
