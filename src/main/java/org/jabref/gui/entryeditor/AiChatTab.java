@@ -30,6 +30,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
+import org.jabref.preferences.WorkspacePreferences;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,7 @@ public class AiChatTab extends EntryEditorTab {
 
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
+    private final WorkspacePreferences workspacePreferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final BibDatabaseContext bibDatabaseContext;
@@ -59,6 +61,7 @@ public class AiChatTab extends EntryEditorTab {
     public AiChatTab(DialogService dialogService, PreferencesService preferencesService, AiService aiService,
                      BibDatabaseContext bibDatabaseContext, EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
+        this.workspacePreferences = preferencesService.getWorkspacePreferences();
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
@@ -212,11 +215,11 @@ public class AiChatTab extends EntryEditorTab {
                     })
                     .executeWith(taskExecutor);
         }, () -> {
-            if (bibDatabaseChats != null) {
+            if (bibDatabaseChatHistory != null) {
                 assert entry.getCitationKey().isPresent();
-                bibDatabaseChats.clearMessagesForEntry(entry.getCitationKey().get());
+                bibDatabaseChatHistory.clearMessagesForEntry(entry.getCitationKey().get());
             }
-        }, dialogService);
+        }, workspacePreferences, dialogService);
 
         if (bibDatabaseChatHistory != null) {
             bibDatabaseChatHistory.getAllMessagesForEntry(entry.getCitationKey().get()).forEach(aiChatComponent::addMessage);

@@ -3,27 +3,27 @@ package org.jabref.gui.ai.components.chatmessage;
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.ai.components.JabRefMarkdownView;
 import org.jabref.logic.ai.chathistory.ChatMessage;
-import org.jabref.gui.entryeditor.aichattab.components.JabRefMarkdownView;
-import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import one.jpro.platform.mdfx.MarkdownView;
+import org.jabref.preferences.WorkspacePreferences;
 
 public class ChatMessageComponent extends HBox {
     @FXML private VBox vBox;
     @FXML private Label sourceLabel;
     @FXML private JabRefMarkdownView contentMarkdownView;
 
-    public ChatMessageComponent() {
+    public ChatMessageComponent(WorkspacePreferences workspacePreferences) {
         ViewLoader.view(this)
                   .root(this)
                   .load();
+
+        contentMarkdownView.applyTheme(workspacePreferences);
     }
 
     public ChatMessageComponent withChatMessage(ChatMessage chatMessage) {

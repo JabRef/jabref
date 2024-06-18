@@ -10,6 +10,8 @@
 <?import com.dlsc.unitfx.DoubleInputField?>
 <?import com.dlsc.unitfx.IntegerInputField?>
 <?import org.controlsfx.control.textfield.CustomPasswordField?>
+
+<?import javafx.scene.control.Button?>
 <fx:root
         spacing="10.0"
         type="VBox"

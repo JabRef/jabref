@@ -16,16 +16,17 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
 import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.entryeditor.aichattab.components.chatmessage.ChatMessageComponent;
-import org.jabref.logic.ai.ChatMessage;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.WorkspacePreferences;
 
 public class AiChatComponent extends VBox {
     private final Consumer<String> sendMessageCallback;
     private final Runnable clearChatHistoryCallback;
 
+    private final WorkspacePreferences workspacePreferences;
     private final DialogService dialogService;
 
     @FXML private ScrollPane scrollPane;
@@ -34,10 +35,11 @@ public class AiChatComponent extends VBox {
     @FXML private Button submitButton;
     @FXML private StackPane stackPane;
 
-    public AiChatComponent(Consumer<String> sendMessageCallback, Runnable clearChatHistoryCallback, DialogService dialogService) {
+    public AiChatComponent(Consumer<String> sendMessageCallback, Runnable clearChatHistoryCallback, WorkspacePreferences workspacePreferences, DialogService dialogService) {
         this.sendMessageCallback = sendMessageCallback;
         this.clearChatHistoryCallback = clearChatHistoryCallback;
 
+        this.workspacePreferences = workspacePreferences;
         this.dialogService = dialogService;
 
         ViewLoader.view(this)
@@ -79,11 +81,11 @@ public class AiChatComponent extends VBox {
     }
 
     public void addMessage(ChatMessage chatMessage) {
-        chatVBox.getChildren().add(new ChatMessageComponent().withChatMessage(chatMessage));
+        chatVBox.getChildren().add(new ChatMessageComponent(workspacePreferences).withChatMessage(chatMessage));
     }
 
     public void addError(String message) {
-        chatVBox.getChildren().add(new ChatMessageComponent().withError(message));
+        chatVBox.getChildren().add(new ChatMessageComponent(workspacePreferences).withError(message));
     }
 
     public void requestUserPromptTextFieldFocus() {

@@ -5,8 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<?import one.jpro.platform.mdfx.MarkdownView?>
-<?import org.jabref.gui.entryeditor.aichattab.components.JabRefMarkdownView?>
+<?import org.jabref.gui.ai.components.JabRefMarkdownView?>
 
 <fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.chatmessage.ChatMessageComponent">
     <children>

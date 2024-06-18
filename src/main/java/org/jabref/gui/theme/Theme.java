@@ -92,6 +92,10 @@ public class Theme {
         return additionalStylesheet;
     }
 
+    public Optional<String> getAdditionalStylesheetURL() {
+        return additionalStylesheet.map(styleSheet -> styleSheet.getSceneStylesheet().toExternalForm());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
