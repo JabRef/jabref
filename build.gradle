@@ -539,7 +539,9 @@ javadoc {
 //}
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+    excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest'
+}
     testLogging {
         events "passed", "skipped", "failed"
         showStandardStreams = true
@@ -548,66 +550,66 @@ test {
 
 
 
-//testlogger {
-//    // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
-//
-//    theme 'standard'
-//
-//    showPassed true
-//    showSkipped true
-//
-//    showCauses true
-//    showStackTraces true
-//}
+testlogger {
+    // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
 
-//tasks.withType(Test) {
-//    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
-//    // Enable parallel tests. See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
-//    maxParallelForks = Runtime.runtime.availableProcessors() - 1
-//}
-//
-//tasks.register('databaseTest', Test) {
-//    useJUnitPlatform {
-//        includeTags 'DatabaseTest'
-//    }
-//
-//    testLogging {
-//        // set options for log level LIFECYCLE
-//        events "passed", "skipped", "failed"
-//        exceptionFormat "full"
-//        showStandardStreams = true
-//    }
-//
-//    maxParallelForks = 1
-//}
-//
-//tasks.register('fetcherTest', Test) {
-//    useJUnitPlatform {
-//        includeTags 'FetcherTest'
-//    }
-//
-//    testLogging {
-//        events "passed", "skipped", "failed"
-//        showStandardStreams = true
-//    }
-//
-//    maxParallelForks = 1
-//}
-//
-//tasks.register('guiTest', Test) {
-//    useJUnitPlatform {
-//        includeTags 'GUITest'
-//    }
-//
-//    testLogging {
-//        // set options for log level LIFECYCLE
-//        events "passed", "skipped", "failed"
-//        exceptionFormat "full"
-//        showStandardStreams = true
-//    }
-//
-//    maxParallelForks = 1
-//}
+    theme 'standard'
+
+    showPassed true
+    showSkipped true
+
+    showCauses true
+    showStackTraces true
+}
+
+tasks.withType(Test) {
+    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
+    // Enable parallel tests. See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
+    maxParallelForks = Runtime.runtime.availableProcessors() - 1
+}
+
+tasks.register('databaseTest', Test) {
+    useJUnitPlatform {
+        includeTags 'DatabaseTest'
+    }
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+
+    maxParallelForks = 1
+}
+
+tasks.register('fetcherTest', Test) {
+    useJUnitPlatform {
+        includeTags 'FetcherTest'
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+    }
+
+    maxParallelForks = 1
+}
+
+tasks.register('guiTest', Test) {
+    useJUnitPlatform {
+        includeTags 'GUITest'
+    }
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+
+    maxParallelForks = 1
+}
 
 // Test result tasks
 tasks.register('copyTestResources', Copy) {
@@ -616,23 +618,22 @@ tasks.register('copyTestResources', Copy) {
 }
 processTestResources.dependsOn copyTestResources
 
-//tasks.register('jacocoPrepare') {
-//    doFirst {
-//        // Ignore failures of tests
-//        tasks.withType(Test).tap {
-//            configureEach {
-//                ignoreFailures = true
-//            }
-//        }
-//    }
-//}
-//test.mustRunAfter jacocoPrepare
-//databaseTest.mustRunAfter jacocoPrepare
-//fetcherTest.mustRunAfter jacocoPrepare
+tasks.register('jacocoPrepare') {
+    doFirst {
+        // Ignore failures of tests
+        tasks.withType(Test).tap {
+            configureEach {
+                ignoreFailures = true
+            }
+        }
+    }
+}
+test.mustRunAfter jacocoPrepare
+databaseTest.mustRunAfter jacocoPrepare
+fetcherTest.mustRunAfter jacocoPrepare
 
 jacocoTestReport {
-    //dependsOn jacocoPrepare, test, fetcherTest, databaseTest
-    //dependsOn jacocoPrepare, test
+    dependsOn jacocoPrepare, test, fetcherTest, databaseTest
 
     executionData files(
             layout.buildDirectory.file('jacoco/test.exec').get().asFile,

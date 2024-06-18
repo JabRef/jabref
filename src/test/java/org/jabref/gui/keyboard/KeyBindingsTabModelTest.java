@@ -195,4 +195,23 @@ class KeyBindingsTabModelTest {
         KeyBindingRepository.printCoverage();
         return viewModel;
     }
+
+
+    @Test
+    void testGetKeyBindingValueIsNull() {
+        KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
+        keyBindingRepository.put(KeyBinding.COPY, null);
+        String result = keyBindingRepository.get(KeyBinding.COPY.getConstant());
+        assertEquals(KeyBinding.COPY.getDefaultKeyBinding(), result);
+    }
+
+    @Test
+    void testGetKeyBindingNotPresent() {
+        KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
+        String result = keyBindingRepository.get("NonExist");
+        assertEquals("Not associated", result);
+    }
+
+
+
 }
