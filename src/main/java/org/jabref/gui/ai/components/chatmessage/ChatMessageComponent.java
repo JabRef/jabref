@@ -1,19 +1,13 @@
-package org.jabref.gui.entryeditor.aichattab.components.chatmessage;
-
-import java.io.IOException;
+package org.jabref.gui.ai.components.chatmessage;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.NodeOrientation;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import org.jabref.logic.ai.ChatMessage;
+import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;

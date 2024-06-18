@@ -456,7 +456,8 @@ public class JabRefPreferences implements PreferencesService {
 
     private static final String AI_ENABLE_CHAT = "aiEnableChat";
     public static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
-    private static final String AI_MODEL = "aiModel";
+    private static final String AI_CHAT_MODEL = "aiChatModel";
+    private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
     private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
     private static final String AI_TEMPERATURE = "aiTemperature";
     private static final String AI_MESSAGE_WINDOW_SIZE = "aiMessageWindowSize";
@@ -854,7 +855,8 @@ public class JabRefPreferences implements PreferencesService {
         // AI
         defaults.put(AI_ENABLE_CHAT, Boolean.FALSE);
         defaults.put(AI_CUSTOMIZE_SETTINGS, false);
-        defaults.put(AI_MODEL, AiPreferences.AiModel.GPT_3_5_TURBO.getName());
+        defaults.put(AI_CHAT_MODEL, AiPreferences.ChatModel.GPT_3_5_TURBO.getName());
+        defaults.put(AI_EMBEDDING_MODEL, AiPreferences.EmbeddingModel.ALL_MINLM_l6_V2.name());
         defaults.put(AI_SYSTEM_MESSAGE, "You are an AI assistant.");
         defaults.put(AI_TEMPERATURE, 0.3);
         defaults.put(AI_MESSAGE_WINDOW_SIZE, 10);
@@ -2771,8 +2773,9 @@ public class JabRefPreferences implements PreferencesService {
         aiPreferences = new AiPreferences(
                 useAi,
                 token,
+                AiPreferences.ChatModel.fromString(get(AI_CHAT_MODEL)),
+                AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
-                AiPreferences.AiModel.fromString(get(AI_MODEL)),
                 get(AI_SYSTEM_MESSAGE),
                 getDouble(AI_TEMPERATURE),
                 getInt(AI_MESSAGE_WINDOW_SIZE),
@@ -2786,7 +2789,8 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(aiPreferences.customizeSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
-        EasyBind.listen(aiPreferences.modelProperty(), (obs, oldValue, newValue) -> put(AI_MODEL, aiPreferences.getModel().getName()));
+        EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue.getName()));
+        EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
 
         EasyBind.listen(aiPreferences.systemMessageProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
         EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, (double)newValue));

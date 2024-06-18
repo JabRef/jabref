@@ -1,12 +1,9 @@
-package org.jabref.logic.ai;
+package org.jabref.logic.ai.chathistory;
 
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.UserMessage;
 import org.slf4j.Logger;
@@ -15,29 +12,31 @@ import org.slf4j.LoggerFactory;
 public class ChatMessage {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatMessage.class);
 
-    private final ChatMessageType type;
+    public enum Type {
+        USER,
+        ASSISTANT;
+    }
+
+    private final Type type;
     private final String content;
 
-    @JsonCreator
-    public ChatMessage(@JsonProperty("type") ChatMessageType type,
-                       @JsonProperty("content") String content) {
+    public ChatMessage(Type type, String content) {
         this.type = type;
         this.content = content;
     }
 
     public static ChatMessage user(String content) {
-        return new ChatMessage(ChatMessageType.USER, content);
+        return new ChatMessage(Type.USER, content);
     }
 
     public static ChatMessage assistant(String content) {
-        return new ChatMessage(ChatMessageType.ASSISTANT, content);
+        return new ChatMessage(Type.ASSISTANT, content);
     }
 
-    public ChatMessageType getType() {
+    public Type getType() {
         return type;
     }
 
-    @JsonIgnore
     public String getTypeLabel() {
         return switch (type) {
             case USER ->
@@ -68,10 +67,10 @@ public class ChatMessage {
 
     public Optional<dev.langchain4j.data.message.ChatMessage> toLangchainMessage() {
         switch (type) {
-            case ChatMessageType.USER -> {
+            case Type.USER -> {
                 return Optional.of(new UserMessage(content));
             }
-            case ChatMessageType.ASSISTANT -> {
+            case Type.ASSISTANT -> {
                 return Optional.of(new AiMessage(content));
             }
             default -> {

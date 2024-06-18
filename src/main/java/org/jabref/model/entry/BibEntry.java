@@ -25,7 +25,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.model.FieldChange;
