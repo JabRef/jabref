@@ -25,7 +25,6 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         }
 
         ScrollPane scrollPane = new ScrollPane(container);
-        scrollPane.setFitToWidth(true);
         getChildren().setAll(scrollPane);
 
         setLeftAnchor(scrollPane, 8d);
