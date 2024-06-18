@@ -16,6 +16,7 @@ import org.jabref.logic.ai.chat.AiChatLogic;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.logic.ai.chathistory.ChatMessage;
+import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
 import org.jabref.logic.ai.embeddings.events.FileIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -42,6 +43,7 @@ public class AiChatTab extends EntryEditorTab {
     private final EntryEditorPreferences entryEditorPreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final BibDatabaseContext bibDatabaseContext;
+    private final EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager;
     private final TaskExecutor taskExecutor;
 
     private AiChatComponent aiChatComponent = null;
@@ -55,7 +57,7 @@ public class AiChatTab extends EntryEditorTab {
     private final @Nullable BibDatabaseChatHistory bibDatabaseChatHistory;
 
     public AiChatTab(DialogService dialogService, PreferencesService preferencesService, AiService aiService,
-                     BibDatabaseContext bibDatabaseContext, TaskExecutor taskExecutor) {
+                     BibDatabaseContext bibDatabaseContext, EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
@@ -70,6 +72,8 @@ public class AiChatTab extends EntryEditorTab {
         } else {
             this.bibDatabaseChatHistory = null;
         }
+
+        this.embeddingsGenerationTaskManager = embeddingsGenerationTaskManager;
 
         this.taskExecutor = taskExecutor;
 
@@ -160,6 +164,7 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void bindToCorrectEntry(BibEntry entry) {
+        embeddingsGenerationTaskManager.moveToFront(entry.getFiles());
         createAiChat();
 
         if (bibDatabaseChatHistory != null) {

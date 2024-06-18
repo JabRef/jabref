@@ -2,9 +2,8 @@ package org.jabref.logic.ai.embeddings;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Stack;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -28,7 +27,7 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
 
     private final AiIngestor aiIngestor;
 
-    private final Queue<LinkedFile> linkedFileQueue = new ConcurrentLinkedQueue<>();
+    private final Stack<LinkedFile> linkedFileQueue = new Stack<>();
     private int numOfProcessedFiles = 0;
 
     private final Object lock = new Object();
@@ -149,7 +148,7 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
         updateProgress();
 
         while (!linkedFileQueue.isEmpty() && !isCanceled()) {
-            LinkedFile linkedFile = linkedFileQueue.poll();
+            LinkedFile linkedFile = linkedFileQueue.pop();
             assert linkedFile != null;
 
             ingestLinkedFile(linkedFile);
@@ -185,5 +184,16 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
             removeFromProcess(entry);
             addToProcess(entry);
         });
+    }
+
+    public void moveToFront(Collection<LinkedFile> linkedFiles) {
+        linkedFiles.forEach(this::moveToFront);
+    }
+
+    public void moveToFront(LinkedFile linkedFile) {
+        // TODO: Is this safe? What if we process this linked file?
+        // Oh, actually we don't use this like a conventional stack :)
+        linkedFileQueue.remove(linkedFile);
+        linkedFileQueue.push(linkedFile);
     }
 }
