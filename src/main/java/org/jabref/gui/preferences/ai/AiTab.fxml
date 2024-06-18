@@ -35,12 +35,19 @@
               <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%Leave these fields as is, if you are not sure of their purpose." />
          </children>
       </VBox>
-      <Label text="%Instruction for AI (also known as 'system message')" />
+      <CheckBox fx:id="customizeSettingsCheckbox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%Customize AI settings" />
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label maxWidth="1.7976931348623157E308" text="%Instruction for AI (also known as 'system message')" HBox.hgrow="ALWAYS" />
+            <Button fx:id="systemMessageHelp" onAction="#openHelpPage" prefWidth="20.0" />
+         </children>
+      </HBox>
       <TextArea fx:id="systemMessageTextArea" wrapText="true" />
       <HBox alignment="CENTER_LEFT" spacing="10.0">
          <children>
             <Label alignment="BASELINE_CENTER" text="%Message window size" />
             <IntegerInputField fx:id="messageWindowSizeTextField" HBox.hgrow="ALWAYS" />
+            <Button fx:id="messageWindowSizeHelp" onAction="#openHelpPage" prefWidth="20.0" />
          </children>
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="448.0" spacing="10.0">
@@ -51,27 +58,48 @@
       </HBox>
           <VBox>
               <children>
-                  <Label text="%RAG - maximum results count" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label maxWidth="1.7976931348623157E308" text="%RAG - maximum results count" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="ragMaxResultsCountHelp" onAction="#openHelpPage" prefWidth="20.0" />
+               </children>
+            </HBox>
                   <IntegerInputField fx:id="ragMaxResultsCountTextField" />
               </children>
           </VBox>
           <VBox>
               <children>
-                  <Label text="%RAG - minimum score" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label maxWidth="1.7976931348623157E308" text="%RAG - minimum score" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="ragMinScoreHelp" onAction="#openHelpPage" prefWidth="20.0" />
+               </children>
+            </HBox>
                   <DoubleInputField fx:id="ragMinScoreTextField" />
               </children>
           </VBox>
       <VBox>
          <children>
-            <Label text="%Document splitter - chunk size" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label maxWidth="1.7976931348623157E308" text="%Document splitter - chunk size" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="documentSplitterChunkSizeHelp" onAction="#openHelpPage" prefWidth="20.0" />
+               </children>
+            </HBox>
             <IntegerInputField fx:id="documentSplitterChunkSizeTextField" />
          </children>
       </VBox>
       <VBox>
          <children>
-            <Label text="%Document splitter - overlap size" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label maxWidth="1.7976931348623157E308" text="%Document splitter - overlap size" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="documentSplitterOverlapSizeHelp" onAction="#openHelpPage" prefWidth="20.0" />
+               </children>
+            </HBox>
             <IntegerInputField fx:id="documentSplitterOverlapSizeTextField" />
          </children>
       </VBox>
+      <Button fx:id="resetExpertSettingsButton" mnemonicParsing="false" onDragDetected="#onResetExpertSettingsButtonClick" text="%Reset expert settings to default" />
     </children>
 </fx:root>

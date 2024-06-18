@@ -51,7 +51,11 @@ public class AiPreferences {
 
     private final BooleanProperty enableChatWithFiles;
     private final StringProperty openAiToken;
+
+    private final BooleanProperty customizeSettings;
+
     private final ObjectProperty<AiModel> model;
+
 
     private final StringProperty systemMessage;
     private final DoubleProperty temperature;
@@ -61,9 +65,12 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles, String openAiToken, AiModel aiModel, String systemMessage, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
+    public AiPreferences(boolean enableChatWithFiles, String openAiToken, boolean customizeSettings, AiModel aiModel, String systemMessage, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
         this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
         this.openAiToken = new SimpleStringProperty(openAiToken);
+
+        this.customizeSettings = new SimpleBooleanProperty(customizeSettings);
+
         this.model = new SimpleObjectProperty<>(aiModel);
 
         this.systemMessage = new SimpleStringProperty(systemMessage);
@@ -97,6 +104,18 @@ public class AiPreferences {
 
     public void setOpenAiToken(String openAiToken) {
         this.openAiToken.set(openAiToken);
+    }
+
+    public BooleanProperty customizeSettingsProperty() {
+        return customizeSettings;
+    }
+
+    public boolean getCustomizeSettings() {
+        return customizeSettings.get();
+    }
+
+    public void setCustomizeSettings(boolean customizeSettings) {
+        this.customizeSettings.set(customizeSettings);
     }
 
     public ObjectProperty<AiModel> modelProperty() {
