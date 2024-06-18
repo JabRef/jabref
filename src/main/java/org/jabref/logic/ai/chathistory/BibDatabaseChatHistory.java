@@ -45,6 +45,19 @@ public class BibDatabaseChatHistory {
         this.messageCitationKey.put(id, citationKey);
     }
 
+    public void clearMessagesForEntry(String citationKey) {
+        messageCitationKey
+                .entrySet()
+                .stream()
+                .filter(integerStringEntry -> integerStringEntry.getValue().equals(citationKey))
+                .map(Map.Entry::getKey)
+                .forEach(id -> {
+                    messageType.remove(id);
+                    messageContent.remove(id);
+                    messageCitationKey.remove(id);
+                });
+    }
+
     public void close() {
         this.mvStore.close();
     }

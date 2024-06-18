@@ -157,4 +157,5 @@ open module org.jabref {
     requires com.dlsc.unitfx;
     requires org.checkerframework.checker.qual;
     requires jakarta.validation;
+    requires one.jpro.platform.mdfx;
 }

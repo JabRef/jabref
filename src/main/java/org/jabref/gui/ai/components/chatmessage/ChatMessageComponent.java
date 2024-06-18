@@ -8,14 +8,17 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import org.jabref.logic.ai.chathistory.ChatMessage;
+import org.jabref.gui.entryeditor.aichattab.components.JabRefMarkdownView;
+import org.jabref.logic.ai.ChatMessage;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import one.jpro.platform.mdfx.MarkdownView;
 
 public class ChatMessageComponent extends HBox {
     @FXML private VBox vBox;
     @FXML private Label sourceLabel;
-    @FXML private TextArea contentTextArea;
+    @FXML private JabRefMarkdownView contentMarkdownView;
 
     public ChatMessageComponent() {
         ViewLoader.view(this)
@@ -25,15 +28,15 @@ public class ChatMessageComponent extends HBox {
 
     public ChatMessageComponent withChatMessage(ChatMessage chatMessage) {
         sourceLabel.setText(chatMessage.getTypeLabel());
-        contentTextArea.setText(chatMessage.getContent());
+        contentMarkdownView.setMdString(chatMessage.getContent());
 
         switch (chatMessage.getType()) {
             case USER:
-                vBox.setStyle("-fx-background-color: -jr-ai-message-user;");
+                setColor("-jr-ai-message-user");
                 setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
                 break;
             case ASSISTANT:
-                vBox.setStyle("-fx-background-color: -jr-ai-message-ai;");
+                setColor("-jr-ai-message-ai");
                 setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
                 break;
         }
@@ -43,7 +46,7 @@ public class ChatMessageComponent extends HBox {
 
     public ChatMessageComponent withError(String message) {
         sourceLabel.setText(Localization.lang("Error"));
-        contentTextArea.setText(message);
+        contentMarkdownView.setMdString(message);
         vBox.setStyle("-fx-background-color: -jr-red;");
         return this;
     }
@@ -56,12 +59,12 @@ public class ChatMessageComponent extends HBox {
         this.sourceLabel.setText(sourceLabel);
     }
 
-    public String getContentTextArea() {
-        return contentTextArea.getText();
+    public String getContent() {
+        return contentMarkdownView.getMdString();
     }
 
-    public void setContentTextArea(String contentTextArea) {
-        this.contentTextArea.setText(contentTextArea);
+    public void setContent(String contentTextArea) {
+        contentMarkdownView.setMdString(contentTextArea);
     }
 
     public void setColor(String color) {
