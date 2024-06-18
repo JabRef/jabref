@@ -8,7 +8,7 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
 import com.github.difflib.DiffUtils;
@@ -32,7 +32,7 @@ public interface FieldEditorFX {
             if (Platform.isFxApplicationThread()) {
                 setTextAndUpdateCaretPosition(textInputControl, newText, logger);
             } else {
-                DefaultTaskExecutor.runInJavaFXThread(() -> setTextAndUpdateCaretPosition(textInputControl, newText, logger));
+                UiTaskExecutor.runInJavaFXThread(() -> setTextAndUpdateCaretPosition(textInputControl, newText, logger));
             }
         });
         EasyBind.subscribe(textInputControl.textProperty(), viewModelTextProperty::set);

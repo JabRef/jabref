@@ -16,7 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.WorkspacePreferences;
@@ -103,7 +103,7 @@ public class ThemeManager {
     }
 
     private void updateFontSettings() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(() -> updateFontStyle(mainWindowScene)));
+        UiTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(() -> updateFontStyle(mainWindowScene)));
     }
 
     private void removeStylesheetFromWatchList(StyleSheet styleSheet) {
@@ -134,7 +134,7 @@ public class ThemeManager {
             LOGGER.debug("Updating base CSS for main window scene");
         }
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(this::updateBaseCss));
+        UiTaskExecutor.runInJavaFXThread(() -> updateRunner.accept(this::updateBaseCss));
     }
 
     private void additionalCssLiveUpdate() {
@@ -145,7 +145,7 @@ public class ThemeManager {
 
         LOGGER.debug("Updating additional CSS for main window scene and {} web engines", webEngines.size());
 
-        DefaultTaskExecutor.runInJavaFXThread(() ->
+        UiTaskExecutor.runInJavaFXThread(() ->
                 updateRunner.accept(() -> {
                     updateAdditionalCss();
 

@@ -13,7 +13,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
@@ -89,7 +89,7 @@ public class GlobalSearchBarTest {
         }
 
         // Set the focus to another node to trigger the listener and finally record the query.
-        DefaultTaskExecutor.runAndWaitInJavaFXThread(hBox::requestFocus);
+        UiTaskExecutor.runAndWaitInJavaFXThread(hBox::requestFocus);
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
         assertEquals(List.of("Smith"), lastSearchHistory);
@@ -104,7 +104,7 @@ public class GlobalSearchBarTest {
         var searchFieldRoboto = robot.clickOn(searchField);
         searchFieldRoboto.write(searchQuery);
 
-        DefaultTaskExecutor.runAndWaitInJavaFXThread(hBox::requestFocus);
+        UiTaskExecutor.runAndWaitInJavaFXThread(hBox::requestFocus);
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory().stream().toList();
 
         assertEquals(List.of(), lastSearchHistory);
