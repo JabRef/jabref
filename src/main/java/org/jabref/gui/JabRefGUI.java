@@ -22,14 +22,15 @@ import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
@@ -141,7 +142,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(UndoManager.class, countingUndoManager);
         Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
 
-        JabRefGUI.taskExecutor = new DefaultTaskExecutor();
+        JabRefGUI.taskExecutor = new UiTaskExecutor();
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);
 
         JabRefGUI.dialogService = new JabRefDialogService(mainStage);
@@ -320,6 +321,6 @@ public class JabRefGUI extends Application {
         fileUpdateMonitor.shutdown();
         DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
         directoryMonitor.shutdown();
-        JabRefExecutorService.INSTANCE.shutdownEverything();
+        HeadlessExecutorService.INSTANCE.shutdownEverything();
     }
 }

@@ -13,7 +13,6 @@ import java.util.Map;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
@@ -29,6 +28,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -85,7 +85,7 @@ public class Launcher {
             try {
                 DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
                 Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
-                JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+                HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
 
                 DirectoryMonitor directoryMonitor = new DefaultDirectoryMonitor();
                 Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);

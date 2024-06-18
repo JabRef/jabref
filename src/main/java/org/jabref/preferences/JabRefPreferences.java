@@ -2978,8 +2978,12 @@ public class JabRefPreferences implements PreferencesService {
     private void clearCustomFetcherKeys() {
         List<String> names = getStringList(FETCHER_CUSTOM_KEY_NAMES);
         try (final Keyring keyring = Keyring.create()) {
-            for (String name : names) {
-                keyring.deletePassword("org.jabref.customapikeys", name);
+            try {
+                for (String name : names) {
+                    keyring.deletePassword("org.jabref.customapikeys", name);
+                }
+            } catch (PasswordAccessException ex) {
+                // nothing to do, no password to remove
             }
         } catch (Exception ex) {
             LOGGER.error("Unable to open key store");

@@ -54,10 +54,10 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TooltipTextUtil;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.Author;
@@ -442,7 +442,7 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
+        UiTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
     }
 
     private static class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {

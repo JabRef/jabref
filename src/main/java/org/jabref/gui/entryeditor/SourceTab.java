@@ -32,7 +32,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
@@ -231,7 +231,7 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void updateCodeArea() {
-        DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
+        UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
             if (codeArea == null) {
                 setupSourceEditor();
             }

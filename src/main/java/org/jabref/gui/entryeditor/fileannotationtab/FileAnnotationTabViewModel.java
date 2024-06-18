@@ -18,7 +18,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.util.OS;
@@ -103,7 +103,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
 
     private void reloadAnnotations() {
         // Make sure to always run this in the JavaFX thread as the file monitor (and its notifications) live in a different thread
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             // Remove annotations for the current entry and reinitialize annotation/cache
             cache.remove(entry);
             fileAnnotations = cache.getFromCache(entry);
