@@ -1,4 +1,4 @@
-package org.jabref.logic.search.indexing;
+package org.jabref.logic.search;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -13,7 +13,9 @@ import javafx.beans.value.ChangeListener;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.indexing.BibFieldsIndexer;
+import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
+import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

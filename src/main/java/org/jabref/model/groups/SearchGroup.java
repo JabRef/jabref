@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.logic.search.indexing.LuceneManager;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
