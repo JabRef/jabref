@@ -26,7 +26,7 @@ public class ArxivCleanupTask implements CleanupJob {
             entry.setField(StandardField.EPRINT, eprint);
         }
 
-        if (institutionField.isPresent() && institutionField.get().equalsIgnoreCase("arxiv")) {
+        if (institutionField.isPresent() && "arxiv".equalsIgnoreCase(institutionField.get())) {
             Optional<String> oldEprintType = entry.getField(StandardField.EPRINTTYPE);
             changes.add(new FieldChange(entry, StandardField.EPRINTTYPE, oldEprintType.orElse(null), "arxiv"));
             entry.setField(StandardField.EPRINTTYPE, "arxiv");

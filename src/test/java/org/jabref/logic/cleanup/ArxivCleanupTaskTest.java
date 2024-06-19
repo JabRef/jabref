@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ArxivCleanupTaskTest {
 
@@ -26,9 +27,9 @@ public class ArxivCleanupTaskTest {
         assertEquals("arxiv", entry.getField(StandardField.EPRINTTYPE).orElse(""));
         assertEquals("1", entry.getField(StandardField.EPRINTCLASS).orElse(""));
 
-        assertTrue(changes.stream().anyMatch(change -> change.getField().equals(StandardField.EPRINT) && change.getNewValue().equals("1503.05173")));
-        assertTrue(changes.stream().anyMatch(change -> change.getField().equals(StandardField.EPRINTTYPE) && change.getNewValue().equals("arxiv")));
-        assertTrue(changes.stream().anyMatch(change -> change.getField().equals(StandardField.EPRINTCLASS) && change.getNewValue().equals("1")));
+        assertTrue(changes.stream().anyMatch(change -> change.getField().equals(StandardField.EPRINT) && "1503.05173".equals(change.getNewValue())));
+        assertTrue(changes.stream().anyMatch(change -> change.getField().equals(StandardField.EPRINTTYPE) && "arxiv".equals(change.getNewValue())));
+        assertTrue(changes.stream().anyMatch(change -> change.getField().equals(StandardField.EPRINTCLASS) && "1".equals(change.getNewValue())));
     }
 
     // Add more tests as needed
