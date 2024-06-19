@@ -21,7 +21,8 @@ public class ArxivCleanup implements CleanupJob {
         Optional<String> eid = entry.getField(StandardField.EID);
 
         if (note.isPresent() && note.get().contains("arXiv")) {
-            entry.setField(StandardField.EPRINT, note.get());
+            String cleanedNote = note.get().replaceAll("\\s+", "");
+            entry.setField(StandardField.EPRINT, cleanedNote);
             changes.add(new FieldChange(entry, StandardField.NOTE, note.get(), ""));
             entry.clearField(StandardField.NOTE);
         }
@@ -39,7 +40,8 @@ public class ArxivCleanup implements CleanupJob {
         }
 
         if (eid.isPresent() && eid.get().contains("arXiv")) {
-            entry.setField(StandardField.EPRINT, eid.get());
+            String cleanedEid = eid.get().replaceAll("\\s+", "");
+            entry.setField(StandardField.EPRINT, cleanedEid);
             changes.add(new FieldChange(entry, StandardField.EID, eid.get(), ""));
             entry.clearField(StandardField.EID);
         }

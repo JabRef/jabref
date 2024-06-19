@@ -24,7 +24,7 @@ public class ArxivCleanupTest {
         ArxivCleanup arxivCleanup = new ArxivCleanup();
         List<FieldChange> changes = arxivCleanup.cleanup(entry);
 
-        assertEquals("arXiv: 1503.05173", entry.getField(StandardField.EPRINT).orElse(""));
+        assertEquals("arXiv:1503.05173", entry.getField(StandardField.EPRINT).orElse(""));
         assertEquals("arxiv", entry.getField(StandardField.EPRINTTYPE).orElse(""));
         assertEquals("1", entry.getField(StandardField.EPRINTCLASS).orElse(""));
         assertTrue(changes.size() > 0);
