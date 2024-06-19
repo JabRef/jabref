@@ -47,5 +47,6 @@ public class ArxivCleanup implements CleanupJob {
         }
 
         return changes;
+
     }
 }
