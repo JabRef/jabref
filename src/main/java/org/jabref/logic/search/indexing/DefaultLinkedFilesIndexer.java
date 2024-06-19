@@ -30,10 +30,10 @@ import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.preferences.PreferencesService;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.SegmentInfos;
 import org.apache.lucene.index.StoredFields;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
@@ -49,6 +49,8 @@ import org.slf4j.LoggerFactory;
 public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLinkedFilesIndexer.class);
     private static final DocumentReader DOCUMENT_READER = new DocumentReader();
+    private static int NUMBER_OF_UNSAVED_LIBRARIES = 1;
+
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferences;
@@ -56,6 +58,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     private final Directory indexDirectory;
     private final IndexWriter indexWriter;
     private final SearcherManager searcherManager;
+    private Path indexDirectoryPath;
     private Map<String, Long> indexedFiles;
     private IndexSearcher indexSearcher;
 
@@ -66,10 +69,11 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "untitled");
         this.indexedFiles = new ConcurrentHashMap<>();
 
-        Path indexDirectoryPath = databaseContext.getFulltextIndexPath();
+        indexDirectoryPath = databaseContext.getFulltextIndexPath();
         IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.ANALYZER);
         if (indexDirectoryPath.getFileName().toString().equals("unsaved")) {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+            indexDirectoryPath = indexDirectoryPath.resolveSibling("unsaved" + NUMBER_OF_UNSAVED_LIBRARIES++);
         }
 
         this.indexDirectory = FSDirectory.open(indexDirectoryPath);
@@ -142,14 +146,15 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
                     int i = 1;
                     for (Map.Entry<String, Pair<Long, Path>> entry : linkedFiles.entrySet()) {
                         if (isCanceled()) {
-                            updateMessage(Localization.lang("Indexing canceled: %0 of %1 files added to the index", i, linkedFiles.size()));
+                            updateMessage(Localization.lang("Indexing canceled: %0 of %1 files added to the index.", i, linkedFiles.size()));
                             break;
                         }
                         addToIndex(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
                         updateProgress(i, linkedFiles.size());
-                        updateMessage(Localization.lang("%0 of %1 files added to the index", i, linkedFiles.size()));
+                        updateMessage(Localization.lang("Indexing %0. %1 of %2 files added to the index.", entry.getValue().getValue().getFileName(), i, linkedFiles.size()));
                         i++;
                     }
+                    updateMessage(Localization.lang("Indexing completed: %0 files added to the index.", linkedFiles.size()));
                     return null;
                 }
             }.willBeRecoveredAutomatically(true)
@@ -325,27 +330,27 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             }
         }
         try {
-            int numSegments = SegmentInfos.readLatestCommit(indexDirectory).size();
-            LOGGER.info("Number of segments: {}", numSegments);
-            if (numSegments >= 3) {
-                LOGGER.info("Forcing merge segments to 1 segment");
-                indexWriter.forceMerge(1, true);
-            }
+            LOGGER.info("Forcing merge segments to 1 segment");
+            indexWriter.forceMerge(1, true);
         } catch (IOException e) {
-            LOGGER.warn("Could read segment infos.");
+            LOGGER.warn("Could not force merge segments.", e);
         }
     }
 
     @Override
     public void close() {
-        LOGGER.info("Closing index");
         HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
+                LOGGER.info("Closing index");
                 searcherManager.close();
                 optimizeIndex();
                 indexWriter.close();
                 indexDirectory.close();
                 LOGGER.info("Index closed");
+                if (databaseContext.getFulltextIndexPath().getFileName().toString().equals("unsaved")) {
+                    LOGGER.info("Deleting unsaved index directory");
+                    FileUtils.deleteDirectory(indexDirectoryPath.toFile());
+                }
             } catch (IOException e) {
                 LOGGER.error("Error closing index", e);
             }

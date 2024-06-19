@@ -77,7 +77,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
                     int i = 1;
                     for (BibEntry entry : entries) {
                         if (isCanceled()) {
-                            updateMessage(Localization.lang("Indexing canceled: %0 of %1 entries added to the index", i, entries.size()));
+                            updateMessage(Localization.lang("Indexing canceled: %0 of %1 entries added to the index.", i, entries.size()));
                             break;
                         }
                         if (entries.size() == 1) {
@@ -85,9 +85,10 @@ public class BibFieldsIndexer implements LuceneIndexer {
                         }
                         addToIndex(entry);
                         updateProgress(i, entries.size());
-                        updateMessage(Localization.lang("%0 of %1 entries added to the index", i, entries.size()));
+                        updateMessage(Localization.lang("%0 of %1 entries added to the index.", i, entries.size()));
                         i++;
                     }
+                    updateMessage(Localization.lang("Indexing completed: %0 entries added to the index.", entries.size()));
                     return null;
                 }
             }.showToUser(entries.size() > 1)
