@@ -35,7 +35,6 @@ import static org.jabref.model.search.SearchFieldConstants.PATH;
 public final class DocumentReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentReader.class);
-
     private static final Pattern HYPHEN_LINEBREAK_PATTERN = Pattern.compile("\\-\n");
     private static final Pattern LINEBREAK_WITHOUT_PERIOD_PATTERN = Pattern.compile("([^\\\\.])\\n");
 

@@ -147,11 +147,11 @@ public class LibraryTab extends Tab {
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
     private BackgroundTask<ParserResult> dataLoadingTask;
-    private LuceneManager luceneManager;
 
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final DirectoryMonitorManager directoryMonitorManager;
+    private LuceneManager luceneManager;
 
     private LibraryTab(BibDatabaseContext bibDatabaseContext,
                        LibraryTabContainer tabContainer,
@@ -178,7 +178,7 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
+        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -255,21 +255,22 @@ public class LibraryTab extends Tab {
         OpenDatabaseAction.performPostOpenActions(result, dialogService, preferencesService);
 
         setDatabaseContext(context);
-        setLuceneManager();
+
         LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;
     }
 
     public void setLuceneManager() {
-        if (luceneManager != null) {
-            luceneManager.close();
-        }
         if (bibDatabaseContext == null) {
             LOGGER.warn("BibDatabaseContext is null, cannot create LuceneIndexer");
         }
         luceneManager = new LuceneManager(bibDatabaseContext, taskExecutor, preferencesService);
         luceneManager.updateOnStart();
+    }
+
+    public void closeLuceneManger() {
+        luceneManager.close();
     }
 
     private void onDatabaseLoadingFailed(Exception ex) {
@@ -307,12 +308,13 @@ public class LibraryTab extends Tab {
         if (this.tableModel != null) {
             this.tableModel.removeBindings();
         }
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
+        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
         setupMainPanel();
         setupAutoCompletion();
+        setLuceneManager();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
@@ -847,7 +849,7 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when closing directory monitor", e);
         }
         try {
-            luceneManager.close();
+            closeLuceneManger();
         } catch (RuntimeException e) {
             LOGGER.error("Problem when closing lucene indexer", e);
         }
@@ -1079,10 +1081,6 @@ public class LibraryTab extends Tab {
         public void listen(FieldChangedEvent fieldChangedEvent) {
             luceneManager.updateEntry(fieldChangedEvent.getBibEntry(), fieldChangedEvent.getOldValue(), fieldChangedEvent.getNewValue(), fieldChangedEvent.getField().equals(StandardField.FILE));
         }
-    }
-
-    public LuceneManager getLuceneManager() {
-        return luceneManager;
     }
 
     public static class DatabaseNotification extends NotificationPane {

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -53,10 +54,11 @@ public class BibFieldsIndexer implements LuceneIndexer {
         this.taskExecutor = executor;
         this.preferences = preferences;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "unsaved");
-        this.indexDirectory = new ByteBuffersDirectory();
-        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.ANALYZER);
 
+        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.ANALYZER);
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+
+        this.indexDirectory = new ByteBuffersDirectory();
         this.indexWriter = new IndexWriter(indexDirectory, config);
         this.searcherManager = new SearcherManager(indexWriter, null);
     }
@@ -68,28 +70,30 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     @Override
     public void addToIndex(Collection<BibEntry> entries) {
-        new BackgroundTask<>() {
-            @Override
-            protected Void call() {
-                int i = 1;
-                for (BibEntry entry : entries) {
-                    if (isCanceled()) {
-                        updateMessage(Localization.lang("Indexing canceled: %0 of %1 entries added to the index", i, entries.size()));
-                        return null;
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            new BackgroundTask<>() {
+                @Override
+                protected Void call() {
+                    int i = 1;
+                    for (BibEntry entry : entries) {
+                        if (isCanceled()) {
+                            updateMessage(Localization.lang("Indexing canceled: %0 of %1 entries added to the index", i, entries.size()));
+                            break;
+                        }
+                        if (entries.size() == 1) {
+                            LOGGER.info("Adding entry {} to index", entry.getId());
+                        }
+                        addToIndex(entry);
+                        updateProgress(i, entries.size());
+                        updateMessage(Localization.lang("%0 of %1 entries added to the index", i, entries.size()));
+                        i++;
                     }
-                    if (entries.size() == 1) {
-                        LOGGER.info("Adding entry {} to index", entry.getId());
-                    }
-                    addToIndex(entry);
-                    updateProgress(i, entries.size());
-                    updateMessage(Localization.lang("%0 of %1 entries added to the index", i, entries.size()));
-                    i++;
+                    return null;
                 }
-                return null;
-            }
-        }.showToUser(entries.size() > 1)
-         .setTitle(Localization.lang("Indexing bib fields for %0", libraryName))
-         .executeWith(taskExecutor);
+            }.showToUser(entries.size() > 1)
+             .setTitle(Localization.lang("Indexing bib fields for %0", libraryName))
+             .executeWith(taskExecutor);
+        });
     }
 
     private void addToIndex(BibEntry bibEntry) {
@@ -134,15 +138,13 @@ public class BibFieldsIndexer implements LuceneIndexer {
     }
 
     private void removeFromIndex(BibEntry entry) {
-        BackgroundTask.wrap(() -> {
-            try {
-                LOGGER.info("Removing entry {} from index", entry.getId());
-                indexWriter.deleteDocuments((new Term(SearchFieldConstants.BIB_ENTRY_ID, entry.getId())));
-                LOGGER.info("Entry {} removed from index", entry.getId());
-            } catch (IOException e) {
-                LOGGER.error("Error deleting entry from index", e);
-            }
-        }).executeWithAndWait(taskExecutor);
+        try {
+            LOGGER.info("Removing entry {} from index", entry.getId());
+            indexWriter.deleteDocuments((new Term(SearchFieldConstants.BIB_ENTRY_ID, entry.getId())));
+            LOGGER.info("Entry {} removed from index", entry.getId());
+        } catch (IOException e) {
+            LOGGER.error("Error deleting entry from index", e);
+        }
     }
 
     @Override
@@ -154,15 +156,13 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     @Override
     public void removeAllFromIndex() {
-        BackgroundTask.wrap(() -> {
-            try {
-                LOGGER.info("Removing all bib fields from index");
-                indexWriter.deleteAll();
-                LOGGER.info("All bib fields removed from index");
-            } catch (IOException e) {
-                LOGGER.error("Error deleting all linked files from index", e);
-            }
-        }).executeWithAndWait(taskExecutor);
+        try {
+            LOGGER.info("Removing all bib fields from index");
+            indexWriter.deleteAll();
+            LOGGER.info("All bib fields removed from index");
+        } catch (IOException e) {
+            LOGGER.error("Error deleting all linked files from index", e);
+        }
     }
 
     @Override

@@ -139,9 +139,10 @@ public class SaveDatabaseAction {
 
         Optional<Path> databasePath = context.getDatabasePath();
         if (databasePath.isPresent()) {
-            // Close AutosaveManager and BackupManager for original library
+            // Close AutosaveManager, BackupManager, and LuceneManager for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
+            libraryTab.closeLuceneManger();
         }
 
         // Set new location
@@ -166,7 +167,6 @@ public class SaveDatabaseAction {
 
             preferences.getGuiPreferences().getFileHistory().newFile(file);
         }
-
         return saveResult;
     }
 

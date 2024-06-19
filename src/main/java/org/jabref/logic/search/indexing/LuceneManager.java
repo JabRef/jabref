@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
@@ -25,7 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LuceneManager {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LuceneManager.class);
+    private static final Map<String, LuceneManager> LUCENE_MANAGERS = new ConcurrentHashMap<>();
 
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
@@ -38,34 +43,31 @@ public class LuceneManager {
     private LuceneIndexer bibFieldsIndexer;
 
     public LuceneManager(BibDatabaseContext databaseContext, TaskExecutor executor, PreferencesService preferences) {
+        LUCENE_MANAGERS.put(databaseContext.getUid(), this);
         this.databaseContext = databaseContext;
         this.taskExecutor = executor;
         this.preferences = preferences;
+        this.isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
         this.shouldIndexLinkedFiles = preferences.getFilePreferences().fulltextIndexLinkedFilesProperty();
         this.preferencesListener = (observable, oldValue, newValue) -> bindToPreferences(newValue);
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
-        this.isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
         this.luceneSearcher = new LuceneSearcher(databaseContext);
 
+        initializeIndexers();
+    }
+
+    public static LuceneManager get(BibDatabaseContext databaseContext) {
+        return LUCENE_MANAGERS.get(databaseContext.getUid());
+    }
+
+    private void initializeIndexers() {
         try {
-            bibFieldsIndexer = new BibFieldsIndexer(databaseContext, executor, preferences);
+            bibFieldsIndexer = new BibFieldsIndexer(databaseContext, taskExecutor, preferences);
         } catch (IOException e) {
             LOGGER.error("Error initializing bib fields index", e);
         }
-
         initializeLinkedFilesIndexer();
-        if (!shouldIndexLinkedFiles.get()) {
-            linkedFilesIndexer.removeAllFromIndex();
-            linkedFilesIndexer.close();
-            linkedFilesIndexer = null;
-        }
-    }
-
-    private void bindToPreferences(boolean newValue) {
-        if (newValue) {
-            initializeLinkedFilesIndexer();
-            linkedFilesIndexer.updateOnStart();
-        } else {
+        if (!shouldIndexLinkedFiles.get() && linkedFilesIndexer != null) {
             linkedFilesIndexer.removeAllFromIndex();
             linkedFilesIndexer.close();
             linkedFilesIndexer = null;
@@ -81,45 +83,64 @@ public class LuceneManager {
         }
     }
 
+    private void bindToPreferences(boolean newValue) {
+        BackgroundTask.wrap(() -> {
+            if (newValue) {
+                initializeLinkedFilesIndexer();
+                linkedFilesIndexer.updateOnStart();
+            } else {
+                linkedFilesIndexer.removeAllFromIndex();
+                linkedFilesIndexer.close();
+                linkedFilesIndexer = null;
+            }
+        }).executeWith(taskExecutor);
+    }
+
     public void updateOnStart() {
-        bibFieldsIndexer.updateOnStart();
+        BackgroundTask.wrap(bibFieldsIndexer::updateOnStart).executeWith(taskExecutor);
+
         if (shouldIndexLinkedFiles.get()) {
-            linkedFilesIndexer.updateOnStart();
+            BackgroundTask.wrap(linkedFilesIndexer::updateOnStart).executeWith(taskExecutor);
         }
     }
 
     public void addToIndex(Collection<BibEntry> entries) {
-        bibFieldsIndexer.addToIndex(entries);
+        BackgroundTask.wrap(() -> bibFieldsIndexer.addToIndex(entries)).executeWith(taskExecutor);
+
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            linkedFilesIndexer.addToIndex(entries);
+            BackgroundTask.wrap(() -> linkedFilesIndexer.addToIndex(entries)).executeWith(taskExecutor);
         }
     }
 
     public void removeFromIndex(Collection<BibEntry> entries) {
-        bibFieldsIndexer.removeFromIndex(entries);
+        BackgroundTask.wrap(() -> bibFieldsIndexer.removeFromIndex(entries)).executeWith(taskExecutor);
+
         if (shouldIndexLinkedFiles.get()) {
-            linkedFilesIndexer.removeFromIndex(entries);
+            BackgroundTask.wrap(() -> linkedFilesIndexer.removeFromIndex(entries)).executeWith(taskExecutor);
         }
     }
 
     public void updateEntry(BibEntry entry, String oldValue, String newValue, boolean isLinkedFile) {
-        bibFieldsIndexer.updateEntry(entry, oldValue, newValue);
+        BackgroundTask.wrap(() -> bibFieldsIndexer.updateEntry(entry, oldValue, newValue)).executeWith(taskExecutor);
+
         if (isLinkedFile && shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            linkedFilesIndexer.updateEntry(entry, oldValue, newValue);
+            BackgroundTask.wrap(() -> linkedFilesIndexer.updateEntry(entry, oldValue, newValue)).executeWith(taskExecutor);
         }
     }
 
     public void updateAfterDropFiles(BibEntry entry) {
-        bibFieldsIndexer.updateEntry(entry, "", "");
+        BackgroundTask.wrap(() -> bibFieldsIndexer.updateEntry(entry, "", "")).executeWith(taskExecutor);
+
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            linkedFilesIndexer.addToIndex(List.of(entry));
+            BackgroundTask.wrap(() -> linkedFilesIndexer.addToIndex(List.of(entry))).executeWith(taskExecutor);
         }
     }
 
     public void rebuildIndex() {
-        bibFieldsIndexer.rebuildIndex();
+        BackgroundTask.wrap(bibFieldsIndexer::rebuildIndex).executeWith(taskExecutor);
+
         if (shouldIndexLinkedFiles.get()) {
-            linkedFilesIndexer.rebuildIndex();
+            BackgroundTask.wrap(linkedFilesIndexer::rebuildIndex).executeWith(taskExecutor);
         }
     }
 
@@ -129,25 +150,24 @@ public class LuceneManager {
         if (linkedFilesIndexer != null) {
             linkedFilesIndexer.close();
         }
+        LUCENE_MANAGERS.remove(databaseContext.getUid());
     }
 
     public AutoCloseable blockLinkedFileIndexer() {
+        LOGGER.info("Blocking linked files indexer");
         isLinkedFilesIndexerBlocked.set(true);
         return () -> isLinkedFilesIndexerBlocked.set(false);
     }
 
     public IndexSearcher getIndexSearcher(SearchQuery query) {
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT) && shouldIndexLinkedFiles.get()) {
-            try {
-                MultiReader reader = new MultiReader(bibFieldsIndexer.getIndexSearcher().getIndexReader(), linkedFilesIndexer.getIndexSearcher().getIndexReader());
+            try (MultiReader reader = new MultiReader(bibFieldsIndexer.getIndexSearcher().getIndexReader(), linkedFilesIndexer.getIndexSearcher().getIndexReader())) {
                 return new IndexSearcher(reader);
             } catch (IOException e) {
                 LOGGER.error("Error getting index searcher", e);
-                return bibFieldsIndexer.getIndexSearcher();
             }
-        } else {
-            return bibFieldsIndexer.getIndexSearcher();
         }
+        return bibFieldsIndexer.getIndexSearcher();
     }
 
     public HashMap<BibEntry, LuceneSearchResults> search(SearchQuery query) {

@@ -15,6 +15,7 @@ import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.indexing.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
@@ -99,7 +100,7 @@ public class MainTableDataModel {
         stateManager.getSearchResults().remove(bibDatabaseContext);
         if (query.isPresent() && !query.get().toString().isEmpty()) {
             // TODO btut: maybe do in background?
-//            stateManager.getSearchResults().put(bibDatabaseContext, Globals.luceneMangers.get(bibDatabaseContext).search(query.get()));
+            stateManager.getSearchResults().put(bibDatabaseContext, LuceneManager.get(bibDatabaseContext).search(query.get()));
         }
     }
 

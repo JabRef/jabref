@@ -77,7 +77,7 @@ public class ExternalFilesEntryLinker {
     }
 
     public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files) {
-        LuceneManager luceneManager = null;
+        LuceneManager luceneManager = LuceneManager.get(bibDatabaseContext);
         try (AutoCloseable blocker = luceneManager.blockLinkedFileIndexer()) {
             addFilesToEntry(entry, files);
             moveLinkedFilesToFileDir(entry);
@@ -89,7 +89,7 @@ public class ExternalFilesEntryLinker {
     }
 
     public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
-        LuceneManager luceneManager = null;
+        LuceneManager luceneManager = LuceneManager.get(bibDatabaseContext);
         try (AutoCloseable blocker = luceneManager.blockLinkedFileIndexer()) {
             for (Path file : files) {
                 copyFileToFileDir(file)

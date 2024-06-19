@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jabref.logic.search.indexing.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
@@ -84,6 +85,6 @@ public class SearchGroup extends AbstractGroup {
     }
 
     public void updateMatches(BibDatabaseContext context) {
-//        this.matches = Globals.luceneMangers.get(context).search(query).keySet();
+        this.matches = LuceneManager.get(context).search(query).keySet();
     }
 }
