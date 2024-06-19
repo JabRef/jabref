@@ -159,8 +159,8 @@ public class FileUtil {
      */
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
-                                          .filter(part -> comparePath.toString().contains(part))
-                                          .max(Comparator.comparingInt(String::length));
+                .filter(part -> comparePath.toString().contains(part))
+                .max(Comparator.comparingInt(String::length));
     }
 
     /**
@@ -171,28 +171,26 @@ public class FileUtil {
      */
     public static List<String> uniquePathSubstrings(List<String> paths) {
         List<Deque<String>> stackList = new ArrayList<>(paths.size());
-        // prepare data structures
+
+        // Prepare data structures
         for (String path : paths) {
-            List<String> directories = Arrays.asList(path.split(Pattern.quote(File.separator)));
-            Deque<String> stack = new ArrayDeque<>(directories.reversed());
+            List<String> directories = Arrays.asList(path.split("[/\\\\]")); // Split by both / and \
+            Collections.reverse(directories); // Reverse to pop from stack
+            Deque<String> stack = new ArrayDeque<>(directories);
             stackList.add(stack);
         }
 
         List<String> pathSubstrings = new ArrayList<>(Collections.nCopies(paths.size(), ""));
 
-        // compute the shortest folder substrings
+        // Compute the shortest folder substrings
         while (!stackList.stream().allMatch(Deque::isEmpty)) {
             for (int i = 0; i < stackList.size(); i++) {
                 String tempPathString = pathSubstrings.get(i);
-
                 Deque<String> stack = stackList.get(i);
 
-                if (tempPathString.isEmpty() && !stack.isEmpty()) {
-                    String stringFromDeque = stack.pop();
-                    pathSubstrings.set(i, stringFromDeque);
-                } else if (!stack.isEmpty()) {
+                if (!stack.isEmpty()) {
                     String stringFromStack = stack.pop();
-                    pathSubstrings.set(i, stringFromStack + File.separator + tempPathString);
+                    pathSubstrings.set(i, stringFromStack + (tempPathString.isEmpty() ? "" : "/" + tempPathString));
                 }
             }
 
@@ -203,7 +201,9 @@ public class FileUtil {
                 }
             }
         }
-        return pathSubstrings;
+
+        // Remove leading path separators if present
+        return pathSubstrings.stream().map(s -> s.replaceFirst("^" + Pattern.quote("/"), "")).collect(Collectors.toList());
     }
 
     /**
