@@ -77,11 +77,11 @@ public class CitationKeyGenerator extends BracketedPattern {
 
     public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
         String newKey = key.chars()
-                           .filter(c -> unwantedCharacters.indexOf(c) == -1)
-                           .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
-                           .collect(StringBuilder::new,
-                                   StringBuilder::appendCodePoint, StringBuilder::append)
-                           .toString();
+                .filter(c -> unwantedCharacters.indexOf(c) == -1)
+                .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
+                .collect(StringBuilder::new,
+                        StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
 
         // Replace non-English characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
@@ -192,7 +192,7 @@ public class CitationKeyGenerator extends BracketedPattern {
             String expandedPattern;
             List<String> fieldParts = parseFieldAndModifiers(bracket);
 
-            expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.getFirst(), keywordDelimiter, database), unwantedCharacters);
+            expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database), unwantedCharacters);
             // check whether there is a modifier on the end such as
             // ":lower":
             if (fieldParts.size() > 1) {
@@ -201,6 +201,54 @@ public class CitationKeyGenerator extends BracketedPattern {
             }
             return cleanKey(expandedPattern, unwantedCharacters);
         };
+    }
+
+    /**
+     * Applies a list of modifiers to a field value.
+     *
+     * @param value the field value
+     * @param fieldParts the list of field parts, including the field name and any modifiers
+     * @param startIndex the index at which to start applying modifiers
+     * @param expandBracketContent the function to expand bracket content
+     * @return the modified field value
+     */
+    static String applyModifiers(String value, List<String> fieldParts, int startIndex, Function<String, String> expandBracketContent) {
+        for (int i = startIndex; i < fieldParts.size(); i++) {
+            String modifier = fieldParts.get(i);
+
+            if (modifier.equals("veryshorttitle")) {
+                value = extractFirstSignificantWord(value);
+            } else if (modifier.startsWith("truncate")) {
+                int length = Integer.parseInt(modifier.replace("truncate", ""));
+                value = truncateValue(value, length);
+            } else if (modifier.startsWith("regex")) {
+                // Handle regex modifier
+            }
+            // Add more modifiers as needed
+        }
+        return value;
+    }
+
+    // Helper method to extract the first significant word
+    private static String extractFirstSignificantWord(String value) {
+        String[] words = value.split("\\s+");
+        for (String word : words) {
+            if (!isFunctionWord(word)) {
+                return word;
+            }
+        }
+        return value;
+    }
+
+    // Helper method to check if a word is a function word
+    private static boolean isFunctionWord(String word) {
+        List<String> functionWords = Arrays.asList("the", "with", "and", "or", "but");
+        return functionWords.contains(word.toLowerCase());
+    }
+
+    // Helper method to truncate the value
+    private static String truncateValue(String value, int length) {
+        return value.length() > length ? value.substring(0, length) : value;
     }
 
     /**
