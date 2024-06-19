@@ -11,7 +11,6 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -19,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is the utility class of the LabelPattern package.
+ * It provides functionality to generate citation keys based on user-defined patterns.
  */
 public class CitationKeyGenerator extends BracketedPattern {
     /**
@@ -29,13 +29,12 @@ public class CitationKeyGenerator extends BracketedPattern {
     /**
      * List of unwanted characters. These will be removed at the end.
      * Note that <code>+</code> is a wanted character to indicate "et al." in authorsAlpha.
-     * Example: "ABC+". See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
      */
     public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
 
-    // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
+    // Source of disallowed characters: https://tex.stackexchange.com/a/408548/9075
     private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
 
     private final AbstractCitationKeyPatterns citeKeyPattern;
@@ -71,10 +70,23 @@ public class CitationKeyGenerator extends BracketedPattern {
         }
     }
 
+    /**
+     * Removes default unwanted characters from the given key.
+     *
+     * @param key the citation key
+     * @return the cleaned key
+     */
     public static String removeDefaultUnwantedCharacters(String key) {
         return removeUnwantedCharacters(key, DEFAULT_UNWANTED_CHARACTERS);
     }
 
+    /**
+     * Removes unwanted characters from the given key.
+     *
+     * @param key the citation key
+     * @param unwantedCharacters characters to be removed
+     * @return the cleaned key
+     */
     public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
         String newKey = key.chars()
                 .filter(c -> unwantedCharacters.indexOf(c) == -1)
@@ -88,6 +100,13 @@ public class CitationKeyGenerator extends BracketedPattern {
         return StringUtil.replaceSpecialCharacters(newKey);
     }
 
+    /**
+     * Cleans the citation key by removing unwanted characters and spaces.
+     *
+     * @param key the citation key
+     * @param unwantedCharacters characters to be removed
+     * @return the cleaned key
+     */
     public static String cleanKey(String key, String unwantedCharacters) {
         return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
     }
@@ -143,40 +162,28 @@ public class CitationKeyGenerator extends BracketedPattern {
                     occurrences--;
                 }
             } while (occurrences > 0);
-
-            key = moddedKey;
-        }
-        return key;
-    }
-
-    /**
-     * Using preferences, replace matches to the provided regex with a string.
-     *
-     * @param key the citation key
-     * @return the citation key where matches to the regex are replaced
-     */
-    private String replaceWithRegex(String key) {
-        // Remove Regular Expressions while generating Keys
-        String regex = citationKeyPatternPreferences.getKeyPatternRegex();
-        if ((regex != null) && !regex.trim().isEmpty()) {
-            String replacement = citationKeyPatternPreferences.getKeyPatternReplacement();
-            try {
-                key = key.replaceAll(regex, replacement);
-            } catch (PatternSyntaxException e) {
-                LOGGER.warn("There is a syntax error in the regular expression \"{}\" used to generate a citation key", regex, e);
-            }
+            return moddedKey;
         }
         return key;
     }
 
     private String createCitationKeyFromPattern(BibEntry entry) {
-        // get the type of entry
-        EntryType entryType = entry.getType();
-        CitationKeyPattern citationKeyPattern = citeKeyPattern.getValue(entryType);
-        if (citationKeyPattern == null || CitationKeyPattern.NULL_CITATION_KEY_PATTERN.equals(citationKeyPattern)) {
-            return "";
+        String patternString = citeKeyPattern.getPattern(entry);
+        return formatPattern(patternString, entry);
+    }
+
+    private String replaceWithRegex(String key) {
+        try {
+            return key.replaceAll(citationKeyPatternPreferences.getKeyPatternRegex(), citationKeyPatternPreferences.getKeyPatternReplacement());
+        } catch (PatternSyntaxException e) {
+            LOGGER.error("Invalid regex pattern provided.", e);
+            return key;
         }
-        return expandBrackets(citationKeyPattern.stringRepresentation(), expandBracketContent(entry));
+    }
+
+    private String formatPattern(String pattern, BibEntry entry) {
+        // Expand the brackets in the pattern
+        return expandBrackets(pattern, expandBracketContent(entry));
     }
 
     /**
@@ -193,8 +200,7 @@ public class CitationKeyGenerator extends BracketedPattern {
             List<String> fieldParts = parseFieldAndModifiers(bracket);
 
             expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database), unwantedCharacters);
-            // check whether there is a modifier on the end such as
-            // ":lower":
+            // check whether there is a modifier on the end such as ":lower":
             if (fieldParts.size() > 1) {
                 // apply modifiers:
                 expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(entry));
@@ -203,33 +209,45 @@ public class CitationKeyGenerator extends BracketedPattern {
         };
     }
 
-    /**
-     * Applies a list of modifiers to a field value.
-     *
-     * @param value the field value
-     * @param fieldParts the list of field parts, including the field name and any modifiers
-     * @param startIndex the index at which to start applying modifiers
-     * @param expandBracketContent the function to expand bracket content
-     * @return the modified field value
-     */
     static String applyModifiers(String value, List<String> fieldParts, int startIndex, Function<String, String> expandBracketContent) {
         for (int i = startIndex; i < fieldParts.size(); i++) {
-            String modifier = fieldParts.get(i);
+            String modifier = fieldParts.get(i).toLowerCase();
 
-            if (modifier.equals("veryshorttitle")) {
-                value = extractFirstSignificantWord(value);
-            } else if (modifier.startsWith("truncate")) {
-                int length = Integer.parseInt(modifier.replace("truncate", ""));
-                value = truncateValue(value, length);
-            } else if (modifier.startsWith("regex")) {
-                // Handle regex modifier
+            switch (modifier) {
+                case "veryshorttitle":
+                    value = extractFirstSignificantWord(value);
+                    break;
+                case "lower":
+                    value = value.toLowerCase();
+                    break;
+                case "upper":
+                    value = value.toUpperCase();
+                    break;
+                case "capitalize":
+                    value = capitalize(value);
+                    break;
+                case "sentencecase":
+                    value = sentenceCase(value);
+                    break;
+                case "titlecase":
+                    value = titleCase(value);
+                    break;
+                case "abbr":
+                    value = abbreviate(value);
+                    break;
+                default:
+                    if (modifier.startsWith("truncate")) {
+                        int length = Integer.parseInt(modifier.replace("truncate", ""));
+                        value = truncateValue(value, length);
+                    } else if (modifier.startsWith("regex")) {
+                        // Handle regex modifier
+                    }
+                    break;
             }
-            // Add more modifiers as needed
         }
         return value;
     }
 
-    // Helper method to extract the first significant word
     private static String extractFirstSignificantWord(String value) {
         String[] words = value.split("\\s+");
         for (String word : words) {
@@ -240,23 +258,72 @@ public class CitationKeyGenerator extends BracketedPattern {
         return value;
     }
 
-    // Helper method to check if a word is a function word
     private static boolean isFunctionWord(String word) {
         List<String> functionWords = Arrays.asList("the", "with", "and", "or", "but");
         return functionWords.contains(word.toLowerCase());
     }
 
-    // Helper method to truncate the value
     private static String truncateValue(String value, int length) {
         return value.length() > length ? value.substring(0, length) : value;
     }
 
-    /**
-     * Generates a citation key for the given entry, and sets the key.
-     *
-     * @param entry the entry to generate the key for
-     * @return the change to the key (or an empty optional if the key was not changed)
-     */
+    private static String abbreviate(String value) {
+        String[] words = value.split(" ");
+        StringBuilder abbr = new StringBuilder();
+        for (String word : words) {
+            if (!word.isEmpty()) {
+                abbr.append(word.charAt(0));
+            }
+        }
+        return abbr.toString();
+    }
+
+    private static String capitalize(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        String[] words = value.split("\\s+");
+        StringBuilder capitalized = new StringBuilder();
+        for (String word : words) {
+            capitalized.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1).toLowerCase()).append(" ");
+        }
+        return capitalized.toString().trim();
+    }
+
+    private static String sentenceCase(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        String[] words = value.split("\\s+");
+        StringBuilder sentenceCase = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            if (i == 0) {
+                sentenceCase.append(Character.toUpperCase(words[i].charAt(0))).append(words[i].substring(1).toLowerCase());
+            } else {
+                sentenceCase.append(words[i].toLowerCase());
+            }
+            if (i < words.length - 1) {
+                sentenceCase.append(" ");
+            }
+        }
+        return sentenceCase.toString();
+    }
+
+    private static String titleCase(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+        String[] words = value.split("\\s+");
+        StringBuilder titleCase = new StringBuilder();
+        for (String word : words) {
+            if (titleCase.length() > 0) {
+                titleCase.append(" ");
+            }
+            titleCase.append(capitalize(word));
+        }
+        return titleCase.toString();
+    }
+
     public Optional<FieldChange> generateAndSetKey(BibEntry entry) {
         String newKey = generateKey(entry);
         return entry.setCitationKey(newKey);

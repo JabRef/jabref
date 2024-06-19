@@ -1,3 +1,4 @@
+// CleanupPreferences.java
 package org.jabref.preferences;
 
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public class CleanupPreferences {
 
     public enum CleanupStep {
         /**
-         * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
+         * Removes the http://... for each DOI. Moves DOIs from URL and NOTE field to DOI field.
          */
         CLEAN_UP_DOI,
         CLEANUP_EPRINT,
@@ -102,6 +103,7 @@ public class CleanupPreferences {
         DO_NOT_CONVERT_TIMESTAMP,
         MOVE_PDF,
         FIX_FILE_LINKS,
-        CLEAN_UP_ISSN
+        CLEAN_UP_ISSN,
+        ARXIV_CLEANUP // Add this line
     }
 }
