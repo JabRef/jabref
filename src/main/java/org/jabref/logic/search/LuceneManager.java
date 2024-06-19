@@ -22,6 +22,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.LuceneSearchResults;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 import org.apache.lucene.index.MultiReader;
@@ -163,12 +164,15 @@ public class LuceneManager {
 
     public IndexSearcher getIndexSearcher(SearchQuery query) {
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT) && shouldIndexLinkedFiles.get()) {
-            try (MultiReader reader = new MultiReader(bibFieldsIndexer.getIndexSearcher().getIndexReader(), linkedFilesIndexer.getIndexSearcher().getIndexReader())) {
+            try {
+                MultiReader reader = new MultiReader(bibFieldsIndexer.getIndexSearcher().getIndexReader(), linkedFilesIndexer.getIndexSearcher().getIndexReader());
+                LOGGER.info("Using MultiReader for searching");
                 return new IndexSearcher(reader);
             } catch (IOException e) {
                 LOGGER.error("Error getting index searcher", e);
             }
         }
+        LOGGER.info("Using single index searcher for searching");
         return bibFieldsIndexer.getIndexSearcher();
     }
 

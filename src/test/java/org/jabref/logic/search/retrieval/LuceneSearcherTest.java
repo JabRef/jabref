@@ -6,15 +6,16 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.LuceneSearchResults;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 

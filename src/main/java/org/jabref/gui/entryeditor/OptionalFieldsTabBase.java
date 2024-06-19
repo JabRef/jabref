@@ -49,8 +49,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                 stateManager,
                 themeManager,
                 taskExecutor,
-                journalAbbreviationRepository
-        );
+                journalAbbreviationRepository);
         this.entryTypesManager = entryTypesManager;
         this.isImportantOptionalFields = isImportantOptionalFields;
         setText(title);

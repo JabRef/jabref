@@ -56,8 +56,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 stateManager,
                 themeManager,
                 taskExecutor,
-                journalAbbreviationRepository
-        );
+                journalAbbreviationRepository);
 
         this.entryTypesManager = entryTypesManager;
         this.customTabsFieldNames = new ArrayList<>();

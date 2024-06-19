@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Objects;
 
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.LuceneSearchResults;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResult;
 
 import org.apache.lucene.search.IndexSearcher;

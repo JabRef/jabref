@@ -249,8 +249,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                     preferences,
                     stateManager,
                     themeManager,
-                    taskExecutor
-            );
+                    taskExecutor);
             EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
                 if (show) {
                     container.getItems().remove(previewPanel);

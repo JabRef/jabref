@@ -1,13 +1,10 @@
-package org.jabref.logic.search;
+package org.jabref.model.search;
 
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
-
-import org.jabref.model.search.SearchFieldConstants;
-import org.jabref.model.search.SearchFlags;
 
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -34,20 +31,19 @@ public class SearchQuery {
         if (searchFlags.contains(SearchFlags.FULLTEXT)) {
             Arrays.stream(SearchFieldConstants.PDF_FIELDS).forEach(field -> boosts.put(field, 1F));
         }
+
         String[] fieldsToSearchArray = new String[boosts.size()];
         boosts.keySet().toArray(fieldsToSearchArray);
 
         if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
             if (!query.isEmpty() && !(query.startsWith("/") && query.endsWith("/"))) {
-                query = "/" + query + "/";
+                query = '/' + query + '/';
             }
         }
 
         MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, SearchFieldConstants.ANALYZER, boosts);
         queryParser.setAllowLeadingWildcard(true);
-//        if (!query.isEmpty() && !query.contains("\"") && !query.contains(":") && !query.contains("*") && !query.contains("~")) {
-//            query = Arrays.stream(query.split(" ")).map(s -> "*" + s + "*").collect(Collectors.joining(" "));
-//        }
+
         try {
             parsedQuery = queryParser.parse(query);
             parseError = null;
