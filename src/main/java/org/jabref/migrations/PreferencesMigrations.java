@@ -292,7 +292,7 @@ public class PreferencesMigrations {
             return result;
         };
 
-        List<String> keys = prefs.getStringList(JabRefPreferences.BINDINGS);
+        List<String> keys = new ArrayList<>(prefs.getStringList(JabRefPreferences.BINDINGS));
         keys.replaceAll(replaceKeys);
         prefs.putStringList(JabRefPreferences.BINDINGS, keys);
     }

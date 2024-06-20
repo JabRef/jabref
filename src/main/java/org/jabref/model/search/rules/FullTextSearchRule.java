@@ -6,14 +6,16 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.logic.pdf.search.PdfIndexer;
 import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.pdf.search.PdfSearcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +57,9 @@ public abstract class FullTextSearchRule implements SearchRule {
             LOGGER.trace("Performing full query {}.", query);
             PdfIndexer pdfIndexer;
             try {
-                pdfIndexer = PdfIndexerManager.getIndexer(Globals.stateManager.getActiveDatabase().get(), Globals.prefs.getFilePreferences());
+                StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+                PreferencesService preferencesService = Injector.instantiateModelOrService(PreferencesService.class);
+                pdfIndexer = PdfIndexerManager.getIndexer(stateManager.getActiveDatabase().get(), preferencesService.getFilePreferences());
             } catch (IOException e) {
                 LOGGER.error("Could not access full text index.", e);
                 return new PdfSearchResults();

@@ -12,7 +12,6 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.telemetry.TelemetryPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -56,8 +55,6 @@ public interface PreferencesService {
 
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
-    void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
-
     KeyBindingRepository getKeyBindingRepository();
 
     FilePreferences getFilePreferences();
@@ -88,8 +85,6 @@ public interface PreferencesService {
     CleanupPreferences getDefaultCleanupPreset();
 
     LibraryPreferences getLibraryPreferences();
-
-    TelemetryPreferences getTelemetryPreferences();
 
     DOIPreferences getDOIPreferences();
 

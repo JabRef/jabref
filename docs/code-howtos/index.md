@@ -11,11 +11,19 @@ See also [High Level Documentation](../getting-into-the-code/high-level-document
 
 We really recommend reading the book [Java by Comparison](http://java.by-comparison.com).
 
-Please read [https://github.com/cxxr/better-java](https://github.com/cxxr/better-java)
+Please read <https://github.com/cxxr/better-java>.
 
 * try not to abbreviate names of variables, classes or methods
 * use lowerCamelCase instead of snake\_case
 * name enums in singular, e.g. `Weekday` instead of `Weekdays` (except if they represent flags)
+
+## Dependency injection
+
+JabRef uses a [fork](https://github.com/JabRef/afterburner.fx) of the [afterburner.fx framework](https://github.com/AdamBien/afterburner.fx) by [Adam Bien](https://adam-bien.com/).
+
+The main idea is to get instances by using `Injector.instantiateModelOrService(X.class)`, where `X` is the instance one needs.
+The method `instantiateModelOrService` checks if there is already an instance of the given class. If yes, it returns it. If not, it creates a new one.
+A singleton can be added by `com.airhacks.afterburner.injection.Injector#setModelOrService(X.class, y)`, where X is the class and y the instance you want to inject.
 
 ## Cleanup and Formatters
 

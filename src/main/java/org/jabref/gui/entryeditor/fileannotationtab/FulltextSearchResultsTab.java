@@ -61,7 +61,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
-        this.actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
 
         content = new TextFlow();

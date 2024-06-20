@@ -12,7 +12,7 @@ import org.jabref.model.paging.Page;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
-public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher, PagedSearchBasedFetcher {
+public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher, PagedSearchBasedFetcher, ParserFetcher {
 
     @Override
     default Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {

@@ -110,13 +110,12 @@ class MedlinePlainImporterTest {
         assertEquals(StandardEntryType.InProceedings, testEntry.getType());
         assertEquals(Optional.of("Inproceedings book title"), testEntry.getField(StandardField.BOOKTITLE));
 
-        BibEntry expectedEntry5 = new BibEntry(StandardEntryType.Proceedings);
-        expectedEntry5.setField(StandardField.KEYWORDS, "Female");
+        BibEntry expectedEntry5 = new BibEntry(StandardEntryType.Proceedings)
+                .withField(StandardField.KEYWORDS, "Female");
         assertEquals(expectedEntry5, entries.get(5));
 
-        BibEntry expectedEntry6 = new BibEntry();
-        expectedEntry6.setType(StandardEntryType.Misc);
-        expectedEntry6.setField(StandardField.KEYWORDS, "Female");
+        BibEntry expectedEntry6 = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.KEYWORDS, "Female");
         assertEquals(expectedEntry6, entries.get(6));
     }
 

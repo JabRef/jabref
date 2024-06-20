@@ -30,7 +30,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -145,7 +144,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
         final Button helpButton = (Button) getDialogPane().lookupButton(helpButtonType);
 
-        ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory actionFactory = new ActionFactory();
         HelpAction helpAction = new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences());
         actionFactory.configureIconButton(
                 StandardActions.HELP_GROUPS,

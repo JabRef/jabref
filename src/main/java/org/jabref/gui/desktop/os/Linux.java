@@ -15,11 +15,11 @@ import java.util.Optional;
 import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class Linux extends NativeDesktop {
     private static final String ETC_ALTERNATIVES_X_TERMINAL_EMULATOR = "/etc/alternatives/x-terminal-emulator";
 
     private void nativeOpenFile(String filePath) {
-        JabRefExecutorService.INSTANCE.execute(() -> {
+        HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
                 File file = new File(filePath);
                 Desktop.getDesktop().open(file);
@@ -67,8 +67,8 @@ public class Linux extends NativeDesktop {
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
             StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
 
-            JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
-            JabRefExecutorService.INSTANCE.execute(streamGobblerError);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
         } else {
             nativeOpenFile(filePath);
         }
@@ -90,8 +90,8 @@ public class Linux extends NativeDesktop {
             StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
             StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
 
-            JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
-            JabRefExecutorService.INSTANCE.execute(streamGobblerError);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+            HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
         } else {
             nativeOpenFile(filePath);
         }
@@ -125,8 +125,8 @@ public class Linux extends NativeDesktop {
         StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
         StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
 
-        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
-        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
+        HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+        HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override
@@ -166,8 +166,8 @@ public class Linux extends NativeDesktop {
                 StreamGobbler streamGobblerInput = new StreamGobbler(processTerminal.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);
                 StreamGobbler streamGobblerError = new StreamGobbler(processTerminal.getErrorStream(), LoggerFactory.getLogger(Linux.class)::debug);
 
-                JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
-                JabRefExecutorService.INSTANCE.execute(streamGobblerError);
+                HeadlessExecutorService.INSTANCE.execute(streamGobblerInput);
+                HeadlessExecutorService.INSTANCE.execute(streamGobblerError);
             }
         }
     }

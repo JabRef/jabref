@@ -24,8 +24,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -37,7 +37,6 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
@@ -47,6 +46,7 @@ import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
@@ -57,6 +57,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
@@ -69,7 +70,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents the inner frame of the JabRef window
  */
-public class JabRefFrame extends BorderPane implements LibraryTabContainer {
+public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMessageHandler {
 
     public static final String FRAME_TITLE = "JabRef";
 
@@ -90,6 +91,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
+    private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
     private final JabRefFrameViewModel viewModel;
@@ -106,6 +108,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                        StateManager stateManager,
                        CountingUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
+                       ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
@@ -114,6 +117,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         this.stateManager = stateManager;
         this.undoManager = undoManager;
         this.entryTypesManager = entryTypesManager;
+        this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
 
         setId("frame");
@@ -127,7 +131,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 entryTypesManager,
                 fileUpdateMonitor,
                 undoManager,
+                clipBoardManager,
                 taskExecutor);
+        Injector.setModelOrService(UiMessageHandler.class, viewModel);
 
         this.frameDndHandler = new FrameDndHandler(
                 tabbedPane,
@@ -146,12 +152,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         this.sidePane = new SidePane(
                 this,
                 prefs,
-                Globals.journalAbbreviationRepository,
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 taskExecutor,
                 dialogService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
+                clipBoardManager,
                 undoManager);
 
         this.pushToApplicationCommand = new PushToApplicationCommand(
@@ -189,6 +196,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 fileUpdateMonitor,
                 taskExecutor,
                 entryTypesManager,
+                clipBoardManager,
                 undoManager);
 
         MainMenu mainMenu = new MainMenu(
@@ -201,10 +209,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 fileUpdateMonitor,
                 taskExecutor,
                 dialogService,
-                Globals.journalAbbreviationRepository,
+                Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 entryTypesManager,
                 undoManager,
-                Globals.getClipboardManager(),
+                clipBoardManager,
                 this::getOpenDatabaseAction);
 
         VBox head = new VBox(mainMenu, mainToolBar);
@@ -242,7 +250,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
 
     private void initKeyBindings() {
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
+            Optional<KeyBinding> keyBinding = prefs.getKeyBindingRepository().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case FOCUS_ENTRY_TABLE:
@@ -431,6 +439,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager,
+                clipBoardManager,
                 taskExecutor);
         addTab(libraryTab, raisePanel);
     }
@@ -442,14 +451,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
             tabbedPane.requestFocus();
         }
 
-        libraryTab.setContextMenu(createTabContextMenuFor(libraryTab, Globals.getKeyPrefs()));
+        libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
 
         libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
-    private ContextMenu createTabContextMenuFor(LibraryTab tab, KeyBindingRepository keyBindingRepository) {
+    private ContextMenu createTabContextMenuFor(LibraryTab tab) {
         ContextMenu contextMenu = new ContextMenu();
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(tab::getBibDatabaseContext, stateManager)),
@@ -507,6 +516,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager,
+                clipBoardManager,
                 taskExecutor);
     }
 
@@ -532,6 +542,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer {
         return mainStage;
     }
 
+    @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
         viewModel.handleUiCommands(uiCommands);
     }

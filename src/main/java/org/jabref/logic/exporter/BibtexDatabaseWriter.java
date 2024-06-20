@@ -38,8 +38,6 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     private static final String PREAMBLE_PREFIX = "@Preamble";
     private static final String STRING_PREFIX = "@String";
 
-    private final FieldPreferences fieldPreferences;
-
     public BibtexDatabaseWriter(BibWriter bibWriter,
                                 SelfContainedSaveConfiguration saveConfiguration,
                                 FieldPreferences fieldPreferences,
@@ -47,10 +45,9 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
                                 BibEntryTypesManager entryTypesManager) {
         super(bibWriter,
                 saveConfiguration,
+                fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);
-
-        this.fieldPreferences = fieldPreferences;
     }
 
     public BibtexDatabaseWriter(Writer writer,
@@ -61,10 +58,9 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
                                 BibEntryTypesManager entryTypesManager) {
         super(new BibWriter(writer, newline),
                 saveConfiguration,
+                fieldPreferences,
                 citationKeyPatternPreferences,
                 entryTypesManager);
-
-        this.fieldPreferences = fieldPreferences;
     }
 
     @Override

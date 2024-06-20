@@ -13,8 +13,8 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -77,7 +77,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
             count++;
             final String statusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                     fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-            DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.notify(statusMessage));
+            UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(statusMessage));
             Optional<T> identifier = Optional.empty();
             try {
                 identifier = fetcher.findIdentifier(bibEntry);
@@ -91,7 +91,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
                     foundCount++;
                     final String nextStatusMessage = Localization.lang("Looking up %0... - entry %1 out of %2 - found %3",
                             fetcher.getIdentifierName(), Integer.toString(count), totalCount, Integer.toString(foundCount));
-                    DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.notify(nextStatusMessage));
+                    UiTaskExecutor.runInJavaFXThread(() -> dialogService.notify(nextStatusMessage));
                 }
             }
         }
