@@ -21,6 +21,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an exporter and improved the importer for Endnote XML format. [#11137](https://github.com/JabRef/jabref/issues/11137)
 - We added support for using BibTeX Style files (BST) in the Preview. [#11102](https://github.com/JabRef/jabref/issues/11102)
 - We added support for automatically update LaTeX citations when a LaTeX file is created, removed, or modified. [#10585](https://github.com/JabRef/jabref/issues/10585)
+- We added a button to compare duplicate entries in Citation relations tab. [#11192](https://github.com/JabRef/jabref/issues/11192)
 
 ### Changed
 
@@ -1355,7 +1356,3 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-alpha...v5.0-beta
 [5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
 <!-- markdownlint-disable-file MD012 MD024 MD033 MD053 -->
-
-### Added
-
-- Added a "Compare" button for duplicate entries in the CitationRelationsTab. Implemented functionality to open a dialog for comparing duplicate entries. Enhanced UI to include the compare button alongside the existing "Jump to entry in library" button. ([#11192](https://github.com/JabRef/jabref/issues/11192))
