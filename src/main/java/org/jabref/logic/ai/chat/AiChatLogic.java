@@ -64,21 +64,7 @@ public class AiChatLogic {
             rebuild();
         });
 
-        aiPreferences.documentSplitterChunkSizeProperty().addListener((obs) -> {
-            rebuild();
-        });
-
-        aiPreferences.documentSplitterOverlapSizeProperty().addListener((obs) -> {
-            rebuild();
-        });
-
-        aiPreferences.ragMinScoreProperty().addListener((obs) -> {
-            rebuild();
-        });
-
-        aiPreferences.ragMaxResultsCountProperty().addListener((obs) -> {
-            rebuild();
-        });
+        aiPreferences.onEmbeddingsParametersChange(this::rebuild);
     }
 
     private void rebuild() {

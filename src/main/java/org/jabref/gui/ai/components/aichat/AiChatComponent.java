@@ -10,6 +10,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -81,11 +82,13 @@ public class AiChatComponent extends VBox {
     }
 
     public void addMessage(ChatMessage chatMessage) {
-        chatVBox.getChildren().add(new ChatMessageComponent(workspacePreferences).withChatMessage(chatMessage));
+        ChatMessageComponent component = new ChatMessageComponent().withChatMessage(chatMessage);
+        chatVBox.getChildren().add(component);
     }
 
     public void addError(String message) {
-        chatVBox.getChildren().add(new ChatMessageComponent(workspacePreferences).withError(message));
+        ChatMessageComponent component = new ChatMessageComponent().withError(message);
+        chatVBox.getChildren().add(component);
     }
 
     public void requestUserPromptTextFieldFocus() {

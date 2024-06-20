@@ -60,10 +60,7 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
 
     private void listenToPreferences() {
         // TODO: Will these listeners align with AiIngestor preference listeners?
-
-        aiService.getPreferences().embeddingModelProperty().addListener(obs -> invalidate());
-        aiService.getPreferences().documentSplitterOverlapSizeProperty().addListener(obs -> invalidate());
-        aiService.getPreferences().documentSplitterChunkSizeProperty().addListener(obs -> invalidate());
+        aiService.getPreferences().onEmbeddingsParametersChange(this::invalidate);
     }
 
     public void addToProcess(Collection<BibEntry> bibEntries) {

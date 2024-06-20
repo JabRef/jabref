@@ -3,6 +3,7 @@ package org.jabref.logic.ai.embeddings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.preferences.AiPreferences;
@@ -35,6 +36,7 @@ public class AiEmbeddingsManager {
             Files.createDirectories(JabRefDesktop.getEmbeddingsCacheDirectory());
         } catch (IOException e) {
             LOGGER.error("An error occurred while creating directories for embedding store. Will use an in-memory store", e);
+            // TODO: Show user message.
             mvStorePath = null;
         }
 
@@ -45,6 +47,7 @@ public class AiEmbeddingsManager {
         } catch (Exception e) {
             LOGGER.error("An error occurred while opening embedding store. Will use an in-memory store", e);
             mvStoreTemp = MVStore.open(null);
+            // TODO: Show user message.
         }
 
         this.mvStore = mvStoreTemp;
@@ -60,9 +63,7 @@ public class AiEmbeddingsManager {
         // once there, and the other in EmbeddingsGenerationTaskManager.
         // It's not an error, but it's a double work.
 
-        aiPreferences.embeddingModelProperty().addListener(obs -> embeddingStore.removeAll());
-        aiPreferences.documentSplitterChunkSizeProperty().addListener(obs -> embeddingStore.removeAll());
-        aiPreferences.documentSplitterOverlapSizeProperty().addListener(obs -> embeddingStore.removeAll());
+        aiPreferences.onEmbeddingsParametersChange(embeddingStore::removeAll);
     }
 
     public void removeIngestedFile(String link) {

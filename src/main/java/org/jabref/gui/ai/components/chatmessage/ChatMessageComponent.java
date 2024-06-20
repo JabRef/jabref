@@ -1,12 +1,12 @@
 package org.jabref.gui.ai.components.chatmessage;
 
+import com.dlsc.gemsfx.ExpandingTextArea;
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.ai.components.JabRefMarkdownView;
 import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.logic.l10n.Localization;
 
@@ -16,19 +16,17 @@ import org.jabref.preferences.WorkspacePreferences;
 public class ChatMessageComponent extends HBox {
     @FXML private VBox vBox;
     @FXML private Label sourceLabel;
-    @FXML private JabRefMarkdownView contentMarkdownView;
+    @FXML private ExpandingTextArea contentTextArea;
 
-    public ChatMessageComponent(WorkspacePreferences workspacePreferences) {
+    public ChatMessageComponent() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
-
-        contentMarkdownView.applyTheme(workspacePreferences);
     }
 
     public ChatMessageComponent withChatMessage(ChatMessage chatMessage) {
         sourceLabel.setText(chatMessage.getTypeLabel());
-        contentMarkdownView.setMdString(chatMessage.getContent());
+        contentTextArea.setText(chatMessage.getContent());
 
         switch (chatMessage.getType()) {
             case USER:
@@ -46,25 +44,9 @@ public class ChatMessageComponent extends HBox {
 
     public ChatMessageComponent withError(String message) {
         sourceLabel.setText(Localization.lang("Error"));
-        contentMarkdownView.setMdString(message);
+        contentTextArea.setText(message);
         vBox.setStyle("-fx-background-color: -jr-red;");
         return this;
-    }
-
-    public String getSourceLabel() {
-        return sourceLabel.getText();
-    }
-
-    public void setSourceLabel(String sourceLabel) {
-        this.sourceLabel.setText(sourceLabel);
-    }
-
-    public String getContent() {
-        return contentMarkdownView.getMdString();
-    }
-
-    public void setContent(String contentTextArea) {
-        contentMarkdownView.setMdString(contentTextArea);
     }
 
     public void setColor(String color) {

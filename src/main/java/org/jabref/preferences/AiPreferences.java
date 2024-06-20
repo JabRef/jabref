@@ -11,6 +11,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.Objects;
+
 public class AiPreferences {
     public enum ChatModel {
         GPT_3_5_TURBO("gpt-3.5-turbo"),
@@ -224,5 +226,26 @@ public class AiPreferences {
 
     public void setRagMinScore(double ragMinScore) {
         this.ragMinScore.set(ragMinScore);
+    }
+
+    public void onEmbeddingsParametersChange(Runnable runnable) {
+        embeddingModel.addListener((observableValue, oldValue, newValue) -> {
+            if (newValue != oldValue) {
+                runnable.run();
+            }
+        });
+
+
+        documentSplitterChunkSize.addListener((observableValue, oldValue, newValue) -> {
+            if (!Objects.equals(newValue, oldValue)) {
+                runnable.run();
+            }
+        });
+
+        documentSplitterOverlapSize.addListener((observableValue, oldValue, newValue) -> {
+            if (!Objects.equals(newValue, oldValue)) {
+                runnable.run();
+            }
+        });
     }
 }

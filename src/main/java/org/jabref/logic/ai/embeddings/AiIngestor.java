@@ -53,8 +53,7 @@ public class AiIngestor {
     }
 
     private void listenToPreferences() {
-        aiService.getPreferences().documentSplitterChunkSizeProperty().addListener(obs -> ingestor = rebuild(aiService));
-        aiService.getPreferences().documentSplitterOverlapSizeProperty().addListener(obs -> ingestor = rebuild(aiService));
+        aiService.getPreferences().onEmbeddingsParametersChange(() -> ingestor = rebuild(aiService));
     }
 
     public void ingestLinkedFile(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
