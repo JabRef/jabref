@@ -1,7 +1,6 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -50,15 +49,14 @@ public class FieldFormatterCleanup implements CleanupJob {
     private List<FieldChange> cleanupSingleField(Field fieldKey, BibEntry entry) {
         if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do
-            return Collections.emptyList();
+            return List.of();
         }
-        String oldValue = entry.getField(fieldKey).orElse(null);
 
-        // Run formatter
+        String oldValue = entry.getField(fieldKey).orElse(null);
         String newValue = formatter.format(oldValue);
 
         if (newValue.equals(oldValue)) {
-            return Collections.emptyList();
+            return List.of();
         } else {
             if (newValue.isEmpty()) {
                 entry.clearField(fieldKey);
@@ -67,7 +65,7 @@ public class FieldFormatterCleanup implements CleanupJob {
                 entry.setField(fieldKey, newValue, EntriesEventSource.SAVE_ACTION);
             }
             FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
-            return Collections.singletonList(change);
+            return List.of(change);
         }
     }
 
@@ -86,7 +84,7 @@ public class FieldFormatterCleanup implements CleanupJob {
     private List<FieldChange> cleanupAllTextFields(BibEntry entry) {
         List<FieldChange> fieldChanges = new ArrayList<>();
         Set<Field> fields = new HashSet<>(entry.getFields());
-        FieldFactory.getNotTextFieldNames().forEach(fields::remove);
+        FieldFactory.getNotTextFields().forEach(fields::remove);
         for (Field fieldKey : fields) {
             if (!fieldKey.equals(InternalField.KEY_FIELD)) {
                 fieldChanges.addAll(cleanupSingleField(fieldKey, entry));

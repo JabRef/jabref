@@ -7,12 +7,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -21,13 +21,12 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
-import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -65,6 +64,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final CountingUndoManager undoManager;
+    private final ClipBoardManager clipboardManager;
     private final TaskExecutor taskExecutor;
 
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
@@ -75,6 +75,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                               FileUpdateMonitor fileUpdateMonitor,
                               BibEntryTypesManager entryTypesManager,
                               CountingUndoManager undoManager,
+                              ClipBoardManager clipBoardManager,
                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.preferencesService = preferencesService;
@@ -84,6 +85,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.undoManager = undoManager;
+        this.clipboardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
     }
 
@@ -92,10 +94,10 @@ public class OpenDatabaseAction extends SimpleCommand {
      *
      * @param result     The result of the BIB file parse operation.
      */
-    public static void performPostOpenActions(ParserResult result, DialogService dialogService) {
+    public static void performPostOpenActions(ParserResult result, DialogService dialogService, PreferencesService preferencesService) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
-            if (action.isActionNecessary(result)) {
-                action.performAction(result, dialogService);
+            if (action.isActionNecessary(result, preferencesService)) {
+                action.performAction(result, dialogService, preferencesService);
             }
         }
     }
@@ -207,8 +209,8 @@ public class OpenDatabaseAction extends SimpleCommand {
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager,
+                clipboardManager,
                 taskExecutor);
-        backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
         tabContainer.addTab(newTab, true);
     }
 
@@ -224,7 +226,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
             // In case the backup differs, ask the user what to do.
             // In case the user opted for restoring a backup, the content of the backup is contained in parserResult.
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService, fileUpdateMonitor, stateManager)
+            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferencesService, fileUpdateMonitor, undoManager, stateManager)
                                           .orElse(null);
         }
 
@@ -239,7 +241,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             if (parserResult.hasWarnings()) {
                 String content = Localization.lang("Please check your library file for wrong syntax.")
                         + "\n\n" + parserResult.getErrorMessage();
-                DefaultTaskExecutor.runInJavaFXThread(() ->
+                UiTaskExecutor.runInJavaFXThread(() ->
                         dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
             }
         } catch (IOException e) {
@@ -258,16 +260,10 @@ public class OpenDatabaseAction extends SimpleCommand {
                                  entryTypesManager,
                                  fileUpdateMonitor,
                                  undoManager,
+                                 clipboardManager,
                                  taskExecutor);
         }
         return parserResult;
-    }
-
-    private void trackOpenNewDatabase(LibraryTab libraryTab) {
-        Telemetry.getTelemetryClient().ifPresent(client -> client.trackEvent(
-                "OpenNewDatabase",
-                Map.of(),
-                Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
     }
 
     public static void openSharedDatabase(ParserResult parserResult,
@@ -279,6 +275,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                                           BibEntryTypesManager entryTypesManager,
                                           FileUpdateMonitor fileUpdateMonitor,
                                           UndoManager undoManager,
+                                          ClipBoardManager clipBoardManager,
                                           TaskExecutor taskExecutor)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException, NotASharedDatabaseException {
         try {
@@ -291,6 +288,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                     entryTypesManager,
                     fileUpdateMonitor,
                     undoManager,
+                    clipBoardManager,
                     taskExecutor)
                     .openSharedDatabaseFromParserResult(parserResult);
         } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |

@@ -14,6 +14,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -48,6 +49,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                              DialogService dialogService,
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager,
+                             ClipBoardManager clipBoardManager,
                              UndoManager undoManager) {
         this.preferencesService = preferencesService;
         this.stateManager = stateManager;
@@ -62,6 +64,7 @@ public class SidePaneViewModel extends AbstractViewModel {
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
+                clipBoardManager,
                 undoManager);
 
         preferencesService.getSidePanePreferences().visiblePanes().forEach(this::show);

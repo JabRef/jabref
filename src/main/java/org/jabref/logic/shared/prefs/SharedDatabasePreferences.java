@@ -31,6 +31,8 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_USE_SSL = "sharedDatabaseUseSSL";
     private static final String SHARED_DATABASE_KEYSTORE_FILE = "sharedDatabaseKeyStoreFile";
     private static final String SHARED_DATABASE_SERVER_TIMEZONE = "sharedDatabaseServerTimezone";
+    private static final String SHARED_DATABASE_EXPERT_MODE = "sharedDatabaseExpertMode";
+    private static final String SHARED_DATABASE_JDBC_URL = "sharedDatabaseJdbcUrl";
 
     // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
     private final Preferences internalPrefs;
@@ -143,6 +145,22 @@ public class SharedDatabasePreferences {
         internalPrefs.remove(SHARED_DATABASE_PASSWORD);
     }
 
+    public void setExpertMode(boolean expertMode) {
+        internalPrefs.putBoolean(SHARED_DATABASE_EXPERT_MODE, expertMode);
+    }
+
+    public void setJdbcUrl(String jdbcUrl) {
+        internalPrefs.put(SHARED_DATABASE_JDBC_URL, jdbcUrl);
+    }
+
+    public boolean isUseExpertMode() {
+        return internalPrefs.getBoolean(SHARED_DATABASE_EXPERT_MODE, false);
+    }
+
+    public Optional<String> getJdbcUrl() {
+        return getOptionalValue(SHARED_DATABASE_JDBC_URL);
+    }
+
     public void clear() throws BackingStoreException {
         internalPrefs.clear();
     }
@@ -166,6 +184,8 @@ public class SharedDatabasePreferences {
         setUseSSL(properties.isUseSSL());
         setKeystoreFile(properties.getKeyStore());
         setServerTimezone(properties.getServerTimezone());
+        setExpertMode(properties.isUseExpertMode());
+        setJdbcUrl(properties.getJdbcUrl());
 
         try {
             setPassword(new Password(properties.getPassword().toCharArray(), properties.getUser()).encrypt());

@@ -23,9 +23,9 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.FieldChange;
@@ -259,7 +259,7 @@ public class GroupNodeViewModel {
     }
 
     private void refreshGroup() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             updateMatchedEntries(); // Update the entries matched by the group
             // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
             ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroups(this.databaseContext);

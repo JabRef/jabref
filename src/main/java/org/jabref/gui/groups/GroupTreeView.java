@@ -532,7 +532,7 @@ public class GroupTreeView extends BorderPane {
         }
 
         ContextMenu contextMenu = new ContextMenu();
-        ActionFactory factory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        ActionFactory factory = new ActionFactory();
 
         MenuItem removeGroup;
         if (group.hasSubgroups() && group.canAddGroupsIn() && !group.isRoot()) {

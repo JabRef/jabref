@@ -4,6 +4,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.Node;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -27,6 +28,7 @@ public class SidePaneContentFactory {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
+    private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
@@ -38,6 +40,7 @@ public class SidePaneContentFactory {
                                   StateManager stateManager,
                                   FileUpdateMonitor fileUpdateMonitor,
                                   BibEntryTypesManager entryTypesManager,
+                                  ClipBoardManager clipBoardManager,
                                   UndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
@@ -48,6 +51,7 @@ public class SidePaneContentFactory {
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
+        this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
     }
 
@@ -69,6 +73,7 @@ public class SidePaneContentFactory {
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,
+                    clipBoardManager,
                     undoManager).getContent();
             case WEB_SEARCH -> new WebSearchPaneView(
                     preferences,

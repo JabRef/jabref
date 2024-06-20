@@ -40,9 +40,11 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesFilter;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,7 +195,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                             + Localization.lang("You must restart JabRef for this to come into effect."));
         }
 
-        Globals.entryTypesManager = preferences.getCustomEntryTypesRepository();
+        Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
         dialogService.notify(Localization.lang("Preferences recorded."));
 
         setValues();

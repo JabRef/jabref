@@ -83,7 +83,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
             validationVisualizer.initVisualization(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand);
         });
 
-        ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_PUSH_TO_APPLICATION, new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, preferencesService.getFilePreferences()), autolinkExternalHelp);
     }
 

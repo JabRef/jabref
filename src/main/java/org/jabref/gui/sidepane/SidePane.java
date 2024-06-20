@@ -10,6 +10,7 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ListChangeListener;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -39,6 +40,7 @@ public class SidePane extends VBox {
                     StateManager stateManager,
                     FileUpdateMonitor fileUpdateMonitor,
                     BibEntryTypesManager entryTypesManager,
+                    ClipBoardManager clipBoardManager,
                     UndoManager undoManager) {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
@@ -52,6 +54,7 @@ public class SidePane extends VBox {
                 dialogService,
                 fileUpdateMonitor,
                 entryTypesManager,
+                clipBoardManager,
                 undoManager);
 
         stateManager.getVisibleSidePaneComponents().addListener((ListChangeListener<SidePaneType>) c -> updateView());

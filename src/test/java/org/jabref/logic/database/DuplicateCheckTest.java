@@ -23,8 +23,7 @@ public class DuplicateCheckTest {
 
     private BibEntry simpleArticle;
     private BibEntry unrelatedArticle;
-    private BibEntry simpleInbook;
-    private BibEntry simpleIncollection;
+    private BibEntry simpleInBook;
     private DuplicateCheck duplicateChecker;
 
     private static BibEntry getSimpleArticle() {
@@ -34,7 +33,7 @@ public class DuplicateCheckTest {
                 .withField(StandardField.YEAR, "2017");
     }
 
-    private static BibEntry getSimpleIncollection() {
+    private static BibEntry getSimpleInCollection() {
         return new BibEntry(StandardEntryType.InCollection)
                 .withField(StandardField.TITLE, "Innovation and Intellectual Property Rights")
                 .withField(StandardField.AUTHOR, "Ove Grandstrand")
@@ -43,7 +42,7 @@ public class DuplicateCheckTest {
                 .withField(StandardField.YEAR, "2004");
     }
 
-    private static BibEntry getSimpleInbook() {
+    private static BibEntry getSimpleInBook() {
         return new BibEntry(StandardEntryType.InBook)
                 .withField(StandardField.TITLE, "Alice in Wonderland")
                 .withField(StandardField.AUTHOR, "Charles Lutwidge Dodgson")
@@ -64,8 +63,7 @@ public class DuplicateCheckTest {
     public void setUp() {
         simpleArticle = getSimpleArticle();
         unrelatedArticle = getUnrelatedArticle();
-        simpleInbook = getSimpleInbook();
-        simpleIncollection = getSimpleIncollection();
+        simpleInBook = getSimpleInBook();
         duplicateChecker = new DuplicateCheck(new BibEntryTypesManager());
     }
 
@@ -393,15 +391,15 @@ public class DuplicateCheckTest {
     public static Stream<Arguments> twoEntriesWithDifferentSpecificFieldsAreNotDuplicates() {
         return Stream.of(
                 // twoInbooksWithDifferentChaptersAreNotDuplicates
-                Arguments.of(getSimpleInbook(), StandardField.CHAPTER,
+                Arguments.of(getSimpleInBook(), StandardField.CHAPTER,
                         "Chapter One – Down the Rabbit Hole",
                         "Chapter Two – The Pool of Tears"),
                 // twoInbooksWithDifferentPagesAreNotDuplicates
-                Arguments.of(getSimpleInbook(), StandardField.PAGES, "1-20", "21-40"),
+                Arguments.of(getSimpleInBook(), StandardField.PAGES, "1-20", "21-40"),
                 // twoIncollectionsWithDifferentChaptersAreNotDuplicates
-                Arguments.of(getSimpleIncollection(), StandardField.CHAPTER, "10", "9"),
+                Arguments.of(getSimpleInCollection(), StandardField.CHAPTER, "10", "9"),
                 // twoEntriesWithDifferentSpecificFieldsAreNotDuplicates
-                Arguments.of(getSimpleIncollection(), StandardField.PAGES, "1-20", "21-40")
+                Arguments.of(getSimpleInCollection(), StandardField.PAGES, "1-20", "21-40")
         );
     }
 
@@ -418,9 +416,9 @@ public class DuplicateCheckTest {
 
     @Test
     public void inbookWithoutChapterCouldBeDuplicateOfInbookWithChapter() {
-        final BibEntry inbook2 = ((BibEntry) simpleInbook.clone()).withField(StandardField.CHAPTER, "");
+        final BibEntry inbook2 = ((BibEntry) simpleInBook.clone()).withField(StandardField.CHAPTER, "");
 
-        assertTrue(duplicateChecker.isDuplicate(simpleInbook, inbook2, BibDatabaseMode.BIBTEX));
+        assertTrue(duplicateChecker.isDuplicate(simpleInBook, inbook2, BibDatabaseMode.BIBTEX));
     }
 
     @Test

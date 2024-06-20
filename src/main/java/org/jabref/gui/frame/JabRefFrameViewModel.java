@@ -16,6 +16,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -42,10 +43,10 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JabRefFrameViewModel {
+public class JabRefFrameViewModel implements UiMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);
 
-    private final PreferencesService prefs;
+    private final PreferencesService preferences;
     private final AiService aiService;
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -53,6 +54,7 @@ public class JabRefFrameViewModel {
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
+    private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
     public JabRefFrameViewModel(PreferencesService preferencesService,
@@ -63,8 +65,9 @@ public class JabRefFrameViewModel {
                                 BibEntryTypesManager entryTypesManager,
                                 FileUpdateMonitor fileUpdateMonitor,
                                 UndoManager undoManager,
+                                ClipBoardManager clipBoardManager,
                                 TaskExecutor taskExecutor) {
-        this.prefs = preferencesService;
+        this.preferences = preferencesService;
         this.aiService = aiService;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
@@ -72,18 +75,19 @@ public class JabRefFrameViewModel {
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
+        this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
     }
 
     void storeLastOpenedFiles(List<Path> filenames, Path focusedDatabase) {
-        if (prefs.getWorkspacePreferences().shouldOpenLastEdited()) {
+        if (preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
-                prefs.getGuiPreferences().getLastFilesOpened().clear();
+                preferences.getGuiPreferences().getLastFilesOpened().clear();
             } else {
-                prefs.getGuiPreferences().setLastFilesOpened(filenames);
-                prefs.getGuiPreferences().setLastFocusedFile(focusedDatabase);
+                preferences.getGuiPreferences().setLastFilesOpened(filenames);
+                preferences.getGuiPreferences().setLastFocusedFile(focusedDatabase);
             }
         }
     }
@@ -136,6 +140,7 @@ public class JabRefFrameViewModel {
      *
      * @param uiCommands to be handled
      */
+    @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
         LOGGER.debug("Handling UI commands {}", uiCommands);
         if (uiCommands.isEmpty()) {
@@ -181,8 +186,8 @@ public class JabRefFrameViewModel {
         Path focusedFile = parserResults.stream()
                                         .findFirst()
                                         .flatMap(ParserResult::getPath)
-                                        .orElse(prefs.getGuiPreferences()
-                                                     .getLastFocusedFile())
+                                        .orElse(preferences.getGuiPreferences()
+                                                           .getLastFocusedFile())
                                         .toAbsolutePath();
 
         // Add all bibDatabases databases to the frame:
@@ -199,12 +204,13 @@ public class JabRefFrameViewModel {
                             parserResult,
                             tabContainer,
                             dialogService,
-                            prefs,
+                            preferences,
                             aiService,
                             stateManager,
                             entryTypesManager,
                             fileUpdateMonitor,
                             undoManager,
+                            clipBoardManager,
                             taskExecutor);
                 } catch (
                         SQLException |
@@ -257,7 +263,7 @@ public class JabRefFrameViewModel {
         // if we found new entry types that can be imported, or checking
         // if the database contents should be modified due to new features
         // in this version of JabRef.
-        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, dialogService));
+        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, dialogService, preferences));
 
         LOGGER.debug("Finished adding panels");
     }
@@ -377,7 +383,7 @@ public class JabRefFrameViewModel {
      */
     void addImportedEntries(final LibraryTab tab, final ParserResult parserResult) {
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
-        ImportCleanup cleanup = ImportCleanup.targeting(tab.getBibDatabaseContext().getMode());
+        ImportCleanup cleanup = ImportCleanup.targeting(tab.getBibDatabaseContext().getMode(), preferences.getFieldPreferences());
         cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
         ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));

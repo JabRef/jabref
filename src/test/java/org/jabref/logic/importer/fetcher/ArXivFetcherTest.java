@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -107,29 +107,6 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.PUBLISHER, "arXiv")
                 .withField(StandardField.DOI, "10.48550/ARXIV.1811.10364");
 
-        // Example of a robust result, with information from both ArXiv-assigned and user-assigned DOIs
-        // FixMe: Test this BibEntry
-        BibEntry completePaper = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
-                .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")
-                .withField(StandardField.DATE, "2020-03-10")
-                .withField(StandardField.YEAR, "2020")
-                .withField(StandardField.MONTH, "aug")
-                .withField(StandardField.NUMBER, "8")
-                .withField(StandardField.VOLUME, "22")
-                .withField(StandardField.PAGES, "083005")
-                .withField(StandardField.PUBLISHER, "{IOP} Publishing")
-                .withField(StandardField.JOURNAL, "New Journal of Physics")
-                .withField(StandardField.ABSTRACT, "Interfaces in tissues are ubiquitous, both between tissue and environment as well as between populations of different cell types. The propagation of an interface can be driven mechanically. % e.g. by a difference in the respective homeostatic stress of the different cell types. Computer simulations of growing tissues are employed to study the stability of the interface between two tissues on a substrate. From a mechanical perspective, the dynamics and stability of this system is controlled mainly by four parameters of the respective tissues: (i) the homeostatic stress (ii) cell motility (iii) tissue viscosity and (iv) substrate friction. For propagation driven by a difference in homeostatic stress, the interface is stable for tissue-specific substrate friction even for very large differences of homeostatic stress; however, it becomes unstable above a critical stress difference when the tissue with the larger homeostatic stress has a higher viscosity. A small difference in directed bulk motility between the two tissues suffices to result in propagation with a stable interface, even for otherwise identical tissues. Larger differences in motility force, however, result in a finite-wavelength instability of the interface. Interestingly, the instability is apparently bound by nonlinear effects and the amplitude of the interface undulations only grows to a finite value in time.")
-                .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
-                .withField(StandardField.EPRINT, "2003.04601")
-                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2003.04601v1:PDF")
-                .withField(StandardField.EPRINTTYPE, "arXiv")
-                .withField(StandardField.EPRINTCLASS, "q-bio.TO")
-                .withField(StandardField.KEYWORDS, "Tissues and Organs (q-bio.TO), FOS: Biological sciences")
-                .withField(InternalField.KEY_FIELD, "B_scher_2020")
-                .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
-
         sliceTheoremPaper = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Diez, Tobias")
                 .withField(StandardField.TITLE, "Slice theorem for Fréchet group actions and covariant symplectic field theory")
@@ -180,7 +157,10 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         getInputTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
-        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
@@ -197,7 +177,9 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         getTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
-        ImportCleanup.targeting(BibDatabaseMode.BIBTEX).doPostCleanup(result);
+        FieldPreferences fieldPreferences = mock(FieldPreferences.class);
+        when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
+        ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
 
         assertEquals(List.of(), result);
     }
@@ -318,13 +300,13 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
     @Test
     void searchEntryByPartOfTitle() throws Exception {
-        assertEquals(Collections.singletonList(mainResultPaper),
+        assertEquals(List.of(mainResultPaper),
                 fetcher.performSearch("title:\"the architecture of mr. dLib's\""));
     }
 
     @Test
     void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
-        assertEquals(Collections.singletonList(sliceTheoremPaper),
+        assertEquals(List.of(sliceTheoremPaper),
                 fetcher.performSearch("title:\"slice theorem for Fréchet\""));
     }
 
@@ -463,11 +445,12 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
 
         // There is only a single paper found by searching that contains the exact sequence "Taxonomy of Distributed" in the title.
-        assertEquals(Collections.singletonList(expected), resultWithPhraseSearch);
+        assertEquals(List.of(expected), resultWithPhraseSearch);
     }
 
     @Test
     public void supportsBooleanANDSearch() throws Exception {
+        // Example of a robust result, with information from both ArXiv-assigned and user-assigned DOIs
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
                 .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")
@@ -479,7 +462,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.ISSN, "1367-2630")
                 .withField(StandardField.PAGES, "083005")
                 .withField(StandardField.PUBLISHER, "IOP Publishing")
-                .withField(StandardField.JOURNAL, "New Journal of Physics")
+                .withField(StandardField.JOURNAL, "New J. Phys., 22, 083005 (2020)")
                 .withField(StandardField.ABSTRACT, "Interfaces in tissues are ubiquitous, both between tissue and environment as well as between populations of different cell types. The propagation of an interface can be driven mechanically. % e.g. by a difference in the respective homeostatic stress of the different cell types. Computer simulations of growing tissues are employed to study the stability of the interface between two tissues on a substrate. From a mechanical perspective, the dynamics and stability of this system is controlled mainly by four parameters of the respective tissues: (i) the homeostatic stress (ii) cell motility (iii) tissue viscosity and (iv) substrate friction. For propagation driven by a difference in homeostatic stress, the interface is stable for tissue-specific substrate friction even for very large differences of homeostatic stress; however, it becomes unstable above a critical stress difference when the tissue with the larger homeostatic stress has a higher viscosity. A small difference in directed bulk motility between the two tissues suffices to result in propagation with a stable interface, even for otherwise identical tissues. Larger differences in motility force, however, result in a finite-wavelength instability of the interface. Interestingly, the instability is apparently bound by nonlinear effects and the amplitude of the interface undulations only grows to a finite value in time.")
                 .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
                 .withField(StandardField.EPRINT, "2003.04601")
@@ -493,7 +476,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
         List<BibEntry> result = fetcher.performSearch("author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\"");
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
-        assertEquals(Collections.singletonList(expected), result);
+        assertEquals(List.of(expected), result);
     }
 
     @Test

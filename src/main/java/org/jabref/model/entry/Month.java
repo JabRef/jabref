@@ -51,7 +51,7 @@ public enum Month {
     }
 
     /**
-     * Find month by shortName (3 letters) case insensitive.
+     * Find month by shortName (3 letters) case-insensitive.
      * If no matching month is found, then an empty Optional is returned.
      *
      * @param shortName "jan", "feb", ...

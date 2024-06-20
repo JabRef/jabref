@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.jabref.gui.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -25,6 +25,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -68,11 +69,12 @@ public class DatabaseSearcherWithBibFilesTest {
             .withCitationKey("minimal-note-mixed-case")
             .withFiles(Collections.singletonList(new LinkedFile("", "minimal-note-mixed-case.pdf", StandardFileType.PDF.getName())));
 
-    FilePreferences filePreferences = mock(FilePreferences.class);
 
     @TempDir
     private Path indexDir;
     private PdfIndexer pdfIndexer;
+    private StateManager stateManager;
+    private PreferencesService preferencesService;
 
     private BibDatabase initializeDatabaseFromPath(String testFile) throws Exception {
         return initializeDatabaseFromPath(Path.of(Objects.requireNonNull(DatabaseSearcherWithBibFilesTest.class.getResource(testFile)).toURI()));
@@ -89,10 +91,14 @@ public class DatabaseSearcherWithBibFilesTest {
         when(context.getEntries()).thenReturn(database.getEntries());
 
         // Required because of {@Link org.jabref.model.search.rules.FullTextSearchRule.FullTextSearchRule}
-        Globals.stateManager.setActiveDatabase(context);
-        PreferencesService preferencesService = mock(PreferencesService.class);
+        stateManager = new StateManager();
+        stateManager.setActiveDatabase(context);
+        Injector.setModelOrService(StateManager.class, stateManager);
+
+        preferencesService = mock(PreferencesService.class);
+        FilePreferences filePreferences = mock(FilePreferences.class);
         when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
-        Globals.prefs = preferencesService;
+        Injector.setModelOrService(PreferencesService.class, preferencesService);
 
         pdfIndexer = PdfIndexerManager.getIndexer(context, filePreferences);
         // Alternative - For debugging with Luke (part of the Apache Lucene distribution)

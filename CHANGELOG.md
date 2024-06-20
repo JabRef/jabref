@@ -40,12 +40,15 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where drag and dropping entries from one library to another was not always working. [#11254](https://github.com/JabRef/jabref/issues/11254)
 - We fixed an issue where drag and dropping entries created a shallow copy. [#11160](https://github.com/JabRef/jabref/issues/11160)
 - We fixed an issue where imports to a custom group would only work for the first entry [#11085](https://github.com/JabRef/jabref/issues/11085), [#11269](https://github.com/JabRef/jabref/issues/11269)
+- We fixed an issue when cursor jumped to the beginning of the line. [#5904](https://github.com/JabRef/jabref/issues/5904)
 - We fixed an issue where a new entry was not added to the selected group [#8933](https://github.com/JabRef/jabref/issues/8933)
 - We fixed an issue where the horizontal position of the Entry Preview inside the entry editor was not remembered across restarts [#11281](https://github.com/JabRef/jabref/issues/11281)
 - We fixed an issue where the search index was not updated after linking PDF files. [#11317](https://github.com/JabRef/jabref/pull/11317)
 - We fixed rendering of (first) author with a single letter surname. [forum#4330](https://discourse.jabref.org/t/correct-rendering-of-first-author-with-a-single-letter-surname/4330)
+- We fixed that the import of the related articles tab sometimes used the wrong library mode. [#11282](https://github.com/JabRef/jabref/pull/11282)
 - We fixed an issue where the entry editor context menu was not shown correctly when JabRef is opened on a second, extended screen [#11323](https://github.com/JabRef/jabref/issues/11323), [#11174](https://github.com/JabRef/jabref/issues/11174)
-- We fixe an issue where the value of "Override default font settings" was not applied on startup [#11344](https://github.com/JabRef/jabref/issues/11344)
+- We fixed an issue where the value of "Override default font settings" was not applied on startup [#11344](https://github.com/JabRef/jabref/issues/11344)
+- We fixed an issue when "Library changed on disk" appeared after a save by JabRef. [#4877](https://github.com/JabRef/jabref/issues/4877)  
 
 ### Removed
 
