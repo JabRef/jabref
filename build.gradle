@@ -222,9 +222,11 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.25.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.32.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
+        exclude group: 'org.apache.commons.validator' // creates issues with common-logging
+        exclude group: 'org.apache.commons.commons-logging'
         exclude group: 'org.openjfx'
         exclude group: 'org.apache.logging.log4j'
         exclude group: 'tech.units'
@@ -235,9 +237,11 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.2.1'
 
     implementation 'org.jsoup:jsoup:1.17.2'
-    implementation 'com.konghq:unirest-java:3.14.5'
+    implementation 'com.konghq:unirest-java-core:4.4.0'
+    implementation 'com.konghq:unirest-modules-gson:4.4.0'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
 
-    implementation 'org.slf4j:slf4j-api:2.0.13'
+    implementation "org.slf4j:slf4j-api:2.0.13"
     implementation "org.tinylog:tinylog-api:2.7.0"
     implementation "org.tinylog:slf4j-tinylog:2.7.0"
     implementation "org.tinylog:tinylog-impl:2.7.0"
@@ -532,7 +536,7 @@ testlogger {
     showStackTraces false
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
     // Enable parallel tests (on desktop).
     // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
@@ -718,6 +722,7 @@ jlink {
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
+        uses 'kong.unirest.core.json.JsonEngine';
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
@@ -733,6 +738,8 @@ jlink {
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
+        provides 'kong.unirest.core.json.JsonEngine' with 'kong.unirest.modules.gson.GsonEngine';
+
     }
 
     jpackage {

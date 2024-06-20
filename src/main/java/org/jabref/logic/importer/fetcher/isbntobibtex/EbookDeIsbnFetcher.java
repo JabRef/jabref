@@ -13,7 +13,7 @@ import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 
 /**
  * Fetcher for ISBN using <a href="https://www.ebook.de">https://www.ebook.de</a>.

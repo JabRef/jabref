@@ -44,10 +44,8 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
 
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
-import kong.unirest.apache.ApacheClient;
-import org.apache.http.client.config.RequestConfig;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,13 +201,13 @@ public class URLDownload {
      * @return the status code of the response
      */
     public boolean canBeReached() throws UnirestException {
-
+/*
         // Set a custom Apache Client Builder to be able to allow circular redirects, otherwise downloads from springer might not work
         Unirest.config().httpClient(new ApacheClient.Builder()
                                     .withRequestConfig((c, r) -> RequestConfig.custom()
                                                        .setCircularRedirectsAllowed(true)
                                                        .build()));
-
+*/
         Unirest.config().setDefaultHeader("User-Agent", USER_AGENT);
 
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
