@@ -15,6 +15,9 @@ import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
@@ -200,79 +203,101 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param listView CheckListView to style
      */
     private void styleFetchedListView(CheckListView<CitationRelationItem> listView) {
-        PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
-        new ViewModelListCellFactory<CitationRelationItem>()
-                .withGraphic(entry -> {
+    PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
+    new ViewModelListCellFactory<CitationRelationItem>()
+            .withGraphic(entry -> {
 
-                    HBox separator = new HBox();
-                    HBox.setHgrow(separator, Priority.SOMETIMES);
-                    Node entryNode = BibEntryView.getEntryNode(entry.entry());
-                    HBox.setHgrow(entryNode, Priority.ALWAYS);
-                    HBox hContainer = new HBox();
-                    hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
+                HBox separator = new HBox();
+                HBox.setHgrow(separator, Priority.SOMETIMES);
+                Node entryNode = BibEntryView.getEntryNode(entry.entry());
+                HBox.setHgrow(entryNode, Priority.ALWAYS);
+                HBox hContainer = new HBox();
+                hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
 
-                    VBox vContainer = new VBox();
+                VBox vContainer = new VBox();
 
-                    if (entry.isLocal()) {
-                        hContainer.getStyleClass().add("duplicate-entry");
-                        Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
-                        jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
-                        jumpTo.getStyleClass().add("addEntryButton");
-                        jumpTo.setOnMouseClicked(event -> {
-                            citingTask.cancel();
-                            citedByTask.cancel();
-                            libraryTab.showAndEdit(entry.localEntry());
-                            libraryTab.clearAndSelect(entry.localEntry());
-                        });
-                        vContainer.getChildren().add(jumpTo);
-                    } else {
-                        ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
-                        addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
-                        EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
-                            if (selected) {
-                                addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());
-                            } else {
-                                addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
-                            }
-                        });
-                        addToggle.getStyleClass().add("addEntryButton");
-                        addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(entry));
-                        vContainer.getChildren().add(addToggle);
-                    }
+                if (entry.isLocal()) {
+                    hContainer.getStyleClass().add("duplicate-entry");
+                    Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
+                    jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
+                    jumpTo.getStyleClass().add("addEntryButton");
+                    jumpTo.setOnMouseClicked(event -> {
+                        citingTask.cancel();
+                        citedByTask.cancel();
+                        libraryTab.showAndEdit(entry.localEntry());
+                        libraryTab.clearAndSelect(entry.localEntry());
+                    });
+                    vContainer.getChildren().add(jumpTo);
 
-                    if (entry.entry().getDOI().isPresent() || entry.entry().getField(StandardField.URL).isPresent()) {
-                        Button openWeb = IconTheme.JabRefIcons.OPEN_LINK.asButton();
-                        openWeb.setTooltip(new Tooltip(Localization.lang("Open URL or DOI")));
-                        openWeb.setOnMouseClicked(event -> {
-                            String url = entry.entry().getDOI().flatMap(DOI::getExternalURI).map(URI::toString)
+                    // Add the compare button for duplicates
+                    Button compareButton = new Button("Compare");
+                    compareButton.setTooltip(new Tooltip(Localization.lang("Compare with duplicate entries")));
+                    compareButton.setOnMouseClicked(event -> {
+                        openDuplicateEntriesWindow(entry.localEntry());
+                    });
+                    vContainer.getChildren().add(compareButton);
+                } else {
+                    ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
+                    addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
+                    EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
+                        if (selected) {
+                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());
+                        } else {
+                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
+                        }
+                    });
+                    addToggle.getStyleClass().add("addEntryButton");
+                    addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(entry));
+                    vContainer.getChildren().add(addToggle);
+                }
+
+                if (entry.entry().getDOI().isPresent() || entry.entry().getField(StandardField.URL).isPresent()) {
+                    Button openWeb = IconTheme.JabRefIcons.OPEN_LINK.asButton();
+                    openWeb.setTooltip(new Tooltip(Localization.lang("Open URL or DOI")));
+                    openWeb.setOnMouseClicked(event -> {
+                        String url = entry.entry().getDOI().flatMap(DOI::getExternalURI).map(URI::toString)
                                               .or(() -> entry.entry().getField(StandardField.URL)).orElse("");
-                            if (StringUtil.isNullOrEmpty(url)) {
-                                return;
-                            }
-                            try {
-                                JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
-                            } catch (IOException ex) {
-                                dialogService.notify(Localization.lang("Unable to open link."));
-                            }
-                        });
-                        vContainer.getChildren().addLast(openWeb);
-                    }
+                        if (StringUtil.isNullOrEmpty(url)) {
+                            return;
+                        }
+                        try {
+                            JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
+                        } catch (IOException ex) {
+                            dialogService.notify(Localization.lang("Unable to open link."));
+                        }
+                    });
+                    vContainer.getChildren().add(openWeb);
+                }
 
-                    hContainer.getChildren().addAll(entryNode, separator, vContainer);
-                    hContainer.getStyleClass().add("entry-container");
+                hContainer.getChildren().addAll(entryNode, separator, vContainer);
+                hContainer.getStyleClass().add("entry-container");
 
-                    return hContainer;
-                })
-                .withOnMouseClickedEvent((ee, event) -> {
-                    if (!ee.isLocal()) {
-                        listView.getCheckModel().toggleCheckState(ee);
-                    }
-                })
-                .withPseudoClass(entrySelected, listView::getItemBooleanProperty)
-                .install(listView);
+                return hContainer;
+            })
+            .withOnMouseClickedEvent((ee, event) -> {
+                if (!ee.isLocal()) {
+                    listView.getCheckModel().toggleCheckState(ee);
+                }
+            })
+            .withPseudoClass(entrySelected, listView::getItemBooleanProperty)
+            .install(listView);
 
-        listView.setSelectionModel(new NoSelectionModel<>());
-    }
+    listView.setSelectionModel(new NoSelectionModel<>());
+}
+
+// Add this method to open the duplicate entries window
+private void openDuplicateEntriesWindow(BibEntry entry) {
+    // Implementation to open the duplicate entries window
+    Dialog<ButtonType> dialog = new Dialog<>();
+    dialog.setTitle(Localization.lang("Possible duplicate entries"));
+
+    DialogPane dialogPane = new DialogPane();
+    dialogPane.setContent(new Label("Here you can show the duplicate entries and their comparison details."));
+    dialog.setDialogPane(dialogPane);
+    dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+    dialog.showAndWait();
+}
 
     /**
      * Method to style heading labels
