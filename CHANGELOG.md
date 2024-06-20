@@ -1355,3 +1355,11 @@ The changelog of JabRef 2.11 and all previous versions is available as [text fil
 [5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-alpha...v5.0-beta
 [5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
 <!-- markdownlint-disable-file MD012 MD024 MD033 MD053 -->
+
+### Added
+
+- Added a "Compare" button for duplicate entries in the CitationRelationsTab. Implemented functionality to open a dialog for comparing duplicate entries. Enhanced UI to include the compare button alongside the existing "Jump to entry in library" button. ([#11192](https://github.com/JabRef/jabref/issues/11192))
+
+### Fixed
+
+- Fixed missing localization key for "Compare with duplicate entries" in `JabRef_en.properties`.
