@@ -2,7 +2,7 @@
 nav_order: 0032
 parent: Decision Records
 ---
-# Store chats in JSON
+# Store chats in MVStore
 
 ## Context and Problem Statement
 
@@ -24,8 +24,7 @@ the serialized messages.
 
 ## Decision Outcome
 
-Chosen option: "JSON", because it is the simplest.
-In case memory and disk consumption will be too high, we will consider switching to MVStore (or other memory-efficient formats).
+Chosen option: "MVStore", because it is simple and memory-efficient.
 
 ## Pros and Cons of the Options
 
@@ -47,3 +46,4 @@ In case memory and disk consumption will be too high, we will consider switching
 
 * Good, because we have the full control
 * Bad, because involves writing our own language and parser
+* Bad, because we need to implement optimizations found in databases on our own (storing some data in RAM, other on disk)
