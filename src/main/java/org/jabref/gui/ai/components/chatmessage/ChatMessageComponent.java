@@ -11,7 +11,6 @@ import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.jabref.preferences.WorkspacePreferences;
 
 public class ChatMessageComponent extends HBox {
     @FXML private VBox vBox;
