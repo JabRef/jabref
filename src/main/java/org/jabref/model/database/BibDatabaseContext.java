@@ -274,6 +274,7 @@ public class BibDatabaseContext {
                 ", mode=" + getMode() +
                 ", databasePath=" + getDatabasePath() +
                 ", biblatexMode=" + isBiblatexMode() +
+                ", uid= " + getUid() +
                 ", fulltextIndexPath=" + getFulltextIndexPath() +
                 '}';
     }
@@ -300,7 +301,7 @@ public class BibDatabaseContext {
     /**
      * Get the generated UID for the current context. Can be used to distinguish contexts with changing metadata etc
      * <p>
-     * This is requried, because of {@link #hashCode()} implementation.
+     * This is required, because of {@link #hashCode()} implementation.
      *
      * @return The generated UID in UUIDv4 format with the prefix bibdatabasecontext_
      */
