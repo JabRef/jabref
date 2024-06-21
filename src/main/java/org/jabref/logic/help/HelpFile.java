@@ -47,6 +47,8 @@ public enum HelpFile {
     FIND_DUPLICATES("finding-sorting-and-cleaning-entries/findduplicates"),
     SQL_DATABASE_MIGRATION("collaborative-work/sqldatabase/sqldatabasemigration"),
     PUSH_TO_APPLICATION("cite/pushtoapplications"),
+    AI_CHAT_MODEL("ai/chat-model"),
+    AI_EMBEDDING_MODEL("ai/embedding-model"),
     AI_SYSTEM_MESSAGE("ai/system-message"),
     AI_MESSAGE_WINDOW_SIZE("ai/message-window-size"),
     AI_DOCUMENT_SPLITTER_CHUNK_SIZE("ai/document-splitter-chunk-size"),

@@ -32,7 +32,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty customizeSettings = new SimpleBooleanProperty();
 
-    private final ObjectProperty<AiPreferences.ChatModel> aiModel = new SimpleObjectProperty<>();
+    private final ObjectProperty<AiPreferences.ChatModel> aiChatModel = new SimpleObjectProperty<>();
     private final ObjectProperty<AiPreferences.EmbeddingModel> embeddingModel = new SimpleObjectProperty<>();
 
     private final StringProperty systemMessage = new SimpleStringProperty();
@@ -105,7 +105,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         customizeSettings.setValue(aiPreferences.getCustomizeSettings());
 
-        aiModel.setValue(aiPreferences.getChatModel());
+        aiChatModel.setValue(aiPreferences.getChatModel());
         embeddingModel.setValue(aiPreferences.getEmbeddingModel());
 
         systemMessage.setValue(aiPreferences.getSystemMessage());
@@ -125,7 +125,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setCustomizeSettings(customizeSettings.get());
 
         if (customizeSettings.get()) {
-            aiPreferences.setChatModel(aiModel.get());
+            aiPreferences.setChatModel(aiChatModel.get());
             aiPreferences.setEmbeddingModel(embeddingModel.get());
 
             aiPreferences.setSystemMessage(systemMessage.get());
@@ -184,14 +184,21 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return useAi;
     }
 
+    public boolean getUseAi() {
+        return useAi.get();
+    }
+
     public BooleanProperty customizeSettingsProperty() {
         return customizeSettings;
     }
 
-    public ObjectProperty<AiPreferences.ChatModel> aiModelProperty() {
-        return aiModel;
+    public boolean getCustomizeSettings() {
+        return customizeSettings.get();
     }
 
+    public ObjectProperty<AiPreferences.ChatModel> aiChatModelProperty() {
+        return aiChatModel;
+    }
     public ObjectProperty<AiPreferences.EmbeddingModel> embeddingModelProperty() {
         return embeddingModel;
     }

@@ -156,4 +156,5 @@ open module org.jabref {
     requires org.checkerframework.checker.qual;
     requires jakarta.validation;
     requires one.jpro.platform.mdfx;
+    requires scala.library;
 }

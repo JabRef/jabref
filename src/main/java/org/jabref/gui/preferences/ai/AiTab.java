@@ -8,16 +8,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.AiPreferences;
-import org.jabref.preferences.FilePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.unitfx.DoubleInputField;
@@ -43,6 +38,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
+    @FXML private Button chatModelHelp;
+    @FXML private Button embeddingModelHelp;
     @FXML private Button systemMessageHelp;
     @FXML private Button messageWindowSizeHelp;
     @FXML private Button documentSplitterChunkSizeHelp;
@@ -69,7 +66,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         customizeSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeSettingsProperty());
 
-        aiModelComboBox.valueProperty().bindBidirectional(viewModel.aiModelProperty());
+        aiModelComboBox.valueProperty().bindBidirectional(viewModel.aiChatModelProperty());
         embeddingModelComboBox.valueProperty().bindBidirectional(viewModel.embeddingModelProperty());
 
         systemMessageTextArea.textProperty().bindBidirectional(viewModel.systemMessageProperty());
@@ -80,58 +77,11 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         ragMaxResultsCountTextField.valueProperty().bindBidirectional(viewModel.ragMaxResultsCountProperty().asObject());
         ragMinScoreTextField.valueProperty().bindBidirectional(viewModel.ragMinScoreProperty().asObject());
 
-        openAiToken.setDisable(!enableChat.isSelected());
+        updateDisabilities();
 
-        customizeSettingsCheckbox.setDisable(!enableChat.isSelected());
+        enableChat.selectedProperty().addListener(obs -> updateDisabilities());
 
-        aiModelComboBox.setDisable(!enableChat.isSelected());
-        embeddingModelComboBox.setDisable(!enableChat.isSelected());
-
-        systemMessageTextArea.setDisable(!enableChat.isSelected());
-        temperatureTextField.setDisable(!enableChat.isSelected());
-        messageWindowSizeTextField.setDisable(!enableChat.isSelected());
-        documentSplitterChunkSizeTextField.setDisable(!enableChat.isSelected());
-        documentSplitterOverlapSizeTextField.setDisable(!enableChat.isSelected());
-        ragMaxResultsCountTextField.setDisable(!enableChat.isSelected());
-        ragMinScoreTextField.setDisable(!enableChat.isSelected());
-        resetExpertSettingsButton.setDisable(!enableChat.isSelected());
-
-        messageWindowSizeTextField.setDisable(!customizeSettingsCheckbox.isSelected());
-        documentSplitterChunkSizeTextField.setDisable(!customizeSettingsCheckbox.isSelected());
-        documentSplitterOverlapSizeTextField.setDisable(!customizeSettingsCheckbox.isSelected());
-        ragMaxResultsCountTextField.setDisable(!customizeSettingsCheckbox.isSelected());
-        ragMinScoreTextField.setDisable(!customizeSettingsCheckbox.isSelected());
-        resetExpertSettingsButton.setDisable(!customizeSettingsCheckbox.isSelected());
-
-        enableChat.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            openAiToken.setDisable(!newValue);
-
-            aiModelComboBox.setDisable(!newValue);
-            embeddingModelComboBox.setDisable(!newValue);
-
-            customizeSettingsCheckbox.setDisable(!newValue);
-
-            systemMessageTextArea.setDisable(!newValue);
-            messageWindowSizeTextField.setDisable(!newValue);
-            documentSplitterChunkSizeTextField.setDisable(!newValue);
-            documentSplitterOverlapSizeTextField.setDisable(!newValue);
-            ragMaxResultsCountTextField.setDisable(!newValue);
-            ragMinScoreTextField.setDisable(!newValue);
-            resetExpertSettingsButton.setDisable(!newValue);
-        });
-
-        customizeSettingsCheckbox.selectedProperty().addListener(((observable, oldValue, newValue) -> {
-            systemMessageTextArea.setDisable(!newValue);
-            temperatureTextField.setDisable(!newValue);
-            messageWindowSizeTextField.setDisable(!newValue);
-            documentSplitterChunkSizeTextField.setDisable(!newValue);
-            documentSplitterOverlapSizeTextField.setDisable(!newValue);
-            ragMaxResultsCountTextField.setDisable(!newValue);
-            ragMinScoreTextField.setDisable(!newValue);
-            resetExpertSettingsButton.setDisable(!newValue);
-
-            viewModel.resetExpertSettings();
-        }));
+        customizeSettingsCheckbox.selectedProperty().addListener(obs -> updateDisabilities());
 
         Platform.runLater(() -> {
             visualizer.initVisualization(viewModel.getOpenAiTokenValidatorStatus(), openAiToken);
@@ -146,6 +96,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         /*
         ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_CHAT_MODEL, dialogService, preferencesService.getFilePreferences()), chatModelHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EMBEDDING_MODEL, dialogService, preferencesService.getFilePreferences()), embeddingModelHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_SYSTEM_MESSAGE, dialogService, preferencesService.getFilePreferences()), systemMessageHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_MESSAGE_WINDOW_SIZE, dialogService, preferencesService.getFilePreferences()), messageWindowSizeHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_CHUNK_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterChunkSizeHelp);
@@ -153,6 +105,24 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MAX_RESULTS_COUNT, dialogService, preferencesService.getFilePreferences()), ragMaxResultsCountHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MIN_SCORE, dialogService, preferencesService.getFilePreferences()), ragMinScoreHelp);
         */
+    }
+
+    private void updateDisabilities() {
+        openAiToken.setDisable(!viewModel.getUseAi());
+
+        customizeSettingsCheckbox.setDisable(!viewModel.getUseAi());
+
+        aiModelComboBox.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        embeddingModelComboBox.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+
+        systemMessageTextArea.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        temperatureTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        messageWindowSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        documentSplitterChunkSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        documentSplitterOverlapSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        ragMaxResultsCountTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        ragMinScoreTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        resetExpertSettingsButton.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
     }
 
     @Override
