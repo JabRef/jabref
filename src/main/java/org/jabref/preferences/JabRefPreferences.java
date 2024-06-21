@@ -35,6 +35,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
+import org.checkerframework.checker.units.qual.A;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
@@ -57,6 +58,7 @@ import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.ai.AiDefaultSettings;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
@@ -849,17 +851,17 @@ public class JabRefPreferences implements PreferencesService {
         setLanguageDependentDefaultValues();
 
         // AI
-        defaults.put(AI_ENABLE_CHAT, Boolean.FALSE);
-        defaults.put(AI_CUSTOMIZE_SETTINGS, false);
-        defaults.put(AI_CHAT_MODEL, AiPreferences.ChatModel.GPT_3_5_TURBO.getName());
-        defaults.put(AI_EMBEDDING_MODEL, AiPreferences.EmbeddingModel.ALL_MINLM_l6_V2.name());
-        defaults.put(AI_SYSTEM_MESSAGE, "You are an AI assistant.");
-        defaults.put(AI_TEMPERATURE, 0.3);
-        defaults.put(AI_MESSAGE_WINDOW_SIZE, 10);
-        defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, 300);
-        defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, 100);
-        defaults.put(AI_RAG_MAX_RESULTS_COUNT, 10);
-        defaults.put(AI_RAG_MIN_SCORE, 0.5);
+        defaults.put(AI_ENABLE_CHAT, AiDefaultSettings.ENABLE_CHAT);
+        defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultSettings.CUSTOMIZE_SETTINGS);
+        defaults.put(AI_CHAT_MODEL, AiDefaultSettings.CHAT_MODEL);
+        defaults.put(AI_EMBEDDING_MODEL, AiDefaultSettings.EMBEDDING_MODEL);
+        defaults.put(AI_SYSTEM_MESSAGE, AiDefaultSettings.SYSTEM_MESSAGE);
+        defaults.put(AI_TEMPERATURE, AiDefaultSettings.TEMPERATURE);
+        defaults.put(AI_MESSAGE_WINDOW_SIZE, AiDefaultSettings.MESSAGE_WINDOW_SIZE);
+        defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, AiDefaultSettings.DOCUMENT_SPLITTER_CHUNK_SIZE);
+        defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultSettings.DOCUMENT_SPLITTER_OVERLAP);
+        defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultSettings.RAG_MAX_RESULTS_COUNT);
+        defaults.put(AI_RAG_MIN_SCORE, AiDefaultSettings.RAG_MIN_SCORE);
     }
 
     public void setLanguageDependentDefaultValues() {

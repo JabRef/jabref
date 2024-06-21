@@ -14,6 +14,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.logic.ai.AiDefaultSettings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AiPreferences;
@@ -142,23 +143,23 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public void resetExpertSettings() {
         // TODO: How to access default settings?
-        aiPreferences.setSystemMessage(JabRefPreferences.getInstance().get(JabRefPreferences.AI_SYSTEM_MESSAGE));
-        systemMessage.set(JabRefPreferences.getInstance().get(JabRefPreferences.AI_SYSTEM_MESSAGE));
+        aiPreferences.setSystemMessage(AiDefaultSettings.SYSTEM_MESSAGE);
+        systemMessage.set(AiDefaultSettings.SYSTEM_MESSAGE);
 
-        aiPreferences.setMessageWindowSize(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_MESSAGE_WINDOW_SIZE));
-        messageWindowSize.set(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_MESSAGE_WINDOW_SIZE));
+        aiPreferences.setMessageWindowSize(AiDefaultSettings.MESSAGE_WINDOW_SIZE);
+        messageWindowSize.set(AiDefaultSettings.MESSAGE_WINDOW_SIZE);
 
-        aiPreferences.setDocumentSplitterChunkSize(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_DOCUMENT_SPLITTER_CHUNK_SIZE));
-        documentSplitterChunkSize.set(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_DOCUMENT_SPLITTER_CHUNK_SIZE));
+        aiPreferences.setDocumentSplitterChunkSize(AiDefaultSettings.DOCUMENT_SPLITTER_CHUNK_SIZE);
+        documentSplitterChunkSize.set(AiDefaultSettings.DOCUMENT_SPLITTER_CHUNK_SIZE);
 
-        aiPreferences.setDocumentSplitterOverlapSize(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE));
-        documentSplitterOverlapSize.set(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE));
+        aiPreferences.setDocumentSplitterOverlapSize(AiDefaultSettings.DOCUMENT_SPLITTER_OVERLAP);
+        documentSplitterOverlapSize.set(AiDefaultSettings.DOCUMENT_SPLITTER_OVERLAP);
 
-        aiPreferences.setRagMaxResultsCount(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_RAG_MAX_RESULTS_COUNT));
-        ragMaxResultsCount.set(JabRefPreferences.getInstance().getInt(JabRefPreferences.AI_RAG_MAX_RESULTS_COUNT));
+        aiPreferences.setRagMaxResultsCount(AiDefaultSettings.RAG_MAX_RESULTS_COUNT);
+        ragMaxResultsCount.set(AiDefaultSettings.RAG_MAX_RESULTS_COUNT);
 
-        aiPreferences.setRagMinScore(JabRefPreferences.getInstance().getDouble(JabRefPreferences.AI_RAG_MIN_SCORE));
-        ragMinScore.set(JabRefPreferences.getInstance().getDouble(JabRefPreferences.AI_RAG_MIN_SCORE));
+        aiPreferences.setRagMinScore(AiDefaultSettings.RAG_MIN_SCORE);
+        ragMinScore.set(AiDefaultSettings.RAG_MIN_SCORE);
     }
 
     @Override
