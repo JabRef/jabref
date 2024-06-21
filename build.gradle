@@ -713,7 +713,6 @@ jlink {
         requires 'jdk.xml.dom'
         requires 'com.google.gson'
         requires 'org.jsoup'
-        requires 'org.apache.commons.logging'
         requires 'org.slf4j'
         requires 'jakarta.xml.bind'
         requires 'org.apache.commons.lang3'
