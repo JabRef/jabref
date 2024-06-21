@@ -119,7 +119,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         AnchorPane citedByHBox = new AnchorPane();
         citedByHBox.setPrefHeight(40);
 
-        // Create Heading Lab
+        // Create Heading Labels
         Label citingLabel = new Label(Localization.lang("Cites"));
         styleLabel(citingLabel);
         Label citedByLabel = new Label(Localization.lang("Cited By"));
@@ -193,7 +193,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         return container;
     }
 
-    /**
+        /**
      * Styles a given CheckListView to display BibEntries either with a hyperlink or an add button
      *
      * @param listView CheckListView to style
@@ -226,7 +226,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         vContainer.getChildren().add(jumpTo);
 
                         // Add the compare button for duplicates
-                        Button compareButton = new Button("Compare");
+                        Button compareButton = IconTheme.JabRefIcons.COMPARE.asButton();
                         compareButton.setTooltip(new Tooltip(Localization.lang("Compare with duplicate entries")));
                         compareButton.setOnMouseClicked(event -> {
                             openDuplicateEntriesWindow(entry.localEntry());
@@ -281,9 +281,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         listView.setSelectionModel(new NoSelectionModel<>());
     }
 
-    // Add this method to open the duplicate entries window
     private void openDuplicateEntriesWindow(BibEntry entry) {
-        // Implementation to open the duplicate entries window
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle(Localization.lang("Possible duplicate entries"));
 
@@ -337,7 +335,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         setContent(getPaneAndStartSearch(entry));
     }
 
-    /**
+        /**
      * Method to start search for relations and display them in the associated ListView
      *
      * @param entry         BibEntry currently selected in Jabref Database
@@ -411,15 +409,15 @@ public class CitationRelationsTab extends EntryEditorTab {
         hideNodes(abortButton, progress);
 
         observableList.setAll(
-        fetchedList.stream()
-            .map(entr -> duplicateCheck.containsDuplicate(
-                    databaseContext.getDatabase(),
-                    entr,
-                    BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()))
-                .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
-                .orElseGet(() -> new CitationRelationItem(entr, false)))
-            .toList()
-    );
+                fetchedList.stream()
+                        .map(entr -> duplicateCheck.containsDuplicate(
+                                databaseContext.getDatabase(),
+                                entr,
+                                BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()))
+                                .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
+                                .orElseGet(() -> new CitationRelationItem(entr, false)))
+                        .toList()
+        );
 
         if (!observableList.isEmpty()) {
             listView.refresh();
