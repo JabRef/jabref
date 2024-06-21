@@ -141,7 +141,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetExpertSettings() {
-        // TODO: How to access default settings?
         aiPreferences.setSystemMessage(AiDefaultPreferences.SYSTEM_MESSAGE);
         systemMessage.set(AiDefaultPreferences.SYSTEM_MESSAGE);
 
