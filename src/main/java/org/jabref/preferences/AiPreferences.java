@@ -28,7 +28,7 @@ public class AiPreferences {
 
         public static ChatModel fromString(String text) {
             for (ChatModel b : ChatModel.values()) {
-                if (b.name.equalsIgnoreCase(text)) {
+                if (b.name.equals(text)) {
                     return b;
                 }
             }
@@ -46,8 +46,32 @@ public class AiPreferences {
     }
 
     public enum EmbeddingModel {
-        ALL_MINLM_l6_V2,
-        ALL_MINLM_l6_V2_Q,
+        ALL_MINLM_l6_V2("all-MiniLM-L6-v2"),
+        ALL_MINLM_l6_V2_Q("all-MiniLM-L6-v2 (quantized)");
+
+        private final String name;
+
+        EmbeddingModel(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+             return name;
+        }
+
+        public static EmbeddingModel fromString(String text) {
+            for (EmbeddingModel b : EmbeddingModel.values()) {
+                if (b.name.equals(text)) {
+                    return b;
+                }
+            }
+            assert false;
+            return null;
+        }
+
+        public String toString() {
+            return name;
+        }
     }
 
     private final BooleanProperty enableChatWithFiles;

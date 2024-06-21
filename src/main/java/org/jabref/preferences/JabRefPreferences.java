@@ -853,8 +853,8 @@ public class JabRefPreferences implements PreferencesService {
         // AI
         defaults.put(AI_ENABLE_CHAT, AiDefaultSettings.ENABLE_CHAT);
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultSettings.CUSTOMIZE_SETTINGS);
-        defaults.put(AI_CHAT_MODEL, AiDefaultSettings.CHAT_MODEL);
-        defaults.put(AI_EMBEDDING_MODEL, AiDefaultSettings.EMBEDDING_MODEL);
+        defaults.put(AI_CHAT_MODEL, AiDefaultSettings.CHAT_MODEL.getName());
+        defaults.put(AI_EMBEDDING_MODEL, AiDefaultSettings.EMBEDDING_MODEL.getName());
         defaults.put(AI_SYSTEM_MESSAGE, AiDefaultSettings.SYSTEM_MESSAGE);
         defaults.put(AI_TEMPERATURE, AiDefaultSettings.TEMPERATURE);
         defaults.put(AI_MESSAGE_WINDOW_SIZE, AiDefaultSettings.MESSAGE_WINDOW_SIZE);
@@ -2704,7 +2704,7 @@ public class JabRefPreferences implements PreferencesService {
                 useAi,
                 token,
                 AiPreferences.ChatModel.fromString(get(AI_CHAT_MODEL)),
-                AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
+                AiPreferences.EmbeddingModel.fromString(get(AI_EMBEDDING_MODEL)),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_SYSTEM_MESSAGE),
                 getDouble(AI_TEMPERATURE),
