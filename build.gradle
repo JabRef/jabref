@@ -510,6 +510,11 @@ test {
         excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest'
     }
 
+    testLogging {
+        events "PASSED", "SKIPPED", "FAILED", "STANDARD_OUT", "STANDARD_ERROR"
+        showStandardStreams = true
+    }
+
     moduleOptions {
         // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true

@@ -1,10 +1,7 @@
 package org.jabref.preferences;
 
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -38,6 +35,13 @@ public class FilePreferences {
     private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
+
+    private static final Map<String,Boolean> branchCov = new HashMap<>();
+
+    static {
+        branchCov.put("getMainFD_0", false);
+        branchCov.put("getMainFD_1", false);
+    }
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -77,10 +81,23 @@ public class FilePreferences {
 
     public Optional<Path> getMainFileDirectory() {
         if (StringUtil.isBlank(mainFileDirectory.getValue())) {
+            branchCov.put("getMainFD_0", true);
             return Optional.empty();
         } else {
+            branchCov.put("getMainFD_1", true);
             return Optional.of(Path.of(mainFileDirectory.getValue()));
         }
+    }
+
+    public static void printCov() {
+        for (Map.Entry <String, Boolean> entry : branchCov.entrySet()){
+            System.out.println((entry.getKey() + " was " + (entry.getValue() ? "hit" : "not hit")));
+        }
+    }
+
+    public static void  resetBranchCov() {
+        branchCov.put("getMainFD_0", false);
+        branchCov.put("getMainFD_1", false);
     }
 
     public StringProperty mainFileDirectoryProperty() {
