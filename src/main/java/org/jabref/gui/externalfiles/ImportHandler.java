@@ -60,13 +60,8 @@ import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
-
 import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult.BREAK;
-
 public class ImportHandler {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
     private final BibDatabaseContext bibDatabaseContext;
     private final PreferencesService preferences;
@@ -78,9 +73,6 @@ public class ImportHandler {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
-
-
-
     public ImportHandler(BibDatabaseContext database,
                          PreferencesService preferences,
                          FileUpdateMonitor fileupdateMonitor,
@@ -88,7 +80,6 @@ public class ImportHandler {
                          StateManager stateManager,
                          DialogService dialogService,
                          TaskExecutor taskExecutor) {
-
         this.bibDatabaseContext = database;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileupdateMonitor;
@@ -118,19 +109,14 @@ public class ImportHandler {
 
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
-
-
                     String relPath = relativize(file);
-
                     if (isCanceled()) {
                         break;
                     }
-
                     UiTaskExecutor.runInJavaFXThread(() -> {
                         updateMessage(Localization.lang("Processing file %0", file.getFileName()));
                         updateProgress(counter, files.size() - 1d);
                     });
-
                     try {
                         if (FileUtil.isPDFFile(file)) {
                             var pdfImporterResult = contentImporter.importPDFContent(file);
@@ -139,7 +125,6 @@ public class ImportHandler {
                             if (pdfImporterResult.hasWarnings()) {
                                 addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
                             }
-
                             if (!pdfEntriesInFile.isEmpty()) {
                                 for (BibEntry entry : pdfEntriesInFile) {
                                     entry.setField(StandardField.FILE, relPath);
@@ -155,7 +140,6 @@ public class ImportHandler {
                             if (bibtexParserResult.hasWarnings()) {
                                 addResultToList(file, false, bibtexParserResult.getErrorMessage());
                             }
-
                             entriesToAdd.addAll(bibtexParserResult.getDatabaseContext().getEntries());
                             addResultToList(file, true, Localization.lang("Bib entry was successfully imported"));
                         } else {
@@ -165,17 +149,13 @@ public class ImportHandler {
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
                         addResultToList(file, false, Localization.lang("Error from import: %0", ex.getLocalizedMessage()));
-
                         UiTaskExecutor.runInJavaFXThread(() -> updateMessage(Localization.lang("Error")));
                     }
-
                     // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                     UiTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
-
                     ce.addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entriesToAdd));
                     ce.end();
                     undoManager.addEdit(ce);
-
                     counter++;
                 }
                 return results;
