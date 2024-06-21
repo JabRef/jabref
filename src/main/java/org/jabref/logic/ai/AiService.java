@@ -7,13 +7,13 @@ import org.jabref.logic.ai.embeddings.AiEmbeddingModel;
 import org.jabref.logic.ai.embeddings.AiEmbeddingsManager;
 import org.jabref.preferences.AiPreferences;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ *  The main class for the AI functionality.
+ *  <p>
+ *  Holds all the AI components: LLM and embedding model, chat history and embeddings cache.
+ */
 public class AiService {
     public static final String VERSION = "1";
-
-    private final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
 
     private final AiPreferences aiPreferences;
 

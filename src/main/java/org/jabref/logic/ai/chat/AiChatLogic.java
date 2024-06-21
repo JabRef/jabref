@@ -18,11 +18,12 @@ import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.preferences.AiPreferences;
 
 /**
- * This class maintains an AI chat.
- * It depends on the {@link AiService}, which holds embedding and chat models.
- * This class was created for hiding the langchain4j state and listening to parameters change.
+ * Wrapper around langchain4j algorithms for chatting functionality.
+ * It also supports filtering of documents that are used for question answering.
  * <p>
- * This class doesn't record the chat history.
+ * This class listens to chat language model change.
+ * <p>
+ * Warning: this class does not manage the chat history.
  */
 public class AiChatLogic {
     private final AiService aiService;

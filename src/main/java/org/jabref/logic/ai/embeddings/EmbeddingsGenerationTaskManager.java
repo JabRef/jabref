@@ -17,9 +17,15 @@ import org.jabref.preferences.FilePreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class manages a queue of embedding generation tasks for one {@link BibEntry} in a {@link org.jabref.model.database.BibDatabase}.
+ * <p>
+ * {@link org.jabref.model.database.BibDatabase} will listen for entries updates and add them to the queue. This class
+ * will start a background task for generating the embeddings for each entry in the queue.
+ * <p>
+ * This class also provides an ability to prioritize the entry in the queue. But it seems not to work well.
+ */
 public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
-    private final Logger LOGGER = LoggerFactory.getLogger(EmbeddingsGenerationTaskManager.class);
-
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final AiService aiService;
@@ -187,10 +193,14 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
         linkedFiles.forEach(this::moveToFront);
     }
 
+    /**
+     * This method is responsible for prioritizing a {@link LinkedFile} in the queue.
+     * <p>
+     * Queue is thought like a stack, so we just push the {@link LinkedFile} to the top of the stack.
+     * <p>
+     * It is not an error to add a {@link LinkedFile} if it is already in the queue or in process. In that case, it will be ignored by {@link AiIngestor}.
+     */
     public void moveToFront(LinkedFile linkedFile) {
-        // TODO: Is this safe? What if we process this linked file?
-        // Oh, actually we don't use this like a conventional stack :)
-        linkedFileQueue.remove(linkedFile);
         linkedFileQueue.push(linkedFile);
     }
 }

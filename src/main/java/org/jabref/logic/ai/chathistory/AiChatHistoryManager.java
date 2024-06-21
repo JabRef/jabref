@@ -6,6 +6,11 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class gives you the ability to open a chat history file for a BIB database.
+ * <p>
+ * If the history was not opened, this class will create it for you. Otherwise, it will return already used object.
+ */
 public class AiChatHistoryManager {
     private final DialogService dialogService;
 

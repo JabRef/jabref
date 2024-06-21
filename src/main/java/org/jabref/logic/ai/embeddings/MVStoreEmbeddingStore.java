@@ -31,6 +31,9 @@ import org.h2.mvstore.MVStore;
 
 import static java.util.Comparator.comparingDouble;
 
+/**
+ * A custom implementation of langchain4j's {@link EmbeddingStore} that uses a {@link MVStore} as an embedded database.
+ */
 public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
     private final MVMap<String, float[]> embeddingsMap;
     private final MVMap<String, String> fileMap;

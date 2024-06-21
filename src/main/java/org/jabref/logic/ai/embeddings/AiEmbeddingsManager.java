@@ -1,12 +1,9 @@
 package org.jabref.logic.ai.embeddings;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
-import jakarta.inject.Inject;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.preferences.AiPreferences;
@@ -18,6 +15,18 @@ import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class is responsible for managing the embeddings cache. The cache is saved in a local user directory.
+ * <p>
+ * MVStore is used as an embedded database. It stores the embeddings and what files have been fully ingested.
+ * {@link org.jabref.model.entry.LinkedFile} and embeddings are connected with LinkedFile.getLink().
+ * <p>
+ * In case an error occurs while opening an MVStore, the class will notify the user of this error and continue
+ * with in-memory store (meaning all embeddings will be thrown away on exit).
+ * <p>
+ * This class also listens for changes of embeddings parameters (in AI "Expert settings" section). In case any of them
+ * changes, the embeddings should be invalidated (cleared).
+ */
 public class AiEmbeddingsManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiEmbeddingsManager.class);
 

@@ -25,6 +25,9 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Main logic class that is responsible for generating embeddings out of {@link LinkedFile}s.
+ */
 public class AiIngestor {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiIngestor.class.getName());
 
@@ -56,6 +59,11 @@ public class AiIngestor {
         aiService.getPreferences().onEmbeddingsParametersChange(() -> ingestor = rebuild(aiService));
     }
 
+    /**
+     * The main method for generating embeddings out of {@link LinkedFile}s.
+     * The method will check if the file was ingested. In case it is, it will do nothing.
+     * The embeddings will be generated if the file was not ingested yet or the file was modified.
+     */
     public void ingestLinkedFile(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
         AiIngestedFilesTracker ingestedFilesTracker = aiService.getEmbeddingsManager().getIngestedFilesTracker();
 

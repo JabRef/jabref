@@ -9,6 +9,13 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.jabref.gui.DialogService;
 
+/**
+ * This class stores the chat history with AI. The chat history file is stored alongside BIB database.
+ * <p>
+ * It uses MVStore for serializing the messages. In case any error occurs while opening the MVStore,
+ * the class will notify the user of this error and continue with in-memory store (meaning all messages will
+ * be thrown away on exit).
+ */
 public class BibDatabaseChatHistory {
     private final MVStore mvStore;
 

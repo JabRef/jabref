@@ -9,6 +9,11 @@ import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.embedding.AllMiniLmL6V2QuantizedEmbeddingModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 
+/**
+ * Wrapper around langchain4j embedding model.
+ * <p>
+ * This class listens to preferences changes.
+ */
 public class AiEmbeddingModel {
     private final AiPreferences aiPreferences;
 

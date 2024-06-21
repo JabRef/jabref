@@ -9,6 +9,11 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Wrapper around langchain4j chat language model.
+ * <p>
+ * This class listens to preferences changes.
+ */
 public class AiChatLanguageModel {
     private final AiPreferences aiPreferences;
 
@@ -65,12 +70,8 @@ public class AiChatLanguageModel {
             }
         });
 
-        aiPreferences.chatModelProperty().addListener(obs -> {
-            rebuild();
-        });
+        aiPreferences.chatModelProperty().addListener(obs -> rebuild());
 
-        aiPreferences.temperatureProperty().addListener(obs -> {
-            rebuild();
-        });
+        aiPreferences.temperatureProperty().addListener(obs -> rebuild());
     }
 }

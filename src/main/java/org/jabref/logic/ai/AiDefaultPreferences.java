@@ -2,7 +2,7 @@ package org.jabref.logic.ai;
 
 import org.jabref.preferences.AiPreferences;
 
-public class AiDefaultSettings {
+public class AiDefaultPreferences {
     public static final boolean ENABLE_CHAT = false;
     public static final boolean CUSTOMIZE_SETTINGS = false;
     public static final AiPreferences.ChatModel CHAT_MODEL = AiPreferences.ChatModel.GPT_3_5_TURBO;

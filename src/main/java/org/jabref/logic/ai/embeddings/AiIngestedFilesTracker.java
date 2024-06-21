@@ -14,6 +14,14 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * This class is responsible for recording the information about which files have been fully ingested.
+ * It does not do this automatically, it encapsulates how the information is stored.
+ * <p>
+ * It will also post an {@link FileIngestedEvent} to the event bus when a file is fully ingested.
+ * <p>
+ * The class also records the file modification time.
+ */
 public class AiIngestedFilesTracker {
     private final MVMap<String, Long> ingestedMap;
 

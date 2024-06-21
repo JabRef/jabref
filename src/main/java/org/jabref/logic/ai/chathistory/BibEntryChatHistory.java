@@ -2,6 +2,11 @@ package org.jabref.logic.ai.chathistory;
 
 import java.util.stream.Stream;
 
+/**
+ * This class helps in storing chat messages for a specific entry in a BIB database.
+ * <p>
+ * It basically wraps the {@link BibDatabaseChatHistory} with the entry's citation key.
+ */
 public class BibEntryChatHistory {
     private final BibDatabaseChatHistory bibDatabaseChatHistory;
     private final String citationKey;
@@ -17,5 +22,9 @@ public class BibEntryChatHistory {
 
     public void addMessage(ChatMessage message) {
         bibDatabaseChatHistory.addMessage(citationKey, message);
+    }
+
+    public void clearMessages() {
+        bibDatabaseChatHistory.clearMessagesForEntry(citationKey);
     }
 }
