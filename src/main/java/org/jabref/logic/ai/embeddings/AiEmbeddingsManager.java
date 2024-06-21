@@ -1,10 +1,13 @@
 package org.jabref.logic.ai.embeddings;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import jakarta.inject.Inject;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.preferences.AiPreferences;
 
@@ -27,7 +30,7 @@ public class AiEmbeddingsManager {
     private final MVStoreEmbeddingStore embeddingStore;
     private final AiIngestedFilesTracker ingestedFilesTracker;
 
-    public AiEmbeddingsManager(AiPreferences aiPreferences) {
+    public AiEmbeddingsManager(AiPreferences aiPreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
 
         Path mvStorePath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(EMBEDDINGS_STORE_FILE_NAME);
@@ -35,8 +38,7 @@ public class AiEmbeddingsManager {
         try {
             Files.createDirectories(JabRefDesktop.getEmbeddingsCacheDirectory());
         } catch (IOException e) {
-            LOGGER.error("An error occurred while creating directories for embedding store. Will use an in-memory store", e);
-            // TODO: Show user message.
+            dialogService.showErrorDialogAndWait("An error occurred while creating directories for embedding store. Will use an in-memory store", e);
             mvStorePath = null;
         }
 
@@ -45,9 +47,9 @@ public class AiEmbeddingsManager {
         try {
             mvStoreTemp = MVStore.open(mvStorePath == null ? null : mvStorePath.toString());
         } catch (Exception e) {
-            LOGGER.error("An error occurred while opening embedding store. Will use an in-memory store", e);
+            dialogService.showErrorDialogAndWait("An error occurred while opening embedding store. Will use an in-memory store", e);
+
             mvStoreTemp = MVStore.open(null);
-            // TODO: Show user message.
         }
 
         this.mvStore = mvStoreTemp;

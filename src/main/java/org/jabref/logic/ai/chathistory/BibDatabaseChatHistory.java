@@ -4,8 +4,10 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import jakarta.inject.Inject;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+import org.jabref.gui.DialogService;
 
 public class BibDatabaseChatHistory {
     private final MVStore mvStore;
@@ -16,8 +18,18 @@ public class BibDatabaseChatHistory {
 
     public static final String AI_CHATS_FILE_EXTENSION = "aichats";
 
-    public BibDatabaseChatHistory(Path bibDatabasePath) {
-        this.mvStore = MVStore.open(bibDatabasePath + "." + AI_CHATS_FILE_EXTENSION);
+    public BibDatabaseChatHistory(Path bibDatabasePath, DialogService dialogService) {
+        MVStore mvStore1; // This Java again...
+
+        try {
+            mvStore1 = MVStore.open(bibDatabasePath + "." + AI_CHATS_FILE_EXTENSION);
+        } catch (Exception e) {
+            dialogService.showErrorDialogAndWait("Unable to open chat history store for the library. Will use an in-memory store", e);
+            mvStore1 = MVStore.open(null);
+        }
+
+        this.mvStore = mvStore1;
+
         this.messageType = this.mvStore.openMap("messageType");
         this.messageContent = this.mvStore.openMap("messageContent");
         this.messageCitationKey = this.mvStore.openMap("messageCitationKey");

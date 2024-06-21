@@ -10,8 +10,8 @@ import org.jabref.gui.ai.components.aichat.AiChatComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.chat.AiChatLogic;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
@@ -91,7 +91,7 @@ public class AiChatTab extends EntryEditorTab {
         public void listen(FileIngestedEvent event) {
             if (currentBibEntry != null) {
                 if (aiService.getEmbeddingsManager().getIngestedFilesTracker().haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
-                    DefaultTaskExecutor.runInJavaFXThread(() -> bindToEntry(currentBibEntry));
+                    UiTaskExecutor.runInJavaFXThread(() -> bindToEntry(currentBibEntry));
                 }
             }
         }

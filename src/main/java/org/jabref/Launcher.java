@@ -65,9 +65,6 @@ public class Launcher {
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
             Injector.setModelOrService(PreferencesService.class, preferences);
 
-            // Initialize AI service.
-            final AiService aiService = new AiService(preferences.getAiPreferences());
-
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
                 return;
@@ -110,7 +107,7 @@ public class Launcher {
                 }
 
                 List<UiCommand> uiCommands = new ArrayList<>(argumentProcessor.getUiCommands());
-                JabRefGUI.setup(uiCommands, preferences, aiService, fileUpdateMonitor);
+                JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);
                 JabRefGUI.launch(JabRefGUI.class, args);
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);

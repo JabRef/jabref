@@ -106,7 +106,6 @@ public class EntryEditor extends BorderPane {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
-    @Inject private AiService aiService;
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
@@ -114,6 +113,7 @@ public class EntryEditor extends BorderPane {
     @Inject private BibEntryTypesManager bibEntryTypesManager;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject private AiService aiService;
 
     private final List<EntryEditorTab> allPossibleTabs;
     private final Collection<OffersPreview> previewTabs;
@@ -143,6 +143,7 @@ public class EntryEditor extends BorderPane {
                 activeTab.notifyAboutFocus(currentlyEditedEntry);
             }
         });
+
         EasyBind.listen(preferencesService.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (obs, oldValue, newValue) -> adaptVisibleTabs());
     }
@@ -275,11 +276,11 @@ public class EntryEditor extends BorderPane {
         tabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
 
         // Comment Tab: Tab for general and user-specific comments
-        tabs.add(new CommentsTab(preferencesService, databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository));
+        tabs.add(new CommentsTab(preferencesService, databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), taskExecutor, journalAbbreviationRepository));
 
         Map<String, Set<Field>> entryEditorTabList = getAdditionalUserConfiguredTabs();
         for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository));
+            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), taskExecutor, journalAbbreviationRepository));
         }
 
         tabs.add(new MathSciNetTab());
@@ -301,6 +302,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
+        tabs.add(new AiChatTab(dialogService, preferencesService, aiService, libraryTab.getBibDatabaseContext(), libraryTab.getEmbeddingsGenerationTaskManager(), taskExecutor));
 
         return tabs;
     }

@@ -73,11 +73,9 @@ public class JabRefGUI extends Application {
 
     public static void setup(List<UiCommand> uiCommands,
                              JabRefPreferences preferencesService,
-                             AiService aiService,
                              FileUpdateMonitor fileUpdateMonitor) {
         JabRefGUI.uiCommands = uiCommands;
         JabRefGUI.preferencesService = preferencesService;
-        JabRefGUI.aiService = aiService;
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
     }
 
@@ -155,7 +153,9 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.clipBoardManager = new ClipBoardManager();
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);
-        aiService.close();
+
+        JabRefGUI.aiService = new AiService(preferencesService.getAiPreferences(), dialogService);
+        Injector.setModelOrService(AiService.class, aiService);
     }
 
     private void setupProxy() {
@@ -316,6 +316,7 @@ public class JabRefGUI extends Application {
         OOBibBaseConnect.closeOfficeConnection();
         stopBackgroundTasks();
         shutdownThreadPools();
+        aiService.close();
     }
 
     public void stopBackgroundTasks() {

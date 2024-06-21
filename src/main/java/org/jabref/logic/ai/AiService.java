@@ -2,12 +2,11 @@ package org.jabref.logic.ai;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.chat.AiChatLanguageModel;
-import org.jabref.logic.ai.chathistory.ChatHistoryManager;
+import org.jabref.logic.ai.chathistory.AiChatHistoryManager;
 import org.jabref.logic.ai.embeddings.AiEmbeddingModel;
 import org.jabref.logic.ai.embeddings.AiEmbeddingsManager;
 import org.jabref.preferences.AiPreferences;
 
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,21 +18,21 @@ public class AiService {
     private final AiPreferences aiPreferences;
 
     private final AiChatLanguageModel aiChatLanguageModel;
-    private final ChatHistoryManager chatHistoryManager = new ChatHistoryManager();
+    private final AiChatHistoryManager aiChatHistoryManager;
 
     private final AiEmbeddingModel aiEmbeddingModel;
     private final AiEmbeddingsManager aiEmbeddingsManager;
 
-    public AiService(AiPreferences aiPreferences) {
+    public AiService(AiPreferences aiPreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
-
         this.aiChatLanguageModel = new AiChatLanguageModel(aiPreferences);
+        this.aiChatHistoryManager = new AiChatHistoryManager(dialogService);
         this.aiEmbeddingModel = new AiEmbeddingModel(aiPreferences);
-        this.aiEmbeddingsManager = new AiEmbeddingsManager(aiPreferences);
+        this.aiEmbeddingsManager = new AiEmbeddingsManager(aiPreferences, dialogService);
     }
 
     public void close() {
-        this.chatHistoryManager.close();
+        this.aiChatHistoryManager.close();
         this.aiEmbeddingsManager.close();
     }
 
@@ -49,8 +48,8 @@ public class AiService {
         return aiEmbeddingModel;
     }
 
-    public ChatHistoryManager getChatHistoryManager() {
-        return chatHistoryManager;
+    public AiChatHistoryManager getChatHistoryManager() {
+        return aiChatHistoryManager;
     }
 
     public AiEmbeddingsManager getEmbeddingsManager() {
