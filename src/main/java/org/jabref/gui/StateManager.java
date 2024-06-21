@@ -61,7 +61,7 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
-    private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
+    private final ObservableMap<String, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
@@ -103,11 +103,11 @@ public class StateManager {
     }
 
     public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
-        searchResultMap.put(database, resultSize);
+        searchResultMap.put(database.getUid(), resultSize);
     }
 
     public IntegerProperty getSearchResultSize() {
-        return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()), new SimpleIntegerProperty(0));
+        return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()).getUid(), new SimpleIntegerProperty(0));
     }
 
     public OptionalObjectProperty<SearchQuery> activeGlobalSearchQueryProperty() {
