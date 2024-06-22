@@ -46,9 +46,6 @@ import org.jabref.logic.util.io.FileUtil;
 
 import kong.unirest.core.Unirest;
 import kong.unirest.core.UnirestException;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
