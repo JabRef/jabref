@@ -24,11 +24,11 @@ import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
-import kong.unirest.Unirest;
-import kong.unirest.json.JSONArray;
-import org.apache.http.client.utils.URIBuilder;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.JsonNode;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.json.JSONArray;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**

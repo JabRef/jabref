@@ -39,7 +39,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
-import kong.unirest.UnirestException;
+import kong.unirest.core.UnirestException;
 
 public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableWebSearchProperty = new SimpleBooleanProperty();

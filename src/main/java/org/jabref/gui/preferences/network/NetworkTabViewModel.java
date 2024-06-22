@@ -38,7 +38,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import kong.unirest.UnirestException;
+import kong.unirest.core.UnirestException;
 
 public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
