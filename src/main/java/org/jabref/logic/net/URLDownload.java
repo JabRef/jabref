@@ -202,7 +202,7 @@ public class URLDownload {
      */
     public boolean canBeReached() throws UnirestException {
         // new unirest version does not support apache http client any longer
-        Unirest.config()
+        Unirest.config().reset()
                .followRedirects(true)
                .enableCookieManagement(true)
                .setDefaultHeader("User-Agent", USER_AGENT);
