@@ -287,6 +287,7 @@ public class SaveDatabaseAction {
             return true;
         }
     }
+
     private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
         DialogPane pane = new DialogPane();
         VBox vbox = new VBox();

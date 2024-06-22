@@ -24,7 +24,7 @@ public class ErrorStateComponent extends BorderPane {
     public static ErrorStateComponent withSpinner(String title, String content) {
         ErrorStateComponent errorStateComponent = new ErrorStateComponent(title, content);
 
-        ((VBox)errorStateComponent.getCenter()).getChildren().add(new ProgressIndicator());
+        ((VBox) errorStateComponent.getCenter()).getChildren().add(new ProgressIndicator());
 
         return errorStateComponent;
     }

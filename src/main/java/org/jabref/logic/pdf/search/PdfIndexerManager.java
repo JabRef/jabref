@@ -6,10 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 
-import jakarta.inject.Inject;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

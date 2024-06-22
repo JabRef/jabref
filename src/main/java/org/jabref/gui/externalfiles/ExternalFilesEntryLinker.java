@@ -1,18 +1,9 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
@@ -24,26 +15,30 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class ExternalFilesEntryLinker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFilesEntryLinker.class);
 
     private final FilePreferences filePreferences;
-    private final AiPreferences aiPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final MoveFilesCleanup moveFilesCleanup;
     private final RenamePdfCleanup renameFilesCleanup;
     private final DialogService dialogService;
 
-    public ExternalFilesEntryLinker(FilePreferences filePreferences, AiPreferences aiPreferences, BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
+    public ExternalFilesEntryLinker(FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
         this.filePreferences = filePreferences;
-        this.aiPreferences = aiPreferences;
         this.bibDatabaseContext = bibDatabaseContext;
         this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences);
         this.renameFilesCleanup = new RenamePdfCleanup(false, bibDatabaseContext, filePreferences);

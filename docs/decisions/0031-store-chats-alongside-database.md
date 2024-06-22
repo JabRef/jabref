@@ -24,7 +24,7 @@ simple to implement and gives the user the ability to share or not to share the 
 
 * Simple implementation
 * The user can send the chats file alongside the `.bib` file if they want to share the chats. If users do not want 
-to share the messages, then they can omit the chats file
+  to share the messages, then they can omit the chats file
 * `.bib` files is kept clean
 
 ### Negative Consequences
@@ -42,7 +42,7 @@ to share the messages, then they can omit the chats file
 * Good, because chats are stored inside one file, and if the `.bib` file is moved, the chat history is preserved
 * Bad, because there may be lots of chats and messages and `.bib` file become too cluttered and too big which slows down the processing of `.bib` file
 * Bad, because if user shares a `.bib` file, they will also share chat messages, but chats are not ideal, so user may not 
-want to share them
+  want to share them
 
 ### In local user folder
 

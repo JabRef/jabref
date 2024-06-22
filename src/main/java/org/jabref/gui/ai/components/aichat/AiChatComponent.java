@@ -1,27 +1,22 @@
 package org.jabref.gui.ai.components.aichat;
 
-import java.util.function.Consumer;
-
+import com.airhacks.afterburner.views.ViewLoader;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-
+import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
 import org.jabref.logic.ai.chathistory.ChatMessage;
-import org.jabref.gui.DialogService;
-
-import com.airhacks.afterburner.views.ViewLoader;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.WorkspacePreferences;
+
+import java.util.function.Consumer;
 
 public class AiChatComponent extends VBox {
     private final Consumer<String> sendMessageCallback;

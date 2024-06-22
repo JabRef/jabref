@@ -17,7 +17,6 @@ import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.net.ProxyAuthenticator;

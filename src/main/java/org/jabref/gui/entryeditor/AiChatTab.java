@@ -1,10 +1,8 @@
 package org.jabref.gui.entryeditor;
 
-import java.nio.file.Path;
-import java.util.Optional;
-
-import javafx.scene.control.*;
-
+import com.google.common.eventbus.Subscribe;
+import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
+import javafx.scene.control.Tooltip;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.aichat.AiChatComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
@@ -12,8 +10,8 @@ import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.ai.chat.AiChatLogic;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chat.AiChatLogic;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.logic.ai.chathistory.BibEntryChatHistory;
 import org.jabref.logic.ai.chathistory.ChatMessage;
@@ -28,12 +26,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
-
-import com.google.common.eventbus.Subscribe;
-import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import org.jabref.preferences.WorkspacePreferences;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
+
+import java.nio.file.Path;
+import java.util.Optional;
 
 public class AiChatTab extends EntryEditorTab {
     public static final String NAME = "AI chat";
@@ -144,8 +142,8 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private static boolean checkIfCitationKeyIsAppropriate(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
-        //noinspection OptionalGetWithoutIsPresent
-        return !checkIfCitationKeyIsEmpty(bibEntry) && checkIfCitationKeyIsUnique(bibDatabaseContext, bibEntry.getCitationKey().get());
+        // bibEntry.getCitationKey().isPresent() is called to pleasure the linter (even if it is already checked in checkIfCitationKeyIsEmpty).
+        return !checkIfCitationKeyIsEmpty(bibEntry) && bibEntry.getCitationKey().isPresent() && checkIfCitationKeyIsUnique(bibDatabaseContext, bibEntry.getCitationKey().get());
     }
 
     private static boolean checkIfCitationKeyIsEmpty(BibEntry bibEntry) {
@@ -190,7 +188,7 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void buildChatUI(BibEntry entry) {
-        aiChatComponent = new AiChatComponent((userPrompt) -> {
+        aiChatComponent = new AiChatComponent(userPrompt -> {
             ChatMessage userMessage = ChatMessage.user(userPrompt);
             aiChatComponent.addMessage(userMessage);
 

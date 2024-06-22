@@ -452,17 +452,17 @@ public class JabRefPreferences implements PreferencesService {
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
-    public static final String AI_ENABLE_CHAT = "aiEnableChat";
-    public static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
-    public static final String AI_CHAT_MODEL = "aiChatModel";
-    public static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
-    public static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
-    public static final String AI_TEMPERATURE = "aiTemperature";
-    public static final String AI_MESSAGE_WINDOW_SIZE = "aiMessageWindowSize";
-    public static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
-    public static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
-    public static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
-    public static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
+    private static final String AI_ENABLE_CHAT = "aiEnableChat";
+    private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
+    private static final String AI_CHAT_MODEL = "aiChatModel";
+    private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
+    private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
+    private static final String AI_TEMPERATURE = "aiTemperature";
+    private static final String AI_MESSAGE_WINDOW_SIZE = "aiMessageWindowSize";
+    private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
+    private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
+    private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
+    private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
@@ -2722,7 +2722,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
 
         EasyBind.listen(aiPreferences.systemMessageProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
-        EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, (double)newValue));
+        EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, (double) newValue));
         EasyBind.listen(aiPreferences.messageWindowSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_MESSAGE_WINDOW_SIZE, newValue));
         EasyBind.listen(aiPreferences.documentSplitterChunkSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, newValue));
         EasyBind.listen(aiPreferences.documentSplitterOverlapSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, newValue));

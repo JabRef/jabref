@@ -8,7 +8,7 @@ parent: Decision Records
 
 This is a follow-up to [ADR-031](0031-store-chats-alongside-database.md).
 
-The chats with AI should be saved on exit from JabRef and retrieved on launch. We need to decide the format of 
+The chats with AI should be saved on exit from JabRef and retrieved on launch. We need to decide the format of
 the serialized messages.
 
 ## Decision Drivers
@@ -18,7 +18,7 @@ the serialized messages.
 
 ## Considered Options
 
-* JSON 
+* JSON
 * MVStore
 * Custom format
 
@@ -40,7 +40,7 @@ Chosen option: "MVStore", because it is simple and memory-efficient.
 
 * Good, because automatic loading and saving to disk
 * Good, because memory-efficient
-* Bad, because the order of messages need to be "hand-crafted" (e.g., by mapping from an Integer to the concrete message) 
+* Bad, because the order of messages need to be "hand-crafted" (e.g., by mapping from an Integer to the concrete message)
 
 ### Custom format
 

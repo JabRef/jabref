@@ -4,10 +4,10 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import jakarta.inject.Inject;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.jabref.gui.DialogService;
+
 
 /**
  * This class stores the chat history with AI. The chat history file is stored alongside BIB database.
@@ -17,13 +17,13 @@ import org.jabref.gui.DialogService;
  * be thrown away on exit).
  */
 public class BibDatabaseChatHistory {
+    public static final String AI_CHATS_FILE_EXTENSION = "aichats";
+
     private final MVStore mvStore;
 
     private final MVMap<Integer, ChatMessage.Type> messageType;
     private final MVMap<Integer, String> messageContent;
     private final MVMap<Integer, String> messageCitationKey;
-
-    public static final String AI_CHATS_FILE_EXTENSION = "aichats";
 
     public BibDatabaseChatHistory(Path bibDatabasePath, DialogService dialogService) {
         MVStore mvStore1; // This Java again...

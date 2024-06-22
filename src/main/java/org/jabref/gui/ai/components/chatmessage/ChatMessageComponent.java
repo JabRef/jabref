@@ -1,16 +1,14 @@
 package org.jabref.gui.ai.components.chatmessage;
 
+import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.ExpandingTextArea;
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
 import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.logic.l10n.Localization;
-
-import com.airhacks.afterburner.views.ViewLoader;
 
 public class ChatMessageComponent extends HBox {
     @FXML private VBox vBox;

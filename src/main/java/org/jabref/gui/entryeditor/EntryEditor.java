@@ -128,7 +128,7 @@ public class EntryEditor extends BorderPane {
                   .load();
 
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), preferencesService.getAiPreferences(), databaseContext, dialogService);
+        this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), databaseContext, dialogService);
 
         setupKeyBindings();
 

@@ -18,16 +18,16 @@ This decision record concerns the UI component that is used for rendering the co
 ## Considered Options
 
 * Use TextArea
-* Use a third-party package (https://github.com/JPro-one/jpro-platform)
+* Use a [third-party package](https://github.com/JPro-one/jpro-platform)
 * Use a Markdown parser and convert AST nodes to JavaFX TextFlow elements
 * Use a Markdown parser to convert content into HTML and use a WebView for one message
 * Use a Markdown parser and WebView for the whole chat history
 
 ## Decision Outcome
 
-Chosen option: "Use TextArea". 
-All other options require some time to implement. 
-Some of the options doesn't support text selection and copying, 
+Chosen option: "Use TextArea".
+All other options require some time to implement.
+Some of the options doesn't support text selection and copying,
 which for now we value better than Markdown rendering.
 
 ## Pros and Cons of the Options
@@ -77,7 +77,7 @@ There seems to be only one package for JavaFX that provides a ready-to-use UI no
 
 ## More Information
 
-Actually we used an `ExpandingTextArea` from `GemsFX` package so the content can occupy 
+Actually we used an `ExpandingTextArea` from `GemsFX` package so the content can occupy
 as much space as it needs in the `ScrollPane`.
 
 About the selection and copying, this goes down to fundamental issue from JavaFX.

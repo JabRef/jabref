@@ -1,19 +1,16 @@
 package org.jabref.gui.ai.components.privacynotice;
 
-import java.io.IOException;
-
+import com.airhacks.afterburner.views.ViewLoader;
 import javafx.fxml.FXML;
 import javafx.scene.layout.Pane;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
-
-import com.airhacks.afterburner.views.ViewLoader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class PrivacyNoticeComponent extends Pane {
     private final Logger LOGGER = LoggerFactory.getLogger(PrivacyNoticeComponent.class);

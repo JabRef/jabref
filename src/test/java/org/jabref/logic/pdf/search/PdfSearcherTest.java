@@ -58,7 +58,7 @@ public class PdfSearcherTest {
                 .withFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(exampleThesis);
 
-        PdfIndexer indexer = PdfIndexer.of(context, filePreferences, aiPreferences);
+        PdfIndexer indexer = PdfIndexer.of(context, filePreferences);
         search = PdfSearcher.of(indexer);
 
         indexer.rebuildIndex();

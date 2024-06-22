@@ -9,7 +9,6 @@ import org.jabref.logic.ai.embeddings.events.FileIngestedEvent;
 import org.jabref.model.entry.LinkedFile;
 
 import com.google.common.eventbus.EventBus;
-import jakarta.validation.constraints.Null;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.Nullable;

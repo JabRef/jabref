@@ -53,7 +53,7 @@ Very bad, for the same reasons as `BibEntry` Java object.
 ### Citation key
 
 * Good, because it is cross-platform, stable (meaning stays the same across launches of JabRef)
-* Bad, because it is not guaranteed that citation key exists on BIB entry, and that it is unique across other 
+* Bad, because it is not guaranteed that citation key exists on BIB entry, and that it is unique across other
 BIB entries in the library
 
 ### Use `ShareId`
@@ -62,7 +62,7 @@ BIB entries in the library
 Thereby, also local and remote entries need to be kept consistent.
 The solution chosen there is that the **server** creates a UUID for each entry.
 
-This approach cannot be used here, because there is no server running which we can ask for an UUID of an entry. 
+This approach cannot be used here, because there is no server running which we can ask for an UUID of an entry.
 
 ## More Information
 

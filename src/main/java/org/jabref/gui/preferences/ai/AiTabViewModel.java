@@ -59,42 +59,42 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.openAiTokenValidator = new FunctionBasedValidator<>(
                 openAiToken,
-                (token) -> !StringUtil.isBlank(token),
+                token -> !StringUtil.isBlank(token),
                 ValidationMessage.error(Localization.lang("The OpenAI token cannot be empty")));
 
         this.systemMessageValidator = new FunctionBasedValidator<>(
                 systemMessage,
-                (message) -> !StringUtil.isBlank(message),
+                message -> !StringUtil.isBlank(message),
                 ValidationMessage.error(Localization.lang("The system message cannot be empty")));
 
         this.temperatureValidator = new FunctionBasedValidator<>(
                 temperature,
-                (temp) -> (double)temp >= 0 && (double)temp <= 2,
+                temp -> (double) temp >= 0 && (double) temp <= 2,
                 ValidationMessage.error(Localization.lang("Temperature must be between 0 and 2")));
 
         this.messageWindowSizeValidator = new FunctionBasedValidator<>(
                 messageWindowSize,
-                (size) -> (int)size > 0,
+                size -> (int) size > 0,
                 ValidationMessage.error(Localization.lang("Message window size must be greater than 0")));
 
         this.documentSplitterChunkSizeValidator = new FunctionBasedValidator<>(
                 documentSplitterChunkSize,
-                (size) -> (int)size > 0,
+                size -> (int) size > 0,
                 ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0")));
 
         this.documentSplitterOverlapSizeValidator = new FunctionBasedValidator<>(
                 documentSplitterOverlapSize,
-                (size) -> (int)size > 0 && (int)size < documentSplitterChunkSize.get(),
+                size -> (int) size > 0 && (int) size < documentSplitterChunkSize.get(),
                 ValidationMessage.error(Localization.lang("Document splitter overlap size must be greater than 0 and less than chunk size")));
 
         this.ragMaxResultsCountValidator = new FunctionBasedValidator<>(
                 ragMaxResultsCount,
-                (count) -> (int)count > 0,
+                count -> (int) count > 0,
                 ValidationMessage.error(Localization.lang("RAG max results count must be greater than 0")));
 
         this.ragMinScoreValidator = new FunctionBasedValidator<>(
                 ragMinScore,
-                (score) -> (double)score > 0 && (double)score < 1,
+                score -> (double) score > 0 && (double) score < 1,
                 ValidationMessage.error(Localization.lang("RAG min score must be greater than 0 and less than 1")));
     }
 
@@ -199,6 +199,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public ObjectProperty<AiPreferences.ChatModel> aiChatModelProperty() {
         return aiChatModel;
     }
+
     public ObjectProperty<AiPreferences.EmbeddingModel> embeddingModelProperty() {
         return embeddingModel;
     }

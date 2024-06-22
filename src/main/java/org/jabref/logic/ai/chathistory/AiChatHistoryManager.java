@@ -1,10 +1,10 @@
 package org.jabref.logic.ai.chathistory;
 
-import org.jabref.gui.DialogService;
-
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.nio.file.Path;
+
+import org.jabref.gui.DialogService;
 
 /**
  * This class gives you the ability to open a chat history file for a BIB database.

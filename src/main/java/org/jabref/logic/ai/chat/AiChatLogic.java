@@ -57,11 +57,11 @@ public class AiChatLogic {
 
         AiPreferences aiPreferences = aiService.getPreferences();
 
-        aiPreferences.systemMessageProperty().addListener((obs) -> {
+        aiPreferences.systemMessageProperty().addListener(obs -> {
             rebuild();
         });
 
-        aiPreferences.messageWindowSizeProperty().addListener((obs) -> {
+        aiPreferences.messageWindowSizeProperty().addListener(obs -> {
             rebuild();
         });
 

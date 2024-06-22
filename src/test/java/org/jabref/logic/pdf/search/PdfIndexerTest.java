@@ -45,7 +45,7 @@ public class PdfIndexerTest {
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         when(context.getEntries()).thenReturn(database.getEntries());
-        this.indexer = PdfIndexer.of(context, filePreferences, aiPreferences);
+        this.indexer = PdfIndexer.of(context, filePreferences);
     }
 
     @Test
