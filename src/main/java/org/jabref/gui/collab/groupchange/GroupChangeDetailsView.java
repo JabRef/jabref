@@ -17,11 +17,6 @@ public final class GroupChangeDetailsView extends DatabaseChangeDetailsView {
         Label label = new Label(labelValue);
         label.setWrapText(true);
 
-        setLeftAnchor(label, 8d);
-        setTopAnchor(label, 8d);
-        setRightAnchor(label, 8d);
-        setBottomAnchor(label, 8d);
-
-        getChildren().setAll(label);
+        this.setAllAnchorsAndAttachChild(label);
     }
 }
