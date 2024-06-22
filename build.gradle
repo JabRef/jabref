@@ -145,10 +145,10 @@ dependencies {
 
     def pdfbox = "3.0.2"
     implementation ("org.apache.pdfbox:pdfbox:$pdfbox") {
-       exclude group: 'commons-logging'
+        exclude group: 'commons-logging'
     }
     implementation ("org.apache.pdfbox:fontbox:$pdfbox") {
-         exclude group: 'commons-logging'
+        exclude group: 'commons-logging'
     }
     implementation ("org.apache.pdfbox:xmpbox:$pdfbox") {
         exclude group: 'org.junit.jupiter'
@@ -226,7 +226,7 @@ dependencies {
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.32.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
-        exclude group: 'org.apache.commons.validator' // creates issues with common-logging
+        exclude group: 'org.apache.commons.validator'
         exclude group: 'org.apache.commons.commons-logging'
         exclude group: 'org.openjfx'
         exclude group: 'org.apache.logging.log4j'
@@ -242,10 +242,10 @@ dependencies {
     implementation 'com.konghq:unirest-modules-gson:4.4.0'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
 
-    implementation "org.slf4j:slf4j-api:2.0.13"
-    implementation "org.tinylog:tinylog-api:2.7.0"
-    implementation "org.tinylog:slf4j-tinylog:2.7.0"
-    implementation "org.tinylog:tinylog-impl:2.7.0"
+    implementation 'org.slf4j:slf4j-api:2.0.13'
+    implementation 'org.tinylog:tinylog-api:2.7.0'
+    implementation 'org.tinylog:slf4j-tinylog:2.7.0'
+    implementation 'org.tinylog:tinylog-impl:2.7.0'
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
     implementation 'org.slf4j:jul-to-slf4j:2.0.13'
