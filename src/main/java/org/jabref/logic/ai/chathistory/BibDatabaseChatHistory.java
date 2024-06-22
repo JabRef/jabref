@@ -4,9 +4,10 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.jabref.gui.DialogService;
+
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
-import org.jabref.gui.DialogService;
 
 
 /**

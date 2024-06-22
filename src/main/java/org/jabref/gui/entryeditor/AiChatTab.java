@@ -1,8 +1,10 @@
 package org.jabref.gui.entryeditor;
 
-import com.google.common.eventbus.Subscribe;
-import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
+import java.nio.file.Path;
+import java.util.Optional;
+
 import javafx.scene.control.Tooltip;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.aichat.AiChatComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
@@ -27,11 +29,11 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.WorkspacePreferences;
+
+import com.google.common.eventbus.Subscribe;
+import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
-import java.util.Optional;
 
 public class AiChatTab extends EntryEditorTab {
     public static final String NAME = "AI chat";

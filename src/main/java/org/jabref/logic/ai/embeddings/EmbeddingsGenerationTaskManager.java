@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.embeddings;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +31,7 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
 
     private final AiIngestor aiIngestor;
 
-    private final Stack<LinkedFile> linkedFileQueue = new Stack<>();
+    private final List<LinkedFile> linkedFileQueue = new ArrayList<>();
     private int numOfProcessedFiles = 0;
 
     private final Object lock = new Object();
@@ -148,8 +149,7 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
         updateProgress();
 
         while (!linkedFileQueue.isEmpty() && !isCanceled()) {
-            LinkedFile linkedFile = linkedFileQueue.pop();
-            assert linkedFile != null;
+            LinkedFile linkedFile = linkedFileQueue.removeLast();
 
             ingestLinkedFile(linkedFile);
 
@@ -198,6 +198,6 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
      * It is not an error to add a {@link LinkedFile} if it is already in the queue or in process. In that case, it will be ignored by {@link AiIngestor}.
      */
     public void moveToFront(LinkedFile linkedFile) {
-        linkedFileQueue.push(linkedFile);
+        linkedFileQueue.add(linkedFile);
     }
 }

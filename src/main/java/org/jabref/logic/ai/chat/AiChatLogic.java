@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chathistory.ChatMessage;
+import org.jabref.preferences.AiPreferences;
+
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.memory.ChatMemory;
@@ -12,10 +16,6 @@ import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.filter.Filter;
-
-import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.chathistory.ChatMessage;
-import org.jabref.preferences.AiPreferences;
 
 /**
  * Wrapper around langchain4j algorithms for chatting functionality.

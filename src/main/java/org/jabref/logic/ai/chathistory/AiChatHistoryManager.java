@@ -1,8 +1,8 @@
 package org.jabref.logic.ai.chathistory;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
 
