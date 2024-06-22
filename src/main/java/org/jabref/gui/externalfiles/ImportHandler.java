@@ -64,6 +64,7 @@ import org.slf4j.LoggerFactory;
 import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult.BREAK;
 
 public class ImportHandler {
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
     private final BibDatabaseContext bibDatabaseContext;
     private final PreferencesService preferences;
@@ -75,6 +76,7 @@ public class ImportHandler {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
+    
     public ImportHandler(BibDatabaseContext database,
                          PreferencesService preferences,
                          FileUpdateMonitor fileupdateMonitor,
