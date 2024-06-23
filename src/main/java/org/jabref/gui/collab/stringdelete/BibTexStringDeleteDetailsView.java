@@ -17,11 +17,7 @@ public final class BibTexStringDeleteDetailsView extends DatabaseChangeDetailsVi
                 new Label(Localization.lang("Label: %0", stringDelete.getDeletedString().getName())),
                 new Label(Localization.lang("Content: %0", stringDelete.getDeletedString().getContent()))
         );
-        setLeftAnchor(container, 8d);
-        setTopAnchor(container, 8d);
-        setRightAnchor(container, 8d);
-        setBottomAnchor(container, 8d);
 
-        getChildren().setAll(container);
+        this.setAllAnchorsAndAttachChild(container);
     }
 }
