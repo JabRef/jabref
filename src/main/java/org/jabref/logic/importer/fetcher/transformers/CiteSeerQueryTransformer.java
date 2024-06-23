@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import org.jabref.model.strings.StringUtil;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONObject;
 
 public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
 

@@ -43,7 +43,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
-import kong.unirest.UnirestException;
+import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

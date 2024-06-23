@@ -274,6 +274,7 @@ public class BibDatabaseContext {
                 ", mode=" + getMode() +
                 ", databasePath=" + getDatabasePath() +
                 ", biblatexMode=" + isBiblatexMode() +
+                ", uid= " + getUid() +
                 ", fulltextIndexPath=" + getFulltextIndexPath() +
                 '}';
     }
@@ -289,6 +290,9 @@ public class BibDatabaseContext {
         return Objects.equals(database, that.database) && Objects.equals(metaData, that.metaData) && Objects.equals(path, that.path) && location == that.location;
     }
 
+    /**
+     * @implNote This implementation needs to be consistent with equals. That means, as soon as a new entry is added to the database, two different instances of BibDatabaseContext are not equal - and thus, the hashCode also needs to change. This has the drawback, that one cannot create HashMaps from the BiDatabaseContext anymore, as the hashCode changes as soon as a new entry is added.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(database, metaData, path, location);
@@ -296,6 +300,8 @@ public class BibDatabaseContext {
 
     /**
      * Get the generated UID for the current context. Can be used to distinguish contexts with changing metadata etc
+     * <p>
+     * This is required, because of {@link #hashCode()} implementation.
      *
      * @return The generated UID in UUIDv4 format with the prefix bibdatabasecontext_
      */

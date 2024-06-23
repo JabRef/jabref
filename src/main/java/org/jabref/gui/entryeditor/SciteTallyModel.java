@@ -1,6 +1,6 @@
 package org.jabref.gui.entryeditor;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 
 /**
  * Simple model object to hold the scite.ai tallies data for a given DOI
