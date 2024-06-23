@@ -164,7 +164,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                 if (viewMode.contains(GroupViewMode.FILTER)) {
                                     return Boolean.valueOf(false);
                                 }
-                                MainTableDataModel.updateSearchGroups(stateManager, database);
+                                MainTableDataModel.updateSearchGroups(stateManager, database, libraryTab.getLuceneManager());
                                 return Boolean.valueOf(preferencesService.getGroupsPreferences().getGroupViewMode().contains(GroupViewMode.INVERT) ^ !MainTableDataModel.createGroupMatcher(stateManager.activeGroupProperty(), preferencesService.getGroupsPreferences()).map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true));
                             });
                     return matchesGroup;
@@ -496,11 +496,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         }
                         case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files);
+                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getLuceneManager());
                         }
                         case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
-                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
+                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getLuceneManager());
                         }
                     }
                 }

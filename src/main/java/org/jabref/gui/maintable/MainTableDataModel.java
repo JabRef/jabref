@@ -39,13 +39,15 @@ public class MainTableDataModel {
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final StateManager stateManager;
+    private final LuceneManager luceneManager;
     private Optional<SearchQuery> lastSearchQuery = Optional.empty();
 
-    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
+    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager, LuceneManager luceneManager) {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = context;
         this.stateManager = stateManager;
+        this.luceneManager = luceneManager;
         this.fieldValueFormatter = new SimpleObjectProperty<>(
                 new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
 
@@ -64,7 +66,7 @@ public class MainTableDataModel {
                             // TODO btut: do not repeat search if display mode changes. Check if the same can be done for groups
                             doSearch(query);
                             return entry -> {
-                                updateSearchGroups(stateManager, bibDatabaseContext);
+                                updateSearchGroups(stateManager, bibDatabaseContext, luceneManager);
                                 return isMatched(groups, query, entry);
                             };
                         })
@@ -88,8 +90,8 @@ public class MainTableDataModel {
         entriesFiltered.predicateProperty().unbind();
     }
 
-    public static void updateSearchGroups(StateManager stateManager, BibDatabaseContext bibDatabaseContext) {
-        stateManager.getSelectedGroups(bibDatabaseContext).stream().map(GroupTreeNode::getGroup).filter(g -> g instanceof SearchGroup).map(g -> ((SearchGroup) g)).forEach(g -> g.updateMatches(bibDatabaseContext));
+    public static void updateSearchGroups(StateManager stateManager, BibDatabaseContext bibDatabaseContext, LuceneManager luceneManager) {
+        stateManager.getSelectedGroups(bibDatabaseContext).stream().map(GroupTreeNode::getGroup).filter(g -> g instanceof SearchGroup).map(g -> ((SearchGroup) g)).forEach(g -> g.updateMatches(bibDatabaseContext, luceneManager));
     }
 
     private void doSearch(Optional<SearchQuery> query) {
@@ -100,7 +102,7 @@ public class MainTableDataModel {
         stateManager.getSearchResults().remove(bibDatabaseContext);
         if (query.isPresent() && !query.get().toString().isEmpty()) {
             // TODO btut: maybe do in background?
-            stateManager.getSearchResults().put(bibDatabaseContext, LuceneManager.get(bibDatabaseContext).search(query.get()));
+            stateManager.getSearchResults().put(bibDatabaseContext, luceneManager.search(query.get()));
         }
     }
 

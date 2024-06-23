@@ -84,7 +84,7 @@ public class SearchGroup extends AbstractGroup {
         return Objects.hash(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags());
     }
 
-    public void updateMatches(BibDatabaseContext context) {
-        this.matches = LuceneManager.get(context).search(query).keySet();
+    public void updateMatches(BibDatabaseContext context, LuceneManager luceneManager) {
+        this.matches = luceneManager.search(query).keySet();
     }
 }

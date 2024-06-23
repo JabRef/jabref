@@ -91,10 +91,10 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             String fileLink = entry.getKey();
             long modification = entry.getValue();
             if (!currentFiles.containsKey(fileLink)) {
-                LOGGER.info("File {} has been removed from the library. Will be removed from the index", fileLink);
+                LOGGER.debug("File {} has been removed from the library. Will be removed from the index", fileLink);
                 filesToRemove.add(fileLink);
             } else if (currentFiles.get(fileLink).getKey() > modification) {
-                LOGGER.info("File {} has been modified since last indexing. Will be removed from the index.", fileLink);
+                LOGGER.debug("File {} has been modified since last indexing. Will be removed from the index.", fileLink);
                 filesToRemove.add(fileLink);
             }
         }
@@ -105,7 +105,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             String fileLink = entry.getKey();
             long modification = entry.getValue().getKey();
             if (!indexedFiles.containsKey(fileLink)) {
-                LOGGER.info("File {} has been added to the library. Will be added to the index.", fileLink);
+                LOGGER.debug("File {} has been added to the library. Will be added to the index.", fileLink);
                 filesToAdd.put(fileLink, entry.getValue());
             }
         }
@@ -131,7 +131,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     private void addToIndex(Map<String, Pair<Long, Path>> linkedFiles) {
         for (String fileLink : linkedFiles.keySet()) {
             if (indexedFiles.containsKey(fileLink)) {
-                LOGGER.info("File {} is already indexed.", fileLink);
+                LOGGER.debug("File {} is already indexed.", fileLink);
                 linkedFiles.remove(fileLink);
             }
         }
@@ -144,6 +144,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
                 @Override
                 protected Void call() {
                     int i = 1;
+                    LOGGER.debug("Adding {} files to index", linkedFiles.size());
                     for (Map.Entry<String, Pair<Long, Path>> entry : linkedFiles.entrySet()) {
                         if (isCanceled()) {
                             updateMessage(Localization.lang("Indexing canceled: %0 of %1 files added to the index.", i, linkedFiles.size()));
@@ -165,7 +166,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     }
 
     private void addToIndex(String fileLink, long modifiedTime, Path resolvedPath) {
-        LOGGER.info("Adding file {} to the index.", fileLink);
+        LOGGER.debug("Adding file {} to the index.", fileLink);
         List<Document> pages = DOCUMENT_READER.readPdfContents(fileLink, resolvedPath);
         try {
             indexWriter.addDocuments(pages);
@@ -208,7 +209,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
     private void removeFromIndex(String fileLink) {
         try {
-            LOGGER.info("Removing file {} from index.", fileLink);
+            LOGGER.debug("Removing file {} from index.", fileLink);
             indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH, fileLink));
             indexedFiles.remove(fileLink);
         } catch (IOException e) {
@@ -233,10 +234,10 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     @Override
     public void removeAllFromIndex() {
         try {
-            LOGGER.info("Removing all linked files from index.");
+            LOGGER.debug("Removing all linked files from index.");
             indexWriter.deleteAll();
             indexedFiles.clear();
-            LOGGER.info("Removed all linked files");
+            LOGGER.debug("Removed all linked files");
         } catch (IOException e) {
             LOGGER.error("Error removing all linked files from index", e);
         }
@@ -249,7 +250,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     }
 
     private Map<String, Long> getLinkedFilesFromIndex() {
-        LOGGER.info("Getting all linked files from index.");
+        LOGGER.debug("Getting all linked files from index.");
         Map<String, Long> linkedFiles = new HashMap<>();
         try {
             TermQuery query = new TermQuery(new Term(SearchFieldConstants.PAGE_NUMBER, "1"));
@@ -289,7 +290,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         }
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
         if (resolvedPath.isEmpty()) {
-            LOGGER.info("Could not resolve path of linked file {}. The file will not be indexed.", linkedFile.getLink());
+            LOGGER.debug("Could not resolve path of linked file {}. The file will not be indexed.", linkedFile.getLink());
             return null;
         }
         try {
@@ -303,15 +304,15 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
     @Override
     public IndexSearcher getIndexSearcher() {
-        LOGGER.info("Getting index searcher");
+        LOGGER.debug("Getting index searcher");
         try {
             if (indexSearcher != null) {
-                LOGGER.info("Releasing index searcher");
+                LOGGER.debug("Releasing index searcher");
                 searcherManager.release(indexSearcher);
             }
-            LOGGER.info("Refreshing searcher");
+            LOGGER.debug("Refreshing searcher");
             searcherManager.maybeRefresh();
-            LOGGER.info("Acquiring index searcher");
+            LOGGER.debug("Acquiring index searcher");
             indexSearcher = searcherManager.acquire();
         } catch (IOException e) {
             LOGGER.error("Error refreshing searcher", e);
@@ -320,17 +321,17 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     }
 
     private void optimizeIndex() {
-        LOGGER.info("Optimizing index");
+        LOGGER.debug("Optimizing index");
         if (indexWriter.hasDeletions()) {
             try {
-                LOGGER.info("Forcing merge deletes");
+                LOGGER.debug("Forcing merge deletes");
                 indexWriter.forceMergeDeletes(true);
             } catch (IOException e) {
                 LOGGER.warn("Could not force merge deletes.", e);
             }
         }
         try {
-            LOGGER.info("Forcing merge segments to 1 segment");
+            LOGGER.debug("Forcing merge segments to 1 segment");
             indexWriter.forceMerge(1, true);
         } catch (IOException e) {
             LOGGER.warn("Could not force merge segments.", e);
@@ -341,14 +342,14 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     public void close() {
         HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
-                LOGGER.info("Closing index");
+                LOGGER.debug("Closing index");
                 searcherManager.close();
                 optimizeIndex();
                 indexWriter.close();
                 indexDirectory.close();
-                LOGGER.info("Index closed");
+                LOGGER.debug("Index closed");
                 if (databaseContext.getFulltextIndexPath().getFileName().toString().equals("unsaved")) {
-                    LOGGER.info("Deleting unsaved index directory");
+                    LOGGER.debug("Deleting unsaved index directory");
                     FileUtils.deleteDirectory(indexDirectoryPath.toFile());
                 }
             } catch (IOException e) {

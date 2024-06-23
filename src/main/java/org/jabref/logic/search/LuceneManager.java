@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -33,8 +31,6 @@ import org.slf4j.LoggerFactory;
 public class LuceneManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LuceneManager.class);
-    private static final Map<String, LuceneManager> LUCENE_MANAGERS = new ConcurrentHashMap<>();
-
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferences;
@@ -46,7 +42,6 @@ public class LuceneManager {
     private LuceneIndexer bibFieldsIndexer;
 
     public LuceneManager(BibDatabaseContext databaseContext, TaskExecutor executor, PreferencesService preferences) {
-        LUCENE_MANAGERS.put(databaseContext.getUid(), this);
         this.databaseContext = databaseContext;
         this.taskExecutor = executor;
         this.preferences = preferences;
@@ -57,10 +52,6 @@ public class LuceneManager {
         this.luceneSearcher = new LuceneSearcher(databaseContext);
 
         initializeIndexers();
-    }
-
-    public static LuceneManager get(BibDatabaseContext databaseContext) {
-        return LUCENE_MANAGERS.get(databaseContext.getUid());
     }
 
     private void initializeIndexers() {
@@ -81,7 +72,7 @@ public class LuceneManager {
         try {
             linkedFilesIndexer = new DefaultLinkedFilesIndexer(databaseContext, taskExecutor, preferences);
         } catch (IOException e) {
-            LOGGER.info("Error initializing linked files index - using read only index");
+            LOGGER.debug("Error initializing linked files index - using read only index");
             linkedFilesIndexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
         }
     }
@@ -153,11 +144,10 @@ public class LuceneManager {
         if (linkedFilesIndexer != null) {
             linkedFilesIndexer.close();
         }
-        LUCENE_MANAGERS.remove(databaseContext.getUid());
     }
 
     public AutoCloseable blockLinkedFileIndexer() {
-        LOGGER.info("Blocking linked files indexer");
+        LOGGER.debug("Blocking linked files indexer");
         isLinkedFilesIndexerBlocked.set(true);
         return () -> isLinkedFilesIndexerBlocked.set(false);
     }
@@ -166,13 +156,13 @@ public class LuceneManager {
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT) && shouldIndexLinkedFiles.get()) {
             try {
                 MultiReader reader = new MultiReader(bibFieldsIndexer.getIndexSearcher().getIndexReader(), linkedFilesIndexer.getIndexSearcher().getIndexReader());
-                LOGGER.info("Using MultiReader for searching");
+                LOGGER.debug("Using MultiReader for searching");
                 return new IndexSearcher(reader);
             } catch (IOException e) {
                 LOGGER.error("Error getting index searcher", e);
             }
         }
-        LOGGER.info("Using single index searcher for searching");
+        LOGGER.debug("Using single index searcher for searching");
         return bibFieldsIndexer.getIndexSearcher();
     }
 

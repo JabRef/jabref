@@ -162,7 +162,8 @@ public class LibraryTab extends Tab {
                        BibEntryTypesManager entryTypesManager,
                        CountingUndoManager undoManager,
                        ClipBoardManager clipBoardManager,
-                      TaskExecutor taskExecutor) {
+                       TaskExecutor taskExecutor,
+                       boolean isDummyContext) {
         this.tabContainer = Objects.requireNonNull(tabContainer);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.undoManager = undoManager;
@@ -178,7 +179,11 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager);
+        if (!isDummyContext) {
+            setLuceneManager();
+        }
+
+        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager, luceneManager);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -269,6 +274,10 @@ public class LibraryTab extends Tab {
         luceneManager.updateOnStart();
     }
 
+    public LuceneManager getLuceneManager() {
+        return luceneManager;
+    }
+
     public void closeLuceneManger() {
         luceneManager.close();
     }
@@ -308,13 +317,14 @@ public class LibraryTab extends Tab {
         if (this.tableModel != null) {
             this.tableModel.removeBindings();
         }
-        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager);
+
+        setLuceneManager();
+        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager, luceneManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
         setupMainPanel();
         setupAutoCompletion();
-        setLuceneManager();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
@@ -1001,7 +1011,8 @@ public class LibraryTab extends Tab {
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                true);
 
         newTab.setDataLoadingTask(dataLoadingTask);
         dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
@@ -1024,7 +1035,7 @@ public class LibraryTab extends Tab {
                                               TaskExecutor taskExecutor) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab libraryTab = new LibraryTab(
+        return new LibraryTab(
                 databaseContext,
                 tabContainer,
                 dialogService,
@@ -1034,10 +1045,8 @@ public class LibraryTab extends Tab {
                 entryTypesManager,
                 (CountingUndoManager) undoManager,
                 clipBoardManager,
-                taskExecutor);
-
-        libraryTab.setLuceneManager();
-        return libraryTab;
+                taskExecutor,
+                false);
     }
 
     private class GroupTreeListener {

@@ -16,6 +16,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -39,7 +40,8 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                                  ThemeManager themeManager,
                                  BibEntryTypesManager entryTypesManager,
                                  TaskExecutor taskExecutor,
-                                 JournalAbbreviationRepository journalAbbreviationRepository) {
+                                 JournalAbbreviationRepository journalAbbreviationRepository,
+                                 LuceneManager luceneManager) {
         super(true,
                 databaseContext,
                 suggestionProviders,
@@ -49,7 +51,9 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                 stateManager,
                 themeManager,
                 taskExecutor,
-                journalAbbreviationRepository);
+                journalAbbreviationRepository,
+                luceneManager
+        );
         this.entryTypesManager = entryTypesManager;
         this.isImportantOptionalFields = isImportantOptionalFields;
         setText(title);

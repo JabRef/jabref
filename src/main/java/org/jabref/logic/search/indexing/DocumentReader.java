@@ -42,7 +42,7 @@ public final class DocumentReader {
         List<Document> pages = new ArrayList<>();
         try (PDDocument pdfDocument = Loader.loadPDF(resolvedPdfPath.toFile())) {
             int numberOfPages = pdfDocument.getNumberOfPages();
-            LOGGER.info("Reading file {} content with {} pages", resolvedPdfPath.toAbsolutePath(), numberOfPages);
+            LOGGER.debug("Reading file {} content with {} pages", resolvedPdfPath.toAbsolutePath(), numberOfPages);
             for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
                 Document newDocument = new Document();
                 addIdentifiers(newDocument, fileLink);

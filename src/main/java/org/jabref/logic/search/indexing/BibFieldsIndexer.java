@@ -75,13 +75,11 @@ public class BibFieldsIndexer implements LuceneIndexer {
                 @Override
                 protected Void call() {
                     int i = 1;
+                    LOGGER.debug("Adding {} entries to index", entries.size());
                     for (BibEntry entry : entries) {
                         if (isCanceled()) {
                             updateMessage(Localization.lang("Indexing canceled: %0 of %1 entries added to the index.", i, entries.size()));
                             break;
-                        }
-                        if (entries.size() == 1) {
-                            LOGGER.info("Adding entry {} to index", entry.getId());
                         }
                         addToIndex(entry);
                         updateProgress(i, entries.size());
@@ -99,7 +97,6 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     private void addToIndex(BibEntry bibEntry) {
         try {
-            LOGGER.debug("Adding entry {} to index", bibEntry.getId());
             Document document = new Document();
             org.apache.lucene.document.Field.Store store = org.apache.lucene.document.Field.Store.YES;
 
@@ -127,7 +124,6 @@ public class BibFieldsIndexer implements LuceneIndexer {
                 }
             }
             indexWriter.addDocument(document);
-            LOGGER.debug("Entry {} added to index", bibEntry.getId());
         } catch (IOException e) {
             LOGGER.warn("Could not add an entry to the index.", e);
         }
@@ -140,9 +136,9 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     private void removeFromIndex(BibEntry entry) {
         try {
-            LOGGER.info("Removing entry {} from index", entry.getId());
+            LOGGER.debug("Removing entry {} from index", entry.getId());
             indexWriter.deleteDocuments((new Term(SearchFieldConstants.BIB_ENTRY_ID, entry.getId())));
-            LOGGER.info("Entry {} removed from index", entry.getId());
+            LOGGER.debug("Entry {} removed from index", entry.getId());
         } catch (IOException e) {
             LOGGER.error("Error deleting entry from index", e);
         }
@@ -150,7 +146,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     @Override
     public void updateEntry(BibEntry entry, String oldValue, String newValue) {
-        LOGGER.info("Updating entry {} in index", entry.getId());
+        LOGGER.debug("Updating entry {} in index", entry.getId());
         removeFromIndex(List.of(entry));
         addToIndex(List.of(entry));
     }
@@ -158,9 +154,9 @@ public class BibFieldsIndexer implements LuceneIndexer {
     @Override
     public void removeAllFromIndex() {
         try {
-            LOGGER.info("Removing all bib fields from index");
+            LOGGER.debug("Removing all bib fields from index");
             indexWriter.deleteAll();
-            LOGGER.info("All bib fields removed from index");
+            LOGGER.debug("All bib fields removed from index");
         } catch (IOException e) {
             LOGGER.error("Error deleting all linked files from index", e);
         }
@@ -174,15 +170,15 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     @Override
     public IndexSearcher getIndexSearcher() {
-        LOGGER.info("Getting index searcher");
+        LOGGER.debug("Getting index searcher");
         try {
             if (indexSearcher != null) {
-                LOGGER.info("Releasing index searcher");
+                LOGGER.debug("Releasing index searcher");
                 searcherManager.release(indexSearcher);
             }
-            LOGGER.info("Refreshing searcher");
+            LOGGER.debug("Refreshing searcher");
             searcherManager.maybeRefresh();
-            LOGGER.info("Acquiring index searcher");
+            LOGGER.debug("Acquiring index searcher");
             indexSearcher = searcherManager.acquire();
         } catch (IOException e) {
             LOGGER.error("Error refreshing searcher", e);
@@ -192,13 +188,13 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     @Override
     public void close() {
-        LOGGER.info("Closing index");
+        LOGGER.debug("Closing index");
         HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
                 searcherManager.close();
                 indexWriter.close();
                 indexDirectory.close();
-                LOGGER.info("Index closed");
+                LOGGER.debug("Index closed");
             } catch (IOException e) {
                 LOGGER.error("Error closing index", e);
             }
