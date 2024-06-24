@@ -16,6 +16,7 @@ public class SearchFieldConstants {
     public static final String ANNOTATIONS = FILE_FIELDS_PREFIX + "annotations";
     public static final String PAGE_NUMBER = FILE_FIELDS_PREFIX + "pageNumber";
     public static final String MODIFIED = FILE_FIELDS_PREFIX + "modified";
+    public static final String DEFAULT_FIELD = "default_field";
     public static final String BIB_ENTRY_ID = "bib_id";
     public static final String BIB_ENTRY_TYPE = "entrytype";
     public static final Analyzer ANALYZER = new StandardAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);

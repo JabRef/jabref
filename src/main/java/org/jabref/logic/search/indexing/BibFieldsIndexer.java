@@ -102,6 +102,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
             document.add(new StringField(SearchFieldConstants.BIB_ENTRY_ID, bibEntry.getId(), store));
             document.add(new StringField(SearchFieldConstants.BIB_ENTRY_TYPE, bibEntry.getType().getName(), store));
+            document.add(new TextField(SearchFieldConstants.DEFAULT_FIELD, bibEntry.getParsedSerialization(), store));
 
             for (Map.Entry<Field, String> field : bibEntry.getFieldMap().entrySet()) {
                 String fieldValue = field.getValue();

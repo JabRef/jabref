@@ -2,6 +2,7 @@ package org.jabref.gui.maintable.columns;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.scene.Node;
@@ -25,6 +26,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.search.SearchResults;
 import org.jabref.preferences.PreferencesService;
 
 /**
@@ -148,7 +150,8 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     }
 
     private Node createFileIcon(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
-        if (!linkedFiles.isEmpty() && stateManager.getSearchResults().containsKey(database) && stateManager.getSearchResults().get(database).containsKey(entry.getEntry()) && stateManager.getSearchResults().get(database).get(entry.getEntry()).hasFulltextResults()) {
+        Optional<SearchResults> searchResults = stateManager.getSearchResults(database);
+        if (!linkedFiles.isEmpty() && searchResults.isPresent() && searchResults.get().containsEntry(entry.getEntry()) && searchResults.get().hasFulltextResults(entry.getEntry())) {
             return IconTheme.JabRefIcons.FILE_SEARCH.getGraphicNode();
         }
         if (linkedFiles.size() > 1) {

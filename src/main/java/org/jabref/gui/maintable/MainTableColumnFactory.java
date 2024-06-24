@@ -51,7 +51,6 @@ import org.slf4j.LoggerFactory;
 public class MainTableColumnFactory {
 
     public static final String STYLE_ICON_COLUMN = "column-icon";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
     private final PreferencesService preferencesService;
@@ -61,7 +60,6 @@ public class MainTableColumnFactory {
     private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
     private final StateManager stateManager;
     private final MainTableTooltip tooltip;
 
@@ -80,8 +78,8 @@ public class MainTableColumnFactory {
         this.cellFactory = new CellFactory(preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager,
-                themeManager, taskExecutor);
+        ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
+        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {

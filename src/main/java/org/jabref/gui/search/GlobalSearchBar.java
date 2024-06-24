@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -18,7 +18,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -61,12 +60,10 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.LuceneSearchResults;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.SearchResults;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
@@ -87,7 +84,6 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 public class GlobalSearchBar extends HBox {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
-
     private static final int SEARCH_DELAY = 400;
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
@@ -101,16 +97,13 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton sortByScoreButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final Label currentResults = new Label("");
-
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
     private final Validator regexValidator;
     private final UndoManager undoManager;
     private final LibraryTabContainer tabContainer;
-
     private final SearchPreferences searchPreferences;
     private final DialogService dialogService;
-
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private GlobalSearchResultDialog globalSearchResultDialog;
@@ -159,20 +152,9 @@ public class GlobalSearchBar extends HBox {
             }
         });
 
-        searchField.setContextMenu(SearchFieldRightClickMenu.create(
-                stateManager,
-                searchField,
-                tabContainer,
-                undoManager));
-
-        ObservableList<String> search = stateManager.getWholeSearchHistory();
-        search.addListener((ListChangeListener.Change<? extends String> change) ->
-                searchField.setContextMenu(SearchFieldRightClickMenu.create(
-                        stateManager,
-                        searchField,
-                        tabContainer,
-                        undoManager))
-        );
+        searchField.setContextMenu(SearchFieldRightClickMenu.create(stateManager, searchField, tabContainer, undoManager));
+        stateManager.getWholeSearchHistory().addListener((ListChangeListener.Change<? extends String> change) ->
+                searchField.setContextMenu(SearchFieldRightClickMenu.create(stateManager, searchField, tabContainer, undoManager)));
 
         ClipBoardManager.addX11Support(searchField);
 
@@ -209,7 +191,7 @@ public class GlobalSearchBar extends HBox {
         if (searchType == SearchType.NORMAL_SEARCH) {
             modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, keepSearchString, filterModeButton, sortByScoreButton));
         } else {
-            modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton));
+            modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, filterModeButton, sortByScoreButton));
         }
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
@@ -244,9 +226,7 @@ public class GlobalSearchBar extends HBox {
                 },
                 query -> setSearchTerm(query.orElse(new SearchQuery("", EnumSet.noneOf(SearchFlags.class)))));
 
-        this.stateManager.getSearchResults().addListener((MapChangeListener<BibDatabaseContext, Map<BibEntry, LuceneSearchResults>>) change -> {
-            stateManager.activeSearchQueryProperty().get().ifPresent(this::updateSearchResultsForQuery);
-        });
+        this.stateManager.getSearchResults().addListener((MapChangeListener<String, SearchResults>) change -> searchQueryProperty.get().ifPresent(this::updateSearchResultsForQuery));
 
         /*
          * The listener tracks a change on the focus property value.
@@ -263,7 +243,7 @@ public class GlobalSearchBar extends HBox {
     }
 
     private void updateSearchResultsForQuery(SearchQuery query) {
-        updateResults(this.stateManager.getSearchResults().values().stream().map(Map::size).reduce(0, Integer::sum));
+        updateResults(stateManager.getSearchResultsCount());
     }
 
     private void initSearchModifierButtons() {
@@ -351,7 +331,7 @@ public class GlobalSearchBar extends HBox {
         if (searchField.getText().isEmpty()) {
             currentResults.setText("");
             setSearchFieldHintTooltip(null);
-            stateManager.clearSearchQuery(searchQueryProperty);
+            searchQueryProperty.setValue(Optional.empty());
             return;
         }
 
@@ -361,12 +341,12 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
+        SearchQuery searchQuery = new SearchQuery(searchField.getText(), searchPreferences.getSearchFlags());
         if (!searchQuery.isValid()) {
             informUserAboutInvalidSearchQuery();
             return;
         }
-        stateManager.setSearchQuery(searchQueryProperty, searchQuery);
+        searchQueryProperty.set(Optional.of(searchQuery));
     }
 
     private boolean validRegex() {
@@ -381,9 +361,7 @@ public class GlobalSearchBar extends HBox {
 
     private void informUserAboutInvalidSearchQuery() {
         searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
-
-        String illegalSearch = Localization.lang("Search failed: illegal search expression");
-        currentResults.setText(illegalSearch);
+        currentResults.setText(Localization.lang("Search failed: illegal search expression"));
     }
 
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {

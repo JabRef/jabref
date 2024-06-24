@@ -7,7 +7,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
@@ -18,7 +17,6 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final Supplier<LibraryTab> tabSupplier;
-    private BibDatabaseContext databaseContext;
     private boolean shouldContinue = true;
 
     public RebuildFulltextSearchIndexAction(StateManager stateManager,
@@ -42,7 +40,6 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
             return;
         }
 
-        databaseContext = stateManager.getActiveDatabase().get();
         boolean confirm = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Rebuild fulltext search index"),
                 Localization.lang("Rebuild fulltext search index for current library?"));

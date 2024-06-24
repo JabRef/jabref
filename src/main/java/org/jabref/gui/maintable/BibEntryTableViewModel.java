@@ -33,7 +33,7 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.search.LuceneSearchResults;
+import org.jabref.model.search.SearchResults;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -63,9 +63,7 @@ public class BibEntryTableViewModel {
         this.stateManager = stateManager;
 
         updateSearchScore();
-        stateManager.getSearchResults().addListener((MapChangeListener<BibDatabaseContext, Map<BibEntry, LuceneSearchResults>>) change -> {
-            updateSearchScore();
-        });
+        stateManager.getSearchResults().addListener((MapChangeListener<String, SearchResults>) change -> updateSearchScore());
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -172,10 +170,8 @@ public class BibEntryTableViewModel {
     }
 
     public void updateSearchScore() {
-        if (stateManager.getSearchResults().containsKey(bibDatabaseContext) && stateManager.getSearchResults().get(bibDatabaseContext).containsKey(entry)) {
-            searchScore.set(stateManager.getSearchResults().get(bibDatabaseContext).get(entry).getSearchScore());
-        } else {
-            searchScore.set(0);
-        }
+        searchScore.set(stateManager.getSearchResults(bibDatabaseContext)
+                                    .map(searchResults -> searchResults.getSearchScoreForEntry(entry))
+                                    .orElse(0f));
     }
 }

@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -36,14 +37,14 @@ public class SearchQuery {
         boosts.keySet().toArray(fieldsToSearchArray);
 
         if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
-            if (!query.isEmpty() && !(query.startsWith("/") && query.endsWith("/"))) {
-                query = '/' + query + '/';
-            }
+            query = '/' + query + '/';
         }
 
         MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, SearchFieldConstants.ANALYZER, boosts);
         queryParser.setAllowLeadingWildcard(true);
-
+        if (!query.contains("\"") && !query.contains(":") && !query.contains("*") && !query.contains("~")) {
+            query = Arrays.stream(query.split(" ")).map(s -> "*" + s + "*").collect(Collectors.joining(" "));
+        }
         try {
             parsedQuery = queryParser.parse(query);
             parseError = null;

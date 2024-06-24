@@ -62,7 +62,6 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.EasyBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +75,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final PreferencesService preferencesService;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
-
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
     private final ClipBoardManager clipBoardManager;
@@ -156,19 +154,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
                 .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search"), entry -> stateManager.activeSearchQueryProperty().isPresent().and(entry.searchScoreProperty().isEqualTo(0)))
-                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-groups"), entry -> {
-                    EasyBinding<Boolean> matchesGroup = EasyBind.combine(
-                            stateManager.activeGroupProperty(),
-                            preferencesService.getGroupsPreferences().groupViewModeProperty(),
-                            (groups, viewMode) -> {
-                                if (viewMode.contains(GroupViewMode.FILTER)) {
-                                    return Boolean.valueOf(false);
-                                }
-                                MainTableDataModel.updateSearchGroups(stateManager, database, libraryTab.getLuceneManager());
-                                return Boolean.valueOf(preferencesService.getGroupsPreferences().getGroupViewMode().contains(GroupViewMode.INVERT) ^ !MainTableDataModel.createGroupMatcher(stateManager.activeGroupProperty(), preferencesService.getGroupsPreferences()).map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true));
-                            });
-                    return matchesGroup;
-                })
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-groups"), entry -> EasyBind.combine(
+                        stateManager.activeGroupProperty(),
+                        preferencesService.getGroupsPreferences().groupViewModeProperty(),
+                        (groups, viewMode) -> {
+                            if (viewMode.contains(GroupViewMode.FILTER)) {
+                                return Boolean.FALSE;
+                            }
+                            MainTableDataModel.updateSearchGroups(stateManager, database, libraryTab.getLuceneManager());
+                            return preferencesService.getGroupsPreferences().getGroupViewMode().contains(GroupViewMode.INVERT) ^ !MainTableDataModel.createGroupMatcher(stateManager.activeGroupProperty(), preferencesService.getGroupsPreferences()).map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
+                        }))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -253,9 +248,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void updateSortOrder() {
-        getSortOrder().removeAll(getColumns().get(0));
+        getSortOrder().removeAll(getColumns().getFirst());
         if (preferencesService.getSearchPreferences().isSortByScore()) {
-            getSortOrder().add(0, getColumns().get(0));
+            getSortOrder().addFirst(getColumns().getFirst());
         }
     }
 

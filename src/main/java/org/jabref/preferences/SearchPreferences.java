@@ -15,7 +15,6 @@ public class SearchPreferences {
 
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
-
     private final DoubleProperty searchWindowHeight = new SimpleDoubleProperty();
     private final DoubleProperty searchWindowWidth = new SimpleDoubleProperty();
 

@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.jabref.logic.search.LuceneManager;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
 import org.jabref.model.search.SearchFlags;
@@ -37,10 +36,9 @@ public class SearchGroup extends AbstractGroup {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SearchGroup)) {
+        if (!(o instanceof SearchGroup other)) {
             return false;
         }
-        SearchGroup other = (SearchGroup) o;
         return Objects.equals(getName(), other.getName())
                && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
                && Objects.equals(getSearchExpression(), other.getSearchExpression())
@@ -84,7 +82,7 @@ public class SearchGroup extends AbstractGroup {
         return Objects.hash(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags());
     }
 
-    public void updateMatches(BibDatabaseContext context, LuceneManager luceneManager) {
-        this.matches = luceneManager.search(query).keySet();
+    public void updateMatches(LuceneManager luceneManager) {
+        this.matches = luceneManager.search(query).getAllSearchResults().keySet();
     }
 }

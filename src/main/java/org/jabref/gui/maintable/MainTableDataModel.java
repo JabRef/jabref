@@ -14,6 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -39,17 +40,18 @@ public class MainTableDataModel {
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final StateManager stateManager;
+    private final TaskExecutor taskExecutor;
     private final LuceneManager luceneManager;
     private Optional<SearchQuery> lastSearchQuery = Optional.empty();
 
-    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager, LuceneManager luceneManager) {
+    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager, TaskExecutor taskExecutor, LuceneManager luceneManager) {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = context;
         this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
         this.luceneManager = luceneManager;
-        this.fieldValueFormatter = new SimpleObjectProperty<>(
-                new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
+        this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
 
         resetFieldFormatter();
 
@@ -59,18 +61,18 @@ public class MainTableDataModel {
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
-                EasyBind.combine(stateManager.activeGroupProperty(),
+                EasyBind.combine(
+                        stateManager.activeGroupProperty(),
                         stateManager.activeSearchQueryProperty(),
                         groupsPreferences.groupViewModeProperty(),
                         (groups, query, groupViewMode) -> {
                             // TODO btut: do not repeat search if display mode changes. Check if the same can be done for groups
                             doSearch(query);
-                            return entry -> {
-                                updateSearchGroups(stateManager, bibDatabaseContext, luceneManager);
-                                return isMatched(groups, query, entry);
-                            };
+                            updateSearchGroups(stateManager, bibDatabaseContext, luceneManager);
+                            return entry -> isMatched(groups, query, entry);
                         })
         );
+
         entriesViewModel.addListener((ListChangeListener<BibEntryTableViewModel>) c -> {
             if (stateManager.activeSearchQueryProperty().isPresent().get()) {
                 while (c.next()) {
@@ -91,7 +93,12 @@ public class MainTableDataModel {
     }
 
     public static void updateSearchGroups(StateManager stateManager, BibDatabaseContext bibDatabaseContext, LuceneManager luceneManager) {
-        stateManager.getSelectedGroups(bibDatabaseContext).stream().map(GroupTreeNode::getGroup).filter(g -> g instanceof SearchGroup).map(g -> ((SearchGroup) g)).forEach(g -> g.updateMatches(bibDatabaseContext, luceneManager));
+        stateManager.getSelectedGroups(bibDatabaseContext)
+                    .stream()
+                    .map(GroupTreeNode::getGroup)
+                    .filter(SearchGroup.class::isInstance)
+                    .map(SearchGroup.class::cast)
+                    .forEach(group -> group.updateMatches(luceneManager));
     }
 
     private void doSearch(Optional<SearchQuery> query) {
@@ -99,10 +106,9 @@ public class MainTableDataModel {
             return;
         }
         lastSearchQuery = query;
-        stateManager.getSearchResults().remove(bibDatabaseContext);
         if (query.isPresent() && !query.get().toString().isEmpty()) {
             // TODO btut: maybe do in background?
-            stateManager.getSearchResults().put(bibDatabaseContext, luceneManager.search(query.get()));
+            stateManager.getSearchResults().put(bibDatabaseContext.getUid(), luceneManager.search(query.get()));
         }
     }
 

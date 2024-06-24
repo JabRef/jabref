@@ -2,7 +2,6 @@ package org.jabref.logic.search;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -18,9 +17,9 @@ import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.LuceneIndexer;
-import org.jabref.model.search.LuceneSearchResults;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.SearchResults;
 import org.jabref.preferences.PreferencesService;
 
 import org.apache.lucene.index.MultiReader;
@@ -166,7 +165,7 @@ public class LuceneManager {
         return bibFieldsIndexer.getIndexSearcher();
     }
 
-    public HashMap<BibEntry, LuceneSearchResults> search(SearchQuery query) {
+    public SearchResults search(SearchQuery query) {
         return luceneSearcher.search(query, getIndexSearcher(query));
     }
 }

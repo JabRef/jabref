@@ -51,7 +51,8 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         }
         this.getColumns().addAll(allCols);
 
-        TableColumn scoreColumn = this.getColumns().stream().filter(c -> c instanceof MainTableColumn<?>)
+        TableColumn scoreColumn = this.getColumns().stream()
+                                      .filter(c -> c instanceof MainTableColumn<?>)
                                       .map(c -> ((MainTableColumn) c))
                                       .filter(c -> c.getModel().getType() == MainTableColumnModel.Type.SCORE)
                                       .findFirst().orElse(null);
@@ -62,7 +63,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
             public void onChanged(Change<? extends TableColumn<BibEntryTableViewModel, ?>> c) {
                 getSortOrder().removeListener(this);
                 getSortOrder().removeAll(scoreColumn);
-                getSortOrder().add(0, scoreColumn);
+                getSortOrder().addFirst(scoreColumn);
                 getSortOrder().addListener(this);
             }
         };
@@ -76,7 +77,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                     .ifPresent(column -> this.getSortOrder().add(column)));
         // insert score sort order
         if (scoreColumn != null) {
-            this.getSortOrder().add(0, scoreColumn);
+            this.getSortOrder().addFirst(scoreColumn);
             this.getSortOrder().addListener(scoreSortOderPrioritizer);
         }
 

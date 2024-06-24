@@ -183,7 +183,7 @@ public class LibraryTab extends Tab {
             setLuceneManager();
         }
 
-        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager, luceneManager);
+        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager, taskExecutor, luceneManager);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -314,12 +314,9 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        if (this.tableModel != null) {
-            this.tableModel.removeBindings();
-        }
-
         setLuceneManager();
-        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager, luceneManager);
+        this.tableModel.removeBindings();
+        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager, taskExecutor, luceneManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
@@ -860,6 +857,7 @@ public class LibraryTab extends Tab {
         }
         try {
             closeLuceneManger();
+            tableModel.removeBindings();
         } catch (RuntimeException e) {
             LOGGER.error("Problem when closing lucene indexer", e);
         }

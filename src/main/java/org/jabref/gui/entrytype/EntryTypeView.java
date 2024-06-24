@@ -219,7 +219,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     private void setEntryTypeForReturnAndClose(Optional<BibEntryType> entryType) {
         type = entryType.map(BibEntryType::getType).orElse(null);
         viewModel.stopFetching();
-        this.stateManager.clearSearchQuery();
+        this.stateManager.activeSearchQueryProperty().set(Optional.empty());
         this.close();
     }
 
