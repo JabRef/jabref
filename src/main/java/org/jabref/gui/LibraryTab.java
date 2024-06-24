@@ -837,6 +837,11 @@ public class LibraryTab extends Tab {
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
         }
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
+            bibDatabaseContext.convertToLocalDatabase();
+            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+            bibDatabaseContext.clearDBMSSynchronizer();
+        }
         try {
             changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         } catch (RuntimeException e) {
@@ -863,12 +868,6 @@ public class LibraryTab extends Tab {
                     preferencesService.getFilePreferences().shouldCreateBackup());
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down backup manager", e);
-        }
-
-        if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
-            bibDatabaseContext.convertToLocalDatabase();
-            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
-            bibDatabaseContext.clearDBMSSynchronizer();
         }
 
         // clean up the groups map
