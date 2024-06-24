@@ -70,7 +70,7 @@ public class ImportFormatReader {
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
         formats.add(new MedlineImporter());
-        formats.add(new MedlinePlainImporter());
+        formats.add(new MedlinePlainImporter(importFormatPreferences));
         formats.add(new ModsImporter(importFormatPreferences));
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
