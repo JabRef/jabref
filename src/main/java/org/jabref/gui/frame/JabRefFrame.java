@@ -502,6 +502,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Close after checking for changes and saving all databases
         for (LibraryTab libraryTab : toClose) {
             tabbedPane.getTabs().remove(libraryTab);
+            // Trigger org.jabref.gui.LibraryTab.onClosed
             Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
         }
         return true;
