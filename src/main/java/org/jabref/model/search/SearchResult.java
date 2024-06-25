@@ -1,61 +1,72 @@
 package org.jabref.model.search;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+
+import org.jabref.model.entry.BibEntry;
+
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.search.highlight.Highlighter;
+import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
+import org.apache.lucene.search.highlight.TextFragment;
 
 public final class SearchResult {
 
     private final float luceneScore;
     private final boolean hasFulltextResults;
     private final String path;
+    private final String pageContent;
+    private final String annotation;
     private final int pageNumber;
-    private final long modified;
-    private final List<String> contentResultStringsHtml;
-    private final List<String> annotationsResultStringsHtml;
-    private final List<String> bibEntryStringsHtml;
-
-    public SearchResult(float luceneScore, List<String> bibEntryStringsHtml) {
-        this(luceneScore,
-                false,
-                "",
-                -1,
-                -1,
-                bibEntryStringsHtml,
-                List.of(),
-                List.of());
-    }
-
-    public SearchResult(float luceneScore,
-                        String path,
-                        int pageNumber,
-                        long modified,
-                        List<String> contentResultStringsHtml,
-                        List<String> annotationsResultStringsHtml) {
-        this(luceneScore,
-                true,
-                path,
-                pageNumber,
-                modified,
-                List.of(),
-                contentResultStringsHtml,
-                annotationsResultStringsHtml);
-    }
+    private final Highlighter highlighter;
+    private List<String> contentResultStringsHtml;
+    private List<String> annotationsResultStringsHtml;
+    private List<String> bibEntryStringsHtml;
 
     private SearchResult(float luceneScore,
-                        boolean hasFulltextResults,
-                        String path,
-                        int pageNumber,
-                        long modified,
-                        List<String> bibEntryStringsHtml,
-                        List<String> contentResultStringsHtml,
-                        List<String> annotationsResultStringsHtml) {
+                         boolean hasFulltextResults,
+                         String path,
+                         String pageContent,
+                         String annotation,
+                         int pageNumber,
+                         Highlighter highlighter) {
         this.luceneScore = luceneScore;
         this.hasFulltextResults = hasFulltextResults;
         this.path = path;
+        this.pageContent = pageContent;
+        this.annotation = annotation;
         this.pageNumber = pageNumber;
-        this.modified = modified;
-        this.bibEntryStringsHtml = bibEntryStringsHtml;
-        this.contentResultStringsHtml = contentResultStringsHtml;
-        this.annotationsResultStringsHtml = annotationsResultStringsHtml;
+        this.highlighter = highlighter;
+    }
+
+    public SearchResult(float luceneScore, Highlighter highlighter) {
+        this(luceneScore, false, "", "", "", -1, highlighter);
+    }
+
+    public SearchResult(float luceneScore, String path, String pageContent, String annotation, int pageNumber, Highlighter highlighter) {
+        this(luceneScore, true, path, pageContent, annotation, pageNumber, highlighter);
+    }
+
+    public List<String> getContentResultStringsHtml() {
+        if (contentResultStringsHtml == null) {
+            return contentResultStringsHtml = getHighlighterFragments(highlighter, SearchFieldConstants.CONTENT, pageContent);
+        }
+        return contentResultStringsHtml;
+    }
+
+    public List<String> getAnnotationsResultStringsHtml() {
+        if (annotationsResultStringsHtml == null) {
+            annotationsResultStringsHtml = getHighlighterFragments(highlighter, SearchFieldConstants.ANNOTATIONS, annotation);
+        }
+        return annotationsResultStringsHtml;
+    }
+
+    public List<String> getBibEntryStringsHtml(BibEntry bibEntry) {
+        if (bibEntryStringsHtml == null) {
+            bibEntryStringsHtml = getHighlighterFragments(highlighter, SearchFieldConstants.ENTRY_ID, bibEntry.getParsedSerialization());
+        }
+        return bibEntryStringsHtml;
     }
 
     public float getLuceneScore() {
@@ -74,19 +85,12 @@ public final class SearchResult {
         return pageNumber;
     }
 
-    public long getModified() {
-        return modified;
-    }
-
-    public List<String> getContentResultStringsHtml() {
-        return contentResultStringsHtml;
-    }
-
-    public List<String> getAnnotationsResultStringsHtml() {
-        return annotationsResultStringsHtml;
-    }
-
-    public List<String> getBibEntryStringsHtml() {
-        return bibEntryStringsHtml;
+    private static List<String> getHighlighterFragments(Highlighter highlighter, SearchFieldConstants field, String content) {
+        try (TokenStream contentStream = SearchFieldConstants.ANALYZER.tokenStream(field.toString(), content)) {
+            TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
+            return Arrays.stream(frags).map(TextFragment::toString).toList();
+        } catch (IOException | InvalidTokenOffsetsException e) {
+            return List.of();
+        }
     }
 }

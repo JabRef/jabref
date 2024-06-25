@@ -2,7 +2,6 @@ package org.jabref.logic.search.retrieval;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,17 +16,14 @@ import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResult;
 import org.jabref.model.search.SearchResults;
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.StoredFields;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.highlight.Highlighter;
-import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
-import org.apache.lucene.search.highlight.TextFragment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +59,7 @@ public final class LuceneSearcher {
         return new SearchResults();
     }
 
-    private SearchResults getSearchResults() {
+    private SearchResults getSearchResults() throws IOException {
         SearchResults searchResults = new SearchResults();
         Map<String, BibEntry> entriesMap = new HashMap<>();
         Map<String, List<BibEntry>> linkedFielsMap = new HashMap<>();
@@ -75,53 +71,33 @@ public final class LuceneSearcher {
             }
         }
 
-        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(searchQuery.getQuery()));
-        Analyzer analyzer = SearchFieldConstants.ANALYZER;
-
         long startTime = System.currentTimeMillis();
+        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(searchQuery.getQuery()));
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-            float luceneScore = scoreDoc.score;
-            String fileLink = getFieldContents(storedFields, scoreDoc, SearchFieldConstants.PATH);
+            float score = scoreDoc.score;
+            Document document = storedFields.document(scoreDoc.doc);
+
+            String fileLink = getFieldContents(document, SearchFieldConstants.PATH);
             if (!fileLink.isEmpty()) {
                 List<BibEntry> entriesWithFile = linkedFielsMap.get(fileLink);
-                if (entriesWithFile.isEmpty()) {
-                    continue;
+                if (!entriesWithFile.isEmpty()) {
+                    SearchResult searchResult = new SearchResult(score, fileLink,
+                            getFieldContents(document, SearchFieldConstants.CONTENT),
+                            getFieldContents(document, SearchFieldConstants.ANNOTATIONS),
+                            Integer.parseInt(getFieldContents(document, SearchFieldConstants.PAGE_NUMBER)),
+                            highlighter);
+                    searchResults.addSearchResult(entriesWithFile, searchResult);
                 }
-                int pageNumber = Integer.parseInt(getFieldContents(storedFields, scoreDoc, SearchFieldConstants.PAGE_NUMBER));
-                long modified = Long.parseLong(getFieldContents(storedFields, scoreDoc, SearchFieldConstants.MODIFIED));
-                String content = getFieldContents(storedFields, scoreDoc, SearchFieldConstants.CONTENT);
-                String annotations = getFieldContents(storedFields, scoreDoc, SearchFieldConstants.ANNOTATIONS);
-
-                searchResults.addSearchResult(entriesWithFile,
-                        new SearchResult(luceneScore, fileLink, pageNumber, modified,
-                                getHighlighterFragments(highlighter, analyzer, SearchFieldConstants.CONTENT.toString(), content),
-                                getHighlighterFragments(highlighter, analyzer, SearchFieldConstants.ANNOTATIONS.toString(), annotations)));
             } else {
-                String entryId = getFieldContents(storedFields, scoreDoc, SearchFieldConstants.ENTRY_ID);
-                String defaultField = getFieldContents(storedFields, scoreDoc, SearchFieldConstants.DEFAULT_FIELD);
-                searchResults.addSearchResult(entriesMap.get(entryId),
-                        new SearchResult(luceneScore, getHighlighterFragments(highlighter, analyzer, SearchFieldConstants.DEFAULT_FIELD.toString(), defaultField)));
+                String entryId = getFieldContents(document, SearchFieldConstants.ENTRY_ID);
+                searchResults.addSearchResult(entriesMap.get(entryId), new SearchResult(score, highlighter));
             }
         }
-        LOGGER.debug("Mapping search results took {} ms", System.currentTimeMillis() - startTime);
+        LOGGER.debug("Reading search results took {} ms", System.currentTimeMillis() - startTime);
         return searchResults;
     }
 
-    private static List<String> getHighlighterFragments(Highlighter highlighter, Analyzer analyzer, String field, String content) {
-        try (TokenStream contentStream = analyzer.tokenStream(field, content)) {
-            TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
-            return Arrays.stream(frags).map(TextFragment::toString).toList();
-        } catch (IOException | InvalidTokenOffsetsException e) {
-            return List.of();
-        }
-    }
-
-    private static String getFieldContents(StoredFields storedFields, ScoreDoc scoreDoc, SearchFieldConstants field) {
-        try {
-            return Optional.ofNullable(storedFields.document(scoreDoc.doc).get(field.toString())).orElse("");
-        } catch (IOException e) {
-            LOGGER.error("Error while getting field contents for field {}", field, e);
-        }
-        return "";
+    private static String getFieldContents(Document document, SearchFieldConstants field) {
+        return Optional.ofNullable(document.get(field.toString())).orElse("");
     }
 }
