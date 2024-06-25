@@ -30,13 +30,13 @@ public class AiIngestedFilesTracker {
         this.ingestedMap = mvStore.openMap("ingestedMap");
     }
 
+    public boolean haveIngestedFile(String link) {
+        return ingestedMap.get(link) != null;
+    }
+
     public void endIngestingFile(String link, long modificationTimeInSeconds) {
         ingestedMap.put(link, modificationTimeInSeconds);
         eventBus.post(new FileIngestedEvent(link));
-    }
-
-    public boolean haveIngestedFile(String link) {
-        return ingestedMap.get(link) != null;
     }
 
     public @Nullable Long getIngestedFileModificationTime(String link) {
