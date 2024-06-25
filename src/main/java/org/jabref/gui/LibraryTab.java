@@ -758,14 +758,11 @@ public class LibraryTab extends Tab {
     }
 
     public boolean requestClose() {
-        if (isModified() && (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL)) {
-            return confirmClose();
-        } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
-            bibDatabaseContext.convertToLocalDatabase();
-            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
-            bibDatabaseContext.clearDBMSSynchronizer();
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL) {
+            if (isModified()) {
+                return confirmClose();
+            }
         }
-
         return true;
     }
 
@@ -845,6 +842,11 @@ public class LibraryTab extends Tab {
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
         }
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
+            bibDatabaseContext.convertToLocalDatabase();
+            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+            bibDatabaseContext.clearDBMSSynchronizer();
+        }
         try {
             changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         } catch (RuntimeException e) {
@@ -873,6 +875,7 @@ public class LibraryTab extends Tab {
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
+
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }
