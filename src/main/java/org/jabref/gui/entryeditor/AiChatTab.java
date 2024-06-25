@@ -36,8 +36,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 public class AiChatTab extends EntryEditorTab {
-    public static final String NAME = "AI chat";
-
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AiChatTab.class.getName());
 
     private final DialogService dialogService;
@@ -75,7 +73,7 @@ public class AiChatTab extends EntryEditorTab {
 
         this.taskExecutor = taskExecutor;
 
-        setText(Localization.lang(NAME));
+        setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
 
         aiService.getEmbeddingsManager().getIngestedFilesTracker().registerListener(new FileIngestedListener());
