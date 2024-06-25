@@ -16,13 +16,14 @@ class ExplicitGroupTest {
 
     private ExplicitGroup group;
     private ExplicitGroup group2;
-
+    private ExplicitGroup group3;
     private BibEntry entry;
 
     @BeforeEach
     void setUp() {
         group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
-        group2 = new ExplicitGroup("myExplicitGroup2", GroupHierarchyType.INCLUDING, ',');
+        group2 = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');  // Same as group
+        group3 = new ExplicitGroup("anotherGroup", GroupHierarchyType.INDEPENDENT, ',');  // Different from group
         entry = new BibEntry();
     }
 
@@ -40,10 +41,10 @@ class ExplicitGroupTest {
     }
 
     @Test
-    void addTwoGroupsToBibEntryChangesGroupsField() {
-        group.add(entry);
-        group2.add(entry);
-        assertEquals(Optional.of("myExplicitGroup, myExplicitGroup2"), entry.getField(StandardField.GROUPS));
+      void addTwoGroupsToBibEntryChangesGroupsField() {
+     group.add(entry);
+    group2.add(entry);
+    assertEquals(Optional.of("myExplicitGroup, myExplicitGroup2"), entry.getField(StandardField.GROUPS));
     }
 
     @Test
@@ -93,4 +94,89 @@ class ExplicitGroupTest {
 
         assertTrue(explicitGroup.contains(entry));
     }
+
+
+    @Test
+    void testEqualsWithSelf() {
+        assertTrue(group.equals(group));
+        ExplicitGroup.printCoverage();
+    }
+
+    @Test
+    void testEqualsWithSameAttributes() {
+        assertTrue(group.equals(group2));
+        ExplicitGroup.printCoverage();
+    }
+
+    @Test
+    void testEqualsWithDifferentAttributes() {
+        assertFalse(group.equals(group3));
+        ExplicitGroup.printCoverage();
+    }
+
+    @Test
+    void testEqualsWithNull() {
+        assertFalse(group.equals(null));
+        ExplicitGroup.printCoverage();
+    }
+
+    @Test
+    void testEqualsWithDifferentType() {
+        assertFalse(group.equals(new Object()));
+        ExplicitGroup.printCoverage();
+    }
+
+
+    @Test
+    void testEqualsWithDifferentHierarchicalContext() {
+        ExplicitGroup groupDiffContext = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING, ',');
+        assertFalse(group.equals(groupDiffContext));
+        ExplicitGroup.printCoverage();
+    }
+
+    @Test
+    void testEqualsWithDifferentIconName() {
+        group.setIconName("icon1");
+        ExplicitGroup groupDiffIcon = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
+        groupDiffIcon.setIconName("icon2");
+        assertFalse(group.equals(groupDiffIcon));
+        ExplicitGroup.printCoverage();
+    }
+
+    @Test
+    void testEqualsWithDifferentDescription() {
+        group.setDescription("Description1");
+        ExplicitGroup groupDiffDescription = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
+        groupDiffDescription.setDescription("Description2");
+        assertFalse(group.equals(groupDiffDescription));
+        ExplicitGroup.printCoverage();
+    }
+
+    @Test
+    void testEqualsWithDifferentColor() {
+        group.setColor("red");
+        ExplicitGroup groupDiffColor = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
+        groupDiffColor.setColor("blue");
+        assertFalse(group.equals(groupDiffColor));
+        ExplicitGroup.printCoverage();
+    }
+
+    @Test
+    void testEqualsWithDifferentExpandedState() {
+        group.setExpanded(true);
+        ExplicitGroup groupDiffExpanded = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
+        groupDiffExpanded.setExpanded(false);
+        assertFalse(group.equals(groupDiffExpanded));
+        ExplicitGroup.printCoverage();
+    }
+
+    @Test
+    void testEqualsWithDifferentLegacyEntryKeys() {
+        group.addLegacyEntryKey("key1");
+        ExplicitGroup groupDiffKeys = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
+        groupDiffKeys.addLegacyEntryKey("key2");
+        assertFalse(group.equals(groupDiffKeys));
+        ExplicitGroup.printCoverage();
+    }
+
 }

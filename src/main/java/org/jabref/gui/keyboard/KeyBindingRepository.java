@@ -1,14 +1,6 @@
 package org.jabref.gui.keyboard;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javafx.scene.input.KeyCode;
@@ -32,6 +24,14 @@ public class KeyBindingRepository {
     public KeyBindingRepository(SortedMap<KeyBinding, String> bindings) {
         this.bindings = bindings;
     }
+
+    public static Map<String,Boolean> branchCoverage = new HashMap<>();
+    static{
+        branchCoverage.put("equals_branch_1",false);
+        branchCoverage.put("equals_branch_2",false);
+        branchCoverage.put("equals_branch_3",false);
+    }
+
 
     public KeyBindingRepository(List<String> bindNames, List<String> bindings) {
         this.bindings = new TreeMap<>(Comparator.comparing(KeyBinding::getLocalization));
@@ -73,11 +73,20 @@ public class KeyBindingRepository {
         Optional<String> result = keyBinding.flatMap(k -> Optional.ofNullable(bindings.get(k)));
 
         if (result.isPresent()) {
+            branchCoverage.put("equals_branch_1", true);
             return result.get();
         } else if (keyBinding.isPresent()) {
+            branchCoverage.put("equals_branch_2", true);
             return keyBinding.get().getDefaultKeyBinding();
         } else {
+            branchCoverage.put("equals_branch_3", true);
             return "Not associated";
+        }
+    }
+
+    public static void printCoverage(){
+        for(Map.Entry<String, Boolean> entry: branchCoverage.entrySet()){
+            System.out.println("test equals()" +entry.getKey() + "was" + (entry.getValue()?"hit":"not hit"));
         }
     }
 

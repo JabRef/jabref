@@ -47,6 +47,7 @@ class KeyBindingsTabModelTest {
         assertFalse(KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
         model.storeSettings();
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, shortcutKeyEvent));
+        KeyBindingRepository.printCoverage();
     }
 
     @Test
@@ -67,6 +68,8 @@ class KeyBindingsTabModelTest {
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.IMPORT_INTO_NEW_DATABASE,
                                                                     shortcutKeyEvent));
+        KeyBindingRepository.printCoverage();
+
     }
 
     @Test
@@ -77,6 +80,8 @@ class KeyBindingsTabModelTest {
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLEANUP, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
         assertNull(model.selectedKeyBindingProperty().get().get().getKeyBinding());
+        KeyBindingRepository.printCoverage();
+
     }
 
     @Test
@@ -119,6 +124,8 @@ class KeyBindingsTabModelTest {
         model.storeSettings();
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        KeyBindingRepository.printCoverage();
+
     }
 
     @Test
@@ -139,6 +146,8 @@ class KeyBindingsTabModelTest {
         model.storeSettings();
 
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        KeyBindingRepository.printCoverage();
+
     }
 
     @Test
@@ -153,6 +162,8 @@ class KeyBindingsTabModelTest {
 
         assertTrue(combi.match(closeEditorEvent));
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, closeEditorEvent));
+        KeyBindingRepository.printCoverage();
+
     }
 
     @Test
@@ -174,11 +185,33 @@ class KeyBindingsTabModelTest {
         model.storeSettings();
 
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+        KeyBindingRepository.printCoverage();
+
     }
 
     private KeyBindingViewModel setKeyBindingViewModel(KeyBinding binding) {
         KeyBindingViewModel viewModel = new KeyBindingViewModel(keyBindingRepository, binding, binding.getDefaultKeyBinding());
         model.selectedKeyBindingProperty().set(Optional.of(viewModel));
+        KeyBindingRepository.printCoverage();
         return viewModel;
     }
+
+
+    @Test
+    void testGetKeyBindingValueIsNull() {
+        KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
+        keyBindingRepository.put(KeyBinding.COPY, null);
+        String result = keyBindingRepository.get(KeyBinding.COPY.getConstant());
+        assertEquals(KeyBinding.COPY.getDefaultKeyBinding(), result);
+    }
+
+    @Test
+    void testGetKeyBindingNotPresent() {
+        KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
+        String result = keyBindingRepository.get("NonExist");
+        assertEquals("Not associated", result);
+    }
+
+
+
 }
