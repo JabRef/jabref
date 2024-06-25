@@ -94,13 +94,13 @@ public final class LuceneSearcher {
 
                 searchResults.addSearchResult(entriesWithFile,
                         new SearchResult(luceneScore, fileLink, pageNumber, modified,
-                                getHighlighterFragments(highlighter, analyzer, SearchFieldConstants.CONTENT, content),
-                                getHighlighterFragments(highlighter, analyzer, SearchFieldConstants.ANNOTATIONS, annotations)));
+                                getHighlighterFragments(highlighter, analyzer, SearchFieldConstants.CONTENT.toString(), content),
+                                getHighlighterFragments(highlighter, analyzer, SearchFieldConstants.ANNOTATIONS.toString(), annotations)));
             } else {
-                String entryId = getFieldContents(storedFields, scoreDoc, SearchFieldConstants.BIB_ENTRY_ID);
-                String defaultField = "";
+                String entryId = getFieldContents(storedFields, scoreDoc, SearchFieldConstants.ENTRY_ID);
+                String defaultField = getFieldContents(storedFields, scoreDoc, SearchFieldConstants.DEFAULT_FIELD);
                 searchResults.addSearchResult(entriesMap.get(entryId),
-                        new SearchResult(luceneScore, getHighlighterFragments(highlighter, analyzer, SearchFieldConstants.DEFAULT_FIELD, defaultField)));
+                        new SearchResult(luceneScore, getHighlighterFragments(highlighter, analyzer, SearchFieldConstants.DEFAULT_FIELD.toString(), defaultField)));
             }
         }
         LOGGER.debug("Mapping search results took {} ms", System.currentTimeMillis() - startTime);
@@ -116,9 +116,9 @@ public final class LuceneSearcher {
         }
     }
 
-    private static String getFieldContents(StoredFields storedFields, ScoreDoc scoreDoc, String field) {
+    private static String getFieldContents(StoredFields storedFields, ScoreDoc scoreDoc, SearchFieldConstants field) {
         try {
-            return Optional.ofNullable(storedFields.document(scoreDoc.doc).get(field)).orElse("");
+            return Optional.ofNullable(storedFields.document(scoreDoc.doc).get(field.toString())).orElse("");
         } catch (IOException e) {
             LOGGER.error("Error while getting field contents for field {}", field, e);
         }

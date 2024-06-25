@@ -30,7 +30,7 @@ public class SearchQuery {
         SearchFieldConstants.SEARCHABLE_BIB_FIELDS.forEach(field -> boosts.put(field, 4F));
 
         if (searchFlags.contains(SearchFlags.FULLTEXT)) {
-            Arrays.stream(SearchFieldConstants.PDF_FIELDS).forEach(field -> boosts.put(field, 1F));
+            Arrays.stream(SearchFieldConstants.PDF_FIELDS).forEach(field -> boosts.put(field.toString(), 1F));
         }
 
         String[] fieldsToSearchArray = new String[boosts.size()];

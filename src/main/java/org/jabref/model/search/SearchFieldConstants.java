@@ -8,18 +8,30 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 
-public class SearchFieldConstants {
-    public static final String VERSION = "99";
-    public static final String FILE_FIELDS_PREFIX = "f_";
-    public static final String PATH = FILE_FIELDS_PREFIX + "path";
-    public static final String CONTENT = FILE_FIELDS_PREFIX + "content";
-    public static final String ANNOTATIONS = FILE_FIELDS_PREFIX + "annotations";
-    public static final String PAGE_NUMBER = FILE_FIELDS_PREFIX + "pageNumber";
-    public static final String MODIFIED = FILE_FIELDS_PREFIX + "modified";
-    public static final String DEFAULT_FIELD = "default_field";
-    public static final String BIB_ENTRY_ID = "bib_id";
-    public static final String BIB_ENTRY_TYPE = "entrytype";
+public enum SearchFieldConstants {
+
+    VERSION("99"),
+    DEFAULT_FIELD("all"),
+    ENTRY_ID("id"),
+    ENTRY_TYPE("entrytype"),
+    PATH("path"),
+    CONTENT("content"),
+    ANNOTATIONS("annotations"),
+    PAGE_NUMBER("pageNumber"),
+    MODIFIED("modified");
+
     public static final Analyzer ANALYZER = new StandardAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-    public static final String[] PDF_FIELDS = {PATH, CONTENT, ANNOTATIONS};
-    public static final Set<String> SEARCHABLE_BIB_FIELDS = new HashSet<>(List.of(BIB_ENTRY_ID, BIB_ENTRY_TYPE));
+    public static final SearchFieldConstants[] PDF_FIELDS = {PATH, CONTENT, ANNOTATIONS};
+    public static final Set<String> SEARCHABLE_BIB_FIELDS = new HashSet<>(List.of(ENTRY_ID.toString(), ENTRY_TYPE.toString()));
+
+    private final String field;
+
+    SearchFieldConstants(String field) {
+        this.field = field;
+    }
+
+    @Override
+    public String toString() {
+        return field;
+    }
 }

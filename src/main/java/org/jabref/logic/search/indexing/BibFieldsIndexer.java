@@ -100,9 +100,9 @@ public class BibFieldsIndexer implements LuceneIndexer {
             Document document = new Document();
             org.apache.lucene.document.Field.Store store = org.apache.lucene.document.Field.Store.YES;
 
-            document.add(new StringField(SearchFieldConstants.BIB_ENTRY_ID, bibEntry.getId(), store));
-            document.add(new StringField(SearchFieldConstants.BIB_ENTRY_TYPE, bibEntry.getType().getName(), store));
-            document.add(new TextField(SearchFieldConstants.DEFAULT_FIELD, bibEntry.getParsedSerialization(), store));
+            document.add(new StringField(SearchFieldConstants.ENTRY_ID.toString(), bibEntry.getId(), store));
+            document.add(new StringField(SearchFieldConstants.ENTRY_TYPE.toString(), bibEntry.getType().getName(), store));
+            document.add(new TextField(SearchFieldConstants.DEFAULT_FIELD.toString(), bibEntry.getParsedSerialization(), store));
 
             for (Map.Entry<Field, String> field : bibEntry.getFieldMap().entrySet()) {
                 String fieldValue = field.getValue();
@@ -138,7 +138,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
     private void removeFromIndex(BibEntry entry) {
         try {
             LOGGER.debug("Removing entry {} from index", entry.getId());
-            indexWriter.deleteDocuments((new Term(SearchFieldConstants.BIB_ENTRY_ID, entry.getId())));
+            indexWriter.deleteDocuments((new Term(SearchFieldConstants.ENTRY_ID.toString(), entry.getId())));
             LOGGER.debug("Entry {} removed from index", entry.getId());
         } catch (IOException e) {
             LOGGER.error("Error deleting entry from index", e);
@@ -171,33 +171,32 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     @Override
     public IndexSearcher getIndexSearcher() {
-        LOGGER.debug("Getting index searcher");
+        LOGGER.debug("Getting index searcher for bib fields index");
         try {
+            IndexSearcher oldSearcher = indexSearcher;
             if (indexSearcher != null) {
-                LOGGER.debug("Releasing index searcher");
+                LOGGER.debug("Releasing bib fields index searcher");
                 searcherManager.release(indexSearcher);
             }
-            LOGGER.debug("Refreshing searcher");
             searcherManager.maybeRefresh();
-            LOGGER.debug("Acquiring index searcher");
             indexSearcher = searcherManager.acquire();
         } catch (IOException e) {
-            LOGGER.error("Error refreshing searcher", e);
+            LOGGER.error("Error refreshing searcher for bib fields index", e);
         }
         return indexSearcher;
     }
 
     @Override
     public void close() {
-        LOGGER.debug("Closing index");
+        LOGGER.debug("Closing bib fields index");
         HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
                 searcherManager.close();
                 indexWriter.close();
                 indexDirectory.close();
-                LOGGER.debug("Index closed");
+                LOGGER.debug("Bib fields index closed");
             } catch (IOException e) {
-                LOGGER.error("Error closing index", e);
+                LOGGER.error("Error while closing bib fields index", e);
             }
         });
     }

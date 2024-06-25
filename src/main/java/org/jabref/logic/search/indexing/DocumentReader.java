@@ -82,11 +82,11 @@ public final class DocumentReader {
     private void addMetaData(Document newDocument, Path resolvedPdfPath, int pageNumber) {
         try {
             long modifiedTime = Files.getLastModifiedTime(resolvedPdfPath).to(TimeUnit.SECONDS);
-            addStringField(newDocument, MODIFIED, String.valueOf(modifiedTime));
+            addStringField(newDocument, MODIFIED.toString(), String.valueOf(modifiedTime));
         } catch (IOException e) {
             LOGGER.error("Could not read timestamp for {}", resolvedPdfPath, e);
         }
-        addStringField(newDocument, PAGE_NUMBER, String.valueOf(pageNumber));
+        addStringField(newDocument, PAGE_NUMBER.toString(), String.valueOf(pageNumber));
     }
 
     private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument, Path resolvedPath, int pageNumber) {
@@ -98,7 +98,7 @@ public final class DocumentReader {
         try {
             String pdfContent = pdfTextStripper.getText(pdfDocument);
             if (StringUtil.isNotBlank(pdfContent)) {
-                newDocument.add(new TextField(CONTENT, mergeLines(pdfContent), Field.Store.YES));
+                newDocument.add(new TextField(CONTENT.toString(), mergeLines(pdfContent), Field.Store.YES));
             }
 
             // Apache PDFTextStripper is 1-based. See {@link org.apache.pdfbox.text.PDFTextStripper.processPages}
@@ -110,7 +110,7 @@ public final class DocumentReader {
                                            .toList();
 
             if (!annotations.isEmpty()) {
-                newDocument.add(new TextField(ANNOTATIONS, String.join("\n", annotations), Field.Store.YES));
+                newDocument.add(new TextField(ANNOTATIONS.toString(), String.join("\n", annotations), Field.Store.YES));
             }
         } catch (IOException e) {
             LOGGER.warn("Could not read page {} of  {}", pageNumber, resolvedPath.toAbsolutePath(), e);
@@ -118,6 +118,6 @@ public final class DocumentReader {
     }
 
     private void addIdentifiers(Document newDocument, String path) {
-        newDocument.add(new StringField(PATH, path, Field.Store.YES));
+        newDocument.add(new StringField(PATH.toString(), path, Field.Store.YES));
     }
 }
