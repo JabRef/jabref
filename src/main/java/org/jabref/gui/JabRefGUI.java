@@ -42,7 +42,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
-import kong.unirest.Unirest;
+import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

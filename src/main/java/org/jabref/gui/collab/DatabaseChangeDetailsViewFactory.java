@@ -57,28 +57,43 @@ public class DatabaseChangeDetailsViewFactory {
     }
 
     public DatabaseChangeDetailsView create(DatabaseChange databaseChange) {
-        // TODO: Use Pattern Matching for switch once it's out of preview
-        if (databaseChange instanceof EntryChange entryChange) {
-            return new EntryChangeDetailsView(entryChange.getOldEntry(), entryChange.getNewEntry(), databaseContext, dialogService, stateManager, themeManager, preferencesService, entryTypesManager, previewViewer, taskExecutor);
-        } else if (databaseChange instanceof EntryAdd entryAdd) {
-            return new EntryWithPreviewAndSourceDetailsView(entryAdd.getAddedEntry(), databaseContext, preferencesService, entryTypesManager, previewViewer);
-        } else if (databaseChange instanceof EntryDelete entryDelete) {
-            return new EntryWithPreviewAndSourceDetailsView(entryDelete.getDeletedEntry(), databaseContext, preferencesService, entryTypesManager, previewViewer);
-        } else if (databaseChange instanceof BibTexStringAdd stringAdd) {
-            return new BibTexStringAddDetailsView(stringAdd);
-        } else if (databaseChange instanceof BibTexStringDelete stringDelete) {
-            return new BibTexStringDeleteDetailsView(stringDelete);
-        } else if (databaseChange instanceof BibTexStringChange stringChange) {
-            return new BibTexStringChangeDetailsView(stringChange);
-        } else if (databaseChange instanceof BibTexStringRename stringRename) {
-            return new BibTexStringRenameDetailsView(stringRename);
-        } else if (databaseChange instanceof MetadataChange metadataChange) {
-            return new MetadataChangeDetailsView(metadataChange, preferencesService.getCitationKeyPatternPreferences().getKeyPatterns());
-        } else if (databaseChange instanceof GroupChange groupChange) {
-            return new GroupChangeDetailsView(groupChange);
-        } else if (databaseChange instanceof PreambleChange preambleChange) {
-            return new PreambleChangeDetailsView(preambleChange);
-        }
-        throw new UnsupportedOperationException("Cannot preview the given change: " + databaseChange.getName());
+        return switch (databaseChange) {
+            case EntryChange entryChange -> new EntryChangeDetailsView(
+                entryChange.getOldEntry(),
+                entryChange.getNewEntry(),
+                databaseContext,
+                dialogService,
+                stateManager,
+                themeManager,
+                preferencesService,
+                entryTypesManager,
+                previewViewer,
+                taskExecutor
+            );
+            case EntryAdd entryAdd -> new EntryWithPreviewAndSourceDetailsView(
+                entryAdd.getAddedEntry(),
+                databaseContext,
+                preferencesService,
+                entryTypesManager,
+                previewViewer
+            );
+            case EntryDelete entryDelete -> new EntryWithPreviewAndSourceDetailsView(
+                entryDelete.getDeletedEntry(),
+                databaseContext,
+                preferencesService,
+                entryTypesManager,
+                previewViewer
+            );
+            case BibTexStringAdd stringAdd -> new BibTexStringAddDetailsView(stringAdd);
+            case BibTexStringDelete stringDelete -> new BibTexStringDeleteDetailsView(stringDelete);
+            case BibTexStringChange stringChange -> new BibTexStringChangeDetailsView(stringChange);
+            case BibTexStringRename stringRename -> new BibTexStringRenameDetailsView(stringRename);
+            case MetadataChange metadataChange -> new MetadataChangeDetailsView(
+                metadataChange,
+                preferencesService.getCitationKeyPatternPreferences().getKeyPatterns()
+            );
+            case GroupChange groupChange -> new GroupChangeDetailsView(groupChange);
+            case PreambleChange preambleChange -> new PreambleChangeDetailsView(preambleChange);
+        };
     }
 }

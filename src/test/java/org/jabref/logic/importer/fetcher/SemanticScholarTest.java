@@ -125,7 +125,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
         String query = "Software engineering";
         SyntaxParser parser = new StandardSyntaxParser();
         URL url = fetcher.getURLForQuery(parser.parse(query, "default"), 0);
-        assertEquals("https://api.semanticscholar.org/graph/v1/paper/search?query=Software+engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors", url.toString());
+        assertEquals("https://api.semanticscholar.org/graph/v1/paper/search?query=Software%20engineering&offset=0&limit=20&fields=paperId%2CexternalIds%2Curl%2Ctitle%2Cabstract%2Cvenue%2Cyear%2Cauthors", url.toString());
     }
 
     @Test

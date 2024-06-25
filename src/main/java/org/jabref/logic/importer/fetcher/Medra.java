@@ -22,9 +22,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
 
 /**
  * A class for fetching DOIs from Medra

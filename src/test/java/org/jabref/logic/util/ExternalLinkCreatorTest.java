@@ -51,6 +51,6 @@ class ExternalLinkCreatorTest {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "JabRef bibliography management");
         Optional<String> url = getShortScienceSearchURL(entry);
         // Expected behaviour is to link to the search results page, /internalsearch
-        assertEquals(Optional.of("https://www.shortscience.org/internalsearch?q=JabRef+bibliography+management"), url);
+        assertEquals(Optional.of("https://www.shortscience.org/internalsearch?q=JabRef%20bibliography%20management"), url);
     }
 }

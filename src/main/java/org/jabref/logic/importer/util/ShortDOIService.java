@@ -10,9 +10,9 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.identifier.DOI;
 
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
 
 /**
  * Class for obtaining shortened DOI names. See <a href="https://shortdoi.org">https://shortdoi.org</a>.
