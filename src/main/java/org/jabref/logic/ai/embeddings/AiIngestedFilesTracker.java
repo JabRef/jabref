@@ -34,6 +34,14 @@ public class AiIngestedFilesTracker {
         return ingestedMap.get(link) != null;
     }
 
+    public boolean haveIngestedFiles(Stream<String> links) {
+        return links.allMatch(this::haveIngestedFile);
+    }
+
+    public boolean haveIngestedLinkedFiles(Collection<LinkedFile> linkedFiles) {
+        return haveIngestedFiles(linkedFiles.stream().map(LinkedFile::getLink));
+    }
+
     public void endIngestingFile(String link, long modificationTimeInSeconds) {
         ingestedMap.put(link, modificationTimeInSeconds);
         eventBus.post(new FileIngestedEvent(link));
@@ -41,14 +49,6 @@ public class AiIngestedFilesTracker {
 
     public @Nullable Long getIngestedFileModificationTime(String link) {
         return ingestedMap.get(link);
-    }
-
-    public boolean haveIngestedFiles(Stream<String> links) {
-        return links.allMatch(this::haveIngestedFile);
-    }
-
-    public boolean haveIngestedLinkedFiles(Collection<LinkedFile> linkedFiles) {
-        return haveIngestedFiles(linkedFiles.stream().map(LinkedFile::getLink));
     }
 
     public void registerListener(Object listener) {
