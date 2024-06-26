@@ -1,12 +1,15 @@
 package org.jabref.logic.cleanup;
 
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.gui.DialogService;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -24,9 +27,13 @@ public class MoveFilesCleanup implements CleanupJob {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
 
-    public MoveFilesCleanup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    private final DialogService dialogService;
+
+
+    public MoveFilesCleanup(BibDatabaseContext databaseContext, FilePreferences filePreferences, DialogService dialogService) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.filePreferences = Objects.requireNonNull(filePreferences);
+        this.dialogService = dialogService;
     }
 
     @Override
@@ -41,8 +48,12 @@ public class MoveFilesCleanup implements CleanupJob {
                 if (fileChanged) {
                     changed = true;
                 }
-            } catch (IOException exception) {
-                LOGGER.error("Error while moving file {}", file.getLink(), exception);
+            } catch (FileSystemException exception){
+                LOGGER.warn("Could not move file",exception);
+                dialogService.notify(Localization.lang("Could not move file."));
+            }
+            catch (IOException exception) {
+                LOGGER.error("Error moving file {}", file.getLink(), exception);
             }
         }
 

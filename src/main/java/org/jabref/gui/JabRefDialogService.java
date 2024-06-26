@@ -80,6 +80,7 @@ public class JabRefDialogService implements DialogService {
         this.mainWindow = mainWindow;
     }
 
+
     private FXDialog createDialog(AlertType type, String title, String content) {
         FXDialog alert = new FXDialog(type, title, true);
         alert.setHeaderText(null);
