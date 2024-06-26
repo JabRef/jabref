@@ -79,6 +79,8 @@ application {
         '--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module',
         '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
         '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
+        // fix for https://github.com/JabRef/jabref/issues/11426
+        '--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module',
 
         // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
         '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
