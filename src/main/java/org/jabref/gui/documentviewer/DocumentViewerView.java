@@ -118,7 +118,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
                 (observable, oldValue, newValue) -> viewModel.switchToFile(newValue));
         // We always want that the first item is selected after a change
         // This also automatically selects the first file on the initial load
-        Stage stage = ((Stage) getDialogPane().getScene().getWindow());
+        Stage stage = (Stage) getDialogPane().getScene().getWindow();
         fileChoice.itemsProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.isEmpty()) {
                 stage.close();
