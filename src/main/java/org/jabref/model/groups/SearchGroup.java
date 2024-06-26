@@ -19,12 +19,15 @@ import org.slf4j.LoggerFactory;
 public class SearchGroup extends AbstractGroup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
+    private final String searchExpression;
+    private final EnumSet<SearchFlags> searchFlags;
     private Set<BibEntry> matches = Set.of();
-    private final GroupSearchQuery query;
+    private GroupSearchQuery query;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
         super(name, context);
-        this.query = new GroupSearchQuery(searchExpression, searchFlags);
+        this.searchExpression = searchExpression;
+        this.searchFlags = searchFlags;
     }
 
     public String getSearchExpression() {
@@ -51,7 +54,7 @@ public class SearchGroup extends AbstractGroup {
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
-        return query.getSearchFlags();
+        return searchFlags;
     }
 
     @Override
@@ -83,6 +86,9 @@ public class SearchGroup extends AbstractGroup {
     }
 
     public void updateMatches(LuceneManager luceneManager) {
+        if (query == null) {
+            query = new GroupSearchQuery(searchExpression, searchFlags);
+        }
         this.matches = luceneManager.search(query).getAllSearchResults().keySet();
     }
 }

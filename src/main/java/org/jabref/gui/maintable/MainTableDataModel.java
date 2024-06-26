@@ -13,6 +13,7 @@ import javafx.collections.transformation.SortedList;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.LuceneManager;
@@ -22,6 +23,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.SearchResults;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
@@ -42,6 +44,7 @@ public class MainTableDataModel {
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
     private final LuceneManager luceneManager;
+    private BackgroundTask<SearchResults> searchTask;
     private Optional<SearchQuery> lastSearchQuery = Optional.empty();
 
     public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager, TaskExecutor taskExecutor, LuceneManager luceneManager) {
@@ -52,7 +55,6 @@ public class MainTableDataModel {
         this.taskExecutor = taskExecutor;
         this.luceneManager = luceneManager;
         this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
-
         resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
@@ -92,7 +94,7 @@ public class MainTableDataModel {
         entriesFiltered.predicateProperty().unbind();
     }
 
-    public static void updateSearchGroups(StateManager stateManager, BibDatabaseContext bibDatabaseContext, LuceneManager luceneManager) {
+    public synchronized static void updateSearchGroups(StateManager stateManager, BibDatabaseContext bibDatabaseContext, LuceneManager luceneManager) {
         stateManager.getSelectedGroups(bibDatabaseContext)
                     .stream()
                     .map(GroupTreeNode::getGroup)
@@ -101,7 +103,7 @@ public class MainTableDataModel {
                     .forEach(group -> group.updateMatches(luceneManager));
     }
 
-    private void doSearch(Optional<SearchQuery> query) {
+    private synchronized void doSearch(Optional<SearchQuery> query) {
         if (lastSearchQuery.isPresent() && lastSearchQuery.equals(query)) {
             return;
         }

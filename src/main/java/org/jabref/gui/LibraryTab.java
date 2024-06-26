@@ -267,9 +267,6 @@ public class LibraryTab extends Tab {
     }
 
     public void setLuceneManager() {
-        if (bibDatabaseContext == null) {
-            LOGGER.warn("BibDatabaseContext is null, cannot create LuceneIndexer");
-        }
         luceneManager = new LuceneManager(bibDatabaseContext, taskExecutor, preferencesService);
         luceneManager.updateOnStart();
     }
@@ -858,8 +855,8 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when closing directory monitor", e);
         }
         try {
-            closeLuceneManger();
             tableModel.removeBindings();
+            closeLuceneManger();
         } catch (RuntimeException e) {
             LOGGER.error("Problem when closing lucene indexer", e);
         }

@@ -67,11 +67,11 @@ public class GroupsSidePaneComponent extends SidePaneComponent {
         public void execute() {
             EnumSet<GroupViewMode> mode = groupsPreferences.getGroupViewMode();
 
-            if (mode.contains(GroupViewMode.INTERSECTION)) {
-                groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION, false);
+            if (!mode.contains(GroupViewMode.INTERSECTION)) {
+                groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION, true);
                 dialogService.notify(Localization.lang("Group view mode set to intersection"));
             } else {
-                groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION, true);
+                groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION, false);
                 dialogService.notify(Localization.lang("Group view mode set to union"));
             }
         }

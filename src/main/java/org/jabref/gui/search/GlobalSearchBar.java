@@ -392,15 +392,16 @@ public class GlobalSearchBar extends HBox {
     }
 
     private void updateResults(int matched) {
-        if (matched == 0) {
-            currentResults.setText(Localization.lang("No results found."));
-            searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
-        } else {
-            currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
-            searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
-        }
-
-        // setSearchFieldHintTooltip(description); TODO btut: Search-tooltip for lucene
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            if (matched == 0) {
+                currentResults.setText(Localization.lang("No results found."));
+                searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
+            } else {
+                currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
+                searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
+            }
+            // setSearchFieldHintTooltip(description); TODO btut: Search-tooltip for lucene
+        });
     }
 
     private void setSearchFieldHintTooltip(TextFlow description) {

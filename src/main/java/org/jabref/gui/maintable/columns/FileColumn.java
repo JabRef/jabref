@@ -151,7 +151,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
     private Node createFileIcon(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
         Optional<SearchResults> searchResults = stateManager.getSearchResults(database);
-        if (!linkedFiles.isEmpty() && searchResults.isPresent() && searchResults.get().containsEntry(entry.getEntry()) && searchResults.get().hasFulltextResults(entry.getEntry())) {
+        if (!linkedFiles.isEmpty() && searchResults.isPresent() && searchResults.get().hasFulltextResults(entry.getEntry())) {
             return IconTheme.JabRefIcons.FILE_SEARCH.getGraphicNode();
         }
         if (linkedFiles.size() > 1) {
