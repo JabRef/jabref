@@ -4,8 +4,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
@@ -19,6 +20,7 @@ import javafx.collections.ListChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -38,7 +40,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private final PreferencesService preferencesService;
     private final ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
     private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
-    private final BooleanProperty liveMode = new SimpleBooleanProperty();
+    private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
     private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
     private final IntegerProperty maxPages = new SimpleIntegerProperty();
 
@@ -48,7 +50,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
         this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) c -> {
             // Switch to currently selected entry in live mode
-            if (isLiveMode()) {
+            if (liveMode.get()) {
                 setCurrentEntries(this.stateManager.getSelectedEntries());
             }
         });
@@ -61,7 +63,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         });
 
         // we need to wrap this in run later so that the max pages number is correctly shown
-        Platform.runLater(() -> maxPages.bindBidirectional(
+        UiTaskExecutor.runInJavaFXThread(() -> maxPages.bind(
                 EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty)));
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
@@ -78,10 +80,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         return maxPages;
     }
 
-    private boolean isLiveMode() {
-        return liveMode.get();
-    }
-
     public ObjectProperty<DocumentViewModel> currentDocumentProperty() {
         return currentDocument;
     }
@@ -91,18 +89,13 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     }
 
     private void setCurrentEntries(List<BibEntry> entries) {
-        if (!entries.isEmpty()) {
-            BibEntry firstSelectedEntry = entries.getFirst();
-            setCurrentEntry(firstSelectedEntry);
-        }
-    }
-
-    private void setCurrentEntry(BibEntry entry) {
-        stateManager.getActiveDatabase().ifPresent(database -> {
-            List<LinkedFile> linkedFiles = entry.getFiles();
+        if (entries.isEmpty()) {
+            files.clear();
+        } else {
+            Set<LinkedFile> linkedFiles = entries.stream().map(BibEntry::getFiles).flatMap(List::stream).collect(Collectors.toSet());
             // We don't need to switch to the first file, this is done automatically in the UI part
             files.setValue(FXCollections.observableArrayList(linkedFiles));
-        });
+        }
     }
 
     private void setCurrentDocument(Path path) {
@@ -121,23 +114,28 @@ public class DocumentViewerViewModel extends AbstractViewModel {
             stateManager.getActiveDatabase()
                         .flatMap(database -> file.findIn(database, preferencesService.getFilePreferences()))
                         .ifPresent(this::setCurrentDocument);
+            currentPage.set(1);
         }
     }
 
-    public BooleanProperty liveModeProperty() {
-        return liveMode;
-    }
-
     public void showPage(int pageNumber) {
-        currentPage.set(pageNumber);
+        if (pageNumber >= 1 && pageNumber <= maxPages.get()) {
+            currentPage.set(pageNumber);
+        } else {
+            currentPage.set(1);
+        }
     }
 
     public void showNextPage() {
-        currentPage.set(getCurrentPage() + 1);
+        if (getCurrentPage() < maxPages.get()) {
+            currentPage.set(getCurrentPage() + 1);
+        }
     }
 
     public void showPreviousPage() {
-        currentPage.set(getCurrentPage() - 1);
+        if (getCurrentPage() > 1) {
+            currentPage.set(getCurrentPage() - 1);
+        }
     }
 
     public void setLiveMode(boolean value) {
