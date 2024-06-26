@@ -40,7 +40,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Run checkstyle reporter
-        uses: nikitasavinov/checkstyle-action@master
+        uses: dbelyaev/action-checkstyle@master
         with:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -329,7 +329,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
-      - uses: gradle/wrapper-validation-action@v3
+      - uses: gradle/actions/wrapper-validation@v3
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
     name: Find merge conflicts
