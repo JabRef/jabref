@@ -40,7 +40,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Run checkstyle reporter
-        uses: nikitasavinov/checkstyle-action@master
+        uses: dbelyaev/action-checkstyle@master
         with:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
