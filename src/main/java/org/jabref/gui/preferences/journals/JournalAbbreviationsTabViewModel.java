@@ -25,6 +25,8 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -278,18 +280,40 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      * be set to the previous or next abbreviation in the abbreviations property if applicable. Else it will be set to
      * {@code null} if there are no abbreviations left.
      */
+
+     public static Map<String, Boolean> branchCoverage = new HashMap<>();
+     static {
+        branchCoverage.put("Curr Abb not null", false);
+        branchCoverage.put("!currentAbbreviation.get().isPseudoAbbreviation()", false);
+        branchCoverage.put("index > 1", false);
+        branchCoverage.put("index + 1 < abbreviationsCount.get()", false);
+        branchCoverage.put("else", false);
+     }
+
+
     public void deleteAbbreviation() {
         if ((currentAbbreviation.get() != null) && !currentAbbreviation.get().isPseudoAbbreviation()) {
+            branchCoverage.put("Curr Abb not null", true);
+            branchCoverage.put("!currentAbbreviation.get().isPseudoAbbreviation()",true);
             int index = abbreviations.indexOf(currentAbbreviation.get());
             if (index > 1) {
+                branchCoverage.put("index > 1", true);
                 currentAbbreviation.set(abbreviations.get(index - 1));
             } else if ((index + 1) < abbreviationsCount.get()) {
+                branchCoverage.put("index + 1 < abbreviationsCount.get()", true);
                 currentAbbreviation.set(abbreviations.get(index + 1));
             } else {
+                branchCoverage.put("else", true);
                 currentAbbreviation.set(null);
             }
             abbreviations.remove(index);
             shouldWriteLists = true;
+        }
+    }
+
+    public static void printCoverage() {
+        for (Map.Entry<String, Boolean> entry : branchCoverage.entrySet()) {
+            System.out.println("Branch \"" + entry.getKey() + "\" was " + (entry.getValue() ? "hit" : "not hit"));
         }
     }
 

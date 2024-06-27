@@ -20,7 +20,7 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -186,6 +186,12 @@ class JournalAbbreviationsViewModelTabTest {
 
         emptyTestFile = createTestFile(new CsvFileNameAndContent("emptyTestFile.csv", ""));
     }
+
+    @AfterAll
+    public static void printCoverage() {
+        JournalAbbreviationsTabViewModel.printCoverage();
+    }
+    
 
     @Test
     void initialHasNoFilesAndNoAbbreviations() {

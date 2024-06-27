@@ -3,5 +3,5 @@
     "java.format.settings.url": "/config/VSCode Code Style.xml",
     "java.checkstyle.configuration": "${workspaceFolder}/config/checkstyle/checkstyle_reviewdog.xml",
     "java.checkstyle.version": "10.3.4",
-    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable"
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m -Xlog:disable"
 }
