@@ -29,6 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -192,6 +193,82 @@ class JournalAbbreviationsViewModelTabTest {
         JournalAbbreviationsTabViewModel.printCoverage();
     }
     
+    // CurrAbb is null
+    @Test
+    void testDelAbbCurIsNull() {
+        viewModel.currentAbbreviationProperty().set(null);
+        viewModel.deleteAbbreviation();
+        assertNull(viewModel.currentAbbreviationProperty().get());
+    }
+
+    // CurrAbb is pseudo
+    @Test
+    void testDelAbbCurIsPseudo() {
+        AbbreviationViewModel pseudoAbbreviation = mock(AbbreviationViewModel.class);
+        when(pseudoAbbreviation.isPseudoAbbreviation()).thenReturn(true);
+
+        viewModel.currentAbbreviationProperty().set(pseudoAbbreviation);
+        viewModel.deleteAbbreviation();
+        assertEquals(pseudoAbbreviation, viewModel.currentAbbreviationProperty().get());
+    }
+
+    // CurrAbb is not Null nor Pseudo, index>1
+    @Test
+    void testDelAbbCurIsNotNulPseudoIndexMore() {
+        AbbreviationViewModel abbreviation1 = new AbbreviationViewModel(new Abbreviation("Test1", "T1"));
+        AbbreviationViewModel abbreviation2 = new AbbreviationViewModel(new Abbreviation("Test2", "T2"));
+        AbbreviationViewModel abbreviation3 = new AbbreviationViewModel(new Abbreviation("Test3", "T3"));
+
+        viewModel.abbreviationsProperty().addAll(abbreviation1, abbreviation2, abbreviation3);
+        viewModel.currentAbbreviationProperty().set(abbreviation2);
+        viewModel.deleteAbbreviation();
+
+        assertEquals(abbreviation1, viewModel.currentAbbreviationProperty().get());
+        assertFalse(viewModel.abbreviationsProperty().contains(abbreviation2));
+    }
+
+    // CurrAbb is not Null nor Pseudo, index<=1
+    @Test
+    void testDelAbbCurIsNotNulPseudoIndexLess() {
+        AbbreviationViewModel abbreviation1 = new AbbreviationViewModel(new Abbreviation("Test1", "T1"));
+        AbbreviationViewModel abbreviation2 = new AbbreviationViewModel(new Abbreviation("Test2", "T2"));
+
+        viewModel.abbreviationsProperty().addAll(abbreviation1, abbreviation2);
+        viewModel.currentAbbreviationProperty().set(abbreviation1);
+        viewModel.deleteAbbreviation();
+
+        assertEquals(abbreviation2, viewModel.currentAbbreviationProperty().get());
+        assertFalse(viewModel.abbreviationsProperty().contains(abbreviation1));
+    }
+
+    // CurrAbb is not Null nor Pseudo, index + 1 < abbreviationsCount.get()
+    @Test
+    void testDelAbbCurIsNotNulPseudoIndexLessAbbCount() {
+        AbbreviationViewModel abbreviation1 = new AbbreviationViewModel(new Abbreviation("Test1", "T1"));
+        AbbreviationViewModel abbreviation2 = new AbbreviationViewModel(new Abbreviation("Test2", "T2"));
+        AbbreviationViewModel abbreviation3 = new AbbreviationViewModel(new Abbreviation("Test3", "T3"));
+
+        viewModel.abbreviationsProperty().addAll(abbreviation1, abbreviation2, abbreviation3);
+        viewModel.currentAbbreviationProperty().set(abbreviation1);
+        viewModel.deleteAbbreviation();
+
+        assertEquals(abbreviation2, viewModel.currentAbbreviationProperty().get());
+        assertFalse(viewModel.abbreviationsProperty().contains(abbreviation1));
+    }
+
+    // CurrAbb is not Null nor Pseudo, index + 1 >= abbreviationsCount.get()
+    @Test
+    void estDelAbbCurIsNotNulPseudoIndexMoreAbbCount() {
+        AbbreviationViewModel abbreviation1 = new AbbreviationViewModel(new Abbreviation("Test1", "T1"));
+        AbbreviationViewModel abbreviation2 = new AbbreviationViewModel(new Abbreviation("Test2", "T2"));
+
+        viewModel.abbreviationsProperty().addAll(abbreviation1, abbreviation2);
+        viewModel.currentAbbreviationProperty().set(abbreviation2);
+        viewModel.deleteAbbreviation();
+
+        assertNull(viewModel.currentAbbreviationProperty().get());
+        assertFalse(viewModel.abbreviationsProperty().contains(abbreviation2));
+    }
 
     @Test
     void initialHasNoFilesAndNoAbbreviations() {
