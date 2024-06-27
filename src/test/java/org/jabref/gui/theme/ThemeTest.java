@@ -2,12 +2,19 @@ package org.jabref.gui.theme;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ThemeTest {
+
+    @AfterAll
+    public static void printCoverage() {
+        Theme.printCoverage();
+    }
+
     @Test
     public void lightThemeUsedWhenPathIsBlank() {
         Theme theme = new Theme("");

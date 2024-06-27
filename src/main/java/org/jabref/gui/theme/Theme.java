@@ -2,6 +2,8 @@ package org.jabref.gui.theme;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents one of three types of a css based Theme for JabRef:
@@ -21,6 +23,13 @@ public class Theme {
     private final Type type;
     private final String name;
     private final Optional<StyleSheet> additionalStylesheet;
+
+    public static Map<String, Boolean> branchCoverage = new HashMap<>();
+    static {
+        branchCoverage.put("this == o", false);
+        branchCoverage.put("o == null", false);
+        branchCoverage.put("getClass() != o.getClass()", false);
+    }
 
     public Theme(String name) {
         Objects.requireNonNull(name);
@@ -95,9 +104,15 @@ public class Theme {
     @Override
     public boolean equals(Object o) {
         if (this == o) {
+            branchCoverage.put("this == o", true);
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null) {
+            branchCoverage.put("o == null", true);
+            return false;
+        }
+        if (getClass() != o.getClass()) {
+            branchCoverage.put("getClass() != o.getClass()", true);
             return false;
         }
         Theme that = (Theme) o;
@@ -116,4 +131,11 @@ public class Theme {
                 ", name='" + name + '\'' +
                 '}';
     }
+
+    public static void printCoverage() {
+        for (Map.Entry<String, Boolean> entry : branchCoverage.entrySet()) {
+            System.out.println("Branch \"" + entry.getKey() + "\" was " + (entry.getValue() ? "hit" : "not hit"));
+        }
+    }
+
 }
