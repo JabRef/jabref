@@ -161,8 +161,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                             if (viewMode.contains(GroupViewMode.FILTER)) {
                                 return Boolean.FALSE;
                             }
-                            MainTableDataModel.updateSearchGroups(stateManager, database, libraryTab.getLuceneManager());
-                            return preferencesService.getGroupsPreferences().getGroupViewMode().contains(GroupViewMode.INVERT) ^ !MainTableDataModel.createGroupMatcher(stateManager.activeGroupProperty(), preferencesService.getGroupsPreferences()).map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
+                            return preferencesService.getGroupsPreferences().getGroupViewMode().contains(GroupViewMode.INVERT) ^
+                                    !MainTableDataModel.createGroupMatcher(stateManager.activeGroupProperty(), preferencesService.getGroupsPreferences())
+                                                       .map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
                         }))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)

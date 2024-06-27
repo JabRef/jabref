@@ -14,10 +14,10 @@ import org.jabref.model.groups.GroupHierarchyType;
 
 public class GroupsPreferences {
 
-    private final SetProperty<GroupViewMode> groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());
-    private final BooleanProperty shouldAutoAssignGroup = new SimpleBooleanProperty();
-    private final BooleanProperty shouldDisplayGroupCount = new SimpleBooleanProperty();
-    private final ObjectProperty<GroupHierarchyType> defaultHierarchicalContext = new SimpleObjectProperty<>();
+    private final SetProperty<GroupViewMode> groupViewMode;
+    private final BooleanProperty shouldAutoAssignGroup;
+    private final BooleanProperty shouldDisplayGroupCount;
+    private final ObjectProperty<GroupHierarchyType> defaultHierarchicalContext;
 
     public GroupsPreferences(boolean viewModeIntersection,
                              boolean viewModeFilter,
@@ -25,6 +25,12 @@ public class GroupsPreferences {
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount,
                              GroupHierarchyType defaultHierarchicalContext) {
+
+        this.groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet());
+        this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
+        this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
+        this.defaultHierarchicalContext = new SimpleObjectProperty<>(defaultHierarchicalContext);
+
         if (viewModeIntersection) {
             this.groupViewMode.add(GroupViewMode.INTERSECTION);
         }
@@ -34,18 +40,6 @@ public class GroupsPreferences {
         if (viewModeInvert) {
             this.groupViewMode.add(GroupViewMode.INVERT);
         }
-        this.shouldAutoAssignGroup.set(shouldAutoAssignGroup);
-        this.shouldDisplayGroupCount.set(shouldDisplayGroupCount);
-    }
-
-    public GroupsPreferences(EnumSet<GroupViewMode> groupViewModes,
-                             boolean shouldAutoAssignGroup,
-                             boolean shouldDisplayGroupCount,
-                             GroupHierarchyType defaultHierarchicalContext) {
-        this.groupViewMode.addAll(groupViewModes);
-        this.shouldAutoAssignGroup.set(shouldAutoAssignGroup);
-        this.shouldDisplayGroupCount.set(shouldDisplayGroupCount);
-        this.defaultHierarchicalContext.set(defaultHierarchicalContext);
     }
 
     public EnumSet<GroupViewMode> getGroupViewMode() {

@@ -45,8 +45,8 @@ public class MainTableDataModel {
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
     private final LuceneManager luceneManager;
-
     private Optional<SearchQuery> lastSearchQuery = Optional.empty();
+
     private final Subscription groupSubscription;
     private final Subscription querySubscription;
     private final Subscription viewModeSubscription;
@@ -60,7 +60,6 @@ public class MainTableDataModel {
         this.taskExecutor = taskExecutor;
         this.luceneManager = luceneManager;
         this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
-
         resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());

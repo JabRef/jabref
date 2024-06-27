@@ -28,12 +28,11 @@ public class SearchResults {
                              .orElse(0f) : 0f;
     }
 
-    public boolean containsEntry(BibEntry entry) {
-        return searchResults.containsKey(entry);
-    }
-
     public boolean hasFulltextResults(BibEntry entry) {
-        return searchResults.get(entry).stream().anyMatch(SearchResult::hasFulltextResults);
+        if (searchResults.containsKey(entry)) {
+            return searchResults.get(entry).stream().anyMatch(SearchResult::hasFulltextResults);
+        }
+        return false;
     }
 
     public Map<String, List<SearchResult>> getFileSearchResultsForEntry(BibEntry entry) {

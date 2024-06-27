@@ -24,7 +24,7 @@ public class GroupModeViewModel {
     }
 
     public Tooltip getUnionIntersectionTooltip() {
-        if (mode.contains(GroupViewMode.INTERSECTION)) {
+        if (!mode.contains(GroupViewMode.INTERSECTION)) {
             return new Tooltip(Localization.lang("Toggle intersection"));
         } else {
             return new Tooltip(Localization.lang("Toggle union"));
