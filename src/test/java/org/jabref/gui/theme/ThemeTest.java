@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ThemeTest {
@@ -69,4 +70,52 @@ public class ThemeTest {
         assertTrue(theme.getAdditionalStylesheet().isPresent());
         assertEquals("Idonotexist.css", theme.getAdditionalStylesheet().get().getWatchPath().getFileName().toString());
     }
+
+    @Test
+    public void thisEqualsO() {
+        Theme theme = new Theme("test");
+        assertTrue(theme.equals(theme));
+    }
+
+    @Test
+    public void oEqualsNull() {
+        Theme theme = new Theme("test");
+        assertFalse(theme.equals(null));
+    }
+
+    @Test
+    public void differentClass() {
+        Theme theme = new Theme("test");
+        String differentClassObject = "test";
+        assertFalse(theme.equals(differentClassObject));
+    }
+
+    @Test
+    public void differentType() {
+        Theme theme1 = new Theme("test1");
+        Theme theme2 = new Theme("test2");
+        assertFalse(theme1.equals(theme2));
+    }
+
+    @Test
+    public void sameTypeAndName() {
+        Theme theme1 = new Theme("test");
+        Theme theme2 = new Theme("test");
+        assertTrue(theme1.equals(theme2));
+    }
+
+    @Test
+    public void sameAttributesDifferentObjects() {
+        Theme theme1 = new Theme("test");
+        Theme theme2 = new Theme("test");
+        assertTrue(theme1.equals(theme2));
+    }
+
+    @Test
+    public void sameTypeDifferentName() {
+        Theme theme1 = new Theme("test1");
+        Theme theme2 = new Theme("test2");
+        assertFalse(theme1.equals(theme2));
+    }
+
 }
