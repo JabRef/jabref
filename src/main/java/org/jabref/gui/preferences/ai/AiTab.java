@@ -8,9 +8,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.AiPreferences;
 
@@ -94,8 +98,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             visualizer.initVisualization(viewModel.getRagMinScoreValidatorStatus(), ragMinScoreTextField);
         });
 
-        /*
-        ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_CHAT_MODEL, dialogService, preferencesService.getFilePreferences()), chatModelHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EMBEDDING_MODEL, dialogService, preferencesService.getFilePreferences()), embeddingModelHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_SYSTEM_MESSAGE, dialogService, preferencesService.getFilePreferences()), systemMessageHelp);
@@ -104,7 +107,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterOverlapSizeHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MAX_RESULTS_COUNT, dialogService, preferencesService.getFilePreferences()), ragMaxResultsCountHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MIN_SCORE, dialogService, preferencesService.getFilePreferences()), ragMinScoreHelp);
-        */
     }
 
     private void updateDisabilities() {
@@ -133,14 +135,5 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML
     private void onResetExpertSettingsButtonClick() {
         viewModel.resetExpertSettings();
-    }
-
-    @FXML
-    private void openHelpPage() {
-        try {
-            JabRefDesktop.openBrowser("https://pad.riseup.net/p/IyiLUl2fQ7v9C6HAyeOi", preferencesService.getFilePreferences());
-        } catch (Exception e) {
-            // ...
-        }
     }
 }
