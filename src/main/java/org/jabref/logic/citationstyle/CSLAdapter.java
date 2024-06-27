@@ -47,6 +47,8 @@ public class CSLAdapter {
         initialize(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
         final Bibliography bibliography = cslInstance.makeBibliography();
+        // [WIP]
+        cslInstance.makeCitation();
         return Arrays.asList(bibliography.getEntries());
     }
 

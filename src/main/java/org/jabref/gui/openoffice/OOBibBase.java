@@ -13,7 +13,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.NoDocumentFoundException;
-import org.jabref.logic.openoffice.action.EditInsert;
 import org.jabref.logic.openoffice.action.EditMerge;
 import org.jabref.logic.openoffice.action.EditSeparate;
 import org.jabref.logic.openoffice.action.ExportCited;
@@ -25,6 +24,7 @@ import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.CitationEntry;
+import org.jabref.model.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
 import org.jabref.model.openoffice.style.CitationGroupId;
 import org.jabref.model.openoffice.style.CitationType;
@@ -579,15 +579,17 @@ class OOBibBase {
 
         try {
             UnoUndo.enterUndoContext(doc, "Insert citation");
-
-            EditInsert.insertCitationGroup(doc,
-                    frontend.get(),
-                    cursor.get(),
-                    entries,
-                    database,
-                    style,
-                    citationType,
-                    pageInfo);
+            // if clause - CSL vs jStyle - if CSL insert the citation here. Cursor and doc available.
+            System.out.println("I'm HerE");
+            CSLCitationOOAdapter.insertCitation(doc, cursor.get());
+//            EditInsert.insertCitationGroup(doc,
+//                    frontend.get(),
+//                    cursor.get(),
+//                    entries,
+//                    database,
+//                    style,
+//                    citationType,
+//                    pageInfo);
 
             if (syncOptions.isPresent()) {
                 Update.resyncDocument(doc, style, fcursor.get(), syncOptions.get());
@@ -597,10 +599,8 @@ class OOBibBase {
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (CreationException
-                | IllegalTypeException
-                | NotRemoveableException
-                | PropertyVetoException
-                | WrappedTargetException ex) {
+                 |
+                 WrappedTargetException ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } finally {

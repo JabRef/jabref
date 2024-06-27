@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice.frontend;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import org.jabref.logic.openoffice.style.OOBibStyle;
@@ -44,7 +45,7 @@ public class UpdateBibliography {
             throws
             WrappedTargetException,
             CreationException,
-            NoDocumentException {
+            NoDocumentException, IOException {
 
         clearBibTextSectionContent2(doc);
 
@@ -53,6 +54,7 @@ public class UpdateBibliography {
                 bibliography,
                 style,
                 alwaysAddCitedOnPages);
+        System.out.println("HI");
     }
 
     /**
@@ -108,7 +110,7 @@ public class UpdateBibliography {
             CreationException,
             IllegalArgumentException,
             NoDocumentException,
-            WrappedTargetException {
+            WrappedTargetException, IOException {
 
         XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
 
@@ -121,6 +123,7 @@ public class UpdateBibliography {
                 style,
                 alwaysAddCitedOnPages);
         OOTextIntoOO.write(doc, cursor, bibliographyText);
+        System.out.println("HIIIIIIII");
         cursor.collapseToEnd();
 
         // remove the initial empty paragraph from the section.

@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice.action;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.jabref.logic.openoffice.frontend.OOFrontend;
@@ -62,6 +63,9 @@ public class Update {
             }
 
             return frontend.citationGroups.getUnresolvedKeys();
+        } catch (
+                IOException e) {
+            throw new RuntimeException(e);
         } finally {
             if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
                 UnoScreenRefresh.unlockControllers(doc);
