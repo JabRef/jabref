@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,7 +108,7 @@ public class MainTableDataModel {
             searchTask.cancel();
         }
 
-        searchTask = BackgroundTask.wrap(() -> luceneManager.search(query.get()));
+        searchTask = BackgroundTask.wrap(() -> luceneManager.search(query.orElse(new SearchQuery("", EnumSet.noneOf(SearchFlags.class)))));
         searchTask.onSuccess(result -> stateManager.getSearchResults().put(bibDatabaseContext.getUid(), result));
         searchTask.onFinished(() -> {
             updateSearchGroups(stateManager, bibDatabaseContext, luceneManager);
