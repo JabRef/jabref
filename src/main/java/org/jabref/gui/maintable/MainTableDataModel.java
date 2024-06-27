@@ -45,7 +45,6 @@ public class MainTableDataModel {
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
     private final LuceneManager luceneManager;
-    private Optional<SearchQuery> lastSearchQuery = Optional.empty();
 
     private final Subscription groupSubscription;
     private final Subscription querySubscription;
@@ -107,11 +106,6 @@ public class MainTableDataModel {
         if (searchTask != null) {
             searchTask.cancel();
         }
-
-        if (lastSearchQuery.isPresent() && lastSearchQuery.equals(query)) {
-            return;
-        }
-        lastSearchQuery = query;
 
         searchTask = BackgroundTask.wrap(() -> luceneManager.search(query.get()));
         searchTask.onSuccess(result -> stateManager.getSearchResults().put(bibDatabaseContext.getUid(), result));
