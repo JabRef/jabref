@@ -117,6 +117,7 @@ public class MainTableDataModel {
                             stateManager.activeGroupProperty().get(),
                             stateManager.activeSearchQueryProperty().get(),
                             entry));
+            searchTask = null;
         });
         searchTask.executeWith(taskExecutor);
     }
