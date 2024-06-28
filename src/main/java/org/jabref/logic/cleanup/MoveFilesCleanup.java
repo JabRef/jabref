@@ -49,8 +49,8 @@ public class MoveFilesCleanup implements CleanupJob {
                     changed = true;
                 }
             } catch (FileSystemException exception){
-                LOGGER.warn("Could not move file",exception);
-                dialogService.notify(Localization.lang("Could not move file."));
+                LOGGER.warn("Could not move file. Please close all the attached files and retry.",exception);
+                dialogService.notify(Localization.lang("Could not move file. Please close all the attached files and retry."));
             }
             catch (IOException exception) {
                 LOGGER.error("Error moving file {}", file.getLink(), exception);
