@@ -24,6 +24,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import jakarta.inject.Inject;
 
 public class GlobalSearchResultDialog extends BaseDialog<Void> {
@@ -34,6 +35,9 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     private final UndoManager undoManager;
     private final LibraryTabContainer libraryTabContainer;
+
+    // Reference needs to be kept, since java garbage collection would otherwise destroy the subscription
+    @SuppressWarnings("FieldCanBeLocal") private Subscription keepOnTopSubscription;
 
     @Inject private PreferencesService preferencesService;
     @Inject private StateManager stateManager;
@@ -98,7 +102,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
         keepOnTop.selectedProperty().bindBidirectional(viewModel.keepOnTop());
 
-        EasyBind.subscribe(viewModel.keepOnTop(), value -> {
+        keepOnTopSubscription = EasyBind.subscribe(viewModel.keepOnTop(), value -> {
             stage.setAlwaysOnTop(value);
             keepOnTop.setGraphic(value
                     ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
