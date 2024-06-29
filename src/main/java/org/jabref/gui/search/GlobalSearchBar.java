@@ -151,22 +151,13 @@ public class GlobalSearchBar extends HBox {
             }
         });
 
-        searchField.setContextMenu(SearchFieldRightClickMenu.create(
-                stateManager,
-                searchField,
-                tabContainer,
-                undoManager));
-
-        ObservableList<String> search = stateManager.getWholeSearchHistory();
-        search.addListener((ListChangeListener.Change<? extends String> change) ->
-                searchField.setContextMenu(SearchFieldRightClickMenu.create(
-                        stateManager,
-                        searchField,
-                        tabContainer,
-                        undoManager))
-        );
-
         ClipBoardManager.addX11Support(searchField);
+
+        searchField.setContextMenu(SearchFieldRightClickMenu.create(stateManager, searchField));
+        stateManager.getWholeSearchHistory().addListener((ListChangeListener.Change<? extends String> change) -> {
+            searchField.getContextMenu().getItems().removeLast();
+            searchField.getContextMenu().getItems().add(SearchFieldRightClickMenu.createSearchFromHistorySubMenu(stateManager, searchField));
+        });
 
         regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
         caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
