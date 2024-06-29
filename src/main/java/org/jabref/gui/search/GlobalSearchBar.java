@@ -292,20 +292,25 @@ public class GlobalSearchBar extends HBox {
         openGlobalSearchButton.disableProperty().bindBidirectional(globalSearchActive);
         openGlobalSearchButton.setTooltip(new Tooltip(Localization.lang("Search across libraries in a new window")));
         initSearchModifierButton(openGlobalSearchButton);
-        openGlobalSearchButton.setOnAction(evt -> {
-            globalSearchActive.setValue(true);
-            if (globalSearchResultDialog == null) {
-                globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
-            }
-            stateManager.activeGlobalSearchQueryProperty().setValue(searchQueryProperty.get());
-            updateSearchQuery();
-            dialogService.showCustomDialogAndWait(globalSearchResultDialog);
-            globalSearchActive.setValue(false);
-        });
+        openGlobalSearchButton.setOnAction(evt -> openGlobalSearchDialog());
+    }
+
+    public void openGlobalSearchDialog() {
+        if (globalSearchActive.get()) {
+            return;
+        }
+        globalSearchActive.setValue(true);
+        if (globalSearchResultDialog == null) {
+            globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
+        }
+        stateManager.activeGlobalSearchQueryProperty().setValue(searchQueryProperty.get());
+        updateSearchQuery();
+        dialogService.showCustomDialogAndWait(globalSearchResultDialog);
+        globalSearchActive.setValue(false);
     }
 
     private void initSearchModifierButton(ButtonBase searchButton) {
-        searchButton.setCursor(Cursor.DEFAULT);
+        searchButton.setCursor(Cursor.HAND);
         searchButton.setMinHeight(28);
         searchButton.setMaxHeight(28);
         searchButton.setMinWidth(28);
@@ -318,7 +323,8 @@ public class GlobalSearchBar extends HBox {
     /**
      * Focuses the search field if it is not focused.
      */
-    public void focus() {
+    @Override
+    public void requestFocus() {
         if (!searchField.isFocused()) {
             searchField.requestFocus();
         }
