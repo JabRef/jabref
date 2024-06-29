@@ -15,7 +15,6 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -144,10 +143,9 @@ public class GlobalSearchBar extends HBox {
 
         searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (keyBindingRepository.matches(event, KeyBinding.CLEAR_SEARCH)) {
-                // Clear search and select first entry, if available
                 searchField.clear();
                 if (searchType == SearchType.NORMAL_SEARCH) {
-                    tabContainer.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();
+                    tabContainer.getCurrentLibraryTab().getMainTable().requestFocus();
                 }
                 event.consume();
             }
@@ -183,8 +181,7 @@ public class GlobalSearchBar extends HBox {
                                                     .or(caseSensitiveButton.focusedProperty())
                                                     .or(fulltextButton.focusedProperty())
                                                     .or(keepSearchString.focusedProperty())
-                                                    .or(searchField.textProperty()
-                                                                   .isNotEmpty());
+                                                    .or(searchField.textProperty().isNotEmpty());
 
         regularExpressionButton.visibleProperty().unbind();
         regularExpressionButton.visibleProperty().bind(focusedOrActive);

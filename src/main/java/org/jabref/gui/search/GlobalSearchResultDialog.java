@@ -14,6 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
@@ -45,8 +46,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;
 
-    private GlobalSearchResultDialogViewModel viewModel;
-
     public GlobalSearchResultDialog(UndoManager undoManager, LibraryTabContainer libraryTabContainer) {
         this.undoManager = undoManager;
         this.libraryTabContainer = libraryTabContainer;
@@ -60,7 +59,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new GlobalSearchResultDialogViewModel(preferencesService);
+        GlobalSearchResultDialogViewModel viewModel = new GlobalSearchResultDialogViewModel(preferencesService.getSearchPreferences());
 
         GlobalSearchBar searchBar = new GlobalSearchBar(libraryTabContainer, stateManager, preferencesService, undoManager, dialogService, SearchType.GLOBAL_SEARCH);
         searchBarContainer.getChildren().addFirst(searchBar);
@@ -86,7 +85,10 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
         resultsTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
-                var selectedEntry = resultsTable.getSelectionModel().getSelectedItem();
+                BibEntryTableViewModel selectedEntry = resultsTable.getSelectionModel().getSelectedItem();
+                if (selectedEntry == null) {
+                    return;
+                }
                 libraryTabContainer.getLibraryTabs().stream()
                                    .filter(tab -> tab.getBibDatabaseContext().equals(selectedEntry.getBibDatabaseContext()))
                                    .findFirst()
@@ -113,6 +115,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             stage.setHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
             stage.setWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
             container.setDividerPositions(preferencesService.getSearchPreferences().getSearchWindowDividerPosition());
+            searchBar.requestFocus();
         });
 
         stage.setOnHidden(event -> {
