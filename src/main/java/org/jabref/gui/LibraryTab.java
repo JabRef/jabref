@@ -15,7 +15,9 @@ import javax.swing.undo.UndoManager;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
@@ -85,6 +87,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -148,6 +151,7 @@ public class LibraryTab extends Tab {
 
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
+    private ListProperty<GroupTreeNode> selectedGroups;
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
@@ -159,15 +163,15 @@ public class LibraryTab extends Tab {
     private final DirectoryMonitorManager directoryMonitorManager;
 
     private LibraryTab(BibDatabaseContext bibDatabaseContext,
-                      LibraryTabContainer tabContainer,
-                      DialogService dialogService,
-                      PreferencesService preferencesService,
-                      StateManager stateManager,
-                      FileUpdateMonitor fileUpdateMonitor,
-                      BibEntryTypesManager entryTypesManager,
-                      CountingUndoManager undoManager,
-                      ClipBoardManager clipBoardManager,
-                      TaskExecutor taskExecutor) {
+                       LibraryTabContainer tabContainer,
+                       DialogService dialogService,
+                       PreferencesService preferencesService,
+                       StateManager stateManager,
+                       FileUpdateMonitor fileUpdateMonitor,
+                       BibEntryTypesManager entryTypesManager,
+                       CountingUndoManager undoManager,
+                       ClipBoardManager clipBoardManager,
+                       TaskExecutor taskExecutor) {
         this.tabContainer = Objects.requireNonNull(tabContainer);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.undoManager = undoManager;
@@ -184,7 +188,8 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
+        this.selectedGroups = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
+        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager, selectedGroups);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -307,7 +312,9 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
+        tableModel.removeBinding();
+        this.selectedGroups = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
+        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager, selectedGroups);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
@@ -385,7 +392,7 @@ public class LibraryTab extends Tab {
             toolTipText.append(databasePath.toAbsolutePath());
 
             if (databaseLocation == DatabaseLocation.SHARED) {
-                tabTitle.append(" \u2013 ");
+                tabTitle.append(" – ");
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 toolTipText.append(' ');
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
@@ -870,6 +877,9 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
 
+        if (tableModel != null) {
+            tableModel.removeBinding();
+        }
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }
@@ -920,10 +930,6 @@ public class LibraryTab extends Tab {
      */
     public void setCurrentSearchQuery(Optional<SearchQuery> currentSearchQuery) {
         this.currentSearchQuery = currentSearchQuery;
-    }
-
-    public CitationStyleCache getCitationStyleCache() {
-        return citationStyleCache;
     }
 
     public FileAnnotationCache getAnnotationCache() {
