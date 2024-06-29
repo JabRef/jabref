@@ -32,9 +32,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.OptionalUtil;
 
 import com.google.common.util.concurrent.RateLimiter;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

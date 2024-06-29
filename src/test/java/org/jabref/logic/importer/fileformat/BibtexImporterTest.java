@@ -63,8 +63,10 @@ public class BibtexImporterTest {
             if ("aksin".equals(entry.getCitationKey().get())) {
                 assertEquals(
                         Optional.of(
-                                "Aks{\\i}n, {\\\"O}zge and T{\\\"u}rkmen, Hayati and Artok, Levent and {\\c{C}}etinkaya, "
-                                        + "Bekir and Ni, Chaoying and B{\\\"u}y{\\\"u}kg{\\\"u}ng{\\\"o}r, Orhan and {\\\"O}zkal, Erhan"),
+                                """
+                                        Aks{\\i}n, {\\"O}zge and T{\\"u}rkmen, Hayati and Artok, Levent
+                                                          and {\\c{C}}etinkaya, Bekir and Ni, Chaoying and
+                                                          B{\\"u}y{\\"u}kg{\\"u}ng{\\"o}r, Orhan and {\\"O}zkal, Erhan"""),
                         entry.getField(StandardField.AUTHOR));
                 assertEquals(Optional.of("aksin"), entry.getCitationKey());
                 assertEquals(Optional.of("2006"), entry.getField(StandardField.DATE));
@@ -73,23 +75,30 @@ public class BibtexImporterTest {
                 assertEquals(Optional.of("13"), entry.getField(StandardField.NUMBER));
                 assertEquals(Optional.of("3027-3036"), entry.getField(StandardField.PAGES));
                 assertEquals(Optional
-                                .of("Effect of immobilization on catalytic characteristics of saturated {Pd-N}-heterocyclic "
-                                        + "carbenes in {Mizoroki-Heck} reactions"),
+                                .of("""
+                                        Effect of immobilization on catalytic characteristics of
+                                                          saturated {Pd-N}-heterocyclic carbenes in {Mizoroki-Heck}
+                                                          reactions"""),
                         entry.getField(StandardField.TITLE));
                 assertEquals(Optional.of("691"), entry.getField(StandardField.VOLUME));
             } else if ("stdmodel".equals(entry.getCitationKey().get())) {
                 assertEquals(Optional
-                                .of("A \\texttt{set} with three members discussing the standard model of particle physics. "
-                                        + "The \\texttt{crossref} field in the \\texttt{@set} entry and the \\texttt{entryset} field in "
-                                        + "each set member entry is needed only when using BibTeX as the backend"),
+                                .of("""
+                                        A \\texttt{set} with three members discussing the standard
+                                                          model of particle physics. The \\texttt{crossref} field
+                                                          in the \\texttt{@set} entry and the \\texttt{entryset} field in
+                                                          each set member entry is needed only when using BibTeX as the
+                                                          backend"""),
                         entry.getField(StandardField.ANNOTATION));
                 assertEquals(Optional.of("stdmodel"), entry.getCitationKey());
                 assertEquals(Optional.of("glashow,weinberg,salam"), entry.getField(StandardField.ENTRYSET));
             } else if ("set".equals(entry.getCitationKey().get())) {
                 assertEquals(Optional
-                                .of("A \\texttt{set} with three members. The \\texttt{crossref} field in the \\texttt{@set} "
-                                        + "entry and the \\texttt{entryset} field in each set member entry is needed only when using "
-                                        + "BibTeX as the backend"),
+                                .of("""
+                                        A \\texttt{set} with three members. The \\texttt{crossref} field
+                                                          in the \\texttt{@set} entry and the \\texttt{entryset} field in
+                                                          each set member entry is needed only when using BibTeX as the
+                                                          backend"""),
                         entry.getField(StandardField.ANNOTATION));
                 assertEquals(Optional.of("set"), entry.getCitationKey());
                 assertEquals(Optional.of("herrmann,aksin,yoon"), entry.getField(StandardField.ENTRYSET));

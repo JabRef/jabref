@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.strings.StringUtil;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;

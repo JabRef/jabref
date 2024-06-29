@@ -1,7 +1,7 @@
-package org.jabref.gui.fieldeditors;
+package org.jabref.gui.fieldeditors.optioneditors;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 import javax.swing.undo.UndoManager;
 
@@ -50,7 +50,7 @@ public class MonthEditorViewModel extends OptionEditorViewModel<Month> {
     }
 
     @Override
-    public List<Month> getItems() {
+    public Collection<Month> getItems() {
         return Arrays.asList(Month.values());
     }
 

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import javafx.application.Platform;
 
 import org.jabref.cli.ArgumentProcessor;
-import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -21,8 +21,13 @@ public class CLIMessageHandler implements RemoteMessageHandler {
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
+    private final UiMessageHandler uiMessageHandler;
 
-    public CLIMessageHandler(PreferencesService preferencesService, FileUpdateMonitor fileUpdateMonitor, BibEntryTypesManager entryTypesManager) {
+    public CLIMessageHandler(UiMessageHandler uiMessageHandler,
+                             PreferencesService preferencesService,
+                             FileUpdateMonitor fileUpdateMonitor,
+                             BibEntryTypesManager entryTypesManager) {
+        this.uiMessageHandler = uiMessageHandler;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -39,7 +44,7 @@ public class CLIMessageHandler implements RemoteMessageHandler {
                     fileUpdateMonitor,
                     entryTypesManager);
             argumentProcessor.processArguments();
-            Platform.runLater(() -> JabRefGUI.getMainFrame().handleUiCommands(argumentProcessor.getUiCommands()));
+            Platform.runLater(() -> uiMessageHandler.handleUiCommands(argumentProcessor.getUiCommands()));
         } catch (ParseException e) {
             LOGGER.error("Error when parsing CLI args", e);
         }

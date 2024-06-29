@@ -28,7 +28,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.16.0'
+    id 'org.openrewrite.rewrite' version '6.16.2'
 }
 
 // Enable following for debugging
@@ -79,6 +79,8 @@ application {
         '--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module',
         '--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module',
         '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module',
+        // fix for https://github.com/JabRef/jabref/issues/11426
+        '--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module',
 
         // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
         '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
@@ -165,6 +167,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
+    implementation 'commons-logging:commons-logging:1.3.2'
     implementation 'com.h2database:h2-mvstore:2.2.224'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
@@ -182,7 +185,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.13.1'
     implementation 'org.antlr:antlr4-runtime:4.13.1'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.9.0.202403050737-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.10.0.202406032230-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.17.1'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.1'
@@ -192,6 +195,10 @@ dependencies {
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
 
     implementation 'org.postgresql:postgresql:42.7.3'
+
+    // Support unix socket connection types
+    implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.9.1'
+    implementation 'com.kohlschutter.junixsocket:junixsocket-mysql:2.9.1'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -218,9 +225,11 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.23.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.32.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
+        exclude group: 'org.apache.commons.validator'
+        exclude group: 'org.apache.commons.commons-logging'
         exclude group: 'org.openjfx'
         exclude group: 'org.apache.logging.log4j'
         exclude group: 'tech.units'
@@ -231,12 +240,14 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.2.1'
 
     implementation 'org.jsoup:jsoup:1.17.2'
-    implementation 'com.konghq:unirest-java:3.14.5'
+    implementation 'com.konghq:unirest-java-core:4.4.0'
+    implementation 'com.konghq:unirest-modules-gson:4.4.0'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
 
     implementation 'org.slf4j:slf4j-api:2.0.13'
-    implementation "org.tinylog:tinylog-api:2.7.0"
-    implementation "org.tinylog:slf4j-tinylog:2.7.0"
-    implementation "org.tinylog:tinylog-impl:2.7.0"
+    implementation 'org.tinylog:tinylog-api:2.7.0'
+    implementation 'org.tinylog:slf4j-tinylog:2.7.0'
+    implementation 'org.tinylog:tinylog-impl:2.7.0'
 
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
     implementation 'org.slf4j:jul-to-slf4j:2.0.13'
@@ -298,7 +309,7 @@ dependencies {
 
     implementation 'commons-io:commons-io:2.16.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.173'
+    testImplementation 'io.github.classgraph:classgraph:4.8.174'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
 
@@ -316,7 +327,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.12.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.13.2"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
@@ -528,11 +539,13 @@ testlogger {
     showStackTraces false
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
-    // Enable parallel tests. See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
-    maxParallelForks = Runtime.runtime.availableProcessors() - 1
-    ignoreFailures = true
+    // Enable parallel tests (on desktop).
+    // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
+    if (!providers.environmentVariable("CI").isPresent()) {
+        maxParallelForks = Math.max(Runtime.runtime.availableProcessors() - 1, 1)
+    }
 }
 
 tasks.register('databaseTest', Test) {
@@ -666,7 +679,7 @@ jlink {
     // but it was removed in the newer releases.
     // The pom.xml associated with such a non-modular artifact does not mention that the artifact depends on the removed code
     // (because the artifact was published when this code was still available in the JDK).
-    forceMerge "controlsfx", "bcprov", "jaxb", "istack", "stax", "log4j"
+    forceMerge "controlsfx", "bcprov", "jaxb", "istack", "stax"
 
     // TODO: Remove the following correction to the merged module
     // The module descriptor automatically generated by the plugin for the merged module contained some invalid entries.
@@ -706,12 +719,14 @@ jlink {
         requires 'jakarta.xml.bind'
         requires 'org.apache.commons.lang3'
         requires 'org.apache.commons.text'
+        requires 'org.apache.commons.logging';
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.eclipse.jgit.transport.SshSessionFactory'
         uses 'org.eclipse.jgit.lib.GpgSigner'
+        uses 'kong.unirest.core.json.JsonEngine';
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
         provides 'org.mariadb.jdbc.authentication.AuthenticationPlugin' with 'org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin',
@@ -727,6 +742,8 @@ jlink {
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
+        provides 'kong.unirest.core.json.JsonEngine' with 'kong.unirest.modules.gson.GsonEngine';
+
     }
 
     jpackage {

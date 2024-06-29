@@ -1,7 +1,8 @@
-package org.jabref.logic.bibtex;
+package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Collections;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
@@ -10,13 +11,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FieldContentFormatterTest {
+class NormalizeWhitespaceFormatterTest {
 
-    private FieldContentFormatter parser;
+    private NormalizeWhitespaceFormatter parser;
 
     @BeforeEach
     void setUp() {
-        parser = new FieldContentFormatter(new FieldPreferences(
+        parser = new NormalizeWhitespaceFormatter(new FieldPreferences(
                 false,
                 Collections.emptyList(),
                 Collections.emptyList()));

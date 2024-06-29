@@ -13,6 +13,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
@@ -33,6 +34,8 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private StateManager stateManager;
+    @Inject private KeyBindingRepository keyBindingRepository;
+
     private Optional<BibEntry> entry = Optional.empty();
 
     public ISSNEditor(Field field,
@@ -53,8 +56,9 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
                 stateManager,
                 preferencesService);
 
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        textArea.initContextMenu(new DefaultMenu(textArea));
+        establishBinding(textArea, viewModel.textProperty());
+
+        textArea.initContextMenu(new DefaultMenu(textArea), keyBindingRepository);
 
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }

@@ -13,7 +13,7 @@ import static org.jabref.architecture.MainArchitectureTest.CLASS_ORG_JABREF_GLOB
  * This class checks JabRef's test classes for architecture quality
  */
 @AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.OnlyIncludeTests.class)
-public class TestArchitectureTest {
+public class ArchitectureTest {
 
     private static final String CLASS_ORG_JABREF_PREFERENCES = "org.jabref.preferences.JabRefPreferences";
 
@@ -40,6 +40,7 @@ public class TestArchitectureTest {
                  .and().doNotHaveFullyQualifiedName("org.jabref.http.server.TestBibFile")
                  .and().doNotHaveFullyQualifiedName("org.jabref.gui.autocompleter.AutoCompleterUtil")
                  .and().doNotHaveFullyQualifiedName("org.jabref.gui.search.TextFlowEqualityHelper")
+                 .and().doNotHaveFullyQualifiedName("org.jabref.gui.util.CurrentThreadTaskExecutor")
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.bibtex.BibEntryAssert")
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.importer.fileformat.ImporterTestEngine")
                  .and().doNotHaveFullyQualifiedName("org.jabref.logic.l10n.JavaLocalizationEntryParser")

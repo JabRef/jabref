@@ -12,7 +12,7 @@ import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
-import kong.unirest.UnirestException;
+import kong.unirest.core.UnirestException;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -72,12 +72,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
         SplitPane split = new SplitPane(containerOld, containerNew);
         split.setOrientation(Orientation.HORIZONTAL);
 
-        setLeftAnchor(split, 8d);
-        setTopAnchor(split, 8d);
-        setRightAnchor(split, 8d);
-        setBottomAnchor(split, 8d);
-
-        this.getChildren().add(split);
+        this.setAllAnchorsAndAttachChild(split);
     }
 
     // Method adapted from:

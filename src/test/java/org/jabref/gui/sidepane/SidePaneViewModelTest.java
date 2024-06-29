@@ -9,6 +9,7 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
@@ -42,6 +43,7 @@ class SidePaneViewModelTest {
     DialogService dialogService = mock(DialogService.class);
     FileUpdateMonitor fileUpdateMonitor = mock(FileUpdateMonitor.class);
     BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
+    ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
     UndoManager undoManager = mock(UndoManager.class);
 
     SidePanePreferences sidePanePreferences = new SidePanePreferences(new HashSet<>(), new HashMap<>(), 0);
@@ -69,6 +71,7 @@ class SidePaneViewModelTest {
                 dialogService,
                 fileUpdateMonitor,
                 entryTypesManager,
+                clipBoardManager,
                 undoManager);
     }
 

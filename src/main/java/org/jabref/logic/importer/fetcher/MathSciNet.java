@@ -36,17 +36,17 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import kong.unirest.JsonNode;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
+import kong.unirest.core.JsonNode;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Fetches data from the MathSciNet (http://www.ams.org/mathscinet)
+ * Fetches data from the <a href="http://www.ams.org/mathscinet">MathSciNet</a> API.
  */
 public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFetcher, IdBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MathSciNet.class);
@@ -73,7 +73,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     }
 
     /**
-     * We use MR Lookup (https://mathscinet.ams.org/mathscinet/freetools/mrlookup) instead of the usual search since this tool is also available
+     * We use <a href="https://mathscinet.ams.org/mathscinet/freetools/mrlookup">MR Lookup</a> instead of the usual search since this tool is also available
      * without subscription and, moreover, is optimized for finding a publication based on partial information.
      */
     @Override
@@ -180,18 +180,17 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             }
 
             // Handle articleUrl and mrnumber fields separately, as they are non-nested properties in the JSON and can be retrieved as Strings directly
-            String doi = item.optString("articleUrl", "");
+            String doi = item.optString("articleUrl");
             if (!doi.isEmpty()) {
                 try {
-                    Optional<DOI> parsedDoi = DOI.parse(doi);
-                    parsedDoi.ifPresent(validDoi -> entry.setField(StandardField.DOI, validDoi.getNormalized()));
+                    DOI.parse(doi).ifPresent(validDoi -> entry.setField(StandardField.DOI, validDoi.getNormalized()));
                 } catch (IllegalArgumentException e) {
                     // If DOI parsing fails, use the original DOI string
                     entry.setField(StandardField.DOI, doi);
                 }
             }
 
-            String mrNumber = item.optString("mrnumber", "");
+            String mrNumber = item.optString("mrnumber");
             if (!mrNumber.isEmpty()) {
                 entry.setField(StandardField.MR_NUMBER, mrNumber);
             }

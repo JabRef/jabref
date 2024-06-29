@@ -14,7 +14,7 @@ import javafx.util.Pair;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.FieldFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class LatexIntegrityChecker implements EntryChecker {
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         return entry.getFieldMap().entrySet().stream()
-                    .filter(field -> !field.getKey().getProperties().contains(FieldProperty.VERBATIM))
+                    .filter(field -> FieldFactory.isLatexField(field.getKey()))
                     .flatMap(LatexIntegrityChecker::getUnescapedAmpersandsWithCount)
                     // Exclude all DOM building errors as this functionality is not used.
                     .filter(pair -> !pair.getValue().getErrorCode().getErrorGroup().equals(CoreErrorGroup.TDE))

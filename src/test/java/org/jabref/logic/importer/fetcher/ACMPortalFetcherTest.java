@@ -64,7 +64,7 @@ class ACMPortalFetcherTest {
         String testQuery = "test query url";
         SyntaxParser parser = new StandardSyntaxParser();
         URL url = fetcher.getURLForQuery(parser.parse(testQuery, NO_EXPLICIT_FIELD));
-        String expected = "https://dl.acm.org/action/doSearch?AllField=test+query+url";
+        String expected = "https://dl.acm.org/action/doSearch?AllField=test%20query%20url";
         assertEquals(expected, url.toString());
     }
 

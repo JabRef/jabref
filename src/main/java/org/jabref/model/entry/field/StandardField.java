@@ -11,7 +11,7 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
 
 /**
  * Standard BibTeX and BibLaTeX fields, as well as "normal" JabRef specific fields.
- *
+ * <p>
  * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
  */
 public enum StandardField implements Field {
@@ -33,13 +33,13 @@ public enum StandardField implements Field {
     CHAPTER("chapter"),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
     // Comments of users are handled at {@link org.jabref.model.entry.field.UserSpecificCommentField}
-    COMMENT("comment", FieldProperty.COMMENT, FieldProperty.MULTILINE_TEXT, FieldProperty.VERBATIM, FieldProperty.MARKDOWN),
+    COMMENT("comment", FieldProperty.MULTILINE_TEXT, FieldProperty.MARKDOWN),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
     CITES("cites", FieldProperty.MULTIPLE_ENTRY_LINK),
     DATE("date", FieldProperty.DATE),
     DAY("day"),
     DAYFILED("dayfiled"),
-    DOI("doi", "DOI", FieldProperty.DOI, FieldProperty.VERBATIM),
+    DOI("doi", "DOI", FieldProperty.VERBATIM, FieldProperty.IDENTIFIER),
     EDITION("edition", FieldProperty.NUMERIC),
     EDITOR("editor", FieldProperty.PERSON_NAMES),
     EDITORA("editora", FieldProperty.PERSON_NAMES),
@@ -51,24 +51,24 @@ public enum StandardField implements Field {
     EDITORCTYPE("editorctype", FieldProperty.EDITOR_TYPE),
     EID("eid"),
     ENTRYSET("entryset", FieldProperty.MULTIPLE_ENTRY_LINK),
-    EPRINT("eprint", FieldProperty.EPRINT, FieldProperty.VERBATIM),
+    EPRINT("eprint", FieldProperty.VERBATIM, FieldProperty.IDENTIFIER),
     EPRINTCLASS("eprintclass"),
     EPRINTTYPE("eprinttype"),
     EVENTDATE("eventdate", FieldProperty.DATE),
     EVENTTITLE("eventtitle"),
     EVENTTITLEADDON("eventtitleaddon"),
-    FILE("file", FieldProperty.FILE_EDITOR, FieldProperty.VERBATIM),
+    FILE("file", FieldProperty.VERBATIM),
     FOREWORD("foreword", FieldProperty.PERSON_NAMES),
     FOLDER("folder"),
-    GENDER("gender", FieldProperty.GENDER),
+    GENDER("gender"),
     HOLDER("holder", FieldProperty.PERSON_NAMES),
     HOWPUBLISHED("howpublished"),
     IDS("ids", FieldProperty.MULTIPLE_ENTRY_LINK),
     INSTITUTION("institution"),
     INTRODUCTION("introduction", FieldProperty.PERSON_NAMES),
-    ISBN("isbn", "ISBN", FieldProperty.ISBN, FieldProperty.VERBATIM),
+    ISBN("isbn", "ISBN", FieldProperty.VERBATIM),
     ISRN("isrn", "ISRN", FieldProperty.VERBATIM),
-    ISSN("issn", "ISSN", FieldProperty.ISSN, FieldProperty.VERBATIM),
+    ISSN("issn", "ISSN", FieldProperty.VERBATIM),
     ISSUE("issue"),
     ISSUETITLE("issuetitle"),
     ISSUESUBTITLE("issuesubtitle"),
@@ -94,15 +94,15 @@ public enum StandardField implements Field {
     ORGANIZATION("organization"),
     ORIGDATE("origdate", FieldProperty.DATE),
     ORIGLANGUAGE("origlanguage", FieldProperty.LANGUAGE),
-    PAGES("pages", FieldProperty.PAGES),
+    PAGES("pages"),
     PAGETOTAL("pagetotal"),
     PAGINATION("pagination", FieldProperty.PAGINATION),
     PART("part"),
     PDF("pdf", "PDF"),
-    PMID("pmid", "PMID", FieldProperty.NUMERIC),
+    PMID("pmid", "PMID", FieldProperty.NUMERIC, FieldProperty.IDENTIFIER),
     PS("ps", "PS"),
     PUBLISHER("publisher"),
-    PUBSTATE("pubstate", FieldProperty.PUBLICATION_STATE),
+    PUBSTATE("pubstate"),
     PRIMARYCLASS("primaryclass"),
     RELATED("related", FieldProperty.MULTIPLE_ENTRY_LINK),
     REPORTNO("reportno"),
@@ -119,7 +119,7 @@ public enum StandardField implements Field {
     TITLE("title"),
     TITLEADDON("titleaddon"),
     TRANSLATOR("translator", FieldProperty.PERSON_NAMES),
-    TYPE("type", FieldProperty.TYPE),
+    TYPE("type"),
     URI("uri", "URI", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
     URL("url", "URL", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
     URLDATE("urldate", FieldProperty.DATE),
@@ -141,7 +141,7 @@ public enum StandardField implements Field {
     CREATIONDATE("creationdate", FieldProperty.DATE),
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
 
-    public static Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
+    public static final Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
 
     private static final Map<String, StandardField> NAME_TO_STANDARD_FIELD = new HashMap<>();
 
