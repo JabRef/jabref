@@ -112,11 +112,13 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         stage.setOnShown(event -> {
             stage.setHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
             stage.setWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
+            container.setDividerPositions(preferencesService.getSearchPreferences().getSearchWindowDividerPosition());
         });
 
         stage.setOnHidden(event -> {
             preferencesService.getSearchPreferences().setSearchWindowHeight(getHeight());
             preferencesService.getSearchPreferences().setSearchWindowWidth(getWidth());
+            preferencesService.getSearchPreferences().setSearchWindowDividerPosition(container.getDividers().getFirst().getPosition());
         });
     }
 }
