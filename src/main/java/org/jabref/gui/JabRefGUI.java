@@ -184,7 +184,6 @@ public class JabRefGUI extends Application {
 
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
-        mainStage.setFullScreen(guiPreferences.isWindowFullscreen());
         mainStage.setMaximized(guiPreferences.isWindowMaximised());
         if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
             // corrects the Window, if it is outside the mainscreen
@@ -253,12 +252,13 @@ public class JabRefGUI extends Application {
 
     private void saveWindowState() {
         GuiPreferences preferences = preferencesService.getGuiPreferences();
-        preferences.setPositionX(mainStage.getX());
-        preferences.setPositionY(mainStage.getY());
-        preferences.setSizeX(mainStage.getWidth());
-        preferences.setSizeY(mainStage.getHeight());
+        if (!mainStage.isMaximized()) {
+            preferences.setPositionX(mainStage.getX());
+            preferences.setPositionY(mainStage.getY());
+            preferences.setSizeX(mainStage.getWidth());
+            preferences.setSizeY(mainStage.getHeight());
+        }
         preferences.setWindowMaximised(mainStage.isMaximized());
-        preferences.setWindowFullScreen(mainStage.isFullScreen());
         debugLogWindowState(mainStage);
     }
 
