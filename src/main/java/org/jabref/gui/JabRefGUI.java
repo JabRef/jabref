@@ -242,15 +242,8 @@ public class JabRefGUI extends Application {
     }
 
     public void onHiding(WindowEvent event) {
-        if (!correctedWindowPos) {
-            // saves the window position only if its not corrected -> the window will rest at the old Position,
-            // if the external Screen is connected again.
-            saveWindowState();
-        }
-
+        saveWindowState();
         preferencesService.flush();
-
-        // Goodbye!
         Platform.exit();
     }
 
