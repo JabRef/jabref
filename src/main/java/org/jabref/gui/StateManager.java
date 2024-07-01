@@ -6,11 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyListProperty;
-import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -21,6 +18,7 @@ import javafx.scene.Node;
 import javafx.util.Pair;
 
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -55,13 +53,12 @@ public class StateManager {
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
-    private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
-    private final ObservableMap<String, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
+    private final IntegerProperty searchResultSize = new SimpleIntegerProperty(0);
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
@@ -69,14 +66,8 @@ public class StateManager {
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
-
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
-
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
-
-    public StateManager() {
-        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null).map(BibDatabaseContext::getUid)));
-    }
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
         return visibleSidePanes;
@@ -102,32 +93,16 @@ public class StateManager {
         return activeSearchQuery;
     }
 
-    public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
-        searchResultMap.put(database.getUid(), resultSize);
-    }
-
-    public IntegerProperty getSearchResultSize() {
-        return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()).getUid(), new SimpleIntegerProperty(0));
-    }
-
     public OptionalObjectProperty<SearchQuery> activeGlobalSearchQueryProperty() {
         return activeGlobalSearchQuery;
     }
 
-    public IntegerProperty getGlobalSearchResultSize() {
-        return globalSearchResultSize;
+    public OptionalObjectProperty<SearchQuery> activeSearchQuery(SearchType type) {
+        return type == SearchType.NORMAL_SEARCH ? activeSearchQuery : activeGlobalSearchQuery;
     }
 
-    public IntegerProperty getSearchResultSize(OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        if (searchQueryProperty.equals(activeSearchQuery)) {
-            return getSearchResultSize();
-        } else {
-            return getGlobalSearchResultSize();
-        }
-    }
-
-    public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
-        return activeGroups.getReadOnlyProperty();
+    public IntegerProperty searchResultSize(SearchType type) {
+        return type == SearchType.NORMAL_SEARCH ? searchResultSize : globalSearchResultSize;
     }
 
     public ObservableList<BibEntry> getSelectedEntries() {
@@ -138,18 +113,17 @@ public class StateManager {
         selectedEntries.setAll(newSelectedEntries);
     }
 
-    public void setSelectedGroups(BibDatabaseContext database, List<GroupTreeNode> newSelectedGroups) {
+    public void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups) {
         Objects.requireNonNull(newSelectedGroups);
-        selectedGroups.put(database.getUid(), FXCollections.observableArrayList(newSelectedGroups));
+        selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
     }
 
     public ObservableList<GroupTreeNode> getSelectedGroups(BibDatabaseContext context) {
-        ObservableList<GroupTreeNode> selectedGroupsForDatabase = selectedGroups.get(context.getUid());
-        return selectedGroupsForDatabase != null ? selectedGroupsForDatabase : FXCollections.observableArrayList();
+        return selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList());
     }
 
-    public void clearSelectedGroups(BibDatabaseContext database) {
-        selectedGroups.remove(database.getUid());
+    public void clearSelectedGroups(BibDatabaseContext context) {
+        selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).clear();
     }
 
     public Optional<BibDatabaseContext> getActiveDatabase() {
@@ -163,18 +137,6 @@ public class StateManager {
         } else {
             activeDatabaseProperty().set(Optional.of(database));
         }
-    }
-
-    public void clearSearchQuery() {
-        activeSearchQuery.setValue(Optional.empty());
-    }
-
-    public void setSearchQuery(OptionalObjectProperty<SearchQuery> searchQueryProperty, SearchQuery query) {
-        searchQueryProperty.setValue(Optional.of(query));
-    }
-
-    public void clearSearchQuery(OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        searchQueryProperty.setValue(Optional.empty());
     }
 
     public OptionalObjectProperty<Node> focusOwnerProperty() {
@@ -215,10 +177,6 @@ public class StateManager {
 
     public ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEditProperty() {
         return lastAutomaticFieldEditorEdit;
-    }
-
-    public LastAutomaticFieldEditorEdit getLastAutomaticFieldEditorEdit() {
-        return lastAutomaticFieldEditorEditProperty().get();
     }
 
     public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {

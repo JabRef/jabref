@@ -2,7 +2,6 @@ package org.jabref.cli;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,7 +18,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.ExportPreferences;
@@ -49,7 +47,7 @@ class ArgumentProcessorTest {
         when(preferencesService.getImporterPreferences()).thenReturn(importerPreferences);
         when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferencesService.getSearchPreferences()).thenReturn(
-                new SearchPreferences(null, EnumSet.noneOf(SearchRules.SearchFlags.class), false)
+                new SearchPreferences(null, false, false, false, false, false, 0, 0, 0)
         );
     }
 

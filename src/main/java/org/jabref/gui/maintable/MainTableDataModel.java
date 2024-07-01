@@ -5,17 +5,17 @@ import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
-import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -34,7 +34,11 @@ public class MainTableDataModel {
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
 
-    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
+    public MainTableDataModel(BibDatabaseContext context,
+                              PreferencesService preferencesService,
+                              ListProperty<GroupTreeNode> selectedGroupsProperty,
+                              OptionalObjectProperty<SearchQuery> searchQueryProperty,
+                              IntegerProperty resultSize) {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = context;
@@ -47,17 +51,19 @@ public class MainTableDataModel {
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
-                EasyBind.combine(stateManager.activeGroupProperty(),
-                        stateManager.activeSearchQueryProperty(),
+                EasyBind.combine(selectedGroupsProperty,
+                        searchQueryProperty,
                         groupsPreferences.groupViewModeProperty(),
-                        (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))
-        );
+                        (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry)));
 
-        IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));
-        stateManager.setActiveSearchResultSize(context, resultSize);
+
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
+    }
+
+    public void removeBinding() {
+        entriesFiltered.predicateProperty().unbind();
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {

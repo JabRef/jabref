@@ -35,6 +35,8 @@ public class EditorContextAction extends SimpleCommand {
         BooleanBinding hasSelectionBinding = Bindings.createBooleanBinding(() -> textInputControl.getSelection().getLength() > 0, textInputControl.selectionProperty());
         BooleanBinding allSelectedBinding = Bindings.createBooleanBinding(() -> textInputControl.getSelection().getLength() == textInputControl.getLength());
         BooleanBinding maskTextBinding = (BooleanBinding) BindingsHelper.constantOf(textInputControl instanceof PasswordField); // (maskText("A") != "A");
+        BooleanBinding undoableBinding = Bindings.createBooleanBinding(textInputControl::isUndoable, textInputControl.undoableProperty());
+        BooleanBinding redoableBinding = Bindings.createBooleanBinding(textInputControl::isRedoable, textInputControl.redoableProperty());
 
         this.executable.bind(
                 switch (command) {
@@ -42,6 +44,8 @@ public class EditorContextAction extends SimpleCommand {
                     case CUT -> maskTextBinding.not().and(hasSelectionBinding);
                     case PASTE -> editableBinding.and(hasStringInClipboardBinding);
                     case DELETE -> editableBinding.and(hasSelectionBinding);
+                    case UNDO -> undoableBinding;
+                    case REDO -> redoableBinding;
                     case SELECT_ALL -> {
                         if (SHOW_HANDLES) {
                             yield hasTextBinding.and(allSelectedBinding.not());
@@ -61,6 +65,8 @@ public class EditorContextAction extends SimpleCommand {
             case PASTE -> textInputControl.paste();
             case DELETE -> textInputControl.deleteText(textInputControl.getSelection());
             case SELECT_ALL -> textInputControl.selectAll();
+            case UNDO -> textInputControl.undo();
+            case REDO -> textInputControl.redo();
         }
         textInputControl.requestFocus();
     }

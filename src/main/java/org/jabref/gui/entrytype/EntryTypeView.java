@@ -20,6 +20,7 @@ import javafx.stage.Screen;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -219,7 +220,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     private void setEntryTypeForReturnAndClose(Optional<BibEntryType> entryType) {
         type = entryType.map(BibEntryType::getType).orElse(null);
         viewModel.stopFetching();
-        this.stateManager.clearSearchQuery();
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(Optional.empty());
         this.close();
     }
 
