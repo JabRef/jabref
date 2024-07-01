@@ -186,6 +186,7 @@ public class JabRefGUI extends Application {
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
         mainStage.setMaximized(guiPreferences.isWindowMaximised());
+        LOGGER.debug("Screens: {}", Screen.getScreens());
         debugLogWindowState(mainStage);
         if (isWindowPositionOutOfBounds()) {
             LOGGER.debug("The Jabref window is outside of screen bounds. Position and size will be corrected. Main screen will be used.");
