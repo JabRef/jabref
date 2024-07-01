@@ -212,20 +212,20 @@ public class JabRefPreferences implements PreferencesService {
     // Window sizes
     // JabRef <= 5.13: "global position"
     // JabRef >= 5.14: Position, if number of screens is 1
-    public static final String SIZE_Y_SCREEN_1 = "mainWindowSizeY";
-    public static final String SIZE_X_SCREEN_1 = "mainWindowSizeX";
-    public static final String POS_Y_SCREEN_1 = "mainWindowPosY";
-    public static final String POS_X_SCREEN_1 = "mainWindowPosX";
+    public static final String SCREEN_1_WIDTH = "mainWindowSizeX";
+    public static final String SCREEN_1_HEIGHT = "mainWindowSizeY";
+    public static final String SCREEN_1_X = "mainWindowPosX";
+    public static final String SCREEN_1_Y = "mainWindowPosY";
 
-    public static final String SIZE_Y_SCREEN_2 = "mainWindowSizeYScreen2";
-    public static final String SIZE_X_SCREEN_2 = "mainWindowSizeXScreen2";
-    public static final String POS_Y_SCREEN_2 = "mainWindowPosYScreen2";
-    public static final String POS_X_SCREEN_2 = "mainWindowPosXScreen2";
+    public static final String SCREEN_2_WIDTH = "mainWindowSizeX2";
+    public static final String SCREEN_2_HEIGHT = "mainWindowSizeY2";
+    public static final String SCREEN_2_X = "mainWindowPosX2";
+    public static final String SCREEN_2_Y = "mainWindowPosY2";
 
-    public static final String SIZE_Y_SCREEN_3 = "mainWindowSizeYScreen3";
-    public static final String SIZE_X_SCREEN_3 = "mainWindowSizeXScreen3";
-    public static final String POS_Y_SCREEN_3 = "mainWindowPosYScreen3";
-    public static final String POS_X_SCREEN_3 = "mainWindowPosXScreen3";
+    public static final String SCREEN_3_WIDTH = "mainWindowSizeX3";
+    public static final String SCREEN_3_HEIGHT = "mainWindowSizeY3";
+    public static final String SCREEN_3_X = "mainWindowPosX3";
+    public static final String SCREEN_3_Y = "mainWindowPosY3";
 
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
@@ -610,10 +610,10 @@ public class JabRefPreferences implements PreferencesService {
                                         .getSslDirectory()
                                         .resolve("truststore.jks").toString());
 
-        defaults.put(POS_X_SCREEN_1, 0);
-        defaults.put(POS_Y_SCREEN_1, 0);
-        defaults.put(SIZE_X_SCREEN_1, 1024);
-        defaults.put(SIZE_Y_SCREEN_1, 768);
+        defaults.put(SCREEN_1_X, 0);
+        defaults.put(SCREEN_1_Y, 0);
+        defaults.put(SCREEN_1_WIDTH, 1024);
+        defaults.put(SCREEN_1_HEIGHT, 768);
         defaults.put(WINDOW_MAXIMISED, Boolean.TRUE);
         defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE); // By default disable "Fit table horizontally on the screen"
         defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
@@ -2578,10 +2578,10 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         guiPreferences = new GuiPreferences(
-                getDouble(POS_X_SCREEN_1),
-                getDouble(POS_Y_SCREEN_1),
-                getDouble(SIZE_X_SCREEN_1),
-                getDouble(SIZE_Y_SCREEN_1),
+                getDouble(SCREEN_1_X),
+                getDouble(SCREEN_1_Y),
+                getDouble(SCREEN_1_WIDTH),
+                getDouble(SCREEN_1_HEIGHT),
                 getBoolean(WINDOW_MAXIMISED),
                 getStringList(LAST_EDITED).stream()
                                           .map(Path::of)
@@ -2591,10 +2591,10 @@ public class JabRefPreferences implements PreferencesService {
                 get(ID_ENTRY_GENERATOR),
                 getDouble(SIDE_PANE_WIDTH));
 
-        EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X_SCREEN_1, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(POS_Y_SCREEN_1, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_X_SCREEN_1, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y_SCREEN_1, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(SCREEN_1_X, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(SCREEN_1_Y, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(SCREEN_1_WIDTH, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SCREEN_1_HEIGHT, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
         EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
