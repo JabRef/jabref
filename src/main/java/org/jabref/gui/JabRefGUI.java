@@ -191,7 +191,7 @@ public class JabRefGUI extends Application {
         debugLogWindowState(mainStage);
 
         if (isWindowPositionOutOfBounds()) {
-            LOGGER.debug("The Jabref window is outside of screen bounds. Position and size will be corrected. Main screen will be used.");
+            LOGGER.debug("The JabRef window is outside of screen bounds. Position and size will be corrected. Main screen will be used.");
             Rectangle2D bounds = Screen.getPrimary().getBounds();
             mainStage.setX(bounds.getMinX());
             mainStage.setY(bounds.getMinY());
@@ -199,7 +199,7 @@ public class JabRefGUI extends Application {
             mainStage.setWidth(Math.min(bounds.getWidth(), 1024.0));
             saveWindowState();
         } else {
-            LOGGER.debug("The Jabref window is inside screen bounds");
+            LOGGER.debug("The JabRef window is inside screen bounds.");
             mainStage.setX(guiPreferences.getPositionX());
             mainStage.setY(guiPreferences.getPositionY());
             mainStage.setWidth(guiPreferences.getSizeX());
