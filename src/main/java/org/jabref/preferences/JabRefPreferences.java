@@ -453,8 +453,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
     private static final String AI_ENABLE_CHAT = "aiEnableChat";
-    private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
+    private static final String AI_PROVIDER = "aiProvider";
     private static final String AI_CHAT_MODEL = "aiChatModel";
+    private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
     private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
     private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
     private static final String AI_TEMPERATURE = "aiTemperature";
@@ -851,8 +852,9 @@ public class JabRefPreferences implements PreferencesService {
 
         // AI
         defaults.put(AI_ENABLE_CHAT, AiDefaultPreferences.ENABLE_CHAT);
+        defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.getName());
+        defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL);
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
-        defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL.getName());
         defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.getName());
         defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
         defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
@@ -2701,8 +2703,9 @@ public class JabRefPreferences implements PreferencesService {
 
         aiPreferences = new AiPreferences(
                 useAi,
+                AiPreferences.AiProvider.fromString(get(AI_PROVIDER)),
+                get(AI_CHAT_MODEL),
                 token,
-                AiPreferences.ChatModel.fromString(get(AI_CHAT_MODEL)),
                 AiPreferences.EmbeddingModel.fromString(get(AI_EMBEDDING_MODEL)),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_SYSTEM_MESSAGE),
@@ -2714,11 +2717,13 @@ public class JabRefPreferences implements PreferencesService {
                 getDouble(AI_RAG_MIN_SCORE));
 
         EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE_CHAT, newValue));
-        EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
+
+        EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue.getName()));
+        EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue));
+        EasyBind.listen(aiPreferences.apiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
 
         EasyBind.listen(aiPreferences.customizeSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
-        EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue.getName()));
         EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
 
         EasyBind.listen(aiPreferences.systemMessageProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));

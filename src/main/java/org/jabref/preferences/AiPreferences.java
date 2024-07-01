@@ -1,5 +1,7 @@
 package org.jabref.preferences;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -14,35 +16,39 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class AiPreferences {
-    public enum ChatModel {
-        GPT_3_5_TURBO("gpt-3.5-turbo"),
-        GPT_4("gpt-4"),
-        GPT_4_TURBO("gpt-4-turbo"),
-        GPT_4O("gpt-4o");
+    public enum AiProvider {
+        OPEN_AI("OpenAI"),
+        MISTRAL_AI("Mistral AI");
 
         private final String name;
 
-        ChatModel(String name) {
+        AiProvider(String name) {
             this.name = name;
-        }
-
-        public static ChatModel fromString(String text) {
-            for (ChatModel b : ChatModel.values()) {
-                if (b.name.equals(text)) {
-                    return b;
-                }
-            }
-            assert false;
-            return null;
-        }
-
-        public String toString() {
-            return name;
         }
 
         public String getName() {
             return name;
         }
+
+        public static AiProvider fromString(String text) {
+            for (AiProvider b : AiProvider.values()) {
+                if (b.name.equals(text)) {
+                    return b;
+                }
+            }
+            return OPEN_AI;
+        }
+
+        public String toString() {
+            return name;
+        }
+    }
+
+    public static final Map<AiProvider, String[]> CHAT_MODELS = new EnumMap<>(AiProvider.class);
+
+    static {
+        CHAT_MODELS.put(AiProvider.OPEN_AI, new String[]{"gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"});
+        CHAT_MODELS.put(AiProvider.MISTRAL_AI, new String[]{"open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-small-latest", "mistral-medium-latest", "mistral-large-latest"});
     }
 
     public enum EmbeddingModel {
@@ -75,13 +81,14 @@ public class AiPreferences {
     }
 
     private final BooleanProperty enableChatWithFiles;
-    private final StringProperty openAiToken;
+
+    private final ObjectProperty<AiProvider> aiProvider;
+    private final StringProperty chatModel;
+    private final StringProperty apiToken;
 
     private final BooleanProperty customizeSettings;
 
-    private final ObjectProperty<ChatModel> chatModel;
     private final ObjectProperty<EmbeddingModel> embeddingModel;
-
     private final StringProperty systemMessage;
     private final DoubleProperty temperature;
     private final IntegerProperty messageWindowSize;
@@ -90,15 +97,16 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles, String openAiToken, ChatModel chatModel, EmbeddingModel embeddingModel, boolean customizeSettings, String systemMessage, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
+    public AiPreferences(boolean enableChatWithFiles, AiProvider aiProvider, String chatModel, String apiToken, EmbeddingModel embeddingModel, boolean customizeSettings, String systemMessage, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
         this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
-        this.openAiToken = new SimpleStringProperty(openAiToken);
+
+        this.aiProvider = new SimpleObjectProperty<>(aiProvider);
+        this.chatModel = new SimpleStringProperty(chatModel);
+        this.apiToken = new SimpleStringProperty(apiToken);
 
         this.customizeSettings = new SimpleBooleanProperty(customizeSettings);
 
-        this.chatModel = new SimpleObjectProperty<>(chatModel);
         this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
-
         this.systemMessage = new SimpleStringProperty(systemMessage);
         this.temperature = new SimpleDoubleProperty(temperature);
         this.messageWindowSize = new SimpleIntegerProperty(messageWindowSize);
@@ -120,16 +128,40 @@ public class AiPreferences {
         this.enableChatWithFiles.set(enableChatWithFiles);
     }
 
-    public StringProperty openAiTokenProperty() {
-        return openAiToken;
+    public ObjectProperty<AiProvider> aiProviderProperty() {
+        return aiProvider;
     }
 
-    public String getOpenAiToken() {
-        return openAiToken.get();
+    public AiProvider getAiProvider() {
+        return aiProvider.get();
     }
 
-    public void setOpenAiToken(String openAiToken) {
-        this.openAiToken.set(openAiToken);
+    public void setAiProvider(AiProvider aiProvider) {
+        this.aiProvider.set(aiProvider);
+    }
+
+    public StringProperty chatModelProperty() {
+        return chatModel;
+    }
+
+    public String getChatModel() {
+        return chatModel.get();
+    }
+
+    public void setChatModel(String chatModel) {
+        this.chatModel.set(chatModel);
+    }
+
+    public StringProperty apiTokenProperty() {
+        return apiToken;
+    }
+
+    public String getApiToken() {
+        return apiToken.get();
+    }
+
+    public void setApiToken(String apiToken) {
+        this.apiToken.set(apiToken);
     }
 
     public BooleanProperty customizeSettingsProperty() {
@@ -142,18 +174,6 @@ public class AiPreferences {
 
     public void setCustomizeSettings(boolean customizeSettings) {
         this.customizeSettings.set(customizeSettings);
-    }
-
-    public ObjectProperty<ChatModel> chatModelProperty() {
-        return chatModel;
-    }
-
-    public ChatModel getChatModel() {
-        return chatModel.get();
-    }
-
-    public void setChatModel(ChatModel chatModel) {
-        this.chatModel.set(chatModel);
     }
 
     public ObjectProperty<EmbeddingModel> embeddingModelProperty() {

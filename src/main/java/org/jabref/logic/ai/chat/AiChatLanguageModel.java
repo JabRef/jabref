@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.chat;
 
+import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -38,15 +39,27 @@ public class AiChatLanguageModel {
     }
 
     private void rebuild() {
-        ChatLanguageModel chatLanguageModel =
-                OpenAiChatModel
-                        .builder()
-                        .apiKey(aiPreferences.getOpenAiToken())
-                        .modelName(aiPreferences.getChatModel().getName())
-                        .temperature(aiPreferences.getTemperature())
-                        .logRequests(true)
-                        .logResponses(true)
-                        .build();
+        ChatLanguageModel chatLanguageModel = null;
+
+        switch (aiPreferences.getAiProvider()) {
+            case OPEN_AI -> chatLanguageModel = OpenAiChatModel
+                    .builder()
+                    .apiKey(aiPreferences.getApiToken())
+                    .modelName(aiPreferences.getChatModel())
+                    .temperature(aiPreferences.getTemperature())
+                    .logRequests(true)
+                    .logResponses(true)
+                    .build();
+
+            case MISTRAL_AI -> chatLanguageModel = MistralAiChatModel
+                    .builder()
+                    .apiKey(aiPreferences.getApiToken())
+                    .modelName(aiPreferences.getChatModel())
+                    .temperature(aiPreferences.getTemperature())
+                    .logRequests(true)
+                    .logResponses(true)
+                    .build();
+        }
 
         chatLanguageModelObjectProperty.set(chatLanguageModel);
     }
@@ -54,7 +67,7 @@ public class AiChatLanguageModel {
     private void listenToPreferences() {
         aiPreferences.enableChatWithFilesProperty().addListener(obs -> {
             if (aiPreferences.getEnableChatWithFiles()) {
-                if (!aiPreferences.getOpenAiToken().isEmpty()) {
+                if (!aiPreferences.getApiToken().isEmpty()) {
                     rebuild();
                 }
             } else {
@@ -62,7 +75,7 @@ public class AiChatLanguageModel {
             }
         });
 
-        aiPreferences.openAiTokenProperty().addListener(obs -> {
+        aiPreferences.apiTokenProperty().addListener(obs -> {
             if (aiPreferences.getEnableChatWithFiles()) {
                 rebuild();
             } else {
