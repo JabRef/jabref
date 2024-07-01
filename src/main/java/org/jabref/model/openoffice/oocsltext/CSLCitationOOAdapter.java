@@ -61,6 +61,7 @@ public class CSLCitationOOAdapter {
 
         BibEntry entry = TestEntry.getTestEntry();
         String style = CitationStyle.discoverCitationStyles().get(cslIndex).getSource();
+        System.out.println(CitationStyle.discoverCitationStyles().get(cslIndex).getTitle());
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
         String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(), BIBENTRYTYPESMANAGER);
