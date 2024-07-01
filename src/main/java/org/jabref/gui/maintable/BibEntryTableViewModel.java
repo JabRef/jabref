@@ -13,10 +13,14 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.FloatProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.MapChangeListener;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.uithreadaware.UiThreadBinding;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -29,6 +33,7 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.search.SearchResults;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -44,8 +49,10 @@ public class BibEntryTableViewModel {
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
+    private final StateManager stateManager;
+    private final FloatProperty searchScore = new SimpleFloatProperty(0);
 
-    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
+    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter, StateManager stateManager) {
         this.entry = entry;
         this.fieldValueFormatter = fieldValueFormatter;
 
@@ -53,6 +60,10 @@ public class BibEntryTableViewModel {
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
+        this.stateManager = stateManager;
+
+        updateSearchScore();
+        stateManager.getSearchResults().addListener((MapChangeListener<String, SearchResults>) change -> updateSearchScore());
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -148,5 +159,19 @@ public class BibEntryTableViewModel {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return bibDatabaseContext;
+    }
+
+    public float getSearchScore() {
+        return searchScore.get();
+    }
+
+    public FloatProperty searchScoreProperty() {
+        return searchScore;
+    }
+
+    public void updateSearchScore() {
+        searchScore.set(stateManager.getSearchResults(bibDatabaseContext)
+                                    .map(searchResults -> searchResults.getSearchScoreForEntry(entry))
+                                    .orElse(0f));
     }
 }

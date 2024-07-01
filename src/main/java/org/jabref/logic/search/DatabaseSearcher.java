@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.search.SearchQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,9 @@ public class DatabaseSearcher {
             return Collections.emptyList();
         }
 
-        List<BibEntry> matchEntries = database.getEntries().stream().filter(query::isMatch).toList();
+        List<BibEntry> matchEntries = List.of();
+        // List<BibEntry> matchEntries = database.getEntries().stream().filter(query::isMatch).toList();
+        // TODO btut: is this for CLI? We need the databasecontext to access the index
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }
 }

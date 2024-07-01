@@ -1,5 +1,7 @@
 package org.jabref.gui.search;
 
+import java.util.Optional;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -88,7 +90,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                                    .findFirst()
                                    .ifPresent(libraryTabContainer::showLibraryTab);
 
-                stateManager.clearSearchQuery();
+                stateManager.activeSearchQueryProperty().set(Optional.empty());
                 stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
                 stage.close();
             }

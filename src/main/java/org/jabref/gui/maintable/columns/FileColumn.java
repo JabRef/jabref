@@ -2,6 +2,7 @@ package org.jabref.gui.maintable.columns;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.scene.Node;
@@ -11,6 +12,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -24,6 +26,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.search.SearchResults;
 import org.jabref.preferences.PreferencesService;
 
 /**
@@ -35,6 +38,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     private final DialogService dialogService;
     private final BibDatabaseContext database;
     private final PreferencesService preferencesService;
+    private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
 
     /**
@@ -44,11 +48,13 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                       BibDatabaseContext database,
                       DialogService dialogService,
                       PreferencesService preferencesService,
+                      StateManager stateManager,
                       TaskExecutor taskExecutor) {
         super(model);
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
 
         setCommonSettings();
@@ -83,12 +89,14 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                       BibDatabaseContext database,
                       DialogService dialogService,
                       PreferencesService preferencesService,
+                      StateManager stateManager,
                       String fileType,
                       TaskExecutor taskExecutor) {
         super(model);
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
 
         setCommonSettings();
@@ -98,7 +106,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                          .getGraphicNode());
 
         new ValueTableCellFactory<BibEntryTableViewModel, List<LinkedFile>>()
-                .withGraphic(linkedFiles -> createFileIcon(linkedFiles.stream().filter(linkedFile ->
+                .withGraphic((entry, linkedFiles) -> createFileIcon(entry, linkedFiles.stream().filter(linkedFile ->
                                 linkedFile.getFileType().equalsIgnoreCase(fileType)).collect(Collectors.toList())))
                 .install(this);
     }
@@ -141,7 +149,11 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
         return contextMenu;
     }
 
-    private Node createFileIcon(List<LinkedFile> linkedFiles) {
+    private Node createFileIcon(BibEntryTableViewModel entry, List<LinkedFile> linkedFiles) {
+        Optional<SearchResults> searchResults = stateManager.getSearchResults(database);
+        if (!linkedFiles.isEmpty() && searchResults.isPresent() && searchResults.get().hasFulltextResults(entry.getEntry())) {
+            return IconTheme.JabRefIcons.FILE_SEARCH.getGraphicNode();
+        }
         if (linkedFiles.size() > 1) {
             return IconTheme.JabRefIcons.FILE_MULTIPLE.getGraphicNode();
         } else if (linkedFiles.size() == 1) {

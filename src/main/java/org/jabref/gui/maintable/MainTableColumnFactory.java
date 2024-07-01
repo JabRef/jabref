@@ -51,7 +51,6 @@ import org.slf4j.LoggerFactory;
 public class MainTableColumnFactory {
 
     public static final String STYLE_ICON_COLUMN = "column-icon";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
     private final PreferencesService preferencesService;
@@ -61,7 +60,6 @@ public class MainTableColumnFactory {
     private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
     private final StateManager stateManager;
     private final MainTableTooltip tooltip;
 
@@ -80,8 +78,8 @@ public class MainTableColumnFactory {
         this.cellFactory = new CellFactory(preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager,
-                themeManager, taskExecutor);
+        ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
+        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
@@ -134,6 +132,8 @@ public class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
+        columns.add(createScoreColumn(new MainTableColumnModel(MainTableColumnModel.Type.SCORE)));
+
         columnPreferences.getColumns().forEach(column -> {
             columns.add(createColumn(column));
         });
@@ -145,6 +145,27 @@ public class MainTableColumnFactory {
         column.setMinWidth(width);
         column.setPrefWidth(width);
         column.setMaxWidth(width);
+    }
+
+    /**
+     * Creates a column with the search score
+     */
+    private TableColumn<BibEntryTableViewModel, String> createScoreColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Score"));
+        header.getStyleClass().add("mainTable-header");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SCORE.getDisplayName()));
+        column.setGraphic(header);
+        column.setStyle("-fx-alignment: CENTER-RIGHT;");
+        column.setCellValueFactory(cellData -> cellData.getValue().searchScoreProperty().asString("%.2f"));
+        new ValueTableCellFactory<BibEntryTableViewModel, String>()
+                .withText(text -> text)
+                .install(column);
+        column.setSortable(true);
+        column.setSortType(TableColumn.SortType.DESCENDING);
+        column.visibleProperty().bind(stateManager.activeSearchQueryProperty().isPresent());
+        column.setReorderable(false);
+        return column;
     }
 
     /**
@@ -296,6 +317,7 @@ public class MainTableColumnFactory {
                 database,
                 dialogService,
                 preferencesService,
+                stateManager,
                 taskExecutor);
     }
 
@@ -307,6 +329,7 @@ public class MainTableColumnFactory {
                 database,
                 dialogService,
                 preferencesService,
+                stateManager,
                 columnModel.getQualifier(),
                 taskExecutor);
     }

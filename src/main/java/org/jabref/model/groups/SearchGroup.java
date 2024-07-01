@@ -2,10 +2,12 @@ package org.jabref.model.groups;
 
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +19,15 @@ import org.slf4j.LoggerFactory;
 public class SearchGroup extends AbstractGroup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
-    private final GroupSearchQuery query;
+    private final String searchExpression;
+    private final EnumSet<SearchFlags> searchFlags;
+    private Set<BibEntry> matches = Set.of();
+    private GroupSearchQuery query;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
         super(name, context);
-        this.query = new GroupSearchQuery(searchExpression, searchFlags);
+        this.searchExpression = searchExpression;
+        this.searchFlags = searchFlags;
     }
 
     public String getSearchExpression() {
@@ -33,10 +39,9 @@ public class SearchGroup extends AbstractGroup {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SearchGroup)) {
+        if (!(o instanceof SearchGroup other)) {
             return false;
         }
-        SearchGroup other = (SearchGroup) o;
         return Objects.equals(getName(), other.getName())
                && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
                && Objects.equals(getSearchExpression(), other.getSearchExpression())
@@ -45,11 +50,11 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public boolean contains(BibEntry entry) {
-        return query.isMatch(entry);
+        return matches.contains(entry);
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
-        return query.getSearchFlags();
+        return searchFlags;
     }
 
     @Override
@@ -78,5 +83,12 @@ public class SearchGroup extends AbstractGroup {
     @Override
     public int hashCode() {
         return Objects.hash(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags());
+    }
+
+    public void updateMatches(LuceneManager luceneManager) {
+        if (query == null) {
+            query = new GroupSearchQuery(searchExpression, searchFlags);
+        }
+        this.matches = luceneManager.search(query).getAllSearchResults().keySet();
     }
 }

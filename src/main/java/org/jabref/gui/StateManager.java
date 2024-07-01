@@ -7,11 +7,9 @@ import java.util.Optional;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,10 +24,11 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.SearchResults;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -60,8 +59,7 @@ public class StateManager {
     private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
-    private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
-    private final ObservableMap<String, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
+    private final ObservableMap<String, SearchResults> searchResults = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
@@ -102,28 +100,8 @@ public class StateManager {
         return activeSearchQuery;
     }
 
-    public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
-        searchResultMap.put(database.getUid(), resultSize);
-    }
-
-    public IntegerProperty getSearchResultSize() {
-        return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()).getUid(), new SimpleIntegerProperty(0));
-    }
-
     public OptionalObjectProperty<SearchQuery> activeGlobalSearchQueryProperty() {
         return activeGlobalSearchQuery;
-    }
-
-    public IntegerProperty getGlobalSearchResultSize() {
-        return globalSearchResultSize;
-    }
-
-    public IntegerProperty getSearchResultSize(OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        if (searchQueryProperty.equals(activeSearchQuery)) {
-            return getSearchResultSize();
-        } else {
-            return getGlobalSearchResultSize();
-        }
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
@@ -163,18 +141,6 @@ public class StateManager {
         } else {
             activeDatabaseProperty().set(Optional.of(database));
         }
-    }
-
-    public void clearSearchQuery() {
-        activeSearchQuery.setValue(Optional.empty());
-    }
-
-    public void setSearchQuery(OptionalObjectProperty<SearchQuery> searchQueryProperty, SearchQuery query) {
-        searchQueryProperty.setValue(Optional.of(query));
-    }
-
-    public void clearSearchQuery(OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        searchQueryProperty.setValue(Optional.empty());
     }
 
     public OptionalObjectProperty<Node> focusOwnerProperty() {
@@ -223,6 +189,21 @@ public class StateManager {
 
     public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
         lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
+    }
+
+    public ObservableMap<String, SearchResults> getSearchResults() {
+        return searchResults;
+    }
+
+    public Optional<SearchResults> getSearchResults(BibDatabaseContext databaseContext) {
+        return Optional.ofNullable(searchResults.get(databaseContext.getUid()));
+    }
+
+    public int getSearchResultsCount() {
+        return activeDatabase.get()
+                             .flatMap(this::getSearchResults)
+                             .map(SearchResults::getNumberOfResults)
+                             .orElse(0);
     }
 
     public List<String> collectAllDatabasePaths() {

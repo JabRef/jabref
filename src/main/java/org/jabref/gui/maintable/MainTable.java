@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.SetChangeListener;
+import javafx.css.PseudoClass;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -33,6 +35,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
@@ -52,11 +55,13 @@ import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,9 +72,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
     private final StateManager stateManager;
+    private final PreferencesService preferencesService;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
-
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
     private final ClipBoardManager clipBoardManager;
@@ -96,6 +101,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.preferencesService = preferencesService;
         this.database = Objects.requireNonNull(database);
         this.model = model;
         this.clipBoardManager = clipBoardManager;
@@ -147,6 +153,18 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search"), entry -> stateManager.activeSearchQueryProperty().isPresent().and(entry.searchScoreProperty().isEqualTo(0)))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-groups"), entry -> EasyBind.combine(
+                        stateManager.activeGroupProperty(),
+                        preferencesService.getGroupsPreferences().groupViewModeProperty(),
+                        (groups, viewMode) -> {
+                            if (viewMode.contains(GroupViewMode.FILTER)) {
+                                return Boolean.FALSE;
+                            }
+                            return preferencesService.getGroupsPreferences().getGroupViewMode().contains(GroupViewMode.INVERT) ^
+                                    !MainTableDataModel.createGroupMatcher(stateManager.activeGroupProperty(), preferencesService.getGroupsPreferences())
+                                                       .map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
+                        }))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -156,15 +174,39 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.getSortOrder().clear();
 
+        // always sort by score first. If no search is ongoing, it will be equal for all columns.
+        ListChangeListener<? super TableColumn<BibEntryTableViewModel, ?>> scoreSortOderPrioritizer = new ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>() {
+            @Override
+            public void onChanged(Change<? extends TableColumn<BibEntryTableViewModel, ?>> c) {
+                getSortOrder().removeListener(this);
+                updateSortOrder();
+                getSortOrder().addListener(this);
+            }
+        };
+
+        preferencesService.getSearchPreferences().getObservableSearchFlags().addListener(new SetChangeListener<SearchFlags>() {
+            @Override
+            public void onChanged(Change<? extends SearchFlags> change) {
+                getSortOrder().removeListener(scoreSortOderPrioritizer);
+                updateSortOrder();
+                getSortOrder().addListener(scoreSortOderPrioritizer);
+            }
+        });
+
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
+                    .filter(column -> !column.getModel().getType().equals(MainTableColumnModel.Type.SCORE))
                     .findFirst()
                     .ifPresent(column -> {
                         LOGGER.debug("Adding sort order for col {} ", column);
                         this.getSortOrder().add(column);
                     }));
+        this.getSortOrder().addListener(scoreSortOderPrioritizer);
+
+        // Is this always called after the search is done?
+        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> sort());
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
@@ -204,6 +246,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, rightClickMenuFactory, tabContainer, dialogService).show(true);
+    }
+
+    private void updateSortOrder() {
+        getSortOrder().removeAll(getColumns().getFirst());
+        if (preferencesService.getSearchPreferences().isSortByScore()) {
+            getSortOrder().addFirst(getColumns().getFirst());
+        }
     }
 
     /**
@@ -443,11 +492,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         }
                         case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
+                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getLuceneManager());
                         }
                         case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
-                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
+                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getLuceneManager());
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-package org.jabref.logic.pdf.search;
+package org.jabref.logic.search.indexing;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -45,7 +45,7 @@ public class DocumentReaderTest {
         entry.setFiles(Collections.singletonList(new LinkedFile("Wrong path", "NOT_PRESENT.pdf", "Type")));
 
         // when
-        final List<Document> emptyDocumentList = new DocumentReader(entry, filePreferences).readLinkedPdfs(databaseContext);
+        final List<Document> emptyDocumentList = new DocumentReader(filePreferences).readLinkedPdfs(databaseContext, entry);
 
         // then
         assertEquals(Collections.emptyList(), emptyDocumentList);

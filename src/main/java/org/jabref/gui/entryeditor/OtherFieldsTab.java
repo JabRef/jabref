@@ -20,7 +20,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -45,10 +45,10 @@ public class OtherFieldsTab extends FieldsEditorTab {
                           PreferencesService preferences,
                           StateManager stateManager,
                           ThemeManager themeManager,
-                          IndexingTaskManager indexingTaskManager,
                           BibEntryTypesManager entryTypesManager,
                           TaskExecutor taskExecutor,
-                          JournalAbbreviationRepository journalAbbreviationRepository) {
+                          JournalAbbreviationRepository journalAbbreviationRepository,
+                          LuceneManager luceneManager) {
         super(false,
                 databaseContext,
                 suggestionProviders,
@@ -59,7 +59,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                indexingTaskManager);
+                luceneManager
+        );
 
         this.entryTypesManager = entryTypesManager;
         this.customTabsFieldNames = new ArrayList<>();
