@@ -102,7 +102,6 @@ class CitationStyleGeneratorTest {
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
         String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(), bibEntryTypesManager);
-        System.out.println(actualCitation);
         assertEquals(expectedCitation, actualCitation);
     }
 

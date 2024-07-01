@@ -449,8 +449,6 @@ public class OpenOfficePanel {
 
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
         final String errorDialogTitle = Localization.lang("Error pushing entries");
-        LOGGER.warn("HELLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-       // CSLCitationOOAdapter.insertCitation(XTextDocument, XTextCursor);
 
         if (stateManager.getActiveDatabase().isEmpty()
                 || (stateManager.getActiveDatabase().get().getDatabase() == null)) {

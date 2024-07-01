@@ -1,6 +1,5 @@
 package org.jabref.model.openoffice.oocsltext;
 
-import org.jabref.logic.citationstyle.CSLAdapter;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -20,9 +19,10 @@ import com.sun.star.text.XTextDocument;
 public class CSLCitationOOAdapter {
 
     private static final BibEntryTypesManager BIBENTRYTYPESMANAGER = new BibEntryTypesManager();
-    private final CSLAdapter cslAdapter;
-    public CSLCitationOOAdapter(CSLAdapter cslAdapter) {
-        this.cslAdapter = cslAdapter;
+    private static int cslIndex;
+
+    public static void setCslIndex(int cslIndex) {
+        CSLCitationOOAdapter.cslIndex = cslIndex;
     }
 
     private static String transformHtml(String html) {
@@ -36,6 +36,7 @@ public class CSLCitationOOAdapter {
         html = html.replace("&rdquo;", "\"");
         html = html.replace("&laquo;", "«");
         html = html.replace("&raquo;", "»");
+        html = html.replace("&amp;", "AND");
 
         // Remove unsupported links
         html = html.replaceAll("<a[^>]*>", "");
@@ -47,6 +48,8 @@ public class CSLCitationOOAdapter {
         // Replace span tags with inline styles for italic
         html = html.replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
 
+        html = html.replaceAll("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>", "<smallcaps>$1</smallcaps>");
+
         // Clean up any remaining span tags
         html = html.replaceAll("</?span[^>]*>", "");
 
@@ -57,8 +60,7 @@ public class CSLCitationOOAdapter {
             throws IllegalArgumentException, WrappedTargetException, CreationException {
 
         BibEntry entry = TestEntry.getTestEntry();
-        String style = CitationStyle.discoverCitationStyles().get(3).getSource();
-        System.out.println(style);
+        String style = CitationStyle.discoverCitationStyles().get(cslIndex).getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
         String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(), BIBENTRYTYPESMANAGER);

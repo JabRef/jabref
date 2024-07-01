@@ -54,7 +54,6 @@ public class UpdateBibliography {
                 bibliography,
                 style,
                 alwaysAddCitedOnPages);
-        System.out.println("HI");
     }
 
     /**
@@ -123,7 +122,6 @@ public class UpdateBibliography {
                 style,
                 alwaysAddCitedOnPages);
         OOTextIntoOO.write(doc, cursor, bibliographyText);
-        System.out.println("HIIIIIIII");
         cursor.collapseToEnd();
 
         // remove the initial empty paragraph from the section.

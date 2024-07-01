@@ -29,6 +29,7 @@ import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -63,9 +64,11 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
+    private int cslIndex;
 
     public StyleSelectDialogView(StyleLoader loader) {
         this.loader = loader;
+        cslIndex = 0;
 
         ViewLoader.view(this)
                   .load()
@@ -74,11 +77,16 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storePrefs();
+                System.out.println("Selected CSL Style Index: " + viewModel.getSelectedStyleIndex());
+                CSLCitationOOAdapter.setCslIndex(viewModel.getSelectedStyleIndex());
                 return tvStyles.getSelectionModel().getSelectedItem().getStyle();
             }
             return null;
         });
         setTitle(Localization.lang("Style selection"));
+        availableListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.selectedStyleIndexProperty().set(newValue.intValue());
+        });
     }
 
     @FXML
@@ -164,5 +172,9 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML
     private void addStyleFile() {
         viewModel.addStyleFile();
+    }
+
+    public int getCslIndex() {
+        return viewModel.getSelectedStyleIndex();
     }
 }

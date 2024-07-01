@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -48,6 +50,7 @@ public class StyleSelectDialogViewModel {
     private final ObservableList<CitationStylePreviewLayout> availableLayouts = FXCollections.observableArrayList();
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
+    private final IntegerProperty selectedStyleIndex = new SimpleIntegerProperty(-1);
 
     public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService, TaskExecutor taskExecutor, BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
@@ -163,5 +166,13 @@ public class StyleSelectDialogViewModel {
     public void setAvailableLayoutsFilter(String searchTerm) {
         filteredAvailableLayouts.setPredicate(layout ->
                 searchTerm.isEmpty() || layout.getDisplayName().toLowerCase().contains(searchTerm.toLowerCase()));
+    }
+
+    public IntegerProperty selectedStyleIndexProperty() {
+        return selectedStyleIndex;
+    }
+
+    public int getSelectedStyleIndex() {
+        return selectedStyleIndex.get();
     }
 }
