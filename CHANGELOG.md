@@ -296,6 +296,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The hostname is now determined using environment variables (`COMPUTERNAME`/`HOSTNAME`) first. [#9910](https://github.com/JabRef/jabref/pull/9910)
 - We improved the Medline importer to correctly import ISO dates for `revised`. [#9536](https://github.com/JabRef/jabref/issues/9536)
 - To avoid cluttering of the directory, We always delete the `.sav` file upon successful write. [#9675](https://github.com/JabRef/jabref/pull/9675)
+- We now display attached files from referenced crossref entry in the entry table. [#7731](https://github.com/JabRef/jabref/issues/7731)
 - We improved the unlinking/deletion of multiple linked files of an entry using the <kbd>Delete</kbd> key. [#9473](https://github.com/JabRef/jabref/issues/9473)
 - The field names of customized entry types are now exchanged preserving the case. [#9993](https://github.com/JabRef/jabref/pull/9993)
 - We moved the custom entry types dialog into the preferences dialog. [#9760](https://github.com/JabRef/jabref/pull/9760)

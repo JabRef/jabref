@@ -19,7 +19,6 @@ import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.uithreadaware.UiThreadBinding;
-import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -49,7 +48,7 @@ public class BibEntryTableViewModel {
         this.entry = entry;
         this.fieldValueFormatter = fieldValueFormatter;
 
-        this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(Collections.emptyList());
+        this.linkedFiles = entry.getFiles(bibDatabaseContext.getDatabase());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
@@ -81,10 +80,10 @@ public class BibEntryTableViewModel {
         return new UiThreadBinding<>(EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
                 (a, b) ->
                         database.getMetaData().getGroups().map(groupTreeNode ->
-                                groupTreeNode.getMatchingGroups(entry).stream()
-                                             .map(GroupTreeNode::getGroup)
-                                             .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
-                                             .collect(Collectors.toList()))
+                                        groupTreeNode.getMatchingGroups(entry).stream()
+                                                     .map(GroupTreeNode::getGroup)
+                                                     .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
+                                                     .collect(Collectors.toList()))
                                 .orElse(Collections.emptyList())));
     }
 

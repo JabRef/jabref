@@ -11,12 +11,14 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CrossrefTest {
@@ -41,6 +43,8 @@ class CrossrefTest {
         parent.setField(StandardField.SUBTITLE, "parent_SUBTITLE");
         parent.setField(StandardField.TITLEADDON, "parent_TITLEADDON");
         parent.setField(StandardField.SHORTTITLE, "parent_SHORTTITLE");
+
+        parent.setField(StandardField.FILE, "parent_FILE");
 
         child = new BibEntry(StandardEntryType.InProceedings);
         child.setField(StandardField.CROSSREF, "parent");
@@ -319,5 +323,17 @@ class CrossrefTest {
                 Arguments.of(StandardEntryType.Proceedings, StandardEntryType.InProceedings, StandardField.MR_NUMBER),
                 Arguments.of(StandardEntryType.Proceedings, StandardEntryType.InProceedings, StandardField.XDATA)
         );
+    }
+
+    @Test
+    public void testFileIsInherited() {
+        // Parent and child should not have the same file list
+        assertNotEquals(parent.getFiles(), child.getFiles());
+
+        // When using the .getFiles(db) method, the child should get the parent's files
+        assertEquals(parent.getFiles(db).get(), child.getFiles(db).get());
+
+        // Should be the same as the parent when using the .getFiles() method
+        assertEquals(parent.getFiles(), child.getFiles(db).get());
     }
 }
