@@ -21,9 +21,9 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty useAi = new SimpleBooleanProperty();
 
-    private final ReadOnlyListProperty<AiPreferences.AiProvider> aiProvidersList =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(AiPreferences.AiProvider.values()));
-    private final ObjectProperty<AiPreferences.AiProvider> selectedAiProvider = new SimpleObjectProperty<>();
+    private final ReadOnlyListProperty<String> aiProvidersList =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Arrays.stream(AiPreferences.AiProvider.values()).map(AiPreferences.AiProvider::toString).toList()));
+    private final StringProperty selectedAiProvider = new SimpleStringProperty();
 
     private final ReadOnlyListProperty<String> chatModelsList =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
@@ -57,7 +57,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.aiPreferences = preferencesService.getAiPreferences();
 
         selectedAiProvider.addListener((observable, oldValue, newValue) -> {
-            String[] models = AiPreferences.CHAT_MODELS.get(newValue);
+            String[] models = AiPreferences.CHAT_MODELS.get(AiPreferences.AiProvider.fromString(newValue));
             chatModelsList.setAll(models);
             selectedChatModel.setValue(models[0]);
         });
@@ -107,7 +107,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         useAi.setValue(aiPreferences.getEnableChatWithFiles());
 
-        selectedAiProvider.setValue(aiPreferences.getAiProvider());
+        selectedAiProvider.setValue(aiPreferences.getAiProvider().getName());
         selectedChatModel.setValue(aiPreferences.getChatModel());
         apiToken.setValue(aiPreferences.getApiToken());
 
@@ -127,7 +127,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         aiPreferences.setEnableChatWithFiles(useAi.get());
 
-        aiPreferences.setAiProvider(selectedAiProvider.get());
+        aiPreferences.setAiProvider(AiPreferences.AiProvider.fromString(selectedAiProvider.get()));
         aiPreferences.setChatModel(selectedChatModel.get());
         aiPreferences.setApiToken(apiToken.get());
 
@@ -191,11 +191,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return useAi.get();
     }
 
-    public ReadOnlyListProperty<AiPreferences.AiProvider> aiProvidersProperty() {
+    public ReadOnlyListProperty<String> aiProvidersProperty() {
         return aiProvidersList;
     }
 
-    public ObjectProperty<AiPreferences.AiProvider> selectedAiProviderProperty() {
+    public StringProperty selectedAiProviderProperty() {
         return selectedAiProvider;
     }
 

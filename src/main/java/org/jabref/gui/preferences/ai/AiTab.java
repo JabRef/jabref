@@ -26,7 +26,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
     @FXML private CheckBox enableChat;
 
-    @FXML private ComboBox<AiPreferences.AiProvider> aiProviderComboBox;
+    @FXML private ComboBox<String> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
     @FXML private CustomPasswordField apiTokenTextField;
 
@@ -67,11 +67,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         enableChat.selectedProperty().bindBidirectional(viewModel.useAiProperty());
 
-        new ViewModelListCellFactory<AiPreferences.AiProvider>()
-            .withText(AiPreferences.AiProvider::getName)
-            .install(aiProviderComboBox);
-
-        aiProviderComboBox.itemsProperty().bind(viewModel.aiProvidersProperty());
+        // aiProviderComboBox.itemsProperty().bind(viewModel.aiProvidersProperty());
+        aiProviderComboBox.getItems().addAll(viewModel.aiProvidersProperty().get());
         aiProviderComboBox.valueProperty().bindBidirectional(viewModel.selectedAiProviderProperty());
 
         chatModelComboBox.itemsProperty().bind(viewModel.chatModelsProperty());

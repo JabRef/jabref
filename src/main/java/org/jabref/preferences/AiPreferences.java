@@ -61,10 +61,6 @@ public class AiPreferences {
             this.name = name;
         }
 
-        public String getName() {
-             return name;
-        }
-
         public static EmbeddingModel fromString(String text) {
             for (EmbeddingModel b : EmbeddingModel.values()) {
                 if (b.name.equals(text)) {
@@ -76,6 +72,10 @@ public class AiPreferences {
         }
 
         public String toString() {
+            return name;
+        }
+
+        public String getName() {
             return name;
         }
     }
