@@ -15,6 +15,9 @@ import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
@@ -116,7 +119,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         AnchorPane citedByHBox = new AnchorPane();
         citedByHBox.setPrefHeight(40);
 
-        // Create Heading Lab
+        // Create Heading Labels
         Label citingLabel = new Label(Localization.lang("Cites"));
         styleLabel(citingLabel);
         Label citedByLabel = new Label(Localization.lang("Cited By"));
@@ -190,7 +193,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         return container;
     }
 
-    /**
+        /**
      * Styles a given CheckListView to display BibEntries either with a hyperlink or an add button
      *
      * @param listView CheckListView to style
@@ -221,6 +224,14 @@ public class CitationRelationsTab extends EntryEditorTab {
                             libraryTab.clearAndSelect(entry.localEntry());
                         });
                         vContainer.getChildren().add(jumpTo);
+
+                        // Add the compare button for duplicates
+                        Button compareButton = IconTheme.JabRefIcons.COMPARE.asButton();
+                        compareButton.setTooltip(new Tooltip(Localization.lang("Compare with duplicate entries")));
+                        compareButton.setOnMouseClicked(event -> {
+                            openDuplicateEntriesWindow(entry.localEntry());
+                        });
+                        vContainer.getChildren().add(compareButton);
                     } else {
                         ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
                         addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
@@ -241,7 +252,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         openWeb.setTooltip(new Tooltip(Localization.lang("Open URL or DOI")));
                         openWeb.setOnMouseClicked(event -> {
                             String url = entry.entry().getDOI().flatMap(DOI::getExternalURI).map(URI::toString)
-                                              .or(() -> entry.entry().getField(StandardField.URL)).orElse("");
+                                                .or(() -> entry.entry().getField(StandardField.URL)).orElse("");
                             if (StringUtil.isNullOrEmpty(url)) {
                                 return;
                             }
@@ -251,7 +262,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 dialogService.notify(Localization.lang("Unable to open link."));
                             }
                         });
-                        vContainer.getChildren().addLast(openWeb);
+                        vContainer.getChildren().add(openWeb);
                     }
 
                     hContainer.getChildren().addAll(entryNode, separator, vContainer);
@@ -268,6 +279,18 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .install(listView);
 
         listView.setSelectionModel(new NoSelectionModel<>());
+    }
+
+    private void openDuplicateEntriesWindow(BibEntry entry) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(Localization.lang("Possible duplicate entries"));
+
+        DialogPane dialogPane = new DialogPane();
+        dialogPane.setContent(new Label("Here you can show the duplicate entries and their comparison details."));
+        dialog.setDialogPane(dialogPane);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.showAndWait();
     }
 
     /**
@@ -312,7 +335,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         setContent(getPaneAndStartSearch(entry));
     }
 
-    /**
+        /**
      * Method to start search for relations and display them in the associated ListView
      *
      * @param entry         BibEntry currently selected in Jabref Database
@@ -386,15 +409,15 @@ public class CitationRelationsTab extends EntryEditorTab {
         hideNodes(abortButton, progress);
 
         observableList.setAll(
-        fetchedList.stream()
-            .map(entr -> duplicateCheck.containsDuplicate(
-                    databaseContext.getDatabase(),
-                    entr,
-                    BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()))
-                .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
-                .orElseGet(() -> new CitationRelationItem(entr, false)))
-            .toList()
-    );
+                fetchedList.stream()
+                        .map(entr -> duplicateCheck.containsDuplicate(
+                                databaseContext.getDatabase(),
+                                entr,
+                                BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()))
+                                .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
+                                .orElseGet(() -> new CitationRelationItem(entr, false)))
+                        .toList()
+        );
 
         if (!observableList.isEmpty()) {
             listView.refresh();
