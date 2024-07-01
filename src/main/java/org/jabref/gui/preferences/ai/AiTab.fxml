@@ -13,22 +13,29 @@
         <Label styleClass="sectionHeader" text="%General" />
 
         <CheckBox fx:id="enableChat" mnemonicParsing="false" text="%Enable chat with attached PDF files" />
+      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="306.0" spacing="10.0">
+         <children>
+            <Label alignment="BASELINE_CENTER" text="%AI provider" />
+            <ComboBox fx:id="aiProviderComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+            <Button fx:id="aiProviderHelp" prefWidth="20.0" />
+         </children>
+      </HBox>
 
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
-                <Label alignment="BASELINE_CENTER" text="%OpenAI API token" />
-                <CustomPasswordField fx:id="openAiToken" HBox.hgrow="ALWAYS" />
+                <Label alignment="BASELINE_CENTER" text="%Chat model" />
+                <ComboBox fx:id="chatModelComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+            <Button fx:id="chatModelHelp" prefWidth="20.0" />
             </children>
         </HBox>
 
-        <Label styleClass="sectionHeader" text="%Expert settings" />
-        <VBox>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
-
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%These parameters affect how AI will answer you questions." />
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%Leave these fields as is, if you are not sure of their purpose." />
+                <Label alignment="BASELINE_CENTER" text="%API token" />
+                <CustomPasswordField fx:id="apiTokenTextField" HBox.hgrow="ALWAYS" />
+            <Button fx:id="apiTokenHelp" prefWidth="20.0" />
             </children>
-        </VBox>
+        </HBox>
 
 
         <Label styleClass="sectionHeader" text="%Expert settings" />
@@ -41,14 +48,6 @@
       </VBox>
 
       <CheckBox fx:id="customizeSettingsCheckbox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%Customize AI settings" />
-
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <children>
-                <Label alignment="BASELINE_CENTER" text="%OpenAI model" />
-                <ComboBox fx:id="aiModelComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-            <Button fx:id="chatModelHelp" prefWidth="20.0" />
-            </children>
-        </HBox>
 
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
