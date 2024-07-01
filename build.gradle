@@ -44,6 +44,7 @@ version = project.findProperty('projVersion') ?: '100.0.0'
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
     modularity.inferModulePath.set(false)
@@ -95,6 +96,13 @@ application {
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
 modularity.disableEffectiveArgumentsAdjustment()
+
+// Required as workaround for  https://github.com/langchain4j/langchain4j/issues/1066
+modularity.patchModule("langchain4j", "langchain4j-core-0.31.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-embeddings-0.31.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-0.31.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-q-0.31.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-open-ai-0.31.0.jar")
 
 sourceSets {
     main {
@@ -230,12 +238,17 @@ dependencies {
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
         exclude group: 'org.apache.commons.commons-logging'
+        exclude module: 'kotlin-stdlib-jdk8'
+        exclude group: 'com.squareup.retrofit2'
         exclude group: 'org.openjfx'
         exclude group: 'org.apache.logging.log4j'
         exclude group: 'tech.units'
     }
     // Required by gemsfx
     implementation 'tech.units:indriya:2.2'
+    implementation ('com.squareup.retrofit2:retrofit:2.11.0') {
+        exclude group: 'com.squareup.okhttp3'
+    }
 
     implementation 'org.controlsfx:controlsfx:11.2.1'
 
@@ -306,6 +319,23 @@ dependencies {
 
     // YAML formatting
     implementation 'org.yaml:snakeyaml:2.2'
+
+    // AI
+    implementation 'dev.langchain4j:langchain4j:0.31.0'
+    implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2:0.31.0'
+    implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2-q:0.31.0'
+    implementation('dev.langchain4j:langchain4j-open-ai:0.31.0') {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    }
+    // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
+    // GemxFX also (transitively) depends on kotlin
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24'
+
+    implementation "one.jpro.platform:jpro-mdfx:0.3.3-SNAPSHOT"
+
+    implementation ('com.squareup.okhttp3:okhttp:4.12.0') {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    }
 
     implementation 'commons-io:commons-io:2.16.1'
 
@@ -450,7 +480,22 @@ compileJava {
         // TODO: Remove access to internal api
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+
+                'langchain4j/dev.langchain4j.data.document' : 'org.jabref',
+                'langchain4j/dev.langchain4j.data.segment' : 'org.jabref',
+                'langchain4j/dev.langchain4j.model.chat' : 'org.jabref',
+                'langchain4j/dev.langchain4j.model.embedding' : 'org.jabref',
+                'langchain4j/dev.langchain4j.model.openai' : 'org.jabref',
+                'langchain4j/dev.langchain4j.rag.content.retriever' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.embedding' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.embedding.inmemory' : 'org.jabref',
+                'langchain4j/dev.langchain4j.memory' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.memory.chat' : 'org.jabref',
+                'langchain4j/dev.langchain4j.data.message' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.embedding.filter' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.embedding.filter.comparison' : 'org.jabref',
+                'langchain4j/dev.langchain4j.data.embedding' : 'org.jabref',
         ]
     }
 }
@@ -468,6 +513,9 @@ run {
         addExports = [
                 'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
+
+                'langchain4j/dev.langchain4j.model.chat' : 'org.jabref',
+                'langchain4j/dev.langchain4j.model.chat' : 'org.jabref.merged.module',
 
                 // We need to restate the ControlsFX exports, because we get following error otherwise:
                 //   java.lang.IllegalAccessError:

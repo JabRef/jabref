@@ -61,6 +61,12 @@
 
     -js-summary-text-color: derive(-fx-light-text-color, 70%);
     -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
+
+
+    -jr-ai-message-user: -jr-accent;
+    -jr-ai-message-ai: -jr-accent;
+
+    -mdfx-font-color: white;
 }
 
 .unchanged {

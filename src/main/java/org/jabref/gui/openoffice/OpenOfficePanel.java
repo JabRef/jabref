@@ -35,11 +35,13 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.help.HelpFile;
@@ -89,6 +91,7 @@ public class OpenOfficePanel {
     private final VBox vbox = new VBox();
 
     private final PreferencesService preferencesService;
+    private final AiService aiService;
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
@@ -102,6 +105,8 @@ public class OpenOfficePanel {
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            PreferencesService preferencesService,
+                           AiService aiService,
+                           KeyBindingRepository keyBindingRepository,
                            JournalAbbreviationRepository abbreviationRepository,
                            TaskExecutor taskExecutor,
                            DialogService dialogService,
@@ -114,6 +119,7 @@ public class OpenOfficePanel {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.preferencesService = preferencesService;
+        this.aiService = aiService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -279,6 +285,7 @@ public class OpenOfficePanel {
                     tabContainer,
                     dialogService,
                     preferencesService,
+                    aiService,
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,

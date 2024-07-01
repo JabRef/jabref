@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Indexes the text of PDF files and adds it into the lucene search index.
+ * Also generates embeddings.
  */
 public class PdfIndexer {
 
@@ -76,6 +77,7 @@ public class PdfIndexer {
         } else {
             this.indexDirectory = indexDirectory;
         }
+
         this.filePreferences = filePreferences;
     }
 
@@ -118,6 +120,7 @@ public class PdfIndexer {
         } else {
             LOGGER.trace("Using existing index writer");
         }
+
         return Optional.ofNullable(indexWriter);
     }
 
@@ -269,11 +272,15 @@ public class PdfIndexer {
                         (!linkedFile.getLink().endsWith(".pdf") && !linkedFile.getLink().endsWith(".PDF")))) {
             return;
         }
+
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
             LOGGER.debug("Could not find {}", linkedFile.getLink());
             return;
         }
+
+        LOGGER.debug("Adding {} to index", linkedFile.getLink());
+
         try {
             // Check if a document with this path is already in the index
             try {

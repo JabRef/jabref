@@ -25,6 +25,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
@@ -54,6 +55,7 @@ public class JabRefGUI extends Application {
 
     private static List<UiCommand> uiCommands;
     private static JabRefPreferences preferencesService;
+    private static AiService aiService;
     private static FileUpdateMonitor fileUpdateMonitor;
 
     private static StateManager stateManager;
@@ -90,6 +92,7 @@ public class JabRefGUI extends Application {
                 dialogService,
                 fileUpdateMonitor,
                 preferencesService,
+                aiService,
                 stateManager,
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
@@ -150,6 +153,9 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.clipBoardManager = new ClipBoardManager();
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);
+
+        JabRefGUI.aiService = new AiService(preferencesService.getAiPreferences(), dialogService);
+        Injector.setModelOrService(AiService.class, aiService);
     }
 
     private void setupProxy() {
@@ -310,6 +316,7 @@ public class JabRefGUI extends Application {
         OOBibBaseConnect.closeOfficeConnection();
         stopBackgroundTasks();
         shutdownThreadPools();
+        aiService.close();
     }
 
     public void stopBackgroundTasks() {
@@ -322,5 +329,9 @@ public class JabRefGUI extends Application {
         DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
         directoryMonitor.shutdown();
         HeadlessExecutorService.INSTANCE.shutdownEverything();
+    }
+
+    public static AiService getAiService() {
+        return aiService;
     }
 }

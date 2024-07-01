@@ -57,6 +57,7 @@ import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
@@ -129,6 +130,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.Nullable;
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -339,6 +341,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
+    public static final String SHOW_AI_CHAT = "showAiChat";
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
     public static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
     public static final String SEND_LANGUAGE_DATA = "sendLanguageData";
@@ -449,6 +452,18 @@ public class JabRefPreferences implements PreferencesService {
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
+    private static final String AI_ENABLE_CHAT = "aiEnableChat";
+    private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
+    private static final String AI_CHAT_MODEL = "aiChatModel";
+    private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
+    private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
+    private static final String AI_TEMPERATURE = "aiTemperature";
+    private static final String AI_MESSAGE_WINDOW_SIZE = "aiMessageWindowSize";
+    private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = "aiDocumentSplitterChunkSize";
+    private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
+    private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
+    private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
 
@@ -505,6 +520,7 @@ public class JabRefPreferences implements PreferencesService {
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private MergeDialogPreferences mergeDialogPreferences;
+    private AiPreferences aiPreferences;
 
     private KeyBindingRepository keyBindingRepository;
 
@@ -664,6 +680,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SHOW_USER_COMMENTS_FIELDS, Boolean.TRUE);
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
+        defaults.put(SHOW_AI_CHAT, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
         defaults.put(SHOW_SCITE_TAB, Boolean.TRUE);
@@ -831,6 +848,19 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(THEME, Theme.BASE_CSS);
         defaults.put(THEME_SYNC_OS, Boolean.FALSE);
         setLanguageDependentDefaultValues();
+
+        // AI
+        defaults.put(AI_ENABLE_CHAT, AiDefaultPreferences.ENABLE_CHAT);
+        defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
+        defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL.getName());
+        defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.getName());
+        defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
+        defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
+        defaults.put(AI_MESSAGE_WINDOW_SIZE, AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
+        defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
+        defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
+        defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
+        defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -1407,6 +1437,7 @@ public class JabRefPreferences implements PreferencesService {
                 getDefaultEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM),
                 getBoolean(SHOW_RECOMMENDATIONS),
+                getBoolean(SHOW_AI_CHAT),
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBoolean(VALIDATE_IN_ENTRY_EDITOR),
@@ -1422,6 +1453,7 @@ public class JabRefPreferences implements PreferencesService {
         // defaultEntryEditorTabs are read-only
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
         EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
+        EasyBind.listen(entryEditorPreferences.shouldShowAiChatTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_AI_CHAT, newValue));
         EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
         EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (obs, oldValue, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
         EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (obs, oldValue, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
@@ -2649,6 +2681,76 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), (obs, oldValue, newValue) -> put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, newValue.name()));
 
         return mergeDialogPreferences;
+    }
+
+    @Override
+    public AiPreferences getAiPreferences() {
+        if (aiPreferences != null) {
+            return aiPreferences;
+        }
+
+        boolean useAi = getBoolean(AI_ENABLE_CHAT);
+
+        String token = getOpenAiTokenFromKeyring();
+
+        // To ensure that the token is never null or empty while useAi is true.
+        if (token == null) {
+            useAi = false;
+            token = "";
+        }
+
+        aiPreferences = new AiPreferences(
+                useAi,
+                token,
+                AiPreferences.ChatModel.fromString(get(AI_CHAT_MODEL)),
+                AiPreferences.EmbeddingModel.fromString(get(AI_EMBEDDING_MODEL)),
+                getBoolean(AI_CUSTOMIZE_SETTINGS),
+                get(AI_SYSTEM_MESSAGE),
+                getDouble(AI_TEMPERATURE),
+                getInt(AI_MESSAGE_WINDOW_SIZE),
+                getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE),
+                getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE),
+                getInt(AI_RAG_MAX_RESULTS_COUNT),
+                getDouble(AI_RAG_MIN_SCORE));
+
+        EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE_CHAT, newValue));
+        EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
+
+        EasyBind.listen(aiPreferences.customizeSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
+
+        EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue.getName()));
+        EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
+
+        EasyBind.listen(aiPreferences.systemMessageProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
+        EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, (double) newValue));
+        EasyBind.listen(aiPreferences.messageWindowSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_MESSAGE_WINDOW_SIZE, newValue));
+        EasyBind.listen(aiPreferences.documentSplitterChunkSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, newValue));
+        EasyBind.listen(aiPreferences.documentSplitterOverlapSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, newValue));
+        EasyBind.listen(aiPreferences.ragMaxResultsCountProperty(), (obs, oldValue, newValue) -> putInt(AI_RAG_MAX_RESULTS_COUNT, newValue));
+        EasyBind.listen(aiPreferences.ragMinScoreProperty(), (obs, oldValue, newValue) -> putDouble(AI_RAG_MIN_SCORE, (Double) newValue));
+
+        return aiPreferences;
+    }
+
+    private @Nullable String getOpenAiTokenFromKeyring() {
+        try (final Keyring keyring = Keyring.create()) {
+            String rawPassword = keyring.getPassword("org.jabref.customapikeys", "openaitoken");
+            Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
+            return password.decrypt();
+        } catch (Exception e) {
+            LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token", e);
+            return null;
+        }
+    }
+
+    private void storeOpenAiTokenToKeyring(String newToken) {
+        try (final Keyring keyring = Keyring.create()) {
+            Password password = new Password(newToken, getInternalPreferences().getUserAndHost());
+            String rawPassword = password.encrypt();
+            keyring.setPassword("org.jabref.customapikeys", "openaitoken", rawPassword);
+        } catch (Exception e) {
+            LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token", e);
+        }
     }
 
     //*************************************************************************************************************

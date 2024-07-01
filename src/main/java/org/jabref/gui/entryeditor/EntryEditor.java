@@ -46,6 +46,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -112,6 +113,7 @@ public class EntryEditor extends BorderPane {
     @Inject private BibEntryTypesManager bibEntryTypesManager;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject private AiService aiService;
 
     private final List<EntryEditorTab> allPossibleTabs;
     private final Collection<OffersPreview> previewTabs;
@@ -141,6 +143,7 @@ public class EntryEditor extends BorderPane {
                 activeTab.notifyAboutFocus(currentlyEditedEntry);
             }
         });
+
         EasyBind.listen(preferencesService.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (obs, oldValue, newValue) -> adaptVisibleTabs());
     }
@@ -152,19 +155,21 @@ public class EntryEditor extends BorderPane {
             }
             event.consume();
         });
+
         this.setOnDragDropped(event -> {
             BibEntry entry = this.getCurrentlyEditedEntry();
             boolean success = false;
+
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 List<Path> draggedFiles = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
                 switch (event.getTransferMode()) {
                     case COPY -> {
                         LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, draggedFiles, libraryTab.getIndexingTaskManager());
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, draggedFiles, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager());
                     }
                     case MOVE -> {
                         LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, draggedFiles, libraryTab.getIndexingTaskManager());
+                        fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, draggedFiles, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager());
                     }
                     case LINK -> {
                         LOGGER.debug("Mode LINK");
@@ -261,21 +266,21 @@ public class EntryEditor extends BorderPane {
     private List<EntryEditorTab> createTabs() {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
-        tabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor));
+        tabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), taskExecutor));
 
         // Required, optional (important+detail), deprecated, and "other" fields
-        tabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
-        tabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
-        tabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
-        tabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
-        tabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
+        tabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
+        tabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
+        tabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
+        tabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
+        tabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository));
 
         // Comment Tab: Tab for general and user-specific comments
-        tabs.add(new CommentsTab(preferencesService, databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository));
+        tabs.add(new CommentsTab(preferencesService, databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), taskExecutor, journalAbbreviationRepository));
 
         Map<String, Set<Field>> entryEditorTabList = getAdditionalUserConfiguredTabs();
         for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository));
+            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, dialogService, preferencesService, stateManager, themeManager, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager(), taskExecutor, journalAbbreviationRepository));
         }
 
         tabs.add(new MathSciNetTab());
@@ -297,6 +302,7 @@ public class EntryEditor extends BorderPane {
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
+        tabs.add(new AiChatTab(dialogService, preferencesService, aiService, libraryTab.getBibDatabaseContext(), libraryTab.getEmbeddingsGenerationTaskManager(), taskExecutor));
 
         return tabs;
     }

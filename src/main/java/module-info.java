@@ -123,6 +123,10 @@ open module org.jabref {
 
     requires org.jooq.jool;
 
+    // AI
+    requires langchain4j;
+    requires kotlin.stdlib;
+
     // fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
@@ -150,4 +154,9 @@ open module org.jabref {
     requires dd.plist;
     requires mslinks;
     requires org.apache.httpcomponents.core5.httpcore5;
+    requires com.dlsc.unitfx;
+    requires org.checkerframework.checker.qual;
+    requires jakarta.validation;
+    requires one.jpro.platform.mdfx;
+    requires scala.library;
 }

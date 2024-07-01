@@ -283,6 +283,7 @@ public class SaveDatabaseAction {
             } catch (IOException ex) {
                 throw new SaveException("Problems saving: " + ex, ex);
             }
+
             return true;
         }
     }

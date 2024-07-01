@@ -16,6 +16,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -37,6 +38,7 @@ class SidePaneViewModelTest {
 
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
     PreferencesService preferencesService = mock(PreferencesService.class);
+    AiService aiService = mock(AiService.class);
     JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     StateManager stateManager = mock(StateManager.class);
     TaskExecutor taskExecutor = mock(TaskExecutor.class);
@@ -65,6 +67,7 @@ class SidePaneViewModelTest {
         sidePaneViewModel = new SidePaneViewModel(
                 tabContainer,
                 preferencesService,
+                aiService,
                 abbreviationRepository,
                 stateManager,
                 taskExecutor,
