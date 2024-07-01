@@ -7,6 +7,8 @@ import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -22,10 +24,19 @@ public interface FieldEditorFX {
     void bindToEntry(BibEntry entry);
 
     default void establishBinding(TextInputControl textInputControl, StringProperty viewModelTextProperty) {
+        Logger logger = LoggerFactory.getLogger(FieldEditorFX.class);
+
+        // We need to consume the key event to avoid the default behavior of undo/redo and enable JabRef's undo/redo
+        // Source: https://stackoverflow.com/a/37575818/873282
+        textInputControl.addEventFilter(KeyEvent.ANY, e -> {
+            if ((e.getCode() == KeyCode.Y || e.getCode() == KeyCode.Z) && e.isShortcutDown()) {
+                e.consume();
+                // FIXME: Add undo/redo functionality
+            }
+        });
+
         // We need some more sophisticated handling to avoid cursor jumping
         // https://github.com/JabRef/jabref/issues/5904
-
-        Logger logger = LoggerFactory.getLogger(FieldEditorFX.class);
 
         EasyBind.subscribe(viewModelTextProperty, newText -> {
             // This might be triggered by save actions from a background thread, so we need to check if we are in the FX thread
