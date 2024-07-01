@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.util.Pair;
 
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -57,7 +58,7 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
-    private final ObservableMap<String, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
+    private final IntegerProperty searchResultSize = new SimpleIntegerProperty(0);
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
@@ -92,28 +93,16 @@ public class StateManager {
         return activeSearchQuery;
     }
 
-    public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {
-        searchResultMap.put(database.getUid(), resultSize);
-    }
-
-    public IntegerProperty getSearchResultSize() {
-        return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()).getUid(), new SimpleIntegerProperty(0));
-    }
-
     public OptionalObjectProperty<SearchQuery> activeGlobalSearchQueryProperty() {
         return activeGlobalSearchQuery;
     }
 
-    public IntegerProperty getGlobalSearchResultSize() {
-        return globalSearchResultSize;
+    public OptionalObjectProperty<SearchQuery> activeSearchQuery(SearchType type) {
+        return type == SearchType.NORMAL_SEARCH ? activeSearchQuery : activeGlobalSearchQuery;
     }
 
-    public IntegerProperty getSearchResultSize(OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        if (searchQueryProperty.equals(activeSearchQuery)) {
-            return getSearchResultSize();
-        } else {
-            return getGlobalSearchResultSize();
-        }
+    public IntegerProperty searchResultSize(SearchType type) {
+        return type == SearchType.NORMAL_SEARCH ? searchResultSize : globalSearchResultSize;
     }
 
     public ObservableList<BibEntry> getSelectedEntries() {
@@ -148,18 +137,6 @@ public class StateManager {
         } else {
             activeDatabaseProperty().set(Optional.of(database));
         }
-    }
-
-    public void clearSearchQuery() {
-        activeSearchQuery.setValue(Optional.empty());
-    }
-
-    public void setSearchQuery(OptionalObjectProperty<SearchQuery> searchQueryProperty, SearchQuery query) {
-        searchQueryProperty.setValue(Optional.of(query));
-    }
-
-    public void clearSearchQuery(OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        searchQueryProperty.setValue(Optional.empty());
     }
 
     public OptionalObjectProperty<Node> focusOwnerProperty() {
@@ -200,10 +177,6 @@ public class StateManager {
 
     public ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEditProperty() {
         return lastAutomaticFieldEditorEdit;
-    }
-
-    public LastAutomaticFieldEditorEdit getLastAutomaticFieldEditorEdit() {
-        return lastAutomaticFieldEditorEditProperty().get();
     }
 
     public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
