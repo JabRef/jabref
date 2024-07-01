@@ -83,6 +83,8 @@ public class CleanupWorker {
                     new FileLinksCleanup();
             case CLEAN_UP_ISSN ->
                     new ISSNCleanup();
+            case ARXIV_CLEANUP ->
+                    new ArxivCleanup();
             default ->
                     throw new UnsupportedOperationException(action.name());
         };

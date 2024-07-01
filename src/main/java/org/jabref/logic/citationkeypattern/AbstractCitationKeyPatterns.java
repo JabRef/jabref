@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 
 /**
@@ -107,4 +108,6 @@ public abstract class AbstractCitationKeyPatterns {
     }
 
     public abstract CitationKeyPattern getLastLevelCitationKeyPattern(EntryType key);
+
+    public abstract String getPattern(BibEntry entry);
 }

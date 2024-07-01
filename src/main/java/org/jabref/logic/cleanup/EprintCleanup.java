@@ -20,31 +20,40 @@ public class EprintCleanup implements CleanupJob {
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
 
-        for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE)) {
+        List<Field> fieldsToCheck = Arrays.asList(
+                StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE,
+                StandardField.NOTE, StandardField.VERSION, StandardField.INSTITUTION, StandardField.EID
+        );
+
+        for (Field field : fieldsToCheck) {
             Optional<ArXivIdentifier> arXivIdentifier = entry.getField(field).flatMap(ArXivIdentifier::parse);
 
             if (arXivIdentifier.isPresent()) {
                 entry.setField(StandardField.EPRINT, arXivIdentifier.get().getNormalized())
-                     .ifPresent(changes::add);
+                        .ifPresent(changes::add);
 
                 entry.setField(StandardField.EPRINTTYPE, "arxiv")
-                     .ifPresent(changes::add);
+                        .ifPresent(changes::add);
 
                 arXivIdentifier.get().getClassification().ifPresent(classification ->
                         entry.setField(StandardField.EPRINTCLASS, classification)
-                             .ifPresent(changes::add)
+                                .ifPresent(changes::add)
                 );
 
                 entry.clearField(field)
-                     .ifPresent(changes::add);
+                        .ifPresent(changes::add);
 
                 if (field.equals(StandardField.URL)) {
                     // If we clear the URL field, we should also clear the URL-date field
                     entry.clearField(StandardField.URLDATE)
-                         .ifPresent(changes::add);
+                            .ifPresent(changes::add);
                 }
             }
         }
+
+        // Additional handling for version and institution fields
+        entry.clearField(StandardField.VERSION).ifPresent(changes::add);
+        entry.clearField(StandardField.INSTITUTION).ifPresent(changes::add);
 
         return changes;
     }
