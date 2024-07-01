@@ -35,6 +35,9 @@ public class CleanupAction extends SimpleCommand {
     private boolean isCanceled;
     private int modifiedEntriesCount;
 
+    protected boolean isFileOpenFlag;
+
+
     public CleanupAction(Supplier<LibraryTab> tabSupplier,
                          PreferencesService preferences,
                          DialogService dialogService,
@@ -108,9 +111,10 @@ public class CleanupAction extends SimpleCommand {
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
-                preferences.getTimestampPreferences());
+                preferences.getTimestampPreferences(),
+                dialogService);
 
-        List<FieldChange> changes = cleaner.cleanup(preset, entry);
+            List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
         // Register undo action
         for (FieldChange change : changes) {

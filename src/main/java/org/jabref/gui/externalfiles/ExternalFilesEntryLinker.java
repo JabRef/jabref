@@ -40,7 +40,7 @@ public class ExternalFilesEntryLinker {
     public ExternalFilesEntryLinker(FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
         this.filePreferences = filePreferences;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences);
+        this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences, dialogService);
         this.renameFilesCleanup = new RenamePdfCleanup(false, bibDatabaseContext, filePreferences);
         this.dialogService = dialogService;
     }
