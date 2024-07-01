@@ -67,7 +67,6 @@ public class JabRefGUI extends Application {
 
     private static RemoteListenerServerManager remoteListenerServerManager;
 
-    private boolean correctedWindowPos = false;
     private Stage mainStage;
 
     public static void setup(List<UiCommand> uiCommands,
@@ -185,9 +184,12 @@ public class JabRefGUI extends Application {
 
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
-        mainStage.setMaximized(guiPreferences.isWindowMaximised());
+        // maximized target state is stored, because "saveWindowState" saves x and y only if not maximized
+        boolean windowMaximised = guiPreferences.isWindowMaximised();
+
         LOGGER.debug("Screens: {}", Screen.getScreens());
         debugLogWindowState(mainStage);
+
         if (isWindowPositionOutOfBounds()) {
             LOGGER.debug("The Jabref window is outside of screen bounds. Position and size will be corrected. Main screen will be used.");
             Rectangle2D bounds = Screen.getPrimary().getBounds();
@@ -195,7 +197,7 @@ public class JabRefGUI extends Application {
             mainStage.setY(bounds.getMinY());
             mainStage.setHeight(Math.min(bounds.getHeight(), 786.0));
             mainStage.setWidth(Math.min(bounds.getWidth(), 1024.0));
-            correctedWindowPos = true;
+            saveWindowState();
         } else {
             LOGGER.debug("The Jabref window is inside screen bounds");
             mainStage.setX(guiPreferences.getPositionX());
@@ -203,6 +205,8 @@ public class JabRefGUI extends Application {
             mainStage.setWidth(guiPreferences.getSizeX());
             mainStage.setHeight(guiPreferences.getSizeY());
         }
+        // after calling "saveWindowState" the maximized state can be set
+        mainStage.setMaximized(windowMaximised);
         debugLogWindowState(mainStage);
 
         Scene scene = new Scene(JabRefGUI.mainFrame);
