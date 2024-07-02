@@ -1,6 +1,7 @@
 package org.jabref.preferences;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -44,11 +45,11 @@ public class AiPreferences {
         }
     }
 
-    public static final Map<AiProvider, String[]> CHAT_MODELS = new EnumMap<>(AiProvider.class);
+    public static final Map<AiProvider, List<String>> CHAT_MODELS = new EnumMap<>(AiProvider.class);
 
     static {
-        CHAT_MODELS.put(AiProvider.OPEN_AI, new String[]{"gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"});
-        CHAT_MODELS.put(AiProvider.MISTRAL_AI, new String[]{"open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-small-latest", "mistral-medium-latest", "mistral-large-latest"});
+        CHAT_MODELS.put(AiProvider.OPEN_AI, List.of("gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"));
+        CHAT_MODELS.put(AiProvider.MISTRAL_AI, List.of("open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-small-latest", "mistral-medium-latest", "mistral-large-latest"));
     }
 
     public enum EmbeddingModel {
