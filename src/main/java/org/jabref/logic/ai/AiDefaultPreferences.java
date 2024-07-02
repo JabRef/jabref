@@ -6,7 +6,7 @@ public class AiDefaultPreferences {
     public static final boolean ENABLE_CHAT = false;
 
     public static final AiPreferences.AiProvider PROVIDER = AiPreferences.AiProvider.OPEN_AI;
-    public static final String CHAT_MODEL = AiPreferences.CHAT_MODELS.get(PROVIDER)[0];
+    public static final String CHAT_MODEL = AiPreferences.CHAT_MODELS.get(PROVIDER).getFirst();
 
     public static final boolean CUSTOMIZE_SETTINGS = false;
 

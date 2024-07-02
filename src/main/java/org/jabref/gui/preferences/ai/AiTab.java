@@ -22,11 +22,14 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.unitfx.DoubleInputField;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.slf4j.Logger;
+
+import java.util.List;import java.util.Map;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
     @FXML private CheckBox enableChat;
 
-    @FXML private ComboBox<String> aiProviderComboBox;
+    @FXML private ComboBox<AiPreferences.AiProvider> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
     @FXML private CustomPasswordField apiTokenTextField;
 
@@ -67,19 +70,33 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         enableChat.selectedProperty().bindBidirectional(viewModel.useAiProperty());
 
-        // aiProviderComboBox.itemsProperty().bind(viewModel.aiProvidersProperty());
-        aiProviderComboBox.getItems().addAll(viewModel.aiProvidersProperty().get());
+        new ViewModelListCellFactory<AiPreferences.AiProvider>()
+            .withText(AiPreferences.AiProvider::toString)
+            .install(aiProviderComboBox);
+        aiProviderComboBox.setItems(viewModel.aiProvidersProperty());
         aiProviderComboBox.valueProperty().bindBidirectional(viewModel.selectedAiProviderProperty());
 
-        chatModelComboBox.itemsProperty().bind(viewModel.chatModelsProperty());
+        aiProviderComboBox.onShowingProperty().addListener((pbs) -> {
+            System.out.println("ADSADA");
+        });
+
+        aiProviderComboBox.setVisibleRowCount(10);
+
+        new ViewModelListCellFactory<String>()
+                .withText(text -> text)
+                .install(chatModelComboBox);
+        chatModelComboBox.setItems(viewModel.chatModelsProperty());
         chatModelComboBox.valueProperty().bindBidirectional(viewModel.selectedChatModelProperty());
 
         apiTokenTextField.textProperty().bindBidirectional(viewModel.apiTokenProperty());
 
         customizeSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeSettingsProperty());
 
-        embeddingModelComboBox.getItems().addAll(AiPreferences.EmbeddingModel.values());
-        embeddingModelComboBox.valueProperty().bindBidirectional(viewModel.embeddingModelProperty());
+        new ViewModelListCellFactory<AiPreferences.EmbeddingModel>()
+            .withText(AiPreferences.EmbeddingModel::toString)
+            .install(embeddingModelComboBox);
+        embeddingModelComboBox.setItems(viewModel.embeddingModelsProperty());
+        embeddingModelComboBox.valueProperty().bindBidirectional(viewModel.selectedEmbeddingModelProperty());
 
         systemMessageTextArea.textProperty().bindBidirectional(viewModel.systemMessageProperty());
         temperatureTextField.valueProperty().bindBidirectional(viewModel.temperatureProperty().asObject());

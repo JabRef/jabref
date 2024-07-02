@@ -1,13 +1,14 @@
 package org.jabref.gui.preferences.ai;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import javafx.beans.property.*;
 
 import javafx.collections.FXCollections;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.AiDefaultPreferences;
-import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AiPreferences;
@@ -21,19 +22,21 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty useAi = new SimpleBooleanProperty();
 
-    private final ReadOnlyListProperty<String> aiProvidersList =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Arrays.stream(AiPreferences.AiProvider.values()).map(AiPreferences.AiProvider::toString).toList()));
-    private final StringProperty selectedAiProvider = new SimpleStringProperty();
+    private final ReadOnlyListProperty<AiPreferences.AiProvider> aiProvidersList =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(AiPreferences.AiProvider.values()));
+    private final ObjectProperty<AiPreferences.AiProvider> selectedAiProvider = new SimpleObjectProperty<>();
 
-    private final ReadOnlyListProperty<String> chatModelsList =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
+    private final ListProperty<String> chatModelsList = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty selectedChatModel = new SimpleStringProperty();
 
     private final StringProperty apiToken = new SimpleStringProperty();
 
     private final BooleanProperty customizeSettings = new SimpleBooleanProperty();
 
-    private final ObjectProperty<AiPreferences.EmbeddingModel> embeddingModel = new SimpleObjectProperty<>();
+    private final ReadOnlyListProperty<AiPreferences.EmbeddingModel> embeddingModelsList =
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(AiPreferences.EmbeddingModel.values()));
+    private final ObjectProperty<AiPreferences.EmbeddingModel> selectedEmbeddingModel = new SimpleObjectProperty<>();
+
     private final StringProperty systemMessage = new SimpleStringProperty();
     private final DoubleProperty temperature = new SimpleDoubleProperty();
     private final IntegerProperty messageWindowSize = new SimpleIntegerProperty();
@@ -57,9 +60,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.aiPreferences = preferencesService.getAiPreferences();
 
         selectedAiProvider.addListener((observable, oldValue, newValue) -> {
-            String[] models = AiPreferences.CHAT_MODELS.get(AiPreferences.AiProvider.fromString(newValue));
+            List<String> models = AiPreferences.CHAT_MODELS.get(newValue);
             chatModelsList.setAll(models);
-            selectedChatModel.setValue(models[0]);
+            selectedChatModel.setValue(chatModelsList.getFirst());
         });
 
         this.apiTokenValidator = new FunctionBasedValidator<>(
@@ -107,13 +110,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         useAi.setValue(aiPreferences.getEnableChatWithFiles());
 
-        selectedAiProvider.setValue(aiPreferences.getAiProvider().getName());
+        selectedAiProvider.setValue(aiPreferences.getAiProvider());
         selectedChatModel.setValue(aiPreferences.getChatModel());
         apiToken.setValue(aiPreferences.getApiToken());
 
         customizeSettings.setValue(aiPreferences.getCustomizeSettings());
 
-        embeddingModel.setValue(aiPreferences.getEmbeddingModel());
+        selectedEmbeddingModel.setValue(aiPreferences.getEmbeddingModel());
         systemMessage.setValue(aiPreferences.getSystemMessage());
         temperature.setValue(aiPreferences.getTemperature());
         messageWindowSize.setValue(aiPreferences.getMessageWindowSize());
@@ -127,14 +130,14 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         aiPreferences.setEnableChatWithFiles(useAi.get());
 
-        aiPreferences.setAiProvider(AiPreferences.AiProvider.fromString(selectedAiProvider.get()));
+        aiPreferences.setAiProvider(selectedAiProvider.get());
         aiPreferences.setChatModel(selectedChatModel.get());
         aiPreferences.setApiToken(apiToken.get());
 
         aiPreferences.setCustomizeSettings(customizeSettings.get());
 
         if (customizeSettings.get()) {
-            aiPreferences.setEmbeddingModel(embeddingModel.get());
+            aiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
             aiPreferences.setSystemMessage(systemMessage.get());
             aiPreferences.setTemperature(temperature.get());
             aiPreferences.setMessageWindowSize(messageWindowSize.get());
@@ -191,11 +194,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return useAi.get();
     }
 
-    public ReadOnlyListProperty<String> aiProvidersProperty() {
+    public ReadOnlyListProperty<AiPreferences.AiProvider> aiProvidersProperty() {
         return aiProvidersList;
     }
 
-    public StringProperty selectedAiProviderProperty() {
+    public ObjectProperty<AiPreferences.AiProvider> selectedAiProviderProperty() {
         return selectedAiProvider;
     }
 
@@ -219,8 +222,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return customizeSettings.get();
     }
 
-    public ObjectProperty<AiPreferences.EmbeddingModel> embeddingModelProperty() {
-        return embeddingModel;
+    public ReadOnlyListProperty<AiPreferences.EmbeddingModel> embeddingModelsProperty() {
+        return embeddingModelsList;
+    }
+
+    public ObjectProperty<AiPreferences.EmbeddingModel> selectedEmbeddingModelProperty() {
+        return selectedEmbeddingModel;
     }
 
     public StringProperty systemMessageProperty() {
