@@ -44,7 +44,7 @@ Click "OK" to store the changes.
 
 Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select JDK 21.
 
-{% figure caption:"Gradle JVM is project SDK (showing JDK 21 as example)" %}
+{% figure caption:"Gradle JVM is project SDK (showing "Projekt SDK temurin-21" as example)" %}
 ![Gradle JVM is project SDK](guidelines-intellij-settings-gradle-gradlejvm-is-projectjvm.png)
 {% endfigure %}
 
