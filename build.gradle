@@ -477,8 +477,8 @@ compileJava {
     options.generatedSourceOutputDirectory.set(file("src-gen/main/java"))
 
     moduleOptions {
-        // TODO: Remove access to internal api
         addExports = [
+                // TODO: Remove access to internal api
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
@@ -507,10 +507,10 @@ run {
         application.applicationDefaultJvmArgs = []
     }
 
-    // TODO: Remove access to internal api
     moduleOptions {
         // On a change here, also adapt "application > applicationDefaultJvmArgs"
         addExports = [
+                // TODO: Remove access to internal api
                 'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
 
