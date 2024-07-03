@@ -483,19 +483,19 @@ compileJava {
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
                 'langchain4j/dev.langchain4j.data.document' : 'org.jabref',
+                'langchain4j/dev.langchain4j.data.embedding' : 'org.jabref',
+                'langchain4j/dev.langchain4j.data.message' : 'org.jabref',
                 'langchain4j/dev.langchain4j.data.segment' : 'org.jabref',
+                'langchain4j/dev.langchain4j.memory' : 'org.jabref',
                 'langchain4j/dev.langchain4j.model.chat' : 'org.jabref',
                 'langchain4j/dev.langchain4j.model.embedding' : 'org.jabref',
                 'langchain4j/dev.langchain4j.model.openai' : 'org.jabref',
                 'langchain4j/dev.langchain4j.rag.content.retriever' : 'org.jabref',
                 'langchain4j/dev.langchain4j.store.embedding' : 'org.jabref',
-                'langchain4j/dev.langchain4j.store.embedding.inmemory' : 'org.jabref',
-                'langchain4j/dev.langchain4j.memory' : 'org.jabref',
-                'langchain4j/dev.langchain4j.store.memory.chat' : 'org.jabref',
-                'langchain4j/dev.langchain4j.data.message' : 'org.jabref',
                 'langchain4j/dev.langchain4j.store.embedding.filter' : 'org.jabref',
                 'langchain4j/dev.langchain4j.store.embedding.filter.comparison' : 'org.jabref',
-                'langchain4j/dev.langchain4j.data.embedding' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.embedding.inmemory' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.memory.chat' : 'org.jabref',
         ]
     }
 }
