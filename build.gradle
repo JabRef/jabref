@@ -157,7 +157,7 @@ dependencies {
         exclude group: 'commons-logging'
     }
 
-    def luceneVersion = "9.11.0"
+    def luceneVersion = "9.11.1"
     implementation "org.apache.lucene:lucene-core:$luceneVersion"
     implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
     implementation "org.apache.lucene:lucene-queries:$luceneVersion"
@@ -224,7 +224,7 @@ dependencies {
         exclude group: 'org.openjfx'
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
-    implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.3'
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.32.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
@@ -310,8 +310,8 @@ dependencies {
     implementation 'commons-io:commons-io:2.16.1'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.174'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.3'
 
     testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.10.0'
