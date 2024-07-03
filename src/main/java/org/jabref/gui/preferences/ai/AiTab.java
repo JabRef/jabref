@@ -76,12 +76,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         aiProviderComboBox.setItems(viewModel.aiProvidersProperty());
         aiProviderComboBox.valueProperty().bindBidirectional(viewModel.selectedAiProviderProperty());
 
-        aiProviderComboBox.onShowingProperty().addListener((pbs) -> {
-            System.out.println("ADSADA");
-        });
-
-        aiProviderComboBox.setVisibleRowCount(10);
-
         new ViewModelListCellFactory<String>()
                 .withText(text -> text)
                 .install(chatModelComboBox);
@@ -134,6 +128,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterOverlapSizeHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MAX_RESULTS_COUNT, dialogService, preferencesService.getFilePreferences()), ragMaxResultsCountHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MIN_SCORE, dialogService, preferencesService.getFilePreferences()), ragMinScoreHelp);
+
+        viewModel.selectedAiProviderProperty().addListener((observable, oldValue, newValue) -> {
+            chatModelComboBox.setEditable(newValue == AiPreferences.AiProvider.HUGGING_FACE);
+        });
     }
 
     private void updateDisabilities() {

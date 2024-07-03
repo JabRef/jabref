@@ -62,7 +62,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         selectedAiProvider.addListener((observable, oldValue, newValue) -> {
             List<String> models = AiPreferences.CHAT_MODELS.get(newValue);
             chatModelsList.setAll(models);
-            selectedChatModel.setValue(chatModelsList.getFirst());
+            if (!models.isEmpty()) {
+                selectedChatModel.setValue(chatModelsList.getFirst());
+            }
         });
 
         this.apiTokenValidator = new FunctionBasedValidator<>(

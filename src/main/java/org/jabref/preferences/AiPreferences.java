@@ -19,7 +19,8 @@ import javafx.beans.property.StringProperty;
 public class AiPreferences {
     public enum AiProvider {
         OPEN_AI("OpenAI"),
-        MISTRAL_AI("Mistral AI");
+        MISTRAL_AI("Mistral AI"),
+        HUGGING_FACE("Hugging Face");
 
         private final String name;
 
@@ -50,6 +51,7 @@ public class AiPreferences {
     static {
         CHAT_MODELS.put(AiProvider.OPEN_AI, List.of("gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"));
         CHAT_MODELS.put(AiProvider.MISTRAL_AI, List.of("open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-small-latest", "mistral-medium-latest", "mistral-large-latest"));
+        CHAT_MODELS.put(AiProvider.HUGGING_FACE, List.of());
     }
 
     public enum EmbeddingModel {

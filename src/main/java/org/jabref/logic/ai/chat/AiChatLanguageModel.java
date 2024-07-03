@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.chat;
 
+import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -58,6 +59,13 @@ public class AiChatLanguageModel {
                     .temperature(aiPreferences.getTemperature())
                     .logRequests(true)
                     .logResponses(true)
+                    .build();
+
+            case HUGGING_FACE -> chatLanguageModel = HuggingFaceChatModel
+                    .builder()
+                    .accessToken(aiPreferences.getApiToken())
+                    .modelId(aiPreferences.getChatModel())
+                    .temperature(aiPreferences.getTemperature())
                     .build();
         }
 
