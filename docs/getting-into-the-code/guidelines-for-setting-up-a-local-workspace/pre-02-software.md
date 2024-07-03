@@ -16,14 +16,11 @@ It is strongly recommended that you have git installed.
 
 ## Installed IDE
 
-We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref).
-The Community Edition works well.
-Most contributors use the Ultimate Edition, because they are students getting that edition for free.
+We highly encourdage [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref), because all other IDEs work less good.
+Especially using VS.Code has issues.
 
-{: .highlight }
-Currently, the 2023.1 version does **not** work for initial setup.
-Please head to <https://www.jetbrains.com/idea/download/other.html> and get 2022.3.3.
-You can update the IDE after a proper setup to the newest version.
+IntelliJ's Community Edition works well.
+Most contributors use the Ultimate Edition, because they are students getting that edition for free.
 
 ## Other Tooling
 
