@@ -10,7 +10,8 @@ plugins {
 
     id 'me.champeau.jmh' version '0.7.2'
 
-    id 'org.javamodularity.moduleplugin' version '1.8.15'
+    // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
+    id 'com.github.koppor.gradle-modules-plugin' version 'jitpack-SNAPSHOT'
 
     id 'org.openjfx.javafxplugin' version '0.1.0'
 
@@ -544,6 +545,8 @@ run {
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
                 'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
         ]
+
+        createCommandLineArgumentFile = true
     }
 
     if (project.hasProperty('component')){
