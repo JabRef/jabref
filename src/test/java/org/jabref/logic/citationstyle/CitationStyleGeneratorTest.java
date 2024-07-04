@@ -1,5 +1,6 @@
 package org.jabref.logic.citationstyle;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -13,6 +14,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import de.undercouch.citeproc.output.Citation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -39,6 +41,18 @@ class CitationStyleGeneratorTest {
                 + "";
 
         assertEquals(expected, citation);
+    }
+
+    @Test
+    void testCreateCitations() throws IOException {
+        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry(), TestEntry.getTestEntryBook())));
+        context.setMode(BibDatabaseMode.BIBLATEX);
+
+        List<Citation> citations = CitationStyleGenerator.generateInText(List.of(TestEntry.getTestEntry(), TestEntry.getTestEntryBook()), styleList.get(2530).getSource(), CitationStyleOutputFormat.HTML, context, bibEntryTypesManager);
+        for (var citation : citations) {
+            System.out.println(citation.getText());
+        }
     }
 
     @Test

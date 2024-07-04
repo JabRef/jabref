@@ -1,10 +1,15 @@
 package org.jabref.model.openoffice.oocsltext;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.util.TestEntry;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.ootext.OOFormat;
@@ -15,6 +20,7 @@ import org.jabref.model.openoffice.uno.CreationException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import de.undercouch.citeproc.output.Citation;
 
 public class CSLCitationOOAdapter {
 
@@ -72,5 +78,20 @@ public class CSLCitationOOAdapter {
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedHTML));
         OOTextIntoOO.write(doc, cursor, ooText);
         cursor.collapseToEnd();
+    }
+
+    public static void insertInText(XTextDocument doc, XTextCursor cursor) throws IOException, WrappedTargetException, CreationException {
+        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry(), TestEntry.getTestEntryBook())));
+        context.setMode(BibDatabaseMode.BIBLATEX);
+
+        List<Citation> citations = CitationStyleGenerator.generateInText(List.of(TestEntry.getTestEntry(), TestEntry.getTestEntryBook()), styleList.get(cslIndex).getSource(), CitationStyleOutputFormat.HTML, context, BIBENTRYTYPESMANAGER);
+        for (var citation : citations) {
+            System.out.println(citation.getText());
+            String formattedHTML = transformHtml(citation.getText());
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedHTML));
+            OOTextIntoOO.write(doc, cursor, ooText);
+            cursor.collapseToEnd();
+        }
     }
 }

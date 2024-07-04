@@ -9,6 +9,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import de.undercouch.citeproc.output.Citation;
 import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,10 @@ public class CitationStyleGenerator {
      */
     public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
         return generateCitations(Collections.singletonList(entry), style, outputFormat, databaseContext, entryTypesManager).stream().findFirst().orElse("");
+    }
+
+    public static List<Citation> generateInText(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
+        return CSL_ADAPTER.makeInText(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.jabref.gui.openoffice;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -581,6 +582,7 @@ class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             // if clause - CSL vs jStyle - if CSL insert the citation here. Cursor and doc available.
             CSLCitationOOAdapter.insertCitation(doc, cursor.get());
+            CSLCitationOOAdapter.insertInText(doc, cursor.get());
 //            EditInsert.insertCitationGroup(doc,
 //                    frontend.get(),
 //                    cursor.get(),
@@ -602,6 +604,9 @@ class OOBibBase {
                  WrappedTargetException ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
+        } catch (
+                IOException e) {
+            throw new RuntimeException(e);
         } finally {
             UnoUndo.leaveUndoContext(doc);
         }
