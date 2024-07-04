@@ -21,6 +21,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import de.undercouch.citeproc.output.Citation;
+import org.tinylog.Logger;
 
 public class CSLCitationOOAdapter {
 
@@ -68,13 +69,13 @@ public class CSLCitationOOAdapter {
 
         BibEntry entry = TestEntry.getTestEntry();
         String style = STYLE_LIST.get(cslIndex).getSource();
-        System.out.println(STYLE_LIST.get(cslIndex).getTitle());
+        Logger.warn("Selected Style: " + STYLE_LIST.get(cslIndex).getTitle());
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
         String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(), BIBENTRYTYPESMANAGER);
-        System.out.println(actualCitation);
+        Logger.warn("Unformatted Citation: " + actualCitation);
         String formattedHTML = transformHtml(actualCitation);
-        System.out.println(formattedHTML);
+        Logger.warn("Formatted Citation: " + formattedHTML);
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedHTML));
         OOTextIntoOO.write(doc, cursor, ooText);
@@ -87,10 +88,11 @@ public class CSLCitationOOAdapter {
         context.setMode(BibDatabaseMode.BIBLATEX);
 
         Citation citation = CitationStyleGenerator.generateInText(List.of(TestEntry.getTestEntry(), TestEntry.getTestEntryBook()), STYLE_LIST.get(cslIndex).getSource(), CitationStyleOutputFormat.HTML, context, BIBENTRYTYPESMANAGER);
-            System.out.println(citation.getText());
-            String formattedHTML = transformHtml(citation.getText());
-            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedHTML));
-            OOTextIntoOO.write(doc, cursor, ooText);
-            cursor.collapseToEnd();
+        Logger.warn("Unformatted in-text Citation: " + citation.getText());
+        String formattedHTML = transformHtml(citation.getText());
+        Logger.warn("Formatted in-text Citation: " + formattedHTML);
+        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedHTML));
+        OOTextIntoOO.write(doc, cursor, ooText);
+        cursor.collapseToEnd();
     }
 }
