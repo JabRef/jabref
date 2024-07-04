@@ -26,6 +26,7 @@ public class CSLCitationOOAdapter {
 
     private static final BibEntryTypesManager BIBENTRYTYPESMANAGER = new BibEntryTypesManager();
     private static int cslIndex;
+    private static final List<CitationStyle> STYLE_LIST = CitationStyle.discoverCitationStyles();
 
     public static void setCslIndex(int cslIndex) {
         CSLCitationOOAdapter.cslIndex = cslIndex;
@@ -62,12 +63,12 @@ public class CSLCitationOOAdapter {
         return html;
     }
 
-    public static void insertCitation(XTextDocument doc, XTextCursor cursor)
+    public static void insertBibliography(XTextDocument doc, XTextCursor cursor)
             throws IllegalArgumentException, WrappedTargetException, CreationException {
 
         BibEntry entry = TestEntry.getTestEntry();
-        String style = CitationStyle.discoverCitationStyles().get(cslIndex).getSource();
-        System.out.println(CitationStyle.discoverCitationStyles().get(cslIndex).getTitle());
+        String style = STYLE_LIST.get(cslIndex).getSource();
+        System.out.println(STYLE_LIST.get(cslIndex).getTitle());
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
         String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(), BIBENTRYTYPESMANAGER);
@@ -81,17 +82,15 @@ public class CSLCitationOOAdapter {
     }
 
     public static void insertInText(XTextDocument doc, XTextCursor cursor) throws IOException, WrappedTargetException, CreationException {
-        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
+
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry(), TestEntry.getTestEntryBook())));
         context.setMode(BibDatabaseMode.BIBLATEX);
 
-        List<Citation> citations = CitationStyleGenerator.generateInText(List.of(TestEntry.getTestEntry(), TestEntry.getTestEntryBook()), styleList.get(cslIndex).getSource(), CitationStyleOutputFormat.HTML, context, BIBENTRYTYPESMANAGER);
-        for (var citation : citations) {
+        Citation citation = CitationStyleGenerator.generateInText(List.of(TestEntry.getTestEntry(), TestEntry.getTestEntryBook()), STYLE_LIST.get(cslIndex).getSource(), CitationStyleOutputFormat.HTML, context, BIBENTRYTYPESMANAGER);
             System.out.println(citation.getText());
             String formattedHTML = transformHtml(citation.getText());
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedHTML));
             OOTextIntoOO.write(doc, cursor, ooText);
             cursor.collapseToEnd();
-        }
     }
 }

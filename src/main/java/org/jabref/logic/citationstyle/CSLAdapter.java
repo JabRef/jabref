@@ -51,11 +51,11 @@ public class CSLAdapter {
         return Arrays.asList(bibliography.getEntries());
     }
 
-    public List<Citation> makeInText(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
+    public Citation makeInText(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
         initialize(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());
-        return cslInstance.makeCitation(bibEntries.stream().map(entry -> entry.getCitationKey().orElse("")).toList());
+        return cslInstance.makeCitation(bibEntries.stream().map(entry -> entry.getCitationKey().orElse("")).toList()).getFirst();
     }
 
     /**

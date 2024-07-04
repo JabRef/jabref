@@ -581,7 +581,7 @@ class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             // if clause - CSL vs jStyle - if CSL insert the citation here. Cursor and doc available.
-            CSLCitationOOAdapter.insertCitation(doc, cursor.get());
+            CSLCitationOOAdapter.insertBibliography(doc, cursor.get());
             CSLCitationOOAdapter.insertInText(doc, cursor.get());
 //            EditInsert.insertCitationGroup(doc,
 //                    frontend.get(),

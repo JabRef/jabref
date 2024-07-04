@@ -53,7 +53,7 @@ public class CitationStyleGenerator {
         return generateCitations(Collections.singletonList(entry), style, outputFormat, databaseContext, entryTypesManager).stream().findFirst().orElse("");
     }
 
-    public static List<Citation> generateInText(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
+    public static Citation generateInText(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
         return CSL_ADAPTER.makeInText(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
     }
 
