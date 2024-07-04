@@ -25,9 +25,9 @@ public class ChatMessageComponent extends HBox {
 
     public ChatMessageComponent withChatMessage(ChatMessage chatMessage) {
         sourceLabel.setText(chatMessage.getTypeLabel());
-        contentTextArea.setText(chatMessage.getContent());
+        contentTextArea.setText(chatMessage.content());
 
-        switch (chatMessage.getType()) {
+        switch (chatMessage.type()) {
             case USER:
                 setColor("-jr-ai-message-user");
                 setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);

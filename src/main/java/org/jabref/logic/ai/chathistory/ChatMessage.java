@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.chathistory;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
@@ -9,20 +10,12 @@ import dev.langchain4j.data.message.UserMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ChatMessage {
+public record ChatMessage(org.jabref.logic.ai.chathistory.ChatMessage.Type type, String content) implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatMessage.class);
 
     public enum Type {
         USER,
         ASSISTANT;
-    }
-
-    private final Type type;
-    private final String content;
-
-    public ChatMessage(Type type, String content) {
-        this.type = type;
-        this.content = content;
     }
 
     public static ChatMessage user(String content) {
@@ -33,21 +26,11 @@ public class ChatMessage {
         return new ChatMessage(Type.ASSISTANT, content);
     }
 
-    public Type getType() {
-        return type;
-    }
-
     public String getTypeLabel() {
         return switch (type) {
-            case USER ->
-                    Localization.lang("User");
-            case ASSISTANT ->
-                    Localization.lang("AI");
+            case USER -> Localization.lang("User");
+            case ASSISTANT -> Localization.lang("AI");
         };
-    }
-
-    public String getContent() {
-        return content;
     }
 
     public static Optional<ChatMessage> fromLangchain(dev.langchain4j.data.message.ChatMessage chatMessage) {

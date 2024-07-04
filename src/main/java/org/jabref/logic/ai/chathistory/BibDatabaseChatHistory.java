@@ -1,44 +1,45 @@
 package org.jabref.logic.ai.chathistory;
 
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import org.jabref.gui.DialogService;
 
+import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
 /**
- * This class stores the chat history with AI. The chat history file is stored alongside BIB database.
+ * This class stores the chat history with AI. The chat history file is stored alongside the BibTeX file.
  * <p>
  * It uses MVStore for serializing the messages. In case any error occurs while opening the MVStore,
  * the class will notify the user of this error and continue with in-memory store (meaning all messages will
  * be thrown away on exit).
+ *
+ * @implNote If something is changed in the data model, increase {@link org.jabref.logic.ai.AiService#VERSION}
  */
-public class BibDatabaseChatHistory {
+public class BibDatabaseChatHistory implements AutoCloseable {
     public static final String AI_CHATS_FILE_EXTENSION = "aichats";
 
     private final MVStore mvStore;
 
-    private final Map<Integer, ChatMessage.Type> messageType;
-    private final Map<Integer, String> messageContent;
-    private final Map<Integer, String> messageCitationKey;
+    // Map from citation key to list of messages
+    // "ArrayList" is used, because it implements Serializable
+    private final MVMap<String, ArrayList<ChatMessage>> messages;
 
     public BibDatabaseChatHistory(Path bibDatabasePath, DialogService dialogService) {
-        MVStore mvStore1;
+        MVStore mvStore;
 
         try {
-            mvStore1 = MVStore.open(bibDatabasePath + "." + AI_CHATS_FILE_EXTENSION);
+            mvStore = MVStore.open(bibDatabasePath + "." + AI_CHATS_FILE_EXTENSION);
         } catch (Exception e) {
             dialogService.showErrorDialogAndWait("Unable to open chat history store for the library. Will use an in-memory store", e);
-            mvStore1 = MVStore.open(null);
+            mvStore = MVStore.open(null);
         }
 
-        this.mvStore = mvStore1;
+        this.mvStore = mvStore;
 
-        this.messageType = this.mvStore.openMap("messageType");
-        this.messageContent = this.mvStore.openMap("messageContent");
-        this.messageCitationKey = this.mvStore.openMap("messageCitationKey");
+        this.messages = this.mvStore.openMap("messages");
     }
 
     public BibEntryChatHistory getChatHistoryForEntry(String citationKey) {
@@ -46,44 +47,21 @@ public class BibDatabaseChatHistory {
     }
 
     public Stream<ChatMessage> getAllMessagesForEntry(String citationKey) {
-        return messageCitationKey
-                .entrySet()
-                .stream()
-                .filter(integerStringEntry -> integerStringEntry.getValue().equals(citationKey))
-                .map(Map.Entry::getKey)
-                .sorted() // Violating normal forms :)
-                .map(id -> new ChatMessage(messageType.get(id), messageContent.get(id)));
+        if (!messages.containsKey(citationKey)) {
+            return Stream.empty();
+        }
+        return messages.get(citationKey).stream();
     }
 
     public void addMessage(String citationKey, ChatMessage message) {
-        int id = getMaxInt() + 1;
-
-        this.messageType.put(id, message.getType());
-        this.messageContent.put(id, message.getContent());
-        this.messageCitationKey.put(id, citationKey);
+        messages.computeIfAbsent(citationKey, k -> new ArrayList<>()).add(message);
     }
 
     public void clearMessagesForEntry(String citationKey) {
-        messageCitationKey
-                .entrySet()
-                .stream()
-                .filter(integerStringEntry -> integerStringEntry.getValue().equals(citationKey))
-                .map(Map.Entry::getKey)
-                .forEach(id -> {
-                    messageType.remove(id);
-                    messageContent.remove(id);
-                    messageCitationKey.remove(id);
-                });
+        messages.remove(citationKey);
     }
 
     public void close() {
         this.mvStore.close();
     }
-
-    private int getMaxInt() {
-        synchronized (messageContent) {
-            return messageContent.size();
-        }
-    }
 }
-
