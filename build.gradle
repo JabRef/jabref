@@ -497,6 +497,8 @@ run {
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
                 'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
         ]
+
+        createCommandLineArgumentFile = true
     }
 
     if (project.hasProperty('component')){
