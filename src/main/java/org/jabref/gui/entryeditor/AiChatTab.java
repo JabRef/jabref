@@ -20,7 +20,6 @@ import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
 import org.jabref.logic.ai.embeddings.events.FileIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -80,7 +79,7 @@ public class AiChatTab extends EntryEditorTab {
                 if (aiService.getEmbeddingsManager().getIngestedFilesTracker().haveIngestedLinkedFiles(entry.getFiles())) {
                     UiTaskExecutor.runInJavaFXThread(() -> bindToEntry(entry));
                 }
-            }
+            });
         }
     }
 
@@ -152,16 +151,19 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void createAiChat() {
-        aiChatLogic = new AiChatLogic(aiService, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.getFiles().stream().map(LinkedFile::getLink).toList()));
+        aiChatLogic = new AiChatLogic(aiService, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.get().getFiles().stream().map(LinkedFile::getLink).toList()));
     }
 
     private void setupChatHistory() {
-        if (bibDatabaseContext.getDatabasePath().isPresent() && currentBibEntry != null && currentBibEntry.getCitationKey().isPresent()) {
-            BibDatabaseChatHistory bibDatabaseChatHistory = aiService.getChatHistoryManager().getChatHistoryForBibDatabase(bibDatabaseContext.getDatabasePath().get());
-            bibEntryChatHistory = bibDatabaseChatHistory.getChatHistoryForEntry(currentBibEntry.getCitationKey().get());
-        } else {
+        Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
+        if (!databasePath.isPresent()) {
             bibEntryChatHistory = null;
         }
+        currentBibEntry.flatMap(entry -> entry.getCitationKey())
+                       .ifPresent(citationKey -> {
+                           BibDatabaseChatHistory bibDatabaseChatHistory = aiService.getChatHistoryManager().getChatHistoryForBibDatabase(databasePath.get());
+                           bibEntryChatHistory = bibDatabaseChatHistory.getChatHistoryForEntry(citationKey);
+                       });
     }
 
     private void restoreLogicalChatHistory() {
