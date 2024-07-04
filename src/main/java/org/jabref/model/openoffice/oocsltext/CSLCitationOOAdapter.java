@@ -21,6 +21,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import de.undercouch.citeproc.output.Citation;
+import org.apache.commons.text.StringEscapeUtils;
 import org.tinylog.Logger;
 
 public class CSLCitationOOAdapter {
@@ -35,31 +36,34 @@ public class CSLCitationOOAdapter {
 
     private static String transformHtml(String html) {
         // Remove unsupported tags
-        html = html.replaceAll("<div[^>]*>", "");
-        html = html.replaceAll("</div>", "");
+        html = StringEscapeUtils.unescapeHtml4(html);
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<div[^>]*>", "");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("</div>", "");
 
         // Replace unsupported entities
-        html = html.replace("&ndash;", "–");
-        html = html.replace("&ldquo;", "\"");
-        html = html.replace("&rdquo;", "\"");
-        html = html.replace("&laquo;", "«");
-        html = html.replace("&raquo;", "»");
-        html = html.replace("&amp;", "AND");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&ndash;", "–");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&ldquo;", "\"");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&rdquo;", "\"");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&laquo;", "«");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&raquo;", "»");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&amp;", "&");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&lt;", "<");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&rt;", ">");
 
         // Remove unsupported links
-        html = html.replaceAll("<a[^>]*>", "");
-        html = html.replaceAll("</a>", "");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<a[^>]*>", "");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("</a>", "");
 
         // Replace span tags with inline styles for bold
-        html = html.replaceAll("<span style=\"font-weight: ?bold;?\">(.*?)</span>", "<b>$1</b>");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<span style=\"font-weight: ?bold;?\">(.*?)</span>", "<b>$1</b>");
 
         // Replace span tags with inline styles for italic
-        html = html.replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
 
-        html = html.replaceAll("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>", "<smallcaps>$1</smallcaps>");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>", "<smallcaps>$1</smallcaps>");
 
         // Clean up any remaining span tags
-        html = html.replaceAll("</?span[^>]*>", "");
+        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("</?span[^>]*>", "");
 
         return html;
     }
