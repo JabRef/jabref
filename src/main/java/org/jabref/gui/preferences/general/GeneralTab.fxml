@@ -72,7 +72,6 @@
               text="%Warn about unresolved duplicates when closing inspection window"/>
 
     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
-    <CheckBox fx:id="collectTelemetry" text="%Collect and share telemetry data to help improve JabRef"/>
 
     <Label styleClass="sectionHeader" text="%Single instance" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -105,7 +104,7 @@
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="createBackup" text="%Create backup"/>
         <TextField fx:id="backupDirectory" HBox.hgrow="ALWAYS"/>
-        <Button fx:id="browseDirectory" onAction="#backupFileDirBrowse"
+        <Button onAction="#backupFileDirBrowse"
                 styleClass="icon-button,narrow"
                 prefHeight="20.0" prefWidth="20.0" GridPane.columnIndex="2">
             <graphic>

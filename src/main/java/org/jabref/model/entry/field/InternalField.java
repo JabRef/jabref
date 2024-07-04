@@ -3,7 +3,6 @@ package org.jabref.model.entry.field;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * JabRef internal fields. These are not normal fields but mostly placeholders with special functions.
@@ -16,8 +15,8 @@ public enum InternalField implements Field {
 
     /**
      * field which indicates the entrytype
-     *
-     * Example: @misc{key}
+     * <p>
+     * Example: <code>@misc{key}</code>
      */
     TYPE_HEADER("entrytype"),
 
@@ -52,7 +51,7 @@ public enum InternalField implements Field {
     INTERNAL_ID_FIELD("JabRef-internal-id");
 
     private final String name;
-    private final Set<FieldProperty> properties;
+    private final EnumSet<FieldProperty> properties;
 
     InternalField(String name) {
         this.name = name;
@@ -76,7 +75,7 @@ public enum InternalField implements Field {
     }
 
     @Override
-    public Set<FieldProperty> getProperties() {
+    public EnumSet<FieldProperty> getProperties() {
         return properties;
     }
 

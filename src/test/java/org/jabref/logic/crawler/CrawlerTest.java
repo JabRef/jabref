@@ -8,7 +8,7 @@ import java.util.List;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -64,7 +64,7 @@ class CrawlerTest {
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
-                GlobalCitationKeyPattern.fromPattern("[auth][year]"),
+                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
                 "",
                 ',');
 

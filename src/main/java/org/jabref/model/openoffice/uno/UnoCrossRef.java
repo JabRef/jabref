@@ -10,6 +10,7 @@ import com.sun.star.text.ReferenceFieldSource;
 import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.Exception;
 import com.sun.star.util.XRefreshable;
 
 public class UnoCrossRef {
@@ -46,7 +47,7 @@ public class UnoCrossRef {
         try {
             String name = "com.sun.star.text.textfield.GetReference";
             xFieldProps = UnoCast.cast(XPropertySet.class, msf.createInstance(name)).get();
-        } catch (com.sun.star.uno.Exception e) {
+        } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
 

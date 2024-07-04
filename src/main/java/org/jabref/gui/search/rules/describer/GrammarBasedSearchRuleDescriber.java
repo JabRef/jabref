@@ -56,7 +56,7 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
         @Override
         public List<Text> visitUnaryExpression(SearchParser.UnaryExpressionContext context) {
             List<Text> textList = visit(context.expression());
-            textList.add(0, TooltipTextUtil.createText(Localization.lang("not").concat(" "), TooltipTextUtil.TextType.NORMAL));
+            textList.addFirst(TooltipTextUtil.createText(Localization.lang("not").concat(" "), TooltipTextUtil.TextType.NORMAL));
             return textList;
         }
 

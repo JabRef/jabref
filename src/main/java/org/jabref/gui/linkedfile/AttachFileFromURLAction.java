@@ -51,7 +51,7 @@ public class AttachFileFromURLAction extends SimpleCommand {
 
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
 
-        BibEntry entry = stateManager.getSelectedEntries().get(0);
+        BibEntry entry = stateManager.getSelectedEntries().getFirst();
 
         Optional<String> urlforDownload = getUrlForDownloadFromClipBoardOrEntry(dialogService, entry);
 
@@ -68,7 +68,7 @@ public class AttachFileFromURLAction extends SimpleCommand {
                              taskExecutor,
                              dialogService,
                              preferencesService);
-            onlineFile.download();
+            onlineFile.download(true);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
         }

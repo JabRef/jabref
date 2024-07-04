@@ -49,6 +49,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -121,14 +122,9 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void createNodes() {
-        searchField = new CustomTextField();
-
-        searchField.setPromptText(Localization.lang("Filter groups"));
-        searchField.setId("searchField");
-        HBox.setHgrow(searchField, Priority.ALWAYS);
-        HBox groupFilterBar = new HBox(searchField);
-        groupFilterBar.setId("groupFilterBar");
-        this.setTop(groupFilterBar);
+        searchField = SearchTextField.create(preferencesService.getKeyBindingRepository());
+        searchField.setPromptText(Localization.lang("Filter groups..."));
+        this.setTop(searchField);
 
         mainColumn = new TreeTableColumn<>();
         mainColumn.setId("mainColumn");
@@ -503,7 +499,7 @@ public class GroupTreeView extends BorderPane {
             return;
         }
 
-        double heightOfOneNode = groupTree.getChildrenUnmodifiable().get(0).getLayoutBounds().getHeight();
+        double heightOfOneNode = groupTree.getChildrenUnmodifiable().getFirst().getLayoutBounds().getHeight();
         // heightOfOneNode is the size of text. We need including surroundings.
         // We found no way to get this. We can only do a heuristics here.
         // 2.0 is backed by measurement using the screen ruler utility (https://learn.microsoft.com/en-us/windows/powertoys/screen-ruler)
@@ -523,7 +519,7 @@ public class GroupTreeView extends BorderPane {
     private Optional<ScrollBar> getVerticalScrollbar() {
         for (Node node : groupTree.lookupAll(".scroll-bar")) {
             if (node instanceof ScrollBar scrollbar
-                    && scrollbar.getOrientation().equals(Orientation.VERTICAL)) {
+                    && scrollbar.getOrientation() == Orientation.VERTICAL) {
                 return Optional.of(scrollbar);
             }
         }
@@ -536,7 +532,7 @@ public class GroupTreeView extends BorderPane {
         }
 
         ContextMenu contextMenu = new ContextMenu();
-        ActionFactory factory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        ActionFactory factory = new ActionFactory();
 
         MenuItem removeGroup;
         if (group.hasSubgroups() && group.canAddGroupsIn() && !group.isRoot()) {

@@ -20,10 +20,10 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
@@ -98,9 +98,9 @@ public class DOABFetcher implements SearchBasedParserFetcher {
             JSONArray array = bitstreamObject.getJSONArray("metadata");
             for (int k = 0; k < array.length(); k++) {
                 JSONObject metadataInBitstreamObject = array.getJSONObject(k);
-                if (metadataInBitstreamObject.getString("key").equals("dc.identifier.isbn")) {
+                if ("dc.identifier.isbn".equals(metadataInBitstreamObject.getString("key"))) {
                     entry.setField(StandardField.ISBN, metadataInBitstreamObject.getString("value"));
-                } else if (metadataInBitstreamObject.getString("key").equals("oapen.relation.isbn")) {
+                } else if ("oapen.relation.isbn".equals(metadataInBitstreamObject.getString("key"))) {
                     entry.setField(StandardField.ISBN, metadataInBitstreamObject.getString("value"));
                 }
             }
@@ -117,8 +117,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                     }
                 }
                 case "dc.type" -> entry.setType(StandardEntryType.Book);
-                case "dc.date.issued" -> entry.setField(StandardField.DATE, String.valueOf(
-                        dataObject.getString("value")));
+                case "dc.date.issued" -> entry.setField(StandardField.DATE, dataObject.getString("value"));
                 case "oapen.identifier.doi" -> entry.setField(StandardField.DOI,
                         dataObject.getString("value"));
                 case "dc.title" -> entry.setField(StandardField.TITLE,

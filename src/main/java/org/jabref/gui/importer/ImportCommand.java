@@ -16,10 +16,10 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -79,7 +79,9 @@ public class ImportCommand extends SimpleCommand {
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences(),
-                fileUpdateMonitor);
+                preferencesService.getCitationKeyPatternPreferences(),
+                fileUpdateMonitor
+        );
         SortedSet<Importer> importers = importFormatReader.getImportFormats();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -134,12 +136,14 @@ public class ImportCommand extends SimpleCommand {
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferencesService.getImporterPreferences(),
                 preferencesService.getImportFormatPreferences(),
-                fileUpdateMonitor);
+                preferencesService.getCitationKeyPatternPreferences(),
+                fileUpdateMonitor
+        );
         for (Path filename : files) {
             try {
                 if (importer.isEmpty()) {
                     // Unknown format
-                    DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
+                    UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (FileUtil.isPDFFile(filename) && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences())) {
                             importFormatReader.reset();
                         }
@@ -148,7 +152,7 @@ public class ImportCommand extends SimpleCommand {
                     // This import method never throws an IOException
                     imports.add(importFormatReader.importUnknownFormat(filename, fileUpdateMonitor));
                 } else {
-                    DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
+                    UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
                         if (((importer.get() instanceof PdfGrobidImporter)
                                 || (importer.get() instanceof PdfMergeMetadataImporter))
                                 && GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences())) {
@@ -161,7 +165,7 @@ public class ImportCommand extends SimpleCommand {
                     imports.add(new ImportFormatReader.UnknownFormatImport(importer.get().getName(), pr));
                 }
             } catch (ImportException ex) {
-                DefaultTaskExecutor.runAndWaitInJavaFXThread(
+                UiTaskExecutor.runAndWaitInJavaFXThread(
                         () -> dialogService.showWarningDialogAndWait(
                                 Localization.lang("Import error"),
                                 Localization.lang("Please check your library file for wrong syntax.")
@@ -171,7 +175,7 @@ public class ImportCommand extends SimpleCommand {
         }
 
         if (imports.isEmpty()) {
-            DefaultTaskExecutor.runAndWaitInJavaFXThread(
+            UiTaskExecutor.runAndWaitInJavaFXThread(
                     () -> dialogService.showWarningDialogAndWait(
                             Localization.lang("Import error"),
                             Localization.lang("No entries found. Please make sure you are using the correct import filter.")));

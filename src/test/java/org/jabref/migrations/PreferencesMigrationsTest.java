@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,7 @@ class PreferencesMigrationsTest {
     @BeforeEach
     void setUp() {
         prefs = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        Injector.setModelOrService(PreferencesService.class, prefs);
         mainPrefsNode = mock(Preferences.class);
     }
 
@@ -84,8 +87,8 @@ class PreferencesMigrationsTest {
 
         String newPreviewStyle = "<font face=\"sans-serif\">__NEWLINE__"
                 + "Customized preview style using reviews and comments:__NEWLINE__"
-                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}__NEWLINE__"
-                + "\\begin{comment} Something: \\format[Markdown,HTMLChars]{\\comment} special \\end{comment}__NEWLINE__"
+                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} \\end{comment}__NEWLINE__"
+                + "\\begin{comment} Something: \\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment} special \\end{comment}__NEWLINE__"
                 + "</font>__NEWLINE__";
 
         when(prefs.get(JabRefPreferences.PREVIEW_STYLE)).thenReturn(oldPreviewStyle);

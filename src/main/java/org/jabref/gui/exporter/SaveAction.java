@@ -3,12 +3,14 @@ package org.jabref.gui.exporter;
 import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
+
+import com.airhacks.afterburner.injection.Injector;
 
 /**
  * This class is just a simple wrapper for the soon to be refactored SaveDatabaseAction.
@@ -46,7 +48,7 @@ public class SaveAction extends SimpleCommand {
                 tabSupplier.get(),
                 dialogService,
                 preferencesService,
-                Globals.entryTypesManager);
+                Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
         switch (saveMethod) {
             case SAVE -> saveDatabaseAction.save();

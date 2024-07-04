@@ -22,7 +22,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +76,13 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         }
         clipBoardManager.setContent(getLogMessagesAsString(messages));
         dialogService.notify(Localization.lang("Log copied to clipboard."));
+    }
+
+    /**
+     * Copies the detailed text of the given {@link LogEventViewModel} to the clipboard.
+     */
+    public void copyLogEntry(LogEventViewModel logEvent) {
+        clipBoardManager.setContent(logEvent.getDetailedText());
     }
 
     /**

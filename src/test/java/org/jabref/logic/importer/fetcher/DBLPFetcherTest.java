@@ -31,15 +31,19 @@ public class DBLPFetcherTest {
 
         entry.setType(StandardEntryType.Article);
         entry.setCitationKey("DBLP:journals/stt/GeigerHL16");
-        entry.setField(StandardField.TITLE,
-                "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards");
-        entry.setField(StandardField.AUTHOR, "Matthias Geiger and Simon Harrer and J{\\\"{o}}rg Lenhard");
+        entry.setField(StandardField.TITLE, """
+                Process Engine Benchmarking with Betsy in the Context of {ISO/IEC}
+                                  Quality Standards""");
+        entry.setField(StandardField.AUTHOR, """
+                Matthias Geiger and
+                                  Simon Harrer and
+                                  J{\\\"{o}}rg Lenhard""");
         entry.setField(StandardField.JOURNAL, "Softwaretechnik-Trends");
         entry.setField(StandardField.VOLUME, "36");
         entry.setField(StandardField.NUMBER, "2");
         entry.setField(StandardField.YEAR, "2016");
         entry.setField(StandardField.URL,
-                "http://pi.informatik.uni-siegen.de/stt/36_2/03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf");
+                "https://fb-swt.gi.de/fileadmin/FB/SWT/Softwaretechnik-Trends/Verzeichnis/Band_36_Heft_2/beitrag_2.pdf");
         entry.setField(new UnknownField("biburl"), "https://dblp.org/rec/journals/stt/GeigerHL16.bib");
         entry.setField(new UnknownField("bibsource"), "dblp computer science bibliography, https://dblp.org");
     }

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * and the options relevant for this file in Defaults.
  * </p>
  * <p>
- *     To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
+ * To get an instance for a .bib file, use {@link org.jabref.logic.importer.fileformat.BibtexParser}.
  * </p>
  */
 @AllowedToUseLogic("because it needs access to shared database features")
@@ -43,6 +44,12 @@ public class BibDatabaseContext {
 
     private final BibDatabase database;
     private MetaData metaData;
+
+    /**
+     * Generate a random UID for unique of the concrete context
+     * In contrast to hashCode this stays unique
+     */
+    private final String uid = "bibdatabasecontext_" + UUID.randomUUID();
 
     /**
      * The path where this database was last saved to.
@@ -127,9 +134,9 @@ public class BibDatabaseContext {
      */
     public boolean isStudy() {
         return this.getDatabasePath()
-                .map(path -> path.getFileName().toString().equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
-                        Files.exists(path.resolveSibling(StudyRepository.STUDY_DEFINITION_FILE_NAME)))
-                .orElse(false);
+                   .map(path -> path.getFileName().toString().equals(Crawler.FILENAME_STUDY_RESULT_BIB) &&
+                           Files.exists(path.resolveSibling(StudyRepository.STUDY_DEFINITION_FILE_NAME)))
+                   .orElse(false);
     }
 
     /**
@@ -248,8 +255,8 @@ public class BibDatabaseContext {
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {
-            Path databaseFileName = getDatabasePath().get().getFileName();
-            String fileName = BackupFileUtil.getUniqueFilePrefix(databaseFileName) + "--" + databaseFileName;
+            Path databasePath = getDatabasePath().get();
+            String fileName = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
             indexPath = appData.resolve(fileName);
             LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
             return indexPath;
@@ -267,6 +274,7 @@ public class BibDatabaseContext {
                 ", mode=" + getMode() +
                 ", databasePath=" + getDatabasePath() +
                 ", biblatexMode=" + isBiblatexMode() +
+                ", uid= " + getUid() +
                 ", fulltextIndexPath=" + getFulltextIndexPath() +
                 '}';
     }
@@ -282,8 +290,22 @@ public class BibDatabaseContext {
         return Objects.equals(database, that.database) && Objects.equals(metaData, that.metaData) && Objects.equals(path, that.path) && location == that.location;
     }
 
+    /**
+     * @implNote This implementation needs to be consistent with equals. That means, as soon as a new entry is added to the database, two different instances of BibDatabaseContext are not equal - and thus, the hashCode also needs to change. This has the drawback, that one cannot create HashMaps from the BiDatabaseContext anymore, as the hashCode changes as soon as a new entry is added.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(database, metaData, path, location);
+    }
+
+    /**
+     * Get the generated UID for the current context. Can be used to distinguish contexts with changing metadata etc
+     * <p>
+     * This is required, because of {@link #hashCode()} implementation.
+     *
+     * @return The generated UID in UUIDv4 format with the prefix bibdatabasecontext_
+     */
+    public String getUid() {
+        return uid;
     }
 }

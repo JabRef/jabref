@@ -37,7 +37,7 @@ See also: [https://help.github.com/articles/syncing-a-fork/](https://help.github
 (As Administrator - one time)
 
 1. Install [chocolatey](https://chocolatey.org)
-2. `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal`
+2. `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal"`
 3. `choco install notepadplusplus`
 4. If you want to have your JDK also managed via chocolatey: `choco install temurin`
 

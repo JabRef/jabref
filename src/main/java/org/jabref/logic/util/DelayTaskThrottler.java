@@ -6,8 +6,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.jabref.gui.JabRefExecutorService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +76,6 @@ public class DelayTaskThrottler {
      * Shuts everything down. Upon termination, this method returns.
      */
     public void shutdown() {
-        JabRefExecutorService.gracefullyShutdown(executor);
+        HeadlessExecutorService.gracefullyShutdown(executor);
     }
 }

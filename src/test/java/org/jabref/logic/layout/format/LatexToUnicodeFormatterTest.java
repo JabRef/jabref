@@ -2,6 +2,8 @@ package org.jabref.logic.layout.format;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,6 +20,15 @@ class LatexToUnicodeFormatterTest {
     void formatUmlaut() {
         assertEquals("ä", formatter.format("{\\\"{a}}"));
         assertEquals("Ä", formatter.format("{\\\"{A}}"));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "ı, \\i",
+            "ı, {\\i}"
+    })
+    void smallIwithoutDot(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 
     @Test
@@ -161,6 +172,14 @@ class LatexToUnicodeFormatterTest {
     @Test
     void conversionOfUnderscoreWithBraces() {
         assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
+    }
+
+    /**
+     * <a href="https://github.com/JabRef/jabref/issues/5547">Issue 5547</a>
+     */
+    @Test
+    void twoDifferentMacrons() {
+        assertEquals("Puṇya-pattana-vidyā-pı̄ṭhādhi-kṛtaiḥ prā-kaśyaṃ nı̄taḥ", formatter.format("Pu{\\d{n}}ya-pattana-vidy{\\={a}}-p{\\={\\i}}{\\d{t}}h{\\={a}}dhi-k{\\d{r}}tai{\\d{h}} pr{\\={a}}-ka{{\\'{s}}}ya{\\d{m}} n{\\={\\i}}ta{\\d{h}}"));
     }
 
     @Test

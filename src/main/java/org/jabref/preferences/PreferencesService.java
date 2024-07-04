@@ -55,8 +55,6 @@ public interface PreferencesService {
 
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
-    void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
-
     KeyBindingRepository getKeyBindingRepository();
 
     FilePreferences getFilePreferences();
@@ -87,8 +85,6 @@ public interface PreferencesService {
     CleanupPreferences getDefaultCleanupPreset();
 
     LibraryPreferences getLibraryPreferences();
-
-    TelemetryPreferences getTelemetryPreferences();
 
     DOIPreferences getDOIPreferences();
 

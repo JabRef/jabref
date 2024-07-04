@@ -32,7 +32,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
@@ -71,7 +71,6 @@ public class SourceTab extends EntryEditorTab {
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
-    private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
@@ -117,7 +116,6 @@ public class SourceTab extends EntryEditorTab {
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
-        this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
@@ -192,7 +190,7 @@ public class SourceTab extends EntryEditorTab {
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),
@@ -233,7 +231,7 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void updateCodeArea() {
-        DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
+        UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
             if (codeArea == null) {
                 setupSourceEditor();
             }
@@ -282,7 +280,7 @@ public class SourceTab extends EntryEditorTab {
             if (!database.hasEntries()) {
                 if (parserResult.hasWarnings()) {
                     // put the warning into as exception text -> it will be displayed to the user
-                    throw new IllegalStateException(parserResult.warnings().get(0));
+                    throw new IllegalStateException(parserResult.warnings().getFirst());
                 } else {
                     throw new IllegalStateException("No entries found.");
                 }
@@ -294,7 +292,7 @@ public class SourceTab extends EntryEditorTab {
             }
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
-            BibEntry newEntry = database.getEntries().get(0);
+            BibEntry newEntry = database.getEntries().getFirst();
             String newKey = newEntry.getCitationKey().orElse(null);
 
             if (newKey != null) {

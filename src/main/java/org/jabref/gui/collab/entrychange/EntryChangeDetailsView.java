@@ -72,12 +72,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
         SplitPane split = new SplitPane(containerOld, containerNew);
         split.setOrientation(Orientation.HORIZONTAL);
 
-        setLeftAnchor(split, 8d);
-        setTopAnchor(split, 8d);
-        setRightAnchor(split, 8d);
-        setBottomAnchor(split, 8d);
-
-        this.getChildren().add(split);
+        this.setAllAnchorsAndAttachChild(split);
     }
 
     // Method adapted from:
@@ -87,8 +82,8 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
         webView.addEventHandler(Event.ANY, event -> {
             if (!scrolling) {
                 scrolling = true;
-                if (event instanceof MouseEvent) {
-                    if (((MouseEvent) event).isPrimaryButtonDown()) {
+                if (event instanceof MouseEvent mouseEvent) {
+                    if (mouseEvent.isPrimaryButtonDown()) {
                         int value = (Integer) webView.getEngine().executeScript("window.scrollY");
                         otherWebView.getEngine().executeScript("window.scrollTo(0, " + value + ")");
                     }

@@ -20,6 +20,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,7 @@ public class ClipBoardManagerTest {
     void setUp() {
         // create preference service mock
         PreferencesService preferencesService = mock(PreferencesService.class);
+        Injector.setModelOrService(PreferencesService.class, preferencesService);
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         List<Field> fields = List.of(StandardField.URL);
         ObservableList<Field> nonWrappableFields = FXCollections.observableArrayList(fields);
@@ -56,7 +58,7 @@ public class ClipBoardManagerTest {
         entryTypesManager = new BibEntryTypesManager();
 
         // initialize a clipBoardManager
-        clipBoardManager = new ClipBoardManager(clipboard, clipboardPrimary, preferencesService);
+        clipBoardManager = new ClipBoardManager(clipboard, clipboardPrimary);
     }
 
     @DisplayName("Check that the ClipBoardManager can set a bibentry as its content from the clipboard")

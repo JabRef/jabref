@@ -11,7 +11,6 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.Telemetry;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -100,6 +99,5 @@ public class BibtexExtractorViewModel {
     private void trackNewEntry(BibEntry bibEntry, String eventMessage) {
         Map<String, String> properties = new HashMap<>();
         properties.put("EntryType", bibEntry.typeProperty().getValue().getName());
-        Telemetry.getTelemetryClient().ifPresent(client -> client.trackEvent(eventMessage, properties, new HashMap<>()));
     }
 }

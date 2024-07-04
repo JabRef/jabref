@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jabref.logic.bibtex.FieldContentFormatter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
@@ -92,7 +91,7 @@ public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
     private static final Integer LOOKAHEAD = 1024;
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
-    private final FieldContentFormatter fieldContentFormatter;
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
@@ -105,11 +104,9 @@ public class BibtexParser implements Parser {
     private final Map<String, String> parsedBibdeskGroups;
 
     private GroupTreeNode bibDeskGroupTreeNode;
-    private final DocumentBuilderFactory builder = DocumentBuilderFactory.newInstance();
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        this.fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.fieldPreferences());
         this.metaDataParser = new MetaDataParser(fileMonitor);
         this.parsedBibdeskGroups = new HashMap<>();
     }
@@ -268,7 +265,7 @@ public class BibtexParser implements Parser {
                     importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
             if (bibDeskGroupTreeNode != null) {
                 metaData.getGroups().ifPresentOrElse(existingGroupTree -> {
-                          var existingGroups = meta.get(MetaData.GROUPSTREE);
+                            var existingGroups = meta.get(MetaData.GROUPSTREE);
                             // We only have one Group BibDeskGroup with n children
                             // instead of iterating through the whole group structure every time we just search in the metadata for the group name
                             var groupsToAdd = bibDeskGroupTreeNode.getChildren()
@@ -419,7 +416,7 @@ public class BibtexParser implements Parser {
         String xml = comment.substring(MetaData.BIBDESK_STATIC_FLAG.length() + 1, comment.length() - 1);
         try {
             // Build a document to handle the xml tags
-            Document doc = builder.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
+            Document doc = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
             doc.getDocumentElement().normalize();
 
             NodeList dictList = doc.getElementsByTagName("dict");
@@ -728,34 +725,37 @@ public class BibtexParser implements Parser {
         if (!content.isEmpty()) {
             if (entry.hasField(field)) {
                 // The following hack enables the parser to deal with multiple
-                // author or
-                // editor lines, stringing them together instead of getting just
+                // author or editor lines, stringing them together instead of getting just
                 // one of them.
                 // Multiple author or editor lines are not allowed by the bibtex
-                // format, but
-                // at least one online database exports bibtex likes to do that, making
-                // it inconvenient
-                // for users if JabRef did not accept it.
+                // format, but at least one online database exports bibtex likes to do that, making
+                // it inconvenient for users if JabRef did not accept it.
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                     entry.setField(field, entry.getField(field).orElse("") + " and " + content);
                 } else if (StandardField.KEYWORDS == field) {
-                    // multiple keywords fields should be combined to one
+                    // TODO: multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                 }
             } else {
                 // If a BibDesk File Field is encountered
                 if (field.getName().length() > 10 && field.getName().startsWith("bdsk-file-")) {
-                    byte[] decodedBytes = Base64.getDecoder().decode(content);
                     try {
+                        byte[] decodedBytes = Base64.getDecoder().decode(content);
+
                         // Parse the base64 encoded binary plist to get the relative (to the .bib file) path
                         NSDictionary plist = (NSDictionary) BinaryPropertyListParser.parse(decodedBytes);
-                        NSString relativePath = (NSString) plist.objectForKey("relativePath");
-                        Path path = Path.of(relativePath.getContent());
 
-                        LinkedFile file = new LinkedFile("", path, "");
-                        entry.addFile(file);
+                        if (plist.containsKey("relativePath")) {
+                            NSString relativePath = (NSString) plist.objectForKey("relativePath");
+                            Path path = Path.of(relativePath.getContent());
+
+                            LinkedFile file = new LinkedFile("", path, "");
+                            entry.addFile(file);
+                        } else {
+                            LOGGER.error("Could not find attribute 'relativePath' for entry {} in decoded BibDesk field bdsk-file...) ", entry);
+                        }
                     } catch (Exception e) {
-                        throw new IOException();
+                        LOGGER.error("Could not parse Bibdesk files content (field: bdsk-file...) for entry {}", entry, e);
                     }
                 } else {
                     entry.setField(field, content);
@@ -775,13 +775,13 @@ public class BibtexParser implements Parser {
             }
             if (character == '"') {
                 StringBuilder text = parseQuotedFieldExactly();
-                value.append(fieldContentFormatter.format(text, field));
+                value.append(text.toString());
             } else if (character == '{') {
                 // Value is a string enclosed in brackets. There can be pairs
                 // of brackets inside a field, so we need to count the
                 // brackets to know when the string is finished.
                 StringBuilder text = parseBracketedFieldContent();
-                value.append(fieldContentFormatter.format(text, field));
+                value.append(text.toString());
             } else if (Character.isDigit((char) character)) { // value is a number
                 String number = parseTextToken();
                 value.append(number);

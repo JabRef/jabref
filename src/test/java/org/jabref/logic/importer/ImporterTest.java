@@ -117,7 +117,7 @@ public class ImporterTest {
                 new InspecImporter(),
                 new IsiImporter(),
                 new MedlineImporter(),
-                new MedlinePlainImporter(),
+                new MedlinePlainImporter(importFormatPreferences),
                 new ModsImporter(importFormatPreferences),
                 new MsBibImporter(),
                 new OvidImporter(),

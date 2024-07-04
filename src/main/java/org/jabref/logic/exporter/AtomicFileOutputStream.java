@@ -49,7 +49,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicFileOutputStream.class);
 
     private static final String TEMPORARY_EXTENSION = ".tmp";
-    private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().get(0);
+    private static final String SAVE_EXTENSION = "." + BackupFileType.SAVE.getExtensions().getFirst();
 
     /**
      * The file we want to create/replace.
@@ -166,12 +166,11 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
     private void cleanup() {
         try {
-            if (temporaryFileLock != null) {
+            if (temporaryFileLock != null && temporaryFileLock.isValid()) {
                 temporaryFileLock.release();
             }
         } catch (IOException exception) {
-            // Currently, we always get the exception:
-            // Unable to release lock on file C:\Users\koppor\AppData\Local\Temp\junit11976839611279549873\error-during-save.txt.tmp: java.nio.channels.ClosedChannelException
+            // In case we still get an exception
             LOGGER.debug("Unable to release lock on file {}", temporaryFile, exception);
         }
         try {

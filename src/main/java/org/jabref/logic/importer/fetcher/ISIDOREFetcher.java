@@ -28,7 +28,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import jakarta.ws.rs.core.MediaType;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
@@ -50,11 +50,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
 
     private static final String SOURCE_WEB_SEARCH = "https://api.isidore.science/resource/search";
 
-    private final DocumentBuilderFactory factory;
-
-    public ISIDOREFetcher() {
-        this.factory = DocumentBuilderFactory.newInstance();
-    }
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
     @Override
     public Parser getParser() {
@@ -73,7 +69,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
                 }
 
                 pushbackInputStream.unread(data);
-                DocumentBuilder builder = this.factory.newDocumentBuilder();
+                DocumentBuilder builder = this.DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
                 Document document = builder.parse(pushbackInputStream);
 
                 // Assuming the root element represents an entry

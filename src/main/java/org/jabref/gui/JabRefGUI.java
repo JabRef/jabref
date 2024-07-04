@@ -3,6 +3,8 @@ package org.jabref.gui;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -11,22 +13,35 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.WebViewStore;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
-import impl.org.controlsfx.skin.DecorationPane;
+import kong.unirest.core.Unirest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +55,16 @@ public class JabRefGUI extends Application {
     private static List<UiCommand> uiCommands;
     private static JabRefPreferences preferencesService;
     private static FileUpdateMonitor fileUpdateMonitor;
-    private static JabRefFrame mainFrame;
-    private static DialogService dialogService;
+
+    private static StateManager stateManager;
     private static ThemeManager themeManager;
+    private static CountingUndoManager countingUndoManager;
+    private static TaskExecutor taskExecutor;
+    private static ClipBoardManager clipBoardManager;
+    private static DialogService dialogService;
+    private static JabRefFrame mainFrame;
+
+    private static RemoteListenerServerManager remoteListenerServerManager;
 
     private boolean correctedWindowPos = false;
     private Stage mainStage;
@@ -60,22 +82,23 @@ public class JabRefGUI extends Application {
         this.mainStage = stage;
 
         FallbackExceptionHandler.installExceptionHandler();
-        Globals.startBackgroundTasks();
 
-        WebViewStore.init();
+        initialize();
 
-        JabRefGUI.themeManager = new ThemeManager(
-                preferencesService.getWorkspacePreferences(),
-                fileUpdateMonitor,
-                Runnable::run);
-        JabRefGUI.dialogService = new JabRefDialogService(mainStage);
         JabRefGUI.mainFrame = new JabRefFrame(
                 mainStage,
                 dialogService,
                 fileUpdateMonitor,
-                preferencesService);
+                preferencesService,
+                stateManager,
+                countingUndoManager,
+                Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                clipBoardManager,
+                taskExecutor);
 
         openWindow();
+
+        startBackgroundTasks();
 
         if (!fileUpdateMonitor.isActive()) {
             dialogService.showErrorDialogAndWait(
@@ -84,11 +107,12 @@ public class JabRefGUI extends Application {
                             "with this session."));
         }
 
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
         EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
-                new VersionWorker(Globals.BUILD_INFO.version,
+                new VersionWorker(buildInfo.version,
                         dialogService,
-                        Globals.TASK_EXECUTOR,
+                        taskExecutor,
                         preferencesService)
                         .checkForNewVersionDelayed();
             }
@@ -97,16 +121,35 @@ public class JabRefGUI extends Application {
         setupProxy();
     }
 
-    @Override
-    public void stop() {
-        OOBibBaseConnect.closeOfficeConnection();
-        Globals.stopBackgroundTasks();
-        Globals.shutdownThreadPools();
-        try {
-            Globals.predatoryJournalRepository.close();
-        } catch (Exception e) {
-            LOGGER.warn("Cloud not shut down predatoryJournalRepository", e);
-        }
+    public void initialize() {
+        WebViewStore.init();
+
+        JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
+        Injector.setModelOrService(RemoteListenerServerManager.class, remoteListenerServerManager);
+
+        JabRefGUI.stateManager = new StateManager();
+        Injector.setModelOrService(StateManager.class, stateManager);
+
+        Injector.setModelOrService(KeyBindingRepository.class, preferencesService.getKeyBindingRepository());
+
+        JabRefGUI.themeManager = new ThemeManager(
+                preferencesService.getWorkspacePreferences(),
+                fileUpdateMonitor,
+                Runnable::run);
+        Injector.setModelOrService(ThemeManager.class, themeManager);
+
+        JabRefGUI.countingUndoManager = new CountingUndoManager();
+        Injector.setModelOrService(UndoManager.class, countingUndoManager);
+        Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
+
+        JabRefGUI.taskExecutor = new UiTaskExecutor();
+        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
+
+        JabRefGUI.dialogService = new JabRefDialogService(mainStage);
+        Injector.setModelOrService(DialogService.class, dialogService);
+
+        JabRefGUI.clipBoardManager = new ClipBoardManager();
+        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
     }
 
     private void setupProxy() {
@@ -159,16 +202,14 @@ public class JabRefGUI extends Application {
         }
         debugLogWindowState(mainStage);
 
-        // We create a decoration pane ourselves for performance reasons
-        // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
-        DecorationPane root = new DecorationPane();
-        root.getChildren().add(JabRefGUI.mainFrame);
-
-        Scene scene = new Scene(root, 800, 800);
+        Scene scene = new Scene(JabRefGUI.mainFrame);
         themeManager.installCss(scene);
 
         // Handle TextEditor key bindings
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(scene, event));
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(
+                scene,
+                event,
+                preferencesService.getKeyBindingRepository()));
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
@@ -182,6 +223,8 @@ public class JabRefGUI extends Application {
     }
 
     public void onShowing(WindowEvent event) {
+        Platform.runLater(() -> mainFrame.updateDividerPosition());
+
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
             && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
@@ -247,15 +290,37 @@ public class JabRefGUI extends Application {
                 preferencesService.getGuiPreferences().getPositionY());
     }
 
-    public static JabRefFrame getMainFrame() {
-        return mainFrame;
+    // Background tasks
+    public void startBackgroundTasks() {
+        RemotePreferences remotePreferences = preferencesService.getRemotePreferences();
+        BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
+        if (remotePreferences.useRemoteServer()) {
+            remoteListenerServerManager.openAndStart(
+                    new CLIMessageHandler(
+                            mainFrame,
+                            preferencesService,
+                            fileUpdateMonitor,
+                            bibEntryTypesManager),
+                    remotePreferences.getPort());
+        }
     }
 
-    public static DialogService getDialogService() {
-        return dialogService;
+    @Override
+    public void stop() {
+        OOBibBaseConnect.closeOfficeConnection();
+        stopBackgroundTasks();
+        shutdownThreadPools();
     }
 
-    public static ThemeManager getThemeManager() {
-        return themeManager;
+    public void stopBackgroundTasks() {
+        Unirest.shutDown();
+    }
+
+    public static void shutdownThreadPools() {
+        taskExecutor.shutdown();
+        fileUpdateMonitor.shutdown();
+        DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
+        directoryMonitor.shutdown();
+        HeadlessExecutorService.INSTANCE.shutdownEverything();
     }
 }

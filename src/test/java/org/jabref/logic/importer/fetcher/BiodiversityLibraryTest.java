@@ -13,7 +13,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -100,10 +100,10 @@ public class BiodiversityLibraryTest {
             .withField(StandardField.URL, "https://www.biodiversitylibrary.org/part/356490")
             .withField(StandardField.DATE, "2023")
             .withField(StandardField.VOLUME, "227")
-            .withField(StandardField.PAGES, "89-97")
+            .withField(StandardField.PAGES, "89--97")
             .withField(StandardField.DOI, "10.3897/phytokeys.227.104703");
 
-        assertEquals(expected, fetcher.performSearch("Amanoa condorensis (Phyllanthaceae)").get(0));
+        assertEquals(expected, fetcher.performSearch("Amanoa condorensis (Phyllanthaceae)").getFirst());
     }
 
     @Test

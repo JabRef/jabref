@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -27,11 +26,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
@@ -40,9 +37,12 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
@@ -59,42 +59,42 @@ import org.slf4j.LoggerFactory;
  */
 public class CitationRelationsTab extends EntryEditorTab {
 
+    public static final String NAME = "Citation relations";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
     // Tasks used to implement asynchronous fetching of related articles
     private static BackgroundTask<List<BibEntry>> citingTask;
     private static BackgroundTask<List<BibEntry>> citedByTask;
-    private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final UndoManager undoManager;
-    private final StateManager stateManager;
-    private final FileUpdateMonitor fileUpdateMonitor;
     private final PreferencesService preferencesService;
     private final LibraryTab libraryTab;
     private final TaskExecutor taskExecutor;
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
+    private final DuplicateCheck duplicateCheck;
 
-    public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService,
-                                BibDatabaseContext databaseContext, UndoManager undoManager,
-                                StateManager stateManager, FileUpdateMonitor fileUpdateMonitor,
-                                PreferencesService preferencesService, LibraryTab lTab, TaskExecutor taskExecutor) {
-        this.preferences = preferences;
+    public CitationRelationsTab(DialogService dialogService,
+                                BibDatabaseContext databaseContext,
+                                UndoManager undoManager,
+                                StateManager stateManager,
+                                FileUpdateMonitor fileUpdateMonitor,
+                                PreferencesService preferencesService,
+                                LibraryTab libraryTab,
+                                TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
-        this.undoManager = undoManager;
-        this.stateManager = stateManager;
-        this.fileUpdateMonitor = fileUpdateMonitor;
         this.preferencesService = preferencesService;
-        this.libraryTab = lTab;
+        this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
+        this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferencesService.getImporterPreferences()),
                 new BibEntryRelationsCache());
-        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService, fileUpdateMonitor, Globals.TASK_EXECUTOR);
+        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService, fileUpdateMonitor, taskExecutor);
     }
 
     /**
@@ -210,14 +210,15 @@ public class CitationRelationsTab extends EntryEditorTab {
                     VBox vContainer = new VBox();
 
                     if (entry.isLocal()) {
+                        hContainer.getStyleClass().add("duplicate-entry");
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(event -> {
-                            libraryTab.showAndEdit(entry.entry());
-                            libraryTab.clearAndSelect(entry.entry());
                             citingTask.cancel();
                             citedByTask.cancel();
+                            libraryTab.showAndEdit(entry.localEntry());
+                            libraryTab.clearAndSelect(entry.localEntry());
                         });
                         vContainer.getChildren().add(jumpTo);
                     } else {
@@ -384,8 +385,16 @@ public class CitationRelationsTab extends EntryEditorTab {
                                              ObservableList<CitationRelationItem> observableList) {
         hideNodes(abortButton, progress);
 
-        observableList.setAll(fetchedList.stream().map(entr -> new CitationRelationItem(entr, false))
-                                         .collect(Collectors.toList()));
+        observableList.setAll(
+        fetchedList.stream()
+            .map(entr -> duplicateCheck.containsDuplicate(
+                    databaseContext.getDatabase(),
+                    entr,
+                    BibDatabaseModeDetection.inferMode(databaseContext.getDatabase()))
+                .map(localEntry -> new CitationRelationItem(entr, localEntry, true))
+                .orElseGet(() -> new CitationRelationItem(entr, false)))
+            .toList()
+    );
 
         if (!observableList.isEmpty()) {
             listView.refresh();

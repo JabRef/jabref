@@ -5,6 +5,8 @@ import java.util.List;
 
 import javafx.util.Pair;
 
+import org.jabref.logic.util.OS;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -134,19 +136,6 @@ class JabRefCLITest {
     }
 
     @Test
-    void wrapStringList() {
-        List<String> given = List.of("html", "simplehtml", "docbook5", "docbook4", "din1505", "bibordf", "tablerefs", "listrefs",
-                "tablerefsabsbib", "harvard", "iso690rtf", "iso690txt", "endnote", "oocsv", "ris", "misq", "yaml", "bibtexml", "oocalc", "ods",
-                "MSBib", "mods", "xmp", "pdf", "bib");
-        String expected = """
-                Available export formats: html, simplehtml, docbook5, docbook4, din1505, bibordf, tablerefs,
-                listrefs, tablerefsabsbib, harvard, iso690rtf, iso690txt, endnote, oocsv, ris, misq, yaml, bibtexml,
-                oocalc, ods, MSBib, mods, xmp, pdf, bib""";
-
-        assertEquals(expected, "Available export formats: " + JabRefCLI.wrapStringList(given, 26));
-    }
-
-    @Test
     void alignStringTable() {
         List<Pair<String, String>> given = List.of(
                 new Pair<>("Apple", "Slice"),
@@ -159,7 +148,7 @@ class JabRefCLITest {
                 Bread   : Loaf
                 Paper   : Sheet
                 Country : County
-                """;
+                """.replace("\n", OS.NEWLINE);
 
         assertEquals(expected, JabRefCLI.alignStringTable(given));
     }

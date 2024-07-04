@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
-<?import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanel?>
+<?import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanel?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.libraryproperties.keypattern.KeyPatternPropertiesView">
@@ -17,9 +17,9 @@
     </HBox>
     <Label text="%( Note: Press return to commit changes in the table! )"/>
     <AnchorPane VBox.vgrow="ALWAYS">
-        <CitationKeyPatternPanel fx:id="bibtexKeyPatternTable"
-                                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                 AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"/>
+        <CitationKeyPatternsPanel fx:id="bibtexKeyPatternTable"
+                                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                  AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"/>
         <Button text="%Reset All" onAction="#resetAllKeyPatterns"
                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
     </AnchorPane>

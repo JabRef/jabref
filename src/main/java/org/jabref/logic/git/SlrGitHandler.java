@@ -71,7 +71,7 @@ public class SlrGitHandler extends GitHandler {
                     formatter.setRepository(git.getRepository());
                     List<DiffEntry> entries = formatter.scan(oldTreeIter, newTreeIter);
                     for (DiffEntry entry : entries) {
-                        if (entry.getChangeType().equals(DiffEntry.ChangeType.MODIFY)) {
+                        if (entry.getChangeType() == DiffEntry.ChangeType.MODIFY) {
                             formatter.format(entry);
                         }
                     }

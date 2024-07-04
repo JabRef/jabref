@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.model.openoffice.DocumentAnnotation;
+
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
@@ -105,16 +107,14 @@ public class UnoReferenceMark {
     /**
      * Insert a new reference mark at the provided cursor position.
      * <p>
-     * If {@code absorb} is true, the text in the cursor range will become the text with gray background.
+     * If {@code documentAnnotation.getAbsorb} is true, the text in the cursor range will become the text with gray background.
      * <p>
      * Note: LibreOffice 6.4.6.2 will create multiple reference marks with the same name without error or renaming. Its GUI does not allow this, but we can create them programmatically. In the GUI, clicking on any of those identical names will move the cursor to the same mark.
      *
-     * @param name  For the reference mark.
-     * @param range Cursor marking the location or range for the reference mark.
      */
-    public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
+    public static XNamed create(DocumentAnnotation documentAnnotation)
             throws
             CreationException {
-        return UnoNamed.insertNamedTextContent(doc, "com.sun.star.text.ReferenceMark", name, range, absorb);
+        return UnoNamed.insertNamedTextContent("com.sun.star.text.ReferenceMark", documentAnnotation);
     }
 }

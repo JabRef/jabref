@@ -29,7 +29,6 @@ import org.jabref.preferences.PreferencesService;
 public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private final KeyBindingRepository keyBindingRepository;
-    private final KeyBindingRepository initialKeyBindingRepository;
     private final PreferencesService preferences;
     private final OptionalObjectProperty<KeyBindingViewModel> selectedKeyBinding = OptionalObjectProperty.empty();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
@@ -40,8 +39,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     private final List<String> restartWarning = new ArrayList<>();
 
     public KeyBindingsTabViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, PreferencesService preferences) {
-        this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
-        this.initialKeyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
+        this.keyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
 
@@ -85,16 +83,15 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
     }
 
     public void storeSettings() {
-        preferences.storeKeyBindingRepository(keyBindingRepository);
-
-        if (!keyBindingRepository.equals(initialKeyBindingRepository)) {
-            restartWarning.add(Localization.lang("Key bindings changed"));
+        if (!keyBindingRepository.equals(preferences.getKeyBindingRepository())) {
+            preferences.getKeyBindingRepository().getBindingsProperty().set(keyBindingRepository.getBindingsProperty());
+            restartWarning.add(Localization.lang("Keyboard shortcuts changed"));
         }
     }
 
     public void resetToDefault() {
-        String title = Localization.lang("Resetting all key bindings");
-        String content = Localization.lang("All key bindings will be reset to their defaults.");
+        String title = Localization.lang("Resetting all keyboard shortcuts");
+        String content = Localization.lang("All keyboard shortcuts will be reset to their defaults.");
         ButtonType resetButtonType = new ButtonType("Reset", ButtonBar.ButtonData.OK_DONE);
         dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION, title, content, resetButtonType,
                 ButtonType.CANCEL).ifPresent(response -> {
@@ -129,5 +126,9 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<KeyBindingViewModel> rootKeyBindingProperty() {
         return rootKeyBinding;
+    }
+
+    public KeyBindingRepository getKeyBindingRepository() {
+        return keyBindingRepository;
     }
 }

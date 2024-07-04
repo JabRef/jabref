@@ -384,8 +384,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
         });
     }
 
+    /**
+     * @implNote Similar method {@link org.jabref.gui.linkedfile.RedownloadMissingFilesAction#redownloadMissing}
+     */
     public void redownload() {
-        LOGGER.info("Redownloading file from " + linkedFile.getSourceUrl());
+        LOGGER.info("Redownloading file from {}", linkedFile.getSourceUrl());
         if (linkedFile.getSourceUrl().isEmpty() || !LinkedFile.isOnlineLink(linkedFile.getSourceUrl())) {
             throw new UnsupportedOperationException("In order to download the file, the source url has to be an online link");
         }
@@ -400,13 +403,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 dialogService,
                 preferencesService.getFilePreferences(),
                 taskExecutor,
-                fileName);
+                fileName,
+                true);
         downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
         downloadLinkedFileAction.execute();
     }
 
-    public void download() {
-        LOGGER.info("Downloading file from " + linkedFile.getSourceUrl());
+    public void download(boolean keepHtmlLink) {
+        LOGGER.info("Downloading file from {}", linkedFile.getSourceUrl());
         if (!linkedFile.isOnlineLink()) {
             throw new UnsupportedOperationException("In order to download the file it has to be an online link");
         }
@@ -418,7 +422,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 linkedFile.getLink(),
                 dialogService,
                 preferencesService.getFilePreferences(),
-                taskExecutor);
+                taskExecutor,
+                "",
+                keepHtmlLink);
         downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
         downloadLinkedFileAction.execute();
     }
@@ -457,7 +463,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 if (parserResult.isInvalid() || parserResult.isEmpty() || !parserResult.getDatabase().hasEntries()) {
                     return null;
                 }
-                return parserResult.getDatabase().getEntries().get(0);
+                return parserResult.getDatabase().getEntries().getFirst();
             } catch (IOException e) {
                 return null;
             }

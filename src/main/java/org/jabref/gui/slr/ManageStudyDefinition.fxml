@@ -270,6 +270,8 @@
                                         </graphic>
                                     </Button>
                                 </HBox>
+                                <Label text="%Note: The study directory should be empty."/>
+                                <Label fx:id="directoryWarning" text="%Warning: The selected directory is not empty." visible="false" styleClass="warning-message" />
                             </VBox>
                         </ScrollPane>
                     </Tab>

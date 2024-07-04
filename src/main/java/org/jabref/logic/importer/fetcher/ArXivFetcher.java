@@ -47,7 +47,7 @@ import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -396,6 +396,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
 
         private static final String API_URL = "https://export.arxiv.org/api/query";
 
+        private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+
         private final ImportFormatPreferences importFormatPreferences;
 
         public ArXiv(ImportFormatPreferences importFormatPreferences) {
@@ -541,8 +543,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 uriBuilder.addParameter("max_results", String.valueOf(maxResults));
                 URL url = uriBuilder.build().toURL();
 
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder builder = factory.newDocumentBuilder();
+                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 if (connection.getResponseCode() == 400) {

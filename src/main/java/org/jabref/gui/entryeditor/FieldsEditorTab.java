@@ -41,11 +41,12 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-abstract class FieldsEditorTab extends EntryEditorTab {
+abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     protected final BibDatabaseContext databaseContext;
     protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     protected GridPane gridPane;
@@ -61,6 +62,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private PreviewPanel previewPanel;
     private final UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
+    private Subscription dividerPositionSubscription;
 
     public FieldsEditorTab(boolean compressed,
                            BibDatabaseContext databaseContext,
@@ -211,14 +213,14 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     }
 
     @Override
-    protected void nextPreviewStyle() {
+    public void nextPreviewStyle() {
         if (previewPanel != null) {
             previewPanel.nextPreviewStyle();
         }
     }
 
     @Override
-    protected void previousPreviewStyle() {
+    public void previousPreviewStyle() {
         if (previewPanel != null) {
             previewPanel.previousPreviewStyle();
         }
@@ -258,9 +260,22 @@ abstract class FieldsEditorTab extends EntryEditorTab {
                     container.getItems().remove(previewPanel);
                 } else {
                     container.getItems().add(1, previewPanel);
+                    container.setDividerPositions(preferences.getEntryEditorPreferences().getPreviewWidthDividerPosition());
                 }
             });
+
+            // save position
+            dividerPositionSubscription = EasyBind.valueAt(container.getDividers(), 0)
+                                                  .mapObservable(SplitPane.Divider::positionProperty)
+                                                  .subscribeToValues(this::savePreviewWidthDividerPosition);
             setContent(container);
         }
     }
+
+    private void savePreviewWidthDividerPosition(Number position) {
+        if (!preferences.getPreviewPreferences().shouldShowPreviewAsExtraTab()) {
+            preferences.getEntryEditorPreferences().setPreviewWidthDividerPosition(position.doubleValue());
+        }
+    }
 }
+

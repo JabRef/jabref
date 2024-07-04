@@ -36,8 +36,6 @@ open module org.jabref {
 
     provides com.airhacks.afterburner.views.ResourceLocator
             with org.jabref.gui.util.JabRefResourceLocator;
-    provides com.airhacks.afterburner.injection.PresenterFactory
-            with org.jabref.gui.DefaultInjector;
 
     // Logging
     requires org.slf4j;
@@ -53,6 +51,9 @@ open module org.jabref {
     // Preferences and XML
     requires java.prefs;
     requires com.fasterxml.aalto;
+
+    // YAML
+    requires org.yaml.snakeyaml;
 
     // Annotations (@PostConstruct)
     requires jakarta.annotation;
@@ -77,8 +78,8 @@ open module org.jabref {
     requires org.glassfish.hk2.api;
 
     // http clients
-    requires unirest.java;
-    requires org.apache.httpcomponents.httpclient;
+    requires unirest.java.core;
+    requires unirest.modules.gson;
     requires org.jsoup;
 
     // SQL databases
@@ -88,12 +89,15 @@ open module org.jabref {
     uses org.mariadb.jdbc.credential.CredentialPlugin;
 
     // Apache Commons and other (similar) helper libraries
-    requires org.apache.commons.cli;
-    requires org.apache.commons.csv;
-    requires org.apache.commons.lang3;
     requires com.google.common;
     requires io.github.javadiffutils;
     requires java.string.similarity;
+    requires org.apache.commons.cli;
+    requires org.apache.commons.csv;
+    requires org.apache.commons.io;
+    requires org.apache.commons.lang3;
+    requires org.apache.commons.text;
+    requires org.apache.commons.logging;
 
     requires com.github.tomtung.latex2unicode;
     requires fastparse;
@@ -143,6 +147,7 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires de.saxsys.mvvmfx.validation;
-    requires com.jthemedetector;
     requires dd.plist;
+    requires mslinks;
+    requires org.apache.httpcomponents.core5.httpcore5;
 }

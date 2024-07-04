@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
@@ -45,6 +46,7 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
@@ -353,19 +355,22 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns this entry's ID.
+     * Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
+     * <p>
+     * It is <emph>not</emph> the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
      */
     public String getId() {
         return id;
     }
 
     /**
-     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the citation key. The BibTexKey is the {@link InternalField#KEY_FIELD}.
+     * Sets this entry's identifier (ID).
      * <p>
      * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
      *
      * @param id The ID to be used
      */
+    @VisibleForTesting
     public void setId(String id) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
@@ -392,6 +397,9 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
+    /**
+     * If not present, {@link BibEntry#getAuthorTitleYear(int)} can be used
+     */
     public Optional<String> getCitationKey() {
         String key = fields.get(InternalField.KEY_FIELD);
         if (StringUtil.isBlank(key)) {
@@ -448,6 +456,13 @@ public class BibEntry implements Cloneable {
      */
     public SequencedSet<Field> getFields() {
         return new LinkedHashSet<>(fields.keySet());
+    }
+
+    /**
+     * Returns an unmodifiable sequence containing the names of all fields that are a) set for this particular entry and b) matching the given predicate
+     */
+    public SequencedSet<Field> getFields(Predicate<Field> selector) {
+        return getFields().stream().filter(selector).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
@@ -610,11 +625,11 @@ public class BibEntry implements Cloneable {
         }
 
         String oldValue = getField(field).orElse(null);
-        boolean isNewField = oldValue == null;
         if (value.equals(oldValue)) {
             return Optional.empty();
         }
 
+        boolean isNewField = oldValue == null;
         changed = true;
 
         invalidateFieldCache(field);
@@ -688,6 +703,7 @@ public class BibEntry implements Cloneable {
     /**
      * Returns a clone of this entry. Useful for copying.
      * This will set a new ID for the cloned entry to be able to distinguish both copies.
+     * Does <em>not</em> port the listeners.
      */
     @Override
     public Object clone() {
@@ -926,7 +942,7 @@ public class BibEntry implements Cloneable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(commentsBeforeEntry, type.getValue(), fields);
+        return Objects.hash(type.getValue(), fields, commentsBeforeEntry);
     }
 
     public void registerListener(Object object) {
@@ -1059,15 +1075,15 @@ public class BibEntry implements Cloneable {
      * Gets a list of linked files.
      *
      * @return the list of linked files, is never null but can be empty.
-     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}
+     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
      */
     public List<LinkedFile> getFiles() {
-        // Extract the path
         Optional<String> oldValue = getField(StandardField.FILE);
         if (oldValue.isEmpty()) {
             return new ArrayList<>(); // Return new ArrayList because emptyList is immutable
         }
 
+        // Extract the path
         return FileFieldParser.parse(oldValue.get());
     }
 

@@ -23,12 +23,12 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryLinkList;
 import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.field.Field;
 
@@ -46,7 +46,6 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
-    @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
 
@@ -71,6 +70,14 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         entryLinkField.getEditor().getStyleClass().clear();
         entryLinkField.getEditor().getStyleClass().add("tags-field-editor");
 
+        String separator = EntryLinkList.SEPARATOR;
+        entryLinkField.getEditor().setOnKeyReleased(event -> {
+            if (event.getText().equals(separator)) {
+                entryLinkField.commit();
+                event.consume();
+            }
+        });
+
         Bindings.bindContentBidirectional(entryLinkField.getTags(), viewModel.linkedEntriesProperty());
     }
 
@@ -81,13 +88,13 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         tagLabel.getGraphic().setOnMouseClicked(event -> entryLinkField.removeTags(entryLink));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         tagLabel.setOnMouseClicked(event -> {
-            if ((event.getClickCount() == 2 || event.isControlDown()) && event.getButton().equals(MouseButton.PRIMARY)) {
+            if ((event.getClickCount() == 2 || event.isControlDown()) && event.getButton() == MouseButton.PRIMARY) {
                 viewModel.jumpToEntry(entryLink);
             }
         });
 
         ContextMenu contextMenu = new ContextMenu();
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new TagContextAction(StandardActions.COPY, entryLink)),
                 factory.createMenuItem(StandardActions.CUT, new TagContextAction(StandardActions.CUT, entryLink)),

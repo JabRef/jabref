@@ -7,7 +7,7 @@ JabRef uses [Material Design Icons](https://materialdesignicons.com) for most bu
 
 ![toolbar](http://i.imgur.com/KlyYrNn.png)
 
-This tutorial aims to describe the process of adding missing icons created in a vector drawing tool like Adobe Illustrator and packing them into a _true type font_ (TTF) to fit seamlessly into the JabRef framework. Already existing custom icons will be published (link is coming soon) as they need to be repacked as well.
+This tutorial aims to describe the process of adding missing icons created in a vector drawing tool like Adobe Illustrator and packing them into a _true type font_ (TTF) to fit seamlessly into the JabRef framework.
 
 The process consists of 5 steps:
 
@@ -25,7 +25,8 @@ Good icon design requires years of experience and cannot be covered here. Adapti
 
 Use the [IcoMoon](https://icomoon.io) tool for packing the icons.
 
-1. Create a new set by importing the json file
+1. Create a new set by importing the json file [JabRefMaterialDesign.json.zip](https://github.com/JabRef/jabref/files/14813394/JabRefMaterialDesign.json.zip)
+
 2. Next to the icons, click on the hamburger menu, chose "Import to Set" to add a new icon (it will be added to the front)
 Rearrange them so that they have the same order as in `org.jabref.gui.JabRefMaterialDesignIcon`. This will avoid that you have to change the code points for the existing glyphs. In the settings for your icon set, set the _Grid_ to 24. This is important to get the correct spacing. The name of the font is `JabRefMaterialDesign`.
 3. Next to the icons, click on the hamburger menu and click "Select all".
