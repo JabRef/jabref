@@ -29,7 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - JabRef no longer downloads HTML files of websites when a PDF was not found. [#10149](https://github.com/JabRef/jabref/issues/10149)
 - We added the HTTP message (in addition to the response code) if an error is encountered. [#11341](https://github.com/JabRef/jabref/pull/11341)
 - We made label wrap text to fit view size when reviewing external group changes. [#11220](https://github.com/JabRef/jabref/issues/11220)
-- We made new Groups automatically focus upon creation. [#11449](https://github.com/JabRef/jabref/issues/11449)
+- We made new groups automatically focus upon creation. [#11449](https://github.com/JabRef/jabref/issues/11449)
 
 ### Fixed
 
