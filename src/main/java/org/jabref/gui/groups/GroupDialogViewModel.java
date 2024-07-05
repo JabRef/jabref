@@ -136,7 +136,7 @@ public class GroupDialogViewModel {
         setValues();
     }
 
-    public GroupDialogViewModel (
+    public GroupDialogViewModel(
             DialogService dialogService,
             BibDatabaseContext currentDatabase,
             PreferencesService preferencesService,
