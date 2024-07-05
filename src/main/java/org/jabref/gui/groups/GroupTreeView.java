@@ -402,7 +402,7 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void selectNode(GroupNodeViewModel value) {
-        selectNode(value, false);
+        selectNode(value, true);
     }
 
     private void selectNode(GroupNodeViewModel value, boolean expandParents) {

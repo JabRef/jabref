@@ -276,7 +276,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     oldGroup.getGroupNode().getParent().orElse(null),
                     oldGroup.getGroupNode().getGroup(),
                     GroupDialogHeader.SUBGROUP,
-                    stateManager.getSelectedEntries()));
+                    stateManager.getSelectedEntries()
+            ));
             newGroup.ifPresent(group -> {
 
                 AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
