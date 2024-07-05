@@ -175,7 +175,10 @@ public class GroupTreeView extends BorderPane {
                 BindingsHelper.bindContentBidirectional(
                         groupTree.getSelectionModel().getSelectedItems(),
                         viewModel.selectedGroupsProperty(),
-                        newSelectedGroups -> newSelectedGroups.forEach(this::selectNode),
+                        newSelectedGroups -> {
+                            groupTree.getSelectionModel().clearSelection();
+                            newSelectedGroups.forEach(this::selectNode);
+                        },
                         this::updateSelection
                 ));
 
