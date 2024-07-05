@@ -85,6 +85,9 @@ public class MainTableColumnFactory {
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
+            case SCORE:
+                returnColumn = createScoreColumn(column);
+                break;
             case INDEX:
                 returnColumn = createIndexColumn(column);
                 break;
@@ -132,12 +135,7 @@ public class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
-        columns.add(createScoreColumn(new MainTableColumnModel(MainTableColumnModel.Type.SCORE)));
-
-        columnPreferences.getColumns().forEach(column -> {
-            columns.add(createColumn(column));
-        });
-
+        columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
         return columns;
     }
 
@@ -150,26 +148,25 @@ public class MainTableColumnFactory {
     /**
      * Creates a column with the search score
      */
-    private TableColumn<BibEntryTableViewModel, String> createScoreColumn(MainTableColumnModel columnModel) {
-        TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
+    private TableColumn<BibEntryTableViewModel, Float> createScoreColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, Float> column = new MainTableColumn<>(columnModel);
         Node header = new Text(Localization.lang("Score"));
         header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SCORE.getDisplayName()));
         column.setGraphic(header);
         column.setStyle("-fx-alignment: CENTER-RIGHT;");
-        column.setCellValueFactory(cellData -> cellData.getValue().searchScoreProperty().asString("%.2f"));
-        new ValueTableCellFactory<BibEntryTableViewModel, String>()
-                .withText(text -> text)
+        column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().searchScoreProperty().getValue()));
+        new ValueTableCellFactory<BibEntryTableViewModel, Float>()
+                .withText(String::valueOf)
                 .install(column);
         column.setSortable(true);
-        column.setSortType(TableColumn.SortType.DESCENDING);
-        column.visibleProperty().bind(stateManager.activeSearchQueryProperty().isPresent());
         column.setReorderable(false);
+        column.visibleProperty().bind(stateManager.activeSearchQueryProperty().isPresent());
         return column;
     }
 
     /**
-     * Creates a column with a continous number
+     * Creates a column with a continuous number
      */
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
@@ -317,7 +314,6 @@ public class MainTableColumnFactory {
                 database,
                 dialogService,
                 preferencesService,
-                stateManager,
                 taskExecutor);
     }
 
@@ -329,7 +325,6 @@ public class MainTableColumnFactory {
                 database,
                 dialogService,
                 preferencesService,
-                stateManager,
                 columnModel.getQualifier(),
                 taskExecutor);
     }
