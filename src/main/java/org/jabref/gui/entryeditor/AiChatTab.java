@@ -20,7 +20,6 @@ import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
 import org.jabref.logic.ai.embeddings.events.FileIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -42,10 +41,10 @@ public class AiChatTab extends EntryEditorTab {
     private final FilePreferences filePreferences;
     private final WorkspacePreferences workspacePreferences;
     private final EntryEditorPreferences entryEditorPreferences;
-    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager;
     private final TaskExecutor taskExecutor;
+    private final CitationKeyGenerator citationKeyGenerator;
 
     private AiChatComponent aiChatComponent = null;
 
@@ -53,7 +52,7 @@ public class AiChatTab extends EntryEditorTab {
 
     private AiChatLogic aiChatLogic = null;
 
-    private BibEntry currentBibEntry = null;
+    private Optional<BibEntry> currentBibEntry = Optional.empty();
 
     private @Nullable BibEntryChatHistory bibEntryChatHistory;
 
@@ -63,30 +62,24 @@ public class AiChatTab extends EntryEditorTab {
         this.workspacePreferences = preferencesService.getWorkspacePreferences();
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
-
         this.aiService = aiService;
-
         this.bibDatabaseContext = bibDatabaseContext;
-
         this.embeddingsGenerationTaskManager = embeddingsGenerationTaskManager;
-
         this.taskExecutor = taskExecutor;
-
+        this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
-
         aiService.getEmbeddingsManager().getIngestedFilesTracker().registerListener(new FileIngestedListener());
     }
 
     private class FileIngestedListener {
         @Subscribe
         public void listen(FileIngestedEvent event) {
-            if (currentBibEntry != null) {
-                if (aiService.getEmbeddingsManager().getIngestedFilesTracker().haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
-                    UiTaskExecutor.runInJavaFXThread(() -> bindToEntry(currentBibEntry));
+            currentBibEntry.ifPresent(entry -> {
+                if (aiService.getEmbeddingsManager().getIngestedFilesTracker().haveIngestedLinkedFiles(entry.getFiles())) {
+                    UiTaskExecutor.runInJavaFXThread(() -> bindToEntry(entry));
                 }
-            }
+            });
         }
     }
 
@@ -97,20 +90,25 @@ public class AiChatTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        currentBibEntry = entry;
+        currentBibEntry = Optional.of(entry);
 
         if (!aiService.getPreferences().getEnableChatWithFiles()) {
             showPrivacyNotice(entry);
-        } else if (!checkIfCitationKeyIsAppropriate(bibDatabaseContext, entry)) {
-            tryToGenerateCitationKey(entry);
         } else if (entry.getFiles().isEmpty()) {
             showErrorNoFiles();
-        } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).allMatch(FileUtil::isPDFFile)) {
+        } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).anyMatch(FileUtil::isPDFFile)) {
             showErrorNotPdfs();
-        } else if (!aiService.getEmbeddingsManager().getIngestedFilesTracker().haveIngestedLinkedFiles(currentBibEntry.getFiles())) {
+        } else if (!citationKeyIsValid(bibDatabaseContext, entry)) {
+            tryToGenerateCitationKeyThenBind(entry);
+        } else if (!aiService.getEmbeddingsManager().getIngestedFilesTracker().haveIngestedLinkedFiles(entry.getFiles())) {
             showErrorNotIngested();
         } else {
-            bindToCorrectEntry(entry);
+            // All preconditions met
+            embeddingsGenerationTaskManager.moveToFront(entry.getFiles());
+            createAiChat();
+            setupChatHistory();
+            restoreLogicalChatHistory();
+            buildChatUI();
         }
     }
 
@@ -126,8 +124,7 @@ public class AiChatTab extends EntryEditorTab {
         setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")));
     }
 
-    private void tryToGenerateCitationKey(BibEntry entry) {
-        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
+    private void tryToGenerateCitationKeyThenBind(BibEntry entry) {
         if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
             setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please provide a non-empty and unique citation key for this entry.")));
         } else {
@@ -141,44 +138,32 @@ public class AiChatTab extends EntryEditorTab {
         }));
     }
 
-    private static boolean checkIfCitationKeyIsAppropriate(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
-        // bibEntry.getCitationKey().isPresent() is called to pleasure the linter (even if it is already checked in checkIfCitationKeyIsEmpty).
-        return !checkIfCitationKeyIsEmpty(bibEntry) && bibEntry.getCitationKey().isPresent() && checkIfCitationKeyIsUnique(bibDatabaseContext, bibEntry.getCitationKey().get());
+    private static boolean citationKeyIsValid(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
+        return !hasEmptyCitationKey(bibEntry) && bibEntry.getCitationKey().map(key -> citationKeyIsUnique(bibDatabaseContext, key)).orElse(false);
     }
 
-    private static boolean checkIfCitationKeyIsEmpty(BibEntry bibEntry) {
-        return bibEntry.getCitationKey().isEmpty() || bibEntry.getCitationKey().get().isEmpty();
+    private static boolean hasEmptyCitationKey(BibEntry bibEntry) {
+        return bibEntry.getCitationKey().map(key -> key.isEmpty()).orElse(true);
     }
 
-    private static boolean checkIfCitationKeyIsUnique(BibDatabaseContext bibDatabaseContext, String citationKey) {
-        return bibDatabaseContext.getDatabase().getEntries().stream()
-              .map(BibEntry::getCitationKey)
-              .filter(Optional::isPresent)
-              .map(Optional::get)
-              .filter(key -> key.equals(citationKey))
-              .count() == 1;
-    }
-
-    private void bindToCorrectEntry(BibEntry entry) {
-        embeddingsGenerationTaskManager.moveToFront(entry.getFiles());
-
-        createAiChat();
-        setupChatHistory();
-        restoreLogicalChatHistory();
-        buildChatUI(entry);
+    private static boolean citationKeyIsUnique(BibDatabaseContext bibDatabaseContext, String citationKey) {
+        return bibDatabaseContext.getDatabase().getNumberOfCitationKeyOccurrences(citationKey) == 1;
     }
 
     private void createAiChat() {
-        aiChatLogic = new AiChatLogic(aiService, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.getFiles().stream().map(LinkedFile::getLink).toList()));
+        aiChatLogic = new AiChatLogic(aiService, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.get().getFiles().stream().map(LinkedFile::getLink).toList()));
     }
 
     private void setupChatHistory() {
-        if (bibDatabaseContext.getDatabasePath().isPresent() && currentBibEntry != null && currentBibEntry.getCitationKey().isPresent()) {
-            BibDatabaseChatHistory bibDatabaseChatHistory = aiService.getChatHistoryManager().getChatHistoryForBibDatabase(bibDatabaseContext.getDatabasePath().get());
-            bibEntryChatHistory = bibDatabaseChatHistory.getChatHistoryForEntry(currentBibEntry.getCitationKey().get());
-        } else {
+        Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
+        if (!databasePath.isPresent()) {
             bibEntryChatHistory = null;
         }
+        currentBibEntry.flatMap(entry -> entry.getCitationKey())
+                       .ifPresent(citationKey -> {
+                           BibDatabaseChatHistory bibDatabaseChatHistory = aiService.getChatHistoryManager().getChatHistoryForBibDatabase(databasePath.get());
+                           bibEntryChatHistory = bibDatabaseChatHistory.getChatHistoryForEntry(citationKey);
+                       });
     }
 
     private void restoreLogicalChatHistory() {
@@ -187,7 +172,7 @@ public class AiChatTab extends EntryEditorTab {
         }
     }
 
-    private void buildChatUI(BibEntry entry) {
+    private void buildChatUI() {
         aiChatComponent = new AiChatComponent(userPrompt -> {
             ChatMessage userMessage = ChatMessage.user(userPrompt);
             aiChatComponent.addMessage(userMessage);

@@ -99,11 +99,11 @@ application {
 modularity.disableEffectiveArgumentsAdjustment()
 
 // Required as workaround for  https://github.com/langchain4j/langchain4j/issues/1066
-modularity.patchModule("langchain4j", "langchain4j-core-0.31.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-embeddings-0.31.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-0.31.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-q-0.31.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-open-ai-0.31.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-core-0.32.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-embeddings-0.32.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-0.32.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-q-0.32.0.jar")
+modularity.patchModule("langchain4j", "langchain4j-open-ai-0.32.0.jar")
 
 sourceSets {
     main {
@@ -322,10 +322,10 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.2'
 
     // AI
-    implementation 'dev.langchain4j:langchain4j:0.31.0'
-    implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2:0.31.0'
-    implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2-q:0.31.0'
-    implementation('dev.langchain4j:langchain4j-open-ai:0.31.0') {
+    implementation 'dev.langchain4j:langchain4j:0.32.0'
+    implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2:0.32.0'
+    implementation 'dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2-q:0.32.0'
+    implementation('dev.langchain4j:langchain4j-open-ai:0.32.0') {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
     }
     // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
@@ -478,25 +478,25 @@ compileJava {
     options.generatedSourceOutputDirectory.set(file("src-gen/main/java"))
 
     moduleOptions {
-        // TODO: Remove access to internal api
         addExports = [
+                // TODO: Remove access to internal api
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
                 'langchain4j/dev.langchain4j.data.document' : 'org.jabref',
+                'langchain4j/dev.langchain4j.data.embedding' : 'org.jabref',
+                'langchain4j/dev.langchain4j.data.message' : 'org.jabref',
                 'langchain4j/dev.langchain4j.data.segment' : 'org.jabref',
+                'langchain4j/dev.langchain4j.memory' : 'org.jabref',
                 'langchain4j/dev.langchain4j.model.chat' : 'org.jabref',
                 'langchain4j/dev.langchain4j.model.embedding' : 'org.jabref',
                 'langchain4j/dev.langchain4j.model.openai' : 'org.jabref',
                 'langchain4j/dev.langchain4j.rag.content.retriever' : 'org.jabref',
                 'langchain4j/dev.langchain4j.store.embedding' : 'org.jabref',
-                'langchain4j/dev.langchain4j.store.embedding.inmemory' : 'org.jabref',
-                'langchain4j/dev.langchain4j.memory' : 'org.jabref',
-                'langchain4j/dev.langchain4j.store.memory.chat' : 'org.jabref',
-                'langchain4j/dev.langchain4j.data.message' : 'org.jabref',
                 'langchain4j/dev.langchain4j.store.embedding.filter' : 'org.jabref',
                 'langchain4j/dev.langchain4j.store.embedding.filter.comparison' : 'org.jabref',
-                'langchain4j/dev.langchain4j.data.embedding' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.embedding.inmemory' : 'org.jabref',
+                'langchain4j/dev.langchain4j.store.memory.chat' : 'org.jabref',
         ]
     }
 }
@@ -508,10 +508,10 @@ run {
         application.applicationDefaultJvmArgs = []
     }
 
-    // TODO: Remove access to internal api
     moduleOptions {
         // On a change here, also adapt "application > applicationDefaultJvmArgs"
         addExports = [
+                // TODO: Remove access to internal api
                 'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
 
