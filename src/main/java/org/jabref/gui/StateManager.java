@@ -140,6 +140,7 @@ public class StateManager {
 
     public void setSelectedGroups(BibDatabaseContext database, List<GroupTreeNode> newSelectedGroups) {
         Objects.requireNonNull(newSelectedGroups);
+        selectedGroups.clear();
         selectedGroups.put(database.getUid(), FXCollections.observableArrayList(newSelectedGroups));
     }
 
