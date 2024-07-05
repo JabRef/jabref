@@ -33,6 +33,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
@@ -76,6 +77,7 @@ public class GroupDialogViewModel {
     private final BooleanProperty typeSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeAutoProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeTexProperty = new SimpleBooleanProperty();
+    private final BooleanProperty typeSelectionProperty = new SimpleBooleanProperty();
 
     // Option Groups
     private final StringProperty keywordGroupSearchTermProperty = new SimpleStringProperty("");
@@ -94,6 +96,7 @@ public class GroupDialogViewModel {
     private final StringProperty autoGroupPersonsFieldProperty = new SimpleStringProperty("");
 
     private final StringProperty texGroupFilePathProperty = new SimpleStringProperty("");
+    private final BooleanProperty entriesAreSelected = new SimpleBooleanProperty(false);
 
     private Validator nameValidator;
     private Validator nameContainsDelimiterValidator;
@@ -112,22 +115,36 @@ public class GroupDialogViewModel {
     private final AbstractGroup editedGroup;
     private final GroupTreeNode parentNode;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final List<BibEntry> selectedEntries;
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
                                 PreferencesService preferencesService,
                                 @Nullable AbstractGroup editedGroup,
                                 @Nullable GroupTreeNode parentNode,
-                                FileUpdateMonitor fileUpdateMonitor) {
+                                FileUpdateMonitor fileUpdateMonitor,
+                                List<BibEntry> selectedEntries) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
         this.parentNode = parentNode;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.selectedEntries = selectedEntries;
 
         setupValidation();
         setValues();
+    }
+
+    public GroupDialogViewModel (
+            DialogService dialogService,
+            BibDatabaseContext currentDatabase,
+            PreferencesService preferencesService,
+            @Nullable AbstractGroup editedGroup,
+            @Nullable GroupTreeNode parentNode,
+            FileUpdateMonitor fileUpdateMonitor
+    ) {
+        this(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, new ArrayList<>());
     }
 
     private void setupValidation() {
@@ -371,6 +388,14 @@ public class GroupDialogViewModel {
                         new DefaultAuxParser(new BibDatabase()),
                         fileUpdateMonitor,
                         currentDatabase.getMetaData());
+            } else if (typeSelectionProperty.getValue()) {
+                ExplicitGroup tempResultingGroup = new ExplicitGroup(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        preferencesService.getBibEntryPreferences().getKeywordSeparator()
+                );
+                tempResultingGroup.add(selectedEntries);
+                resultingGroup = tempResultingGroup;
             }
 
             if (resultingGroup != null) {
@@ -405,7 +430,16 @@ public class GroupDialogViewModel {
                           .ifPresent(iconProperty::setValue);
                 parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
             }
-            typeExplicitProperty.setValue(true);
+            if (!selectedEntries.isEmpty()) {
+                entriesAreSelected.setValue(true);
+                if (selectedEntries.size() > 1) {
+                    typeSelectionProperty.setValue(true);
+                } else {
+                    typeExplicitProperty.setValue(true);
+                }
+            } else {
+                typeExplicitProperty.setValue(true);
+            }
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
         } else {
@@ -587,6 +621,10 @@ public class GroupDialogViewModel {
         return typeTexProperty;
     }
 
+    public BooleanProperty typeSelectionProperty() {
+        return typeSelectionProperty;
+    }
+
     public StringProperty keywordGroupSearchTermProperty() {
         return keywordGroupSearchTermProperty;
     }
@@ -637,5 +675,9 @@ public class GroupDialogViewModel {
 
     public StringProperty texGroupFilePathProperty() {
         return texGroupFilePathProperty;
+    }
+
+    public BooleanProperty entriesAreSelectedProperty() {
+        return entriesAreSelected;
     }
 }

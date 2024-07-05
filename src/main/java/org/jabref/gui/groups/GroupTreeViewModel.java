@@ -175,7 +175,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     database,
                     parent.getGroupNode(),
                     null,
-                    groupDialogHeader));
+                    groupDialogHeader,
+                    stateManager.getSelectedEntries()
+            ));
 
             newGroup.ifPresent(group -> {
                 parent.addSubgroup(group);
@@ -260,7 +262,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     database,
                     oldGroup.getGroupNode().getParent().orElse(null),
                     oldGroup.getGroupNode().getGroup(),
-                    GroupDialogHeader.SUBGROUP));
+                    GroupDialogHeader.SUBGROUP,
+                    stateManager.getSelectedEntries()
+            ));
             newGroup.ifPresent(group -> {
 
                 AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();

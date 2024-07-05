@@ -99,6 +99,12 @@
                             <Tooltip text="%Group containing entries cited in a given TeX file"/>
                         </tooltip>
                     </RadioButton>
+                    <RadioButton fx:id="selectionRadioButton" toggleGroup="$type" wrapText="true"
+                                 text="%Current selection">
+                        <tooltip>
+                            <Tooltip text="%Group all entries currently selected"/>
+                        </tooltip>
+                    </RadioButton>
                 </VBox>
                 <Separator orientation="VERTICAL"/>
                 <StackPane HBox.hgrow="ALWAYS">

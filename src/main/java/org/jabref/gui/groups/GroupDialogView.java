@@ -41,6 +41,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -81,6 +82,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private RadioButton searchRadioButton;
     @FXML private RadioButton autoRadioButton;
     @FXML private RadioButton texRadioButton;
+    @FXML private RadioButton selectionRadioButton;
 
     // Option Groups
     @FXML private TextField keywordGroupSearchTerm;
@@ -109,6 +111,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final BibDatabaseContext currentDatabase;
     private final @Nullable GroupTreeNode parentNode;
     private final @Nullable AbstractGroup editedGroup;
+    private final List<BibEntry> selectedEntries;
 
     private GroupDialogViewModel viewModel;
 
@@ -119,10 +122,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     public GroupDialogView(BibDatabaseContext currentDatabase,
                            @Nullable GroupTreeNode parentNode,
                            @Nullable AbstractGroup editedGroup,
-                           GroupDialogHeader groupDialogHeader) {
+                           GroupDialogHeader groupDialogHeader,
+                           List<BibEntry> selectedEntries) {
         this.currentDatabase = currentDatabase;
         this.parentNode = parentNode;
         this.editedGroup = editedGroup;
+        this.selectedEntries = selectedEntries;
 
         ViewLoader.view(this)
                   .load()
@@ -172,7 +177,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, selectedEntries);
 
         setResultConverter(viewModel::resultConverter);
 
@@ -200,6 +205,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchRadioButton.selectedProperty().bindBidirectional(viewModel.typeSearchProperty());
         autoRadioButton.selectedProperty().bindBidirectional(viewModel.typeAutoProperty());
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
+        selectionRadioButton.selectedProperty().bindBidirectional(viewModel.typeSelectionProperty());
+        selectionRadioButton.disableProperty().bind(viewModel.entriesAreSelectedProperty().not());
 
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());
