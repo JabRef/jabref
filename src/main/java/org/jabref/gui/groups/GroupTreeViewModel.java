@@ -72,7 +72,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager,
+                              DialogService dialogService,
+                              PreferencesService preferencesService,
+                              TaskExecutor taskExecutor,
+                              CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferencesService);
@@ -132,12 +136,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /**
      * Opens "New Group Dialog" and add the resulting group to the root
      */
-    public void addNewGroupToRoot() {
+    public void addNewGroupToRoot(boolean useSelectedEntries) {
         if (currentDatabase.isPresent()) {
-            addNewSubgroup(rootGroup.get(), GroupDialogHeader.GROUP);
+            addNewSubgroup(rootGroup.get(), GroupDialogHeader.GROUP, useSelectedEntries);
         } else {
             dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
         }
+    }
+
+    public void addNewGroupToRoot() {
+        addNewGroupToRoot(false);
     }
 
     /**
@@ -166,16 +174,23 @@ public class GroupTreeViewModel extends AbstractViewModel {
         currentDatabase = newDatabase;
     }
 
+    public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
+        addNewSubgroup(parent, groupDialogHeader, false);
+    }
+
     /**
      * Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
      */
-    public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
+    public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader, boolean useSelectedEntries) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
                     database,
                     parent.getGroupNode(),
                     null,
-                    groupDialogHeader));
+                    groupDialogHeader,
+                    stateManager.getSelectedEntries().stream().toList(),
+                    useSelectedEntries
+            ));
 
             newGroup.ifPresent(group -> {
                 parent.addSubgroup(group);
@@ -260,7 +275,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     database,
                     oldGroup.getGroupNode().getParent().orElse(null),
                     oldGroup.getGroupNode().getGroup(),
-                    GroupDialogHeader.SUBGROUP));
+                    GroupDialogHeader.SUBGROUP,
+                    stateManager.getSelectedEntries()));
             newGroup.ifPresent(group -> {
 
                 AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();

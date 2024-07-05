@@ -109,6 +109,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final BibDatabaseContext currentDatabase;
     private final @Nullable GroupTreeNode parentNode;
     private final @Nullable AbstractGroup editedGroup;
+    private final List<BibEntry> selectedEntries;
+    private final boolean useSelectedEntries;
 
     private GroupDialogViewModel viewModel;
 
@@ -119,10 +121,22 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     public GroupDialogView(BibDatabaseContext currentDatabase,
                            @Nullable GroupTreeNode parentNode,
                            @Nullable AbstractGroup editedGroup,
-                           GroupDialogHeader groupDialogHeader) {
+                           GroupDialogHeader groupDialogHeader,
+                           List<BibEntry> selectedEntries) {
+        this(currentDatabase, parentNode, editedGroup, groupDialogHeader, selectedEntries, false);
+    }
+
+    public GroupDialogView(BibDatabaseContext currentDatabase,
+                           @Nullable GroupTreeNode parentNode,
+                           @Nullable AbstractGroup editedGroup,
+                           GroupDialogHeader groupDialogHeader,
+                           List<BibEntry> selectedEntries,
+                           boolean useSelectedEntries) {
         this.currentDatabase = currentDatabase;
         this.parentNode = parentNode;
         this.editedGroup = editedGroup;
+        this.selectedEntries = selectedEntries;
+        this.useSelectedEntries = useSelectedEntries;
 
         ViewLoader.view(this)
                   .load()
@@ -172,7 +186,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, selectedEntries, useSelectedEntries);
 
         setResultConverter(viewModel::resultConverter);
 

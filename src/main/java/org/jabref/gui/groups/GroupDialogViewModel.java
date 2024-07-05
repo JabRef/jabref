@@ -112,22 +112,39 @@ public class GroupDialogViewModel {
     private final AbstractGroup editedGroup;
     private final GroupTreeNode parentNode;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final List<BibEntry> selectedEntries;
+    private final boolean useSelectedEntries;
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
                                 PreferencesService preferencesService,
                                 @Nullable AbstractGroup editedGroup,
                                 @Nullable GroupTreeNode parentNode,
-                                FileUpdateMonitor fileUpdateMonitor) {
+                                FileUpdateMonitor fileUpdateMonitor,
+                                List<BibEntry> selectedEntries,
+                                boolean useSelectedEntries) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
         this.parentNode = parentNode;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.selectedEntries = selectedEntries;
+        this.useSelectedEntries = useSelectedEntries;
 
         setupValidation();
         setValues();
+    }
+
+    public GroupDialogViewModel(
+            DialogService dialogService,
+            BibDatabaseContext currentDatabase,
+            PreferencesService preferencesService,
+            @Nullable AbstractGroup editedGroup,
+            @Nullable GroupTreeNode parentNode,
+            FileUpdateMonitor fileUpdateMonitor
+    ) {
+        this(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, new ArrayList<>(), false);
     }
 
     private void setupValidation() {
@@ -405,7 +422,16 @@ public class GroupDialogViewModel {
                           .ifPresent(iconProperty::setValue);
                 parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
             }
-            typeExplicitProperty.setValue(true);
+            if (!selectedEntries.isEmpty()) {
+                entriesAreSelected.setValue(true);
+                if (selectedEntries.size() > 1 || useSelectedEntries) {
+                    typeSelectionProperty.setValue(true);
+                } else {
+                    typeExplicitProperty.setValue(true);
+                }
+            } else {
+                typeExplicitProperty.setValue(true);
+            }
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
         } else {

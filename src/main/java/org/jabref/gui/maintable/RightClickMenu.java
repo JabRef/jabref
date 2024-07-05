@@ -18,6 +18,7 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
+import org.jabref.gui.groups.GroupDialogView;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
@@ -86,6 +87,7 @@ public class RightClickMenu {
 
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferencesService)),
                 factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferencesService)),
+                factory.createMenuItem(StandardActions.CREATE_GROUP_FROM_SELECTION, new CreateGroupFromSelectionAction(stateManager))
 
                 new SeparatorMenuItem(),
 
