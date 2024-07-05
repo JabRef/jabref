@@ -25,7 +25,7 @@ import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.CitationEntry;
-import org.jabref.model.openoffice.oocsltext.CSLCitationOOAdapter;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
 import org.jabref.model.openoffice.style.CitationGroupId;
 import org.jabref.model.openoffice.style.CitationType;
@@ -581,6 +581,7 @@ class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             // if clause - CSL vs jStyle - if CSL insert the citation here. Cursor and doc available.
+            // introduce a new method - handling both
             CSLCitationOOAdapter.insertBibliography(doc, cursor.get());
             CSLCitationOOAdapter.insertInText(doc, cursor.get());
 //            EditInsert.insertCitationGroup(doc,

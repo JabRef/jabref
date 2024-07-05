@@ -1,4 +1,4 @@
-package org.jabref.model.openoffice.oocsltext;
+package org.jabref.logic.openoffice.oocsltext;
 
 import java.io.IOException;
 import java.util.List;
