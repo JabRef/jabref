@@ -23,13 +23,13 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
