@@ -282,7 +282,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
     public static final String SEARCH_FILTERING_MODE = "filteringSearch";
-    public static final String SEARCH_SORT_BY_SCORE = "sortByScore";
     public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
     public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
@@ -528,7 +527,6 @@ public class JabRefPreferences implements PreferencesService {
         // will never be translated.
         Localization.setLanguage(getLanguage());
 
-        defaults.put(SEARCH_SORT_BY_SCORE, Boolean.TRUE);
         defaults.put(SEARCH_FILTERING_MODE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);
@@ -2675,7 +2673,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
                 getBoolean(SEARCH_FILTERING_MODE),
-                getBoolean(SEARCH_SORT_BY_SCORE),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),
                 getDouble(SEARCH_WINDOW_HEIGHT),
                 getDouble(SEARCH_WINDOW_WIDTH));
@@ -2685,7 +2682,6 @@ public class JabRefPreferences implements PreferencesService {
             putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT));
             putBoolean(SEARCH_KEEP_SEARCH_STRING, searchPreferences.getObservableSearchFlags().contains(SearchFlags.KEEP_SEARCH_STRING));
             putBoolean(SEARCH_FILTERING_MODE, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FILTERING_SEARCH));
-            putBoolean(SEARCH_SORT_BY_SCORE, searchPreferences.getObservableSearchFlags().contains(SearchFlags.SORT_BY_SCORE));
         });
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
         EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));

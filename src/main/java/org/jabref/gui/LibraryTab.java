@@ -555,7 +555,6 @@ public class LibraryTab extends Tab {
                 preferencesService,
                 dialogService,
                 stateManager,
-                preferencesService.getKeyBindingRepository(),
                 clipBoardManager,
                 entryTypesManager,
                 taskExecutor,

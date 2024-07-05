@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
-import javafx.collections.SetChangeListener;
 import javafx.css.PseudoClass;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -55,7 +54,6 @@ import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -72,7 +70,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
     private final ImportHandler importHandler;
@@ -91,7 +88,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      PreferencesService preferencesService,
                      DialogService dialogService,
                      StateManager stateManager,
-                     KeyBindingRepository keyBindingRepository,
                      ClipBoardManager clipBoardManager,
                      BibEntryTypesManager entryTypesManager,
                      TaskExecutor taskExecutor,
@@ -101,7 +97,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
         this.database = Objects.requireNonNull(database);
         this.model = model;
         this.clipBoardManager = clipBoardManager;
@@ -143,7 +138,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     }
                 })
                 .withContextMenu(entry -> RightClickMenu.create(entry,
-                        keyBindingRepository,
+                        preferencesService.getKeyBindingRepository(),
                         libraryTab,
                         dialogService,
                         stateManager,
@@ -174,39 +169,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.getSortOrder().clear();
 
-        // always sort by score first. If no search is ongoing, it will be equal for all columns.
-        ListChangeListener<? super TableColumn<BibEntryTableViewModel, ?>> scoreSortOderPrioritizer = new ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>() {
-            @Override
-            public void onChanged(Change<? extends TableColumn<BibEntryTableViewModel, ?>> c) {
-                getSortOrder().removeListener(this);
-                updateSortOrder();
-                getSortOrder().addListener(this);
-            }
-        };
-
-        preferencesService.getSearchPreferences().getObservableSearchFlags().addListener(new SetChangeListener<SearchFlags>() {
-            @Override
-            public void onChanged(Change<? extends SearchFlags> change) {
-                getSortOrder().removeListener(scoreSortOderPrioritizer);
-                updateSortOrder();
-                getSortOrder().addListener(scoreSortOderPrioritizer);
-            }
-        });
-
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
-                    .filter(column -> !column.getModel().getType().equals(MainTableColumnModel.Type.SCORE))
                     .findFirst()
                     .ifPresent(column -> {
                         LOGGER.debug("Adding sort order for col {} ", column);
                         this.getSortOrder().add(column);
                     }));
-        this.getSortOrder().addListener(scoreSortOderPrioritizer);
-
-        // Is this always called after the search is done?
-        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> sort());
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
@@ -224,7 +195,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Store visual state
         new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
 
-        setupKeyBindings(keyBindingRepository);
+        setupKeyBindings(preferencesService.getKeyBindingRepository());
 
         this.setOnKeyTyped(key -> {
             if (this.getSortOrder().isEmpty()) {
@@ -246,13 +217,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, rightClickMenuFactory, tabContainer, dialogService).show(true);
-    }
-
-    private void updateSortOrder() {
-        getSortOrder().removeAll(getColumns().getFirst());
-        if (preferencesService.getSearchPreferences().isSortByScore()) {
-            getSortOrder().addFirst(getColumns().getFirst());
-        }
     }
 
     /**

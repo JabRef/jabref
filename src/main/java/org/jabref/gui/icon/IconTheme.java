@@ -291,7 +291,6 @@ public class IconTheme {
         FULLTEXT(MaterialDesignF.FILE_EYE),
         FILTER(MaterialDesignF.FILTER),
         INVERT(MaterialDesignI.INVERT_COLORS),
-        SORT_BY_SCORE(MaterialDesignS.SORT_VARIANT),
         CONSOLE(MaterialDesignC.CONSOLE),
         FORUM(MaterialDesignF.FORUM),
         FACEBOOK(MaterialDesignF.FACEBOOK),

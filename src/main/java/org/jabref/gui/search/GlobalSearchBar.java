@@ -94,7 +94,6 @@ public class GlobalSearchBar extends HBox {
     private final Button openGlobalSearchButton;
     private final ToggleButton keepSearchString;
     private final ToggleButton filterModeButton;
-    private final ToggleButton sortByScoreButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final Label currentResults = new Label("");
     private final StateManager stateManager;
@@ -163,7 +162,6 @@ public class GlobalSearchBar extends HBox {
         openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
         keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();
         filterModeButton = IconTheme.JabRefIcons.FILTER.asToggleButton();
-        sortByScoreButton = IconTheme.JabRefIcons.SORT_BY_SCORE.asToggleButton();
 
         initSearchModifierButtons();
 
@@ -172,7 +170,6 @@ public class GlobalSearchBar extends HBox {
                                                     .or(fulltextButton.focusedProperty())
                                                     .or(keepSearchString.focusedProperty())
                                                     .or(filterModeButton.focusedProperty())
-                                                    .or(sortByScoreButton.focusedProperty())
                                                     .or(searchField.textProperty()
                                                                    .isNotEmpty());
 
@@ -184,14 +181,12 @@ public class GlobalSearchBar extends HBox {
         keepSearchString.visibleProperty().bind(focusedOrActive);
         filterModeButton.visibleProperty().unbind();
         filterModeButton.visibleProperty().bind(focusedOrActive);
-        sortByScoreButton.visibleProperty().unbind();
-        sortByScoreButton.visibleProperty().bind(focusedOrActive);
 
         StackPane modifierButtons;
         if (searchType == SearchType.NORMAL_SEARCH) {
-            modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, keepSearchString, filterModeButton, sortByScoreButton));
+            modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, keepSearchString, filterModeButton));
         } else {
-            modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, filterModeButton, sortByScoreButton));
+            modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, filterModeButton));
         }
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
@@ -276,14 +271,6 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(filterModeButton);
         filterModeButton.setOnAction(event -> {
             searchPreferences.setSearchFlag(SearchFlags.FILTERING_SEARCH, filterModeButton.isSelected());
-            updateSearchQuery();
-        });
-
-        sortByScoreButton.setSelected(searchPreferences.isSortByScore());
-        sortByScoreButton.setTooltip(new Tooltip(Localization.lang("Always sort by score")));
-        initSearchModifierButton(sortByScoreButton);
-        sortByScoreButton.setOnAction(event -> {
-            searchPreferences.setSearchFlag(SearchFlags.SORT_BY_SCORE, sortByScoreButton.isSelected());
             updateSearchQuery();
         });
 
