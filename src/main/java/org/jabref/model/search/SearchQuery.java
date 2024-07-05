@@ -3,6 +3,7 @@ package org.jabref.model.search;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,7 +14,6 @@ import org.apache.lucene.search.Query;
 
 import static org.jabref.model.search.SearchFlags.FILTERING_SEARCH;
 import static org.jabref.model.search.SearchFlags.KEEP_SEARCH_STRING;
-import static org.jabref.model.search.SearchFlags.SORT_BY_SCORE;
 
 public class SearchQuery {
 
@@ -26,11 +26,11 @@ public class SearchQuery {
         this.query = Objects.requireNonNull(query);
         this.searchFlags = searchFlags;
 
-        HashMap<String, Float> boosts = new HashMap<>();
+        Map<String, Float> boosts = new HashMap<>();
         SearchFieldConstants.SEARCHABLE_BIB_FIELDS.forEach(field -> boosts.put(field, 4F));
 
         if (searchFlags.contains(SearchFlags.FULLTEXT)) {
-            Arrays.stream(SearchFieldConstants.PDF_FIELDS).forEach(field -> boosts.put(field.toString(), 1F));
+            SearchFieldConstants.PDF_FIELDS.forEach(field -> boosts.put(field, 1F));
         }
 
         String[] fieldsToSearchArray = new String[boosts.size()];
@@ -42,6 +42,7 @@ public class SearchQuery {
 
         MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, SearchFieldConstants.ANALYZER, boosts);
         queryParser.setAllowLeadingWildcard(true);
+
         if (!query.contains("\"") && !query.contains(":") && !query.contains("*") && !query.contains("~")) {
             query = Arrays.stream(query.split(" ")).map(s -> "*" + s + "*").collect(Collectors.joining(" "));
         }
@@ -54,28 +55,33 @@ public class SearchQuery {
         }
     }
 
+    /**
+     * Equals, but only partially compares SearchFlags
+     *
+     * @return true if the search query is the same except for the filtering/keep search string flags
+     */
+    public boolean isEqualExceptSearchFlags(SearchQuery other) {
+        if (!(other instanceof SearchQuery searchQuery) || !searchQuery.query.equals(this.query)) {
+            return false;
+        }
+        return excludeFilterAndKeepSearchFlags(this.searchFlags).equals(excludeFilterAndKeepSearchFlags(searchQuery.searchFlags));
+    }
+
+    private Set<SearchFlags> excludeFilterAndKeepSearchFlags(EnumSet<SearchFlags> searchFlags) {
+        EnumSet<SearchFlags> searchRulesWithoutFilterAndSort = searchFlags.clone();
+        searchRulesWithoutFilterAndSort.removeAll(EnumSet.of(FILTERING_SEARCH, KEEP_SEARCH_STRING));
+        return searchRulesWithoutFilterAndSort;
+    }
+
     @Override
     public String toString() {
         return query;
     }
 
-    /**
-     * Equals, but only partially compares SearchFlags
-     *
-     * @return true if the search query is the same except for the filtering/sorting flags
-     */
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof SearchQuery searchQuery) {
-            if (!searchQuery.query.equals(this.query)) {
-                return false;
-            }
-            Set<SearchFlags> thisSearchRulesWithoutFilterAndSort = this.searchFlags.clone();
-            Set<SearchFlags> otherSearchRulesWithoutFilterAndSort = searchQuery.searchFlags.clone();
-            Set<SearchFlags> filterAndSortFlags = EnumSet.of(SORT_BY_SCORE, FILTERING_SEARCH, KEEP_SEARCH_STRING);
-            thisSearchRulesWithoutFilterAndSort.removeAll(filterAndSortFlags);
-            otherSearchRulesWithoutFilterAndSort.removeAll(filterAndSortFlags);
-            return thisSearchRulesWithoutFilterAndSort.equals(otherSearchRulesWithoutFilterAndSort);
+    public boolean equals(Object o) {
+        if (o instanceof SearchQuery searchQuery) {
+            return this.query.equals(searchQuery.query) && this.searchFlags.equals(searchQuery.searchFlags);
         }
         return false;
     }

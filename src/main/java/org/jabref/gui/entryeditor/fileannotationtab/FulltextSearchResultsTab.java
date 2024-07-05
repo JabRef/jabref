@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import javafx.collections.MapChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
@@ -34,6 +35,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResult;
+import org.jabref.model.search.SearchResults;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -72,7 +74,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         content.setPadding(new Insets(10));
         setContent(scrollPane);
         setText(Localization.lang("Search results"));
-        this.stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> bindToEntry(entry));
+        this.stateManager.getSearchResults().addListener((MapChangeListener<String, SearchResults>) change -> bindToEntry(entry));
     }
 
     @Override

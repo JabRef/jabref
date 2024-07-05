@@ -24,8 +24,7 @@ public class SearchResults {
         return searchResults.containsKey(entry) ?
                 searchResults.get(entry).stream()
                              .map(SearchResult::getLuceneScore)
-                             .max(Float::compareTo)
-                             .orElse(0f) : 0f;
+                             .reduce(0f, Float::sum) : 0f;
     }
 
     public boolean hasFulltextResults(BibEntry entry) {

@@ -93,7 +93,7 @@ public final class LuceneSearcher {
                 searchResults.addSearchResult(entriesMap.get(entryId), new SearchResult(score, highlighter));
             }
         }
-        LOGGER.debug("Reading search results took {} ms", System.currentTimeMillis() - startTime);
+        LOGGER.debug("Mapping search results took {} ms", System.currentTimeMillis() - startTime);
         return searchResults;
     }
 
