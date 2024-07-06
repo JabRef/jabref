@@ -459,8 +459,8 @@ public class OpenOfficePanel {
             return;
         }
 
-        final BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
-        if (database == null) {
+        final BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().get();
+        if (bibDatabaseContext == null) {
             OOError.noDataBaseIsOpenForCiting()
                    .setTitle(errorDialogTitle)
                    .showErrorDialog(dialogService);
@@ -507,7 +507,7 @@ public class OpenOfficePanel {
                         : Optional.empty();
 
         ooBase.guiActionInsertEntry(entries,
-                database,
+                bibDatabaseContext,
                 style,
                 citationType,
                 pageInfo,

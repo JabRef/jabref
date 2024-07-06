@@ -28,6 +28,11 @@ public class CSLCitationOOAdapter {
     private static final BibEntryTypesManager BIBENTRYTYPESMANAGER = new BibEntryTypesManager();
     private static int cslIndex;
     private static final List<CitationStyle> STYLE_LIST = CitationStyle.discoverCitationStyles();
+    private final BibDatabaseContext bibDatabaseContext;
+
+    public CSLCitationOOAdapter(BibDatabaseContext bibDatabaseContext) {
+        this.bibDatabaseContext = bibDatabaseContext;
+    }
 
     public static void setCslIndex(int cslIndex) {
         CSLCitationOOAdapter.cslIndex = cslIndex;
@@ -67,7 +72,7 @@ public class CSLCitationOOAdapter {
         return html;
     }
 
-    public static void insertBibliography(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries)
+    public static void insertBibliography(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
             throws IllegalArgumentException, WrappedTargetException, CreationException {
 
         String style = STYLE_LIST.get(cslIndex).getSource();
@@ -75,10 +80,7 @@ public class CSLCitationOOAdapter {
 
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
-        context.setMode(BibDatabaseMode.BIBLATEX);
-
-        List<String> actualCitations = CitationStyleGenerator.generateCitation(entries, style, format, context, BIBENTRYTYPESMANAGER);
+        List<String> actualCitations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, BIBENTRYTYPESMANAGER);
         for (String actualCitation: actualCitations) {
             Logger.warn("Unformatted Citation: " + actualCitation);
             String formattedHTML = transformHtml(actualCitation);

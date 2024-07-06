@@ -24,6 +24,7 @@ import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.CitationEntry;
 import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
@@ -510,7 +511,7 @@ class OOBibBase {
      * Note: Undo does not remove or reestablish custom properties.
      *
      * @param entries      The entries to cite.
-     * @param database     The database the entries belong to (all of them). Used when creating the citation mark.
+     * @param bibDatabaseContext     The database the entries belong to (all of them). Used when creating the citation mark.
      *                     <p>
      *                     Consistency: for each entry in {@code entries}: looking it up in {@code syncOptions.get().databases} (if present) should yield {@code database}.
      * @param style        The bibliography style we are using.
@@ -519,7 +520,7 @@ class OOBibBase {
      * @param syncOptions  Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise provides options for refreshing the reference list.
      */
     public void guiActionInsertEntry(List<BibEntry> entries,
-                                     BibDatabase database,
+                                     BibDatabaseContext bibDatabaseContext,
                                      OOBibStyle style,
                                      CitationType citationType,
                                      String pageInfo,
@@ -582,13 +583,13 @@ class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             // if clause - CSL vs jStyle - if CSL insert the citation here. Cursor and doc available.
             // introduce a new method - handling both
-            CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), entries);
+            CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), entries, bibDatabaseContext);
             CSLCitationOOAdapter.insertInText(doc, cursor.get(), entries);
 //            EditInsert.insertCitationGroup(doc,
 //                    frontend.get(),
 //                    cursor.get(),
 //                    entries,
-//                    database,
+//                    bibDatabaseContext.getDatabase(),
 //                    style,
 //                    citationType,
 //                    pageInfo);
