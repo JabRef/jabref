@@ -36,7 +36,6 @@ public class AiChatTabWorking {
                             BibDatabaseContext bibDatabaseContext,
                             EmbeddingsGenerationTask embeddingsGenerationTask,
                             TaskExecutor taskExecutor,
-                            WorkspacePreferences workspacePreferences,
                             DialogService dialogService) {
         this.aiChatLogic = AiChatLogic.forBibEntry(aiService, entry);
 
@@ -53,7 +52,6 @@ public class AiChatTabWorking {
             ChatMessage userMessage = ChatMessage.user(userPrompt);
             // The aiChatComponent should be non-final to suppress an error in the next statement.
             aiChatComponent.addMessage(userMessage);
-
             addMessageToChatHistory(userMessage);
 
             aiChatComponent.setLoading(true);
@@ -64,7 +62,6 @@ public class AiChatTabWorking {
 
                               ChatMessage aiMessage = ChatMessage.assistant(aiMessageText);
                               aiChatComponent.addMessage(aiMessage);
-
                               addMessageToChatHistory(aiMessage);
 
                               aiChatComponent.requestUserPromptTextFieldFocus();
@@ -75,7 +72,7 @@ public class AiChatTabWorking {
                               aiChatComponent.addError(e.getMessage());
                           })
                           .executeWith(taskExecutor);
-        }, this::clearMessagesFromChatHistory, workspacePreferences, dialogService);
+        }, this::clearMessagesFromChatHistory, dialogService);
 
         restoreUIChatHistory();
 

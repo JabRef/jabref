@@ -21,16 +21,10 @@ public class AiChatHistoryManager {
     }
 
     public BibDatabaseChatHistory getChatHistoryForBibDatabase(Path bibDatabasePath) {
-        BibDatabaseChatHistory found = bibDatabaseChatHistoryMap.get(bibDatabasePath);
-        if (found != null) {
-            return found;
-        }
-
-        BibDatabaseChatHistory bibDatabaseChatHistory = new BibDatabaseChatHistory(bibDatabasePath, dialogService);
-
-        bibDatabaseChatHistoryMap.put(bibDatabasePath, bibDatabaseChatHistory);
-
-        return bibDatabaseChatHistory;
+        return bibDatabaseChatHistoryMap.computeIfAbsent(
+                bibDatabasePath,
+                path -> new BibDatabaseChatHistory(bibDatabasePath, dialogService)
+        );
     }
 
     public void close() {

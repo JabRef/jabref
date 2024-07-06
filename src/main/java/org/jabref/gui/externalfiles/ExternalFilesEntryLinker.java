@@ -79,13 +79,13 @@ public class ExternalFilesEntryLinker {
     }
 
     public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, EmbeddingsGenerationTask embeddingsGenerationTask) {
-        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
-            try (AutoCloseable blocker2 = embeddingsGenerationTask.blockNewTasks()) {
+        try (AutoCloseable indexingTaskManagerBlocker = indexingTaskManager.blockNewTasks()) {
+            try (AutoCloseable embeddingsGenerationTaskBlocker = embeddingsGenerationTask.blockNewTasks()) {
                 addFilesToEntry(entry, files);
                 moveLinkedFilesToFileDir(entry);
                 renameLinkedFilesToPattern(entry);
             } catch (Exception e) {
-                LOGGER.error("Could not block EmbeddingsGenerationTaskManager", e);
+                LOGGER.error("Could not block EmbeddingsGenerationTask", e);
             }
         } catch (Exception e) {
             LOGGER.error("Could not block IndexingTaskManager", e);

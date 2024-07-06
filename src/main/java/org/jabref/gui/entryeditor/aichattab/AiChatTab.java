@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 public class AiChatTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
-    private final WorkspacePreferences workspacePreferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final EmbeddingsGenerationTask embeddingsGenerationTask;
@@ -51,7 +50,6 @@ public class AiChatTab extends EntryEditorTab {
     public AiChatTab(DialogService dialogService, PreferencesService preferencesService, AiService aiService,
                      BibDatabaseContext bibDatabaseContext, EmbeddingsGenerationTask embeddingsGenerationTask, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.workspacePreferences = preferencesService.getWorkspacePreferences();
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.aiService = aiService;
@@ -101,7 +99,7 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void bindToCorrectEntry(BibEntry entry) {
-        AiChatTabWorking aiChatTabWorking = new AiChatTabWorking(aiService, entry, bibDatabaseContext, embeddingsGenerationTask, taskExecutor, workspacePreferences, dialogService);
+        AiChatTabWorking aiChatTabWorking = new AiChatTabWorking(aiService, entry, bibDatabaseContext, embeddingsGenerationTask, taskExecutor, dialogService);
         setContent(aiChatTabWorking.getNode());
     }
 
