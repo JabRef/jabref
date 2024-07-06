@@ -6,7 +6,6 @@ import java.util.List;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -68,30 +67,35 @@ public class CSLCitationOOAdapter {
         return html;
     }
 
-    public static void insertBibliography(XTextDocument doc, XTextCursor cursor)
+    public static void insertBibliography(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries)
             throws IllegalArgumentException, WrappedTargetException, CreationException {
 
-        BibEntry entry = TestEntry.getTestEntry();
         String style = STYLE_LIST.get(cslIndex).getSource();
         Logger.warn("Selected Style: " + STYLE_LIST.get(cslIndex).getTitle());
+
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format, new BibDatabaseContext(), BIBENTRYTYPESMANAGER);
-        Logger.warn("Unformatted Citation: " + actualCitation);
-        String formattedHTML = transformHtml(actualCitation);
-        Logger.warn("Formatted Citation: " + formattedHTML);
-
-        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedHTML));
-        OOTextIntoOO.write(doc, cursor, ooText);
-        cursor.collapseToEnd();
-    }
-
-    public static void insertInText(XTextDocument doc, XTextCursor cursor) throws IOException, WrappedTargetException, CreationException {
-
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry(), TestEntry.getTestEntryBook())));
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
         context.setMode(BibDatabaseMode.BIBLATEX);
 
-        Citation citation = CitationStyleGenerator.generateInText(List.of(TestEntry.getTestEntry(), TestEntry.getTestEntryBook()), STYLE_LIST.get(cslIndex).getSource(), CitationStyleOutputFormat.HTML, context, BIBENTRYTYPESMANAGER);
+        List<String> actualCitations = CitationStyleGenerator.generateCitation(entries, style, format, context, BIBENTRYTYPESMANAGER);
+        for (String actualCitation: actualCitations) {
+            Logger.warn("Unformatted Citation: " + actualCitation);
+            String formattedHTML = transformHtml(actualCitation);
+            Logger.warn("Formatted Citation: " + formattedHTML);
+
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedHTML));
+            OOTextIntoOO.write(doc, cursor, ooText);
+            cursor.collapseToEnd();
+        }
+    }
+
+    public static void insertInText(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries) throws IOException, WrappedTargetException, CreationException {
+
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
+        context.setMode(BibDatabaseMode.BIBLATEX);
+
+        Citation citation = CitationStyleGenerator.generateInText(entries, STYLE_LIST.get(cslIndex).getSource(), CitationStyleOutputFormat.HTML, context, BIBENTRYTYPESMANAGER);
         Logger.warn("Unformatted in-text Citation: " + citation.getText());
         String formattedHTML = transformHtml(citation.getText());
         Logger.warn("Formatted in-text Citation: " + formattedHTML);

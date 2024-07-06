@@ -31,8 +31,8 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    protected static String generateCitation(BibEntry entry, CitationStyle style, BibEntryTypesManager entryTypesManager) {
-        return generateCitation(entry, style.getSource(), entryTypesManager);
+    protected static String generateCitation(List<BibEntry> bibEntries, CitationStyle style, BibEntryTypesManager entryTypesManager) {
+        return generateCitation(bibEntries, style.getSource(), entryTypesManager);
     }
 
     /**
@@ -40,8 +40,8 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    protected static String generateCitation(BibEntry entry, String style, BibEntryTypesManager entryTypesManager) {
-        return generateCitation(entry, style, CitationStyleOutputFormat.HTML, new BibDatabaseContext(), entryTypesManager);
+    protected static String generateCitation(List<BibEntry> bibEntries, String style, BibEntryTypesManager entryTypesManager) {
+        return generateCitation(bibEntries, style, CitationStyleOutputFormat.HTML, new BibDatabaseContext(), entryTypesManager).getFirst();
     }
 
     /**
@@ -49,8 +49,8 @@ public class CitationStyleGenerator {
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
-    public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
-        return generateCitations(Collections.singletonList(entry), style, outputFormat, databaseContext, entryTypesManager).stream().findFirst().orElse("");
+    public static List<String> generateCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
+        return generateCitations(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
     }
 
     public static Citation generateInText(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
