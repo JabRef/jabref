@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.ai;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -35,7 +36,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<AiPreferences.ChatModel> aiChatModel = new SimpleObjectProperty<>();
     private final ObjectProperty<AiPreferences.EmbeddingModel> embeddingModel = new SimpleObjectProperty<>();
 
-    private final StringProperty systemMessage = new SimpleStringProperty();
+    private final StringProperty instruction = new SimpleStringProperty();
     private final DoubleProperty temperature = new SimpleDoubleProperty();
     private final IntegerProperty messageWindowSize = new SimpleIntegerProperty();
     private final IntegerProperty documentSplitterChunkSize = new SimpleIntegerProperty();
@@ -46,7 +47,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final AiPreferences aiPreferences;
 
     private final Validator openAiTokenValidator;
-    private final Validator systemMessageValidator;
+    private final Validator instructionValidator;
     private final Validator temperatureValidator;
     private final Validator messageWindowSizeValidator;
     private final Validator documentSplitterChunkSizeValidator;
@@ -60,41 +61,42 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.openAiTokenValidator = new FunctionBasedValidator<>(
                 openAiToken,
                 token -> !StringUtil.isBlank(token),
-                ValidationMessage.error(Localization.lang("The OpenAI token cannot be empty")));
+                ValidationMessage.error(Localization.lang("The OpenAI token has to be provided")));
 
-        this.systemMessageValidator = new FunctionBasedValidator<>(
-                systemMessage,
+        this.instructionValidator = new FunctionBasedValidator<>(
+                instruction,
                 message -> !StringUtil.isBlank(message),
-                ValidationMessage.error(Localization.lang("The system message cannot be empty")));
+                ValidationMessage.error(Localization.lang("The instruction has to be provided")));
 
+        // Source: https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature
         this.temperatureValidator = new FunctionBasedValidator<>(
                 temperature,
-                temp -> (double) temp >= 0 && (double) temp <= 2,
+                temp -> temp.doubleValue() >= 0 && temp.doubleValue() <= 2,
                 ValidationMessage.error(Localization.lang("Temperature must be between 0 and 2")));
 
         this.messageWindowSizeValidator = new FunctionBasedValidator<>(
                 messageWindowSize,
-                size -> (int) size > 0,
+                size -> size.intValue() > 0,
                 ValidationMessage.error(Localization.lang("Message window size must be greater than 0")));
 
         this.documentSplitterChunkSizeValidator = new FunctionBasedValidator<>(
                 documentSplitterChunkSize,
-                size -> (int) size > 0,
+                size -> size.intValue() > 0,
                 ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0")));
 
         this.documentSplitterOverlapSizeValidator = new FunctionBasedValidator<>(
                 documentSplitterOverlapSize,
-                size -> (int) size > 0 && (int) size < documentSplitterChunkSize.get(),
+                size -> size.intValue() > 0 && size.intValue() < documentSplitterChunkSize.get(),
                 ValidationMessage.error(Localization.lang("Document splitter overlap size must be greater than 0 and less than chunk size")));
 
         this.ragMaxResultsCountValidator = new FunctionBasedValidator<>(
                 ragMaxResultsCount,
-                count -> (int) count > 0,
+                count -> count.intValue() > 0,
                 ValidationMessage.error(Localization.lang("RAG max results count must be greater than 0")));
 
         this.ragMinScoreValidator = new FunctionBasedValidator<>(
                 ragMinScore,
-                score -> (double) score > 0 && (double) score < 1,
+                score -> score.doubleValue() > 0 && score.doubleValue() < 1,
                 ValidationMessage.error(Localization.lang("RAG min score must be greater than 0 and less than 1")));
     }
 
@@ -108,7 +110,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiChatModel.setValue(aiPreferences.getChatModel());
         embeddingModel.setValue(aiPreferences.getEmbeddingModel());
 
-        systemMessage.setValue(aiPreferences.getSystemMessage());
+        instruction.setValue(aiPreferences.getInstruction());
         temperature.setValue(aiPreferences.getTemperature());
         messageWindowSize.setValue(aiPreferences.getMessageWindowSize());
         documentSplitterChunkSize.setValue(aiPreferences.getDocumentSplitterChunkSize());
@@ -128,7 +130,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             aiPreferences.setChatModel(aiChatModel.get());
             aiPreferences.setEmbeddingModel(embeddingModel.get());
 
-            aiPreferences.setSystemMessage(systemMessage.get());
+            aiPreferences.setInstruction(instruction.get());
             aiPreferences.setTemperature(temperature.get());
             aiPreferences.setMessageWindowSize(messageWindowSize.get());
             aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
@@ -141,8 +143,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetExpertSettings() {
-        aiPreferences.setSystemMessage(AiDefaultPreferences.SYSTEM_MESSAGE);
-        systemMessage.set(AiDefaultPreferences.SYSTEM_MESSAGE);
+        aiPreferences.setInstruction(AiDefaultPreferences.SYSTEM_MESSAGE);
+        instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
 
         aiPreferences.setMessageWindowSize(AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
         messageWindowSize.set(AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
@@ -162,18 +164,18 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        Validator[] validators = {
+        List<Validator> validators = List.of(
                 openAiTokenValidator,
-                systemMessageValidator,
+                instructionValidator,
                 temperatureValidator,
                 messageWindowSizeValidator,
                 documentSplitterChunkSizeValidator,
                 documentSplitterOverlapSizeValidator,
                 ragMaxResultsCountValidator,
                 ragMinScoreValidator
-        };
+        );
 
-        return Arrays.stream(validators).map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
+        return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
     }
 
     public StringProperty openAiTokenProperty() {
@@ -204,8 +206,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return embeddingModel;
     }
 
-    public StringProperty systemMessageProperty() {
-        return systemMessage;
+    public StringProperty instructionProperty() {
+        return instruction;
     }
 
     public DoubleProperty temperatureProperty() {
@@ -237,7 +239,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public ValidationStatus getSystemMessageValidatorStatus() {
-        return systemMessageValidator.getValidationStatus();
+        return instructionValidator.getValidationStatus();
     }
 
     public ValidationStatus getTemperatureValidatorStatus() {

@@ -1,6 +1,5 @@
 package org.jabref.logic.ai.chat;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -23,7 +22,8 @@ import dev.langchain4j.store.embedding.filter.Filter;
  * <p>
  * This class listens to chat language model change.
  * <p>
- * Warning: this class does not manage the chat history.
+ * Notice: this class does not manage the chat history.
+ * You should add messages to history on your own to {@link org.jabref.logic.ai.chathistory.BibDatabaseChatHistory}.
  */
 public class AiChatLogic {
     private final AiService aiService;
@@ -39,12 +39,12 @@ public class AiChatLogic {
 
         rebuild();
 
-        listenToPreferences();
+        setupListeningToPreferencesChanges();
     }
 
-    private void listenToPreferences() {
+    private void setupListeningToPreferencesChanges() {
         aiService.getChatLanguageModel().chatLanguageModelObjectProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue != null) {
+            if (newValue.isPresent()) {
                 rebuild();
             }
         });
@@ -57,7 +57,7 @@ public class AiChatLogic {
 
         AiPreferences aiPreferences = aiService.getPreferences();
 
-        aiPreferences.systemMessageProperty().addListener(obs -> {
+        aiPreferences.instructionProperty().addListener(obs -> {
             rebuild();
         });
 
@@ -71,10 +71,12 @@ public class AiChatLogic {
     private void rebuild() {
         // When the user turns off the AI features all AiChat classes should be destroyed.
         // So this assert should never fail.
-        assert aiService.getChatLanguageModel().getChatLanguageModel() != null;
+        assert aiService.getChatLanguageModel().getChatLanguageModel().isPresent();
 
-        List<dev.langchain4j.data.message.ChatMessage> oldMessages = new ArrayList<>();
-        if (chatMemory != null) {
+        List<dev.langchain4j.data.message.ChatMessage> oldMessages;
+        if (chatMemory == null) {
+            oldMessages = List.of();
+        } else {
             oldMessages = chatMemory.messages();
         }
 
@@ -98,13 +100,13 @@ public class AiChatLogic {
 
         this.chain = ConversationalRetrievalChain
                 .builder()
-                .chatLanguageModel(aiService.getChatLanguageModel().getChatLanguageModel())
+                .chatLanguageModel(aiService.getChatLanguageModel().getChatLanguageModel().get())
                 .contentRetriever(contentRetirever)
                 .chatMemory(chatMemory)
                 .build();
 
-        if (aiPreferences.getSystemMessage() != null || !aiPreferences.getSystemMessage().isEmpty()) {
-            this.chatMemory.add(new SystemMessage(aiPreferences.getSystemMessage()));
+        if (!aiPreferences.getInstruction().isEmpty()) {
+            this.chatMemory.add(new SystemMessage(aiPreferences.getInstruction()));
         }
     }
 

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -22,7 +23,7 @@ import org.jabref.preferences.FilePreferences;
  * <p>
  * This class also provides an ability to prioritize the entry in the queue. But it seems not to work well.
  */
-public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
+public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final AiService aiService;
@@ -30,6 +31,8 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
 
     private final AiIngestor aiIngestor;
 
+    // We use an {@link ArrayList} as a queue to implement prioritization of the {@link LinkedFile}s as it provides more
+    // methods to manipulate the collection.
     private final List<LinkedFile> linkedFileQueue = new ArrayList<>();
     private int numOfProcessedFiles = 0;
 
@@ -37,7 +40,7 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
     private boolean isRunning = false;
     private boolean isBlockingNewTasks = false;
 
-    public EmbeddingsGenerationTaskManager(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiService aiService, TaskExecutor taskExecutor) {
+    public EmbeddingsGenerationTask(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiService aiService, TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.aiService = aiService;
@@ -47,7 +50,7 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
 
         configure();
 
-        listenToPreferences();
+        setupListeningToPreferencesChanges();
     }
 
     private void configure() {
@@ -55,42 +58,25 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
         willBeRecoveredAutomatically(true);
         updateProgress(1, 1);
         titleProperty().set(Localization.lang("Embeddings generation"));
-
-        this.onFailure(e -> {
-            throw new RuntimeException(e);
-        });
     }
 
-    private void listenToPreferences() {
-        // TODO: Will these listeners align with AiIngestor preference listeners?
+    private void setupListeningToPreferencesChanges() {
         aiService.getPreferences().onEmbeddingsParametersChange(this::invalidate);
     }
 
-    public void addToProcess(Collection<BibEntry> bibEntries) {
-        bibEntries.forEach(this::addToProcess);
+    public void addToStore(Collection<BibEntry> bibEntries) {
+        bibEntries.forEach(this::addToStore);
     }
 
-    public void removeFromProcess(Collection<BibEntry> bibEntries) {
-        bibEntries.forEach(this::removeFromProcess);
+    public void addToStore(BibEntry bibEntry) {
+        addToStore(bibEntry.getFiles());
     }
 
-    public void addToProcess(BibEntry bibEntry) {
-        addToProcess(bibEntry.getFiles());
+    public void addToStore(List<LinkedFile> linkedFiles) {
+        linkedFiles.forEach(this::addToStore);
     }
 
-    public void removeFromProcess(BibEntry bibEntry) {
-        removeFromProcess(bibEntry.getFiles());
-    }
-
-    public void addToProcess(List<LinkedFile> linkedFiles) {
-        linkedFiles.forEach(this::addToProcess);
-    }
-
-    public void removeFromProcess(List<LinkedFile> linkedFiles) {
-        linkedFiles.forEach(this::removeFromProcess);
-    }
-
-    public void addToProcess(LinkedFile linkedFile) {
+    public void addToStore(LinkedFile linkedFile) {
         if (!isBlockingNewTasks) {
             linkedFileQueue.add(linkedFile);
 
@@ -115,28 +101,41 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
         };
     }
 
-    public void removeFromProcess(LinkedFile linkedFile) {
+    public void removeFromStore(Collection<BibEntry> bibEntries) {
+        bibEntries.forEach(this::removeFromStore);
+    }
+
+    public void removeFromStore(BibEntry bibEntry) {
+        removeFromStore(bibEntry.getFiles());
+    }
+
+    public void removeFromStore(List<LinkedFile> linkedFiles) {
+        linkedFiles.forEach(this::removeFromStore);
+    }
+
+
+    public void removeFromStore(LinkedFile linkedFile) {
         aiService.getEmbeddingsManager().removeIngestedFile(linkedFile.getLink());
     }
 
-    public void removeFromProcess(Set<String> linksToRemove) {
-        linksToRemove.forEach(this::removeFromProcess);
+    public void removeFromStore(Set<String> linksToRemove) {
+        linksToRemove.forEach(this::removeFromStore);
     }
 
-    public void removeFromProcess(String link) {
+    public void removeFromStore(String link) {
         aiService.getEmbeddingsManager().removeIngestedFile(link);
     }
 
     public void updateEmbeddings(BibDatabaseContext bibDatabaseContext) {
-        Set<String> linksToRemove = aiService.getEmbeddingsManager().getIngestedFilesTracker().getListOfIngestedFilesLinks();
+        Set<String> linksToRemove = aiService.getEmbeddingsManager().getIngestedFilesTracker().getIngestedLinkedFiles();
         bibDatabaseContext.getEntries().stream()
                        .flatMap(entry -> entry.getFiles().stream())
                        .map(LinkedFile::getLink)
                        .forEach(linksToRemove::remove);
 
-        removeFromProcess(linksToRemove);
+        removeFromStore(linksToRemove);
 
-        addToProcess(bibDatabaseContext.getEntries());
+        addToStore(bibDatabaseContext.getEntries());
     }
 
     @Override
@@ -180,8 +179,8 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
 
         linkedFileQueue.clear();
         databaseContext.getEntries().forEach(entry -> {
-            removeFromProcess(entry);
-            addToProcess(entry);
+            removeFromStore(entry);
+            addToStore(entry);
         });
     }
 
@@ -198,5 +197,9 @@ public class EmbeddingsGenerationTaskManager extends BackgroundTask<Void> {
      */
     public void moveToFront(LinkedFile linkedFile) {
         linkedFileQueue.add(linkedFile);
+    }
+
+    public void updateDatabaseName(String name) {
+        UiTaskExecutor.runInJavaFXThread(() -> this.titleProperty().set(Localization.lang("Generating embeddings for %0", name)));
     }
 }

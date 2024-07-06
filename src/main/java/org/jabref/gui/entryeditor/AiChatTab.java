@@ -17,7 +17,7 @@ import org.jabref.logic.ai.chat.AiChatLogic;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.logic.ai.chathistory.BibEntryChatHistory;
 import org.jabref.logic.ai.chathistory.ChatMessage;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
+import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
 import org.jabref.logic.ai.embeddings.events.FileIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
@@ -42,7 +42,7 @@ public class AiChatTab extends EntryEditorTab {
     private final WorkspacePreferences workspacePreferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final BibDatabaseContext bibDatabaseContext;
-    private final EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager;
+    private final EmbeddingsGenerationTask embeddingsGenerationTask;
     private final TaskExecutor taskExecutor;
     private final CitationKeyGenerator citationKeyGenerator;
 
@@ -57,14 +57,14 @@ public class AiChatTab extends EntryEditorTab {
     private @Nullable BibEntryChatHistory bibEntryChatHistory;
 
     public AiChatTab(DialogService dialogService, PreferencesService preferencesService, AiService aiService,
-                     BibDatabaseContext bibDatabaseContext, EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager, TaskExecutor taskExecutor) {
+                     BibDatabaseContext bibDatabaseContext, EmbeddingsGenerationTask embeddingsGenerationTask, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.workspacePreferences = preferencesService.getWorkspacePreferences();
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.aiService = aiService;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.embeddingsGenerationTaskManager = embeddingsGenerationTaskManager;
+        this.embeddingsGenerationTask = embeddingsGenerationTask;
         this.taskExecutor = taskExecutor;
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
         setText(Localization.lang("AI chat"));
@@ -104,7 +104,7 @@ public class AiChatTab extends EntryEditorTab {
             showErrorNotIngested();
         } else {
             // All preconditions met
-            embeddingsGenerationTaskManager.moveToFront(entry.getFiles());
+            embeddingsGenerationTask.moveToFront(entry.getFiles());
             createAiChat();
             setupChatHistory();
             restoreLogicalChatHistory();

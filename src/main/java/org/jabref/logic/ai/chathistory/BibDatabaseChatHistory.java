@@ -6,7 +6,6 @@ import java.util.stream.Stream;
 
 import org.jabref.gui.DialogService;
 
-import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
 /**
@@ -21,12 +20,12 @@ public class BibDatabaseChatHistory {
 
     private final MVStore mvStore;
 
-    private final MVMap<Integer, ChatMessage.Type> messageType;
-    private final MVMap<Integer, String> messageContent;
-    private final MVMap<Integer, String> messageCitationKey;
+    private final Map<Integer, ChatMessage.Type> messageType;
+    private final Map<Integer, String> messageContent;
+    private final Map<Integer, String> messageCitationKey;
 
     public BibDatabaseChatHistory(Path bibDatabasePath, DialogService dialogService) {
-        MVStore mvStore1; // This Java again...
+        MVStore mvStore1;
 
         try {
             mvStore1 = MVStore.open(bibDatabasePath + "." + AI_CHATS_FILE_EXTENSION);

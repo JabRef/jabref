@@ -1,13 +1,17 @@
 package org.jabref.logic.ai.chat;
 
+import java.util.Optional;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.preferences.AiPreferences;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.openai.OpenAiChatModel;
-import org.jspecify.annotations.Nullable;
+import org.h2.mvstore.MVStore;
 
 /**
  * Wrapper around langchain4j chat language model.
@@ -17,7 +21,7 @@ import org.jspecify.annotations.Nullable;
 public class AiChatLanguageModel {
     private final AiPreferences aiPreferences;
 
-    private final ObjectProperty<@Nullable ChatLanguageModel> chatLanguageModelObjectProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<Optional<ChatLanguageModel>> chatLanguageModelObjectProperty = new SimpleObjectProperty<>(Optional.empty());
 
     public AiChatLanguageModel(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
@@ -26,37 +30,52 @@ public class AiChatLanguageModel {
             rebuild();
         }
 
-        listenToPreferences();
+        setupListeningToPreferencesChanges();
     }
 
-    public ObjectProperty<@Nullable ChatLanguageModel> chatLanguageModelObjectProperty() {
+    public ObjectProperty<Optional<ChatLanguageModel>> chatLanguageModelObjectProperty() {
         return chatLanguageModelObjectProperty;
     }
 
-    public @Nullable ChatLanguageModel getChatLanguageModel() {
+    /**
+     * Returns the chat language model.
+     * The return may be empty in case user disallowed any usage of AI or if the API token is empty.
+     * Unfortunately, we really mustn't send empty API tokens to langchain4j models, because there will be a
+     * {@link RuntimeException}.
+     */
+    public Optional<ChatLanguageModel> getChatLanguageModel() {
         return chatLanguageModelObjectProperty.get();
     }
 
+    /**
+     * Update the underlying {@link ChatLanguageModel] by current {@link AiPreferences} parameters.
+     * When the model is updated, the chat messages are not lost.
+     * See {@link AiChatLogic}, where messages are stored in {@link ChatMemory},
+     * and {@link BibDatabaseChatHistory}, where messages are stored in {@link MVStore}.
+     */
     private void rebuild() {
+        if (aiPreferences.getOpenAiToken().isEmpty()) {
+            chatLanguageModelObjectProperty.set(null);
+            return;
+        }
+
         ChatLanguageModel chatLanguageModel =
                 OpenAiChatModel
                         .builder()
                         .apiKey(aiPreferences.getOpenAiToken())
-                        .modelName(aiPreferences.getChatModel().getName())
+                        .modelName(aiPreferences.getChatModel().getLabel())
                         .temperature(aiPreferences.getTemperature())
                         .logRequests(true)
                         .logResponses(true)
                         .build();
 
-        chatLanguageModelObjectProperty.set(chatLanguageModel);
+        chatLanguageModelObjectProperty.set(Optional.of(chatLanguageModel));
     }
 
-    private void listenToPreferences() {
+    private void setupListeningToPreferencesChanges() {
         aiPreferences.enableChatWithFilesProperty().addListener(obs -> {
             if (aiPreferences.getEnableChatWithFiles()) {
-                if (!aiPreferences.getOpenAiToken().isEmpty()) {
-                    rebuild();
-                }
+                rebuild();
             } else {
                 chatLanguageModelObjectProperty.set(null);
             }

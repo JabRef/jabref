@@ -55,8 +55,10 @@ public class JabRefGUI extends Application {
 
     private static List<UiCommand> uiCommands;
     private static JabRefPreferences preferencesService;
-    private static AiService aiService;
     private static FileUpdateMonitor fileUpdateMonitor;
+
+    // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
+    private static AiService aiService;
 
     private static StateManager stateManager;
     private static ThemeManager themeManager;

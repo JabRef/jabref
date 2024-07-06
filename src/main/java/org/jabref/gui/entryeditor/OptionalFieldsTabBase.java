@@ -14,7 +14,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
+import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
@@ -40,7 +40,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                                  StateManager stateManager,
                                  ThemeManager themeManager,
                                  IndexingTaskManager indexingTaskManager,
-                                 EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager,
+                                 EmbeddingsGenerationTask embeddingsGenerationTask,
                                  BibEntryTypesManager entryTypesManager,
                                  TaskExecutor taskExecutor,
                                  JournalAbbreviationRepository journalAbbreviationRepository) {
@@ -55,7 +55,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                 taskExecutor,
                 journalAbbreviationRepository,
                 indexingTaskManager,
-                embeddingsGenerationTaskManager);
+                embeddingsGenerationTask);
         this.entryTypesManager = entryTypesManager;
         this.isImportantOptionalFields = isImportantOptionalFields;
         setText(title);

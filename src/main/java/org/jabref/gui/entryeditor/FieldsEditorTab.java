@@ -33,7 +33,7 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
+import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
@@ -60,7 +60,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final StateManager stateManager;
     private final IndexingTaskManager indexingTaskManager;
-    private final EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager;
+    private final EmbeddingsGenerationTask embeddingsGenerationTask;
     private PreviewPanel previewPanel;
     private final UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
@@ -77,7 +77,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                            TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository,
                            IndexingTaskManager indexingTaskManager,
-                           EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager) {
+                           EmbeddingsGenerationTask embeddingsGenerationTask) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
@@ -89,7 +89,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.stateManager = stateManager;
         this.indexingTaskManager = indexingTaskManager;
-        this.embeddingsGenerationTaskManager = embeddingsGenerationTaskManager;
+        this.embeddingsGenerationTask = embeddingsGenerationTask;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -258,7 +258,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                     stateManager,
                     themeManager,
                     indexingTaskManager,
-                    embeddingsGenerationTaskManager,
+                    embeddingsGenerationTask,
                     taskExecutor);
             EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
                 if (show) {

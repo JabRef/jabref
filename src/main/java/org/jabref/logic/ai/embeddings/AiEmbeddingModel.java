@@ -21,9 +21,8 @@ public class AiEmbeddingModel {
 
     public AiEmbeddingModel(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
-
         rebuild();
-        listenToPreferences();
+        setupListeningToPreferencesChanges();
     }
 
     private void rebuild() {
@@ -37,7 +36,7 @@ public class AiEmbeddingModel {
         embeddingModelObjectProperty.set(embeddingModel);
     }
 
-    private void listenToPreferences() {
+    private void setupListeningToPreferencesChanges() {
         aiPreferences.embeddingModelProperty().addListener(obs -> rebuild());
     }
 

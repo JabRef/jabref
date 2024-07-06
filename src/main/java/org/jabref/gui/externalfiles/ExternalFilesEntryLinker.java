@@ -12,7 +12,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
+import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
@@ -78,9 +78,9 @@ public class ExternalFilesEntryLinker {
         }
     }
 
-    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager) {
+    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, EmbeddingsGenerationTask embeddingsGenerationTask) {
         try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
-            try (AutoCloseable blocker2 = embeddingsGenerationTaskManager.blockNewTasks()) {
+            try (AutoCloseable blocker2 = embeddingsGenerationTask.blockNewTasks()) {
                 addFilesToEntry(entry, files);
                 moveLinkedFilesToFileDir(entry);
                 renameLinkedFilesToPattern(entry);
@@ -98,9 +98,9 @@ public class ExternalFilesEntryLinker {
         }
     }
 
-    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager) {
+    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, EmbeddingsGenerationTask embeddingsGenerationTask) {
         try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
-            try (AutoCloseable blocker2 = embeddingsGenerationTaskManager.blockNewTasks()) {
+            try (AutoCloseable blocker2 = embeddingsGenerationTask.blockNewTasks()) {
                 for (Path file : files) {
                     copyFileToFileDir(file)
                             .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));

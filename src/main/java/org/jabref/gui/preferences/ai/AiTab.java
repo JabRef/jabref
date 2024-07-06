@@ -31,7 +31,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private ComboBox<AiPreferences.ChatModel> aiModelComboBox;
     @FXML private ComboBox<AiPreferences.EmbeddingModel> embeddingModelComboBox;
 
-    @FXML private TextArea systemMessageTextArea;
+    @FXML private TextArea instructionTextArea;
     @FXML private DoubleInputField temperatureTextField;
     @FXML private IntegerInputField messageWindowSizeTextField;
     @FXML private IntegerInputField documentSplitterChunkSizeTextField;
@@ -43,7 +43,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     @FXML private Button chatModelHelp;
     @FXML private Button embeddingModelHelp;
-    @FXML private Button systemMessageHelp;
+    @FXML private Button instructionHelp;
     @FXML private Button messageWindowSizeHelp;
     @FXML private Button documentSplitterChunkSizeHelp;
     @FXML private Button documentSplitterOverlapSizeHelp;
@@ -72,7 +72,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         aiModelComboBox.valueProperty().bindBidirectional(viewModel.aiChatModelProperty());
         embeddingModelComboBox.valueProperty().bindBidirectional(viewModel.embeddingModelProperty());
 
-        systemMessageTextArea.textProperty().bindBidirectional(viewModel.systemMessageProperty());
+        instructionTextArea.textProperty().bindBidirectional(viewModel.instructionProperty());
         temperatureTextField.valueProperty().bindBidirectional(viewModel.temperatureProperty().asObject());
         messageWindowSizeTextField.valueProperty().bindBidirectional(viewModel.messageWindowSizeProperty().asObject());
         documentSplitterChunkSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterChunkSizeProperty().asObject());
@@ -80,15 +80,15 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         ragMaxResultsCountTextField.valueProperty().bindBidirectional(viewModel.ragMaxResultsCountProperty().asObject());
         ragMinScoreTextField.valueProperty().bindBidirectional(viewModel.ragMinScoreProperty().asObject());
 
-        updateDisabilities();
+        updateDisabledProperties();
 
-        enableChat.selectedProperty().addListener(obs -> updateDisabilities());
+        enableChat.selectedProperty().addListener(obs -> updateDisabledProperties());
 
-        customizeSettingsCheckbox.selectedProperty().addListener(obs -> updateDisabilities());
+        customizeSettingsCheckbox.selectedProperty().addListener(obs -> updateDisabledProperties());
 
         Platform.runLater(() -> {
             visualizer.initVisualization(viewModel.getOpenAiTokenValidatorStatus(), openAiToken);
-            visualizer.initVisualization(viewModel.getSystemMessageValidatorStatus(), systemMessageTextArea);
+            visualizer.initVisualization(viewModel.getSystemMessageValidatorStatus(), instructionTextArea);
             visualizer.initVisualization(viewModel.getTemperatureValidatorStatus(), temperatureTextField);
             visualizer.initVisualization(viewModel.getMessageWindowSizeValidatorStatus(), messageWindowSizeTextField);
             visualizer.initVisualization(viewModel.getDocumentSplitterChunkSizeValidatorStatus(), documentSplitterChunkSizeTextField);
@@ -100,7 +100,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_CHAT_MODEL, dialogService, preferencesService.getFilePreferences()), chatModelHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EMBEDDING_MODEL, dialogService, preferencesService.getFilePreferences()), embeddingModelHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_SYSTEM_MESSAGE, dialogService, preferencesService.getFilePreferences()), systemMessageHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_INSTRUCTION, dialogService, preferencesService.getFilePreferences()), instructionHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_MESSAGE_WINDOW_SIZE, dialogService, preferencesService.getFilePreferences()), messageWindowSizeHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_CHUNK_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterChunkSizeHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterOverlapSizeHelp);
@@ -108,7 +108,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MIN_SCORE, dialogService, preferencesService.getFilePreferences()), ragMinScoreHelp);
     }
 
-    private void updateDisabilities() {
+    private void updateDisabledProperties() {
         openAiToken.setDisable(!viewModel.getUseAi());
 
         customizeSettingsCheckbox.setDisable(!viewModel.getUseAi());
@@ -116,7 +116,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         aiModelComboBox.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
         embeddingModelComboBox.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
 
-        systemMessageTextArea.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        instructionTextArea.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
         temperatureTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
         messageWindowSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
         documentSplitterChunkSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());

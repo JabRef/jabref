@@ -20,28 +20,18 @@ public class AiPreferences {
         GPT_4_TURBO("gpt-4-turbo"),
         GPT_4O("gpt-4o");
 
-        private final String name;
+        private final String label;
 
-        ChatModel(String name) {
-            this.name = name;
-        }
-
-        public static ChatModel fromString(String text) {
-            for (ChatModel b : ChatModel.values()) {
-                if (b.name.equals(text)) {
-                    return b;
-                }
-            }
-            assert false;
-            return null;
+        ChatModel(String label) {
+            this.label = label;
         }
 
         public String toString() {
-            return name;
+            return label;
         }
 
-        public String getName() {
-            return name;
+        public String getLabel() {
+            return label;
         }
     }
 
@@ -49,28 +39,18 @@ public class AiPreferences {
         ALL_MINLM_l6_V2("all-MiniLM-L6-v2"),
         ALL_MINLM_l6_V2_Q("all-MiniLM-L6-v2 (quantized)");
 
-        private final String name;
+        private final String label;
 
-        EmbeddingModel(String name) {
-            this.name = name;
+        EmbeddingModel(String label) {
+            this.label = label;
         }
 
-        public String getName() {
-             return name;
-        }
-
-        public static EmbeddingModel fromString(String text) {
-            for (EmbeddingModel b : EmbeddingModel.values()) {
-                if (b.name.equals(text)) {
-                    return b;
-                }
-            }
-            assert false;
-            return null;
+        public String getLabel() {
+             return label;
         }
 
         public String toString() {
-            return name;
+            return label;
         }
     }
 
@@ -82,7 +62,7 @@ public class AiPreferences {
     private final ObjectProperty<ChatModel> chatModel;
     private final ObjectProperty<EmbeddingModel> embeddingModel;
 
-    private final StringProperty systemMessage;
+    private final StringProperty instruction;
     private final DoubleProperty temperature;
     private final IntegerProperty messageWindowSize;
     private final IntegerProperty documentSplitterChunkSize;
@@ -90,7 +70,7 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles, String openAiToken, ChatModel chatModel, EmbeddingModel embeddingModel, boolean customizeSettings, String systemMessage, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
+    public AiPreferences(boolean enableChatWithFiles, String openAiToken, ChatModel chatModel, EmbeddingModel embeddingModel, boolean customizeSettings, String instruction, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
         this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
         this.openAiToken = new SimpleStringProperty(openAiToken);
 
@@ -99,7 +79,7 @@ public class AiPreferences {
         this.chatModel = new SimpleObjectProperty<>(chatModel);
         this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
 
-        this.systemMessage = new SimpleStringProperty(systemMessage);
+        this.instruction = new SimpleStringProperty(instruction);
         this.temperature = new SimpleDoubleProperty(temperature);
         this.messageWindowSize = new SimpleIntegerProperty(messageWindowSize);
         this.documentSplitterChunkSize = new SimpleIntegerProperty(documentSplitterChunkSize);
@@ -168,16 +148,16 @@ public class AiPreferences {
         this.embeddingModel.set(embeddingModel);
     }
 
-    public StringProperty systemMessageProperty() {
-        return systemMessage;
+    public StringProperty instructionProperty() {
+        return instruction;
     }
 
-    public String getSystemMessage() {
-        return systemMessage.get();
+    public String getInstruction() {
+        return instruction.get();
     }
 
-    public void setSystemMessage(String systemMessage) {
-        this.systemMessage.set(systemMessage);
+    public void setInstruction(String instruction) {
+        this.instruction.set(instruction);
     }
 
     public DoubleProperty temperatureProperty() {

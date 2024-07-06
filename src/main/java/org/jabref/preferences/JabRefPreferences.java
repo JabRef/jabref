@@ -464,6 +464,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
+    private static final String KEYRING_AI_SERVICE = "org.jabref.ai";
+    private static final String KEYRING_AI_SERVICE_ACCOUNT = "apitoken";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
 
@@ -852,8 +855,8 @@ public class JabRefPreferences implements PreferencesService {
         // AI
         defaults.put(AI_ENABLE_CHAT, AiDefaultPreferences.ENABLE_CHAT);
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
-        defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL.getName());
-        defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.getName());
+        defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL.name());
+        defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());
         defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
         defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
         defaults.put(AI_MESSAGE_WINDOW_SIZE, AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
@@ -2689,21 +2692,11 @@ public class JabRefPreferences implements PreferencesService {
             return aiPreferences;
         }
 
-        boolean useAi = getBoolean(AI_ENABLE_CHAT);
-
-        String token = getOpenAiTokenFromKeyring();
-
-        // To ensure that the token is never null or empty while useAi is true.
-        if (token == null) {
-            useAi = false;
-            token = "";
-        }
-
         aiPreferences = new AiPreferences(
-                useAi,
-                token,
-                AiPreferences.ChatModel.fromString(get(AI_CHAT_MODEL)),
-                AiPreferences.EmbeddingModel.fromString(get(AI_EMBEDDING_MODEL)),
+                getBoolean(AI_ENABLE_CHAT),
+                getOpenAiTokenFromKeyring().orElse(""),
+                AiPreferences.ChatModel.valueOf(get(AI_CHAT_MODEL)),
+                AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_SYSTEM_MESSAGE),
                 getDouble(AI_TEMPERATURE),
@@ -2718,10 +2711,10 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(aiPreferences.customizeSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
-        EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue.getName()));
+        EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue.name()));
         EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
 
-        EasyBind.listen(aiPreferences.systemMessageProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
+        EasyBind.listen(aiPreferences.instructionProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
         EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, (double) newValue));
         EasyBind.listen(aiPreferences.messageWindowSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_MESSAGE_WINDOW_SIZE, newValue));
         EasyBind.listen(aiPreferences.documentSplitterChunkSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, newValue));
@@ -2732,14 +2725,14 @@ public class JabRefPreferences implements PreferencesService {
         return aiPreferences;
     }
 
-    private @Nullable String getOpenAiTokenFromKeyring() {
+    private Optional<String> getOpenAiTokenFromKeyring() {
         try (final Keyring keyring = Keyring.create()) {
-            String rawPassword = keyring.getPassword("org.jabref.customapikeys", "openaitoken");
+            String rawPassword = keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT);
             Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
-            return password.decrypt();
+            return Optional.of(password.decrypt());
         } catch (Exception e) {
             LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token", e);
-            return null;
+            return Optional.empty();
         }
     }
 

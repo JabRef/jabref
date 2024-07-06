@@ -66,6 +66,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new KeyBindingsTab(),
                 new GroupsTab(),
                 new WebSearchTab(),
+                new AiTab(),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
@@ -83,8 +84,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new XmpPrivacyTab(),
                 new CustomImporterTab(),
                 new CustomExporterTab(),
-                new NetworkTab(),
-                new AiTab()
+                new NetworkTab()
         );
     }
 

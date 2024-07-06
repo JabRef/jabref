@@ -39,7 +39,7 @@ public class AiIngestor {
         this.aiService = aiService;
         this.ingestor = rebuild(aiService);
 
-        listenToPreferences();
+        setupListeningToPreferencesChanges();
     }
 
     private EmbeddingStoreIngestor rebuild(AiService aiService) {
@@ -55,7 +55,7 @@ public class AiIngestor {
                 .build();
     }
 
-    private void listenToPreferences() {
+    private void setupListeningToPreferencesChanges() {
         aiService.getPreferences().onEmbeddingsParametersChange(() -> ingestor = rebuild(aiService));
     }
 
@@ -79,9 +79,9 @@ public class AiIngestor {
 
             long currentModificationTimeInSeconds = attributes.lastModifiedTime().to(TimeUnit.SECONDS);
 
-            Long ingestedModificationTimeInSeconds = ingestedFilesTracker.getIngestedFileModificationTime(linkedFile.getLink());
+            Optional<Long> ingestedModificationTimeInSeconds = ingestedFilesTracker.getIngestedFileModificationTime(linkedFile.getLink());
 
-            if (ingestedModificationTimeInSeconds != null && currentModificationTimeInSeconds <= ingestedModificationTimeInSeconds) {
+            if (ingestedModificationTimeInSeconds.isPresent() && currentModificationTimeInSeconds <= ingestedModificationTimeInSeconds.get()) {
                 return;
             }
 
@@ -105,14 +105,13 @@ public class AiIngestor {
     }
 
     private void ingestPDFFile(Path path, Metadata metadata) {
-        try {
-            PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(path);
-            PDFTextStripper stripper = new PDFTextStripper();
-
+        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(path)) {
             int lastPage = document.getNumberOfPages();
+            StringWriter writer = new StringWriter();
+
+            PDFTextStripper stripper = new PDFTextStripper();
             stripper.setStartPage(1);
             stripper.setEndPage(lastPage);
-            StringWriter writer = new StringWriter();
             stripper.writeText(document, writer);
 
             ingestString(writer.toString(), metadata);
@@ -126,7 +125,6 @@ public class AiIngestor {
     }
 
     private void ingestDocument(Document document) {
-        LOGGER.trace("Ingesting: {}", document);
         ingestor.ingest(document);
     }
 }

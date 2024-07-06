@@ -47,11 +47,12 @@ public class AiEmbeddingsManager {
         try {
             Files.createDirectories(JabRefDesktop.getEmbeddingsCacheDirectory());
         } catch (IOException e) {
+            LOGGER.error("An error occurred while creating directories for embedding store", e);
             dialogService.showErrorDialogAndWait("An error occurred while creating directories for embedding store. Will use an in-memory store", e);
             mvStorePath = null;
         }
 
-        MVStore mvStoreTemp; // Strange Java...
+        MVStore mvStoreTemp;
 
         try {
             mvStoreTemp = MVStore.open(mvStorePath == null ? null : mvStorePath.toString());
@@ -65,21 +66,21 @@ public class AiEmbeddingsManager {
         this.embeddingStore = new MVStoreEmbeddingStore(this.mvStore);
         this.ingestedFilesTracker = new AiIngestedFilesTracker(this.mvStore);
 
-        listenToPreferences();
+        setupListeningToPreferencesChanges();
     }
 
-    private void listenToPreferences() {
+    public void removeIngestedFile(String link) {
+        embeddingStore.removeAll(MetadataFilterBuilder.metadataKey("linkedFile").isEqualTo(link));
+        ingestedFilesTracker.removeIngestedFileTrack(link);
+    }
+
+    private void setupListeningToPreferencesChanges() {
         // When these properties change, EmbeddingsGenerationTaskManager's should add the entries again.
         // Unfortunately, they would also remove embeddings. So embeddings will be removed twice:
         // once there, and the other in EmbeddingsGenerationTaskManager.
         // It's not an error, but it's a double work.
 
         aiPreferences.onEmbeddingsParametersChange(embeddingStore::removeAll);
-    }
-
-    public void removeIngestedFile(String link) {
-        embeddingStore.removeAll(MetadataFilterBuilder.metadataKey("linkedFile").isEqualTo(link));
-        ingestedFilesTracker.removeIngestedFileTrack(link);
     }
 
     public AiIngestedFilesTracker getIngestedFilesTracker() {
