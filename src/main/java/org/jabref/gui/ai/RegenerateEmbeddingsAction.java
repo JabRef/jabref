@@ -16,53 +16,40 @@ public class RegenerateEmbeddingsAction extends SimpleCommand {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
-    private boolean shouldContinue = true;
+    public interface GetCurrentLibraryTab {
+        LibraryTab get();
+    }
 
     public RegenerateEmbeddingsAction(StateManager stateManager,
-                                        GetCurrentLibraryTab currentLibraryTab,
-                                        DialogService dialogService,
-                                        TaskExecutor taskExecutor) {
+                                      GetCurrentLibraryTab currentLibraryTab,
+                                      DialogService dialogService,
+                                      TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.currentLibraryTab = currentLibraryTab;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-
         this.executable.bind(needsDatabase(stateManager));
     }
 
     @Override
     public void execute() {
-        init();
-        BackgroundTask.wrap(this::rebuildIndex)
-                      .executeWith(taskExecutor);
-    }
-
-    public void init() {
         if (stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
 
-        boolean confirm = dialogService.showConfirmationDialogAndWait(
+        final LibraryTab libraryTab = currentLibraryTab.get();
+
+        boolean confirmed = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Regenerate embeddings cache"),
                 Localization.lang("Regenerate embeddings cache for current library?"));
 
-        if (!confirm) {
-            shouldContinue = false;
+        if (!confirmed) {
             return;
         }
 
         dialogService.notify(Localization.lang("Regenerating embeddings cache..."));
-    }
 
-    private void rebuildIndex() {
-        if (!shouldContinue || stateManager.getActiveDatabase().isEmpty()) {
-            return;
-        }
-
-        currentLibraryTab.get().getEmbeddingsGenerationTaskManager().invalidate();
-    }
-
-    public interface GetCurrentLibraryTab {
-        LibraryTab get();
+        BackgroundTask.wrap(() -> libraryTab.getEmbeddingsGenerationTaskManager().invalidate())
+                      .executeWith(taskExecutor);
     }
 }

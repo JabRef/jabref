@@ -6,6 +6,8 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chathistory.ChatMessage;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.AiPreferences;
 
 import dev.langchain4j.chain.ConversationalRetrievalChain;
@@ -15,6 +17,7 @@ import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.filter.Filter;
+import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 
 /**
  * Wrapper around langchain4j algorithms for chatting functionality.
@@ -40,6 +43,19 @@ public class AiChatLogic {
         rebuild();
 
         setupListeningToPreferencesChanges();
+    }
+
+    public static AiChatLogic forBibEntry(AiService aiService, BibEntry entry) {
+        Filter filter = MetadataFilterBuilder
+                .metadataKey("linkedFile")
+                .isIn(entry
+                        .getFiles()
+                        .stream()
+                        .map(LinkedFile::getLink)
+                        .toList()
+                );
+
+        return new AiChatLogic(aiService, filter);
     }
 
     private void setupListeningToPreferencesChanges() {

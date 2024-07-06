@@ -2740,7 +2740,7 @@ public class JabRefPreferences implements PreferencesService {
         try (final Keyring keyring = Keyring.create()) {
             Password password = new Password(newToken, getInternalPreferences().getUserAndHost());
             String rawPassword = password.encrypt();
-            keyring.setPassword("org.jabref.customapikeys", "openaitoken", rawPassword);
+            keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT, rawPassword);
         } catch (Exception e) {
             LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token", e);
         }

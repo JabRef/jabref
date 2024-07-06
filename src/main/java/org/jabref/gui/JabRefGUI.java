@@ -332,8 +332,4 @@ public class JabRefGUI extends Application {
         directoryMonitor.shutdown();
         HeadlessExecutorService.INSTANCE.shutdownEverything();
     }
-
-    public static AiService getAiService() {
-        return aiService;
-    }
 }

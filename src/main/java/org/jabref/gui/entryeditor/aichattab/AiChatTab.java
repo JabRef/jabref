@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor;
+package org.jabref.gui.entryeditor.aichattab;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -9,6 +9,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.aichat.AiChatComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -31,12 +33,9 @@ import org.jabref.preferences.WorkspacePreferences;
 
 import com.google.common.eventbus.Subscribe;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 public class AiChatTab extends EntryEditorTab {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AiChatTab.class.getName());
-
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final WorkspacePreferences workspacePreferences;
@@ -45,16 +44,9 @@ public class AiChatTab extends EntryEditorTab {
     private final EmbeddingsGenerationTask embeddingsGenerationTask;
     private final TaskExecutor taskExecutor;
     private final CitationKeyGenerator citationKeyGenerator;
-
-    private AiChatComponent aiChatComponent = null;
-
     private final AiService aiService;
 
-    private AiChatLogic aiChatLogic = null;
-
     private Optional<BibEntry> currentBibEntry = Optional.empty();
-
-    private @Nullable BibEntryChatHistory bibEntryChatHistory;
 
     public AiChatTab(DialogService dialogService, PreferencesService preferencesService, AiService aiService,
                      BibDatabaseContext bibDatabaseContext, EmbeddingsGenerationTask embeddingsGenerationTask, TaskExecutor taskExecutor) {
@@ -67,6 +59,7 @@ public class AiChatTab extends EntryEditorTab {
         this.embeddingsGenerationTask = embeddingsGenerationTask;
         this.taskExecutor = taskExecutor;
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
+
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
         aiService.getEmbeddingsManager().getIngestedFilesTracker().registerListener(new FileIngestedListener());
@@ -96,20 +89,20 @@ public class AiChatTab extends EntryEditorTab {
             showPrivacyNotice(entry);
         } else if (entry.getFiles().isEmpty()) {
             showErrorNoFiles();
-        } else if (!entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).anyMatch(FileUtil::isPDFFile)) {
+        } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {
             showErrorNotPdfs();
         } else if (!citationKeyIsValid(bibDatabaseContext, entry)) {
             tryToGenerateCitationKeyThenBind(entry);
         } else if (!aiService.getEmbeddingsManager().getIngestedFilesTracker().haveIngestedLinkedFiles(entry.getFiles())) {
             showErrorNotIngested();
         } else {
-            // All preconditions met
-            embeddingsGenerationTask.moveToFront(entry.getFiles());
-            createAiChat();
-            setupChatHistory();
-            restoreLogicalChatHistory();
-            buildChatUI();
+            bindToCorrectEntry(entry);
         }
+    }
+
+    private void bindToCorrectEntry(BibEntry entry) {
+        AiChatTabWorking aiChatTabWorking = new AiChatTabWorking(aiService, entry, bibDatabaseContext, embeddingsGenerationTask, taskExecutor, workspacePreferences, dialogService);
+        setContent(aiChatTabWorking.getNode());
     }
 
     private void showErrorNotIngested() {
@@ -143,84 +136,10 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private static boolean hasEmptyCitationKey(BibEntry bibEntry) {
-        return bibEntry.getCitationKey().map(key -> key.isEmpty()).orElse(true);
+        return bibEntry.getCitationKey().map(String::isEmpty).orElse(true);
     }
 
     private static boolean citationKeyIsUnique(BibDatabaseContext bibDatabaseContext, String citationKey) {
         return bibDatabaseContext.getDatabase().getNumberOfCitationKeyOccurrences(citationKey) == 1;
-    }
-
-    private void createAiChat() {
-        aiChatLogic = new AiChatLogic(aiService, MetadataFilterBuilder.metadataKey("linkedFile").isIn(currentBibEntry.get().getFiles().stream().map(LinkedFile::getLink).toList()));
-    }
-
-    private void setupChatHistory() {
-        Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
-        if (!databasePath.isPresent()) {
-            bibEntryChatHistory = null;
-        }
-        currentBibEntry.flatMap(entry -> entry.getCitationKey())
-                       .ifPresent(citationKey -> {
-                           BibDatabaseChatHistory bibDatabaseChatHistory = aiService.getChatHistoryManager().getChatHistoryForBibDatabase(databasePath.get());
-                           bibEntryChatHistory = bibDatabaseChatHistory.getChatHistoryForEntry(citationKey);
-                       });
-    }
-
-    private void restoreLogicalChatHistory() {
-        if (bibEntryChatHistory != null) {
-            aiChatLogic.restoreMessages(bibEntryChatHistory.getAllMessages());
-        }
-    }
-
-    private void buildChatUI() {
-        aiChatComponent = new AiChatComponent(userPrompt -> {
-            ChatMessage userMessage = ChatMessage.user(userPrompt);
-            aiChatComponent.addMessage(userMessage);
-
-            addMessageToChatHistory(userMessage);
-
-            aiChatComponent.setLoading(true);
-
-            BackgroundTask.wrap(() -> aiChatLogic.execute(userPrompt))
-                    .onSuccess(aiMessageText -> {
-                        aiChatComponent.setLoading(false);
-
-                        ChatMessage aiMessage = ChatMessage.assistant(aiMessageText);
-                        aiChatComponent.addMessage(aiMessage);
-
-                        addMessageToChatHistory(aiMessage);
-
-                        aiChatComponent.requestUserPromptTextFieldFocus();
-                    })
-                    .onFailure(e -> {
-                        // TODO: User-friendly error message.
-                        LOGGER.error("Got an error while sending a message to AI", e);
-                        aiChatComponent.setLoading(false);
-                        aiChatComponent.addError(e.getMessage());
-                    })
-                    .executeWith(taskExecutor);
-        }, this::clearMessagesFromChatHistory, workspacePreferences, dialogService);
-
-        restoreUIChatHistory();
-
-        setContent(aiChatComponent);
-    }
-
-    private void clearMessagesFromChatHistory() {
-        if (bibEntryChatHistory != null) {
-            bibEntryChatHistory.clearMessages();
-        }
-    }
-
-    private void restoreUIChatHistory() {
-        if (bibEntryChatHistory != null) {
-            bibEntryChatHistory.getAllMessages().forEach(aiChatComponent::addMessage);
-        }
-    }
-
-    private void addMessageToChatHistory(ChatMessage userMessage) {
-        if (bibEntryChatHistory != null) {
-            bibEntryChatHistory.addMessage(userMessage);
-        }
     }
 }
