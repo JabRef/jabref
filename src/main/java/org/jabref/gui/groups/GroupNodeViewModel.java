@@ -93,7 +93,10 @@ public class GroupNodeViewModel {
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
+
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
+        stateManager.activeGroupProperty().subscribe(this::updateMatchedEntries);
+
         expandedProperty.set(groupNode.getGroup().isExpanded());
         expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
@@ -389,7 +392,7 @@ public class GroupNodeViewModel {
             return true;
         } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
                             .orElse(false);
         } else if (group instanceof KeywordGroup) {

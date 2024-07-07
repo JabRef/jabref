@@ -150,4 +150,5 @@ open module org.jabref {
     requires dd.plist;
     requires mslinks;
     requires org.apache.httpcomponents.core5.httpcore5;
+    requires commons.beanutils;
 }

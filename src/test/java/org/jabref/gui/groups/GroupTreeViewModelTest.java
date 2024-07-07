@@ -72,7 +72,7 @@ class GroupTreeViewModelTest {
 
         GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
         model.addEntriesToGroup(databaseContext.getEntries());
-        groupTree.removeGroupsAndSubGroupsFromEntries(model);
+        groupTree.removeGroupsAndSubGroupsFromEntries(model.getGroupNode());
 
         assertEquals(Optional.empty(), entry.getField(StandardField.GROUPS));
     }
@@ -86,7 +86,7 @@ class GroupTreeViewModelTest {
 
         GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
         model.addEntriesToGroup(databaseContext.getEntries());
-        groupTree.removeGroupsAndSubGroupsFromEntries(model);
+        groupTree.removeGroupsAndSubGroupsFromEntries(model.getGroupNode());
 
         assertEquals(groupName, entry.getField(StandardField.KEYWORDS).get());
     }

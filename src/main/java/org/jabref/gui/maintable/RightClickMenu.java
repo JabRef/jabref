@@ -18,7 +18,6 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.frame.SendAsKindleEmailAction;
 import org.jabref.gui.frame.SendAsStandardEmailAction;
-import org.jabref.gui.groups.GroupDialogView;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
@@ -75,6 +74,15 @@ public class RightClickMenu {
                 SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
+                factory.createMenuItem(
+                        // The new group is placed inside the currently active group, so
+                        // the button's name changes based on whether we are in the root group
+                        // or a subgroup.
+                        stateManager.activeGroupProperty().isEmpty() || stateManager.activeGroupProperty().getFirst().getParent().isEmpty()
+                                ? StandardActions.CREATE_GROUP_FROM_SELECTION
+                                : StandardActions.CREATE_SUBGROUP_FROM_SELECTION,
+                        new CreateGroupAction(dialogService, stateManager, true, PreferredGroupAdditionLocation.ADD_BELOW, null)),
+
 
                 new SeparatorMenuItem(),
 
@@ -87,7 +95,6 @@ public class RightClickMenu {
 
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferencesService)),
                 factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferencesService)),
-                factory.createMenuItem(StandardActions.CREATE_GROUP_FROM_SELECTION, new CreateGroupFromSelectionAction(stateManager))
 
                 new SeparatorMenuItem(),
 

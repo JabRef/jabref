@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.jabref.model.groups.GroupTreeNode;
 
 /**
  * Represents a node in a tree.

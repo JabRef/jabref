@@ -112,7 +112,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final @Nullable GroupTreeNode parentNode;
     private final @Nullable AbstractGroup editedGroup;
     private final List<BibEntry> selectedEntries;
-    private final boolean useSelectedEntries;
+    private final boolean preferUseSelection;
 
     private GroupDialogViewModel viewModel;
 
@@ -133,12 +133,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                            @Nullable AbstractGroup editedGroup,
                            GroupDialogHeader groupDialogHeader,
                            List<BibEntry> selectedEntries,
-                           boolean useSelectedEntries) {
+                           boolean preferUseSelection) {
         this.currentDatabase = currentDatabase;
         this.parentNode = parentNode;
         this.editedGroup = editedGroup;
         this.selectedEntries = selectedEntries;
-        this.useSelectedEntries = useSelectedEntries;
+        this.preferUseSelection = preferUseSelection;
 
         ViewLoader.view(this)
                   .load()
@@ -188,7 +188,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, selectedEntries, useSelectedEntries);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, selectedEntries, preferUseSelection);
 
         setResultConverter(viewModel::resultConverter);
 

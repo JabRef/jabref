@@ -140,7 +140,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      *
      * @param entries    List of {@link BibEntry} to search for
      * @param requireAll Whether to return only groups that must contain all entries
-     * @return List of {@link GroupTreeNode} containing the matches. {@link AllEntriesGroup} is always contained}
+     * @return List of {@link GroupTreeNode} containing the matches. {@link AllEntriesGroup} is always contained.
      */
     public List<GroupTreeNode> getContainingGroups(List<BibEntry> entries, boolean requireAll) {
         List<GroupTreeNode> groups = new ArrayList<>();
@@ -255,7 +255,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Get the path from the root of the tree as a string (every group name is separated by {@link #PATH_DELIMITER}.
+     * Get the path from the root of the tree as a string every group name is separated by {@link #PATH_DELIMITER}.
      * <p>
      * The name of the root is not included.
      */
