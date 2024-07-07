@@ -7,9 +7,10 @@ import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
@@ -23,15 +24,25 @@ public interface FieldEditorFX {
 
     void bindToEntry(BibEntry entry);
 
-    default void establishBinding(TextInputControl textInputControl, StringProperty viewModelTextProperty) {
+    default void establishBinding(TextInputControl textInputControl, StringProperty viewModelTextProperty, UndoAction undoAction, RedoAction redoAction) {
         Logger logger = LoggerFactory.getLogger(FieldEditorFX.class);
 
+        // Workaround to fix https://github.com/JabRef/jabref/issues/11420
         // We need to consume the key event to avoid the default behavior of undo/redo and enable JabRef's undo/redo
         // Source: https://stackoverflow.com/a/37575818/873282
         textInputControl.addEventFilter(KeyEvent.ANY, e -> {
-            if ((e.getCode() == KeyCode.Y || e.getCode() == KeyCode.Z) && e.isShortcutDown()) {
-                e.consume();
-                // FIXME: Add undo/redo functionality
+            if (e.getEventType() == KeyEvent.KEY_PRESSED // if not checked, it will be fired twice: once for key pressed and once for key released
+                    && e.isShortcutDown()) {
+                switch (e.getCode()) {
+                    case Y -> {
+                        redoAction.execute();
+                        e.consume();
+                    }
+                    case Z -> {
+                        undoAction.execute();
+                        e.consume();
+                    }
+                }
             }
         });
 

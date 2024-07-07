@@ -11,6 +11,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -35,7 +37,9 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
     public JournalEditor(Field field,
                          SuggestionProvider<?> suggestionProvider,
-                         FieldCheckers fieldCheckers) {
+                         FieldCheckers fieldCheckers,
+                         UndoAction undoAction,
+                         RedoAction redoAction) {
 
         ViewLoader.view(this)
                   .root(this)
@@ -50,7 +54,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                 dialogService,
                 undoManager);
 
-        establishBinding(textField, viewModel.textProperty());
+        establishBinding(textField, viewModel.textProperty(), undoAction, redoAction);
 
         textField.initContextMenu(new DefaultMenu(textField), preferencesService.getKeyBindingRepository());
 
