@@ -27,10 +27,10 @@ public interface FieldEditorFX {
     default void establishBinding(TextInputControl textInputControl, StringProperty viewModelTextProperty, UndoAction undoAction, RedoAction redoAction) {
         Logger logger = LoggerFactory.getLogger(FieldEditorFX.class);
 
-        // Workaround to fix https://github.com/JabRef/jabref/issues/11420
-        // We need to consume the key event to avoid the default behavior of undo/redo and enable JabRef's undo/redo
-        // Source: https://stackoverflow.com/a/37575818/873282
+        // We need to use the "global" UndoManager instead of JavaFX TextInputControls's native undo/redo handling.
+        // This also prevents NPEs. See https://github.com/JabRef/jabref/issues/11420 for details.
         textInputControl.addEventFilter(KeyEvent.ANY, e -> {
+            // Source: https://stackoverflow.com/a/37575818/873282
             if (e.getEventType() == KeyEvent.KEY_PRESSED // if not checked, it will be fired twice: once for key pressed and once for key released
                     && e.isShortcutDown()) {
                 switch (e.getCode()) {
