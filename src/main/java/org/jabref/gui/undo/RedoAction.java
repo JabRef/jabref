@@ -2,7 +2,7 @@ package org.jabref.gui.undo;
 
 import java.util.function.Supplier;
 
-import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.CannotRedoException;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -20,7 +20,7 @@ public class RedoAction extends UndoRedoAction {
         try {
             libraryTab.getUndoManager().redo();
             dialogService.notify(Localization.lang("Redo"));
-        } catch (CannotUndoException ex) {
+        } catch (CannotRedoException ex) {
             dialogService.notify(Localization.lang("Nothing to redo") + '.');
         }
         libraryTab.markChangedOrUnChanged();
