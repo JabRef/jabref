@@ -19,7 +19,6 @@ public class UndoAction extends UndoRedoAction {
         LibraryTab libraryTab = this.tabSupplier.get();
         try {
             libraryTab.getUndoManager().undo();
-            libraryTab.markBaseChanged();
             dialogService.notify(Localization.lang("Undo"));
         } catch (CannotUndoException ex) {
             dialogService.notify(Localization.lang("Nothing to undo") + '.');

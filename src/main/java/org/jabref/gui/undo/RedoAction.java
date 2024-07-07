@@ -19,7 +19,6 @@ public class RedoAction extends UndoRedoAction {
         LibraryTab libraryTab = this.tabSupplier.get();
         try {
             libraryTab.getUndoManager().redo();
-            libraryTab.markBaseChanged();
             dialogService.notify(Localization.lang("Redo"));
         } catch (CannotUndoException ex) {
             dialogService.notify(Localization.lang("Nothing to redo") + '.');
