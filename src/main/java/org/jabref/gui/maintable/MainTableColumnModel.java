@@ -153,7 +153,7 @@ public class MainTableColumnModel {
 
     public String getDisplayName() {
         if ((Type.ICON_COLUMNS.contains(typeProperty.getValue()) && qualifierProperty.getValue().isBlank())
-                || (typeProperty.getValue() == Type.INDEX || typeProperty.getValue() == Type.SCORE)) {
+                || (typeProperty.getValue() == Type.INDEX || typeProperty.getValue() == Type.SCORE || typeProperty.getValue() == Type.SEARCH_RANK)) {
             return typeProperty.getValue().getDisplayName();
         } else {
             // In case an OrField is used, `FieldFactory.parseField` returns UnknownField, which leads to

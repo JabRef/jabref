@@ -147,7 +147,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
                 .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-search-and-groups"), entry -> entry.matchedBySearchProperty().and(entry.matchedByGroupProperty()))
-//                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-groups-not-search"), entry -> entry.matchedByGroupProperty().and(entry.matchedBySearchQueryProperty().not()))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-groups-not-search"), entry -> entry.matchedByGroupProperty().and(entry.matchedByGroupProperty().not()))
                 .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-search-not-groups"), entry -> entry.matchedBySearchProperty().and(entry.matchedByGroupProperty().not()))
                 .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search-and-groups"), entry -> entry.matchedBySearchProperty().not().and(entry.matchedByGroupProperty().not()))
                 .setOnDragDetected(this::handleOnDragDetected)
