@@ -32,6 +32,10 @@ import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
+/**
+ * This offers the user to connect to a remove SQL database.
+ * Moreover, it directly opens the shared database after successful connection.
+ */
 public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private ComboBox<DBMSType> databaseType;
     @FXML private TextField host;

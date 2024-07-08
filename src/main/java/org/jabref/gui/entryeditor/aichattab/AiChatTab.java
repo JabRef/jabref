@@ -6,19 +6,13 @@ import java.util.Optional;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.ai.components.aichat.AiChatComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.chat.AiChatLogic;
-import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
-import org.jabref.logic.ai.chathistory.BibEntryChatHistory;
-import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
 import org.jabref.logic.ai.embeddings.events.FileIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -29,11 +23,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.WorkspacePreferences;
 
 import com.google.common.eventbus.Subscribe;
-import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
-import org.slf4j.LoggerFactory;
 
 public class AiChatTab extends EntryEditorTab {
     private final DialogService dialogService;

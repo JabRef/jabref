@@ -4,8 +4,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.scene.Node;
-import javafx.scene.control.Tab;
-import javafx.scene.layout.Pane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.aichat.AiChatComponent;
@@ -19,7 +17,6 @@ import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.WorkspacePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

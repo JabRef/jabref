@@ -16,7 +16,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
 import org.jabref.logic.ai.chathistory.ChatMessage;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.WorkspacePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
