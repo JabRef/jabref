@@ -55,6 +55,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the Pubmed/Medline Plain importer would not respect the user defined keyword separator [#11413](https://github.com/JabRef/jabref/issues/11413)
 - We fixed an issue where the value of "Override default font settings" was not applied on startup [#11344](https://github.com/JabRef/jabref/issues/11344)
 - We fixed an issue where DatabaseChangeDetailsView was not scrollable when reviewing external metadata changes [#11220](https://github.com/JabRef/jabref/issues/11220)
+- We fixed undo/redo for text fields. [#11420](https://github.com/JabRef/jabref/issues/11420)
 - We fixed an issue where clicking on a page number in the search results tab opens a wrong file in the document viewer. [#11432](https://github.com/JabRef/jabref/pull/11432)
 
 ### Removed

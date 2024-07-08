@@ -13,6 +13,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -34,6 +36,8 @@ public class RequiredFieldsTab extends FieldsEditorTab {
     public RequiredFieldsTab(BibDatabaseContext databaseContext,
                              SuggestionProviders suggestionProviders,
                              UndoManager undoManager,
+                             UndoAction undoAction,
+                             RedoAction redoAction,
                              DialogService dialogService,
                              PreferencesService preferences,
                              StateManager stateManager,
@@ -42,7 +46,7 @@ public class RequiredFieldsTab extends FieldsEditorTab {
                              TaskExecutor taskExecutor,
                              JournalAbbreviationRepository journalAbbreviationRepository,
                              LuceneManager luceneManager) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService,
+        super(false, databaseContext, suggestionProviders, undoManager, undoAction, redoAction, dialogService,
                 preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, luceneManager);
         this.entryTypesManager = entryTypesManager;
         setText(Localization.lang("Required fields"));

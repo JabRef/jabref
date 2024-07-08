@@ -65,7 +65,8 @@ import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
-import org.jabref.gui.undo.UndoRedoAction;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
@@ -174,8 +175,8 @@ public class MainMenu extends MenuBar {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
