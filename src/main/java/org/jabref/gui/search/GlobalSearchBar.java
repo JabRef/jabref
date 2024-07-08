@@ -97,7 +97,6 @@ public class GlobalSearchBar extends HBox {
 
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
-    private final Validator regexValidator;
     private final UndoManager undoManager;
     private final LibraryTabContainer tabContainer;
 
@@ -195,14 +194,6 @@ public class GlobalSearchBar extends HBox {
         searchField.getStyleClass().add("global-search-bar");
         searchField.setMinWidth(100);
         HBox.setHgrow(searchField, Priority.ALWAYS);
-
-        regexValidator = new FunctionBasedValidator<>(
-                searchField.textProperty(),
-                query -> !(regularExpressionButton.isSelected() && !validRegex()),
-                ValidationMessage.error(Localization.lang("Invalid regular expression")));
-        ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
-        visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
-        Platform.runLater(() -> visualizer.initVisualization(regexValidator.getValidationStatus(), searchField));
 
         if (searchType == SearchType.NORMAL_SEARCH) {
             this.getChildren().addAll(searchField, openGlobalSearchButton, currentResults);
@@ -332,7 +323,7 @@ public class GlobalSearchBar extends HBox {
         }
 
         // Invalid regular expression
-        if (!regexValidator.getValidationStatus().isValid()) {
+        if (regularExpressionButton.isSelected() && !validRegex()) {
             currentResults.setText(Localization.lang("Invalid regular expression"));
             return;
         }
