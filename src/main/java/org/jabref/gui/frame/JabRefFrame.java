@@ -378,7 +378,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             // Update search autocompleter with information for the correct database:
             globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
-            libraryTab.getUndoManager().postUndoRedoEvent();
             libraryTab.getMainTable().requestFocus();
 
             // Set window title - copy tab title
