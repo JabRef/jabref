@@ -11,6 +11,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -29,13 +32,16 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
     @Inject private UndoManager undoManager;
 
     public JournalEditor(Field field,
                          SuggestionProvider<?> suggestionProvider,
-                         FieldCheckers fieldCheckers) {
+                         FieldCheckers fieldCheckers,
+                         UndoAction undoAction,
+                         RedoAction redoAction) {
 
         ViewLoader.view(this)
                   .root(this)
@@ -50,12 +56,9 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                 dialogService,
                 undoManager);
 
-        establishBinding(textField, viewModel.textProperty());
-
-        textField.initContextMenu(new DefaultMenu(textField), preferencesService.getKeyBindingRepository());
-
+        establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
+        textField.initContextMenu(new DefaultMenu(textField), keyBindingRepository);
         AutoCompletionTextInputBinding.autoComplete(textField, viewModel::complete);
-
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
