@@ -48,7 +48,7 @@ public class AiChatLanguageModel {
     }
 
     /**
-     * Update the underlying {@link ChatLanguageModel] by current {@link AiPreferences} parameters.
+     * Update the underlying {@link ChatLanguageModel} by current {@link AiPreferences} parameters.
      * When the model is updated, the chat messages are not lost.
      * See {@link AiChatLogic}, where messages are stored in {@link ChatMemory},
      * and {@link BibDatabaseChatHistory}, where messages are stored in {@link MVStore}.
