@@ -25,8 +25,8 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextArea textArea;
 
     @Inject private PreferencesService preferencesService;
-    @Inject private UndoManager undoManager;
     @Inject private KeyBindingRepository keyBindingRepository;
+    @Inject private UndoManager undoManager;
 
     public OwnerEditor(Field field,
                        SuggestionProvider<?> suggestionProvider,
@@ -38,11 +38,8 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
                   .load();
 
         this.viewModel = new OwnerEditorViewModel(field, suggestionProvider, preferencesService, fieldCheckers, undoManager);
-
-        establishBinding(textArea, viewModel.textProperty(), undoAction, redoAction);
-
+        establishBinding(textArea, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
         textArea.initContextMenu(EditorMenus.getNameMenu(textArea), keyBindingRepository);
-
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 

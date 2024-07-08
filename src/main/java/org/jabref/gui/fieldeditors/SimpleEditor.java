@@ -38,7 +38,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         textInput = createTextInputControl();
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
-        establishBinding(textInput, viewModel.textProperty(), undoAction, redoAction);
+        establishBinding(textInput, viewModel.textProperty(), preferences.getKeyBindingRepository(), undoAction, redoAction);
 
         ((ContextMenuAddable) textInput).initContextMenu(new DefaultMenu(textInput), preferences.getKeyBindingRepository());
         this.getChildren().add(textInput);

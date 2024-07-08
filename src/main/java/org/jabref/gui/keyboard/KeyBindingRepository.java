@@ -20,6 +20,10 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.logic.util.OS;
 
+/**
+ * Handles keyboard shortcuts. Including checking whether a keybinding matches.
+ * See {@link #matches}.
+ */
 public class KeyBindingRepository {
 
     /**

@@ -8,12 +8,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public abstract class UndoRedoAction extends SimpleCommand {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UndoRedoAction.class);
 
     protected final Supplier<LibraryTab> tabSupplier;
     protected final DialogService dialogService;

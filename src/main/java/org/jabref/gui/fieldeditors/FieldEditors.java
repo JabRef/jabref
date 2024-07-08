@@ -105,7 +105,7 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isMultiLine, undoManager, undoAction, redoAction);
+            return new PersonsEditor(field, suggestionProvider, fieldCheckers, isMultiLine, undoManager, undoAction, redoAction);
         } else if (StandardField.KEYWORDS == field) {
             return new KeywordsEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == InternalField.KEY_FIELD) {

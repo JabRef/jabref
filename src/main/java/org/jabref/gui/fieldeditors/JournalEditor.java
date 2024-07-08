@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
@@ -31,6 +32,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
     @Inject private UndoManager undoManager;
@@ -54,12 +56,9 @@ public class JournalEditor extends HBox implements FieldEditorFX {
                 dialogService,
                 undoManager);
 
-        establishBinding(textField, viewModel.textProperty(), undoAction, redoAction);
-
-        textField.initContextMenu(new DefaultMenu(textField), preferencesService.getKeyBindingRepository());
-
+        establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
+        textField.initContextMenu(new DefaultMenu(textField), keyBindingRepository);
         AutoCompletionTextInputBinding.autoComplete(textField, viewModel::complete);
-
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 

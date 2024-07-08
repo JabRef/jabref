@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
@@ -33,6 +34,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private UndoManager undoManager;
 
     public UrlEditor(Field field,
@@ -46,7 +48,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
 
         this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, preferencesService, fieldCheckers, undoManager);
 
-        establishBinding(textArea, viewModel.textProperty(), undoAction, redoAction);
+        establishBinding(textArea, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
 
         Supplier<List<MenuItem>> contextMenuSupplier = EditorMenus.getCleanupUrlMenu(textArea);
         textArea.initContextMenu(contextMenuSupplier, preferencesService.getKeyBindingRepository());
