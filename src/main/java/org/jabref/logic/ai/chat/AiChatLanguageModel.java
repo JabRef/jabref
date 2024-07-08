@@ -8,8 +8,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.preferences.AiPreferences;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import org.h2.mvstore.MVStore;
 

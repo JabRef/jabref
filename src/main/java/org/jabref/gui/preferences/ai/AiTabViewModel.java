@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.ai;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
