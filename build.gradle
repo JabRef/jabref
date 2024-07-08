@@ -285,7 +285,7 @@ dependencies {
     implementation 'org.glassfish.jersey.core:jersey-server:3.1.7'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.7'
-    implementation 'org.glassfish.hk2:hk2-api:3.1.0'
+    implementation 'org.glassfish.hk2:hk2-api:3.1.1'
     // testImplementation 'org.glassfish.hk2:hk2-testing:3.0.4'
     // implementation 'org.glassfish.hk2:hk2-testing-jersey:3.0.4'
     // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
