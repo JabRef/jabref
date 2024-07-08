@@ -36,9 +36,9 @@ import static java.util.Comparator.comparingDouble;
  * A custom implementation of langchain4j's {@link EmbeddingStore} that uses a {@link MVStore} as an embedded database.
  */
 public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreEmbeddingStore.class);
-
     public static final String LINKED_FILE_METADATA_KEY = "linkedFile";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreEmbeddingStore.class);
 
     private final Map<String, float[]> embeddingsMap;
     private final Map<String, String> fileMap;
@@ -52,6 +52,8 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
 
     @Override
     public String add(Embedding embedding) {
+        // Every embedding must have a unique id (conventions in `langchain4j` + it's a key to the {@link Map}.
+        // Most of the code in this class was borrowed from {@link InMemoryEmbeddingStore}.
         String id = String.valueOf(UUID.randomUUID());
         add(id, embedding);
         return id;
@@ -64,7 +66,7 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
 
     @Override
     public String add(Embedding embedding, TextSegment textSegment) {
-        // Every embedding must have a unique id (conventions in `langchain4j`).
+        // Every embedding must have a unique id (conventions in `langchain4j` + it's a key to the {@link Map}.
         // Most of the code in this class was borrowed from {@link InMemoryEmbeddingStore}.
         String id = String.valueOf(UUID.randomUUID());
 

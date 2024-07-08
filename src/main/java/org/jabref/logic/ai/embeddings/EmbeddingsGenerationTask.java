@@ -2,8 +2,10 @@ package org.jabref.logic.ai.embeddings;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -14,6 +16,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
+
+import org.checkerframework.checker.units.qual.A;
 
 /**
  * This class manages a queue of embedding generation tasks for one {@link BibEntry} in a {@link org.jabref.model.database.BibDatabase}.
@@ -33,12 +37,12 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
 
     // We use an {@link ArrayList} as a queue to implement prioritization of the {@link LinkedFile}s as it provides more
     // methods to manipulate the collection.
-    private final List<LinkedFile> linkedFileQueue = new ArrayList<>();
+    private final List<LinkedFile> linkedFileQueue = Collections.synchronizedList(new ArrayList<>());
     private int numOfProcessedFiles = 0;
 
     private final Object lock = new Object();
-    private boolean isRunning = false;
-    private boolean isBlockingNewTasks = false;
+    private AtomicBoolean isRunning = new AtomicBoolean(false);
+    private AtomicBoolean isBlockingNewTasks = new AtomicBoolean(false);
 
     public EmbeddingsGenerationTask(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiService aiService, TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
@@ -77,27 +81,21 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
     }
 
     public void addToStore(LinkedFile linkedFile) {
-        if (!isBlockingNewTasks) {
+        if (!isBlockingNewTasks.get()) {
             linkedFileQueue.add(linkedFile);
 
-            synchronized (lock) {
-                if (!isRunning) {
-                    this.executeWith(taskExecutor);
-                    showToUser(false);
-                }
+            if (!isRunning.get()) {
+                this.executeWith(taskExecutor);
+                showToUser(false);
             }
         }
     }
 
     public AutoCloseable blockNewTasks() {
-        synchronized (lock) {
-            isBlockingNewTasks = true;
-        }
+        isBlockingNewTasks.set(true);
 
         return () -> {
-            synchronized (lock) {
-                isBlockingNewTasks = false;
-            }
+            isBlockingNewTasks.set(false);
         };
     }
 
@@ -112,7 +110,6 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
     public void removeFromStore(List<LinkedFile> linkedFiles) {
         linkedFiles.forEach(this::removeFromStore);
     }
-
 
     public void removeFromStore(LinkedFile linkedFile) {
         aiService.getEmbeddingsManager().removeIngestedFile(linkedFile.getLink());
@@ -140,9 +137,7 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
 
     @Override
     protected Void call() throws Exception {
-        synchronized (lock) {
-            isRunning = true;
-        }
+        isRunning.set(true);
 
         updateProgress();
 
@@ -155,9 +150,7 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
             updateProgress();
         }
 
-        synchronized (lock) {
-            isRunning = false;
-        }
+        isRunning.set(false);
 
         return null;
     }
@@ -201,5 +194,10 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
 
     public void updateDatabaseName(String name) {
         UiTaskExecutor.runInJavaFXThread(() -> this.titleProperty().set(Localization.lang("Generating embeddings for %0", name)));
+    }
+
+    public void shutdown() {
+        linkedFileQueue.clear();
+        // TODO: Stop the AiIngestor.
     }
 }
