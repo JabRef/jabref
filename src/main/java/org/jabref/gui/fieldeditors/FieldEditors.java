@@ -20,6 +20,8 @@ import org.jabref.gui.fieldeditors.optioneditors.mapbased.PaginationEditorViewMo
 import org.jabref.gui.fieldeditors.optioneditors.mapbased.PatentTypeEditorViewModel;
 import org.jabref.gui.fieldeditors.optioneditors.mapbased.TypeEditorViewModel;
 import org.jabref.gui.fieldeditors.optioneditors.mapbased.YesNoEditorViewModel;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -50,7 +52,9 @@ public class FieldEditors {
                                             final BibDatabaseContext databaseContext,
                                             final EntryType entryType,
                                             final SuggestionProviders suggestionProviders,
-                                            final UndoManager undoManager) {
+                                            final UndoManager undoManager,
+                                            final UndoAction undoAction,
+                                            final RedoAction redoAction) {
         final Set<FieldProperty> fieldProperties = field.getProperties();
 
         final SuggestionProvider<?> suggestionProvider = getSuggestionProvider(field, suggestionProviders, databaseContext.getMetaData());
@@ -64,22 +68,22 @@ public class FieldEditors {
         boolean isMultiLine = FieldFactory.isMultiLineField(field, preferences.getFieldPreferences().getNonWrappableFields());
 
         if (preferences.getTimestampPreferences().getTimestampField().equals(field)) {
-            return new DateEditor(field, DateTimeFormatter.ofPattern(preferences.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers);
+            return new DateEditor(field, DateTimeFormatter.ofPattern(preferences.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.DATE)) {
-            return new DateEditor(field, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fieldCheckers);
+            return new DateEditor(field, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.EXTERNAL)) {
-            return new UrlEditor(field, suggestionProvider, fieldCheckers);
+            return new UrlEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(field, suggestionProvider, fieldCheckers);
+            return new JournalEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN) {
             // Identifier editor does not support PMID, therefore excluded at the condition above
             return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.ISSN) {
-            return new ISSNEditor(field, suggestionProvider, fieldCheckers);
+            return new ISSNEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (field == StandardField.OWNER) {
-            return new OwnerEditor(field, suggestionProvider, fieldCheckers);
+            return new OwnerEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (field == StandardField.GROUPS) {
-            return new GroupEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
+            return new GroupEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager, undoAction, redoAction);
         } else if (field == StandardField.FILE) {
             return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
@@ -101,13 +105,13 @@ public class FieldEditors {
         } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isMultiLine, undoManager);
+            return new PersonsEditor(field, suggestionProvider, fieldCheckers, isMultiLine, undoManager, undoAction, redoAction);
         } else if (StandardField.KEYWORDS == field) {
             return new KeywordsEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == InternalField.KEY_FIELD) {
-            return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext);
+            return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {
-            return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager);
+            return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction);
         } else {
             // There was no specific editor found
 
@@ -116,7 +120,7 @@ public class FieldEditors {
             if (!isMultiLine && !selectorValues.isEmpty()) {
                 return new OptionEditor<>(new CustomFieldEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager, selectorValues));
             } else {
-                return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager);
+                return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager, undoAction, redoAction);
             }
         }
     }
