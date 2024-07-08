@@ -54,10 +54,10 @@ public class GroupsPreferences {
     }
 
     public void setGroupViewMode(GroupViewMode mode, boolean value) {
-        if (groupViewMode.contains(mode) && !value) {
-            groupViewMode.remove(mode);
-        } else if (!groupViewMode.contains(mode) && value) {
+        if (value) {
             groupViewMode.add(mode);
+        } else {
+            groupViewMode.remove(mode);
         }
     }
 

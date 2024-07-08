@@ -34,7 +34,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ImportHandler;
-import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
@@ -59,7 +58,6 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
-import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,18 +146,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
-                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search"), entry -> stateManager.activeSearchQueryProperty().isPresent().and(entry.searchScoreProperty().isEqualTo(0)))
-                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-groups"), entry -> EasyBind.combine(
-                        stateManager.activeGroupProperty(),
-                        preferencesService.getGroupsPreferences().groupViewModeProperty(),
-                        (groups, viewMode) -> {
-                            if (viewMode.contains(GroupViewMode.FILTER)) {
-                                return Boolean.FALSE;
-                            }
-                            return preferencesService.getGroupsPreferences().getGroupViewMode().contains(GroupViewMode.INVERT) ^
-                                    !MainTableDataModel.createGroupMatcher(stateManager.activeGroupProperty(), preferencesService.getGroupsPreferences())
-                                                       .map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
-                        }))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-search-and-groups"), entry -> entry.matchedBySearchProperty().and(entry.matchedByGroupProperty()))
+//                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-groups-not-search"), entry -> entry.matchedByGroupProperty().and(entry.matchedBySearchQueryProperty().not()))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-search-not-groups"), entry -> entry.matchedBySearchProperty().and(entry.matchedByGroupProperty().not()))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search-and-groups"), entry -> entry.matchedBySearchProperty().not().and(entry.matchedByGroupProperty().not()))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -168,6 +158,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .install(this);
 
         this.getSortOrder().clear();
+        this.getColumns().stream().map(column -> (MainTableColumn<?>) column)
+            .filter(column -> column.getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
+            .findFirst().ifPresent(searchRankColumn -> this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
+                if (!this.getSortOrder().contains(searchRankColumn)) {
+                    this.getSortOrder().addFirst(searchRankColumn);
+                }
+            }));
 
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()

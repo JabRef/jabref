@@ -49,7 +49,9 @@ public class BibEntryTableViewModel {
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
     private final FloatProperty searchScore = new SimpleFloatProperty(0);
-    private final BooleanProperty hasFullTextResult = new SimpleBooleanProperty(false);
+    private final BooleanProperty isMatchedBySearch = new SimpleBooleanProperty(false);
+    private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(true);
+    private final BooleanProperty hasFullTextResults = new SimpleBooleanProperty(false);
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -156,23 +158,31 @@ public class BibEntryTableViewModel {
         return bibDatabaseContext;
     }
 
-    public float getSearchScore() {
-        return searchScore.get();
-    }
-
     public FloatProperty searchScoreProperty() {
         return searchScore;
     }
 
-    public void updateSearchScore(float score) {
-        searchScore.set(score);
+    public BooleanProperty hasFullTextResultsProperty() {
+        return hasFullTextResults;
     }
 
-    public boolean hasFullTextResult() {
-        return hasFullTextResult.get();
+    public BooleanProperty matchedBySearchProperty() {
+        return isMatchedBySearch;
     }
 
-    public void setHasFullTextResult(boolean hasFullTextResult) {
-        this.hasFullTextResult.set(hasFullTextResult);
+    public BooleanProperty matchedByGroupProperty() {
+        return isMatchedByGroup;
+    }
+
+    public int getSearchRank() {
+        if (matchedBySearchProperty().and(matchedByGroupProperty()).get()) {
+            return 1;
+        } else if (matchedByGroupProperty().and(matchedBySearchProperty().not()).get()) {
+            return 2;
+        } else if (matchedBySearchProperty().and(matchedByGroupProperty().not()).get()) {
+            return 3;
+        } else {
+            return 4;
+        }
     }
 }

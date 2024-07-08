@@ -88,6 +88,9 @@ public class MainTableColumnFactory {
             case SCORE:
                 returnColumn = createScoreColumn(column);
                 break;
+            case SEARCH_RANK:
+                returnColumn = createSearchRankColumn(column);
+                break;
             case INDEX:
                 returnColumn = createIndexColumn(column);
                 break;
@@ -156,12 +159,23 @@ public class MainTableColumnFactory {
         column.setGraphic(header);
         column.setStyle("-fx-alignment: CENTER-RIGHT;");
         column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().searchScoreProperty().getValue()));
-        new ValueTableCellFactory<BibEntryTableViewModel, Float>()
-                .withText(String::valueOf)
-                .install(column);
+        new ValueTableCellFactory<BibEntryTableViewModel, Float>().withText(String::valueOf).install(column);
         column.setSortable(true);
         column.setReorderable(false);
         column.visibleProperty().bind(stateManager.activeSearchQueryProperty().isPresent());
+        return column;
+    }
+
+    private TableColumn<BibEntryTableViewModel, Integer> createSearchRankColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, Integer> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Search rank"));
+        header.getStyleClass().add("mainTable-header");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SEARCH_RANK.getDisplayName()));
+        column.setGraphic(header);
+        column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getSearchRank()));
+        new ValueTableCellFactory<BibEntryTableViewModel, Integer>().withText(String::valueOf).install(column);
+        column.setSortable(true);
+//        column.setVisible(false);
         return column;
     }
 

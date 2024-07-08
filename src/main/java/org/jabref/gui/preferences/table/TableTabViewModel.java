@@ -123,6 +123,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
         availableColumnsProperty.clear();
         availableColumnsProperty.addAll(
+                new MainTableColumnModel(MainTableColumnModel.Type.SCORE),
                 new MainTableColumnModel(MainTableColumnModel.Type.INDEX),
                 new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER),
                 new MainTableColumnModel(MainTableColumnModel.Type.GROUPS),
@@ -165,7 +166,10 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     public void fillColumnList() {
         columnsListProperty.getValue().clear();
         if (initialColumnPreferences != null) {
-            initialColumnPreferences.getColumns().forEach(columnsListProperty.getValue()::add);
+            initialColumnPreferences.getColumns()
+                                    .stream()
+                                    .filter(column -> !column.getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
+                                    .forEach(columnsListProperty.getValue()::add);
         }
     }
 

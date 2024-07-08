@@ -4,7 +4,6 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
 import org.jabref.model.search.SearchFlags;
@@ -19,19 +18,28 @@ import org.slf4j.LoggerFactory;
 public class SearchGroup extends AbstractGroup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
-    private final String searchExpression;
-    private final EnumSet<SearchFlags> searchFlags;
+    private final GroupSearchQuery query;
     private Set<BibEntry> matches = Set.of();
-    private GroupSearchQuery query;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
         super(name, context);
-        this.searchExpression = searchExpression;
-        this.searchFlags = searchFlags;
+        this.query = new GroupSearchQuery(searchExpression, searchFlags);
     }
 
     public String getSearchExpression() {
         return query.getSearchExpression();
+    }
+
+    public GroupSearchQuery getQuery() {
+        return query;
+    }
+
+    public void setMatches(Set<BibEntry> matches) {
+        this.matches = matches;
+    }
+
+    public EnumSet<SearchFlags> getSearchFlags() {
+        return query.getSearchFlags();
     }
 
     @Override
@@ -51,10 +59,6 @@ public class SearchGroup extends AbstractGroup {
     @Override
     public boolean contains(BibEntry entry) {
         return matches.contains(entry);
-    }
-
-    public EnumSet<SearchFlags> getSearchFlags() {
-        return searchFlags;
     }
 
     @Override
@@ -83,12 +87,5 @@ public class SearchGroup extends AbstractGroup {
     @Override
     public int hashCode() {
         return Objects.hash(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags());
-    }
-
-    public void updateMatches(LuceneManager luceneManager) {
-        if (query == null) {
-            query = new GroupSearchQuery(searchExpression, searchFlags);
-        }
-        this.matches = luceneManager.search(query).getAllSearchResults().keySet();
     }
 }

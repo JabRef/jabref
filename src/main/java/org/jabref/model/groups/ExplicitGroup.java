@@ -41,10 +41,9 @@ public class ExplicitGroup extends WordKeywordGroup {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ExplicitGroup)) {
+        if (!(o instanceof ExplicitGroup other)) {
             return false;
         }
-        ExplicitGroup other = (ExplicitGroup) o;
         return Objects.equals(getName(), other.getName())
                 && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
                 && Objects.equals(getIconName(), other.getIconName())

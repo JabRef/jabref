@@ -63,6 +63,7 @@ public class PreferencesMigrations {
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
         changeColumnVariableNamesFor51(preferences);
         upgradeColumnPreferences(preferences);
+        addSearchRankColumn(preferences);
         restoreVariablesForBackwardCompatibility(preferences);
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
@@ -404,6 +405,25 @@ public class PreferencesMigrations {
                            .map(MainTableColumnModel::getSortType)
                            .map(TableColumn.SortType::toString)
                            .collect(Collectors.toList()));
+        }
+    }
+
+    static void addSearchRankColumn(JabRefPreferences preferences) {
+        List<String> columnNames = new ArrayList<>(preferences.getStringList(JabRefPreferences.COLUMN_NAMES));
+        if (!columnNames.getFirst().equals(MainTableColumnModel.Type.SEARCH_RANK.getName())) {
+            List<String> columnWidths = new ArrayList<>(preferences.getStringList(JabRefPreferences.COLUMN_WIDTHS));
+            List<String> columnSortTypes = new ArrayList<>(preferences.getStringList(JabRefPreferences.COLUMN_SORT_TYPES));
+            List<String> sortOrder = new ArrayList<>(preferences.getStringList(JabRefPreferences.COLUMN_SORT_ORDER));
+
+            columnNames.addFirst(MainTableColumnModel.Type.SEARCH_RANK.getName());
+            columnWidths.addFirst(String.valueOf(ColumnPreferences.DEFAULT_COLUMN_WIDTH));
+            columnSortTypes.addFirst(TableColumn.SortType.ASCENDING.toString());
+            sortOrder.addFirst(MainTableColumnModel.Type.SEARCH_RANK.getName());
+
+            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
+            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnWidths);
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES, columnSortTypes);
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_ORDER, sortOrder);
         }
     }
 

@@ -68,6 +68,9 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         // Populate the menu with currently used fields
         for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
             // Append only if the column has not already been added (a common column)
+            if (((MainTableColumn<?>) column).getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK)) {
+                continue;
+            }
             RightClickMenuItem itemToAdd = createMenuItem(column, true);
             this.getItems().add(itemToAdd);
 

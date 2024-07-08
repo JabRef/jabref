@@ -34,7 +34,7 @@ public class SearchResultsTableDataModel {
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> populateEntriesViewModel(entriesViewModel));
 
         FilteredList<BibEntryTableViewModel> entriesFiltered = new FilteredList<>(entriesViewModel);
-        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeGlobalSearchQueryProperty(), query -> entry -> entry.getSearchScore() > 0));
+        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeGlobalSearchQueryProperty(), query -> entry -> entry.searchScoreProperty().get() > 0));
 
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
