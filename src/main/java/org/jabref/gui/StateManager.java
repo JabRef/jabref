@@ -6,8 +6,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -52,6 +55,7 @@ public class StateManager {
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
+    private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
@@ -65,8 +69,14 @@ public class StateManager {
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
+
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
+
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
+
+    public StateManager() {
+        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null).map(BibDatabaseContext::getUid)));
+    }
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
         return visibleSidePanes;
@@ -116,6 +126,10 @@ public class StateManager {
         }
     }
 
+    public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
+        return activeGroups.getReadOnlyProperty();
+    }
+
     public ObservableList<BibEntry> getSelectedEntries() {
         return selectedEntries;
     }
@@ -124,17 +138,18 @@ public class StateManager {
         selectedEntries.setAll(newSelectedEntries);
     }
 
-    public void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups) {
+    public void setSelectedGroups(BibDatabaseContext database, List<GroupTreeNode> newSelectedGroups) {
         Objects.requireNonNull(newSelectedGroups);
-        selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
+        selectedGroups.put(database.getUid(), FXCollections.observableArrayList(newSelectedGroups));
     }
 
     public ObservableList<GroupTreeNode> getSelectedGroups(BibDatabaseContext context) {
-        return selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList());
+        ObservableList<GroupTreeNode> selectedGroupsForDatabase = selectedGroups.get(context.getUid());
+        return selectedGroupsForDatabase != null ? selectedGroupsForDatabase : FXCollections.observableArrayList();
     }
 
-    public void clearSelectedGroups(BibDatabaseContext context) {
-        selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).clear();
+    public void clearSelectedGroups(BibDatabaseContext database) {
+        selectedGroups.remove(database.getUid());
     }
 
     public Optional<BibDatabaseContext> getActiveDatabase() {

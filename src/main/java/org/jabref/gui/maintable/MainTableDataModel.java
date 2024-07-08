@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -35,7 +34,7 @@ public class MainTableDataModel {
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
 
-    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager, ListProperty<GroupTreeNode> selectedGroupsProperty) {
+    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = context;
@@ -48,7 +47,7 @@ public class MainTableDataModel {
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
-                EasyBind.combine(selectedGroupsProperty,
+                EasyBind.combine(stateManager.activeGroupProperty(),
                         stateManager.activeSearchQueryProperty(),
                         groupsPreferences.groupViewModeProperty(),
                         (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))
@@ -59,10 +58,6 @@ public class MainTableDataModel {
         stateManager.setActiveSearchResultSize(context, resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
-    }
-
-    public void removeBinding() {
-        entriesFiltered.predicateProperty().unbind();
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
