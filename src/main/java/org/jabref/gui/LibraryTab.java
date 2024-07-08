@@ -708,7 +708,6 @@ public class LibraryTab extends Tab {
     /**
      * Put an asterisk behind the filename to indicate the database has changed.
      */
-
     public synchronized void markChangedOrUnChanged() {
         if (undoManager.hasChanged()) {
             this.changedProperty.setValue(true);
