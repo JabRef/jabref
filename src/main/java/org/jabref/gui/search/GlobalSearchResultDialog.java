@@ -94,10 +94,8 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                                    .findFirst()
                                    .ifPresent(libraryTabContainer::showLibraryTab);
 
-                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).get());
+                stateManager.clearSearchQuery();
                 stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
-
-                model.removeBinding();
                 stage.close();
             }
         });
@@ -117,7 +115,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
             stage.setHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
             stage.setWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
             container.setDividerPositions(preferencesService.getSearchPreferences().getSearchWindowDividerPosition());
-            model.setBinding();
             searchBar.requestFocus();
         });
 

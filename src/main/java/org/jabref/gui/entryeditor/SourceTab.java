@@ -21,6 +21,7 @@ import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -31,7 +32,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -104,9 +104,9 @@ public class SourceTab extends EntryEditorTab {
                      ImportFormatPreferences importFormatPreferences,
                      FileUpdateMonitor fileMonitor,
                      DialogService dialogService,
+                     StateManager stateManager,
                      BibEntryTypesManager entryTypesManager,
-                     KeyBindingRepository keyBindingRepository,
-                     OptionalObjectProperty<SearchQuery> searchQuery) {
+                     KeyBindingRepository keyBindingRepository) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -119,7 +119,12 @@ public class SourceTab extends EntryEditorTab {
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
 
-        searchQuery.addListener((observable, oldValue, newValue) -> {
+        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
+            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+            highlightSearchPattern();
+        });
+
+        stateManager.activeGlobalSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
             searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
             highlightSearchPattern();
         });

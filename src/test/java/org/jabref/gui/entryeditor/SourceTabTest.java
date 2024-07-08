@@ -10,6 +10,7 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.OptionalObjectProperty;
@@ -47,6 +48,9 @@ class SourceTabTest {
     public void onStart(Stage stage) {
         area = new CodeArea();
         area.appendText("some example\n text to go here\n across a couple of \n lines....");
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.activeSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
+        when(stateManager.activeGlobalSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -60,9 +64,9 @@ class SourceTabTest {
                 importFormatPreferences,
                 new DummyFileUpdateMonitor(),
                 mock(DialogService.class),
+                stateManager,
                 mock(BibEntryTypesManager.class),
-                keyBindingRepository,
-                OptionalObjectProperty.empty());
+                keyBindingRepository);
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),

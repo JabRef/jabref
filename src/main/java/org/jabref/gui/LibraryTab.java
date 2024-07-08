@@ -15,10 +15,8 @@ import javax.swing.undo.UndoManager;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
@@ -59,7 +57,6 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleCache;
@@ -152,8 +149,8 @@ public class LibraryTab extends Tab {
     @SuppressWarnings({"FieldCanBeLocal"})
     private Subscription dividerPositionSubscription;
 
-    private final OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
-    private final IntegerProperty resultSize = new SimpleIntegerProperty(0);
+    // the query the user searches when this BasePanel is active
+    private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private ListProperty<GroupTreeNode> selectedGroups;
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
@@ -192,7 +189,7 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getMetaData().registerListener(this);
 
         this.selectedGroups = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
-        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, selectedGroups, searchQueryProperty, resultSize);
+        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager, selectedGroups);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -317,7 +314,7 @@ public class LibraryTab extends Tab {
 
         tableModel.removeBinding();
         this.selectedGroups = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
-        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, selectedGroups, searchQueryProperty, resultSize);
+        this.tableModel = new MainTableDataModel(bibDatabaseContext, preferencesService, stateManager, selectedGroups);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
@@ -924,12 +921,15 @@ public class LibraryTab extends Tab {
         return mainTable;
     }
 
-    public OptionalObjectProperty<SearchQuery> searchQueryProperty() {
-        return searchQueryProperty;
+    public Optional<SearchQuery> getCurrentSearchQuery() {
+        return currentSearchQuery;
     }
 
-    public IntegerProperty resultSizeProperty() {
-        return resultSize;
+    /**
+     * Set the query the user currently searches while this basepanel is active
+     */
+    public void setCurrentSearchQuery(Optional<SearchQuery> currentSearchQuery) {
+        this.currentSearchQuery = currentSearchQuery;
     }
 
     public FileAnnotationCache getAnnotationCache() {

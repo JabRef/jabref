@@ -53,7 +53,7 @@ public class SearchPreferences {
         return EnumSet.copyOf(searchFlags);
     }
 
-    public ObservableSet<SearchFlags> getObservableSearchFlags() {
+    protected ObservableSet<SearchFlags> getObservableSearchFlags() {
         return searchFlags;
     }
 
