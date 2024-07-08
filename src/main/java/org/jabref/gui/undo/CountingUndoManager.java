@@ -4,12 +4,10 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
-
 public class CountingUndoManager extends UndoManager {
 
     private int unchangedPoint;
     private int current;
-
 
     @Override
     public synchronized boolean addEdit(UndoableEdit edit) {
