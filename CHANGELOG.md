@@ -58,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
+- We remove the misleading message "Doing a cleanup for X entries" when opening the Cleanup entries dialog []
 
 
 
