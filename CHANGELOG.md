@@ -7,7 +7,7 @@ In case, there is no issue present, the pull request implementing the feature is
 
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [5.14] – 2024-07-08
 
 ### Added
 
@@ -59,9 +59,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Removed
 
 - We removed the misleading message "Doing a cleanup for X entries" when opening the Cleanup entries dialog [#11463](https://github.com/JabRef/jabref/pull/11463)
-
-
-
 
 ## [5.13] – 2024-04-01
 
@@ -1343,7 +1340,7 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.13...HEAD
+[5.14]: https://github.com/JabRef/jabref/compare/v5.13...v5.14
 [5.13]: https://github.com/JabRef/jabref/compare/v5.12...v5.13
 [5.12]: https://github.com/JabRef/jabref/compare/v5.11...v5.12
 [5.11]: https://github.com/JabRef/jabref/compare/v5.10...v5.11
