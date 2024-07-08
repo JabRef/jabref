@@ -113,7 +113,6 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
         linkedFiles.forEach(this::removeFromStore);
     }
 
-
     public void removeFromStore(LinkedFile linkedFile) {
         aiService.getEmbeddingsManager().removeIngestedFile(linkedFile.getLink());
     }
