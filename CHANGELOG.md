@@ -11,7 +11,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the ability to add the current selection to a newly created group. [#11449](https://github.com/JabRef/jabref/issues/11449)
 - We made new groups automatically to focus upon creation. [#11449](https://github.com/JabRef/jabref/issues/11449)
+- We added the ability to right-click on selected entries and create a group using them. [#11449](https://github.com/JabRef/jabref/issues/11449)
+
 
 ### Changed
 
@@ -40,8 +43,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an exporter and improved the importer for Endnote XML format. [#11137](https://github.com/JabRef/jabref/issues/11137)
 - We added support for using BibTeX Style files (BST) in the Preview. [#11102](https://github.com/JabRef/jabref/issues/11102)
 - We added support for automatically update LaTeX citations when a LaTeX file is created, removed, or modified. [#10585](https://github.com/JabRef/jabref/issues/10585)
-- We added the ability to collect a group by your current selection. [#11449](https://github.com/JabRef/jabref/issues/11449)
-- We added the ability to right-click on selected entries and create a group using them.
 
 ### Changed
 
@@ -50,7 +51,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - JabRef no longer downloads HTML files of websites when a PDF was not found. [#10149](https://github.com/JabRef/jabref/issues/10149)
 - We added the HTTP message (in addition to the response code) if an error is encountered. [#11341](https://github.com/JabRef/jabref/pull/11341)
 - We made label wrap text to fit view size when reviewing external group changes. [#11220](https://github.com/JabRef/jabref/issues/11220)
-- We made new Groups automatically focus upon creation. [#11449](https://github.com/JabRef/jabref/issues/11449)
 
 ### Fixed
 
