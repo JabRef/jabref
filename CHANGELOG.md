@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We made new groups automatically to focus upon creation. [#11449](https://github.com/JabRef/jabref/issues/11449)
+
 ### Changed
 
 ### Fixed
