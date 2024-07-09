@@ -14,6 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.NoDocumentFoundException;
+import org.jabref.logic.openoffice.action.EditInsert;
 import org.jabref.logic.openoffice.action.EditMerge;
 import org.jabref.logic.openoffice.action.EditSeparate;
 import org.jabref.logic.openoffice.action.ExportCited;
@@ -524,7 +525,7 @@ class OOBibBase {
                                      OOBibStyle style,
                                      CitationType citationType,
                                      String pageInfo,
-                                     Optional<Update.SyncOptions> syncOptions) {
+                                     Optional<Update.SyncOptions> syncOptions, StyleSelectDialogViewModel.StyleType selectedStyleType) {
 
         final String errorTitle = "Could not insert citation";
 
@@ -581,18 +582,19 @@ class OOBibBase {
 
         try {
             UnoUndo.enterUndoContext(doc, "Insert citation");
-            // if clause - CSL vs jStyle - if CSL insert the citation here. Cursor and doc available.
-            // introduce a new method - handling both
-            CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), entries, bibDatabaseContext);
-            CSLCitationOOAdapter.insertInText(doc, cursor.get(), entries);
-//            EditInsert.insertCitationGroup(doc,
-//                    frontend.get(),
-//                    cursor.get(),
-//                    entries,
-//                    bibDatabaseContext.getDatabase(),
-//                    style,
-//                    citationType,
-//                    pageInfo);
+            if (selectedStyleType == StyleSelectDialogViewModel.StyleType.CSL) {
+                CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), entries, bibDatabaseContext);
+                CSLCitationOOAdapter.insertInText(doc, cursor.get(), entries);
+            } else {
+                EditInsert.insertCitationGroup(doc,
+                        frontend.get(),
+                        cursor.get(),
+                        entries,
+                        bibDatabaseContext.getDatabase(),
+                        style,
+                        citationType,
+                        pageInfo);
+            }
 
             if (syncOptions.isPresent()) {
                 Update.resyncDocument(doc, style, fcursor.get(), syncOptions.get());
@@ -607,7 +609,10 @@ class OOBibBase {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (
-                IOException e) {
+                IOException |
+                PropertyVetoException |
+                IllegalTypeException |
+                NotRemoveableException e) {
             throw new RuntimeException(e);
         } finally {
             UnoUndo.leaveUndoContext(doc);

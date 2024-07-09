@@ -6,6 +6,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
@@ -54,6 +55,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private VBox cslPreviewBox;
     @FXML private ListView<CitationStylePreviewLayout> availableListView;
     @FXML private CustomTextField searchBox;
+    @FXML private TabPane tabPane;
 
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
@@ -65,6 +67,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
+    private StyleSelectDialogViewModel.StyleType selectedStyleType = StyleSelectDialogViewModel.StyleType.CSL;
 
     public StyleSelectDialogView(StyleLoader loader) {
         this.loader = loader;
@@ -85,9 +88,6 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
             return null;
         });
         setTitle(Localization.lang("Style selection"));
-        availableListView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            viewModel.selectedStyleIndexProperty().set(newValue.intValue());
-        });
     }
 
     @FXML
@@ -162,6 +162,10 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         availableListView.setItems(viewModel.getAvailableLayouts());
         searchBox.textProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.setAvailableLayoutsFilter(newValue));
+
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.setSelectedTab(newValue);
+        });
     }
 
     private ContextMenu createContextMenu() {
@@ -175,7 +179,9 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         viewModel.addStyleFile();
     }
 
-    public int getCslIndex() {
-        return viewModel.getSelectedStyleIndex();
+    public StyleSelectDialogViewModel.StyleType getSelectedStyleType() {
+        return tabPane.getSelectionModel().getSelectedItem().getText().equals("CSL Styles")
+                ? StyleSelectDialogViewModel.StyleType.CSL
+                : StyleSelectDialogViewModel.StyleType.JSTYLE;
     }
 }

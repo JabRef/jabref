@@ -98,6 +98,7 @@ public class OpenOfficePanel {
     private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
     private OOBibStyle style;
+    private StyleSelectDialogViewModel.StyleType currentStyleType;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            PreferencesService preferencesService,
@@ -187,17 +188,20 @@ public class OpenOfficePanel {
         selectDocument.setOnAction(e -> ooBase.guiActionSelectDocument(false));
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
-        setStyleFile.setOnAction(event ->
-                dialogService.showCustomDialogAndWait(new StyleSelectDialogView(loader))
-                             .ifPresent(selectedStyle -> {
-                                 style = selectedStyle;
-                                 try {
-                                     style.ensureUpToDate();
-                                 } catch (IOException e) {
-                                     LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
-                                 }
-                                 dialogService.notify(Localization.lang("Current style is '%0'", style.getName()));
-                             }));
+        setStyleFile.setOnAction(event -> {
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(loader);
+            dialogService.showCustomDialogAndWait(styleDialog)
+                         .ifPresent(selectedStyle -> {
+                             style = selectedStyle;
+                             currentStyleType = styleDialog.getSelectedStyleType(); // Store the selected style type
+                             try {
+                                 style.ensureUpToDate();
+                             } catch (IOException e) {
+                                 LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
+                             }
+                             dialogService.notify(Localization.lang("Current style is '%0'", style.getName()));
+                         });
+        });
 
         pushEntries.setTooltip(new Tooltip(Localization.lang("Cite selected entries between parenthesis")));
         pushEntries.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_PAR, false));
@@ -511,7 +515,8 @@ public class OpenOfficePanel {
                 style,
                 citationType,
                 pageInfo,
-                syncOptions);
+                syncOptions,
+                currentStyleType);
     }
 
     /**

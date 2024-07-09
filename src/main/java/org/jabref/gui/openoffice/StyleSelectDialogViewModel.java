@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -18,6 +16,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
@@ -50,7 +49,10 @@ public class StyleSelectDialogViewModel {
     private final ObservableList<CitationStylePreviewLayout> availableLayouts = FXCollections.observableArrayList();
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
-    private final IntegerProperty selectedStyleIndex = new SimpleIntegerProperty(-1);
+    public enum StyleType {
+        CSL,
+        JSTYLE
+    }
 
     public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService, TaskExecutor taskExecutor, BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
@@ -168,16 +170,32 @@ public class StyleSelectDialogViewModel {
                 searchTerm.isEmpty() || layout.getDisplayName().toLowerCase().contains(searchTerm.toLowerCase()));
     }
 
-    public IntegerProperty selectedStyleIndexProperty() {
-        return selectedStyleIndex;
-    }
-
-    public int getSelectedStyleIndex() {
-        return selectedStyleIndex.get();
-    }
-
     public String getSelectedStyleName() {
         CitationStylePreviewLayout selectedLayout = selectedLayoutProperty.get();
         return (selectedLayout != null) ? selectedLayout.getDisplayName() : "";
+    }
+
+    private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
+
+    public ObjectProperty<Tab> selectedTabProperty() {
+        return selectedTab;
+    }
+
+    public Tab getSelectedTab() {
+        return selectedTab.get();
+    }
+
+    public void setSelectedTab(Tab tab) {
+        selectedTab.set(tab);
+    }
+
+    public boolean isCSLStyleSelected() {
+        return selectedTab.get() != null && selectedTab.get().getText().equals("CSL Styles");
+    }
+
+    public StyleType getSelectedStyleType() {
+        return selectedTab.get() != null && selectedTab.get().getText().equals("CSL Styles")
+                ? StyleType.CSL
+                : StyleType.JSTYLE;
     }
 }

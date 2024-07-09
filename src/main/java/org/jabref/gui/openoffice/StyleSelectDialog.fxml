@@ -12,7 +12,6 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
-<?import org.jabref.gui.preview.PreviewViewer?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0"
             prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171"
