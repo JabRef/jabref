@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for using BibTeX Style files (BST) in the Preview. [#11102](https://github.com/JabRef/jabref/issues/11102)
 - We added support for automatically update LaTeX citations when a LaTeX file is created, removed, or modified. [#10585](https://github.com/JabRef/jabref/issues/10585)
 - We added the ability to collect a group by your current selection. [#11449](https://github.com/JabRef/jabref/issues/11449)
+- We added the ability to right-click on selected entries and create a group using them.
 
 ### Changed
 
