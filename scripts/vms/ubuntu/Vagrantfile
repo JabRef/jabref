@@ -28,13 +28,17 @@ Vagrant.configure("2") do |config|
     v.customize ["modifyvm", :id, "--memory", "2048", "--cpus", "2"]
   end
 
+  # Update package index
   config.vm.provision "shell", inline: "sudo apt-get update"
   config.vm.provision "shell", inline: "sudo apt-get upgrade -y"
 
+  # Install latest development build of JabRef
+  config.vm.provision "shell", inline: "sudo snap install --edge jabref"
+
   # Enable LibreOffice connection
   config.vm.provision "shell", inline: "sudo apt-get install -y libreoffice-java-common"
-
-  config.vm.provision "shell", inline: "sudo snap install --edge jabref"
+  config.vm.provision "shell", inline: "sudo mkdir -p /usr/lib/mozilla/native-messaging-hosts"
+  config.vm.provision "shell", inline: "snap connect jabref:hostfs-mozilla-native-messaging-jabref"
 
   config.ssh.forward_x11 = true
 end
