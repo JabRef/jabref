@@ -42,6 +42,7 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -98,7 +99,7 @@ public class OpenOfficePanel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
-    private OOBibStyle style;
+    private OOBibStyle jStyle;
     private StyleSelectDialogViewModel.StyleType currentStyleType;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
@@ -164,15 +165,15 @@ public class OpenOfficePanel {
         final boolean FAIL = true;
         final boolean PASS = false;
 
-        if (style == null) {
-            style = loader.getUsedStyle();
+        if (jStyle == null) {
+            jStyle = loader.getUsedStyle();
         } else {
             try {
-                style.ensureUpToDate();
+                jStyle.ensureUpToDate();
             } catch (IOException ex) {
-                LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", ex);
+                LOGGER.warn("Unable to reload style file '" + jStyle.getPath() + "'", ex);
                 String msg = Localization.lang("Unable to reload style file")
-                        + "'" + style.getPath() + "'"
+                        + "'" + jStyle.getPath() + "'"
                         + "\n" + ex.getMessage();
                 new OOError(title, msg, ex).showErrorDialog(dialogService);
                 return FAIL;
@@ -193,18 +194,18 @@ public class OpenOfficePanel {
             StyleSelectDialogView styleDialog = new StyleSelectDialogView(loader);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
-                             style = selectedStyle;
+                             jStyle = selectedStyle;
                              currentStyleType = styleDialog.getSelectedStyleType();
                              try {
-                                 style.ensureUpToDate();
+                                 jStyle.ensureUpToDate();
                              } catch (IOException e) {
-                                 LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
+                                 LOGGER.warn("Unable to reload style file '" + jStyle.getPath() + "'", e);
                              }
                              if (currentStyleType == StyleSelectDialogViewModel.StyleType.JSTYLE) {
-                                 dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", style.getName()));
+                                 dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
                              } else {
-                                 String cslStyleName = CSLCitationOOAdapter.getSelectedStyleName();
-                                 dialogService.notify(Localization.lang("Current selected CSL Style: '%0'", cslStyleName));
+                                 CitationStyle cslStyle = CSLCitationOOAdapter.getSelectedStyle();
+                                 dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getTitle()));
                              }
                          });
         });
@@ -231,16 +232,16 @@ public class OpenOfficePanel {
                 return;
             }
             List<BibDatabase> databases = getBaseList();
-            ooBase.guiActionUpdateDocument(databases, style);
+            ooBase.guiActionUpdateDocument(databases, jStyle);
         });
 
         merge.setMaxWidth(Double.MAX_VALUE);
         merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
-        merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), style));
+        merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), jStyle));
 
         unmerge.setMaxWidth(Double.MAX_VALUE);
         unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
-        unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), style));
+        unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), jStyle));
 
         ContextMenu settingsMenu = createSettingsPopup();
         settingsB.setMaxWidth(Double.MAX_VALUE);
@@ -518,7 +519,7 @@ public class OpenOfficePanel {
 
         ooBase.guiActionInsertEntry(entries,
                 bibDatabaseContext,
-                style,
+                jStyle,
                 citationType,
                 pageInfo,
                 syncOptions,

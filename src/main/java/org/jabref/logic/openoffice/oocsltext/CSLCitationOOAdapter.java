@@ -17,37 +17,60 @@ import org.jabref.model.openoffice.uno.CreationException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
-import de.undercouch.citeproc.output.Citation;
 import org.apache.commons.text.StringEscapeUtils;
-import org.tinylog.Logger;
 
 public class CSLCitationOOAdapter {
 
-    private static final BibEntryTypesManager BIBENTRYTYPESMANAGER = new BibEntryTypesManager();
+    private static final BibEntryTypesManager BIB_ENTRY_TYPES_MANAGER = new BibEntryTypesManager();
     private static final List<CitationStyle> STYLE_LIST = CitationStyle.discoverCitationStyles();
-
+    private static final CitationStyleOutputFormat FORMAT = CitationStyleOutputFormat.HTML;
     private static String selectedStyleName;
 
-    public static void setSelectedStyleName(String styleName) {
-        CSLCitationOOAdapter.selectedStyleName = styleName;
-    }
-
-    // Replace or modify the existing methods that use cslIndex
-    private static CitationStyle getSelectedStyle() {
+    public static CitationStyle getSelectedStyle() {
         return STYLE_LIST.stream()
                          .filter(style -> style.getTitle().equals(selectedStyleName))
                          .findFirst()
-                         .orElse(STYLE_LIST.getFirst()); // Default to first style if not found
+                         .orElse(STYLE_LIST.getFirst());
     }
 
-    public static String getSelectedStyleName() {
-        return selectedStyleName;
+    public static void insertBibliography(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
+            throws IllegalArgumentException, WrappedTargetException, CreationException {
+
+        String selectedStyle = getSelectedStyle().getSource();
+
+        List<String> citations = CitationStyleGenerator.generateCitation(entries, selectedStyle, FORMAT, bibDatabaseContext, BIB_ENTRY_TYPES_MANAGER);
+
+        for (String citation: citations) {
+            writeCitation(doc, cursor, citation);
+        }
+    }
+
+    public static void insertInText(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
+            throws IOException, WrappedTargetException, CreationException {
+
+        String selectedStyle = getSelectedStyle().getSource();
+
+        String inTextCitation = CitationStyleGenerator.generateInText(entries, selectedStyle, FORMAT, bibDatabaseContext, BIB_ENTRY_TYPES_MANAGER).getText();
+
+        writeCitation(doc, cursor, inTextCitation);
+    }
+
+    public static void writeCitation(XTextDocument doc, XTextCursor cursor, String citation) throws WrappedTargetException, CreationException {
+
+        String formattedCitation = transformHtml(citation);
+        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+        OOTextIntoOO.write(doc, cursor, ooText);
+        cursor.collapseToEnd();
     }
 
     private static String transformHtml(String html) {
-        // Remove unsupported tags
+        // Initial clean up of escaped characters
         html = StringEscapeUtils.unescapeHtml4(html);
+
+        // Handle margins (spaces between citation number and text)
         html = html.replaceAll("<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>", "$1 $2");
+
+        // Remove unsupported tags
         html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<div[^>]*>", "");
         html = StringEscapeUtils.unescapeHtml4(html).replaceAll("</div>", "");
 
@@ -79,36 +102,7 @@ public class CSLCitationOOAdapter {
         return html;
     }
 
-    public static void insertBibliography(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
-            throws IllegalArgumentException, WrappedTargetException, CreationException {
-
-        CitationStyle selectedStyle = getSelectedStyle();
-        String style = selectedStyle.getSource();
-        Logger.warn("Selected Style: " + selectedStyle.getTitle());
-
-        CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
-
-        List<String> actualCitations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, BIBENTRYTYPESMANAGER);
-        for (String actualCitation: actualCitations) {
-            Logger.warn("Unformatted Citation: " + actualCitation);
-            String formattedHTML = transformHtml(actualCitation);
-            Logger.warn("Formatted Citation: " + formattedHTML);
-
-            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedHTML));
-            OOTextIntoOO.write(doc, cursor, ooText);
-            cursor.collapseToEnd();
-        }
-    }
-
-    public static void insertInText(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) throws IOException, WrappedTargetException, CreationException {
-        CitationStyle selectedStyle = getSelectedStyle();
-
-        Citation citation = CitationStyleGenerator.generateInText(entries, selectedStyle.getSource(), CitationStyleOutputFormat.HTML, bibDatabaseContext, BIBENTRYTYPESMANAGER);
-        Logger.warn("Unformatted in-text Citation: " + citation.getText());
-        String formattedHTML = transformHtml(citation.getText());
-        Logger.warn("Formatted in-text Citation: " + formattedHTML);
-        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedHTML));
-        OOTextIntoOO.write(doc, cursor, ooText);
-        cursor.collapseToEnd();
+    public static void setSelectedStyleName(String styleName) {
+        CSLCitationOOAdapter.selectedStyleName = styleName;
     }
 }

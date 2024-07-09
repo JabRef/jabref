@@ -37,7 +37,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
-import org.tinylog.Logger;
 
 public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
@@ -80,9 +79,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storePrefs();
-                String selectedStyleName = viewModel.getSelectedStyleName();
-                Logger.warn("Selected CSL Style Name: " + selectedStyleName);
-                CSLCitationOOAdapter.setSelectedStyleName(selectedStyleName);
+                CSLCitationOOAdapter.setSelectedStyleName(viewModel.getSelectedStyleName());
                 return tvStyles.getSelectionModel().getSelectedItem().getStyle();
             }
             return null;
