@@ -34,6 +34,10 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(binding);
     }
 
+    public static BooleanExpression needsMultipleDatabases(TabPane tabbedPane) {
+        return Bindings.size(tabbedPane.getTabs()).greaterThan(1);
+    }
+
     public static BooleanExpression needsStudyDatabase(StateManager stateManager) {
         EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(BibDatabaseContext::isStudy).isPresent());
         return BooleanExpression.booleanExpression(binding);
@@ -96,9 +100,5 @@ public class ActionHelper {
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
                 entries -> entries.anyMatch(entry -> !entry.getFiles().isEmpty())));
-    }
-
-    public static BooleanExpression isOpenMultiDatabase(TabPane tabbedPane) {
-        return Bindings.size(tabbedPane.getTabs()).greaterThan(1);
     }
 }
