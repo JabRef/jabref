@@ -13,6 +13,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -29,13 +32,16 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextField textField;
 
     @Inject private PreferencesService preferencesService;
+    @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
 
     public CitationKeyEditor(Field field,
                              SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
-                             BibDatabaseContext databaseContext) {
+                             BibDatabaseContext databaseContext,
+                             UndoAction undoAction,
+                             RedoAction redoAction) {
 
         ViewLoader.view(this)
                   .root(this)
@@ -50,10 +56,8 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
                 undoManager,
                 dialogService);
 
-        establishBinding(textField, viewModel.textProperty());
-
-        textField.initContextMenu(Collections::emptyList, preferencesService.getKeyBindingRepository());
-
+        establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
+        textField.initContextMenu(Collections::emptyList, keyBindingRepository);
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 

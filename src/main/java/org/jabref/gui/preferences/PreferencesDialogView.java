@@ -65,6 +65,10 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
+    public PreferencesDialogViewModel getViewModel() {
+        return viewModel;
+    }
+
     @FXML
     private void initialize() {
         viewModel = new PreferencesDialogViewModel(dialogService, preferencesService);
