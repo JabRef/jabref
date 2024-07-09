@@ -29,7 +29,11 @@ If asked for a password, this is `vagrant`.
 Execute `vagrant destroy`.
 Then, everything is removed.
 
-## Trouble shooting
+## Available VMs
+
+- `ubuntu`: Ubuntu with JabRef snap and libreoffice-connection pre-installed. One has to install the [JabRef Browser Extension](https://addons.mozilla.org/en-US/firefox/addon/jabref/) manually.
+
+## Troubleshooting
 
 > VBoxManage.exe: error: Could not rename the directory '`C:\Users\$username\VirtualBox VMs\output-ubuntu_source_1720167378145_42641_1720548095320_67904`' to '`C:\Users\$username\VirtualBox VMs\jabref-ubuntu`' to save the settings file (`VERR_ALREADY_EXISTS`)
 
