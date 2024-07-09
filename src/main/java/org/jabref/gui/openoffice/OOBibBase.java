@@ -608,17 +608,15 @@ class OOBibBase {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-        } catch (CreationException
-                 |
-                 WrappedTargetException ex) {
-            LOGGER.warn("Could not insert entry", ex);
-            OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (
+                CreationException |
+                WrappedTargetException |
                 IOException |
                 PropertyVetoException |
                 IllegalTypeException |
-                NotRemoveableException e) {
-            throw new RuntimeException(e);
+                NotRemoveableException ex) {
+            LOGGER.warn("Could not insert entry", ex);
+            OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } finally {
             UnoUndo.leaveUndoContext(doc);
         }
