@@ -26,16 +26,20 @@ import org.tinylog.Logger;
 public class CSLCitationOOAdapter {
 
     private static final BibEntryTypesManager BIBENTRYTYPESMANAGER = new BibEntryTypesManager();
-    private static int cslIndex;
     private static final List<CitationStyle> STYLE_LIST = CitationStyle.discoverCitationStyles();
-    private final BibDatabaseContext bibDatabaseContext;
 
-    public CSLCitationOOAdapter(BibDatabaseContext bibDatabaseContext) {
-        this.bibDatabaseContext = bibDatabaseContext;
+    private static String selectedStyleName;
+
+    public static void setSelectedStyleName(String styleName) {
+        CSLCitationOOAdapter.selectedStyleName = styleName;
     }
 
-    public static void setCslIndex(int cslIndex) {
-        CSLCitationOOAdapter.cslIndex = cslIndex;
+    // Replace or modify the existing methods that use cslIndex
+    private static CitationStyle getSelectedStyle() {
+        return STYLE_LIST.stream()
+                         .filter(style -> style.getTitle().equals(selectedStyleName))
+                         .findFirst()
+                         .orElse(STYLE_LIST.getFirst()); // Default to first style if not found
     }
 
     private static String transformHtml(String html) {
@@ -75,8 +79,9 @@ public class CSLCitationOOAdapter {
     public static void insertBibliography(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
             throws IllegalArgumentException, WrappedTargetException, CreationException {
 
-        String style = STYLE_LIST.get(cslIndex).getSource();
-        Logger.warn("Selected Style: " + STYLE_LIST.get(cslIndex).getTitle());
+        CitationStyle selectedStyle = getSelectedStyle();
+        String style = selectedStyle.getSource();
+        Logger.warn("Selected Style: " + selectedStyle.getTitle());
 
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
@@ -96,8 +101,9 @@ public class CSLCitationOOAdapter {
 
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
         context.setMode(BibDatabaseMode.BIBLATEX);
+        CitationStyle selectedStyle = getSelectedStyle();
 
-        Citation citation = CitationStyleGenerator.generateInText(entries, STYLE_LIST.get(cslIndex).getSource(), CitationStyleOutputFormat.HTML, context, BIBENTRYTYPESMANAGER);
+        Citation citation = CitationStyleGenerator.generateInText(entries, selectedStyle.getSource(), CitationStyleOutputFormat.HTML, context, BIBENTRYTYPESMANAGER);
         Logger.warn("Unformatted in-text Citation: " + citation.getText());
         String formattedHTML = transformHtml(citation.getText());
         Logger.warn("Formatted in-text Citation: " + formattedHTML);

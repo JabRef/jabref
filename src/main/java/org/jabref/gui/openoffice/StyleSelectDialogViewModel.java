@@ -175,4 +175,9 @@ public class StyleSelectDialogViewModel {
     public int getSelectedStyleIndex() {
         return selectedStyleIndex.get();
     }
+
+    public String getSelectedStyleName() {
+        CitationStylePreviewLayout selectedLayout = selectedLayoutProperty.get();
+        return (selectedLayout != null) ? selectedLayout.getDisplayName() : "";
+    }
 }

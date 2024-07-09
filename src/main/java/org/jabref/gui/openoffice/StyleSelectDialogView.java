@@ -65,11 +65,10 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
-    private int cslIndex;
 
     public StyleSelectDialogView(StyleLoader loader) {
         this.loader = loader;
-        cslIndex = 0;
+        int cslIndex = 0;
 
         ViewLoader.view(this)
                   .load()
@@ -78,8 +77,9 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storePrefs();
-                Logger.warn("Selected CSL Style Index: " + viewModel.getSelectedStyleIndex());
-                CSLCitationOOAdapter.setCslIndex(viewModel.getSelectedStyleIndex());
+                String selectedStyleName = viewModel.getSelectedStyleName();
+                Logger.warn("Selected CSL Style Name: " + selectedStyleName);
+                CSLCitationOOAdapter.setSelectedStyleName(selectedStyleName);
                 return tvStyles.getSelectionModel().getSelectedItem().getStyle();
             }
             return null;
