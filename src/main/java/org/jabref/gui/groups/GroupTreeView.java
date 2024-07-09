@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -159,8 +160,6 @@ public class GroupTreeView extends BorderPane {
         this.setBottom(groupBar);
     }
 
-
-
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
         viewModel = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, localDragboard);
@@ -171,14 +170,19 @@ public class GroupTreeView extends BorderPane {
 
         BindingsHelper.bindContentBidirectional(
                 groupTree.getSelectionModel().getSelectedItems(),
-                viewModel.selectedGroupsProperty(),
-                newSelectedGroups -> {
-                    groupTree.getSelectionModel().clearSelection();
-                    newSelectedGroups.forEach(this::selectNode);
-                },
+                stateManager.activeGroupProperty(),
+                this::selectActiveNodes,
                 model -> {
+                    // activeGroupProperty is read-only, so we update it by proxy
+                    // by updating stateManager.getSelectedGroups(database),
+                    // which propagates back to activeGroupProperty.
                     if (stateManager.getActiveDatabase().isPresent()) {
-                        updateSelection(model.stream().map(node -> node.getValue().getGroupNode()).collect(Collectors.toList()), stateManager.getActiveDatabase().get());
+                            updateSelection(
+                                    model.stream().map(TreeItem::getValue)
+                                            .map(GroupNodeViewModel::getGroupNode)
+                                            .collect(Collectors.toList()),
+                                    stateManager.getActiveDatabase().get()
+                        );
                     }
                 });
 
@@ -190,19 +194,23 @@ public class GroupTreeView extends BorderPane {
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
 
-        groupTree.rootProperty().bind(
-                EasyBind.map(viewModel.rootGroupProperty(),
-                        group -> {
-                            if (group == null) {
-                                return null;
-                            } else {
-                                return new RecursiveTreeItem<>(
-                                        group,
-                                        GroupNodeViewModel::getChildren,
-                                        GroupNodeViewModel::expandedProperty,
-                                        viewModel.filterPredicateProperty());
-                            }
-                        }));
+        // Binding these values causes some issues with update order which
+        // lead to the active groups not being highlighted.
+        EasyBind.subscribe(stateManager.activeDatabaseProperty(),
+                database -> {
+                    viewModel.setNewDatabase(database);
+                    groupTree.rootProperty().setValue(
+                        viewModel.rootGroup() != null
+                            ? new RecursiveTreeItem<>(
+                                viewModel.rootGroup(),
+                                GroupNodeViewModel::getChildren,
+                                GroupNodeViewModel::expandedProperty,
+                                viewModel.filterPredicateProperty())
+                            : null
+                    );
+                    database.ifPresent(bibDatabaseContext -> selectActiveNodes(stateManager.activeGroupProperty()));
+                }
+            );
 
         // Icon and group name
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
@@ -354,7 +362,7 @@ public class GroupTreeView extends BorderPane {
             List<GroupNodeViewModel> changedGroups = new LinkedList<>();
             for (String pathToSource : pathToSources) {
                 Optional<GroupNodeViewModel> source = viewModel
-                        .rootGroupProperty().get()
+                        .rootGroup()
                         .getChildByPath(pathToSource);
                 if (source.isPresent() && source.get().canBeDragged()) {
                     source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
@@ -394,12 +402,23 @@ public class GroupTreeView extends BorderPane {
         }
     }
 
-    private void updateSelection(List<GroupTreeNode> newSelectedGroups, BibDatabaseContext database) {
-        if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {
-            stateManager.getSelectedGroups(database).clear();
+    private void updateSelection(List<GroupTreeNode> newActiveGroups, BibDatabaseContext database) {
+        if ((newActiveGroups == null)) {
+            stateManager.setSelectedGroups(database, Collections.singletonList(viewModel.rootGroup().getGroupNode()));
         } else {
-            List<GroupTreeNode> list = newSelectedGroups.stream().filter(model -> (model != null) && !(model.getGroup() instanceof AllEntriesGroup)).collect(Collectors.toList());
-            stateManager.getSelectedGroups(database).setAll(list);
+            List<GroupTreeNode> list = newActiveGroups.stream()
+                    .filter(model -> (model != null) && !(model.getGroup() instanceof AllEntriesGroup))
+                    .collect(Collectors.toList());
+            stateManager.setSelectedGroups(database, list);
+        }
+    }
+
+    private void selectActiveNodes(ObservableList<GroupTreeNode> activeGroups) {
+        groupTree.getSelectionModel().clearSelection();
+        if (activeGroups != null && !activeGroups.isEmpty()) {
+            activeGroups.forEach(this::selectNode);
+        } else if (viewModel.rootGroup() != null) {
+            this.selectNode(viewModel.rootGroup().getGroupNode(), true);
         }
     }
 

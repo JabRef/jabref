@@ -266,7 +266,7 @@ public class GroupDialogViewModel {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
-                                .map(extension -> "aux".equalsIgnoreCase(extension))
+                                .map("aux"::equalsIgnoreCase)
                                 .orElse(false);
                     }
                 },
@@ -572,7 +572,7 @@ public class GroupDialogViewModel {
         return keywordSearchTermEmptyValidator.getValidationStatus();
     }
 
-    public ValidationStatus texGroupFilePathValidatonStatus() {
+    public ValidationStatus texGroupFilePathValidationStatus() {
         return texGroupFilePathValidator.getValidationStatus();
     }
 

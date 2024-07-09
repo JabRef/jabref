@@ -96,18 +96,20 @@ public class CreateGroupAction extends SimpleCommand {
                     ));
 
             newGroup.ifPresent(group -> {
+                GroupTreeNode newSubgroup;
                 if (editGroup != null) {
-                    groupEditActions(editGroup, group, database.get());
-                    return;
+                    Optional<GroupTreeNode> editedGroup = groupEditActions(editGroup, group, database.get());
+                    if (editedGroup.isEmpty()) return;
+                    newSubgroup = editedGroup.get();
+                    dialogService.notify(Localization.lang("Modified group \"%0\".", newSubgroup.getName()));
+                } else {
+                    newSubgroup = groupFallsUnder.addSubgroup(group);
+                    dialogService.notify(Localization.lang("Added group \"%0\".", newSubgroup.getName()));
                 }
-                GroupTreeNode newSubgroup = groupFallsUnder.addSubgroup(group);
                 stateManager.getSelectedGroups(database.get()).setAll(newSubgroup);
-
                 // TODO: Add undo
                 // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
                 // panel.getUndoManager().addEdit(undo);
-
-                dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData(database.get(), newSubgroup);
             });
         } else {
@@ -116,12 +118,12 @@ public class CreateGroupAction extends SimpleCommand {
 
     }
 
-    private void groupEditActions(GroupTreeNode oldGroup, AbstractGroup newGroup, BibDatabaseContext database) {
-        AbstractGroup oldGroupDef = oldGroup.getGroup();
-        String oldGroupName = oldGroupDef.getName();
+    private Optional<GroupTreeNode> groupEditActions(GroupTreeNode node, AbstractGroup newGroup, BibDatabaseContext database) {
+        AbstractGroup oldGroup = node.getGroup();
+        String oldGroupName = oldGroup.getName();
 
-        boolean groupTypeEqual = isGroupTypeEqual(oldGroupDef, newGroup);
-        boolean onlyMinorModifications = groupTypeEqual && changesAreMinor(oldGroupDef, newGroup);
+        boolean groupTypeEqual = isGroupTypeEqual(oldGroup, newGroup);
+        boolean onlyMinorModifications = groupTypeEqual && changesAreMinor(oldGroup, newGroup);
 
         // I inherited this from the previous maintainer. Haven't dug into which has better priority,
         // what default behavior is, or why this appears replicated -- all my changes are simply refactoring.
@@ -138,7 +140,7 @@ public class CreateGroupAction extends SimpleCommand {
             // Otherwise, we need to keep them.
             removePreviousAssignments = nameIsUnique(oldGroup, newGroup, database);
 
-        } else if (groupTypeEqual && changesAreMinor(oldGroup.getGroup(), newGroup)) {
+        } else if (groupTypeEqual && changesAreMinor(oldGroup, newGroup)) {
 
             keepPreviousAssignments = true;
             removePreviousAssignments = true;
@@ -147,9 +149,9 @@ public class CreateGroupAction extends SimpleCommand {
             // Major modifications
             Optional<ButtonType> reassignmentResponse = showConfirmationPanel(newGroup.getClass() == WordKeywordGroup.class);
             if (reassignmentResponse.isEmpty() || reassignmentResponse.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
-                return;
+                return Optional.empty();
             }
-            removePreviousAssignments = (oldGroup.getGroup() instanceof ExplicitGroup)
+            removePreviousAssignments = (node.getGroup() instanceof ExplicitGroup)
                     && (newGroup instanceof ExplicitGroup)
                     && nameIsUnique(oldGroup, newGroup, database);
             keepPreviousAssignments = (reassignmentResponse.get().getButtonData() == ButtonBar.ButtonData.YES);
@@ -173,15 +175,12 @@ public class CreateGroupAction extends SimpleCommand {
         //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
         // }
 
-        oldGroup.setGroup(
+        node.setGroup(
                 newGroup,
                 keepPreviousAssignments,
                 removePreviousAssignments,
                 database.getEntries());
-        stateManager.getSelectedGroups(database).setAll(oldGroup);
-        dialogService.notify(Localization.lang("Modified group \"%0\".", oldGroup.getName()));
-        writeGroupChangesToMetaData(database, oldGroup);
-
+        return Optional.of(node);
     }
 
     private boolean isGroupTypeEqual(AbstractGroup oldGroup, AbstractGroup newGroup) {
@@ -196,7 +195,7 @@ public class CreateGroupAction extends SimpleCommand {
      * @param newGroup Edited group
      * @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
      */
-    private boolean changesAreMinor(AbstractGroup oldGroup, AbstractGroup newGroup) {
+    public static boolean changesAreMinor(AbstractGroup oldGroup, AbstractGroup newGroup) {
         // we need to use getclass here because we have different subclass inheritance e.g. ExplicitGroup is a subclass of WordKeyWordGroup
         if (oldGroup.getClass() == WordKeywordGroup.class) {
             WordKeywordGroup oldWordKeywordGroup = (WordKeywordGroup) oldGroup;
@@ -238,7 +237,7 @@ public class CreateGroupAction extends SimpleCommand {
         return true;
     }
 
-    private boolean nameIsUnique(GroupTreeNode oldGroup, AbstractGroup newGroup, BibDatabaseContext database) {
+    private boolean nameIsUnique(AbstractGroup oldGroup, AbstractGroup newGroup, BibDatabaseContext database) {
         int groupsWithSameName = 0;
         Optional<GroupTreeNode> databaseRootGroup = database.getMetaData().getGroups();
         if (databaseRootGroup.isPresent()) {

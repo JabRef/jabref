@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import javafx.collections.FXCollections;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
@@ -111,7 +112,7 @@ public class ExportCommand extends SimpleCommand {
             // All entries
             entries = stateManager.getActiveDatabase()
                                   .map(BibDatabaseContext::getEntries)
-                                  .orElse(Collections.emptyList());
+                                  .orElse(FXCollections.emptyObservableList());
         }
 
         List<Path> fileDirForDatabase = stateManager.getActiveDatabase()

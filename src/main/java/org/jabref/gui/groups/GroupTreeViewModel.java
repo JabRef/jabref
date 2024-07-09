@@ -1,23 +1,15 @@
 package org.jabref.gui.groups;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import com.tobiasdiez.easybind.Subscription;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -69,7 +61,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return 0;
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
-    private Optional<Subscription> unsubscribe = Optional.empty();
 
 
     public GroupTreeViewModel(StateManager stateManager,
@@ -83,39 +74,29 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
 
-        // Register listener
-        EasyBind.subscribe(
-            stateManager.activeDatabaseProperty(),
-            val -> this.onActiveDatabaseChanged()
-        );
-
         // Set-up bindings
         filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
 
-        // Init
-        onActiveDatabaseChanged();
-    }
+        ReadOnlyListProperty<GroupTreeNode> list = stateManager.activeGroupProperty();
+        selectedGroups.setAll(list);
+        list.addListener(this::onActiveGroupChange);
 
-    private void subscribeToSelectedGroups() {
-        unsubscribe.ifPresent(Subscription::unsubscribe);
-        if (currentDatabase.isEmpty()) return;
-        ObservableList<GroupTreeNode> list = stateManager.getSelectedGroups(currentDatabase.get());
-        list.addListener(this::onSelectedGroupChanged);
-        unsubscribe = Optional.of(() -> list.removeListener(this::onSelectedGroupChanged));
+        // Init
+        setNewDatabase(currentDatabase);
     }
 
     /**
      * Gets invoked if the user selects a different group.
      * We need to notify the {@link StateManager} about this change so that the main table gets updated.
      */
-    private void onSelectedGroupChanged(ListChangeListener.Change<? extends GroupTreeNode> newValue) {
+    private void onActiveGroupChange(ListChangeListener.Change<? extends GroupTreeNode> newValue) {
         if (!currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
             // Active database is not this one: do nothing
             return;
         }
 
         currentDatabase.ifPresent(database -> {
-            if ((newValue == null) || (newValue.getList().isEmpty())) {
+            if ((newValue == null)) {
                 selectedGroups.clear();
             } else {
                 selectedGroups.setAll(newValue.getList());
@@ -123,18 +104,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
         });
     }
 
-    private void onActiveDatabaseChanged() {
-        Optional<BibDatabaseContext> newDatabase = stateManager.activeDatabaseProperty().getValue();
-        currentDatabase = newDatabase;
-        newDatabase.ifPresentOrElse(
+    public void setNewDatabase(Optional<BibDatabaseContext> database) {
+        currentDatabase = database;
+        database.ifPresentOrElse(
                 this::onActiveDatabaseExists,
                 this::onActiveDatabaseNull
         );
-        subscribeToSelectedGroups();
     }
 
-    public ObjectProperty<GroupNodeViewModel> rootGroupProperty() {
-        return rootGroup;
+    public GroupNodeViewModel rootGroup() {
+        return rootGroup.get();
     }
 
     public ListProperty<GroupTreeNode> selectedGroupsProperty() {
@@ -166,7 +145,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
     /**
      * Gets invoked if the user changes the active database.
-     * We need to get the new group tree and update the view
+     * We need to get the new group tree
      */
     private void onActiveDatabaseExists(BibDatabaseContext newDatabase) {
 
@@ -175,11 +154,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase, stateManager, taskExecutor, localDragboard, preferences));
 
         rootGroup.setValue(newRoot);
-        if (stateManager.getSelectedGroups(newDatabase).isEmpty()) {
-            stateManager.setSelectedGroups(newDatabase, Collections.singletonList(newRoot.getGroupNode()));
-        }
-        selectedGroups.setAll(
-                stateManager.getSelectedGroups(newDatabase));
     }
 
     private void onActiveDatabaseNull() {

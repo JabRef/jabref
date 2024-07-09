@@ -21,11 +21,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.DroppingMouseLocation;
-import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.gui.util.*;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.FieldChange;
@@ -52,7 +48,7 @@ import com.tobiasdiez.easybind.EasyObservableList;
 
 public class GroupNodeViewModel {
 
-    private final String displayName;
+    private String displayName;
     private final boolean isRoot;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
@@ -65,9 +61,10 @@ public class GroupNodeViewModel {
     private final BooleanBinding allSelectedEntriesMatched;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
-    private final ObservableList<BibEntry> entriesList;
     private final PreferencesService preferencesService;
     private final InvalidationListener onInvalidatedGroup = listener -> refreshGroup();
+
+    private final ObservableList<BibEntry> entriesList;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -76,8 +73,8 @@ public class GroupNodeViewModel {
         this.groupNode = Objects.requireNonNull(groupNode);
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
         this.preferencesService = preferencesService;
-
-        displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
+        LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
+        groupNode.nameSubscription(name -> displayName = formatter.format(name));
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup automaticGroup) {
             children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
@@ -95,20 +92,28 @@ public class GroupNodeViewModel {
         hasChildren.bind(Bindings.isNotEmpty(children));
 
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
+        if (!stateManager.activeGroupProperty().isEmpty()) {
+            this.updateMatchedEntries();
+        }
         stateManager.activeGroupProperty().subscribe(this::updateMatchedEntries);
 
         expandedProperty.set(groupNode.getGroup().isExpanded());
         expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
         // Register listener
-        // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
+        // The wrapper created by the FXCollections will set a weak listener on the wrapped list.
+        // This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
         entriesList = databaseContext.getDatabase().getEntries();
-        entriesList.addListener(this::onDatabaseChanged);
+        entriesList.addListener(this::onEntriesChanged);
 
-        EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
+        this.groupNode.subscribeToDescendantChanged(node -> this.refreshGroup());
+        EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(
+                stateManager.getSelectedEntries(),
+                groupNode::matches
+        );
         anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
         // 'all' returns 'true' for empty streams, so this has to be checked explicitly
-        allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
+        allSelectedEntriesMatched = selectedEntriesMatchStatus.allMatch(matched -> matched).and(selectedEntriesMatchStatus.isEmptyBinding().not());
     }
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, PreferencesService preferencesService) {
@@ -232,10 +237,10 @@ public class GroupNodeViewModel {
     /**
      * Gets invoked if an entry in the current database changes.
      */
-    private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
+    private void onEntriesChanged(ListChangeListener.Change<? extends BibEntry> change) {
         while (change.next()) {
             if (change.wasPermutated()) {
-                // Nothing to do, as permutation doesn't change matched entries
+                // do nothing
             } else if (change.wasUpdated()) {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
                     if (groupNode.matches(changedEntry)) {
@@ -251,10 +256,10 @@ public class GroupNodeViewModel {
                     matchedEntries.remove(removedEntry);
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
+                    // Newly-created empty entries are indistinguishable from one another,
+                    // so we should not check if the entry is already in our matched entries list.
                     if (groupNode.matches(addedEntry)) {
-                        if (!matchedEntries.contains(addedEntry)) {
-                            matchedEntries.add(addedEntry);
-                        }
+                        matchedEntries.add(addedEntry);
                     }
                 }
             }
@@ -495,7 +500,7 @@ public class GroupNodeViewModel {
         } else if (group instanceof KeywordGroup) {
             // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
         } else if (group instanceof SearchGroup) {

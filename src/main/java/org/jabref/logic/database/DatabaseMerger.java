@@ -105,11 +105,12 @@ public class DatabaseMerger {
     private void mergeGroups(MetaData target, MetaData other, String otherFilename, List<BibEntry> allOtherEntries) {
         // Adds the specified node as a child of the current root. The group contained in <b>newGroups</b> must not be of
         // type AllEntriesGroup, since every tree has exactly one AllEntriesGroup (its root). The <b>newGroups</b> are
-        // inserted directly, i.e. they are not deepCopy()'d.
-        other.getGroups().ifPresent(newGroups -> {
+        // deepCopy()'d by proxy through the GroupTreeNode's 'setGroup' function. This should allow 'undos'
+        // to be possible, if implemented.
+        other.getGroups().ifPresent(node -> {
             // ensure that there is always only one AllEntriesGroup in the resulting database
             // "Rename" the AllEntriesGroup of the imported database to "Imported"
-            if (newGroups.getGroup() instanceof AllEntriesGroup) {
+            if (node.getGroup() instanceof AllEntriesGroup) {
                 // create a dummy group
                 try {
                     // This will cause a bug if the group already exists
@@ -119,16 +120,16 @@ public class DatabaseMerger {
                             "Imported " + newGroupName,
                             GroupHierarchyType.INDEPENDENT,
                             keywordDelimiter);
-                    newGroups.setGroup(group);
                     group.add(allOtherEntries);
+                    node.setGroup(group, true, false, allOtherEntries);
                 } catch (IllegalArgumentException e) {
                     LOGGER.error("Problem appending entries to group", e);
                 }
             }
             target.getGroups().ifPresentOrElse(
-                    newGroups::moveTo,
+                    node::moveTo,
                     // target does not contain any groups, so we can just use the new groups
-                    () -> target.setGroups(newGroups));
+                    () -> target.setGroups(node));
         });
     }
 

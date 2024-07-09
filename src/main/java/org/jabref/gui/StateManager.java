@@ -75,7 +75,8 @@ public class StateManager {
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
 
     public StateManager() {
-        activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElseOpt(null).map(BibDatabaseContext::getUid)));
+        activeGroups.bind(Bindings.valueAt(
+                selectedGroups, activeDatabase.orElseOpt(null).map(BibDatabaseContext::getUid)).orElse(FXCollections.emptyObservableList()));
     }
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
@@ -161,6 +162,7 @@ public class StateManager {
             LOGGER.info("No open database detected");
             activeDatabaseProperty().set(Optional.empty());
         } else {
+            selectedGroups.computeIfAbsent(database.getUid(), k -> FXCollections.emptyObservableList());
             activeDatabaseProperty().set(Optional.of(database));
         }
     }

@@ -3,11 +3,15 @@ package org.jabref.model.groups;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.paint.Color;
 
+import javafx.util.Subscription;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.strings.StringUtil;
@@ -29,6 +33,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     protected boolean isExpanded = true;
     protected Optional<String> description = Optional.empty();
     protected Optional<String> iconName = Optional.empty();
+    protected IntegerProperty versionNumber = new SimpleIntegerProperty();
 
     protected AbstractGroup(String name, GroupHierarchyType context) {
         this.name.setValue(name);
@@ -75,7 +80,7 @@ public abstract class AbstractGroup implements SearchMatcher {
 
     public void setColor(String colorString) {
         if (StringUtil.isBlank(colorString)) {
-            color = Optional.empty();
+            setColor((Color) null);
         } else {
             setColor(Color.valueOf(colorString));
         }
@@ -135,6 +140,14 @@ public abstract class AbstractGroup implements SearchMatcher {
      * @return true if this group contains the specified entry, false otherwise.
      */
     public abstract boolean contains(BibEntry entry);
+
+    public Subscription subscribe(Consumer<AbstractGroup> action) {
+        return versionNumber.subscribe(() -> action.accept(this.deepCopy()));
+    }
+
+    protected void alertChange() {
+        versionNumber.set(versionNumber.get() + 1);
+    }
 
     @Override
     public boolean isMatch(BibEntry entry) {

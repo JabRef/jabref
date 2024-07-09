@@ -265,7 +265,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.keywordRegexValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordFieldEmptyValidationStatus(), keywordGroupSearchField);
-            validationVisualizer.initVisualization(viewModel.texGroupFilePathValidatonStatus(), texGroupFilePath);
+            validationVisualizer.initVisualization(viewModel.texGroupFilePathValidationStatus(), texGroupFilePath);
             nameField.requestFocus();
         });
 
@@ -279,10 +279,14 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
                 return;
             }
-            List<Color> colorsOfSiblings = parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
-                                                     .flatMap(Optional::stream)
-                                                     .toList();
-            Optional<Color> parentColor = parentGroup().getColor();
+
+            List<Color> colorsOfSiblings = parentNode.getChildren()
+                    .stream()
+                    .map(GroupTreeNode::getGroup)
+                    .map(AbstractGroup::getColor)
+                    .flatMap(Optional::stream)
+                    .toList();
+            Optional<Color> parentColor = parentNode.getGroup().getColor();
             Color color;
             color = parentColor.map(value -> GroupColorPicker.generateColor(colorsOfSiblings, value)).orElseGet(() -> GroupColorPicker.generateColor(colorsOfSiblings));
             viewModel.colorFieldProperty().setValue(color);
