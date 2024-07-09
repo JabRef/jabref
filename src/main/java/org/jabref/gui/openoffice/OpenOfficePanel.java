@@ -48,6 +48,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.model.database.BibDatabase;
@@ -193,13 +194,18 @@ public class OpenOfficePanel {
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              style = selectedStyle;
-                             currentStyleType = styleDialog.getSelectedStyleType(); // Store the selected style type
+                             currentStyleType = styleDialog.getSelectedStyleType();
                              try {
                                  style.ensureUpToDate();
                              } catch (IOException e) {
                                  LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
                              }
-                             dialogService.notify(Localization.lang("Current style is '%0'", style.getName()));
+                             if (currentStyleType == StyleSelectDialogViewModel.StyleType.JSTYLE) {
+                                 dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", style.getName()));
+                             } else {
+                                 String cslStyleName = CSLCitationOOAdapter.getSelectedStyleName();
+                                 dialogService.notify(Localization.lang("Current selected CSL Style: '%0'", cslStyleName));
+                             }
                          });
         });
 

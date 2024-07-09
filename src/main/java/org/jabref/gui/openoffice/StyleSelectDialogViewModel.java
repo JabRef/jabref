@@ -49,6 +49,7 @@ public class StyleSelectDialogViewModel {
     private final ObservableList<CitationStylePreviewLayout> availableLayouts = FXCollections.observableArrayList();
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
+    private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
     public enum StyleType {
         CSL,
         JSTYLE
@@ -175,27 +176,7 @@ public class StyleSelectDialogViewModel {
         return (selectedLayout != null) ? selectedLayout.getDisplayName() : "";
     }
 
-    private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
-
-    public ObjectProperty<Tab> selectedTabProperty() {
-        return selectedTab;
-    }
-
-    public Tab getSelectedTab() {
-        return selectedTab.get();
-    }
-
     public void setSelectedTab(Tab tab) {
         selectedTab.set(tab);
-    }
-
-    public boolean isCSLStyleSelected() {
-        return selectedTab.get() != null && selectedTab.get().getText().equals("CSL Styles");
-    }
-
-    public StyleType getSelectedStyleType() {
-        return selectedTab.get() != null && selectedTab.get().getText().equals("CSL Styles")
-                ? StyleType.CSL
-                : StyleType.JSTYLE;
     }
 }

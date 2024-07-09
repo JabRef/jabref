@@ -42,6 +42,10 @@ public class CSLCitationOOAdapter {
                          .orElse(STYLE_LIST.getFirst()); // Default to first style if not found
     }
 
+    public static String getSelectedStyleName() {
+        return selectedStyleName;
+    }
+
     private static String transformHtml(String html) {
         // Remove unsupported tags
         html = StringEscapeUtils.unescapeHtml4(html);
