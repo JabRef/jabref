@@ -46,7 +46,7 @@ jobs:
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-          - os: macos-latest
+          - os: macos-13  # intel image
             displayName: macOS
     runs-on: ${{ matrix.os }}
     outputs:
