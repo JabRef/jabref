@@ -47,6 +47,7 @@ public class CSLCitationOOAdapter {
     private static String transformHtml(String html) {
         // Remove unsupported tags
         html = StringEscapeUtils.unescapeHtml4(html);
+        html = html.replaceAll("<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>", "$1 $2");
         html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<div[^>]*>", "");
         html = StringEscapeUtils.unescapeHtml4(html).replaceAll("</div>", "");
 
