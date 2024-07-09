@@ -6,9 +6,7 @@ import java.util.List;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.ootext.OOFormat;
@@ -101,13 +99,10 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    public static void insertInText(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries) throws IOException, WrappedTargetException, CreationException {
-
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
-        context.setMode(BibDatabaseMode.BIBLATEX);
+    public static void insertInText(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) throws IOException, WrappedTargetException, CreationException {
         CitationStyle selectedStyle = getSelectedStyle();
 
-        Citation citation = CitationStyleGenerator.generateInText(entries, selectedStyle.getSource(), CitationStyleOutputFormat.HTML, context, BIBENTRYTYPESMANAGER);
+        Citation citation = CitationStyleGenerator.generateInText(entries, selectedStyle.getSource(), CitationStyleOutputFormat.HTML, bibDatabaseContext, BIBENTRYTYPESMANAGER);
         Logger.warn("Unformatted in-text Citation: " + citation.getText());
         String formattedHTML = transformHtml(citation.getText());
         Logger.warn("Formatted in-text Citation: " + formattedHTML);

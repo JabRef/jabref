@@ -583,9 +583,14 @@ class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (selectedStyleType == StyleSelectDialogViewModel.StyleType.CSL) {
-                CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), entries, bibDatabaseContext);
-                CSLCitationOOAdapter.insertInText(doc, cursor.get(), entries);
+                // Handle CSL Styles
+                if (citationType == CitationType.AUTHORYEAR_INTEXT) {
+                    CSLCitationOOAdapter.insertInText(doc, cursor.get(), entries, bibDatabaseContext);
+                } else {
+                    CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), entries, bibDatabaseContext);
+                }
             } else {
+                // Handle JStyles
                 EditInsert.insertCitationGroup(doc,
                         frontend.get(),
                         cursor.get(),
