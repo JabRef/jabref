@@ -11,6 +11,25 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We made new groups automatically to focus upon creation. [#11449](https://github.com/JabRef/jabref/issues/11449)
+
+### Changed
+
+### Fixed
+
+- We fixed an issue where JabRef was no longer built for Intel based macs (x86) [#11468](https://github.com/JabRef/jabref/issues/11468)
+- We fixed usage when using running on Snapcraft. [#11465](https://github.com/JabRef/jabref/issues/11465)
+
+### Removed
+
+
+
+
+
+## [5.14] – 2024-07-08
+
+### Added
+
 - We added support for offline extracting references from PDFs following the IEEE format. [#11156](https://github.com/JabRef/jabref/pull/11156)
 - We added a new keyboard shortcut  <kbd>ctrl</kbd> + <kbd>,</kbd> to open the preferences. [#11154](https://github.com/JabRef/jabref/pull/11154)
 - We added value selection (such as for month) for content selectors in custom entry types. [#11109](https://github.com/JabRef/jabref/issues/11109)
@@ -56,14 +75,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the Pubmed/Medline Plain importer would not respect the user defined keyword separator [#11413](https://github.com/JabRef/jabref/issues/11413)
 - We fixed an issue where the value of "Override default font settings" was not applied on startup [#11344](https://github.com/JabRef/jabref/issues/11344)
 - We fixed an issue where DatabaseChangeDetailsView was not scrollable when reviewing external metadata changes [#11220](https://github.com/JabRef/jabref/issues/11220)
+- We fixed undo/redo for text fields. [#11420](https://github.com/JabRef/jabref/issues/11420)
 - We fixed an issue where clicking on a page number in the search results tab opens a wrong file in the document viewer. [#11432](https://github.com/JabRef/jabref/pull/11432)
 
 ### Removed
 
-
-
-
-
+- We removed the misleading message "Doing a cleanup for X entries" when opening the Cleanup entries dialog [#11463](https://github.com/JabRef/jabref/pull/11463)
 
 ## [5.13] – 2024-04-01
 
@@ -1345,7 +1362,8 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.13...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.14...HEAD
+[5.14]: https://github.com/JabRef/jabref/compare/v5.13...v5.14
 [5.13]: https://github.com/JabRef/jabref/compare/v5.12...v5.13
 [5.12]: https://github.com/JabRef/jabref/compare/v5.11...v5.12
 [5.11]: https://github.com/JabRef/jabref/compare/v5.10...v5.11
