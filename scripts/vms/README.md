@@ -32,6 +32,7 @@ Then, everything is removed.
 ## Available VMs
 
 - `ubuntu`: Ubuntu with JabRef snap and libreoffice-connection pre-installed. One has to install the [JabRef Browser Extension](https://addons.mozilla.org/en-US/firefox/addon/jabref/) manually.
+- `fedora`: Fedora 39 with KDE plasma and JDK. During the build, the JabRef sources will be fetched and an initial build will be triggered. Login and then type `startx`. Now KDE Plasma should start. Open Konsole. Then `cd jabref`. Then `./gradlew run`.
 
 ## Troubleshooting
 
