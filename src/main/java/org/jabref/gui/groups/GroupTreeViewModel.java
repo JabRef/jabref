@@ -109,7 +109,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
 
         currentDatabase.ifPresent(database -> {
-            if ((newValue == null)) {
+            if (newValue == null) {
                 selectedGroups.clear();
             } else {
                 selectedGroups.setAll(newValue.getList());

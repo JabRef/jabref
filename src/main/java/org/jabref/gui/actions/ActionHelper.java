@@ -4,10 +4,12 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TabPane;
 
@@ -18,6 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -41,6 +44,28 @@ public class ActionHelper {
     public static BooleanExpression needsStudyDatabase(StateManager stateManager) {
         EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(BibDatabaseContext::isStudy).isPresent());
         return BooleanExpression.booleanExpression(binding);
+    }
+
+    // Makes sure there is at least one group selected, and if there are multiple groups selected
+    // all have the same parent node.
+    public static BooleanExpression needsSelectedGroupsShareParent(StateManager stateManager) {
+        if (stateManager.activeGroupProperty().isEmpty()) {
+            return Bindings.size(stateManager.activeGroupProperty()).isEqualTo(1);
+        }
+        return Bindings.size(stateManager.activeGroupProperty()).isEqualTo(1)
+           .or(Bindings.size(stateManager.activeGroupProperty()).greaterThan(1).and(
+                Bindings.size(
+                        (ObservableList<GroupTreeNode>) stateManager
+                                .activeGroupProperty()
+                                .stream()
+                                .filter(stateManager.activeGroupProperty().get().getFirst()::equals)
+                                .collect(Collectors.toCollection(FXCollections::observableArrayList))
+                        ).isEqualTo(Bindings.size(stateManager.activeGroupProperty())))
+           );
+    }
+
+    public static BooleanExpression needsNotMultipleGroupsSelected(StateManager stateManager) {
+        return Bindings.size(stateManager.activeGroupProperty()).lessThan(2);
     }
 
     public static BooleanExpression needsEntriesSelected(StateManager stateManager) {

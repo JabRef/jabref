@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -27,14 +28,18 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jspecify.annotations.Nullable;
 
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
+import static org.jabref.gui.actions.ActionHelper.needsNotMultipleGroupsSelected;
+import static org.jabref.gui.actions.ActionHelper.needsSelectedGroupsShareParent;
 
 public class CreateGroupAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final boolean preferSelectedEntries;
-    private final PreferredGroupAdditionLocation preferredAdditionLocation;
     private final GroupTreeNode editGroup;
+    private final GroupTreeNode prospectiveParent;
+    private final Optional<BibDatabaseContext> database;
+    private final Optional<GroupTreeNode> active;
 
     public CreateGroupAction(
             DialogService dialogService,
@@ -46,10 +51,51 @@ public class CreateGroupAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferSelectedEntries = preferSelectedEntries;
-        this.preferredAdditionLocation = preferredAdditionLocation;
         this.editGroup = editGroup;
 
-        this.executable.bind(needsEntriesSelected(stateManager));
+        database = stateManager.getActiveDatabase();
+
+        if (!stateManager.activeGroupProperty().isEmpty()) {
+            active = Optional.of(stateManager.activeGroupProperty().getFirst());
+        } else if (database.isPresent()) {
+            active = database.get().getMetaData().getGroups();
+        } else {
+            active = Optional.empty();
+        }
+
+        if (active.isEmpty()) {
+            throw new IllegalStateException("ERROR: No parent findable which this group could be added to.");
+        }
+
+        boolean isRoot = active.get().isRoot();
+
+        if (editGroup != null && editGroup.getParent().isPresent()) {
+            prospectiveParent = editGroup.getParent().get();
+        } else if (editGroup != null) {
+            prospectiveParent = editGroup;
+        } else if (preferredAdditionLocation == PreferredGroupAdditionLocation.ADD_TO_ROOT) {
+            prospectiveParent = active.get().getRoot();
+        } else if (preferredAdditionLocation == PreferredGroupAdditionLocation.ADD_BESIDE
+                && !isRoot) {
+            prospectiveParent = active.get().getParent().isPresent()
+                    ? active.get().getParent().get()
+                    : active.get();
+        } else {
+            prospectiveParent = active.get();
+        }
+
+        switch (preferredAdditionLocation) {
+            case ADD_BESIDE:
+                this.executable.bind(needsEntriesSelected(stateManager).and(needsSelectedGroupsShareParent(stateManager)));
+                break;
+            case ADD_BELOW:
+                this.executable.bind(needsEntriesSelected(stateManager).and(needsNotMultipleGroupsSelected(stateManager)));
+                break;
+            case ADD_TO_ROOT:
+            default:
+                this.executable.bind(needsEntriesSelected(stateManager));
+                break;
+        }
     }
 
     public CreateGroupAction(
@@ -65,45 +111,17 @@ public class CreateGroupAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        Optional<BibDatabaseContext> database = stateManager.getActiveDatabase();
-        Optional<GroupTreeNode> active;
-
-        if (!stateManager.activeGroupProperty().isEmpty()) {
-            active = Optional.of(stateManager.activeGroupProperty().getFirst());
-        } else if (database.isPresent()) {
-            active = database.get().getMetaData().getGroups();
-        } else {
-            active = Optional.empty();
-        }
-
-        if (database.isEmpty() || active.isEmpty()) {
+        if (database.isEmpty() || prospectiveParent == null) {
             dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
             return;
-        }
-        boolean isRoot = active.get().isRoot();
-
-        final GroupTreeNode groupFallsUnder;
-        if (editGroup != null && editGroup.getParent().isPresent()) {
-            groupFallsUnder = editGroup.getParent().get();
-        } else if (editGroup != null) {
-            groupFallsUnder = editGroup;
-        } else if (preferredAdditionLocation == PreferredGroupAdditionLocation.ADD_TO_ROOT) {
-            groupFallsUnder = active.get().getRoot();
-        } else if (preferredAdditionLocation == PreferredGroupAdditionLocation.ADD_BESIDE
-                && !isRoot) {
-            groupFallsUnder = active.get().getParent().isPresent()
-                    ? active.get().getParent().get()
-                    : active.get();
-        } else {
-            groupFallsUnder = active.get();
         }
 
         Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(
                 new GroupDialogView(
                         database.get(),
-                        groupFallsUnder,
+                        prospectiveParent,
                         editGroup != null ? editGroup.getGroup() : null,
-                        isRoot ? GroupDialogHeader.GROUP : GroupDialogHeader.SUBGROUP,
+                        prospectiveParent.isRoot() ? GroupDialogHeader.GROUP : GroupDialogHeader.SUBGROUP,
                         stateManager.getSelectedEntries(),
                         preferSelectedEntries
                 ));
@@ -118,14 +136,15 @@ public class CreateGroupAction extends SimpleCommand {
                 newSubgroup = editedGroup.get();
                 dialogService.notify(Localization.lang("Modified group \"%0\".", newSubgroup.getName()));
             } else {
-                newSubgroup = groupFallsUnder.addSubgroup(group);
+                newSubgroup = prospectiveParent.addSubgroup(group);
                 dialogService.notify(Localization.lang("Added group \"%0\".", newSubgroup.getName()));
             }
-            stateManager.getSelectedGroups(database.get()).setAll(newSubgroup);
+
             // TODO: Add undo
             // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
             // panel.getUndoManager().addEdit(undo);
             writeGroupChangesToMetaData(database.get(), newSubgroup);
+            stateManager.setSelectedGroups(database.get(), Collections.singletonList(newSubgroup));
         });
     }
 
@@ -161,7 +180,7 @@ public class CreateGroupAction extends SimpleCommand {
             removePreviousAssignments = (node.getGroup() instanceof ExplicitGroup)
                     && (newGroup instanceof ExplicitGroup)
                     && nameIsUnique(oldGroup, newGroup, database);
-            keepPreviousAssignments = (reassignmentResponse.get().getButtonData() == ButtonBar.ButtonData.YES);
+            keepPreviousAssignments = reassignmentResponse.get().getButtonData() == ButtonBar.ButtonData.YES;
         }
         // TODO: Add undo
         // Store undo information.
@@ -248,7 +267,7 @@ public class CreateGroupAction extends SimpleCommand {
             // we need to check the old name for duplicates. If the new group name occurs more than once, it won't matter
             groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(oldGroup.getName())).size();
         }
-        return !(groupsWithSameName >= 2);
+        return groupsWithSameName < 2;
     }
 
     private Optional<ButtonType> showConfirmationPanel(boolean isNowWordKeywordGroup) {

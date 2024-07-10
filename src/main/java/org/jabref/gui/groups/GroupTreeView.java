@@ -50,6 +50,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.maintable.CreateGroupAction;
+import org.jabref.gui.maintable.PreferredGroupAdditionLocation;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
@@ -408,7 +410,7 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void updateSelection(List<GroupTreeNode> newActiveGroups, BibDatabaseContext database) {
-        if ((newActiveGroups == null)) {
+        if (newActiveGroups == null) {
             stateManager.setSelectedGroups(database, Collections.singletonList(viewModel.rootGroup().getGroupNode()));
         } else {
             List<GroupTreeNode> list = newActiveGroups.stream()
@@ -580,6 +582,7 @@ public class GroupTreeView extends BorderPane {
                 removeGroup,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
+                factory.createMenuItem(StandardActions.ADD_SUBGROUP_FROM_SELECTION, new CreateGroupAction(dialogService, stateManager, true, PreferredGroupAdditionLocation.ADD_BELOW, null)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),

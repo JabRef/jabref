@@ -79,8 +79,8 @@ public class RightClickMenu {
                         // the button's name changes based on whether we are in the root group
                         // or a subgroup.
                         stateManager.activeGroupProperty().isEmpty() || stateManager.activeGroupProperty().getFirst().getParent().isEmpty()
-                                ? StandardActions.CREATE_GROUP_FROM_SELECTION
-                                : StandardActions.CREATE_SUBGROUP_FROM_SELECTION,
+                                ? StandardActions.ADD_GROUP_FROM_SELECTION
+                                : StandardActions.ADD_SUBGROUP_FROM_SELECTION,
                         new CreateGroupAction(dialogService, stateManager, true, PreferredGroupAdditionLocation.ADD_BELOW, null)),
 
                 new SeparatorMenuItem(),
