@@ -163,6 +163,14 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.setSelectedTab(newValue);
         });
+
+        availableListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                viewModel.handleStyleSelection();
+                this.setResult(tvStyles.getSelectionModel().getSelectedItem().getStyle());
+                this.close();
+            }
+        });
     }
 
     private ContextMenu createContextMenu() {

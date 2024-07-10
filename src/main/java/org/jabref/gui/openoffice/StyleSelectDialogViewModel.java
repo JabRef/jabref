@@ -30,6 +30,7 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.StandardFileType;
@@ -178,5 +179,13 @@ public class StyleSelectDialogViewModel {
 
     public void setSelectedTab(Tab tab) {
         selectedTab.set(tab);
+    }
+
+    public void handleStyleSelection() {
+        CitationStylePreviewLayout selectedLayout = selectedLayoutProperty.get();
+        if (selectedLayout != null) {
+            CSLCitationOOAdapter.setSelectedStyleName(selectedLayout.getDisplayName());
+            // You might want to add any other necessary actions here
+        }
     }
 }
