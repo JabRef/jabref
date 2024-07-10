@@ -55,8 +55,6 @@ public class OpenOfficeFileSearch {
                                          return Stream.empty();
                                      }
                                  })
-                                 // On Windows, the executable is nested in subdirectory "program"
-                                 .map(dir -> dir.resolve("program"))
                                  .toList();
     }
 
@@ -75,7 +73,11 @@ public class OpenOfficeFileSearch {
             sourceList.add(Path.of(progFiles));
         }
 
-        return findOpenOfficeDirectories(sourceList);
+        return findOpenOfficeDirectories(sourceList)
+                .stream()
+                // On Windows, the executable is nested in subdirectory "program"
+                .map(dir -> dir.resolve("program"))
+                .toList();
     }
 
     private static List<Path> findOSXOpenOfficeDirs() {
