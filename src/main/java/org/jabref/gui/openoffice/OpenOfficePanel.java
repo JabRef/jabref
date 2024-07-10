@@ -318,12 +318,12 @@ public class OpenOfficePanel {
             };
 
             taskConnectIfInstalled.setOnSucceeded(evt -> {
-                var installations = new ArrayList<>(taskConnectIfInstalled.getValue());
+                List<Path> installations = new ArrayList<>(taskConnectIfInstalled.getValue());
                 if (installations.isEmpty()) {
                     officeInstallation.selectInstallationPath().ifPresent(installations::add);
                 }
-                Optional<Path> actualFile = officeInstallation.chooseAmongInstallations(installations);
-                if (actualFile.isPresent() && officeInstallation.setOpenOfficePreferences(actualFile.get())) {
+                Optional<Path> chosenInstallationDirectory = officeInstallation.chooseAmongInstallations(installations);
+                if (chosenInstallationDirectory.isPresent() && officeInstallation.setOpenOfficePreferences(chosenInstallationDirectory.get())) {
                     connect();
                 }
             });
@@ -389,7 +389,7 @@ public class OpenOfficePanel {
             protected OOBibBase call() throws Exception {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
-                var path = Path.of(preferencesService.getOpenOfficePreferences().getExecutablePath());
+                Path path = Path.of(preferencesService.getOpenOfficePreferences().getExecutablePath());
                 return createBibBase(path);
             }
         };
@@ -399,7 +399,7 @@ public class OpenOfficePanel {
 
             ooBase.guiActionSelectDocument(true);
 
-            // Enable actions that depend on Connect:
+            // Enable actions that depend on a connection
             updateButtonAvailability();
         });
 
