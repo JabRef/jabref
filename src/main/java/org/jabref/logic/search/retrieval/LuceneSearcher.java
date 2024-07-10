@@ -62,12 +62,12 @@ public final class LuceneSearcher {
     private SearchResults getSearchResults() throws IOException {
         SearchResults searchResults = new SearchResults();
         Map<String, BibEntry> entriesMap = new HashMap<>();
-        Map<String, List<BibEntry>> linkedFielsMap = new HashMap<>();
+        Map<String, List<BibEntry>> linkedFilesMap = new HashMap<>();
 
         for (BibEntry bibEntry : databaseContext.getEntries()) {
             entriesMap.put(bibEntry.getId(), bibEntry);
             for (LinkedFile linkedFile : bibEntry.getFiles()) {
-                linkedFielsMap.computeIfAbsent(linkedFile.getLink(), k -> new ArrayList<>()).add(bibEntry);
+                linkedFilesMap.computeIfAbsent(linkedFile.getLink(), k -> new ArrayList<>()).add(bibEntry);
             }
         }
 
@@ -79,7 +79,7 @@ public final class LuceneSearcher {
 
             String fileLink = getFieldContents(document, SearchFieldConstants.PATH);
             if (!fileLink.isEmpty()) {
-                List<BibEntry> entriesWithFile = linkedFielsMap.get(fileLink);
+                List<BibEntry> entriesWithFile = linkedFilesMap.get(fileLink);
                 if (!entriesWithFile.isEmpty()) {
                     SearchResult searchResult = new SearchResult(score, fileLink,
                             getFieldContents(document, SearchFieldConstants.CONTENT),
