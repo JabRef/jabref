@@ -50,7 +50,7 @@ public class BibEntryTableViewModel {
     private final BibDatabaseContext bibDatabaseContext;
     private final FloatProperty searchScore = new SimpleFloatProperty(0);
     private final BooleanProperty isMatchedBySearch = new SimpleBooleanProperty(false);
-    private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(true);
+    private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(false);
     private final BooleanProperty hasFullTextResults = new SimpleBooleanProperty(false);
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {

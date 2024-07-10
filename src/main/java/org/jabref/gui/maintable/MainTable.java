@@ -147,7 +147,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
                 .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-search-and-groups"), entry -> entry.matchedBySearchProperty().and(entry.matchedByGroupProperty()))
-                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-groups-not-search"), entry -> entry.matchedByGroupProperty().and(entry.matchedByGroupProperty().not()))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-groups-not-search"), entry -> entry.matchedByGroupProperty().and(entry.matchedBySearchProperty().not()))
                 .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-search-not-groups"), entry -> entry.matchedBySearchProperty().and(entry.matchedByGroupProperty().not()))
                 .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search-and-groups"), entry -> entry.matchedBySearchProperty().not().and(entry.matchedByGroupProperty().not()))
                 .setOnDragDetected(this::handleOnDragDetected)
@@ -158,6 +158,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .install(this);
 
         this.getSortOrder().clear();
+
         this.getColumns().stream().map(column -> (MainTableColumn<?>) column)
             .filter(column -> column.getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
             .findFirst().ifPresent(searchRankColumn -> this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {

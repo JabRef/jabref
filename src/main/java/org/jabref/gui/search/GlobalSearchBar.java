@@ -219,8 +219,7 @@ public class GlobalSearchBar extends HBox {
                     // Async update
                     searchTask.restart();
                 },
-                query -> setSearchTerm(query.orElse(new SearchQuery("", EnumSet.noneOf(SearchFlags.class)))));
-
+                query -> setSearchTerm(query.orElseGet(() -> new SearchQuery("", EnumSet.noneOf(SearchFlags.class)))));
         this.stateManager.getSearchResults().addListener((MapChangeListener<String, SearchResults>) change -> searchQueryProperty.get().ifPresent(this::updateSearchResultsForQuery));
 
         /*

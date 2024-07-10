@@ -166,10 +166,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     public void fillColumnList() {
         columnsListProperty.getValue().clear();
         if (initialColumnPreferences != null) {
-            initialColumnPreferences.getColumns()
-                                    .stream()
-                                    .filter(column -> !column.getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
-                                    .forEach(columnsListProperty.getValue()::add);
+            initialColumnPreferences.getColumns().forEach(columnsListProperty.getValue()::add);
         }
     }
 
@@ -209,13 +206,15 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     public void removeColumn(MainTableColumnModel column) {
-        columnsListProperty.remove(column);
+        if (column.getType() != MainTableColumnModel.Type.SEARCH_RANK) {
+            columnsListProperty.remove(column);
+        }
     }
 
     public void moveColumnUp() {
         MainTableColumnModel selectedColumn = selectedColumnModelProperty.getValue().getSelectedItem();
         int row = columnsListProperty.getValue().indexOf(selectedColumn);
-        if ((selectedColumn == null) || (row < 1)) {
+        if ((selectedColumn == null) || (row < 1) || selectedColumn.getType() == MainTableColumnModel.Type.SEARCH_RANK) {
             return;
         }
 
@@ -227,7 +226,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     public void moveColumnDown() {
         MainTableColumnModel selectedColumn = selectedColumnModelProperty.getValue().getSelectedItem();
         int row = columnsListProperty.getValue().indexOf(selectedColumn);
-        if ((selectedColumn == null) || (row > (columnsListProperty.getValue().size() - 2))) {
+        if ((selectedColumn == null) || (row > (columnsListProperty.getValue().size() - 2)) || selectedColumn.getType() == MainTableColumnModel.Type.SEARCH_RANK) {
             return;
         }
 
