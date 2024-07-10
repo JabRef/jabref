@@ -76,55 +76,57 @@ public class CreateGroupAction extends SimpleCommand {
             active = Optional.empty();
         }
 
-        if (database.isPresent() && active.isPresent()) {
-            boolean isRoot = active.get().isRoot();
-
-            final GroupTreeNode groupFallsUnder;
-            if (editGroup != null && editGroup.getParent().isPresent()) {
-                groupFallsUnder = editGroup.getParent().get();
-            } else if (editGroup != null) {
-                groupFallsUnder = editGroup;
-            } else if (preferredAdditionLocation == PreferredGroupAdditionLocation.ADD_TO_ROOT) {
-                groupFallsUnder = active.get().getRoot();
-            } else if (preferredAdditionLocation == PreferredGroupAdditionLocation.ADD_BESIDE
-                    && !isRoot) {
-                groupFallsUnder = active.get().getParent().get();
-            } else {
-                groupFallsUnder = active.get();
-            }
-
-            Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(
-                    new GroupDialogView(
-                            database.get(),
-                            groupFallsUnder,
-                            editGroup != null ? editGroup.getGroup() : null,
-                            isRoot ? GroupDialogHeader.GROUP : GroupDialogHeader.SUBGROUP,
-                            stateManager.getSelectedEntries(),
-                            preferSelectedEntries
-                    ));
-
-            newGroup.ifPresent(group -> {
-                GroupTreeNode newSubgroup;
-                if (editGroup != null) {
-                    Optional<GroupTreeNode> editedGroup = groupEditActions(editGroup, group, database.get());
-                    if (editedGroup.isEmpty()) {
-                        return;
-                    }
-                    newSubgroup = editedGroup.get();
-                    dialogService.notify(Localization.lang("Modified group \"%0\".", newSubgroup.getName()));
-                } else {
-                    newSubgroup = groupFallsUnder.addSubgroup(group);
-                    dialogService.notify(Localization.lang("Added group \"%0\".", newSubgroup.getName()));
-                }
-                stateManager.getSelectedGroups(database.get()).setAll(newSubgroup);
-                // TODO: Add undo
-                // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
-                // panel.getUndoManager().addEdit(undo);
-                writeGroupChangesToMetaData(database.get(), newSubgroup);
-            });
-        } else {
+        if (database.isEmpty() || active.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
+            return;
         }
+        boolean isRoot = active.get().isRoot();
+
+        final GroupTreeNode groupFallsUnder;
+        if (editGroup != null && editGroup.getParent().isPresent()) {
+            groupFallsUnder = editGroup.getParent().get();
+        } else if (editGroup != null) {
+            groupFallsUnder = editGroup;
+        } else if (preferredAdditionLocation == PreferredGroupAdditionLocation.ADD_TO_ROOT) {
+            groupFallsUnder = active.get().getRoot();
+        } else if (preferredAdditionLocation == PreferredGroupAdditionLocation.ADD_BESIDE
+                && !isRoot) {
+            groupFallsUnder = active.get().getParent().isPresent()
+                    ? active.get().getParent().get()
+                    : active.get();
+        } else {
+            groupFallsUnder = active.get();
+        }
+
+        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(
+                new GroupDialogView(
+                        database.get(),
+                        groupFallsUnder,
+                        editGroup != null ? editGroup.getGroup() : null,
+                        isRoot ? GroupDialogHeader.GROUP : GroupDialogHeader.SUBGROUP,
+                        stateManager.getSelectedEntries(),
+                        preferSelectedEntries
+                ));
+
+        newGroup.ifPresent(group -> {
+            GroupTreeNode newSubgroup;
+            if (editGroup != null) {
+                Optional<GroupTreeNode> editedGroup = groupEditActions(editGroup, group, database.get());
+                if (editedGroup.isEmpty()) {
+                    return;
+                }
+                newSubgroup = editedGroup.get();
+                dialogService.notify(Localization.lang("Modified group \"%0\".", newSubgroup.getName()));
+            } else {
+                newSubgroup = groupFallsUnder.addSubgroup(group);
+                dialogService.notify(Localization.lang("Added group \"%0\".", newSubgroup.getName()));
+            }
+            stateManager.getSelectedGroups(database.get()).setAll(newSubgroup);
+            // TODO: Add undo
+            // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
+            // panel.getUndoManager().addEdit(undo);
+            writeGroupChangesToMetaData(database.get(), newSubgroup);
+        });
     }
 
     private Optional<GroupTreeNode> groupEditActions(GroupTreeNode node, AbstractGroup newGroup, BibDatabaseContext database) {

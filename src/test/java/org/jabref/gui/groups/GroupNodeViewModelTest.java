@@ -1,7 +1,6 @@
 package org.jabref.gui.groups;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
