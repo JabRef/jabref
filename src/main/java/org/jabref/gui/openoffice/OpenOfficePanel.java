@@ -217,7 +217,6 @@ public class OpenOfficePanel {
         pushEntries.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_PAR, false));
         pushEntries.setMaxWidth(Double.MAX_VALUE);
         pushEntriesInt.setTooltip(new Tooltip(Localization.lang("Cite selected entries with in-text citation")));
-        // marker: JStyle in-text citations
         pushEntriesInt.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_INTEXT, false));
         pushEntriesInt.setMaxWidth(Double.MAX_VALUE);
         pushEntriesEmpty.setTooltip(new Tooltip(Localization.lang("Insert a citation without text (the entry will appear in the reference list)")));
