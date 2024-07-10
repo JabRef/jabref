@@ -17,6 +17,7 @@ import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
+import org.tinylog.Logger;
 
 /**
  * Update document: citation marks and bibliography
@@ -65,7 +66,7 @@ public class Update {
             return frontend.citationGroups.getUnresolvedKeys();
         } catch (
                 IOException e) {
-            throw new RuntimeException(e);
+            Logger.warn("Error while updating document", e);
         } finally {
             if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
                 UnoScreenRefresh.unlockControllers(doc);
