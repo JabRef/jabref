@@ -61,6 +61,7 @@ public class AiEmbeddingsManager {
 
             mvStoreTemp = MVStore.open(null);
         }
+        LOGGER.trace("Created MVStore for embeddings");
 
         this.mvStore = mvStoreTemp;
         this.embeddingStore = new MVStoreEmbeddingStore(this.mvStore);
@@ -88,6 +89,7 @@ public class AiEmbeddingsManager {
     }
 
     public void close() {
+        LOGGER.trace("Closing embeddings manager");
         mvStore.close();
     }
 
