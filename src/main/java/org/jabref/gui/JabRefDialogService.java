@@ -24,6 +24,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -42,9 +43,9 @@ import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
 
@@ -282,7 +283,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog) {
+    public <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog) {
         if (dialog.getOwner() == null) {
             dialog.initOwner(mainWindow);
         }
@@ -291,7 +292,7 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public Optional<String> showPasswordDialogAndWait(String title, String header, String content) {
-        javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();
+        Dialog<String> dialog = new Dialog<>();
         dialog.setTitle(title);
         dialog.setHeaderText(header);
 
@@ -377,9 +378,11 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public void notify(String message) {
+        // TODO: Change to a notification overview instead of event log when that is available.
+        //       The event log is not that user friendly (different purpose).
         LOGGER.info(message);
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             Notifications.create()
                          .text(message)
                          .position(Pos.BOTTOM_CENTER)
@@ -388,7 +391,6 @@ public class JabRefDialogService implements DialogService {
                          .threshold(5,
                                  Notifications.create()
                                               .title(Localization.lang("Last notification"))
-                                              // TODO: Change to a notification overview instead of event log when that is available. The event log is not that user friendly (different purpose).
                                               .text(
                                                     "(" + Localization.lang("Check the event log to see all notifications") + ")"
                                                      + "\n\n" + message)

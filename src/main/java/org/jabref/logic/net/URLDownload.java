@@ -44,10 +44,8 @@ import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
 
-import kong.unirest.Unirest;
-import kong.unirest.UnirestException;
-import kong.unirest.apache.ApacheClient;
-import org.apache.http.client.config.RequestConfig;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,15 +132,15 @@ public class URLDownload {
             // Install all-trusting host verifier
             HostnameVerifier allHostsValid = (hostname, session) -> true;
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             LOGGER.error("A problem occurred when bypassing SSL verification", e);
         }
     }
 
     /**
-     *
      * @param socketFactory trust manager
-     * @param verifier host verifier
+     * @param verifier      host verifier
      */
     public static void setSSLVerification(SSLSocketFactory socketFactory, HostnameVerifier verifier) {
         try {
@@ -163,7 +161,7 @@ public class URLDownload {
         String contentType;
         // Try to use HEAD request to avoid downloading the whole file
         try {
-            contentType = Unirest.head(source.toString()).asString().getHeaders().get("Content-Type").get(0);
+            contentType = Unirest.head(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
             if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }
@@ -173,7 +171,7 @@ public class URLDownload {
 
         // Use GET request as alternative if no HEAD request is available
         try {
-            contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").get(0);
+            contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").getFirst();
             if ((contentType != null) && !contentType.isEmpty()) {
                 return contentType;
             }
@@ -203,14 +201,11 @@ public class URLDownload {
      * @return the status code of the response
      */
     public boolean canBeReached() throws UnirestException {
-
-        // Set a custom Apache Client Builder to be able to allow circular redirects, otherwise downloads from springer might not work
-        Unirest.config().httpClient(new ApacheClient.Builder()
-                                    .withRequestConfig((c, r) -> RequestConfig.custom()
-                                                       .setCircularRedirectsAllowed(true)
-                                                       .build()));
-
-        Unirest.config().setDefaultHeader("User-Agent", USER_AGENT);
+        // new unirest version does not support apache http client any longer
+        Unirest.config().reset()
+               .followRedirects(true)
+               .enableCookieManagement(true)
+               .setDefaultHeader("User-Agent", USER_AGENT);
 
         int statusCode = Unirest.head(source.toString()).asString().getStatus();
         return (statusCode >= 200) && (statusCode < 300);
@@ -272,7 +267,7 @@ public class URLDownload {
     /**
      * Downloads the web resource to a String.
      *
-     * @param encoding the desired String encoding
+     * @param encoding   the desired String encoding
      * @param connection an existing connection
      * @return the downloaded string
      */
@@ -387,25 +382,27 @@ public class URLDownload {
         }
 
         if (connection instanceof HttpURLConnection lConnection) {
-            // normally, 3xx is redirect
+            // this does network i/o: GET + read returned headers
             int status = lConnection.getResponseCode();
 
+            // normally, 3xx is redirect
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                 // get redirect url from "location" header field
                 String newUrl = connection.getHeaderField("location");
                 // open the new connection again
                 connection = new URLDownload(newUrl).openConnection();
             }
             if ((status >= 400) && (status < 500)) {
-                throw new IOException(new FetcherClientException("Encountered HTTP Status code " + status));
+                LOGGER.info("HTTP {}, details: {}, {}", status, lConnection.getResponseMessage(), lConnection.getContentLength() > 0 ? lConnection.getContent() : "");
+                throw new IOException(new FetcherClientException("Encountered HTTP %s %s".formatted(status, lConnection.getResponseMessage())));
             }
             if (status >= 500) {
-                throw new IOException(new FetcherServerException("Encountered HTTP Status Code " + status));
+                LOGGER.info("HTTP {}, details: {}, {}", status, lConnection.getResponseMessage(), lConnection.getContentLength() > 0 ? lConnection.getContent() : "");
+                throw new IOException(new FetcherServerException("Encountered HTTP %s %s".formatted(status, lConnection.getResponseMessage())));
             }
         }
-        // this does network i/o: GET + read returned headers
         return connection;
     }
 

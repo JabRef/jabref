@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Button;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -21,7 +20,7 @@ public class ToggleMergeUnmergeButton extends Button {
     private final ObjectProperty<FieldState> fieldState = new SimpleObjectProperty<>(FieldState.UNMERGED);
     private final BooleanProperty canMerge = new SimpleBooleanProperty(Boolean.TRUE);
 
-    private final ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
+    private final ActionFactory actionFactory = new ActionFactory();
 
     private final Field field;
 

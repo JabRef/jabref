@@ -10,7 +10,6 @@ import javafx.scene.input.ClipboardContent;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -27,8 +26,10 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,11 +84,16 @@ public class CopyCitationAction extends SimpleCommand {
         PreviewLayout previewLayout = preferencesService.getPreviewPreferences().getSelectedPreviewLayout();
 
         if (previewLayout instanceof CitationStylePreviewLayout citationStyleLayout) {
-            styleSource = citationStyleLayout.getSource();
+            styleSource = citationStyleLayout.getText();
         }
 
         if (styleSource != null) {
-            return CitationStyleGenerator.generateCitations(selectedEntries, styleSource, outputFormat, stateManager.getActiveDatabase().get(), Globals.entryTypesManager);
+            return CitationStyleGenerator.generateCitations(
+                    selectedEntries,
+                    styleSource,
+                    outputFormat,
+                    stateManager.getActiveDatabase().get(),
+                    Injector.instantiateModelOrService(BibEntryTypesManager.class));
         } else {
             return generateTextBasedPreviewLayoutCitations();
         }

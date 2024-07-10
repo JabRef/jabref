@@ -47,7 +47,7 @@ import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

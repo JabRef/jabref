@@ -3,7 +3,6 @@ package org.jabref.gui.actions;
 import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Objects;
 
 import javafx.beans.binding.BooleanExpression;
 import javafx.scene.control.Button;
@@ -17,6 +16,7 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.model.strings.StringUtil;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.sun.javafx.scene.control.ContextMenuContent;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.commands.Command;
@@ -33,8 +33,8 @@ public class ActionFactory {
 
     private final KeyBindingRepository keyBindingRepository;
 
-    public ActionFactory(KeyBindingRepository keyBindingRepository) {
-        this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
+    public ActionFactory() {
+        this.keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
     }
 
     /**
@@ -76,7 +76,7 @@ public class ActionFactory {
     }
 
     public MenuItem configureMenuItem(Action action, Command command, MenuItem menuItem) {
-        ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu), menuItem);
+        ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository), menuItem);
         setGraphic(menuItem, action);
         enableTooltips(command, menuItem);
         return menuItem;
@@ -108,7 +108,7 @@ public class ActionFactory {
     }
 
     public CheckMenuItem createCheckMenuItem(Action action, Command command, boolean selected) {
-        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu));
+        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));
         checkMenuItem.setSelected(selected);
         setGraphic(checkMenuItem, action);
 
@@ -116,7 +116,7 @@ public class ActionFactory {
     }
 
     public CheckMenuItem createCheckMenuItem(Action action, Command command, BooleanExpression selectedBinding) {
-        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository, Sources.FromMenu));
+        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));
         EasyBind.subscribe(selectedBinding, checkMenuItem::setSelected);
         setGraphic(checkMenuItem, action);
 
@@ -138,7 +138,7 @@ public class ActionFactory {
     }
 
     public Button createIconButton(Action action, Command command) {
-        Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository, Sources.FromButton), ActionUtils.ActionTextBehavior.HIDE);
+        Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);
 
         button.getStyleClass().setAll("icon-button");
 
@@ -153,7 +153,7 @@ public class ActionFactory {
     public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
         ActionUtils.unconfigureButton(button);
         ActionUtils.configureButton(
-                new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
+                new JabRefAction(action, command, keyBindingRepository),
                 button,
                 ActionUtils.ActionTextBehavior.HIDE);
 

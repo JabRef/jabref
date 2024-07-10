@@ -20,7 +20,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.MrDlibPreferences;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

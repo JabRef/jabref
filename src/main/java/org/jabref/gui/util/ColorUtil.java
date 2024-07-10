@@ -12,7 +12,7 @@ public class ColorUtil {
     }
 
     public static String toRGBACode(Color color) {
-        return String.format("rgba(%d,%d,%d,%f)",
+        return "rgba(%d,%d,%d,%f)".formatted(
                 (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255),
                 (int) (color.getBlue() * 255),

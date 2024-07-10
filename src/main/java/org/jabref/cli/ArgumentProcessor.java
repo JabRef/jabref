@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.JabRefException;
@@ -59,6 +58,7 @@ import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.base.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -250,9 +250,9 @@ public class ArgumentProcessor {
                         preferencesService.getXmpPreferences(),
                         preferencesService.getFilePreferences(),
                         preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                        Globals.entryTypesManager,
+                        Injector.instantiateModelOrService(BibEntryTypesManager.class),
                         preferencesService.getFieldPreferences(),
-                        Globals.journalAbbreviationRepository,
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         cli.isWriteXMPtoPdf() || cli.isWriteMetadatatoPdf(),
                         cli.isEmbeddBibfileInPdf() || cli.isWriteMetadatatoPdf());
             }
@@ -486,7 +486,7 @@ public class ArgumentProcessor {
                 // export new database
                 ExporterFactory exporterFactory = ExporterFactory.create(
                         preferencesService,
-                        Globals.entryTypesManager);
+                        Injector.instantiateModelOrService(BibEntryTypesManager.class));
                 Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
                 if (exporter.isEmpty()) {
                     System.err.println(Localization.lang("Unknown export format %0", formatName));
@@ -494,7 +494,12 @@ public class ArgumentProcessor {
                     // We have an TemplateExporter instance:
                     try {
                         System.out.println(Localization.lang("Exporting %0", data[1]));
-                        exporter.get().export(databaseContext, Path.of(data[1]), matches, Collections.emptyList(), Globals.journalAbbreviationRepository);
+                        exporter.get().export(
+                                databaseContext,
+                                Path.of(data[1]),
+                                matches,
+                                Collections.emptyList(),
+                                Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
                     } catch (Exception ex) {
                         System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", data[1], Throwables.getStackTraceAsString(ex)));
                     }
@@ -661,7 +666,7 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Exporting %0", data[0]));
             ExporterFactory exporterFactory = ExporterFactory.create(
                     preferencesService,
-                    Globals.entryTypesManager);
+                    Injector.instantiateModelOrService(BibEntryTypesManager.class));
             Optional<Exporter> exporter = exporterFactory.getExporterByName(data[1]);
             if (exporter.isEmpty()) {
                 System.err.println(Localization.lang("Unknown export format %0", data[1]));
@@ -673,7 +678,7 @@ public class ArgumentProcessor {
                             Path.of(data[0]),
                             parserResult.getDatabaseContext().getDatabase().getEntries(),
                             fileDirForDatabase,
-                            Globals.journalAbbreviationRepository);
+                            Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", data[0], Throwables.getStackTraceAsString(ex)));
                 }
@@ -684,7 +689,7 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             preferencesService.importPreferences(Path.of(cli.getPreferencesImport()));
-            Globals.entryTypesManager = preferencesService.getCustomEntryTypesRepository();
+            Injector.setModelOrService(BibEntryTypesManager.class, preferencesService.getCustomEntryTypesRepository());
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

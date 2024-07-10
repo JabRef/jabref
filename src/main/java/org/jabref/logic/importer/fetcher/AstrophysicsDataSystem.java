@@ -17,7 +17,7 @@ import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
@@ -38,10 +38,10 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
@@ -149,9 +149,9 @@ public class AstrophysicsDataSystem
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveEnclosingBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
 

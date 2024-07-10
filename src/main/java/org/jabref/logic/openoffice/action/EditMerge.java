@@ -181,9 +181,9 @@ public class EditMerge {
             int textOrder = UnoTextRange.compareStarts(state.prevRange, currentRange);
             if (textOrder != -1) {
                 String msg =
-                        String.format("MergeCitationGroups:"
-                                        + " \"%s\" supposed to be followed by \"%s\","
-                                        + " but %s",
+                        ("MergeCitationGroups:"
+                                + " \"%s\" supposed to be followed by \"%s\","
+                                + " but %s").formatted(
                                 state.prevRange.getString(),
                                 currentRange.getString(),
                                 (textOrder == 0

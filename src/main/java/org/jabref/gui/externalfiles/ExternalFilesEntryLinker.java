@@ -70,7 +70,7 @@ public class ExternalFilesEntryLinker {
             FileUtil.getFileExtension(file).ifPresent(ext -> {
                 ExternalFileType type = ExternalFileTypes.getExternalFileTypeByExt(ext, filePreferences)
                                                          .orElse(new UnknownExternalFileType(ext));
-                Path relativePath = FileUtil.relativize(file, bibDatabaseContext.getFileDirectories(filePreferences));
+                Path relativePath = FileUtil.relativize(file, bibDatabaseContext, filePreferences);
                 LinkedFile linkedfile = new LinkedFile("", relativePath, type.getName());
                 entry.addFile(linkedfile);
             });

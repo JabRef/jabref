@@ -61,7 +61,13 @@ class AuthorListParserTest {
                                 new Author("A.", "A.", null, "Ibarra", null),
                                 new Author("J.", "J.", null, "Molla", null)
                         ),
-                        "I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla")
+                        "I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla"),
+                Arguments.of(AuthorList.of(
+                                new Author("Vivian", "V.", null, "U", null),
+                                new Author("Thomas", "T.", null, "Lai", null)
+                        ),
+                        "U, Vivian and Lai, Thomas"
+                )
         );
     }
 

@@ -30,11 +30,16 @@ public class DBMSConnection implements DatabaseConnection {
             // ensure that all SQL drivers are loaded - source: http://stackoverflow.com/a/22384826/873282
             // we use the side effect of getAvailableDBMSTypes() - it loads all available drivers
             DBMSConnection.getAvailableDBMSTypes();
-            this.connection = DriverManager.getConnection(connectionProperties.getUrl(), connectionProperties.asProperties());
+
+            if (connectionProperties.isUseExpertMode()) {
+                this.connection = DriverManager.getConnection(connectionProperties.getJdbcUrl(), connectionProperties.asProperties());
+            } else {
+                this.connection = DriverManager.getConnection(connectionProperties.getUrl(), connectionProperties.asProperties());
+            }
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
             // Therefore a stable error determination is not possible.
-            LOGGER.error("Could not connect to database: " + e.getMessage() + " - Error code: " + e.getErrorCode());
+            LOGGER.error("Could not connect to database: {} - Error code: {}", e.getMessage(), e.getErrorCode());
             throw e;
         }
     }

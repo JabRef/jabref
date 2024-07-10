@@ -19,7 +19,6 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.theme.ThemeManager;
@@ -34,6 +33,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -154,7 +154,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.clipBoardManager = Globals.getClipboardManager();
+        this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
 
         setFitToHeight(true);

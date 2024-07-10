@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
+
+import com.airhacks.afterburner.injection.Injector;
 
 public class SaveAllAction extends SimpleCommand {
 
@@ -27,7 +29,7 @@ public class SaveAllAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Saving all libraries..."));
 
         for (LibraryTab libraryTab : tabsSupplier.get()) {
-            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferencesService, Globals.entryTypesManager);
+            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferencesService, Injector.instantiateModelOrService(BibEntryTypesManager.class));
             boolean saveResult = saveDatabaseAction.save();
             if (!saveResult) {
                 dialogService.notify(Localization.lang("Could not save file."));

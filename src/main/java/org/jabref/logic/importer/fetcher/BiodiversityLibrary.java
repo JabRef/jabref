@@ -24,10 +24,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONException;
+import kong.unirest.core.json.JSONObject;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.tinylog.Logger;
 
@@ -99,7 +99,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
 
     public BibEntry parseBibJSONtoBibtex(JSONObject item, BibEntry entry) throws IOException, URISyntaxException {
         if (item.has("BHLType")) {
-            if (item.getString("BHLType").equals("Part")) {
+            if ("Part".equals(item.getString("BHLType"))) {
                 URL url = getPartMetadataURL(item.getString("PartID"));
                 JSONObject itemsDetails = getDetails(url);
                 entry.setField(StandardField.LANGUAGE, itemsDetails.optString("Language", ""));
@@ -112,7 +112,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
                 entry.setField(StandardField.URL, itemsDetails.optString("PartUrl", ""));
             }
 
-            if (item.getString("BHLType").equals("Item")) {
+            if ("Item".equals(item.getString("BHLType"))) {
                 URL url = getItemMetadataURL(item.getString("ItemID"));
                 JSONObject itemsDetails = getDetails(url);
                 entry.setField(StandardField.EDITOR, itemsDetails.optString("Sponsor", ""));

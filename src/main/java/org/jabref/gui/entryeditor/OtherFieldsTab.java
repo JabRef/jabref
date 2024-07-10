@@ -17,6 +17,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -41,6 +43,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
     public OtherFieldsTab(BibDatabaseContext databaseContext,
                           SuggestionProviders suggestionProviders,
                           UndoManager undoManager,
+                          UndoAction undoAction,
+                          RedoAction redoAction,
                           DialogService dialogService,
                           PreferencesService preferences,
                           StateManager stateManager,
@@ -53,6 +57,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 databaseContext,
                 suggestionProviders,
                 undoManager,
+                undoAction,
+                redoAction,
                 dialogService,
                 preferences,
                 stateManager,

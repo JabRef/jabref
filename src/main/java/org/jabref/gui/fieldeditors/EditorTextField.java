@@ -8,14 +8,15 @@ import java.util.function.Supplier;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.Globals;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 
-public class EditorTextField extends javafx.scene.control.TextField implements Initializable, ContextMenuAddable {
+public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -34,12 +35,11 @@ public class EditorTextField extends javafx.scene.control.TextField implements I
     }
 
     @Override
-    public void initContextMenu(final Supplier<List<MenuItem>> items) {
+    public void initContextMenu(final Supplier<List<MenuItem>> items, KeyBindingRepository keyBindingRepository) {
         setOnContextMenuRequested(event -> {
-            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this, Globals.getKeyPrefs()));
+            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this));
             contextMenu.getItems().addAll(0, items.get());
-
-            TextInputControlBehavior.showContextMenu(this, contextMenu, event);
+            contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });
     }
 

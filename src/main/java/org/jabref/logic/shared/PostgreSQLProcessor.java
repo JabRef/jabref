@@ -7,8 +7,8 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.gui.JabRefExecutorService;
 import org.jabref.logic.shared.listener.PostgresSQLNotificationListener;
+import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 
@@ -148,7 +148,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             // Otherwise, the listener is going to be deleted by Java's garbage collector.
             PGConnection pgConnection = connection.unwrap(PGConnection.class);
             listener = new PostgresSQLNotificationListener(dbmsSynchronizer, pgConnection);
-            JabRefExecutorService.INSTANCE.execute(listener);
+            HeadlessExecutorService.INSTANCE.execute(listener);
         } catch (SQLException e) {
             LOGGER.error("SQL Error during starting the notification listener", e);
         }

@@ -5,15 +5,17 @@ import java.util.Objects;
 
 import javafx.util.Pair;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -322,17 +324,17 @@ public class JabRefCLI {
                 .map(format -> new Pair<>(format.getName(), format.getId()))
                 .toList();
         String importFormatsIntro = Localization.lang("Available import formats");
-        String importFormatsList = String.format("%s:%n%s%n", importFormatsIntro, alignStringTable(importFormats));
+        String importFormatsList = "%s:%n%s%n".formatted(importFormatsIntro, alignStringTable(importFormats));
 
         ExporterFactory exporterFactory = ExporterFactory.create(
                 preferencesService,
-                Globals.entryTypesManager);
+                Injector.instantiateModelOrService(BibEntryTypesManager.class));
         List<Pair<String, String>> exportFormats = exporterFactory
                 .getExporters().stream()
                 .map(format -> new Pair<>(format.getName(), format.getId()))
                 .toList();
         String outFormatsIntro = Localization.lang("Available export formats");
-        String outFormatsList = String.format("%s:%n%s%n", outFormatsIntro, alignStringTable(exportFormats));
+        String outFormatsList = "%s:%n%s%n".formatted(outFormatsIntro, alignStringTable(exportFormats));
 
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 
@@ -341,7 +343,8 @@ public class JabRefCLI {
     }
 
     private String getVersionInfo() {
-        return "JabRef %s".formatted(Globals.BUILD_INFO.version);
+        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        return "JabRef %s".formatted(buildInfo.version);
     }
 
     public List<String> getLeftOver() {

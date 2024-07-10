@@ -40,12 +40,11 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Run checkstyle reporter
-        uses: nikitasavinov/checkstyle-action@master
+        uses: dbelyaev/action-checkstyle@master
         with:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
-          checkstyle_version: '10.3'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -315,6 +314,11 @@ jobs:
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload Codacy report
+        if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        run: bash <(curl -Ls https://coverage.codacy.com/get.sh)
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
   # This is https://github.com/marketplace/actions/gradle-wrapper-validation
   # It ensures that the jar file is from gradle and not by a strange third party.
   gradlevalidation:
@@ -324,7 +328,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
-      - uses: gradle/wrapper-validation-action@v3
+      - uses: gradle/actions/wrapper-validation@v3
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
     name: Find merge conflicts

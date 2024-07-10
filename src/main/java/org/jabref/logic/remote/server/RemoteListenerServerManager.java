@@ -3,7 +3,7 @@ package org.jabref.logic.remote.server;
 import java.io.IOException;
 import java.net.BindException;
 
-import org.jabref.gui.JabRefExecutorService;
+import org.jabref.logic.util.HeadlessExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class RemoteListenerServerManager implements AutoCloseable {
         if (isOpen()) {
             remoteServerThread.interrupt();
             remoteServerThread = null;
-            JabRefExecutorService.INSTANCE.stopRemoteThread();
+            HeadlessExecutorService.INSTANCE.stopRemoteThread();
         }
     }
 
@@ -57,7 +57,7 @@ public class RemoteListenerServerManager implements AutoCloseable {
     public void start() {
         if (isOpen() && isNotStartedBefore()) {
             // threads can only be started when in state NEW
-            JabRefExecutorService.INSTANCE.startRemoteThread(remoteServerThread);
+            HeadlessExecutorService.INSTANCE.startRemoteThread(remoteServerThread);
         }
     }
 

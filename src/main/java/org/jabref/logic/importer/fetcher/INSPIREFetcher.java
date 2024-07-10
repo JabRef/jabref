@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
@@ -28,7 +28,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
@@ -76,7 +76,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
         new FieldFormatterCleanup(new UnknownField("SLACcitation"), new ClearFormatter()).cleanup(entry);
 
         // Remove braces around content of "title" field
-        new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);
 
         new FieldFormatterCleanup(StandardField.TITLE, new LatexToUnicodeFormatter()).cleanup(entry);
     }

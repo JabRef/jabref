@@ -15,8 +15,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
@@ -27,6 +27,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.NormalizeWhitespacesCleanup;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -62,19 +63,22 @@ public abstract class BibDatabaseWriter {
     protected final CitationKeyPatternPreferences keyPatternPreferences;
     protected final List<FieldChange> saveActionsFieldChanges = new ArrayList<>();
     protected final BibEntryTypesManager entryTypesManager;
+    protected final FieldPreferences fieldPreferences;
 
     public BibDatabaseWriter(BibWriter bibWriter,
                              SelfContainedSaveConfiguration saveConfiguration,
+                             FieldPreferences fieldPreferences,
                              CitationKeyPatternPreferences keyPatternPreferences,
                              BibEntryTypesManager entryTypesManager) {
         this.bibWriter = Objects.requireNonNull(bibWriter);
         this.saveConfiguration = saveConfiguration;
         this.keyPatternPreferences = keyPatternPreferences;
+        this.fieldPreferences = fieldPreferences;
         this.entryTypesManager = entryTypesManager;
         assert saveConfiguration.getSaveOrder().getOrderType() != SaveOrder.OrderType.TABLE;
     }
 
-    private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
+    private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData, FieldPreferences fieldPreferences) {
         List<FieldChange> changes = new ArrayList<>();
 
         Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
@@ -85,22 +89,22 @@ public abstract class BibDatabaseWriter {
             }
         });
 
-        // Run standard cleanups
-        List<FieldFormatterCleanup> preSaveCleanups =
-                Stream.of(new TrimWhitespaceFormatter())
-                      .map(formatter -> new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, formatter))
-                      .toList();
-        for (FieldFormatterCleanup formatter : preSaveCleanups) {
-            for (BibEntry entry : toChange) {
-                changes.addAll(formatter.cleanup(entry));
+        // Trim and normalize all white spaces
+        FieldFormatterCleanup trimWhiteSpaces = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new TrimWhitespaceFormatter());
+        NormalizeWhitespacesCleanup normalizeWhitespacesCleanup = new NormalizeWhitespacesCleanup(fieldPreferences);
+        for (BibEntry entry : toChange) {
+            // Only apply the trimming if the entry itself has other changes (e.g., by the user or by save actions)
+            if (entry.hasChanged()) {
+                changes.addAll(trimWhiteSpaces.cleanup(entry));
+                changes.addAll(normalizeWhitespacesCleanup.cleanup(entry));
             }
         }
 
         return changes;
     }
 
-    public static List<FieldChange> applySaveActions(BibEntry entry, MetaData metaData) {
-        return applySaveActions(Collections.singletonList(entry), metaData);
+    public static List<FieldChange> applySaveActions(BibEntry entry, MetaData metaData, FieldPreferences fieldPreferences) {
+        return applySaveActions(List.of(entry), metaData, fieldPreferences);
     }
 
     private static List<Comparator<BibEntry>> getSaveComparators(SaveOrder saveOrder) {
@@ -182,7 +186,10 @@ public abstract class BibDatabaseWriter {
 
         // Write database entries.
         List<BibEntry> sortedEntries = getSortedEntries(entries, saveConfiguration.getSelfContainedSaveOrder());
-        List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
+
+        // FIXME: "Clean" architecture violation: We modify the entries here, which should not happen during a write
+        //        The cleanup should be done before the write operation
+        List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData(), fieldPreferences);
         saveActionsFieldChanges.addAll(saveActionChanges);
         if (keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);

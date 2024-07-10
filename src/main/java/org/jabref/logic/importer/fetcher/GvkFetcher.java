@@ -20,7 +20,7 @@ import org.jabref.logic.importer.fileformat.PicaXmlParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class GvkFetcher extends AbstractIsbnFetcher implements SearchBasedParserFetcher {

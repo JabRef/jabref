@@ -14,7 +14,7 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.ACMPortalParser;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class ACMPortalFetcher implements SearchBasedParserFetcher {
