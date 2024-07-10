@@ -173,7 +173,7 @@ public class StyleSelectDialogViewModel {
 
     public String getSelectedStyleName() {
         CitationStylePreviewLayout selectedLayout = selectedLayoutProperty.get();
-        return (selectedLayout != null) ? selectedLayout.getDisplayName() : "";
+        return selectedLayout != null ? selectedLayout.getDisplayName() : "";
     }
 
     public void setSelectedTab(Tab tab) {
