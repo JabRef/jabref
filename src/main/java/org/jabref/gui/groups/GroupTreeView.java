@@ -4,8 +4,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.time.Duration;
-import java.util.*;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Collections;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -169,22 +174,22 @@ public class GroupTreeView extends BorderPane {
         dragExpansionHandler = new DragExpansionHandler();
 
         BindingsHelper.bindContentBidirectional(
-                groupTree.getSelectionModel().getSelectedItems(),
-                stateManager.activeGroupProperty(),
-                this::selectActiveNodes,
-                model -> {
-                    // activeGroupProperty is read-only, so we update it by proxy
-                    // by updating stateManager.getSelectedGroups(database),
-                    // which propagates back to activeGroupProperty.
-                    if (stateManager.getActiveDatabase().isPresent()) {
-                            updateSelection(
-                                    model.stream().map(TreeItem::getValue)
-                                            .map(GroupNodeViewModel::getGroupNode)
-                                            .collect(Collectors.toList()),
-                                    stateManager.getActiveDatabase().get()
-                        );
-                    }
-                });
+            groupTree.getSelectionModel().getSelectedItems(),
+            stateManager.activeGroupProperty(),
+            this::selectActiveNodes,
+            model -> {
+                // activeGroupProperty is read-only, so we update it by proxy
+                // by updating stateManager.getSelectedGroups(database),
+                // which propagates back to activeGroupProperty.
+                if (stateManager.getActiveDatabase().isPresent()) {
+                    updateSelection(
+                        model.stream().map(TreeItem::getValue)
+                            .map(GroupNodeViewModel::getGroupNode)
+                            .collect(Collectors.toList()),
+                        stateManager.getActiveDatabase().get()
+                    );
+                }
+            });
 
         // We try to prevent publishing changes in the search field directly to the search task that takes some time
         // for larger group structures.

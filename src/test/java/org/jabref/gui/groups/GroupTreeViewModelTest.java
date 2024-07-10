@@ -41,7 +41,7 @@ class GroupTreeViewModelTest {
     void setUp() {
         databaseContext = new BibDatabaseContext();
         stateManager = new StateManager();
-        stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
+        stateManager.setActiveDatabase(databaseContext);
         taskExecutor = new CurrentThreadTaskExecutor();
         preferencesService = mock(PreferencesService.class);
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
@@ -57,7 +57,7 @@ class GroupTreeViewModelTest {
     @Test
     void rootGroupIsAllEntriesByDefault() {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
-        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferencesService), groupTree.rootGroup());
+        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferencesService).getGroupNode(), groupTree.rootGroup().getGroupNode());
     }
 
     @Test

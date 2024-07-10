@@ -14,6 +14,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.util.Subscription;
+
 import org.jabref.model.FieldChange;
 import org.jabref.model.TreeNode;
 import org.jabref.model.database.BibDatabase;
@@ -132,7 +133,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(group.get());
+        return group.hashCode();
+
     }
 
     /**
@@ -326,6 +328,6 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * Returns true if the underlying groups of both {@link GroupTreeNode}s is the same.
      */
     public boolean isSameGroupAs(GroupTreeNode other) {
-        return Objects.equals(group, other.group);
+        return Objects.equals(group.get(), other.group.get());
     }
 }

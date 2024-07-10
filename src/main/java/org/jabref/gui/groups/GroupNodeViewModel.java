@@ -21,7 +21,11 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.util.*;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.FieldChange;
@@ -77,11 +81,12 @@ public class GroupNodeViewModel {
         groupNode.nameSubscription(name -> displayName = formatter.format(name));
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup automaticGroup) {
-            children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
-                                     .stream()
-                                     .map(this::toViewModel)
-                                     .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
-                                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
+            children = automaticGroup
+                .createSubgroups(this.databaseContext.getDatabase().getEntries())
+                .stream()
+                .map(this::toViewModel)
+                .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
+                .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
@@ -92,7 +97,7 @@ public class GroupNodeViewModel {
         hasChildren.bind(Bindings.isNotEmpty(children));
 
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
-        if (!stateManager.activeGroupProperty().isEmpty()) {
+        if (stateManager.activeGroupProperty() != null && !stateManager.activeGroupProperty().isEmpty()) {
             this.updateMatchedEntries();
         }
         stateManager.activeGroupProperty().subscribe(this::updateMatchedEntries);
@@ -106,7 +111,6 @@ public class GroupNodeViewModel {
         entriesList = databaseContext.getDatabase().getEntries();
         entriesList.addListener(this::onEntriesChanged);
 
-        this.groupNode.subscribeToDescendantChanged(node -> this.refreshGroup());
         EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(
                 stateManager.getSelectedEntries(),
                 groupNode::matches
@@ -198,7 +202,7 @@ public class GroupNodeViewModel {
         return "GroupNodeViewModel{" +
                 "displayName='" + displayName + '\'' +
                 ", isRoot=" + isRoot +
-                ", icon='" + getIcon() + '\'' +
+                ", icon='" + getIcon().name() + '\'' +
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
@@ -256,12 +260,14 @@ public class GroupNodeViewModel {
                     matchedEntries.remove(removedEntry);
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
-                    // Newly-created empty entries are indistinguishable from one another,
-                    // so we should not check if the entry is already in our matched entries list.
-                    if (groupNode.matches(addedEntry)) {
-                        matchedEntries.add(addedEntry);
+                    // Check for strict equality, as otherwise newly-created entries
+                    // would all be considered the same.
+                    if (matchedEntries.stream().anyMatch(e -> e == addedEntry)) {
+                        if (groupNode.matches(addedEntry)) {
+                            matchedEntries.add(addedEntry);
+                        }
                     }
-                }
+                    }
             }
         }
     }

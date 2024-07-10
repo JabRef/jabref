@@ -1,6 +1,7 @@
 package org.jabref.gui.groups;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,7 +41,9 @@ class GroupNodeViewModelTest {
     @BeforeEach
     void setUp() {
         stateManager = mock(StateManager.class);
+        StateManager templateStateManager = new StateManager();
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
+        when(stateManager.activeGroupProperty()).thenReturn(templateStateManager.activeGroupProperty());
         databaseContext = new BibDatabaseContext();
         taskExecutor = new CurrentThreadTaskExecutor();
         preferencesService = mock(PreferencesService.class);
@@ -96,9 +99,9 @@ class GroupNodeViewModelTest {
         expectedA.addSubgroup(expectedGroupC);
         expectedA.addSubgroup(expectedGroupD);
         GroupNodeViewModel expectedE = getViewModelForGroup(expectedGroupE);
-        ObservableList<GroupNodeViewModel> expected = FXCollections.observableArrayList(expectedA, expectedE);
+        ObservableList<AbstractGroup> expected = FXCollections.observableArrayList(expectedA.getGroupNode().getGroup(), expectedE.getGroupNode().getGroup());
 
-        assertEquals(expected, groupViewModel.getChildren());
+        assertEquals(expected, groupViewModel.getGroupNode().getChildren().stream().map(GroupTreeNode::getGroup).collect(Collectors.toCollection(FXCollections::observableArrayList)));
     }
 
     @Test

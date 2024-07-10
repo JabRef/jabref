@@ -10,8 +10,8 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.paint.Color;
-
 import javafx.util.Subscription;
+
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.strings.StringUtil;
@@ -45,10 +45,10 @@ public abstract class AbstractGroup implements SearchMatcher {
         return "AbstractGroup{" +
                 "name='" + name.getValue() + '\'' +
                 ", context=" + context +
-                ", color=" + color +
+                ", color=" + color.orElse(Color.BLACK) +
                 ", isExpanded=" + isExpanded +
-                ", description=" + description +
-                ", iconName=" + iconName +
+                ", description=" + description.orElse("null") +
+                ", iconName=" + iconName.orElse("null") +
                 '}';
     }
 
@@ -61,13 +61,14 @@ public abstract class AbstractGroup implements SearchMatcher {
             return false;
         }
         AbstractGroup that = (AbstractGroup) other;
-        return Objects.equals(this.name.getValue(), that.name.getValue()) && Objects.equals(this.description, that.description)
+        return Objects.equals(this.name.getValue(), that.name.getValue())
+                && Objects.equals(this.description, that.description)
                 && Objects.equals(this.context, that.context);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name.getValue(), description, context);
+        return Objects.hash(name.getValue(), getDescription().orElse("null"), getHierarchicalContext());
     }
 
     public Optional<Color> getColor() {

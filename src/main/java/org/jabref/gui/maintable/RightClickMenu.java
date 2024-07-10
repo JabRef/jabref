@@ -83,7 +83,6 @@ public class RightClickMenu {
                                 : StandardActions.CREATE_SUBGROUP_FROM_SELECTION,
                         new CreateGroupAction(dialogService, stateManager, true, PreferredGroupAdditionLocation.ADD_BELOW, null)),
 
-
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(libraryTab, dialogService, stateManager, preferencesService.getFilePreferences())),

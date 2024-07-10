@@ -1,9 +1,14 @@
 package org.jabref.gui.maintable;
 
-import javafx.scene.Group;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
+import java.util.Optional;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -11,13 +16,16 @@ import org.jabref.gui.groups.GroupDialogHeader;
 import org.jabref.gui.groups.GroupDialogView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.groups.*;
-import org.jspecify.annotations.Nullable;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.TexGroup;
+import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
+import org.jabref.model.groups.AutomaticPersonsGroup;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
 
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
@@ -61,12 +69,13 @@ public class CreateGroupAction extends SimpleCommand {
         Optional<BibDatabaseContext> database = stateManager.getActiveDatabase();
         Optional<GroupTreeNode> active;
 
-        if (!stateManager.activeGroupProperty().isEmpty())
+        if (!stateManager.activeGroupProperty().isEmpty()) {
             active = Optional.of(stateManager.activeGroupProperty().getFirst());
-        else if (database.isPresent())
+        } else if (database.isPresent()) {
             active = database.get().getMetaData().getGroups();
-        else
+        } else {
             active = Optional.empty();
+        }
 
         if (database.isPresent() && active.isPresent()) {
             boolean isRoot = active.get().isRoot();
@@ -115,7 +124,6 @@ public class CreateGroupAction extends SimpleCommand {
         } else {
             dialogService.showWarningDialogAndWait(Localization.lang("Cannot create group"), Localization.lang("Cannot create group. Please create a library first."));
         }
-
     }
 
     private Optional<GroupTreeNode> groupEditActions(GroupTreeNode node, AbstractGroup newGroup, BibDatabaseContext database) {
@@ -134,17 +142,13 @@ public class CreateGroupAction extends SimpleCommand {
         // dialog already warns us about this if the new group is named like another existing group
         // We need to check if only the name changed as this is relevant for the entry's group field
         if (groupTypeEqual && !newGroup.getName().equals(oldGroupName) && onlyMinorModifications) {
-
             keepPreviousAssignments = true;
             // If the name is unique, we want to remove the old database with the same name.
             // Otherwise, we need to keep them.
             removePreviousAssignments = nameIsUnique(oldGroup, newGroup, database);
-
         } else if (groupTypeEqual && changesAreMinor(oldGroup, newGroup)) {
-
             keepPreviousAssignments = true;
             removePreviousAssignments = true;
-
         } else {
             // Major modifications
             Optional<ButtonType> reassignmentResponse = showConfirmationPanel(newGroup.getClass() == WordKeywordGroup.class);
@@ -156,8 +160,6 @@ public class CreateGroupAction extends SimpleCommand {
                     && nameIsUnique(oldGroup, newGroup, database);
             keepPreviousAssignments = (reassignmentResponse.get().getButtonData() == ButtonBar.ButtonData.YES);
         }
-
-
         // TODO: Add undo
         // Store undo information.
         // AbstractUndoableEdit undoAddPreviousEntries = null;
@@ -174,7 +176,6 @@ public class CreateGroupAction extends SimpleCommand {
         // if (!addChange.isEmpty()) {
         //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
         // }
-
         node.setGroup(
                 newGroup,
                 keepPreviousAssignments,

@@ -1,13 +1,15 @@
 package org.jabref.gui.groups;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
-import javafx.beans.property.*;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.ReadOnlyListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
@@ -62,7 +64,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-
     public GroupTreeViewModel(StateManager stateManager,
                               DialogService dialogService,
                               PreferencesService preferencesService,
@@ -78,11 +79,18 @@ public class GroupTreeViewModel extends AbstractViewModel {
         filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
 
         ReadOnlyListProperty<GroupTreeNode> list = stateManager.activeGroupProperty();
+        Optional<BibDatabaseContext> database = stateManager.getActiveDatabase();
         selectedGroups.setAll(list);
         list.addListener(this::onActiveGroupChange);
 
         // Init
-        setNewDatabase(currentDatabase);
+        setNewDatabase(stateManager.getActiveDatabase());
+        database.ifPresent(
+            bibDatabaseContext ->
+                stateManager.setSelectedGroups(
+                    bibDatabaseContext,
+                    Collections.singletonList(rootGroup.get().getGroupNode()
+        )));
     }
 
     /**
@@ -102,6 +110,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 selectedGroups.setAll(newValue.getList());
             }
         });
+    }
+
+    public void setNewDatabase(BibDatabaseContext database) {
+        setNewDatabase(Optional.ofNullable(database));
     }
 
     public void setNewDatabase(Optional<BibDatabaseContext> database) {
@@ -142,13 +154,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
         groupMaker.execute();
     }
 
-
     /**
      * Gets invoked if the user changes the active database.
      * We need to get the new group tree
      */
     private void onActiveDatabaseExists(BibDatabaseContext newDatabase) {
-
         GroupNodeViewModel newRoot = newDatabase.getMetaData().getGroups()
                 .map(root -> new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, root, localDragboard, preferences))
                 .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase, stateManager, taskExecutor, localDragboard, preferences));
@@ -316,7 +326,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
 
         // only remove explicit groups from the entries, keyword groups should not be deleted
-        if (group.getGroup() instanceof ExplicitGroup) {
+        if (currentDatabase.isPresent() && group.getGroup() instanceof ExplicitGroup) {
             int groupsWithSameName = 0;
             String name = group.getGroup().getName();
             Optional<GroupTreeNode> rootGroup = currentDatabase.get().getMetaData().getGroups();
