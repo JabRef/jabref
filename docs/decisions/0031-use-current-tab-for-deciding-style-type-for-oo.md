@@ -5,6 +5,7 @@ parent: Decision Records
 # Use currently active Style tab in Select Style Dialog to decide which style to activate
 
 ## Context and Problem Statement
+
 In the Select Style Dialog window of the OpenOffice Panel, in case a style is selected in both the CSL Styles Tab and JStyles Tab, how to decide which of the two will be activated for use?
 
 ## Considered Options
