@@ -71,33 +71,23 @@ public class CSLCitationOOAdapter {
         html = html.replaceAll("<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>", "$1 $2");
 
         // Remove unsupported tags
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<div[^>]*>", "");
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("</div>", "");
-
-        // Replace unsupported entities
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&ndash;", "–");
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&ldquo;", "\"");
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&rdquo;", "\"");
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&laquo;", "«");
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&raquo;", "»");
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&amp;", "&");
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&lt;", "<");
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("&rt;", ">");
+        html = html.replaceAll("<div[^>]*>", "");
+        html = html.replaceAll("</div>", "");
 
         // Remove unsupported links
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<a[^>]*>", "");
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("</a>", "");
+        html = html.replaceAll("<a[^>]*>", "");
+        html = html.replaceAll("</a>", "");
 
         // Replace span tags with inline styles for bold
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<span style=\"font-weight: ?bold;?\">(.*?)</span>", "<b>$1</b>");
+        html = html.replaceAll("<span style=\"font-weight: ?bold;?\">(.*?)</span>", "<b>$1</b>");
 
         // Replace span tags with inline styles for italic
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
+        html = html.replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
 
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>", "<smallcaps>$1</smallcaps>");
+        html = html.replaceAll("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>", "<smallcaps>$1</smallcaps>");
 
         // Clean up any remaining span tags
-        html = StringEscapeUtils.unescapeHtml4(html).replaceAll("</?span[^>]*>", "");
+        html = html.replaceAll("</?span[^>]*>", "");
 
         return html;
     }
