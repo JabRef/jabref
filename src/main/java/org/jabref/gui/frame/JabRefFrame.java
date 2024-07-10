@@ -48,9 +48,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.undo.AddUndoableActionEvent;
-import org.jabref.logic.undo.UndoChangeEvent;
-import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -59,7 +56,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import com.tobiasdiez.easybind.Subscription;
@@ -389,7 +385,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             // Update search autocompleter with information for the correct database:
             globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
-            libraryTab.getUndoManager().postUndoRedoEvent();
             libraryTab.getMainTable().requestFocus();
 
             // Set window title - copy tab title
@@ -460,8 +455,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
-
-        libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
     private ContextMenu createTabContextMenuFor(LibraryTab tab) {
@@ -510,6 +503,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Close after checking for changes and saving all databases
         for (LibraryTab libraryTab : toClose) {
             tabbedPane.getTabs().remove(libraryTab);
+            // Trigger org.jabref.gui.LibraryTab.onClosed
             Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
         }
         return true;
@@ -615,7 +609,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         public CloseOthersDatabaseAction(LibraryTab libraryTab) {
             this.libraryTab = libraryTab;
-            this.executable.bind(ActionHelper.isOpenMultiDatabase(tabbedPane));
+            this.executable.bind(ActionHelper.needsMultipleDatabases(tabbedPane));
         }
 
         @Override
@@ -657,31 +651,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     LOGGER.info("Could not open folder", e);
                 }
             });
-        }
-    }
-
-    private class UndoRedoEventManager {
-
-        @Subscribe
-        public void listen(UndoRedoEvent event) {
-            updateTexts(event);
-            JabRefFrame.this.getCurrentLibraryTab().updateEntryEditorIfShowing();
-        }
-
-        @Subscribe
-        public void listen(AddUndoableActionEvent event) {
-            updateTexts(event);
-        }
-
-        private void updateTexts(UndoChangeEvent event) {
-            /* TODO
-            SwingUtilities.invokeLater(() -> {
-                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
-                undo.setEnabled(event.isCanUndo());
-                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
-                redo.setEnabled(event.isCanRedo());
-            });
-            */
         }
     }
 }

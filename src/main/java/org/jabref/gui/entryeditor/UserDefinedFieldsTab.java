@@ -11,6 +11,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -28,6 +30,8 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
                                 BibDatabaseContext databaseContext,
                                 SuggestionProviders suggestionProviders,
                                 UndoManager undoManager,
+                                UndoAction undoAction,
+                                RedoAction redoAction,
                                 DialogService dialogService,
                                 PreferencesService preferences,
                                 StateManager stateManager,
@@ -36,7 +40,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
                                 EmbeddingsGenerationTask embeddingsGenerationTask,
                                 TaskExecutor taskExecutor,
                                 JournalAbbreviationRepository journalAbbreviationRepository) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, indexingTaskManager, embeddingsGenerationTask);
+        super(false, databaseContext, suggestionProviders, undoManager, undoAction, redoAction, dialogService, preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, indexingTaskManager, embeddingsGenerationTask);
 
         this.fields = new LinkedHashSet<>(fields);
 

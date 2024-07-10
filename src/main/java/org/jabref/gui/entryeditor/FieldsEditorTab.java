@@ -32,6 +32,8 @@ import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -53,6 +55,8 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     protected GridPane gridPane;
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
+    private final UndoAction undoAction;
+    private final RedoAction redoAction;
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private final ThemeManager themeManager;
@@ -70,6 +74,8 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                            BibDatabaseContext databaseContext,
                            SuggestionProviders suggestionProviders,
                            UndoManager undoManager,
+                           UndoAction undoAction,
+                           RedoAction redoAction,
                            DialogService dialogService,
                            PreferencesService preferences,
                            StateManager stateManager,
@@ -82,6 +88,8 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
         this.undoManager = Objects.requireNonNull(undoManager);
+        this.undoAction = undoAction;
+        this.redoAction = redoAction;
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
         this.themeManager = themeManager;
@@ -157,7 +165,9 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                 databaseContext,
                 entry.getType(),
                 suggestionProviders,
-                undoManager);
+                undoManager,
+                undoAction,
+                redoAction);
         fieldEditor.bindToEntry(entry);
         editors.put(field, fieldEditor);
         return new FieldNameLabel(field);

@@ -10,6 +10,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -97,6 +99,8 @@ class CommentsTabTest {
                 databaseContext,
                 suggestionProviders,
                 undoManager,
+                mock(UndoAction.class),
+                mock(RedoAction.class),
                 dialogService,
                 stateManager,
                 themeManager,
