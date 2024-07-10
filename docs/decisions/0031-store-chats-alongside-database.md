@@ -62,4 +62,3 @@ Refer to positive and negative consequences of the decision outcome.
 * Bad, because if `.bib` files are edited externally (meaning, not inside the JabRef), then chats file will not be updated correspondingly
 * Bad, because if user moves `.bib` file, they should move the chats file too
 * Bad, because if two persons work in parallel using a OneDrive share, the file is overwritten or a conflict file is generated. ([Dropbox "conflicted copy"](https://help.dropbox.com/en-en/organize/conflicted-copy))
-
