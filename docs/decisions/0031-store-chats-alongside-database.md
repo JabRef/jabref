@@ -43,6 +43,9 @@ One can use `%APPDATA%`, where JabRef stores the Lucene index and other informat
 See `org.jabref.gui.desktop.os.NativeDesktop#getFulltextIndexBaseDirectory` for use in JabRef and
 <https://github.com/harawata/appdirs> for general information.
 
+Concrete example for backup folder: `C:\Users\${username}\AppData\Local\org.jabref\jabref\backups`.
+Example filename: `4a070cf3--Chocolate.bib--2024-03-25--14.20.12.bak`.
+
 * Good, because `.bib` file is kept clean
 * Good, because chat messages are saved locally
 * Neutral, because may be a little harder to implement
