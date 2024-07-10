@@ -17,8 +17,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell", inline: "sudo dnf update -y"
   config.vm.provision "shell", inline: "sudo dnf install -y @kde-desktop-environment"
-  # X11 seems to be required by the Clipboard functionality (Java AWT)
-  config.vm.provision "shell", inline: "sudo dnf install -y kwin-x11 plasma-workspace-x11"
+
+  # Following X11 packages are NOT required even the clipboard functionality seems to ask for (cf. https://github.com/JabRef/jabref/issues/11464)
+  # config.vm.provision "shell", inline: "sudo dnf install -y kwin-x11 plasma-workspace-x11"
 
   # We need exactly the java version required by JabRef. Auto download does not work on Fedora.
   config.vm.provision "shell", inline: "sudo dnf install -y git java-21-openjdk-devel.x86_64"
