@@ -72,11 +72,11 @@ public class CSLCitationOOAdapter {
 
         // Remove unsupported tags
         html = html.replaceAll("<div[^>]*>", "");
-        html = html.replaceAll("</div>", "");
+        html = html.replace("</div>", "");
 
         // Remove unsupported links
         html = html.replaceAll("<a[^>]*>", "");
-        html = html.replaceAll("</a>", "");
+        html = html.replace("</a>", "");
 
         // Replace span tags with inline styles for bold
         html = html.replaceAll("<span style=\"font-weight: ?bold;?\">(.*?)</span>", "<b>$1</b>");
