@@ -55,7 +55,7 @@ public class OpenOfficeFileSearch {
                                          return Stream.empty();
                                      }
                                  })
-                                 // On Windows, the executable is nested in usb directory "program"
+                                 // On Windows, the executable is nested in subdirectory "program"
                                  .map(dir -> dir.resolve("program"))
                                  .toList();
     }
