@@ -1,13 +1,11 @@
 package org.jabref.gui.maintable;
 
+import java.util.Objects;
+import java.util.Optional;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-
-import org.jspecify.annotations.Nullable;
-
-import java.util.Objects;
-import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -17,15 +15,16 @@ import org.jabref.gui.groups.GroupDialogView;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.groups.ExplicitGroup;
-import org.jabref.model.groups.WordKeywordGroup;
-import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.RegexKeywordGroup;
-import org.jabref.model.groups.TexGroup;
-import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
+import org.jabref.model.groups.WordKeywordGroup;
 
+import org.jspecify.annotations.Nullable;
 
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
@@ -108,7 +107,9 @@ public class CreateGroupAction extends SimpleCommand {
                 GroupTreeNode newSubgroup;
                 if (editGroup != null) {
                     Optional<GroupTreeNode> editedGroup = groupEditActions(editGroup, group, database.get());
-                    if (editedGroup.isEmpty()) return;
+                    if (editedGroup.isEmpty()) {
+                        return;
+                    }
                     newSubgroup = editedGroup.get();
                     dialogService.notify(Localization.lang("Modified group \"%0\".", newSubgroup.getName()));
                 } else {

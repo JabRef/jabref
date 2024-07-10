@@ -21,11 +21,11 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.FieldChange;
@@ -87,6 +87,7 @@ public class GroupNodeViewModel {
                 .map(this::toViewModel)
                 .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
                 .collect(Collectors.toCollection(FXCollections::observableArrayList));
+            children.forEach(c -> groupNode.addChild(c.getGroupNode()));
         } else {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
@@ -94,7 +95,7 @@ public class GroupNodeViewModel {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         }
         hasChildren = new SimpleBooleanProperty();
-        hasChildren.bind(Bindings.isNotEmpty(children));
+        hasChildren.bind(Bindings.isNotEmpty(groupNode.getChildren()));
 
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
         if (stateManager.activeGroupProperty() != null && !stateManager.activeGroupProperty().isEmpty()) {
@@ -260,14 +261,14 @@ public class GroupNodeViewModel {
                     matchedEntries.remove(removedEntry);
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
-                    // Check for strict equality, as otherwise newly-created entries
-                    // would all be considered the same.
-                    if (matchedEntries.stream().anyMatch(e -> e == addedEntry)) {
+                    // Check for ID equality, otherwise new entries with no field info aren't added
+                    // and entry count doesn't increment.
+                    if (matchedEntries.stream().noneMatch(e -> e.getId().equals(addedEntry.getId()))) {
                         if (groupNode.matches(addedEntry)) {
                             matchedEntries.add(addedEntry);
                         }
                     }
-                    }
+                }
             }
         }
     }

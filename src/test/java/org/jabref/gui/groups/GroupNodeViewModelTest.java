@@ -99,9 +99,9 @@ class GroupNodeViewModelTest {
         expectedA.addSubgroup(expectedGroupC);
         expectedA.addSubgroup(expectedGroupD);
         GroupNodeViewModel expectedE = getViewModelForGroup(expectedGroupE);
-        ObservableList<AbstractGroup> expected = FXCollections.observableArrayList(expectedA.getGroupNode().getGroup(), expectedE.getGroupNode().getGroup());
+        ObservableList<GroupTreeNode> expected = FXCollections.observableArrayList(expectedA.getGroupNode(), expectedE.getGroupNode());
 
-        assertEquals(expected, groupViewModel.getGroupNode().getChildren().stream().map(GroupTreeNode::getGroup).collect(Collectors.toCollection(FXCollections::observableArrayList)));
+        assertEquals(expected, groupViewModel.getGroupNode().getChildren());
     }
 
     @Test

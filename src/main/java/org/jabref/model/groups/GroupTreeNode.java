@@ -128,13 +128,14 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
         GroupTreeNode that = (GroupTreeNode) o;
         return Objects.equals(group.get(), that.group.get()) &&
-                Objects.equals(getChildren(), that.getChildren());
+                getChildren()
+                        .stream().map(GroupTreeNode::getGroup)
+                        .allMatch(v -> that.getChildren().stream().map(GroupTreeNode::getGroup).anyMatch(v::equals));
     }
 
     @Override
     public int hashCode() {
-        return group.hashCode();
-
+        return group.get().hashCode();
     }
 
     /**
