@@ -66,11 +66,9 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
-    private StyleSelectDialogViewModel.StyleType selectedStyleType = StyleSelectDialogViewModel.StyleType.CSL;
 
     public StyleSelectDialogView(StyleLoader loader) {
         this.loader = loader;
-        int cslIndex = 0;
 
         ViewLoader.view(this)
                   .load()
