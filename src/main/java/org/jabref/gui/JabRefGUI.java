@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -272,7 +271,7 @@ public class JabRefGUI extends Application {
     }
 
     /**
-     * outprints the Data from the Screen (only in debug mode)
+     * Logs data from the Screen (only in debug mode)
      *
      * @param mainStage JabRefs stage
      */
@@ -316,10 +315,15 @@ public class JabRefGUI extends Application {
 
     @Override
     public void stop() {
+        LOGGER.trace("Closing AI service");
         aiService.close();
+        LOGGER.trace("Closing OpenOffice connection");
         OOBibBaseConnect.closeOfficeConnection();
+        LOGGER.trace("Stopping background tasks");
         stopBackgroundTasks();
+        LOGGER.trace("Shutting down thread pools");
         shutdownThreadPools();
+        LOGGER.trace("Finished stop");
     }
 
     public void stopBackgroundTasks() {
@@ -327,10 +331,15 @@ public class JabRefGUI extends Application {
     }
 
     public static void shutdownThreadPools() {
+        LOGGER.trace("Shutting down taskExecutor");
         taskExecutor.shutdown();
+        LOGGER.trace("Shutting down fileUpdateMonitor");
         fileUpdateMonitor.shutdown();
+        LOGGER.trace("Shutting down directoryMonitor");
         DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
         directoryMonitor.shutdown();
+        LOGGER.trace("Shutting down HeadlessExecutorService");
         HeadlessExecutorService.INSTANCE.shutdownEverything();
+        LOGGER.trace("Finished shutdownThreadPools");
     }
 }

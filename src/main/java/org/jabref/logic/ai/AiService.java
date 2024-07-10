@@ -7,13 +7,18 @@ import org.jabref.logic.ai.embeddings.AiEmbeddingModel;
 import org.jabref.logic.ai.embeddings.AiEmbeddingsManager;
 import org.jabref.preferences.AiPreferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *  The main class for the AI functionality.
  *  <p>
  *  Holds all the AI components: LLM and embedding model, chat history and embeddings cache.
  */
-public class AiService {
+public class AiService implements AutoCloseable {
     public static final String VERSION = "1";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
 
     private final AiPreferences aiPreferences;
 
@@ -31,9 +36,12 @@ public class AiService {
         this.aiEmbeddingsManager = new AiEmbeddingsManager(aiPreferences, dialogService);
     }
 
+    @Override
     public void close() {
         this.aiChatHistoryManager.close();
+        LOGGER.trace("aiChatHistoryManager closed");
         this.aiEmbeddingsManager.close();
+        LOGGER.trace("aiEmbeddingsManager closed");
     }
 
     public AiPreferences getPreferences() {

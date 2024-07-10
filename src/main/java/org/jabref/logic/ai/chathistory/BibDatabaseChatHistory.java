@@ -8,6 +8,8 @@ import org.jabref.gui.DialogService;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class stores the chat history with AI. The chat history file is stored alongside the BibTeX file.
@@ -20,6 +22,8 @@ import org.h2.mvstore.MVStore;
  */
 public class BibDatabaseChatHistory implements AutoCloseable {
     public static final String AI_CHATS_FILE_EXTENSION = "aichats";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseChatHistory.class);
 
     private final MVStore mvStore;
 
@@ -62,6 +66,8 @@ public class BibDatabaseChatHistory implements AutoCloseable {
     }
 
     public void close() {
+        LOGGER.trace("Closing chat history store");
         this.mvStore.close();
+        LOGGER.trace("Closed chat history store");
     }
 }

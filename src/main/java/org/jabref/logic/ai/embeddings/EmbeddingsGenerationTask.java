@@ -15,12 +15,14 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
-import org.checkerframework.checker.units.qual.A;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class manages a queue of embedding generation tasks for one {@link BibEntry} in a {@link org.jabref.model.database.BibDatabase}.
@@ -29,8 +31,12 @@ import org.checkerframework.checker.units.qual.A;
  * will start a background task for generating the embeddings for each entry in the queue.
  * <p>
  * This class also provides an ability to prioritize the entry in the queue. But it seems not to work well.
+ *
+ * FIXME: This is a "Manager" (similar to {@link PdfIndexerManager}) and should be renamed to "EmbeddingsGenerationManager".
  */
 public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddingsGenerationTask.class);
+
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final AiService aiService;
@@ -66,6 +72,8 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
         titleProperty().set(Localization.lang("Embeddings generation"));
 
         this.onFailure(e -> {
+            LOGGER.error("Failure during configure phase", e);
+            // This is caught by the UI thread to display the error message
             throw new RuntimeException(e);
         });
     }
@@ -148,6 +156,7 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
         updateProgress();
 
         while (!linkedFileQueue.isEmpty() && !isCanceled()) {
+            LOGGER.trace("linkedFileQueue size: {}", linkedFileQueue.size());
             LinkedFile linkedFile = linkedFileQueue.removeLast();
 
             ingestLinkedFile(linkedFile);
@@ -204,7 +213,10 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
     }
 
     public void shutdown() {
+        LOGGER.trace("Shutting down embeddings generation task.");
+        LOGGER.trace("Clearing linkedFileQueue...");
         linkedFileQueue.clear();
+        LOGGER.trace("Cleared linkedFileQueue");
         shutdownProperty.set(true);
     }
 }
