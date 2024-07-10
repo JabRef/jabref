@@ -8,6 +8,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.property.BooleanProperty;
+
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilReader;
@@ -19,6 +21,7 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
+import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -34,20 +37,26 @@ public class AiIngestor {
     private final AiService aiService;
 
     private EmbeddingStoreIngestor ingestor;
+    private DocumentSplitter documentSplitter;
 
-    public AiIngestor(AiService aiService) {
+    // A workaround to stop ingesting files.
+    private BooleanProperty shutdownProperty;
+
+    public AiIngestor(AiService aiService, BooleanProperty shutdownProperty) {
         this.aiService = aiService;
-        this.ingestor = rebuild(aiService);
+        this.shutdownProperty = shutdownProperty;
+
+        rebuild(aiService);
 
         setupListeningToPreferencesChanges();
     }
 
-    private EmbeddingStoreIngestor rebuild(AiService aiService) {
-        DocumentSplitter documentSplitter = DocumentSplitters
+    private void rebuild(AiService aiService) {
+        this.documentSplitter = DocumentSplitters
                 .recursive(aiService.getPreferences().getDocumentSplitterChunkSize(),
                            aiService.getPreferences().getDocumentSplitterOverlapSize());
 
-        return EmbeddingStoreIngestor
+        this.ingestor = EmbeddingStoreIngestor
                 .builder()
                 .embeddingStore(aiService.getEmbeddingsManager().getEmbeddingsStore())
                 .embeddingModel(aiService.getEmbeddingModel().getEmbeddingModel())
@@ -56,7 +65,7 @@ public class AiIngestor {
     }
 
     private void setupListeningToPreferencesChanges() {
-        aiService.getPreferences().onEmbeddingsParametersChange(() -> ingestor = rebuild(aiService));
+        aiService.getPreferences().onEmbeddingsParametersChange(() -> rebuild(aiService));
     }
 
     /**
@@ -120,11 +129,17 @@ public class AiIngestor {
         }
     }
 
-    private void ingestString(String string, Metadata metadata) {
+    private void ingestString(String string, Metadata metadata) throws InterruptedException {
         ingestDocument(new Document(string, metadata));
     }
 
     private void ingestDocument(Document document) {
-        ingestor.ingest(document);
+        for (TextSegment documentPart : documentSplitter.split(document)) {
+            if (shutdownProperty.get()) {
+                return;
+            }
+
+            ingestor.ingest(new Document(documentPart.text(), document.metadata()));
+        }
     }
 }

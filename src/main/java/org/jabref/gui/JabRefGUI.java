@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -315,10 +316,10 @@ public class JabRefGUI extends Application {
 
     @Override
     public void stop() {
+        aiService.close();
         OOBibBaseConnect.closeOfficeConnection();
         stopBackgroundTasks();
         shutdownThreadPools();
-        aiService.close();
     }
 
     public void stopBackgroundTasks() {

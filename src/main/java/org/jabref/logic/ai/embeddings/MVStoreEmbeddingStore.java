@@ -25,6 +25,7 @@ import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.comparison.IsEqualTo;
 import dev.langchain4j.store.embedding.filter.comparison.IsIn;
 import jakarta.annotation.Nullable;
+import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,10 @@ import static java.util.Comparator.comparingDouble;
 
 /**
  * A custom implementation of langchain4j's {@link EmbeddingStore} that uses a {@link MVStore} as an embedded database.
+ * <p>
+ * Every embedding has 3 fields: float array (the embedding itself), file where it was generated from, and the embedded
+ * string (the content). Each of those fields is stored in a separate {@link MVMap}.
+ * To connect values in those fields we use an id, which is a random {@link UUID}.
  */
 public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
     public static final String LINKED_FILE_METADATA_KEY = "linkedFile";

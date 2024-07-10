@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -40,9 +43,10 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
     private final List<LinkedFile> linkedFileQueue = Collections.synchronizedList(new ArrayList<>());
     private int numOfProcessedFiles = 0;
 
-    private final Object lock = new Object();
-    private AtomicBoolean isRunning = new AtomicBoolean(false);
-    private AtomicBoolean isBlockingNewTasks = new AtomicBoolean(false);
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
+    private final AtomicBoolean isBlockingNewTasks = new AtomicBoolean(false);
+
+    private final BooleanProperty shutdownProperty = new SimpleBooleanProperty(false);
 
     public EmbeddingsGenerationTask(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiService aiService, TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
@@ -50,7 +54,7 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
         this.aiService = aiService;
         this.taskExecutor = taskExecutor;
 
-        this.aiIngestor = new AiIngestor(aiService);
+        this.aiIngestor = new AiIngestor(aiService, shutdownProperty);
 
         configure();
 
@@ -58,10 +62,12 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
     }
 
     private void configure() {
-        showToUser(true);
         willBeRecoveredAutomatically(true);
-        updateProgress(1, 1);
         titleProperty().set(Localization.lang("Embeddings generation"));
+
+        this.onFailure(e -> {
+            throw new RuntimeException(e);
+        });
     }
 
     private void setupListeningToPreferencesChanges() {
@@ -86,7 +92,6 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
 
             if (!isRunning.get()) {
                 this.executeWith(taskExecutor);
-                showToUser(false);
             }
         }
     }
@@ -138,6 +143,7 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
     @Override
     protected Void call() throws Exception {
         isRunning.set(true);
+        showToUser(true);
 
         updateProgress();
 
@@ -151,6 +157,7 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
         }
 
         isRunning.set(false);
+        showToUser(false);
 
         return null;
     }
@@ -198,6 +205,6 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
 
     public void shutdown() {
         linkedFileQueue.clear();
-        // TODO: Stop the AiIngestor.
+        shutdownProperty.set(true);
     }
 }

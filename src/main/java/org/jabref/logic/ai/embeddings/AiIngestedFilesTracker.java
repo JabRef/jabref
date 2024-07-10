@@ -53,7 +53,7 @@ public class AiIngestedFilesTracker {
     }
 
     public Optional<Long> getIngestedFileModificationTime(String link) {
-        return Optional.of(ingestedMap.get(link));
+        return Optional.ofNullable(ingestedMap.get(link));
     }
 
     public void registerListener(Object listener) {
