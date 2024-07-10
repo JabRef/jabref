@@ -11,6 +11,8 @@ import com.airhacks.afterburner.injection.Injector;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
 public class ShowDocumentViewerAction extends SimpleCommand {
+    private final DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+    private DocumentViewerView documentViewerView;
 
     public ShowDocumentViewerAction(StateManager stateManager, PreferencesService preferences) {
         this.executable.bind(needsEntriesSelected(stateManager).and(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferences)));
@@ -18,7 +20,9 @@ public class ShowDocumentViewerAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        dialogService.showCustomDialog(new DocumentViewerView());
+        if (documentViewerView == null) {
+            documentViewerView = new DocumentViewerView();
+        }
+        dialogService.showCustomDialog(documentViewerView);
     }
 }

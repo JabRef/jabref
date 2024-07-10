@@ -1,13 +1,13 @@
-package org.jabref.gui.fieldeditors;
+package org.jabref.gui.fieldeditors.optioneditors.mapbased;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import javax.swing.undo.UndoManager;
 
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.fieldeditors.optioneditors.OptionEditorViewModel;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.field.Field;
 
@@ -36,7 +36,8 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
                 if (object == null) {
                     return null;
                 } else {
-                    return getItemMap().inverse().getOrDefault(object, object.toString()); // if the object is not found we simply return itself as string
+                    // if the object is not found we simply return itself as string
+                    return getItemMap().inverse().getOrDefault(object, object.toString());
                 }
             }
 
@@ -52,10 +53,10 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
     }
 
     /**
-     * Converts a String value to the Type T. If the type cannot be directly casted to T, this method must be overriden in a subclass
+     * Converts a String value to the Type T. If the type cannot be directly cast to T, this method must be overridden in a subclass
      *
      * @param string The input value to convert
-     * @return The value or null if the value could not be casted
+     * @return The value or null if the value could not be cast
      */
     @SuppressWarnings("unchecked")
     protected T getValueFromString(String string) {
@@ -68,7 +69,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
     }
 
     @Override
-    public List<T> getItems() {
-        return new ArrayList<>(getItemMap().values());
+    public Collection<T> getItems() {
+        return getItemMap().values();
     }
 }

@@ -10,6 +10,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
@@ -51,6 +52,7 @@ public class SharedDatabaseUIManager {
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
+    private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
     public SharedDatabaseUIManager(LibraryTabContainer tabContainer,
@@ -60,6 +62,7 @@ public class SharedDatabaseUIManager {
                                    BibEntryTypesManager entryTypesManager,
                                    FileUpdateMonitor fileUpdateMonitor,
                                    UndoManager undoManager,
+                                   ClipBoardManager clipBoardManager,
                                    TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
@@ -68,6 +71,7 @@ public class SharedDatabaseUIManager {
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
+        this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
     }
 
@@ -138,7 +142,7 @@ public class SharedDatabaseUIManager {
 
         libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.getBibEntries()));
 
-        if (entryEditor != null && (event.getBibEntries().contains(entryEditor.getEntry()))) {
+        if (entryEditor != null && (event.getBibEntries().contains(entryEditor.getCurrentlyEditedEntry()))) {
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")
                             + "\n"
@@ -172,6 +176,7 @@ public class SharedDatabaseUIManager {
                 fileUpdateMonitor,
                 entryTypesManager,
                 undoManager,
+                clipBoardManager,
                 taskExecutor);
         tabContainer.addTab(libraryTab, true);
         return libraryTab;
@@ -209,6 +214,7 @@ public class SharedDatabaseUIManager {
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(
                 bibDatabaseContext,
                 preferencesService.getBibEntryPreferences().getKeywordSeparator(),
+                preferencesService.getFieldPreferences(),
                 preferencesService.getCitationKeyPatternPreferences().getKeyPatterns(),
                 fileUpdateMonitor);
         bibDatabaseContext.convertToSharedDatabase(synchronizer);

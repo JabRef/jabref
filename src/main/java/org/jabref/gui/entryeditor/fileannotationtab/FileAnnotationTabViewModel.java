@@ -17,8 +17,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.Globals;
-import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.util.OS;
@@ -43,12 +43,17 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private Map<Path, List<FileAnnotation>> fileAnnotations;
     private Path currentFile;
     private final FileUpdateMonitor fileMonitor;
+    private final ClipBoardManager clipBoardManager;
     private final FileUpdateListener fileListener = this::reloadAnnotations;
 
-    public FileAnnotationTabViewModel(FileAnnotationCache cache, BibEntry entry, FileUpdateMonitor fileMonitor) {
+    public FileAnnotationTabViewModel(FileAnnotationCache cache,
+                                      BibEntry entry,
+                                      FileUpdateMonitor fileMonitor,
+                                      ClipBoardManager clipBoardManager) {
         this.cache = cache;
         this.entry = entry;
         this.fileMonitor = fileMonitor;
+        this.clipBoardManager = clipBoardManager;
 
         fileAnnotations = this.cache.getFromCache(this.entry);
         files.setAll(fileAnnotations.keySet());
@@ -98,7 +103,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
 
     private void reloadAnnotations() {
         // Make sure to always run this in the JavaFX thread as the file monitor (and its notifications) live in a different thread
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             // Remove annotations for the current entry and reinitialize annotation/cache
             cache.remove(entry);
             fileAnnotations = cache.getFromCache(entry);
@@ -123,7 +128,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         sj.add(Localization.lang("Content") + ": " + getCurrentAnnotation().getContent());
         sj.add(Localization.lang("Marking") + ": " + getCurrentAnnotation().markingProperty().get());
 
-        Globals.getClipboardManager().setContent(sj.toString());
+        clipBoardManager.setContent(sj.toString());
     }
 
     private FileAnnotationViewModel getCurrentAnnotation() {

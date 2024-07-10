@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
@@ -32,6 +33,11 @@ public class MedlinePlainImporter extends Importer {
     private static final Pattern PMCR_PATTERN = Pattern.compile("PMCR.*-.*");
     private static final Pattern CREATE_DATE_PATTERN = Pattern.compile("\\d{4}/[0123]?\\d/\\s?[012]\\d:[0-5]\\d");
     private static final Pattern COMPLETE_DATE_PATTERN = Pattern.compile("\\d{8}");
+    private final ImportFormatPreferences importFormatPreferences;
+
+    public MedlinePlainImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public String getName() {
@@ -84,9 +90,9 @@ public class MedlinePlainImporter extends Importer {
             }
 
             EntryType type = BibEntry.DEFAULT_TYPE;
-            String author = "";
-            String editor = "";
-            String comment = "";
+            StringBuilder author = new StringBuilder();
+            StringBuilder editor = new StringBuilder();
+            StringBuilder comment = new StringBuilder();
             Map<Field, String> fieldConversionMap = new HashMap<>();
 
             String[] lines = entry1.split("\n");
@@ -101,7 +107,7 @@ public class MedlinePlainImporter extends Importer {
                         continue;
                     }
                     if (lines[j + 1].charAt(4) != '-') {
-                        if ((current.length() > 0) && !Character.isWhitespace(current.charAt(current.length() - 1))) {
+                        if ((!current.isEmpty()) && !Character.isWhitespace(current.charAt(current.length() - 1))) {
                             current.append(' ');
                         }
                         current.append(lines[j + 1].trim());
@@ -128,16 +134,16 @@ public class MedlinePlainImporter extends Importer {
                 addStandardNumber(fieldConversionMap, label, value);
 
                 if ("FAU".equals(label)) {
-                    if ("".equals(author)) {
-                        author = value;
+                    if (author.isEmpty()) {
+                        author = new StringBuilder(value);
                     } else {
-                        author += " and " + value;
+                        author.append(" and ").append(value);
                     }
                 } else if ("FED".equals(label)) {
-                    if ("".equals(editor)) {
-                        editor = value;
+                    if (editor.isEmpty()) {
+                        editor = new StringBuilder(value);
                     } else {
-                        editor += " and " + value;
+                        editor.append(" and ").append(value);
                     }
                 }
 
@@ -176,34 +182,47 @@ public class MedlinePlainImporter extends Importer {
                     }
                 }
 
-                if ("IRAD".equals(label) || "IR".equals(label) || "FIR".equals(label)) {
-                    String oldInvestigator = fieldConversionMap.get(new UnknownField("investigator"));
-                    if (oldInvestigator == null) {
-                        fieldConversionMap.put(new UnknownField("investigator"), value);
-                    } else {
-                        fieldConversionMap.put(new UnknownField("investigator"), oldInvestigator + ", " + value);
+                switch (label) {
+                    case "IRAD",
+                         "IR",
+                         "FIR" -> {
+                        fieldConversionMap.merge(new UnknownField("investigator"), value, (a, b) -> a + ", " + b);
                     }
-                } else if ("MH".equals(label) || "OT".equals(label)) {
-                    if (!fieldConversionMap.containsKey(StandardField.KEYWORDS)) {
-                        fieldConversionMap.put(StandardField.KEYWORDS, value);
-                    } else {
-                        String kw = fieldConversionMap.get(StandardField.KEYWORDS);
-                        fieldConversionMap.put(StandardField.KEYWORDS, kw + ", " + value);
+                    case "MH",
+                         "OT" -> {
+                        if (!fieldConversionMap.containsKey(StandardField.KEYWORDS)) {
+                            fieldConversionMap.put(StandardField.KEYWORDS, value);
+                        } else {
+                            fieldConversionMap.compute(StandardField.KEYWORDS, (k, kw) -> kw + importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " " + value);
+                        }
                     }
-                } else if ("CON".equals(label) || "CIN".equals(label) || "EIN".equals(label) || "EFR".equals(label)
-                        || "CRI".equals(label) || "CRF".equals(label) || "PRIN".equals(label) || "PROF".equals(label)
-                        || "RPI".equals(label) || "RPF".equals(label) || "RIN".equals(label) || "ROF".equals(label)
-                        || "UIN".equals(label) || "UOF".equals(label) || "SPIN".equals(label) || "ORI".equals(label)) {
-                    if (!comment.isEmpty()) {
-                        comment = comment + "\n";
+                    case "CON",
+                         "CIN",
+                         "EIN",
+                         "EFR",
+                         "CRI",
+                         "CRF",
+                         "PRIN",
+                         "PROF",
+                         "RPI",
+                         "RPF",
+                         "RIN",
+                         "ROF",
+                         "UIN",
+                         "UOF",
+                         "SPIN",
+                         "ORI" -> {
+                        if (!comment.isEmpty()) {
+                            comment.append("\n");
+                        }
+                        comment.append(value);
                     }
-                    comment = comment + value;
                 }
             }
-            fixAuthors(fieldConversionMap, author, StandardField.AUTHOR);
-            fixAuthors(fieldConversionMap, editor, StandardField.EDITOR);
+            fixAuthors(fieldConversionMap, author.toString(), StandardField.AUTHOR);
+            fixAuthors(fieldConversionMap, editor.toString(), StandardField.EDITOR);
             if (!comment.isEmpty()) {
-                fieldConversionMap.put(StandardField.COMMENT, comment);
+                fieldConversionMap.put(StandardField.COMMENT, comment.toString());
             }
 
             BibEntry b = new BibEntry(type);
@@ -222,29 +241,29 @@ public class MedlinePlainImporter extends Importer {
 
     private EntryType addSourceType(String value, EntryType type) {
         String val = value.toLowerCase(Locale.ENGLISH);
-        switch (val) {
-            case "book":
-                return StandardEntryType.Book;
-            case "journal article":
-            case "classical article":
-            case "corrected and republished article":
-            case "historical article":
-            case "introductory journal article":
-            case "newspaper article":
-                return StandardEntryType.Article;
-            case "clinical conference":
-            case "consensus development conference":
-            case "consensus development conference, nih":
-                return StandardEntryType.Conference;
-            case "technical report":
-                return StandardEntryType.TechReport;
-            case "editorial":
-                return StandardEntryType.InProceedings;
-            case "overall":
-                return StandardEntryType.Proceedings;
-            default:
-                return type;
-        }
+        return switch (val) {
+            case "book" ->
+                    StandardEntryType.Book;
+            case "journal article",
+                 "classical article",
+                 "corrected and republished article",
+                 "historical article",
+                 "introductory journal article",
+                 "newspaper article" ->
+                    StandardEntryType.Article;
+            case "clinical conference",
+                 "consensus development conference",
+                 "consensus development conference, nih" ->
+                    StandardEntryType.Conference;
+            case "technical report" ->
+                    StandardEntryType.TechReport;
+            case "editorial" ->
+                    StandardEntryType.InProceedings;
+            case "overall" ->
+                    StandardEntryType.Proceedings;
+            default ->
+                    type;
+        };
     }
 
     private void addStandardNumber(Map<Field, String> hm, String lab, String value) {
@@ -333,7 +352,7 @@ public class MedlinePlainImporter extends Importer {
     }
 
     private void addAbstract(Map<Field, String> hm, String lab, String value) {
-        String abstractValue = "";
+        String abstractValue;
         if ("AB".equals(lab)) {
             // adds copyright information that comes at the end of an abstract
             if (value.contains("Copyright")) {
@@ -341,16 +360,11 @@ public class MedlinePlainImporter extends Importer {
                 // remove the copyright from the field since the name of the field is copyright
                 String copyrightInfo = value.substring(copyrightIndex).replace("Copyright ", "");
                 hm.put(new UnknownField("copyright"), copyrightInfo);
-                abstractValue = value.substring(0, copyrightIndex);
+                abstractValue = value.substring(0, copyrightIndex).trim();
             } else {
                 abstractValue = value;
             }
-            String oldAb = hm.get(StandardField.ABSTRACT);
-            if (oldAb == null) {
-                hm.put(StandardField.ABSTRACT, abstractValue);
-            } else {
-                hm.put(StandardField.ABSTRACT, oldAb + '\n' + abstractValue);
-            }
+            hm.merge(StandardField.ABSTRACT, abstractValue, (a, b) -> a + '\n' + b);
         } else if ("OAB".equals(lab) || "OABL".equals(lab)) {
             hm.put(new UnknownField("other-abstract"), value);
         }

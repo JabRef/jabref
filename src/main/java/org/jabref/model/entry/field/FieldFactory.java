@@ -3,6 +3,7 @@ package org.jabref.model.entry.field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -49,12 +50,25 @@ public class FieldFactory {
         return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));
     }
 
-    public static List<Field> getNotTextFieldNames() {
-        return Arrays.asList(StandardField.DOI, StandardField.FILE, StandardField.URL, StandardField.URI, StandardField.ISBN, StandardField.ISSN, StandardField.MONTH, StandardField.DATE, StandardField.YEAR);
+    /**
+     * Checks whether the given field contains LaTeX code or something else
+     */
+    public static boolean isLatexField(Field field) {
+        return Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.MARKDOWN));
     }
 
-    public static List<Field> getIdentifierFieldNames() {
-        return Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.PMID);
+    /**
+     * Returns a collection of StandardFields where the content should not be interpreted as "plain" text, but something else (such as links to other fields, numbers, ...)
+     */
+    public static Collection<Field> getNotTextFields() {
+        Set<Field> result = Arrays.stream(StandardField.values())
+              .filter(field -> !Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.MULTIPLE_ENTRY_LINK)))
+                .collect(Collectors.toSet());
+
+        // These fields are not marked as verbatim, because they could include LaTeX code
+        result.add(StandardField.MONTH);
+        result.add(StandardField.DATE);
+        return result;
     }
 
     public static OrFields parseOrFields(String fieldNames) {
@@ -123,10 +137,6 @@ public class FieldFactory {
         return parseField(null, fieldName);
     }
 
-    public static Set<Field> getKeyFields() {
-        return getFieldsFiltered(field -> field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) || field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK));
-    }
-
     public static boolean isInternalField(Field field) {
         return field.getName().startsWith("__");
     }
@@ -162,9 +172,9 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a  List with all standard fields and the citation key field
+     * Returns a list with all standard fields and the citation key field
      */
-    public static Set<Field> getStandardFieldsWithCitationKey() {
+    public static SequencedSet<Field> getStandardFieldsWithCitationKey() {
         EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
 
         LinkedHashSet<Field> standardFieldsWithBibtexKey = new LinkedHashSet<>(allFields.size() + 1);
@@ -196,7 +206,6 @@ public class FieldFactory {
         fields.addAll(EnumSet.allOf(InternalField.class));
         fields.addAll(EnumSet.allOf(SpecialField.class));
         fields.addAll(EnumSet.allOf(StandardField.class));
-        fields.removeIf(field -> field instanceof UserSpecificCommentField);
         return fields;
     }
 

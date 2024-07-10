@@ -13,7 +13,6 @@ import javafx.scene.input.Clipboard;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.util.OS;
 
@@ -69,9 +68,8 @@ public class EditorContextAction extends SimpleCommand {
     /**
      * Returns the default context menu items (except undo/redo)
      */
-    public static List<MenuItem> getDefaultContextMenuItems(TextInputControl textInputControl,
-                                                            KeyBindingRepository keyBindingRepository) {
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+    public static List<MenuItem> getDefaultContextMenuItems(TextInputControl textInputControl) {
+        ActionFactory factory = new ActionFactory();
 
         MenuItem selectAllMenuItem = factory.createMenuItem(StandardActions.SELECT_ALL,
                 new EditorContextAction(StandardActions.SELECT_ALL, textInputControl));

@@ -16,10 +16,10 @@ import org.jabref.logic.importer.fileformat.CiteSeerParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import kong.unirest.JsonNode;
-import kong.unirest.Unirest;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONElement;
+import kong.unirest.core.JsonNode;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.json.JSONArray;
+import kong.unirest.core.json.JSONElement;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {

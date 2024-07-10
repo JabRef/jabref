@@ -23,7 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 import org.tinylog.Logger;
 
 public class SciteTabViewModel extends AbstractViewModel {

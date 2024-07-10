@@ -21,7 +21,6 @@ public class FieldWriter {
 
     private final boolean neverFailOnHashes;
     private final FieldPreferences preferences;
-    private final FieldContentFormatter formatter;
 
     public FieldWriter(FieldPreferences preferences) {
         this(true, preferences);
@@ -30,8 +29,6 @@ public class FieldWriter {
     private FieldWriter(boolean neverFailOnHashes, FieldPreferences preferences) {
         this.neverFailOnHashes = neverFailOnHashes;
         this.preferences = preferences;
-
-        formatter = new FieldContentFormatter(preferences);
     }
 
     public static FieldWriter buildIgnoreHashes(FieldPreferences prefs) {
@@ -79,11 +76,12 @@ public class FieldWriter {
      * @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
      * @param content the content of the field
      * @return a formatted string suitable for output
-     * @throws InvalidFieldValueException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
+     *
+     * @throws InvalidFieldValueException if content is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
     public String write(Field field, String content) throws InvalidFieldValueException {
         if (content == null) {
-            return FIELD_START + String.valueOf(FIELD_END);
+            return FIELD_START + "" + FIELD_END;
         }
 
         if (!shouldResolveStrings(field) || field.equals(InternalField.BIBTEX_STRING)) {
@@ -101,6 +99,8 @@ public class FieldWriter {
     private String formatAndResolveStrings(String content, Field field) throws InvalidFieldValueException {
         checkBraces(content);
 
+        content = content.replace("##", "");
+
         StringBuilder stringBuilder = new StringBuilder();
 
         // Here we assume that the user encloses any bibtex strings in #, e.g.:
@@ -109,39 +109,30 @@ public class FieldWriter {
         // jan # { - } # feb
         int pivot = 0;
         while (pivot < content.length()) {
-            int goFrom = pivot;
-            int pos1 = pivot;
-            while (goFrom == pos1) {
-                pos1 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, goFrom);
-                if ((pos1 > 0) && (content.charAt(pos1 - 1) == '\\')) {
-                    goFrom = pos1 + 1;
-                    pos1++;
-                } else {
-                    goFrom = pos1 - 1; // Ends the loop.
-                }
-            }
-
+            int pos1 = getFirstOccurrenceOfStartEndSymbol(content, pivot);
             int pos2;
             if (pos1 == -1) {
-                pos1 = content.length(); // No more occurrences found.
+                // Process content and end the loop after that
+                pos1 = content.length();
                 pos2 = -1;
             } else {
                 pos2 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, pos1 + 1);
-                if (pos2 == -1) {
-                    if (neverFailOnHashes) {
-                        pos1 = content.length(); // just write out the rest of the text, and throw no exception
-                    } else {
-                        LOGGER.error("The character {} is not allowed in BibTeX strings unless escaped as in '\\{}'. "
-                                + "In JabRef, use pairs of # characters to indicate a string. "
-                                + "Note that the entry causing the problem has been selected. Field value: {}",
-                                BIBTEX_STRING_START_END_SYMBOL,
-                                BIBTEX_STRING_START_END_SYMBOL,
-                                content);
-                        throw new InvalidFieldValueException(
-                                "The character " + BIBTEX_STRING_START_END_SYMBOL + " is not allowed in BibTeX strings unless escaped as in '\\" + BIBTEX_STRING_START_END_SYMBOL + "'.\n"
-                                        + "In JabRef, use pairs of # characters to indicate a string.\n"
-                                        + "Note that the entry causing the problem has been selected. Field value: " + content);
-                    }
+            }
+
+            if (pos2 == -1) {
+                if (neverFailOnHashes) {
+                    pos1 = content.length(); // just write out the rest of the text, and throw no exception
+                } else {
+                    LOGGER.error("The character {} is not allowed in BibTeX strings unless escaped as in '\\{}'. "
+                                    + "In JabRef, use pairs of # characters to indicate a string. "
+                                    + "Note that the entry causing the problem has been selected. Field value: {}",
+                            BIBTEX_STRING_START_END_SYMBOL,
+                            BIBTEX_STRING_START_END_SYMBOL,
+                            content);
+                    throw new InvalidFieldValueException(
+                            "The character " + BIBTEX_STRING_START_END_SYMBOL + " is not allowed in BibTeX strings unless escaped as in '\\" + BIBTEX_STRING_START_END_SYMBOL + "'.\n"
+                                    + "In JabRef, use pairs of # characters to indicate a string.\n"
+                                    + "Note that the entry causing the problem has been selected. Field value: " + content);
                 }
             }
 
@@ -163,7 +154,25 @@ public class FieldWriter {
             }
         }
 
-        return formatter.format(stringBuilder, field);
+        return stringBuilder.toString();
+    }
+
+    /**
+     * Finds the first occurrence of # from the pivot point
+     */
+    private static int getFirstOccurrenceOfStartEndSymbol(String content, int pivot) {
+        int goFrom = pivot;
+        int pos1 = pivot;
+        while (goFrom == pos1) {
+            pos1 = content.indexOf(BIBTEX_STRING_START_END_SYMBOL, goFrom);
+            if ((pos1 > 0) && (content.charAt(pos1 - 1) == '\\')) {
+                pos1++;
+                goFrom = pos1;
+            } else {
+                break;
+            }
+        }
+        return pos1;
     }
 
     private boolean shouldResolveStrings(Field field) {
@@ -176,9 +185,8 @@ public class FieldWriter {
 
     private String formatWithoutResolvingStrings(String content, Field field) throws InvalidFieldValueException {
         checkBraces(content);
-
         StringBuilder stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
-        stringBuilder.append(formatter.format(content, field));
+        stringBuilder.append(content);
         stringBuilder.append(FIELD_END);
         return stringBuilder.toString();
     }

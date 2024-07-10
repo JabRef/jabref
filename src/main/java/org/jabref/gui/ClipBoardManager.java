@@ -24,6 +24,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,16 +38,13 @@ public class ClipBoardManager {
     private static Clipboard clipboard;
     private static java.awt.datatransfer.Clipboard primary;
 
-    private final PreferencesService preferencesService;
-
-    public ClipBoardManager(PreferencesService preferencesService) {
-        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection(), preferencesService);
+    public ClipBoardManager() {
+        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection());
     }
 
-    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary, PreferencesService preferencesService) {
+    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary) {
         ClipBoardManager.clipboard = clipboard;
         ClipBoardManager.primary = primary;
-        this.preferencesService = preferencesService;
     }
 
     /**
@@ -169,6 +167,7 @@ public class ClipBoardManager {
     }
 
     private String serializeEntries(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
+        PreferencesService preferencesService = Injector.instantiateModelOrService(PreferencesService.class);
         // BibEntry is not Java serializable. Thus, we need to do the serialization manually
         // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here
         // Furthermore, storing a string also enables other applications to work with the data

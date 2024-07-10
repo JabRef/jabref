@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -24,12 +25,15 @@ import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class MedlinePlainImporterTest {
 
@@ -48,7 +52,9 @@ class MedlinePlainImporterTest {
 
     @BeforeEach
     void setUp() {
-        importer = new MedlinePlainImporter();
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        importer = new MedlinePlainImporter(importFormatPreferences);
     }
 
     @Test
@@ -110,13 +116,12 @@ class MedlinePlainImporterTest {
         assertEquals(StandardEntryType.InProceedings, testEntry.getType());
         assertEquals(Optional.of("Inproceedings book title"), testEntry.getField(StandardField.BOOKTITLE));
 
-        BibEntry expectedEntry5 = new BibEntry(StandardEntryType.Proceedings);
-        expectedEntry5.setField(StandardField.KEYWORDS, "Female");
+        BibEntry expectedEntry5 = new BibEntry(StandardEntryType.Proceedings)
+                .withField(StandardField.KEYWORDS, "Female");
         assertEquals(expectedEntry5, entries.get(5));
 
-        BibEntry expectedEntry6 = new BibEntry();
-        expectedEntry6.setType(StandardEntryType.Misc);
-        expectedEntry6.setField(StandardField.KEYWORDS, "Female");
+        BibEntry expectedEntry6 = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.KEYWORDS, "Female");
         assertEquals(expectedEntry6, entries.get(6));
     }
 
@@ -172,7 +177,10 @@ class MedlinePlainImporterTest {
 
     @Test
     void keyWords() throws IOException {
-        try (BufferedReader reader = readerForString("PMID-22664795" + "\n" + "MH  - Female" + "\n" + "OT  - Male")) {
+        try (BufferedReader reader = readerForString("""
+                PMID-22664795
+                MH  - Female
+                OT  - Male""")) {
             List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
 
             BibEntry expectedEntry = new BibEntry();

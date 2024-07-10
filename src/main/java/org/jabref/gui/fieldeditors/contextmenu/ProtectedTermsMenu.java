@@ -8,7 +8,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextInputControl;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -19,12 +18,15 @@ import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+
+import com.airhacks.afterburner.injection.Injector;
 
 class ProtectedTermsMenu extends Menu {
 
-    private static final Formatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
+    private static Formatter FORMATTER;
     private final TextInputControl textInputControl;
-    private final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+    private final ActionFactory factory = new ActionFactory();
 
     private final Action protectSelectionActionInformation = new Action() {
         @Override
@@ -137,6 +139,7 @@ class ProtectedTermsMenu extends Menu {
     public ProtectedTermsMenu(final TextInputControl textInputControl) {
         super(Localization.lang("Protect terms"));
         this.textInputControl = textInputControl;
+        FORMATTER = new ProtectTermsFormatter(Injector.instantiateModelOrService(ProtectedTermsLoader.class));
 
         getItems().addAll(factory.createMenuItem(protectSelectionActionInformation, new ProtectSelectionAction()),
                 getExternalFilesMenu(),
@@ -147,11 +150,11 @@ class ProtectedTermsMenu extends Menu {
 
     private Menu getExternalFilesMenu() {
         Menu protectedTermsMenu = factory.createSubMenu(() -> Localization.lang("Add selected text to list"));
-
-        Globals.protectedTermsLoader.getProtectedTermsLists().stream()
-                                    .filter(list -> !list.isInternalList())
-                                    .forEach(list -> protectedTermsMenu.getItems().add(
-                                            factory.createMenuItem(list::getDescription, new AddToProtectedTermsAction(list))));
+        ProtectedTermsLoader loader = Injector.instantiateModelOrService(ProtectedTermsLoader.class);
+        loader.getProtectedTermsLists().stream()
+              .filter(list -> !list.isInternalList())
+              .forEach(list -> protectedTermsMenu.getItems().add(
+                      factory.createMenuItem(list::getDescription, new AddToProtectedTermsAction(list))));
 
         if (protectedTermsMenu.getItems().isEmpty()) {
             MenuItem emptyItem = new MenuItem(Localization.lang("No list enabled"));
