@@ -72,6 +72,7 @@ public class Update {
                 UnoScreenRefresh.unlockControllers(doc);
             }
         }
+        return frontend.citationGroups.getUnresolvedKeys();
     }
 
     public static class SyncOptions {
