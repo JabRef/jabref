@@ -15,24 +15,17 @@ Chats with AI should be stored somewhere. But where and how?
 * In local user folder
 * Alongside `.bib` file
 
+## Decision Drivers
+
+* Should work when shared with OneDrive, Dropbox or similar asynchronous services
+* Should work on network drives
+* Should be "easy" for users to follow
+* Should be the same in a shared and non-shared setting (e.g., if Dropbox is used or not should make a difference)
+
 ## Decision Outcome
 
 Chosen option: "Alongside `.bib` file", because
-simple to implement and gives the user the ability to share or not to share the chats.
-
-### Positive Consequences
-
-* Simple implementation
-* The user can send the chats file alongside the `.bib` file if they want to share the chats. If users do not want
-  to share the messages, then they can omit the chats file
-* `.bib` files is kept clean
-
-### Negative Consequences
-
-* User may not expect that a new file will be created alongside their `.bib` (or other LaTeX-related) files
-* It may be not convenient to share both files (`.bib` file and chats file) in order to share chat history.
-* If `.bib` files are edited externally (meaning, not inside the JabRef), then chats file will not be updated correspondingly
-* If user moves `.bib` file, they should move the chats file too
+simple to implement and gives the user the ability to share or not to share the chats. For pros and cons: See below
 
 ## Pros and Cons of the Options
 
@@ -59,3 +52,14 @@ See `org.jabref.gui.desktop.os.NativeDesktop#getFulltextIndexBaseDirectory` for 
 ### Alongside `.bib` file
 
 Refer to positive and negative consequences of the decision outcome.
+
+* Good, because simple implementation
+* Good, because, the user can send the chats file alongside the `.bib` file if they want to share the chats. If users do not want
+  to share the messages, then they can omit the chats file
+* Good, because `.bib` files is kept clean
+* Bad, because user may not expect that a new file will be created alongside their `.bib` (or other LaTeX-related) files
+* Bad, because, it may be not convenient to share both files (`.bib` file and chats file) in order to share chat history.
+* Bad, because if `.bib` files are edited externally (meaning, not inside the JabRef), then chats file will not be updated correspondingly
+* Bad, because if user moves `.bib` file, they should move the chats file too
+* Bad, because if two persons work in parallel using a OneDrive share, the file is overwritten or a conflict file is generated. ([Dropbox "conflicted copy"](https://help.dropbox.com/en-en/organize/conflicted-copy))
+
