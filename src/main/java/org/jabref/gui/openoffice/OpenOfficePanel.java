@@ -174,7 +174,7 @@ public class OpenOfficePanel {
             try {
                 jStyle.ensureUpToDate();
             } catch (IOException ex) {
-                LOGGER.warn("Unable to reload style file '" + jStyle.getPath() + "'", ex);
+                LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
                 String msg = Localization.lang("Unable to reload style file")
                         + "'" + jStyle.getPath() + "'"
                         + "\n" + ex.getMessage();
@@ -202,7 +202,7 @@ public class OpenOfficePanel {
                              try {
                                  jStyle.ensureUpToDate();
                              } catch (IOException e) {
-                                 LOGGER.warn("Unable to reload style file '" + jStyle.getPath() + "'", e);
+                                 LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), e);
                              }
                              if (currentStyleType == StyleSelectDialogViewModel.StyleType.JSTYLE) {
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
