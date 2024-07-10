@@ -46,7 +46,7 @@ open module org.jabref {
     requires org.tinylog.impl;
 
     provides org.tinylog.writers.Writer
-    with org.jabref.gui.logging.GuiWriter;
+            with org.jabref.gui.logging.GuiWriter;
 
     // Preferences and XML
     requires java.prefs;
@@ -150,5 +150,4 @@ open module org.jabref {
     requires dd.plist;
     requires mslinks;
     requires org.apache.httpcomponents.core5.httpcore5;
-    requires commons.beanutils;
 }
