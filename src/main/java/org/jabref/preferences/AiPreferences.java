@@ -64,13 +64,13 @@ public class AiPreferences {
 
     private final StringProperty instruction;
     private final DoubleProperty temperature;
-    private final IntegerProperty messageWindowSize;
+    private final IntegerProperty contextWindowSize;
     private final IntegerProperty documentSplitterChunkSize;
     private final IntegerProperty documentSplitterOverlapSize;
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles, String openAiToken, ChatModel chatModel, EmbeddingModel embeddingModel, boolean customizeSettings, String instruction, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
+    public AiPreferences(boolean enableChatWithFiles, String openAiToken, ChatModel chatModel, EmbeddingModel embeddingModel, boolean customizeSettings, String instruction, double temperature, int contextWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
         this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
         this.openAiToken = new SimpleStringProperty(openAiToken);
 
@@ -81,7 +81,7 @@ public class AiPreferences {
 
         this.instruction = new SimpleStringProperty(instruction);
         this.temperature = new SimpleDoubleProperty(temperature);
-        this.messageWindowSize = new SimpleIntegerProperty(messageWindowSize);
+        this.contextWindowSize = new SimpleIntegerProperty(contextWindowSize);
         this.documentSplitterChunkSize = new SimpleIntegerProperty(documentSplitterChunkSize);
         this.documentSplitterOverlapSize = new SimpleIntegerProperty(documentSplitterOverlapSize);
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
@@ -172,16 +172,16 @@ public class AiPreferences {
         this.temperature.set(temperature);
     }
 
-    public IntegerProperty messageWindowSizeProperty() {
-        return messageWindowSize;
+    public IntegerProperty contextWindowSizeProperty() {
+        return contextWindowSize;
     }
 
-    public int getMessageWindowSize() {
-        return messageWindowSize.get();
+    public int getContextWindowSize() {
+        return contextWindowSize.get();
     }
 
-    public void setMessageWindowSize(int messageWindowSize) {
-        this.messageWindowSize.set(messageWindowSize);
+    public void setContextWindowSize(int contextWindowSize) {
+        this.contextWindowSize.set(contextWindowSize);
     }
 
     public IntegerProperty documentSplitterChunkSizeProperty() {

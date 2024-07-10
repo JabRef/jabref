@@ -50,7 +50,7 @@ public enum HelpFile {
     AI_CHAT_MODEL("ai#chat-model"),
     AI_EMBEDDING_MODEL("ai#embedding-model"),
     AI_INSTRUCTION("ai#instruction"),
-    AI_MESSAGE_WINDOW_SIZE("ai#message-window-size"),
+    AI_CONTEXT_WINDOW_SIZE("ai#context-window-size"),
     AI_DOCUMENT_SPLITTER_CHUNK_SIZE("ai#document-splitter-chunk-size"),
     AI_DOCUMENT_SPLITTER_OVERLAP_SIZE("ai#document-splitter-overlap-size"),
     AI_RAG_MAX_RESULTS_COUNT("ai#retrieval-augmented-generation-maximum-results-count"),

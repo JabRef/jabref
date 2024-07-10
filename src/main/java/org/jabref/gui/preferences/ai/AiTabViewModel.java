@@ -37,7 +37,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty instruction = new SimpleStringProperty();
     private final DoubleProperty temperature = new SimpleDoubleProperty();
-    private final IntegerProperty messageWindowSize = new SimpleIntegerProperty();
+    private final IntegerProperty contextWindowSize = new SimpleIntegerProperty();
     private final IntegerProperty documentSplitterChunkSize = new SimpleIntegerProperty();
     private final IntegerProperty documentSplitterOverlapSize = new SimpleIntegerProperty();
     private final IntegerProperty ragMaxResultsCount = new SimpleIntegerProperty();
@@ -74,7 +74,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 ValidationMessage.error(Localization.lang("Temperature must be between 0 and 2")));
 
         this.messageWindowSizeValidator = new FunctionBasedValidator<>(
-                messageWindowSize,
+                contextWindowSize,
                 size -> size.intValue() > 0,
                 ValidationMessage.error(Localization.lang("Message window size must be greater than 0")));
 
@@ -111,7 +111,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         instruction.setValue(aiPreferences.getInstruction());
         temperature.setValue(aiPreferences.getTemperature());
-        messageWindowSize.setValue(aiPreferences.getMessageWindowSize());
+        contextWindowSize.setValue(aiPreferences.getContextWindowSize());
         documentSplitterChunkSize.setValue(aiPreferences.getDocumentSplitterChunkSize());
         documentSplitterOverlapSize.setValue(aiPreferences.getDocumentSplitterOverlapSize());
         ragMaxResultsCount.setValue(aiPreferences.getRagMaxResultsCount());
@@ -131,7 +131,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
             aiPreferences.setInstruction(instruction.get());
             aiPreferences.setTemperature(temperature.get());
-            aiPreferences.setMessageWindowSize(messageWindowSize.get());
+            aiPreferences.setContextWindowSize(contextWindowSize.get());
             aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
             aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
             aiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());
@@ -145,8 +145,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setInstruction(AiDefaultPreferences.SYSTEM_MESSAGE);
         instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
 
-        aiPreferences.setMessageWindowSize(AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
-        messageWindowSize.set(AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
+        aiPreferences.setContextWindowSize(AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
+        contextWindowSize.set(AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
 
         aiPreferences.setDocumentSplitterChunkSize(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
         documentSplitterChunkSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
@@ -213,8 +213,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return temperature;
     }
 
-    public IntegerProperty messageWindowSizeProperty() {
-        return messageWindowSize;
+    public IntegerProperty contextWindowSizeProperty() {
+        return contextWindowSize;
     }
 
     public IntegerProperty documentSplitterChunkSizeProperty() {

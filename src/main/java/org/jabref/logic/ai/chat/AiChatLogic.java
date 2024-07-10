@@ -13,7 +13,8 @@ import org.jabref.preferences.AiPreferences;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.memory.chat.TokenWindowChatMemory;
+import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.filter.Filter;
@@ -77,7 +78,7 @@ public class AiChatLogic {
             rebuild();
         });
 
-        aiPreferences.messageWindowSizeProperty().addListener(obs -> {
+        aiPreferences.contextWindowSizeProperty().addListener(obs -> {
             rebuild();
         });
 
@@ -98,14 +99,14 @@ public class AiChatLogic {
 
         AiPreferences aiPreferences = aiService.getPreferences();
 
-        this.chatMemory = MessageWindowChatMemory
+        this.chatMemory = TokenWindowChatMemory
                 .builder()
-                .maxMessages(aiPreferences.getMessageWindowSize())
+                .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenizer())
                 .build();
 
         oldMessages.forEach(message -> chatMemory.add(message));
 
-        ContentRetriever contentRetirever = EmbeddingStoreContentRetriever
+        ContentRetriever contentRetriever = EmbeddingStoreContentRetriever
                 .builder()
                 .embeddingStore(aiService.getEmbeddingsManager().getEmbeddingsStore())
                 .filter(filter)
@@ -117,7 +118,7 @@ public class AiChatLogic {
         this.chain = ConversationalRetrievalChain
                 .builder()
                 .chatLanguageModel(aiService.getChatLanguageModel().getChatLanguageModel().get())
-                .contentRetriever(contentRetirever)
+                .contentRetriever(contentRetriever)
                 .chatMemory(chatMemory)
                 .build();
 

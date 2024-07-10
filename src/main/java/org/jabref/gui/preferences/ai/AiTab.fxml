@@ -71,9 +71,9 @@
 
       <HBox alignment="CENTER_LEFT" spacing="10.0">
          <children>
-            <Label alignment="BASELINE_CENTER" text="%Message window size" />
-            <IntegerInputField fx:id="messageWindowSizeTextField" HBox.hgrow="ALWAYS" />
-            <Button fx:id="messageWindowSizeHelp" prefWidth="20.0" />
+            <Label alignment="BASELINE_CENTER" text="%Context window size" />
+            <IntegerInputField fx:id="contextWindowSizeTextField" HBox.hgrow="ALWAYS" />
+            <Button fx:id="contextWindowSizeHelp" prefWidth="20.0" />
          </children>
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="448.0" spacing="10.0">

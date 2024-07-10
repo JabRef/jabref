@@ -68,6 +68,7 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
     }
 
     private void configure() {
+        showToUser(true);
         willBeRecoveredAutomatically(true);
         titleProperty().set(Localization.lang("Embeddings generation"));
 
@@ -151,7 +152,6 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
     @Override
     protected Void call() throws Exception {
         isRunning.set(true);
-        showToUser(true);
 
         updateProgress();
 
@@ -166,7 +166,6 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
         }
 
         isRunning.set(false);
-        showToUser(false);
 
         return null;
     }
