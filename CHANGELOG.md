@@ -13,7 +13,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added the ability to add the current selection to a newly created group. [#11449](https://github.com/JabRef/jabref/issues/11449)
 - We made new groups automatically to focus upon creation. [#11449](https://github.com/JabRef/jabref/issues/11449)
-- We added the ability to right-click on selected entries and create a group using them. [#11449](https://github.com/JabRef/jabref/issues/11449)
 
 
 ### Changed
