@@ -3,12 +3,9 @@ package org.jabref.logic.git;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-
-import org.jabref.logic.util.io.FileUtil;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;

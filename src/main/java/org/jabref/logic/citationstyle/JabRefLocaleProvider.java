@@ -3,13 +3,11 @@ package org.jabref.logic.citationstyle;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.undercouch.citeproc.LocaleProvider;
-import de.undercouch.citeproc.helper.CSLUtils;
 import org.slf4j.Logger;
 
 /**

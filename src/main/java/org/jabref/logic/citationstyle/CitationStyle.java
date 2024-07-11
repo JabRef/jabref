@@ -2,7 +2,6 @@ package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -20,7 +19,6 @@ import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.stream.StreamSource;
 
 import org.jabref.logic.util.StandardFileType;
 
