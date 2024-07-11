@@ -12,9 +12,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseClassGetResource("to determine the root directory")
 public class MathMLParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MathMLParser.class);
     private static final String XSLT_FILE_PATH = "/xslt/mathml_latex/mmltex.xsl";
@@ -38,7 +41,7 @@ public class MathMLParser {
             Source xmlSource = new StreamSource(new StringReader(xmlContent));
 
             // No SystemId required, because no relative URLs need to be resolved
-            Source xsltSource = new StreamSource(xsltResource);
+            Source xsltSource = new StreamSource(xsltResource, MathMLParser.class.getResource(XSLT_FILE_PATH).toExternalForm());
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer(xsltSource);
