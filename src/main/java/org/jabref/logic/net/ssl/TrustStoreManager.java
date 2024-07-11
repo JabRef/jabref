@@ -25,6 +25,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import org.glassfish.grizzly.streams.Input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,9 +149,10 @@ public class TrustStoreManager {
         try {
             LOGGER.debug("Trust store path: {}", storePath.toAbsolutePath());
             if (Files.notExists(storePath)) {
-                Path storeResourcePath = Path.of(TrustStoreManager.class.getResource("/ssl/truststore.jks").toURI());
                 Files.createDirectories(storePath.getParent());
-                Files.copy(storeResourcePath, storePath);
+                try (InputStream inputStream = TrustStoreManager.class.getResourceAsStream("/ssl/truststore.jks")) {
+                    Files.copy(inputStream, storePath);
+                }
             }
 
             try {
@@ -160,8 +162,6 @@ public class TrustStoreManager {
             }
         } catch (IOException e) {
             LOGGER.warn("Bad truststore path", e);
-        } catch (URISyntaxException e) {
-            LOGGER.warn("Bad resource path", e);
         }
     }
 
