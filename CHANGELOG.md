@@ -13,7 +13,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- The 'Check for updates' menu bar button is now always enabled. [#11485](https://github.com/JabRef/jabref/pull/11485)
+
 ### Fixed
+
+- We fixed an issue where the 'Check for updates' preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
 
 ### Removed
 
