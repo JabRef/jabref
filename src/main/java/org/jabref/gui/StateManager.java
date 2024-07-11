@@ -75,13 +75,12 @@ public class StateManager {
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
 
     public StateManager() {
-        BibDatabaseContext nullContext = new BibDatabaseContext();
-        selectedGroups.put(nullContext.getUid(), FXCollections.observableArrayList());
         activeGroups.bind(Bindings.valueAt(
             selectedGroups,
             activeDatabase
-                .orElseOpt(nullContext)
-                .map(BibDatabaseContext::getUid)));
+                .orElseOpt(null)
+                .map(BibDatabaseContext::getUid))
+            .orElse(FXCollections.observableArrayList()));
     }
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {

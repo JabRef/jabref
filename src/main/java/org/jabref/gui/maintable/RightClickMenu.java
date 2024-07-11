@@ -74,14 +74,7 @@ public class RightClickMenu {
                 SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
-                factory.createMenuItem(
-                        // The new group is placed inside the currently active group, so
-                        // the button's name changes based on whether we are in the root group
-                        // or a subgroup.
-                        stateManager.activeGroupProperty().isEmpty() || stateManager.activeGroupProperty().getFirst().getParent().isEmpty()
-                                ? StandardActions.ADD_GROUP_FROM_SELECTION
-                                : StandardActions.ADD_SUBGROUP_FROM_SELECTION,
-                        new CreateGroupAction(dialogService, stateManager, true, PreferredGroupAdditionLocation.ADD_BELOW, null)),
+                factory.createMenuItem(StandardActions.ADD_SUBGROUP_FROM_SELECTION, new CreateGroupAction(dialogService, stateManager, true, PreferredGroupAdditionLocation.ADD_BELOW, null)),
 
                 new SeparatorMenuItem(),
 

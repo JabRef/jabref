@@ -3,17 +3,22 @@ package org.jabref.gui.actions;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.BooleanExpression;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TabPane;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -49,19 +54,17 @@ public class ActionHelper {
     // Makes sure there is at least one group selected, and if there are multiple groups selected
     // all have the same parent node.
     public static BooleanExpression needsSelectedGroupsShareParent(StateManager stateManager) {
-        if (stateManager.activeGroupProperty().isEmpty()) {
-            return Bindings.size(stateManager.activeGroupProperty()).isEqualTo(1);
-        }
-        return Bindings.size(stateManager.activeGroupProperty()).isEqualTo(1)
-           .or(Bindings.size(stateManager.activeGroupProperty()).greaterThan(1).and(
-                Bindings.size(
-                        (ObservableList<GroupTreeNode>) stateManager
-                                .activeGroupProperty()
-                                .stream()
-                                .filter(stateManager.activeGroupProperty().get().getFirst()::equals)
-                                .collect(Collectors.toCollection(FXCollections::observableArrayList))
-                        ).isEqualTo(Bindings.size(stateManager.activeGroupProperty())))
-           );
+        return Bindings.size(stateManager.activeGroupProperty()).isEqualTo(1)        // Is single element OR
+            .or(Bindings.size(stateManager.activeGroupProperty()).greaterThan(1)     // (Is multiple elements AND
+                .and(Bindings.createBooleanBinding(
+                    () -> stateManager.activeGroupProperty().stream()
+                        .allMatch(val ->                                                // The parent of the first element
+                            stateManager.activeGroupProperty()                          // is equal to the parent of all
+                                .getFirst()                                             // other elements
+                                .getParent()                                            // (including if they are null))
+                                    .map(node -> node.equals(val.getParent().get()))
+                                    .orElseGet(() -> val.getParent().isEmpty())),
+                stateManager.activeGroupProperty())));
     }
 
     public static BooleanExpression needsNotMultipleGroupsSelected(StateManager stateManager) {
