@@ -44,6 +44,8 @@ public class ProtectedTermsParser {
     }
 
     public void readTermsFromFile(Path path) {
+        location = path.toString();
+
         path = path.toAbsolutePath();
         if (!Files.exists(path)) {
             LOGGER.warn("Could not read terms from file {}", path);
