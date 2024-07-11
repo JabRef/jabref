@@ -72,6 +72,14 @@ class MainArchitectureTest {
     }
 
     @ArchTest
+    public static void useStreamsOfResources(JavaClasses classes) {
+        noClasses().should()
+                   .callMethod(Class.class, "getResource", String.class)
+                   .because("getResourceAsStream(...) should be used instead")
+                   .check(classes);
+    }
+
+    @ArchTest
     @ArchIgnore
     // Fails currently
     public static void respectLayeredArchitecture(JavaClasses classes) {
