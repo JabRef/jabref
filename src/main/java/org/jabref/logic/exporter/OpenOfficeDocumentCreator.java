@@ -111,18 +111,8 @@ public class OpenOfficeDocumentCreator extends Exporter {
     }
 
     private static void addFromResource(String resource, OutputStream out) {
-        URL url = OpenOfficeDocumentCreator.class.getResource(resource);
-        try (InputStream in = url.openStream()) {
-            byte[] buffer = new byte[256];
-            synchronized (out) {
-                while (true) {
-                    int bytesRead = in.read(buffer);
-                    if (bytesRead == -1) {
-                        break;
-                    }
-                    out.write(buffer, 0, bytesRead);
-                }
-            }
+        try (InputStream in = OpenOfficeDocumentCreator.class.getResourceAsStream(resource)) {
+            in.transferTo(out);
         } catch (IOException e) {
             LOGGER.warn("Cannot get resource", e);
         }

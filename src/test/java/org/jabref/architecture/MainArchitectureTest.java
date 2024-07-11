@@ -2,6 +2,8 @@ package org.jabref.architecture;
 
 import java.nio.file.Paths;
 
+import org.jabref.logic.importer.fileformat.ImporterTestEngine;
+
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchIgnore;
@@ -72,8 +74,11 @@ class MainArchitectureTest {
     }
 
     @ArchTest
-        noClasses().should()
     public void useStreamsOfResources(JavaClasses classes) {
+        // Reason: https://github.com/oracle/graal/issues/7682#issuecomment-1786704111
+        noClasses().that().haveNameNotMatching(".*Test")
+                   .and().areNotAnnotatedWith(AllowedToUseClassGetResource.class)
+                   .and().areNotAssignableFrom(ImporterTestEngine.class)
                    .should()
                    .callMethod(Class.class, "getResource", String.class)
                    .because("getResourceAsStream(...) should be used instead")

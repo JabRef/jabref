@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
@@ -33,17 +34,17 @@ public class MathMLParser {
      */
     public static String parse(XMLStreamReader reader) {
         String xmlContent = "";
-        String latexResult = "<Unsupported MathML expression>";
+        String latexResult;
 
-        try {
+        try (InputStream xsltResource = MathMLParser.class.getResourceAsStream(XSLT_FILE_PATH)) {
             // extract XML content
             xmlContent = StaxParser.getXMLContent(reader);
 
             // convert to LaTeX using XSLT file
             Source xmlSource = new StreamSource(new StringReader(xmlContent));
 
-            URL xsltResource = MathMLParser.class.getResource(XSLT_FILE_PATH);
-            Source xsltSource = new StreamSource(Objects.requireNonNull(xsltResource).openStream(), xsltResource.toURI().toASCIIString());
+            // No SystemId required, because no relative URLs need to be resolved
+            Source xsltSource = new StreamSource(xsltResource);
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer(xsltSource);
@@ -53,14 +54,9 @@ public class MathMLParser {
             transformer.transform(xmlSource, result);
 
             latexResult = writer.getBuffer().toString();
-        } catch (XMLStreamException e) {
-            LOGGER.debug("An exception occurred when getting XML content", e);
-        } catch (IOException e) {
-            LOGGER.debug("An I/O exception occurred", e);
-        } catch (URISyntaxException e) {
-            LOGGER.debug("XSLT Source URI invalid", e);
-        } catch (TransformerException e) {
-            LOGGER.debug("An exception occurred during transformation", e);
+        } catch (Exception e) {
+            LOGGER.error("Could not transform", e);
+            return "<Unsupported MathML expression>";
         }
 
         return latexResult;
