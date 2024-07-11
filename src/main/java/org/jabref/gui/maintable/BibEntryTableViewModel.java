@@ -177,9 +177,9 @@ public class BibEntryTableViewModel {
     public int getSearchRank() {
         if (matchedBySearchProperty().and(matchedByGroupProperty()).get()) {
             return 1;
-        } else if (matchedByGroupProperty().and(matchedBySearchProperty().not()).get()) {
-            return 2;
         } else if (matchedBySearchProperty().and(matchedByGroupProperty().not()).get()) {
+            return 2;
+        } else if (matchedByGroupProperty().and(matchedBySearchProperty().not()).get()) {
             return 3;
         } else {
             return 4;
