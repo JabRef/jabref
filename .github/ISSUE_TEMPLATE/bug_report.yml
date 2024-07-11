@@ -12,7 +12,7 @@ body:
     attributes:
       label: JabRef version
       options:
-        - "5.13 (latest release)"
+        - "5.15 (latest release)"
         - Latest development branch build (please note build date below)
         - Other (please describe below)
       description: The version as shown in the about dialog.
