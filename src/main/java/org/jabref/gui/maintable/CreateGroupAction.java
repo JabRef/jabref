@@ -24,77 +24,37 @@ import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.metadata.MetaData;
 
 import org.jspecify.annotations.Nullable;
-
-import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
-import static org.jabref.gui.actions.ActionHelper.needsNotMultipleGroupsSelected;
-import static org.jabref.gui.actions.ActionHelper.needsSelectedGroupsShareParent;
 
 public class CreateGroupAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final boolean preferSelectedEntries;
     private final GroupTreeNode editGroup;
     private final GroupTreeNode prospectiveParent;
     private final Optional<BibDatabaseContext> database;
-    private final Optional<GroupTreeNode> active;
+    private final Selection includeSelection;
 
     public CreateGroupAction(
             DialogService dialogService,
             StateManager stateManager,
-            boolean preferSelectedEntries,
-            PreferredGroupAdditionLocation preferredAdditionLocation,
-            @Nullable GroupTreeNode editGroup
+            @Nullable GroupTreeNode parentGroup,
+            @Nullable GroupTreeNode editGroup,
+            Selection includeSelection
     ) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.preferSelectedEntries = preferSelectedEntries;
         this.editGroup = editGroup;
+        this.includeSelection = includeSelection;
 
         database = stateManager.getActiveDatabase();
 
-        if (!stateManager.activeGroupProperty().isEmpty()) {
-            active = Optional.of(stateManager.activeGroupProperty().getFirst());
-        } else if (database.isPresent()) {
-            active = database.get().getMetaData().getGroups();
-        } else {
-            active = Optional.empty();
-        }
-
-        if (active.isEmpty()) {
-            throw new IllegalStateException("ERROR: No parent findable which this group could be added to.");
-        }
-
-        boolean isRoot = active.get().isRoot();
-
         if (editGroup != null && editGroup.getParent().isPresent()) {
             prospectiveParent = editGroup.getParent().get();
-        } else if (editGroup != null) {
-            prospectiveParent = editGroup;
-        } else if (preferredAdditionLocation == PreferredGroupAdditionLocation.ADD_TO_ROOT) {
-            prospectiveParent = active.get().getRoot();
-        } else if (preferredAdditionLocation == PreferredGroupAdditionLocation.ADD_BESIDE
-                && !isRoot) {
-            prospectiveParent = active.get().getParent().isPresent()
-                    ? active.get().getParent().get()
-                    : active.get();
         } else {
-            prospectiveParent = active.get();
-        }
-
-        switch (preferredAdditionLocation) {
-            case ADD_BESIDE:
-                this.executable.bind(needsEntriesSelected(stateManager).and(needsSelectedGroupsShareParent(stateManager)));
-                break;
-            case ADD_BELOW:
-                this.executable.bind(needsEntriesSelected(stateManager).and(needsNotMultipleGroupsSelected(stateManager)));
-                break;
-            case ADD_TO_ROOT:
-            default:
-                this.executable.bind(needsEntriesSelected(stateManager));
-                break;
+            prospectiveParent = parentGroup;
         }
     }
 
@@ -102,7 +62,7 @@ public class CreateGroupAction extends SimpleCommand {
         DialogService dialogService,
         StateManager stateManager
     ) {
-        this(dialogService, stateManager, false, PreferredGroupAdditionLocation.ADD_BESIDE, null);
+        this(dialogService, stateManager, stateManager.getActiveDatabase().map(BibDatabaseContext::getMetaData).map(MetaData::getGroups).get().get(), null, Selection.IGNORE_SELECTED_ENTRIES);
     }
 
     public void writeGroupChangesToMetaData(BibDatabaseContext database, GroupTreeNode newGroup) {
@@ -123,7 +83,7 @@ public class CreateGroupAction extends SimpleCommand {
                         editGroup != null ? editGroup.getGroup() : null,
                         prospectiveParent.isRoot() ? GroupDialogHeader.GROUP : GroupDialogHeader.SUBGROUP,
                         stateManager.getSelectedEntries(),
-                        preferSelectedEntries
+                        includeSelection
                 ));
 
         newGroup.ifPresent(group -> {
@@ -159,7 +119,6 @@ public class CreateGroupAction extends SimpleCommand {
         // what default behavior is, or why this appears replicated -- all my changes are simply refactoring.
         boolean keepPreviousAssignments;
         boolean removePreviousAssignments;
-        GroupTreeNode finalResults;
 
         // dialog already warns us about this if the new group is named like another existing group
         // We need to check if only the name changed as this is relevant for the entry's group field
@@ -168,7 +127,7 @@ public class CreateGroupAction extends SimpleCommand {
             // If the name is unique, we want to remove the old database with the same name.
             // Otherwise, we need to keep them.
             removePreviousAssignments = nameIsUnique(oldGroup, newGroup, database);
-        } else if (groupTypeEqual && changesAreMinor(oldGroup, newGroup)) {
+        } else if (onlyMinorModifications) {
             keepPreviousAssignments = true;
             removePreviousAssignments = true;
         } else {

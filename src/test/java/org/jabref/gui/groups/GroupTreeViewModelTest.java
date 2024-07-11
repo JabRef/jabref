@@ -50,6 +50,7 @@ class GroupTreeViewModelTest {
                 GroupViewMode.UNION,
                 true,
                 true,
+                false,
                 GroupHierarchyType.INDEPENDENT));
         groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
     }

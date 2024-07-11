@@ -51,7 +51,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.maintable.CreateGroupAction;
-import org.jabref.gui.maintable.PreferredGroupAdditionLocation;
+import org.jabref.gui.maintable.Selection;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
@@ -582,7 +582,7 @@ public class GroupTreeView extends BorderPane {
                 removeGroup,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
-                factory.createMenuItem(StandardActions.ADD_SUBGROUP_FROM_SELECTION, new CreateGroupAction(dialogService, stateManager, true, PreferredGroupAdditionLocation.ADD_BELOW, null)),
+                factory.createMenuItem(StandardActions.ADD_SUBGROUP_FROM_SELECTION, new CreateGroupAction(dialogService, stateManager, group.getGroupNode(), null, Selection.INCLUDE_SELECTED_ENTRIES)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
@@ -599,7 +599,7 @@ public class GroupTreeView extends BorderPane {
     }
 
     private void addNewGroup() {
-        viewModel.addNewGroupToRoot(false);
+        viewModel.addNewGroupToRoot();
     }
 
     private String getFormattedNumber(int hits) {
@@ -694,7 +694,7 @@ public class GroupTreeView extends BorderPane {
                     groupTree.refresh();
                 }
                 case GROUP_SUBGROUP_ADD ->
-                        viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);
+                        viewModel.addNewSubgroup(group);
                 case GROUP_SUBGROUP_REMOVE ->
                         viewModel.removeSubgroups(group);
                 case GROUP_SUBGROUP_SORT ->

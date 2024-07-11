@@ -50,6 +50,7 @@ class GroupNodeViewModelTest {
                 GroupViewMode.UNION,
                 true,
                 true,
+                false,
                 GroupHierarchyType.INDEPENDENT
         ));
 

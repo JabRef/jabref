@@ -86,8 +86,13 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             }
         }
 
+        if (newGroup instanceof GroupEntryChanger changer) {
+            changes.addAll(changer.add(entriesInDatabase.stream().filter(newGroup::isMatch).toList()));
+        }
+
         group.set(newGroup);
         groupName.set(newGroup.getName());
+        notifyAboutDescendantChange(this);
         return changes;
     }
 
@@ -276,7 +281,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     @Override
     public String toString() {
         return "GroupTreeNode{" +
-                "group=" + group +
+                "group=" + group.get() +
                 '}';
     }
 

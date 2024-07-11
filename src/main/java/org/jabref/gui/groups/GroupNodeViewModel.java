@@ -113,8 +113,8 @@ public class GroupNodeViewModel {
         entriesList.addListener(this::onEntriesChanged);
 
         EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(
-                stateManager.getSelectedEntries(),
-                groupNode::matches
+                this.stateManager.getSelectedEntries(),
+                this.groupNode::matches
         );
         anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
         // 'all' returns 'true' for empty streams, so this has to be checked explicitly
@@ -250,6 +250,9 @@ public class GroupNodeViewModel {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
                     if (groupNode.matches(changedEntry)) {
                         if (!matchedEntries.contains(changedEntry)) {
+                            matchedEntries.add(changedEntry);
+                        } else if (matchedEntries.stream().map(BibEntry::getId).noneMatch(changedEntry.getId()::equals)) {
+                            // Deals with potentially-identical newly created entries
                             matchedEntries.add(changedEntry);
                         }
                     } else {

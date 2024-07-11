@@ -35,6 +35,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabrefIconProvider;
+import org.jabref.gui.maintable.Selection;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -82,9 +83,10 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private RadioButton searchRadioButton;
     @FXML private RadioButton autoRadioButton;
     @FXML private RadioButton texRadioButton;
-    @FXML private RadioButton selectionRadioButton;
 
     // Option Groups
+    @FXML private CheckBox explicitIncludeSelected;
+
     @FXML private TextField keywordGroupSearchTerm;
     @FXML private TextField keywordGroupSearchField;
     @FXML private CheckBox keywordGroupCaseSensitive;
@@ -112,7 +114,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final @Nullable GroupTreeNode parentNode;
     private final @Nullable AbstractGroup editedGroup;
     private final List<BibEntry> selectedEntries;
-    private final boolean preferUseSelection;
+    private final Selection includeSelectedEntries;
 
     private GroupDialogViewModel viewModel;
 
@@ -124,21 +126,14 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                            @Nullable GroupTreeNode parentNode,
                            @Nullable AbstractGroup editedGroup,
                            GroupDialogHeader groupDialogHeader,
-                           List<BibEntry> selectedEntries) {
-        this(currentDatabase, parentNode, editedGroup, groupDialogHeader, selectedEntries, false);
-    }
-
-    public GroupDialogView(BibDatabaseContext currentDatabase,
-                           @Nullable GroupTreeNode parentNode,
-                           @Nullable AbstractGroup editedGroup,
-                           GroupDialogHeader groupDialogHeader,
                            List<BibEntry> selectedEntries,
-                           boolean preferUseSelection) {
+                           Selection includeSelectedEntries
+    ) {
         this.currentDatabase = currentDatabase;
         this.parentNode = parentNode;
         this.editedGroup = editedGroup;
         this.selectedEntries = selectedEntries;
-        this.preferUseSelection = preferUseSelection;
+        this.includeSelectedEntries = includeSelectedEntries;
 
         ViewLoader.view(this)
                   .load()
@@ -188,7 +183,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, selectedEntries, preferUseSelection);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, selectedEntries, includeSelectedEntries);
 
         setResultConverter(viewModel::resultConverter);
 
@@ -216,8 +211,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchRadioButton.selectedProperty().bindBidirectional(viewModel.typeSearchProperty());
         autoRadioButton.selectedProperty().bindBidirectional(viewModel.typeAutoProperty());
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
-        selectionRadioButton.selectedProperty().bindBidirectional(viewModel.typeSelectionProperty());
-        selectionRadioButton.disableProperty().bind(viewModel.entriesAreSelectedProperty().not());
+
+        explicitIncludeSelected.selectedProperty().bindBidirectional(viewModel.explicitIncludeSelectedProperty());
 
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());

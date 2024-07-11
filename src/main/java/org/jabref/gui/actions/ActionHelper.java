@@ -43,26 +43,6 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(binding);
     }
 
-    // Makes sure there is at least one group selected, and if there are multiple groups selected
-    // all have the same parent node.
-    public static BooleanExpression needsSelectedGroupsShareParent(StateManager stateManager) {
-        return Bindings.size(stateManager.activeGroupProperty()).isEqualTo(1)        // Is single element OR
-            .or(Bindings.size(stateManager.activeGroupProperty()).greaterThan(1)     // (Is multiple elements AND
-                .and(Bindings.createBooleanBinding(
-                    () -> stateManager.activeGroupProperty().stream()
-                        .allMatch(val ->                                                // The parent of the first element
-                            stateManager.activeGroupProperty()                          // is equal to the parent of all
-                                .getFirst()                                             // other elements
-                                .getParent()                                            // (including if they are null))
-                                    .map(node -> node.equals(val.getParent().get()))
-                                    .orElseGet(() -> val.getParent().isEmpty())),
-                stateManager.activeGroupProperty())));
-    }
-
-    public static BooleanExpression needsNotMultipleGroupsSelected(StateManager stateManager) {
-        return Bindings.size(stateManager.activeGroupProperty()).lessThan(2);
-    }
-
     public static BooleanExpression needsEntriesSelected(StateManager stateManager) {
         return Bindings.isNotEmpty(stateManager.getSelectedEntries());
     }

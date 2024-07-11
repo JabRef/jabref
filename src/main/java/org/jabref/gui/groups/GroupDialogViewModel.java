@@ -25,6 +25,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.maintable.Selection;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
@@ -77,9 +78,10 @@ public class GroupDialogViewModel {
     private final BooleanProperty typeSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeAutoProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeTexProperty = new SimpleBooleanProperty();
-    private final BooleanProperty typeSelectionProperty = new SimpleBooleanProperty();
 
     // Option Groups
+    private final BooleanProperty explicitIncludeSelectedProperty = new SimpleBooleanProperty(false);
+
     private final StringProperty keywordGroupSearchTermProperty = new SimpleStringProperty("");
     private final StringProperty keywordGroupSearchFieldProperty = new SimpleStringProperty("");
     private final BooleanProperty keywordGroupCaseSensitiveProperty = new SimpleBooleanProperty();
@@ -96,7 +98,6 @@ public class GroupDialogViewModel {
     private final StringProperty autoGroupPersonsFieldProperty = new SimpleStringProperty("");
 
     private final StringProperty texGroupFilePathProperty = new SimpleStringProperty("");
-    private final BooleanProperty entriesAreSelected = new SimpleBooleanProperty(false);
 
     private Validator nameValidator;
     private Validator nameContainsDelimiterValidator;
@@ -116,7 +117,7 @@ public class GroupDialogViewModel {
     private final GroupTreeNode parentNode;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final List<BibEntry> selectedEntries;
-    private final boolean useSelectedEntries;
+    private final Selection includeSelectedEntries;
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
@@ -125,7 +126,8 @@ public class GroupDialogViewModel {
                                 @Nullable GroupTreeNode parentNode,
                                 FileUpdateMonitor fileUpdateMonitor,
                                 List<BibEntry> selectedEntries,
-                                boolean useSelectedEntries) {
+                                Selection includeSelectedEntries
+    ) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
@@ -133,7 +135,7 @@ public class GroupDialogViewModel {
         this.parentNode = parentNode;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.selectedEntries = selectedEntries;
-        this.useSelectedEntries = useSelectedEntries;
+        this.includeSelectedEntries = includeSelectedEntries;
 
         setupValidation();
         setValues();
@@ -147,7 +149,7 @@ public class GroupDialogViewModel {
             @Nullable GroupTreeNode parentNode,
             FileUpdateMonitor fileUpdateMonitor
     ) {
-        this(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, new ArrayList<>(), false);
+        this(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, new ArrayList<>(), Selection.IGNORE_SELECTED_ENTRIES);
     }
 
     private void setupValidation() {
@@ -330,10 +332,15 @@ public class GroupDialogViewModel {
         try {
             String groupName = nameProperty.getValue().trim();
             if (typeExplicitProperty.getValue()) {
-                resultingGroup = new ExplicitGroup(
+                ExplicitGroup tempResultingGroup = new ExplicitGroup(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
-                        preferencesService.getBibEntryPreferences().getKeywordSeparator());
+                        preferencesService.getBibEntryPreferences().getKeywordSeparator()
+                );
+                if (explicitIncludeSelectedProperty.getValue()) {
+                    tempResultingGroup.add(selectedEntries);
+                }
+                resultingGroup = tempResultingGroup;
             } else if (typeKeywordsProperty.getValue()) {
                 if (keywordGroupRegexProperty.getValue()) {
                     resultingGroup = new RegexKeywordGroup(
@@ -391,16 +398,7 @@ public class GroupDialogViewModel {
                         new DefaultAuxParser(new BibDatabase()),
                         fileUpdateMonitor,
                         currentDatabase.getMetaData());
-            } else if (typeSelectionProperty.getValue()) {
-                ExplicitGroup tempResultingGroup = new ExplicitGroup(
-                        groupName,
-                        groupHierarchySelectedProperty.getValue(),
-                        preferencesService.getBibEntryPreferences().getKeywordSeparator()
-                );
-                tempResultingGroup.add(selectedEntries);
-                resultingGroup = tempResultingGroup;
             }
-
             if (resultingGroup != null) {
                 preferencesService.getGroupsPreferences().setDefaultHierarchicalContext(groupHierarchySelectedProperty.getValue());
 
@@ -419,7 +417,7 @@ public class GroupDialogViewModel {
 
     public void setValues() {
         groupHierarchyListProperty.setValue(FXCollections.observableArrayList(GroupHierarchyType.values()));
-
+        explicitIncludeSelectedProperty.setValue(includeSelectedEntries == Selection.INCLUDE_SELECTED_ENTRIES || preferencesService.getGroupsPreferences().shouldAutoIncludeSelected());
         if (editedGroup == null) {
             // creating new group -> defaults!
             // TODO: Create default group (via org.jabref.logic.groups.DefaultGroupsFactory) and use values
@@ -433,16 +431,7 @@ public class GroupDialogViewModel {
                           .ifPresent(iconProperty::setValue);
                 parentNode.getGroup().getColor().ifPresent(color -> colorUseProperty.setValue(true));
             }
-            if (!selectedEntries.isEmpty()) {
-                entriesAreSelected.setValue(true);
-                if (selectedEntries.size() > 1 || useSelectedEntries) {
-                    typeSelectionProperty.setValue(true);
-                } else {
-                    typeExplicitProperty.setValue(true);
-                }
-            } else {
-                typeExplicitProperty.setValue(true);
-            }
+            typeExplicitProperty.setValue(true);
             groupHierarchySelectedProperty.setValue(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext());
             autoGroupKeywordsOptionProperty.setValue(Boolean.TRUE);
         } else {
@@ -624,8 +613,8 @@ public class GroupDialogViewModel {
         return typeTexProperty;
     }
 
-    public BooleanProperty typeSelectionProperty() {
-        return typeSelectionProperty;
+    public BooleanProperty explicitIncludeSelectedProperty() {
+        return explicitIncludeSelectedProperty;
     }
 
     public StringProperty keywordGroupSearchTermProperty() {
@@ -678,9 +667,5 @@ public class GroupDialogViewModel {
 
     public StringProperty texGroupFilePathProperty() {
         return texGroupFilePathProperty;
-    }
-
-    public BooleanProperty entriesAreSelectedProperty() {
-        return entriesAreSelected;
     }
 }

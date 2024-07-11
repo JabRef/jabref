@@ -74,7 +74,6 @@ public class RightClickMenu {
                 SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
                 SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, () -> libraryTab, dialogService, preferencesService, undoManager, stateManager),
-                factory.createMenuItem(StandardActions.ADD_SUBGROUP_FROM_SELECTION, new CreateGroupAction(dialogService, stateManager, true, PreferredGroupAdditionLocation.ADD_BELOW, null)),
 
                 new SeparatorMenuItem(),
 

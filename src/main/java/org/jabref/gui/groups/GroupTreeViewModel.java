@@ -22,7 +22,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.maintable.CreateGroupAction;
-import org.jabref.gui.maintable.PreferredGroupAdditionLocation;
+import org.jabref.gui.maintable.Selection;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -148,13 +148,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /**
      * Opens "New Group Dialog" and add the resulting group to the root
      */
-    public void addNewGroupToRoot(boolean preferSelectedEntries) {
+    public void addNewGroupToRoot() {
         CreateGroupAction groupMaker = new CreateGroupAction(
                 dialogService,
                 stateManager,
-                preferSelectedEntries,
-                PreferredGroupAdditionLocation.ADD_TO_ROOT,
-                null
+                rootGroup.get().getGroupNode(),
+                null,
+                Selection.IGNORE_SELECTED_ENTRIES
         );
         groupMaker.execute();
     }
@@ -175,14 +175,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
         rootGroup.setValue(null);
     }
 
-    public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
-        addNewSubgroup(parent, groupDialogHeader, false);
-    }
-
     /**
      * Opens "New Group Dialog" and adds the resulting group as subgroup to the specified group
      */
-    public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader, boolean preferUseSelection) {
+    public void addNewSubgroup(GroupNodeViewModel parent) {
         CreateGroupAction groupMaker = new CreateGroupAction(dialogService, stateManager);
         groupMaker.execute();
     }
@@ -195,7 +191,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
     public void editGroup(GroupTreeNode oldGroup) {
-        CreateGroupAction groupMaker = new CreateGroupAction(dialogService, stateManager, false, PreferredGroupAdditionLocation.ADD_BESIDE, oldGroup);
+        GroupTreeNode parent;
+        if (oldGroup.getParent().isEmpty()) {
+            parent = rootGroup.get().getGroupNode();
+        } else {
+            parent = oldGroup.getParent().get();
+        }
+        CreateGroupAction groupMaker = new CreateGroupAction(dialogService, stateManager, parent, oldGroup, Selection.IGNORE_SELECTED_ENTRIES);
         groupMaker.execute();
     }
 
