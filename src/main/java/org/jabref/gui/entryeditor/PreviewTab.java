@@ -12,7 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
-public class PreviewTab extends EntryEditorTab {
+public class PreviewTab extends EntryEditorTab implements OffersPreview {
     public static final String NAME = "Preview";
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
@@ -43,14 +43,14 @@ public class PreviewTab extends EntryEditorTab {
     }
 
     @Override
-    protected void nextPreviewStyle() {
+    public void nextPreviewStyle() {
         if (previewPanel != null) {
             previewPanel.nextPreviewStyle();
         }
     }
 
     @Override
-    protected void previousPreviewStyle() {
+    public void previousPreviewStyle() {
         if (previewPanel != null) {
             previewPanel.previousPreviewStyle();
         }

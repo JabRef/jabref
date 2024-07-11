@@ -12,8 +12,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -31,6 +31,7 @@ import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,14 +123,14 @@ public class JabRefDesktop {
                 try {
                     NATIVE_DESKTOP.openFile(link, PS.getName(), preferencesService.getFilePreferences());
                 } catch (IOException e) {
-                    LOGGER.error("An error occurred on the command: " + link, e);
+                    LOGGER.error("An error occurred on the command: {}", link, e);
                 }
             }
             case PDF -> {
                 try {
                     NATIVE_DESKTOP.openFile(link, PDF.getName(), preferencesService.getFilePreferences());
                 } catch (IOException e) {
-                    LOGGER.error("An error occurred on the command: " + link, e);
+                    LOGGER.error("An error occurred on the command: {}", link, e);
                 }
             }
             case null, default ->
@@ -237,8 +238,6 @@ public class JabRefDesktop {
 
     /**
      * Opens a new console starting on the given file location
-     * <p>
-     * If no command is specified in {@link Globals}, the default system console will be executed.
      *
      * @param file Location the console should be opened at.
      */
@@ -306,7 +305,8 @@ public class JabRefDesktop {
         try {
             openBrowser(url, filePreferences);
         } catch (IOException exception) {
-            Globals.getClipboardManager().setContent(url);
+            ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
+            clipBoardManager.setContent(url);
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);

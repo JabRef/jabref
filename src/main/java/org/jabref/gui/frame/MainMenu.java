@@ -12,7 +12,6 @@ import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -66,7 +65,8 @@ import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
-import org.jabref.gui.undo.UndoRedoAction;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
@@ -129,7 +129,7 @@ public class MainMenu extends MenuBar {
     }
 
     private void createMenu() {
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory factory = new ActionFactory();
         Menu file = new Menu(Localization.lang("File"));
         Menu edit = new Menu(Localization.lang("Edit"));
         Menu library = new Menu(Localization.lang("Library"));
@@ -175,8 +175,8 @@ public class MainMenu extends MenuBar {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -202,7 +202,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(stateManager)),
-                factory.createMenuItem(StandardActions.AUTOMATIC_FIELD_EDITOR, new AutomaticFieldEditorAction(stateManager, dialogService)));
+                factory.createMenuItem(StandardActions.AUTOMATIC_FIELD_EDITOR, new AutomaticFieldEditorAction(stateManager, dialogService, undoManager)));
         SeparatorMenuItem specialFieldsSeparator = new SeparatorMenuItem();
         specialFieldsSeparator.visibleProperty().bind(preferencesService.getSpecialFieldsPreferences().specialFieldsEnabledProperty());
 
@@ -237,7 +237,7 @@ public class MainMenu extends MenuBar {
 
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame::getCurrentLibraryTab, dialogService, stateManager, preferencesService, entryTypesManager, taskExecutor)),
-                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, preferencesService)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferencesService)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, abbreviationRepository)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, undoManager)),
 
@@ -334,7 +334,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org", dialogService, preferencesService.getFilePreferences())),
-                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(Globals.BUILD_INFO, preferencesService, dialogService, taskExecutor)),
+                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(preferencesService, dialogService, taskExecutor)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
                         factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/", dialogService, preferencesService.getFilePreferences())),
                         factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/", dialogService, preferencesService.getFilePreferences())),

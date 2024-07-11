@@ -13,8 +13,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
@@ -34,7 +34,8 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.UndoRedoAction;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -57,6 +58,7 @@ public class MainToolBar extends ToolBar {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
     private final BibEntryTypesManager entryTypesManager;
+    private final ClipBoardManager clipBoardManager;
     private final CountingUndoManager undoManager;
 
     private PopOver entryFromIdPopOver;
@@ -71,6 +73,7 @@ public class MainToolBar extends ToolBar {
                        FileUpdateMonitor fileUpdateMonitor,
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
+                       ClipBoardManager clipBoardManager,
                        CountingUndoManager undoManager) {
         this.frame = tabContainer;
         this.pushToApplicationCommand = pushToApplicationCommand;
@@ -81,13 +84,14 @@ public class MainToolBar extends ToolBar {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.entryTypesManager = entryTypesManager;
+        this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
 
         createToolBar();
     }
 
     private void createToolBar() {
-        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        final ActionFactory factory = new ActionFactory();
 
         final Region leftSpacer = new Region();
         final Region rightSpacer = new Region();
@@ -100,7 +104,7 @@ public class MainToolBar extends ToolBar {
         getItems().addAll(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, taskExecutor)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager))),
 
                 leftSpacer,
@@ -119,8 +123,8 @@ public class MainToolBar extends ToolBar {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
                         factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
                         factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
                         factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager))),

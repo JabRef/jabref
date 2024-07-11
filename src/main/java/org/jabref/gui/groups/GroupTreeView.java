@@ -175,7 +175,10 @@ public class GroupTreeView extends BorderPane {
                 BindingsHelper.bindContentBidirectional(
                         groupTree.getSelectionModel().getSelectedItems(),
                         viewModel.selectedGroupsProperty(),
-                        newSelectedGroups -> newSelectedGroups.forEach(this::selectNode),
+                        newSelectedGroups -> {
+                            groupTree.getSelectionModel().clearSelection();
+                            newSelectedGroups.forEach(this::selectNode);
+                        },
                         this::updateSelection
                 ));
 
@@ -532,7 +535,7 @@ public class GroupTreeView extends BorderPane {
         }
 
         ContextMenu contextMenu = new ContextMenu();
-        ActionFactory factory = new ActionFactory(preferencesService.getKeyBindingRepository());
+        ActionFactory factory = new ActionFactory();
 
         MenuItem removeGroup;
         if (group.hasSubgroups() && group.canAddGroupsIn() && !group.isRoot()) {

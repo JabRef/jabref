@@ -104,16 +104,16 @@ public class BibEntryWriter {
         if (type.isPresent()) {
             // Write required fields first
             List<Field> requiredFields = type.get()
-                    .getRequiredFields()
-                    .stream()
-                    .map(OrFields::getFields)
-                    .flatMap(Collection::stream)
-                    .sorted(Comparator.comparing(Field::getName))
-                    .collect(Collectors.toList());
-
+                                             .getRequiredFields()
+                                             .stream()
+                                             .map(OrFields::getFields)
+                                             .flatMap(Collection::stream)
+                                             .sorted(Comparator.comparing(Field::getName))
+                                             .toList();
             for (Field field : requiredFields) {
                 writeField(entry, out, field, indent);
             }
+            written.addAll(requiredFields);
 
             // Then optional fields
             List<Field> optionalFields = type.get()
@@ -121,21 +121,18 @@ public class BibEntryWriter {
                                              .stream()
                                              .map(BibField::field)
                                              .sorted(Comparator.comparing(Field::getName))
-                                             .collect(Collectors.toList());
-
+                                             .toList();
             for (Field field : optionalFields) {
                 writeField(entry, out, field, indent);
             }
-
-            written.addAll(requiredFields);
             written.addAll(optionalFields);
         }
+
         // Then write remaining fields in alphabetic order.
         SortedSet<Field> remainingFields = entry.getFields()
                                                 .stream()
                                                 .filter(key -> !written.contains(key))
                                                 .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
-
         for (Field field : remainingFields) {
             writeField(entry, out, field, indent);
         }

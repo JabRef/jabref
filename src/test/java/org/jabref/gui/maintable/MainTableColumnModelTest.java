@@ -1,8 +1,13 @@
 package org.jabref.gui.maintable;
 
+import org.jabref.preferences.PreferencesService;
+
+import com.airhacks.afterburner.injection.Injector;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class MainTableColumnModelTest {
 
@@ -13,39 +18,44 @@ public class MainTableColumnModelTest {
     private static String testTypeOnlyName = "linked_id";
     private static MainTableColumnModel.Type testTypeOnlyType = MainTableColumnModel.Type.LINKED_IDENTIFIER;
 
+    @BeforeAll
+    public static void setup() {
+        Injector.setModelOrService(PreferencesService.class, mock(PreferencesService.class));
+    }
+
     @Test
     public void mainTableColumnModelParserRetrievesCorrectType() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testQualifier);
 
-        assertEquals(testColumnModel.getType(), testType);
+        assertEquals(testType, testColumnModel.getType());
     }
 
     @Test
     public void mainTableColumnModelParserRetrievesCorrectQualifier() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testQualifier);
 
-        assertEquals(testColumnModel.getQualifier(), testQualifier);
+        assertEquals(testQualifier, testColumnModel.getQualifier());
     }
 
     @Test
     public void fullMainTableColumnModelParserRetrievesCorrectType() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testName);
 
-        assertEquals(testColumnModel.getType(), testType);
+        assertEquals(testType, testColumnModel.getType());
     }
 
     @Test
     public void fullMainTableColumnModelParserRetrievesCorrectQualifier() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testName);
 
-        assertEquals(testColumnModel.getQualifier(), testQualifier);
+        assertEquals(testQualifier, testColumnModel.getQualifier());
     }
 
     @Test
     public void typeOnlyMainTableColumnModelParserRetrievesCorrectType() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testTypeOnlyName);
 
-        assertEquals(testColumnModel.getType(), testTypeOnlyType);
+        assertEquals(testTypeOnlyType, testColumnModel.getType());
     }
 
     @Test

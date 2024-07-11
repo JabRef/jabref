@@ -1,6 +1,5 @@
 package org.jabref.gui.importer.fetcher;
 
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javafx.beans.property.ListProperty;
@@ -15,7 +14,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
-import org.jabref.gui.telemetry.Telemetry;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
@@ -155,16 +153,12 @@ public class WebSearchPaneViewModel {
             fetcherName = Localization.lang("Identifier-based Web Search");
         }
 
-        final String finalFetcherName = fetcherName;
-        Telemetry.getTelemetryClient().ifPresent(client ->
-                client.trackEvent("search", Map.of("fetcher", finalFetcherName), Map.of()));
-
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
                              .withInitialMessage(Localization.lang("Processing %0", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
-        dialog.setTitle(finalFetcherName);
+        dialog.setTitle(fetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }
 

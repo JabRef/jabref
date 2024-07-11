@@ -13,18 +13,16 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.l10n.Localization;
 
 import org.controlsfx.control.textfield.CustomTextField;
 
 public class SearchFieldRightClickMenu {
-    public static ContextMenu create(KeyBindingRepository keyBindingRepository,
-                                     StateManager stateManager,
+    public static ContextMenu create(StateManager stateManager,
                                      CustomTextField searchField,
                                      LibraryTabContainer tabContainer,
                                      UndoManager undoManager) {
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
 
         contextMenu.getItems().addAll(

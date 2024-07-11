@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -21,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * 2. Parse the response to get a list of {@link BibEntry}
  * 3. Post-process fetched entries
  */
-public interface IdBasedParserFetcher extends IdBasedFetcher {
+public interface IdBasedParserFetcher extends IdBasedFetcher, ParserFetcher {
 
     Logger LOGGER = LoggerFactory.getLogger(IdBasedParserFetcher.class);
 
@@ -36,24 +35,6 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
      * Returns the parser used to convert the response to a list of {@link BibEntry}.
      */
     Parser getParser();
-
-    /**
-     * Performs a cleanup of the fetched entry.
-     *
-     * Only systematic errors of the fetcher should be corrected here
-     * (i.e. if information is consistently contained in the wrong field or the wrong format)
-     * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
-     *
-     * Try to reuse existing {@link Formatter} for the cleanup. For example,
-     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
-     *
-     * By default, no cleanup is done.
-     *
-     * @param entry the entry to be cleaned-up
-     */
-    default void doPostCleanup(BibEntry entry) {
-        // Do nothing by default
-    }
 
     @Override
     default Optional<BibEntry> performSearchById(String identifier) throws FetcherException {

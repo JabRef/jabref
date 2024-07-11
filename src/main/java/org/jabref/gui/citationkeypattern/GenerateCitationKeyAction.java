@@ -14,8 +14,8 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -112,7 +112,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                     if (isCanceled) {
                         return null;
                     }
-                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                UiTaskExecutor.runInJavaFXThread(() -> {
                         updateProgress(0, entries.size());
                         messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
                     });
@@ -127,7 +127,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                                         .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
                             entriesDone++;
                             int finalEntriesDone = entriesDone;
-                            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                            UiTaskExecutor.runInJavaFXThread(() -> {
                                 updateProgress(finalEntriesDone, entries.size());
                                 messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entries.size()));
                             });

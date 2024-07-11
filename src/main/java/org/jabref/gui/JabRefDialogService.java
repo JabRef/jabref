@@ -43,9 +43,9 @@ import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
 
@@ -379,9 +379,11 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public void notify(String message) {
+        // TODO: Change to a notification overview instead of event log when that is available.
+        //       The event log is not that user friendly (different purpose).
         LOGGER.info(message);
 
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             Notifications.create()
                          .text(message)
                          .position(Pos.BOTTOM_CENTER)
@@ -390,7 +392,6 @@ public class JabRefDialogService implements DialogService {
                          .threshold(5,
                                  Notifications.create()
                                               .title(Localization.lang("Last notification"))
-                                              // TODO: Change to a notification overview instead of event log when that is available. The event log is not that user friendly (different purpose).
                                               .text(
                                                     "(" + Localization.lang("Check the event log to see all notifications") + ")"
                                                      + "\n\n" + message)

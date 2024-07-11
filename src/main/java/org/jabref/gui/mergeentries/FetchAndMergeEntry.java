@@ -47,16 +47,16 @@ public class FetchAndMergeEntry {
     private final UndoManager undoManager;
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferencesService;
+    private final PreferencesService preferences;
 
     public FetchAndMergeEntry(BibDatabaseContext bibDatabaseContext,
                               TaskExecutor taskExecutor,
-                              PreferencesService preferencesService,
+                              PreferencesService preferences,
                               DialogService dialogService,
                               UndoManager undoManager) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
     }
@@ -73,11 +73,11 @@ public class FetchAndMergeEntry {
         for (Field field : fields) {
             Optional<String> fieldContent = entry.getField(field);
             if (fieldContent.isPresent()) {
-                Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, preferencesService.getImportFormatPreferences());
+                Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences());
                 if (fetcher.isPresent()) {
                     BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
                                   .onSuccess(fetchedEntry -> {
-                                      ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
+                                      ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
                                       String type = field.getDisplayName();
                                       if (fetchedEntry.isPresent()) {
                                           cleanup.doPostCleanup(fetchedEntry.get());
@@ -105,7 +105,7 @@ public class FetchAndMergeEntry {
     }
 
     private void showMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
-        MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferencesService);
+        MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, preferences);
         dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         dialog.setLeftHeaderText(Localization.lang("Original entry"));
         dialog.setRightHeaderText(Localization.lang("Entry from %0", fetcher.getName()));
@@ -169,7 +169,7 @@ public class FetchAndMergeEntry {
         BackgroundTask.wrap(() -> fetcher.performSearch(entry).stream().findFirst())
                       .onSuccess(fetchedEntry -> {
                           if (fetchedEntry.isPresent()) {
-                              ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode());
+                              ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
                               cleanup.doPostCleanup(fetchedEntry.get());
                               showMergeDialog(entry, fetchedEntry.get(), fetcher);
                           } else {

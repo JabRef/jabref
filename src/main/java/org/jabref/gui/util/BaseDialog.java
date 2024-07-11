@@ -9,16 +9,17 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+
+import com.airhacks.afterburner.injection.Injector;
 
 public class BaseDialog<T> extends Dialog<T> {
 
     protected BaseDialog() {
         getDialogPane().getScene().setOnKeyPressed(event -> {
-            KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
                 close();
             } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {

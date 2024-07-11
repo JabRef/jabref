@@ -36,8 +36,6 @@ open module org.jabref {
 
     provides com.airhacks.afterburner.views.ResourceLocator
             with org.jabref.gui.util.JabRefResourceLocator;
-    provides com.airhacks.afterburner.injection.PresenterFactory
-            with org.jabref.gui.DefaultInjector;
 
     // Logging
     requires org.slf4j;
@@ -80,8 +78,8 @@ open module org.jabref {
     requires org.glassfish.hk2.api;
 
     // http clients
-    requires unirest.java;
-    requires org.apache.httpcomponents.httpclient;
+    requires unirest.java.core;
+    requires unirest.modules.gson;
     requires org.jsoup;
 
     // SQL databases
@@ -99,6 +97,7 @@ open module org.jabref {
     requires org.apache.commons.io;
     requires org.apache.commons.lang3;
     requires org.apache.commons.text;
+    requires org.apache.commons.logging;
 
     requires com.github.tomtung.latex2unicode;
     requires fastparse;
@@ -150,4 +149,5 @@ open module org.jabref {
     requires de.saxsys.mvvmfx.validation;
     requires dd.plist;
     requires mslinks;
+    requires org.apache.httpcomponents.core5.httpcore5;
 }

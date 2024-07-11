@@ -18,8 +18,8 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultLatexParser;
 import org.jabref.logic.util.io.FileUtil;
@@ -92,7 +92,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             @Override
             public void onStart(FileAlterationObserver observer) {
                 if (!updateStatusOnCreate.get()) {
-                    DefaultTaskExecutor.runInJavaFXThread(() -> status.set(Status.IN_PROGRESS));
+                    UiTaskExecutor.runInJavaFXThread(() -> status.set(Status.IN_PROGRESS));
                 }
             }
 
@@ -113,7 +113,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 Optional<String> citationKey = currentEntry.getCitationKey();
                 if (citationKey.isPresent()) {
                     Collection<Citation> citations = result.getCitationsByKey(citationKey.get());
-                    DefaultTaskExecutor.runInJavaFXThread(() -> citationList.addAll(citations));
+                    UiTaskExecutor.runInJavaFXThread(() -> citationList.addAll(citations));
                 }
 
                 if (updateStatusOnCreate.get()) {
@@ -128,7 +128,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 Optional<String> citationKey = currentEntry.getCitationKey();
                 if (citationKey.isPresent()) {
                     Collection<Citation> citations = result.getCitationsByKey(citationKey.get());
-                    DefaultTaskExecutor.runInJavaFXThread(() -> citationList.removeAll(citations));
+                    UiTaskExecutor.runInJavaFXThread(() -> citationList.removeAll(citations));
                     updateStatus();
                 }
             }
@@ -204,7 +204,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     private void updateStatus() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             if (!Files.exists(directory.get())) {
                 searchError.set(Localization.lang("Current search directory does not exist: %0", directory.get()));
                 status.set(Status.ERROR);

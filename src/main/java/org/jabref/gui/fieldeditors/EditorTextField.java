@@ -13,8 +13,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.Globals;
 import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
@@ -35,9 +35,9 @@ public class EditorTextField extends TextField implements Initializable, Context
     }
 
     @Override
-    public void initContextMenu(final Supplier<List<MenuItem>> items) {
+    public void initContextMenu(final Supplier<List<MenuItem>> items, KeyBindingRepository keyBindingRepository) {
         setOnContextMenuRequested(event -> {
-            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this, Globals.getKeyPrefs()));
+            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this));
             contextMenu.getItems().addAll(0, items.get());
             contextMenu.show(this, event.getScreenX(), event.getScreenY());
         });

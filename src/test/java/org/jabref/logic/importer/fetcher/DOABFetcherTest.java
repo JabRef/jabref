@@ -97,7 +97,7 @@ public class DOABFetcherTest {
                                 .withField(StandardField.URL, "http://library.oapen.org/handle/20.500.12657/30652")
                                 .withField(StandardField.URI, "https://directory.doabooks.org/handle/20.500.12854/38792")
                                 .withField(StandardField.LANGUAGE, "English")
-                                .withField(StandardField.KEYWORDS, "agile, structural equation modelling, information technology, success, models, strategic alignment, complexity, waterfall, project management, quantitative, Agile software development, Change management, Deliverable, Exploratory factor analysis, South Africa")
+                                .withField(StandardField.KEYWORDS, "agile, structural equation modelling, information technology, success, models, strategic alignment, complexity, waterfall, project management, quantitative, Agile software development, Change management, Deliverable, Exploratory factor analysis, South Africa, thema EDItEUR::U Computing and Information Technology::UB Information technology: general topics")
                                 .withField(StandardField.PUBLISHER, "AOSIS"),
                         "The symbiosis between information system project complexity and information system project success"
                 )

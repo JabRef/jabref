@@ -40,13 +40,16 @@ Navigate to **Project Settings > Project** and ensure that the projects' SDK is 
 
 Click "OK" to store the changes.
 
-## Configure the Build System
+## Ensure correct JDK setting for Gradle
 
-Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom. If that does not exist, just select JDK 21.
+Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
+If that does not exist, just select JDK 21.
 
-{% figure caption:"Gradle JVM is project SDK (showing JDK 21 as example)" %}
+{% figure caption:"Gradle JVM is project SDK (showing "Projekt SDK temurin-21" as example)" %}
 ![Gradle JVM is project SDK](guidelines-intellij-settings-gradle-gradlejvm-is-projectjvm.png)
 {% endfigure %}
+
+## Enable compiliation by IntelliJ
 
 To prepare IntelliJ's build system additional steps are required:
 
@@ -56,7 +59,7 @@ Navigate to **Build, Execution, Deployment > Compiler > Java Compiler**, and und
 ![Gradle JVM is project SDK](guidelines-choose-module.png)
 {% endfigure %}
 
-Then double click inside the cell "Compilation options" and enter following parameters:
+Copy following text into your clipboard:
 
 ```text
 --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
@@ -65,15 +68,23 @@ Then double click inside the cell "Compilation options" and enter following para
 --add-reads org.jabref=org.apache.commons.csv
 ```
 
+Then double click inside the cell "Compilation options".
+Press <kbd>Ctrl</kbd>+<kbd>A</kbd> to mark all text.
+Press <kbd>Ctrl</kbd>+<kbd>V</kbd> to paste all text.
 Press <kbd>Enter</kbd> to have the value really stored.
 Otherwise, it seems like the setting is stored, but it is not there if you reopen this preference dialog.
-Then click on "Apply" to store the setting.
+
+Note: If you use the expand arrow, you need to press <kbd>Shift</kbd>+<kbd>Enter</kbd> to close the expansion and then <kbd>Enter</kbd> to commit the value.
 
 {% figure caption:"Resulting settings for module JabRef.main" %}
 ![Overridden compiler parameters](guidelines-overridden-compiler-parameters.png)
 {% endfigure %}
 
-If this step is omitted, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`.
+Then click on "Apply" to store the setting.
+
+Note: If this step is omitted, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`.
+
+## Enable annotation processors
 
 Enable annotation processors by navigating to **Build, Execution, Deployment > Compiler > Annotation processors** and check "Enable annotation processing"
 
@@ -136,7 +147,7 @@ This should happen without any error.
 
 Now you can use IntelliJ IDEA's internal build system by using **Build > Build Project**.
 
-## Final build system checks (optional)
+## Final build system checks
 
 To run an example test from IntelliJ, we let IntelliJ create a launch configuration:
 

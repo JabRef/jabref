@@ -25,31 +25,31 @@ jobs:
       - name: 'Development history of current build'
         uses: BoundfoxStudios/action-gource@v2
         with:
-          gource_title: 'JabRef v5.14 (in development) | more information at contribute.jabref.org'
+          gource_title: 'JabRef v5.16 (in development) | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
           avatars_auto_fetch: true
           # 5s * 365 / 4 = 7.5min
           gource_seconds_per_day: 1
-          gource_start_date: '2024-04-01'
+          gource_start_date: '2024-07-11'
           gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
         run: |
           mkdir gource-videos
-          mv ./gource/gource.mp4 ./gource-videos/jabref-v5.14-dev.mp4
+          mv ./gource/gource.mp4 ./gource-videos/jabref-v5.16-dev.mp4
       - name: 'Development history of last release'
         uses: BoundfoxStudios/action-gource@v2
         with:
-          gource_title: 'JabRef v5.13 | more information at contribute.jabref.org'
+          gource_title: 'JabRef v5.15 | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
           avatars_auto_fetch: true
           # 5s * 365 / 4 = 7.5min
           gource_seconds_per_day: 2
-          gource_start_date: '2023-12-24'
-          gource_stop_date: '2024-04-01'
+          gource_start_date: '2024-07-09'
+          gource_stop_date: '2024-07-10'
           gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
         run: |
-          mv ./gource/gource.mp4 ./gource-videos/jabref-v5.13.mp4
+          mv ./gource/gource.mp4 ./gource-videos/jabref-v5.15.mp4
       - name: 'Complete development history'
         uses: BoundfoxStudios/action-gource@v2
         with:

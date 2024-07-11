@@ -26,11 +26,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
@@ -61,17 +59,15 @@ import org.slf4j.LoggerFactory;
  */
 public class CitationRelationsTab extends EntryEditorTab {
 
+    public static final String NAME = "Citation relations";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
     // Tasks used to implement asynchronous fetching of related articles
     private static BackgroundTask<List<BibEntry>> citingTask;
     private static BackgroundTask<List<BibEntry>> citedByTask;
-    private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final UndoManager undoManager;
-    private final StateManager stateManager;
-    private final FileUpdateMonitor fileUpdateMonitor;
     private final PreferencesService preferencesService;
     private final LibraryTab libraryTab;
     private final TaskExecutor taskExecutor;
@@ -79,18 +75,18 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final CitationsRelationsTabViewModel citationsRelationsTabViewModel;
     private final DuplicateCheck duplicateCheck;
 
-    public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService,
-                                BibDatabaseContext databaseContext, UndoManager undoManager,
-                                StateManager stateManager, FileUpdateMonitor fileUpdateMonitor,
-                                PreferencesService preferencesService, LibraryTab lTab, TaskExecutor taskExecutor) {
-        this.preferences = preferences;
+    public CitationRelationsTab(DialogService dialogService,
+                                BibDatabaseContext databaseContext,
+                                UndoManager undoManager,
+                                StateManager stateManager,
+                                FileUpdateMonitor fileUpdateMonitor,
+                                PreferencesService preferencesService,
+                                LibraryTab libraryTab,
+                                TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
-        this.undoManager = undoManager;
-        this.stateManager = stateManager;
-        this.fileUpdateMonitor = fileUpdateMonitor;
         this.preferencesService = preferencesService;
-        this.libraryTab = lTab;
+        this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
@@ -98,7 +94,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
         this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferencesService.getImporterPreferences()),
                 new BibEntryRelationsCache());
-        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService, fileUpdateMonitor, Globals.TASK_EXECUTOR);
+        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService, fileUpdateMonitor, taskExecutor);
     }
 
     /**

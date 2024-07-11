@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 
 public class ExternalLinkCreator {
     private static final String SHORTSCIENCE_SEARCH_URL = "https://www.shortscience.org/internalsearch";
