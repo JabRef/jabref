@@ -1,11 +1,12 @@
 package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -19,10 +20,10 @@ import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.stream.StreamSource;
 
 import org.jabref.logic.util.StandardFileType;
 
-import de.undercouch.citeproc.helper.CSLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.CharacterData;
@@ -57,31 +58,41 @@ public class CitationStyle {
     /**
      * Creates an CitationStyle instance out of the style string
      */
-    private static Optional<CitationStyle> createCitationStyleFromSource(final String source, final String filename) {
-        if ((filename != null) && !filename.isEmpty() && (source != null) && !source.isEmpty()) {
-            try {
-                InputSource inputSource = new InputSource();
-                inputSource.setCharacterStream(new StringReader(stripInvalidProlog(source)));
+    private static Optional<CitationStyle> createCitationStyleFromSource(final InputStream source, final String filename) {
+        try {
+            // We need the content twice:
+            //   First, for parsing it here for the name
+            //   Second for the CSL library to parse it
+            String content = new String(source.readAllBytes());
 
-                Document doc = FACTORY.newDocumentBuilder().parse(inputSource);
-
-                // See CSL#canFormatBibliographies, checks if the tag exists
-                NodeList bibs = doc.getElementsByTagName("bibliography");
-                if (bibs.getLength() <= 0) {
-                    LOGGER.debug("no bibliography element for file {} ", filename);
-                    return Optional.empty();
-                }
-
-                NodeList nodes = doc.getElementsByTagName("info");
-                NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
-                String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
-
-                return Optional.of(new CitationStyle(filename, title, source));
-            } catch (ParserConfigurationException | SAXException | IOException e) {
-                LOGGER.error("Error while parsing source", e);
+            Optional<String> title = getTitle(filename, content);
+            if (title.isEmpty()) {
+                return Optional.empty();
             }
+
+            return Optional.of(new CitationStyle(filename, title.get(), content));
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            LOGGER.error("Error while parsing source", e);
+            return Optional.empty();
         }
-        return Optional.empty();
+    }
+
+    private static Optional<String> getTitle(String filename, String content) throws SAXException, IOException, ParserConfigurationException {
+        // TODO: Switch to StAX parsing (to speed up - we need only the title)
+        InputSource inputSource = new InputSource(new StringReader(content));
+        Document doc = FACTORY.newDocumentBuilder().parse(inputSource);
+
+        // See CSL#canFormatBibliographies, checks if the tag exists
+        NodeList bibs = doc.getElementsByTagName("bibliography");
+        if (bibs.getLength() <= 0) {
+            LOGGER.debug("no bibliography element for file {} ", filename);
+            return Optional.empty();
+        }
+
+        NodeList nodes = doc.getElementsByTagName("info");
+        NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
+        String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
+        return Optional.of(title);
     }
 
     private static String stripInvalidProlog(String source) {
@@ -102,18 +113,11 @@ public class CitationStyle {
             return Optional.empty();
         }
 
-        try {
-            String text;
-            String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
-            URL url = CitationStyle.class.getResource(internalFile);
-
-            if (url != null) {
-                text = CSLUtils.readURLToString(url, StandardCharsets.UTF_8.toString());
-            } else {
-                // if the url is null then the style is located outside the classpath
-                text = Files.readString(Path.of(styleFile));
-            }
-            return createCitationStyleFromSource(text, styleFile);
+        String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
+        Path internalFilePath = Path.of(internalFile);
+        boolean isExternalFile = Files.exists(internalFilePath);
+        try (InputStream inputStream = isExternalFile ? Files.newInputStream(internalFilePath) : CitationStyle.class.getResourceAsStream(internalFile)) {
+            return createCitationStyleFromSource(inputStream, styleFile);
         } catch (NoSuchFileException e) {
             LOGGER.error("Could not find file: {}", styleFile, e);
         } catch (IOException e) {
