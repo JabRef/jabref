@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -64,7 +65,7 @@ class MoveFilesCleanupTest {
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false); // Biblocation as Primary overwrites all other dirs, therefore we set it to false here
-        cleanup = new MoveFilesCleanup(databaseContext, filePreferences);
+        cleanup = new MoveFilesCleanup(databaseContext, filePreferences, mock(DialogService.class));
     }
 
     @Test
