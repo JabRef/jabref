@@ -80,7 +80,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed rendering of (first) author with a single letter surname. [forum#4330](https://discourse.jabref.org/t/correct-rendering-of-first-author-with-a-single-letter-surname/4330)
 - We fixed that the import of the related articles tab sometimes used the wrong library mode. [#11282](https://github.com/JabRef/jabref/pull/11282)
 - We fixed an issue where the entry editor context menu was not shown correctly when JabRef is opened on a second, extended screen [#11323](https://github.com/JabRef/jabref/issues/11323), [#11174](https://github.com/JabRef/jabref/issues/11174)
-- We fixed an issue where the value of "Override default font settings" was not applied on startup [#11344](https://github.com/JabRef/jabref/issues/11344)
+- We fixe an issue where the value of "Override default font settings" was not applied on startup [#11344](https://github.com/JabRef/jabref/issues/11344)
 - We fixed an issue where we display warning message for moving attached open files. [#10121](https://github.com/JabRef/jabref/issues/10121)
 - We fixed an issue where the value of "Override default font settings" was not applied on startup [#11344](https://github.com/JabRef/jabref/issues/11344)
 - We fixed an issue when "Library changed on disk" appeared after a save by JabRef. [#4877](https://github.com/JabRef/jabref/issues/4877)  
