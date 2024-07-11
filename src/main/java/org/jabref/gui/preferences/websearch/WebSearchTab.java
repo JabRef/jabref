@@ -140,7 +140,11 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         apiKeySelectorTable.setItems(viewModel.fetcherApiKeys());
 
         // Content is set later
-        viewModel.fetcherApiKeys().addListener((InvalidationListener) change -> apiKeySelectorTable.getSelectionModel().selectFirst());
+        viewModel.fetcherApiKeys().addListener((InvalidationListener) change -> {
+            if (!apiKeySelectorTable.getItems().isEmpty()) {
+                apiKeySelectorTable.getSelectionModel().selectFirst();
+            }
+        });
     }
 
     private void updateFetcherApiKey(FetcherApiKey apiKey) {
