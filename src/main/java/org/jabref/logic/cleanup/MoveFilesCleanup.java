@@ -29,7 +29,6 @@ public class MoveFilesCleanup implements CleanupJob {
 
     private final DialogService dialogService;
 
-
     public MoveFilesCleanup(BibDatabaseContext databaseContext, FilePreferences filePreferences, DialogService dialogService) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.filePreferences = Objects.requireNonNull(filePreferences);
@@ -48,11 +47,10 @@ public class MoveFilesCleanup implements CleanupJob {
                 if (fileChanged) {
                     changed = true;
                 }
-            } catch (FileSystemException exception){
-                LOGGER.warn("Could not move file. Please close all the attached files and retry.",exception);
+            } catch (FileSystemException exception) {
+                LOGGER.warn("Could not move file. Please close all the attached files and retry.", exception);
                 dialogService.notify(Localization.lang("Could not move file. Please close all the attached files and retry."));
-            }
-            catch (IOException exception) {
+            } catch (IOException exception) {
                 LOGGER.error("Error moving file {}", file.getLink(), exception);
             }
         }

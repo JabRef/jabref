@@ -35,9 +35,6 @@ public class CleanupAction extends SimpleCommand {
     private boolean isCanceled;
     private int modifiedEntriesCount;
 
-    protected boolean isFileOpenFlag;
-
-
     public CleanupAction(Supplier<LibraryTab> tabSupplier,
                          PreferencesService preferences,
                          DialogService dialogService,
