@@ -211,9 +211,11 @@ public class JabRefGUI extends Application {
         debugLogWindowState(mainStage);
 
         Scene scene = new Scene(JabRefGUI.mainFrame);
+
+        LOGGER.debug("installing CSS");
         themeManager.installCss(scene);
 
-        // Handle TextEditor key bindings
+        LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(
                 scene,
                 event,
@@ -225,7 +227,11 @@ public class JabRefGUI extends Application {
         mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
         mainStage.setOnHiding(this::onHiding);
+
+        LOGGER.debug("Showing mainStage");
         mainStage.show();
+
+        LOGGER.debug("frame initialized");
 
         Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
     }

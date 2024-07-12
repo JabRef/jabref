@@ -53,8 +53,12 @@ public class AiChatTabWorking {
 
             aiChatComponent.setLoading(true);
 
-            BackgroundTask.wrap(() -> aiChatLogic.execute(userPrompt))
+            BackgroundTask.wrap(() -> {
+                              LOGGER.debug("Sending a message to AI: {}", userPrompt);
+                              return aiChatLogic.execute(userPrompt);
+                          })
                           .onSuccess(aiMessageText -> {
+                              LOGGER.debug("Success");
                               aiChatComponent.setLoading(false);
 
                               ChatMessage aiMessage = ChatMessage.assistant(aiMessageText);

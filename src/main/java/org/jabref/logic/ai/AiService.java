@@ -38,10 +38,12 @@ public class AiService implements AutoCloseable {
 
     @Override
     public void close() {
+        LOGGER.trace("Closing aiChatHistoryManager");
         this.aiChatHistoryManager.close();
-        LOGGER.trace("aiChatHistoryManager closed");
+        LOGGER.trace("Closing aiEmbeddingsManager");
         this.aiEmbeddingsManager.close();
-        LOGGER.trace("aiEmbeddingsManager closed");
+        LOGGER.trace("Closing aiChatLanguageModel");
+        this.aiChatLanguageModel.close();
     }
 
     public AiPreferences getPreferences() {
