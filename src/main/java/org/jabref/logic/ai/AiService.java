@@ -42,8 +42,6 @@ public class AiService implements AutoCloseable {
         this.aiChatHistoryManager.close();
         LOGGER.trace("Closing aiEmbeddingsManager");
         this.aiEmbeddingsManager.close();
-        LOGGER.trace("Closing aiChatLanguageModel");
-        this.aiChatLanguageModel.close();
     }
 
     public AiPreferences getPreferences() {
