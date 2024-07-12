@@ -3,7 +3,6 @@ package org.jabref.logic.net.ssl;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyManagementException;
@@ -25,7 +24,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import org.glassfish.grizzly.streams.Input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
