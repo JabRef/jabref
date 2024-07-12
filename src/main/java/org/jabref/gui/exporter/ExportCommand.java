@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -112,8 +111,6 @@ public class ExportCommand extends SimpleCommand {
             // All entries
             entries = stateManager.getActiveDatabase()
                                   .map(BibDatabaseContext::getEntries)
-                                  .map(List::stream)
-                                  .map(Stream::toList)
                                   .orElse(Collections.emptyList());
         }
 
