@@ -185,7 +185,6 @@ public class StyleSelectDialogViewModel {
         CitationStylePreviewLayout selectedLayout = selectedLayoutProperty.get();
         if (selectedLayout != null) {
             CSLCitationOOAdapter.setSelectedStyleName(selectedLayout.getDisplayName());
-            // You might want to add any other necessary actions here
         }
     }
 }
