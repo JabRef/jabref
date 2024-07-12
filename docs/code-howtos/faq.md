@@ -32,7 +32,7 @@ Following is a list of common errors encountered by developers which lead to fai
 * `org.jabref.architecture.MainArchitectureTest` `doNotUseLogicInModel` <span style="color:red">FAILED</span>
   * <span style="color:green">Fix</span> : One common case when this test fails is when you put any class purely containing business logic at some level inside the ```model``` directory (```org/jabref/model/```). To fix this, shift the class to a subdirectory within the ```logic``` directory (```org/jabref/logic/```).
 
-* `ANTLR Tool version 4.12.0 used for code generation does not match the current runtime version 4.13.1` 
+* `ANTLR Tool version 4.12.0 used for code generation does not match the current runtime version 4.13.1`
   * <span style="color:green">Fix</span> : Execute ```gradle clean``` job.
 
 <!-- markdownlint-disable-file MD033 -->
