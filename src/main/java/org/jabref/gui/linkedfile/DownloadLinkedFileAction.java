@@ -203,7 +203,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         String failedTitle = Localization.lang("Failed to download from URL");
         int statusCode;
         if (ex instanceof FetcherClientException clientException) {
-            statusCode = clientException.getStatusCode();
+            statusCode = clientException.getHttpResponse().statusCode();
             if (statusCode == 401) {
                 dialogService.showInformationDialogAndWait(failedTitle, Localization.lang("401 Unauthorized: Access Denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.\nURL: %0 \n %1", urlDownload.getSource(), fetcherExceptionMessage));
             } else if (statusCode == 403) {

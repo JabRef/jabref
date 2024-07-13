@@ -59,9 +59,13 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
         } catch (IOException e) {
-            throw new FetcherException("A network error occurred while fetching from " + urlForQuery, e);
+            throw new FetcherException(("A network error occurred while fetching from " + urlForQuery).replaceAll
+//                   // Regular expression to redact API keys from the error message
+                    ("(?i)(api[_-]?key)=.*","[REDACTED]"), e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred while fetching from " + urlForQuery, e);
+            throw new FetcherException(("An internal parser error occurred while fetching from " + urlForQuery).replaceAll
+                    // Regular expression to redact API keys from the error message
+                    ("(?i)(api[_-]?key)=.*","[REDACTED]"), e);
         }
     }
 
