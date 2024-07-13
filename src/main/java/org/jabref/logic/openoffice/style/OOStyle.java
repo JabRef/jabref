@@ -7,5 +7,7 @@ public interface OOStyle {
 
     boolean isInternalStyle();
 
+    String getPath();
+
     StyleType getStyleType();
 }

@@ -28,4 +28,9 @@ public class CSLStyle implements OOStyle {
     public CitationStyle getCitationStyle() {
         return citationStyle;
     }
+
+    @Override
+    public String getPath() {
+        return citationStyle.getFilePath();
+    }
 }

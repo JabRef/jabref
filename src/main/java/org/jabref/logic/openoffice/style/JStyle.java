@@ -227,6 +227,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         return name;
     }
 
+    @Override
     public String getPath() {
         return path;
     }
