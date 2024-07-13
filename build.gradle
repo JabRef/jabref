@@ -331,6 +331,7 @@ dependencies {
     // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
     // GemxFX also (transitively) depends on kotlin
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24'
+    implementation 'io.github.stefanbratanov:jvm-openai:0.9.3'
 
     implementation "one.jpro.platform:jpro-mdfx:0.3.3-SNAPSHOT"
 

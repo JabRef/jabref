@@ -60,12 +60,6 @@ public class AiChatLogic {
     }
 
     private void setupListeningToPreferencesChanges() {
-        aiService.getChatLanguageModel().chatLanguageModelObjectProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue.isPresent()) {
-                rebuild();
-            }
-        });
-
         aiService.getEmbeddingModel().embeddingModelObjectProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue != null) {
                 rebuild();
@@ -86,10 +80,6 @@ public class AiChatLogic {
     }
 
     private void rebuild() {
-        // When the user turns off the AI features all AiChat classes should be destroyed.
-        // So this assert should never fail.
-        assert aiService.getChatLanguageModel().getChatLanguageModel().isPresent();
-
         List<dev.langchain4j.data.message.ChatMessage> oldMessages;
         if (chatMemory == null) {
             oldMessages = List.of();
@@ -117,7 +107,7 @@ public class AiChatLogic {
 
         this.chain = ConversationalRetrievalChain
                 .builder()
-                .chatLanguageModel(aiService.getChatLanguageModel().getChatLanguageModel().get())
+                .chatLanguageModel(aiService.getChatLanguageModel())
                 .contentRetriever(contentRetriever)
                 .chatMemory(chatMemory)
                 .build();

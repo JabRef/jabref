@@ -322,7 +322,11 @@ public class JabRefGUI extends Application {
     @Override
     public void stop() {
         LOGGER.trace("Closing AI service");
-        aiService.close();
+        try {
+            aiService.close();
+        } catch (Exception e) {
+            LOGGER.error("Unable to close AI service", e);
+        }
         LOGGER.trace("Closing OpenOffice connection");
         OOBibBaseConnect.closeOfficeConnection();
         LOGGER.trace("Stopping background tasks");

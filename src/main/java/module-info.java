@@ -100,7 +100,6 @@ open module org.jabref {
     requires org.apache.commons.logging;
 
     requires com.github.tomtung.latex2unicode;
-    requires fastparse;
 
     requires jbibtex;
     requires citeproc.java;
@@ -109,7 +108,6 @@ open module org.jabref {
 
     requires org.apache.pdfbox;
     requires org.apache.xmpbox;
-    requires com.ibm.icu;
 
     requires flexmark;
     requires flexmark.html2md.converter;
@@ -159,4 +157,5 @@ open module org.jabref {
     requires jakarta.validation;
     requires one.jpro.platform.mdfx;
     requires scala.library;
+    requires jvm.openai;
 }
