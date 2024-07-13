@@ -164,7 +164,7 @@ public class StyleSelectDialogView extends BaseDialog<JStyle> {
 
         availableListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
-                viewModel.handleStyleSelection();
+                viewModel.handleCslStyleSelection();
                 this.setResult(tvStyles.getSelectionModel().getSelectedItem().getStyle());
                 this.close();
             }

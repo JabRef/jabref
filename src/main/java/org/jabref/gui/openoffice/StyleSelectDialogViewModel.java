@@ -30,6 +30,7 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.CSLStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -53,6 +54,7 @@ public class StyleSelectDialogViewModel {
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
     private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
     private final ObjectProperty<OOStyle> selectedStyle = new SimpleObjectProperty<>();
+
     public enum StyleType {
         CSL,
         JSTYLE
@@ -181,6 +183,13 @@ public class StyleSelectDialogViewModel {
 
     public void setSelectedTab(Tab tab) {
         selectedTab.set(tab);
+    }
+
+    public void handleCslStyleSelection() {
+        CitationStylePreviewLayout selectedLayout = selectedLayoutProperty.get();
+        if (selectedLayout != null) {
+            CSLCitationOOAdapter.setSelectedStyleName(selectedLayout.getDisplayName());
+        }
     }
 
     public void handleStyleSelection() {
