@@ -10,12 +10,12 @@ import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.PageInfo;
 import org.jabref.model.openoffice.util.OOListUtil;
 
-class OOBibStyleGetNumCitationMarker {
+class JStyleGetNumCitationMarker {
 
     // The number encoding "this entry is unresolved"
     public final static int UNRESOLVED_ENTRY_NUMBER = 0;
 
-    private OOBibStyleGetNumCitationMarker() {
+    private JStyleGetNumCitationMarker() {
     }
 
     /**
@@ -193,7 +193,7 @@ class OOBibStyleGetNumCitationMarker {
 
         // Sort a copy of entries
         List<CitationMarkerNumericEntry> sorted = OOListUtil.map(entries, e -> e);
-        sorted.sort(OOBibStyleGetNumCitationMarker::compareCitationMarkerNumericEntry);
+        sorted.sort(JStyleGetNumCitationMarker::compareCitationMarkerNumericEntry);
 
         // "["
         StringBuilder stringBuilder = new StringBuilder(bracketBefore);

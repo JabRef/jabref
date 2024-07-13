@@ -680,7 +680,7 @@ public class JStyle implements Comparable<JStyle> {
      */
     public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries) {
         final int minGroupingCount = this.getMinimumGroupingCount();
-        return OOBibStyleGetNumCitationMarker.getNumCitationMarker2(this,
+        return JStyleGetNumCitationMarker.getNumCitationMarker2(this,
                                                                     entries,
                                                                     minGroupingCount);
     }
@@ -690,7 +690,7 @@ public class JStyle implements Comparable<JStyle> {
      */
     public OOText getNumCitationMarker2(List<CitationMarkerNumericEntry> entries,
                                         int minGroupingCount) {
-        return OOBibStyleGetNumCitationMarker.getNumCitationMarker2(this,
+        return JStyleGetNumCitationMarker.getNumCitationMarker2(this,
                                                                     entries,
                                                                     minGroupingCount);
     }
@@ -699,11 +699,11 @@ public class JStyle implements Comparable<JStyle> {
      * Format a number-based bibliography label for the given number.
      */
     public OOText getNumCitationMarkerForBibliography(CitationMarkerNumericBibEntry entry) {
-        return OOBibStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(this, entry);
+        return JStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(this, entry);
     }
 
     public OOText getNormalizedCitationMarker(CitationMarkerNormEntry entry) {
-        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, entry, Optional.empty());
+        return JStyleGetCitationMarker.getNormalizedCitationMarker(this, entry, Optional.empty());
     }
 
     /**
@@ -740,7 +740,7 @@ public class JStyle implements Comparable<JStyle> {
     public OOText createCitationMarker(List<CitationMarkerEntry> citationMarkerEntries,
                                        boolean inParenthesis,
                                        NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
-        return OOBibStyleGetCitationMarker.createCitationMarker(this,
+        return JStyleGetCitationMarker.createCitationMarker(this,
                                                                 citationMarkerEntries,
                                                                 inParenthesis,
                                                                 nonUniqueCitationMarkerHandling);

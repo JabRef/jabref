@@ -22,11 +22,11 @@ import org.jabref.model.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 
-class OOBibStyleGetCitationMarker {
+class JStyleGetCitationMarker {
 
     private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
-    private OOBibStyleGetCitationMarker() {
+    private JStyleGetCitationMarker() {
     }
 
     /**
