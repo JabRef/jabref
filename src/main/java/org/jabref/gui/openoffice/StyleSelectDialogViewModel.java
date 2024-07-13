@@ -30,8 +30,9 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
+import org.jabref.logic.openoffice.style.CSLStyle;
 import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,6 +52,7 @@ public class StyleSelectDialogViewModel {
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
     private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
+    private final ObjectProperty<OOStyle> selectedStyle = new SimpleObjectProperty<>();
     public enum StyleType {
         CSL,
         JSTYLE
@@ -182,9 +184,11 @@ public class StyleSelectDialogViewModel {
     }
 
     public void handleStyleSelection() {
-        CitationStylePreviewLayout selectedLayout = selectedLayoutProperty.get();
-        if (selectedLayout != null) {
-            CSLCitationOOAdapter.setSelectedStyleName(selectedLayout.getDisplayName());
+        OOStyle selected = selectedStyle.get();
+        if (selected instanceof CSLStyle cslStyle) {
+            openOfficePreferences.setCurrentStyle(cslStyle);
+        } else if (selected instanceof JStyle jStyle) {
+            openOfficePreferences.setCurrentStyle(jStyle);
         }
     }
 }
