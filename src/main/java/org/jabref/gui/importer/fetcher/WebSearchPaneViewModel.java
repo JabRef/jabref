@@ -2,6 +2,7 @@ package org.jabref.gui.importer.fetcher;
 
 import java.util.concurrent.Callable;
 
+import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -14,11 +15,9 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
+import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.importer.CompositeIdFetcher;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.*;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
@@ -144,7 +143,20 @@ public class WebSearchPaneViewModel {
         }
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
-        Callable<ParserResult> parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
+
+        ParserResult parserResult;
+        try{
+            parserResult = new ParserResult(activeFetcher.performSearch(query));
+        } catch (FetcherException e) {
+            if(e.getCause()!=null && e.getCause().getCause() instanceof FetcherClientException clientException)    {
+                    dialogService.showErrorDialogAndWait(e.getMessage(),clientException.getHttpResponse().responseBody(),clientException);
+            } else{
+                dialogService.showErrorDialogAndWait(e.getMessage(),e);
+            }
+            return;
+        }
+
+        Callable<ParserResult> parserResultCallable = () -> parserResult;
         String fetcherName = activeFetcher.getName();
 
         if (CompositeIdFetcher.containsValidId(query)) {
