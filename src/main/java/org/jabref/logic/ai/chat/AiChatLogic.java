@@ -15,6 +15,8 @@ import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.TokenWindowChatMemory;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
+import dev.langchain4j.rag.DefaultRetrievalAugmentor;
+import dev.langchain4j.rag.RetrievalAugmentor;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.filter.Filter;
@@ -115,10 +117,16 @@ public class AiChatLogic {
                 .minScore(aiPreferences.getRagMinScore())
                 .build();
 
+        RetrievalAugmentor retrievalAugmentor = DefaultRetrievalAugmentor
+                .builder()
+                .contentRetriever(contentRetriever)
+                .executor(aiService.getCachedThreadPool())
+                .build();
+
         this.chain = ConversationalRetrievalChain
                 .builder()
                 .chatLanguageModel(aiService.getChatLanguageModel().getChatLanguageModel().get())
-                .contentRetriever(contentRetriever)
+                .retrievalAugmentor(retrievalAugmentor)
                 .chatMemory(chatMemory)
                 .build();
 
