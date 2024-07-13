@@ -79,14 +79,15 @@ public class GroupDialogViewModel {
     private final BooleanProperty typeAutoProperty = new SimpleBooleanProperty();
     private final BooleanProperty typeTexProperty = new SimpleBooleanProperty();
 
-    // Option Groups
+    // Explicit Groups
     private final BooleanProperty explicitIncludeSelectedProperty = new SimpleBooleanProperty(false);
 
+    // Option Groups
     private final StringProperty keywordGroupSearchTermProperty = new SimpleStringProperty("");
     private final StringProperty keywordGroupSearchFieldProperty = new SimpleStringProperty("");
     private final BooleanProperty keywordGroupCaseSensitiveProperty = new SimpleBooleanProperty();
     private final BooleanProperty keywordGroupRegexProperty = new SimpleBooleanProperty();
-
+    
     private final StringProperty searchGroupSearchTermProperty = new SimpleStringProperty("");
     private final ObjectProperty<EnumSet<SearchFlags>> searchFlagsProperty = new SimpleObjectProperty<>(EnumSet.noneOf(SearchFlags.class));
 
@@ -518,7 +519,7 @@ public class GroupDialogViewModel {
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
-        List<Path> fileDirs = new ArrayList<>();
+        List<Path> fileDirs = List.of();
         MetaData metaData = currentDatabase.getMetaData();
         metaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost()).ifPresent(fileDirs::add);
 

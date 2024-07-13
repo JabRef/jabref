@@ -95,7 +95,7 @@ public class GroupNodeViewModel {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         }
         hasChildren = new SimpleBooleanProperty();
-        hasChildren.bind(Bindings.isNotEmpty(groupNode.getChildren()));
+        hasChildren.bind(Bindings.isNotEmpty(children));
 
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
         if (stateManager.activeGroupProperty() != null && !stateManager.activeGroupProperty().isEmpty()) {
@@ -116,9 +116,9 @@ public class GroupNodeViewModel {
                 this.stateManager.getSelectedEntries(),
                 this.groupNode::matches
         );
-        anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
         // 'all' returns 'true' for empty streams, so this has to be checked explicitly
         allSelectedEntriesMatched = selectedEntriesMatchStatus.allMatch(matched -> matched).and(selectedEntriesMatchStatus.isEmptyBinding().not());
+        anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
     }
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, PreferencesService preferencesService) {

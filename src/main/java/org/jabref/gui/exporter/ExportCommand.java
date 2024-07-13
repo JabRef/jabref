@@ -2,13 +2,12 @@ package org.jabref.gui.exporter;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import javafx.collections.FXCollections;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
@@ -112,9 +111,7 @@ public class ExportCommand extends SimpleCommand {
             // All entries
             entries = stateManager.getActiveDatabase()
                                   .map(BibDatabaseContext::getEntries)
-                                  .map(List::stream)
-                                  .map(Stream::toList)
-                                  .orElse(Collections.emptyList());
+                                  .orElse(FXCollections.emptyObservableList());
         }
 
         List<Path> fileDirForDatabase = stateManager.getActiveDatabase()
