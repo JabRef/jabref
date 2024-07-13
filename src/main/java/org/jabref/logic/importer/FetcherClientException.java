@@ -1,18 +1,20 @@
 package org.jabref.logic.importer;
 
+import org.jabref.http.dto.SimpleHttpResponse;
+
 /**
  * Should be thrown when you encounter an HTTP status code error &gt;= 400 and &lt; 500.
  */
 public class FetcherClientException extends FetcherException {
-    private int statusCode;
+    private SimpleHttpResponse httpResponse;
 
     public FetcherClientException(String errorMessage, Throwable cause) {
         super(errorMessage, cause);
     }
 
-    public FetcherClientException(String errorMessage, Throwable cause, int statusCode) {
+    public FetcherClientException(String errorMessage, Throwable cause, SimpleHttpResponse httpResponse) {
         super(errorMessage, cause);
-        this.statusCode = statusCode;
+        this.httpResponse = httpResponse;
     }
 
     public FetcherClientException(String errorMessage) {
@@ -23,7 +25,13 @@ public class FetcherClientException extends FetcherException {
         super(errorMessage, localizedMessage, cause);
     }
 
-    public int getStatusCode() {
-        return statusCode;
+    public FetcherClientException(String errorMessage,SimpleHttpResponse httpResponse) {
+        super(errorMessage);
+        this.httpResponse=httpResponse;
     }
+
+    public SimpleHttpResponse getHttpResponse() {
+        return httpResponse;
+    }
+
 }
