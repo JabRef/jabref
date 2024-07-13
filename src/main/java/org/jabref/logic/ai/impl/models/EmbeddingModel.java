@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.embeddings;
+package org.jabref.logic.ai.impl.models;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +16,6 @@ import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.embedding.AllMiniLmL6V2QuantizedEmbeddingModel;
-import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.output.Response;
 
 /**
@@ -24,16 +23,16 @@ import dev.langchain4j.model.output.Response;
  * <p>
  * This class listens to preferences changes.
  */
-public class AiEmbeddingModel implements EmbeddingModel, AutoCloseable {
+public class EmbeddingModel implements dev.langchain4j.model.embedding.EmbeddingModel, AutoCloseable {
     private final AiPreferences aiPreferences;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("ai-embedding-pool-%d").build()
     );
 
-    private final ObjectProperty<Optional<EmbeddingModel>> embeddingModelObjectProperty = new SimpleObjectProperty<>(Optional.empty());
+    private final ObjectProperty<Optional<dev.langchain4j.model.embedding.EmbeddingModel>> embeddingModelObjectProperty = new SimpleObjectProperty<>(Optional.empty());
 
-    public AiEmbeddingModel(AiPreferences aiPreferences) {
+    public EmbeddingModel(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
         rebuild();
         setupListeningToPreferencesChanges();
@@ -45,7 +44,7 @@ public class AiEmbeddingModel implements EmbeddingModel, AutoCloseable {
             return;
         }
 
-        EmbeddingModel embeddingModel = switch (aiPreferences.getEmbeddingModel()) {
+        dev.langchain4j.model.embedding.EmbeddingModel embeddingModel = switch (aiPreferences.getEmbeddingModel()) {
             case AiPreferences.EmbeddingModel.ALL_MINLM_l6_V2 ->
                     new AllMiniLmL6V2EmbeddingModel(executorService);
             case AiPreferences.EmbeddingModel.ALL_MINLM_l6_V2_Q ->

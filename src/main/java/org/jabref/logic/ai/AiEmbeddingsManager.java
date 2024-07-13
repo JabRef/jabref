@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.embeddings;
+package org.jabref.logic.ai;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,6 +6,8 @@ import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.logic.ai.impl.embeddings.IngestedFilesTracker;
+import org.jabref.logic.ai.impl.embeddings.MVStoreEmbeddingStore;
 import org.jabref.preferences.AiPreferences;
 
 import dev.langchain4j.data.segment.TextSegment;
@@ -27,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * This class also listens for changes of embeddings parameters (in AI "Expert settings" section). In case any of them
  * changes, the embeddings should be invalidated (cleared).
  */
-public class AiEmbeddingsManager {
+public class AiEmbeddingsManager implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiEmbeddingsManager.class);
 
     private static final String EMBEDDINGS_STORE_FILE_NAME = "embeddings.mv";
@@ -37,7 +39,7 @@ public class AiEmbeddingsManager {
     private final MVStore mvStore;
 
     private final MVStoreEmbeddingStore embeddingStore;
-    private final AiIngestedFilesTracker ingestedFilesTracker;
+    private final IngestedFilesTracker ingestedFilesTracker;
 
     public AiEmbeddingsManager(AiPreferences aiPreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
@@ -65,7 +67,7 @@ public class AiEmbeddingsManager {
 
         this.mvStore = mvStoreTemp;
         this.embeddingStore = new MVStoreEmbeddingStore(this.mvStore);
-        this.ingestedFilesTracker = new AiIngestedFilesTracker(this.mvStore);
+        this.ingestedFilesTracker = new IngestedFilesTracker(this.mvStore);
 
         setupListeningToPreferencesChanges();
     }
@@ -84,7 +86,7 @@ public class AiEmbeddingsManager {
         aiPreferences.onEmbeddingsParametersChange(embeddingStore::removeAll);
     }
 
-    public AiIngestedFilesTracker getIngestedFilesTracker() {
+    public IngestedFilesTracker getIngestedFilesTracker() {
         return ingestedFilesTracker;
     }
 

@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.embeddings;
+package org.jabref.logic.ai.impl.embeddings;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Main logic class that is responsible for generating embeddings out of {@link LinkedFile}s.
  */
-public class AiIngestor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiIngestor.class.getName());
+public class Ingestor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Ingestor.class.getName());
 
     private final AiService aiService;
 
@@ -40,9 +40,9 @@ public class AiIngestor {
     private DocumentSplitter documentSplitter;
 
     // A workaround to stop ingesting files.
-    private BooleanProperty shutdownProperty;
+    private final BooleanProperty shutdownProperty;
 
-    public AiIngestor(AiService aiService, BooleanProperty shutdownProperty) {
+    public Ingestor(AiService aiService, BooleanProperty shutdownProperty) {
         this.aiService = aiService;
         this.shutdownProperty = shutdownProperty;
 
@@ -74,7 +74,7 @@ public class AiIngestor {
      * The embeddings will be generated if the file was not ingested yet or the file was modified.
      */
     public void ingestLinkedFile(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
-        AiIngestedFilesTracker ingestedFilesTracker = aiService.getEmbeddingsManager().getIngestedFilesTracker();
+        IngestedFilesTracker ingestedFilesTracker = aiService.getEmbeddingsManager().getIngestedFilesTracker();
 
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
 

@@ -14,16 +14,24 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
-import org.jabref.logic.ai.chathistory.ChatMessage;
+import org.jabref.gui.ai.components.errormessage.ErrorMessageComponent;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.UserMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AiChatComponent extends VBox {
-    private final Consumer<String> sendMessageCallback;
-    private final Runnable clearChatHistoryCallback;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
 
+    private final AiChat aiChat;
     private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
 
     @FXML private ScrollPane scrollPane;
     @FXML private VBox chatVBox;
@@ -31,11 +39,10 @@ public class AiChatComponent extends VBox {
     @FXML private Button submitButton;
     @FXML private StackPane stackPane;
 
-    public AiChatComponent(Consumer<String> sendMessageCallback, Runnable clearChatHistoryCallback, DialogService dialogService) {
-        this.sendMessageCallback = sendMessageCallback;
-        this.clearChatHistoryCallback = clearChatHistoryCallback;
-
+    public AiChatComponent(AiChat aiChat, DialogService dialogService, TaskExecutor taskExecutor) {
+        this.aiChat = aiChat;
         this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
 
         ViewLoader.view(this)
                 .root(this)
@@ -50,20 +57,38 @@ public class AiChatComponent extends VBox {
             }
         });
 
+        chatVBox.getChildren().addAll(aiChat.getChatHistory().getMessages().stream().map(ChatMessageComponent::new).toList());
+
         Platform.runLater(() -> userPromptTextField.requestFocus());
     }
 
     @FXML
-    private void internalSendMessageEvent() {
+    private void onSendMessage() {
         String userPrompt = userPromptTextField.getText();
 
         if (!userPrompt.isEmpty()) {
             userPromptTextField.clear();
-            sendMessageCallback.accept(userPrompt);
+
+            UserMessage userMessage = new UserMessage(userPrompt);
+            addMessage(userMessage);
+            setLoading(true);
+
+            BackgroundTask.wrap(() -> aiChat.execute(userMessage))
+                          .onSuccess(aiMessage -> {
+                              setLoading(false);
+                              addMessage(aiMessage);
+                              requestUserPromptTextFieldFocus();
+                          })
+                          .onFailure(e -> {
+                              LOGGER.error("Got an error while sending a message to AI", e);
+                              setLoading(false);
+                              addError(e.getMessage());
+                          })
+                          .executeWith(taskExecutor);
         }
     }
 
-    public void setLoading(boolean loading) {
+    private void setLoading(boolean loading) {
         userPromptTextField.setDisable(loading);
         submitButton.setDisable(loading);
 
@@ -75,27 +100,27 @@ public class AiChatComponent extends VBox {
         }
     }
 
-    public void addMessage(ChatMessage chatMessage) {
-        ChatMessageComponent component = new ChatMessageComponent().withChatMessage(chatMessage);
+    private void addMessage(ChatMessage chatMessage) {
+        ChatMessageComponent component = new ChatMessageComponent(chatMessage);
         chatVBox.getChildren().add(component);
     }
 
-    public void addError(String message) {
-        ChatMessageComponent component = new ChatMessageComponent().withError(message);
+    private void addError(String message) {
+        ErrorMessageComponent component = new ErrorMessageComponent(message);
         chatVBox.getChildren().add(component);
     }
 
-    public void requestUserPromptTextFieldFocus() {
+    private void requestUserPromptTextFieldFocus() {
         userPromptTextField.requestFocus();
     }
 
     @FXML
-    private void onClearChatHistoryClick() {
+    private void onClearChatHistory() {
         boolean agreed = dialogService.showConfirmationDialogAndWait(Localization.lang("Clear chat history"), Localization.lang("Are you sure you want to clear the chat history with this entry?"));
 
         if (agreed) {
             chatVBox.getChildren().clear();
-            clearChatHistoryCallback.run();
+            aiChat.getChatHistory().clear();
         }
     }
 }

@@ -61,7 +61,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
+import org.jabref.logic.ai.AiEmbeddingsGenerationTask;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -161,7 +161,7 @@ public class LibraryTab extends Tab {
 
     private final ClipBoardManager clipBoardManager;
     private final IndexingTaskManager indexingTaskManager;
-    private EmbeddingsGenerationTask embeddingsGenerationTask;
+    private AiEmbeddingsGenerationTask aiEmbeddingsGenerationTask;
 
     private final TaskExecutor taskExecutor;
     private final DirectoryMonitorManager directoryMonitorManager;
@@ -188,7 +188,7 @@ public class LibraryTab extends Tab {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
-        this.embeddingsGenerationTask = new EmbeddingsGenerationTask(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
+        this.aiEmbeddingsGenerationTask = new AiEmbeddingsGenerationTask(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
         this.taskExecutor = taskExecutor;
         this.directoryMonitorManager = new DirectoryMonitorManager(Injector.instantiateModelOrService(DirectoryMonitor.class));
 
@@ -291,7 +291,7 @@ public class LibraryTab extends Tab {
         }
 
         if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-            embeddingsGenerationTask.updateEmbeddings(bibDatabaseContext);
+            aiEmbeddingsGenerationTask.updateEmbeddings(bibDatabaseContext);
         }
 
         LOGGER.trace("loading.set(false);");
@@ -334,7 +334,7 @@ public class LibraryTab extends Tab {
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
-        this.embeddingsGenerationTask = new EmbeddingsGenerationTask(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
+        this.aiEmbeddingsGenerationTask = new AiEmbeddingsGenerationTask(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
 
         setupMainPanel();
         setupAutoCompletion();
@@ -457,7 +457,7 @@ public class LibraryTab extends Tab {
         }
 
         if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-            embeddingsGenerationTask.updateDatabaseName(tabTitle.toString());
+            aiEmbeddingsGenerationTask.updateDatabaseName(tabTitle.toString());
         }
     }
 
@@ -899,7 +899,7 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
 
-        embeddingsGenerationTask.shutdown();
+        aiEmbeddingsGenerationTask.shutdown();
 
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
@@ -1162,14 +1162,14 @@ public class LibraryTab extends Tab {
         @Subscribe
         public void listen(EntriesAddedEvent event) {
             if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-                embeddingsGenerationTask.addToStore(event.getBibEntries());
+                aiEmbeddingsGenerationTask.addToStore(event.getBibEntries());
             }
         }
 
         @Subscribe
         public void listen(EntriesRemovedEvent event) {
             if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-                embeddingsGenerationTask.removeFromStore(event.getBibEntries());
+                aiEmbeddingsGenerationTask.removeFromStore(event.getBibEntries());
             }
         }
 
@@ -1185,15 +1185,15 @@ public class LibraryTab extends Tab {
                     List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
                     removedFiles.removeAll(newFileList);
 
-                    embeddingsGenerationTask.addToStore(addedFiles);
-                    embeddingsGenerationTask.removeFromStore(removedFiles);
+                    aiEmbeddingsGenerationTask.addToStore(addedFiles);
+                    aiEmbeddingsGenerationTask.removeFromStore(removedFiles);
                 }
             }
         }
     }
 
-    public EmbeddingsGenerationTask getEmbeddingsGenerationTaskManager() {
-        return embeddingsGenerationTask;
+    public AiEmbeddingsGenerationTask getEmbeddingsGenerationTaskManager() {
+        return aiEmbeddingsGenerationTask;
     }
 
     public static class DatabaseNotification extends NotificationPane {

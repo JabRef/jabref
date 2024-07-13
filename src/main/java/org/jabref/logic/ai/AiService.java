@@ -4,10 +4,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.ai.chat.AiChatLanguageModel;
-import org.jabref.logic.ai.chathistory.AiChatHistoryManager;
-import org.jabref.logic.ai.embeddings.AiEmbeddingModel;
-import org.jabref.logic.ai.embeddings.AiEmbeddingsManager;
+import org.jabref.logic.ai.impl.models.ChatLanguageModel;
+import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager;
+import org.jabref.logic.ai.impl.models.EmbeddingModel;
 import org.jabref.preferences.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -25,26 +24,26 @@ public class AiService implements AutoCloseable {
             new ThreadFactoryBuilder().setNameFormat("ai-retrieval-pool-%d").build()
     );
 
-    private final AiChatLanguageModel aiChatLanguageModel;
-    private final AiChatHistoryManager aiChatHistoryManager;
+    private final ChatLanguageModel chatLanguageModel;
+    private final BibDatabaseChatHistoryManager bibDatabaseChatHistoryManager;
 
-    private final AiEmbeddingModel aiEmbeddingModel;
+    private final EmbeddingModel embeddingModel;
     private final AiEmbeddingsManager aiEmbeddingsManager;
 
     public AiService(AiPreferences aiPreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
-        this.aiChatLanguageModel = new AiChatLanguageModel(aiPreferences);
-        this.aiChatHistoryManager = new AiChatHistoryManager(dialogService);
-        this.aiEmbeddingModel = new AiEmbeddingModel(aiPreferences);
+        this.chatLanguageModel = new ChatLanguageModel(aiPreferences);
+        this.bibDatabaseChatHistoryManager = new BibDatabaseChatHistoryManager(dialogService);
+        this.embeddingModel = new EmbeddingModel(aiPreferences);
         this.aiEmbeddingsManager = new AiEmbeddingsManager(aiPreferences, dialogService);
     }
 
     @Override
     public void close() throws Exception {
         this.cachedThreadPool.shutdownNow();
-        this.aiChatLanguageModel.close();
-        this.aiEmbeddingModel.close();
-        this.aiChatHistoryManager.close();
+        this.chatLanguageModel.close();
+        this.embeddingModel.close();
+        this.bibDatabaseChatHistoryManager.close();
         this.aiEmbeddingsManager.close();
     }
 
@@ -56,16 +55,16 @@ public class AiService implements AutoCloseable {
         return cachedThreadPool;
     }
 
-    public AiChatLanguageModel getChatLanguageModel() {
-        return aiChatLanguageModel;
+    public ChatLanguageModel getChatLanguageModel() {
+        return chatLanguageModel;
     }
 
-    public AiEmbeddingModel getEmbeddingModel() {
-        return aiEmbeddingModel;
+    public EmbeddingModel getEmbeddingModel() {
+        return embeddingModel;
     }
 
-    public AiChatHistoryManager getChatHistoryManager() {
-        return aiChatHistoryManager;
+    public BibDatabaseChatHistoryManager getChatHistoryManager() {
+        return bibDatabaseChatHistoryManager;
     }
 
     public AiEmbeddingsManager getEmbeddingsManager() {

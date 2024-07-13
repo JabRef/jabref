@@ -1,13 +1,13 @@
-package org.jabref.logic.ai.chat;
+package org.jabref.logic.ai.impl.models;
 
 import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
-import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
+import org.jabref.logic.ai.AiChat;
+import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryFile;
 import org.jabref.preferences.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -17,7 +17,6 @@ import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.ToolExecutionResultMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.output.FinishReason;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.output.TokenUsage;
@@ -33,7 +32,7 @@ import org.h2.mvstore.MVStore;
  * <p>
  * This class listens to preferences changes.
  */
-public class AiChatLanguageModel implements ChatLanguageModel, AutoCloseable {
+public class ChatLanguageModel implements dev.langchain4j.model.chat.ChatLanguageModel, AutoCloseable {
     private final AiPreferences aiPreferences;
 
     private final HttpClient httpClient;
@@ -42,7 +41,7 @@ public class AiChatLanguageModel implements ChatLanguageModel, AutoCloseable {
     );
     private Optional<ChatClient> chatClient = Optional.empty();
 
-    public AiChatLanguageModel(AiPreferences aiPreferences) {
+    public ChatLanguageModel(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
         this.httpClient = HttpClient.newBuilder().executor(executorService).build();
 
@@ -54,10 +53,10 @@ public class AiChatLanguageModel implements ChatLanguageModel, AutoCloseable {
     }
 
     /**
-     * Update the underlying {@link ChatLanguageModel} by current {@link AiPreferences} parameters.
+     * Update the underlying {@link dev.langchain4j.model.chat.ChatLanguageModel} by current {@link AiPreferences} parameters.
      * When the model is updated, the chat messages are not lost.
-     * See {@link AiChatLogic}, where messages are stored in {@link ChatMemory},
-     * and {@link BibDatabaseChatHistory}, where messages are stored in {@link MVStore}.
+     * See {@link AiChat}, where messages are stored in {@link ChatMemory},
+     * and {@link BibDatabaseChatHistoryFile}, where messages are stored in {@link MVStore}.
      */
     private void rebuild() {
         if (!aiPreferences.getEnableChatWithFiles() || aiPreferences.getOpenAiToken().isEmpty()) {

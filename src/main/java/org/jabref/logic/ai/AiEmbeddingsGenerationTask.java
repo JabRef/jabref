@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.embeddings;
+package org.jabref.logic.ai;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,7 +13,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.impl.embeddings.Ingestor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.model.database.BibDatabaseContext;
@@ -34,15 +34,15 @@ import org.slf4j.LoggerFactory;
  *
  * FIXME: This is a "Manager" (similar to {@link PdfIndexerManager}) and should be renamed to "EmbeddingsGenerationManager".
  */
-public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddingsGenerationTask.class);
+public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiEmbeddingsGenerationTask.class);
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
 
-    private final AiIngestor aiIngestor;
+    private final Ingestor ingestor;
 
     // We use an {@link ArrayList} as a queue to implement prioritization of the {@link LinkedFile}s as it provides more
     // methods to manipulate the collection.
@@ -54,13 +54,13 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
 
     private final BooleanProperty shutdownProperty = new SimpleBooleanProperty(false);
 
-    public EmbeddingsGenerationTask(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiService aiService, TaskExecutor taskExecutor) {
+    public AiEmbeddingsGenerationTask(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiService aiService, TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.aiService = aiService;
         this.taskExecutor = taskExecutor;
 
-        this.aiIngestor = new AiIngestor(aiService, shutdownProperty);
+        this.ingestor = new Ingestor(aiService, shutdownProperty);
 
         configure();
 
@@ -156,7 +156,9 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
         updateProgress();
 
         while (!linkedFileQueue.isEmpty() && !isCanceled()) {
-            LOGGER.trace("linkedFileQueue size: {}", linkedFileQueue.size());
+            // TODO: there is a very strange error.
+            // It seems between these two statements someone removes a message.
+            // And that is true: it happens in prioritization.
             LinkedFile linkedFile = linkedFileQueue.removeLast();
 
             ingestLinkedFile(linkedFile);
@@ -171,7 +173,7 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
     }
 
     private void ingestLinkedFile(LinkedFile linkedFile) {
-        aiIngestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
+        ingestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
     }
 
     private void updateProgress() {
@@ -190,21 +192,6 @@ public class EmbeddingsGenerationTask extends BackgroundTask<Void> {
             removeFromStore(entry);
             addToStore(entry);
         });
-    }
-
-    public void moveToFront(Collection<LinkedFile> linkedFiles) {
-        linkedFiles.forEach(this::moveToFront);
-    }
-
-    /**
-     * This method is responsible for prioritizing a {@link LinkedFile} in the queue.
-     * <p>
-     * Queue is thought like a stack, so we just push the {@link LinkedFile} to the top of the stack.
-     * <p>
-     * It is not an error to add a {@link LinkedFile} if it is already in the queue or in process. In that case, it will be ignored by {@link AiIngestor}.
-     */
-    public void moveToFront(LinkedFile linkedFile) {
-        linkedFileQueue.add(linkedFile);
     }
 
     public void updateDatabaseName(String name) {

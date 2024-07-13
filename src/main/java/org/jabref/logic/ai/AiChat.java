@@ -1,18 +1,18 @@
-package org.jabref.logic.ai.chat;
+package org.jabref.logic.ai;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.chathistory.ChatMessage;
+import org.jabref.logic.ai.chathistory.AiChatHistory;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.AiPreferences;
 
+import dev.langchain4j.chain.Chain;
 import dev.langchain4j.chain.ConversationalRetrievalChain;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.TokenWindowChatMemory;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
@@ -22,34 +22,29 @@ import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Wrapper around langchain4j algorithms for chatting functionality.
- * It also supports filtering of documents that are used for question answering.
- * <p>
- * This class listens to chat language model change.
- * <p>
- * Notice: this class does not manage the chat history.
- * You should add messages to history on your own to {@link org.jabref.logic.ai.chathistory.BibDatabaseChatHistory}.
- */
-public class AiChatLogic {
+public class AiChat {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiChat.class);
+
     private final AiService aiService;
+    private final AiChatHistory aiChatHistory;
+    private final Filter embeddingsFilter;
 
-    private final Filter filter;
-
-    private ConversationalRetrievalChain chain;
     private ChatMemory chatMemory;
+    private Chain<String, String> chain;
 
-    public AiChatLogic(AiService aiService, Filter filter) {
+    public AiChat(AiService aiService, AiChatHistory aiChatHistory, Filter embeddingsFilter) {
         this.aiService = aiService;
-        this.filter = filter;
-
-        rebuild();
+        this.aiChatHistory = aiChatHistory;
+        this.embeddingsFilter = embeddingsFilter;
 
         setupListeningToPreferencesChanges();
+        rebuildFull(aiChatHistory.getMessages());
     }
 
-    public static AiChatLogic forBibEntry(AiService aiService, BibEntry entry) {
+    public static AiChat forBibEntry(AiService aiService, AiChatHistory aiChatHistory, BibEntry entry) {
         Filter filter = MetadataFilterBuilder
                 .metadataKey("linkedFile")
                 .isIn(entry
@@ -59,25 +54,22 @@ public class AiChatLogic {
                         .toList()
                 );
 
-        return new AiChatLogic(aiService, filter);
+        return new AiChat(aiService, aiChatHistory, filter);
     }
 
     private void setupListeningToPreferencesChanges() {
         AiPreferences aiPreferences = aiService.getPreferences();
 
-        aiPreferences.instructionProperty().addListener(obs -> rebuild());
-        aiPreferences.contextWindowSizeProperty().addListener(obs -> rebuild());
-        aiPreferences.onEmbeddingsParametersChange(this::rebuild);
+        aiPreferences.instructionProperty().addListener(obs -> setSystemMessage(aiPreferences.getInstruction()));
+        aiPreferences.contextWindowSizeProperty().addListener(obs -> rebuildFull(chatMemory.messages()));
     }
 
-    private void rebuild() {
-        List<dev.langchain4j.data.message.ChatMessage> oldMessages;
-        if (chatMemory == null) {
-            oldMessages = List.of();
-        } else {
-            oldMessages = chatMemory.messages();
-        }
+    private void rebuildFull(List<ChatMessage> chatMessages) {
+        rebuildChatMemory(chatMessages);
+        rebuildChain();
+    }
 
+    private void rebuildChatMemory(List<ChatMessage> chatMessages) {
         AiPreferences aiPreferences = aiService.getPreferences();
 
         this.chatMemory = TokenWindowChatMemory
@@ -85,12 +77,18 @@ public class AiChatLogic {
                 .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenizer())
                 .build();
 
-        oldMessages.forEach(message -> chatMemory.add(message));
+        chatMessages.forEach(chatMemory::add);
+
+        setSystemMessage(aiPreferences.getInstruction());
+    }
+
+    private void rebuildChain() {
+        AiPreferences aiPreferences = aiService.getPreferences();
 
         ContentRetriever contentRetriever = EmbeddingStoreContentRetriever
                 .builder()
                 .embeddingStore(aiService.getEmbeddingsManager().getEmbeddingsStore())
-                .filter(filter)
+                .filter(embeddingsFilter)
                 .embeddingModel(aiService.getEmbeddingModel())
                 .maxResults(aiPreferences.getRagMaxResultsCount())
                 .minScore(aiPreferences.getRagMinScore())
@@ -108,17 +106,28 @@ public class AiChatLogic {
                 .retrievalAugmentor(retrievalAugmentor)
                 .chatMemory(chatMemory)
                 .build();
+    }
 
-        if (!aiPreferences.getInstruction().isEmpty()) {
-            this.chatMemory.add(new SystemMessage(aiPreferences.getInstruction()));
+    private void setSystemMessage(String systemMessage) {
+        if (systemMessage.isEmpty()) {
+            LOGGER.warn("An empty system message is passed to AiChat");
+            return;
         }
+
+        chatMemory.add(new SystemMessage(systemMessage));
     }
 
-    public String execute(String prompt) {
-        return chain.execute(prompt);
+    public AiMessage execute(UserMessage message) {
+        // Message will be automatically added to ChatMemory through ConversationalRetrievalChain.
+
+        aiChatHistory.add(message);
+        AiMessage result = new AiMessage(chain.execute(message.singleText()));
+        aiChatHistory.add(result);
+
+        return result;
     }
 
-    public void restoreMessages(Stream<ChatMessage> messages) {
-        messages.map(ChatMessage::toLangchainMessage).filter(Optional::isPresent).map(Optional::get).forEach(this.chatMemory::add);
+    public AiChatHistory getChatHistory() {
+        return aiChatHistory;
     }
 }

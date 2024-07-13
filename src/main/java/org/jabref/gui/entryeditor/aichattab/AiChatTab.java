@@ -13,8 +13,8 @@ import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
-import org.jabref.logic.ai.embeddings.events.FileIngestedEvent;
+import org.jabref.logic.ai.AiEmbeddingsGenerationTask;
+import org.jabref.logic.ai.events.FileIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
@@ -31,7 +31,6 @@ public class AiChatTab extends EntryEditorTab {
     private final FilePreferences filePreferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final BibDatabaseContext bibDatabaseContext;
-    private final EmbeddingsGenerationTask embeddingsGenerationTask;
     private final TaskExecutor taskExecutor;
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
@@ -39,13 +38,12 @@ public class AiChatTab extends EntryEditorTab {
     private Optional<BibEntry> currentBibEntry = Optional.empty();
 
     public AiChatTab(DialogService dialogService, PreferencesService preferencesService, AiService aiService,
-                     BibDatabaseContext bibDatabaseContext, EmbeddingsGenerationTask embeddingsGenerationTask, TaskExecutor taskExecutor) {
+                     BibDatabaseContext bibDatabaseContext, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.aiService = aiService;
         this.bibDatabaseContext = bibDatabaseContext;
-        this.embeddingsGenerationTask = embeddingsGenerationTask;
         this.taskExecutor = taskExecutor;
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
 
@@ -90,7 +88,7 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void bindToCorrectEntry(BibEntry entry) {
-        AiChatTabWorking aiChatTabWorking = new AiChatTabWorking(aiService, entry, bibDatabaseContext, embeddingsGenerationTask, taskExecutor, dialogService);
+        AiChatTabWorking aiChatTabWorking = new AiChatTabWorking(aiService, entry, bibDatabaseContext, taskExecutor, dialogService);
         setContent(aiChatTabWorking.getNode());
     }
 

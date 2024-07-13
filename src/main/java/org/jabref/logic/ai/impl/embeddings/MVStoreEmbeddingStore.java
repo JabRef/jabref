@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.embeddings;
+package org.jabref.logic.ai.impl.embeddings;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.embeddings;
+package org.jabref.logic.ai.impl.embeddings;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.jabref.logic.ai.embeddings.events.FileIngestedEvent;
+import org.jabref.logic.ai.events.FileIngestedEvent;
 import org.jabref.model.entry.LinkedFile;
 
 import com.google.common.eventbus.EventBus;
@@ -21,7 +21,7 @@ import org.h2.mvstore.MVStore;
  * <p>
  * The class also records the file modification time.
  */
-public class AiIngestedFilesTracker {
+public class IngestedFilesTracker {
     // This map stores the ingested files. The key is LinkedFile.getLink(), and the value is the modification time in seconds.
     // If an entry is present, then it means the file was ingested. Otherwise, file was not ingested.
     // The reason why we need to track ingested files is because we cannot use AiEmbeddingsManager and see if there are
@@ -31,7 +31,7 @@ public class AiIngestedFilesTracker {
 
     private final EventBus eventBus = new EventBus();
 
-    public AiIngestedFilesTracker(MVStore mvStore) {
+    public IngestedFilesTracker(MVStore mvStore) {
         this.ingestedMap = mvStore.openMap("ingestedMap");
     }
 

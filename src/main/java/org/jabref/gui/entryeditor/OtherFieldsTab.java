@@ -20,7 +20,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
+import org.jabref.logic.ai.AiEmbeddingsGenerationTask;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
@@ -51,7 +51,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                           StateManager stateManager,
                           ThemeManager themeManager,
                           IndexingTaskManager indexingTaskManager,
-                          EmbeddingsGenerationTask embeddingsGenerationTask,
+                          AiEmbeddingsGenerationTask aiEmbeddingsGenerationTask,
                           BibEntryTypesManager entryTypesManager,
                           TaskExecutor taskExecutor,
                           JournalAbbreviationRepository journalAbbreviationRepository) {
@@ -68,7 +68,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 taskExecutor,
                 journalAbbreviationRepository,
                 indexingTaskManager,
-                embeddingsGenerationTask);
+                aiEmbeddingsGenerationTask);
 
         this.entryTypesManager = entryTypesManager;
         this.customTabsFieldNames = new ArrayList<>();

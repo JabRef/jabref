@@ -6,7 +6,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTask;
+import org.jabref.logic.ai.AiEmbeddingsGenerationTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,7 +21,7 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
     private final IndexingTaskManager indexingTaskManager;
-    private final EmbeddingsGenerationTask embeddingsGenerationTask;
+    private final AiEmbeddingsGenerationTask aiEmbeddingsGenerationTask;
     private final TaskExecutor taskExecutor;
     private PreviewPanel previewPanel;
 
@@ -31,7 +31,7 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
                       StateManager stateManager,
                       ThemeManager themeManager,
                       IndexingTaskManager indexingTaskManager,
-                      EmbeddingsGenerationTask embeddingsGenerationTask,
+                      AiEmbeddingsGenerationTask aiEmbeddingsGenerationTask,
                       TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
@@ -39,7 +39,7 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
         this.stateManager = stateManager;
         this.themeManager = themeManager;
         this.indexingTaskManager = indexingTaskManager;
-        this.embeddingsGenerationTask = embeddingsGenerationTask;
+        this.aiEmbeddingsGenerationTask = aiEmbeddingsGenerationTask;
         this.taskExecutor = taskExecutor;
 
         setGraphic(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getGraphicNode());
@@ -68,7 +68,7 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (previewPanel == null) {
-            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager, embeddingsGenerationTask, taskExecutor);
+            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager, aiEmbeddingsGenerationTask, taskExecutor);
             setContent(previewPanel);
         }
 

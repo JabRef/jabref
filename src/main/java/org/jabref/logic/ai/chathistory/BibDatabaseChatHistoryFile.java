@@ -2,14 +2,13 @@ package org.jabref.logic.ai.chathistory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.stream.Stream;
+import java.util.List;
 
 import org.jabref.gui.DialogService;
 
+import dev.langchain4j.data.message.ChatMessage;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class stores the chat history with AI. The chat history file is stored alongside the BibTeX file.
@@ -20,18 +19,16 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote If something is changed in the data model, increase {@link org.jabref.logic.ai.AiService#VERSION}
  */
-public class BibDatabaseChatHistory implements AutoCloseable {
+public class BibDatabaseChatHistoryFile implements AutoCloseable {
     public static final String AI_CHATS_FILE_EXTENSION = "aichats";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseChatHistory.class);
 
     private final MVStore mvStore;
 
-    // Map from citation key to list of messages
-    // "ArrayList" is used, because it implements Serializable
+    // Map from citation key to list of messages.
+    // "ArrayList" is used, because it implements Serializable.
     private final MVMap<String, ArrayList<ChatMessage>> messages;
 
-    public BibDatabaseChatHistory(Path bibDatabasePath, DialogService dialogService) {
+    public BibDatabaseChatHistoryFile(Path bibDatabasePath, DialogService dialogService) {
         MVStore mvStore;
 
         try {
@@ -50,11 +47,12 @@ public class BibDatabaseChatHistory implements AutoCloseable {
         return new BibEntryChatHistory(this, citationKey);
     }
 
-    public Stream<ChatMessage> getAllMessagesForEntry(String citationKey) {
+    public List<ChatMessage> getMessagesForEntry(String citationKey) {
         if (!messages.containsKey(citationKey)) {
-            return Stream.empty();
+            return List.of();
         }
-        return messages.get(citationKey).stream();
+
+        return messages.get(citationKey);
     }
 
     public void addMessage(String citationKey, ChatMessage message) {
@@ -66,8 +64,6 @@ public class BibDatabaseChatHistory implements AutoCloseable {
     }
 
     public void close() {
-        LOGGER.trace("Closing chat history store");
         this.mvStore.close();
-        LOGGER.trace("Closed chat history store");
     }
 }

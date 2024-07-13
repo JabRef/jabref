@@ -108,7 +108,6 @@ public class Launcher {
                 List<UiCommand> uiCommands = new ArrayList<>(argumentProcessor.getUiCommands());
                 JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);
                 JabRefGUI.launch(JabRefGUI.class, args);
-                LOGGER.error("THE GREAT END!");
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 JabRefCLI.printUsage(preferences);
