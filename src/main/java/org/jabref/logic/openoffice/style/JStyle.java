@@ -19,6 +19,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.jabref.gui.openoffice.StyleSelectDialogViewModel;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatter;
@@ -55,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * 3) If the entries are not numbered, a citation marker must be produced for each entry. This
  * operation is performed for each JabRef BibEntry.
  */
-public class JStyle implements Comparable<JStyle> {
+public class JStyle implements Comparable<JStyle>, OOStyle {
 
     public static final String ITALIC_ET_AL = "ItalicEtAl";
     public static final String MULTI_CITE_CHRONOLOGICAL = "MultiCiteChronological";
@@ -221,6 +222,7 @@ public class JStyle implements Comparable<JStyle> {
         citProperties.put(OXFORD_COMMA, "");
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -540,6 +542,7 @@ public class JStyle implements Comparable<JStyle> {
      *
      * @return True if an internal style
      */
+    @Override
     public boolean isInternalStyle() {
         return fromResource;
     }
@@ -570,6 +573,11 @@ public class JStyle implements Comparable<JStyle> {
     @Override
     public int hashCode() {
         return Objects.hash(path, name, citProperties, properties);
+    }
+
+    @Override
+    public StyleSelectDialogViewModel.StyleType getStyleType() {
+        return StyleSelectDialogViewModel.StyleType.JSTYLE;
     }
 
     enum BibStyleMode {
