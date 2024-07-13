@@ -23,7 +23,7 @@ import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -297,7 +297,7 @@ class OOBibBase {
         return OOVoidResult.ok();
     }
 
-    OOVoidResult<OOError> styleIsRequired(OOBibStyle style) {
+    OOVoidResult<OOError> styleIsRequired(JStyle style) {
         if (style == null) {
             return OOVoidResult.error(OOError.noValidStyleSelected());
         } else {
@@ -393,7 +393,7 @@ class OOBibBase {
         return OOVoidResult.ok();
     }
 
-    public OOVoidResult<OOError> checkStylesExistInTheDocument(OOBibStyle style, XTextDocument doc) {
+    public OOVoidResult<OOError> checkStylesExistInTheDocument(JStyle style, XTextDocument doc) {
         String pathToStyleFile = style.getPath();
 
         List<OOVoidResult<OOError>> results = new ArrayList<>();
@@ -522,7 +522,7 @@ class OOBibBase {
      */
     public void guiActionInsertEntry(List<BibEntry> entries,
                                      BibDatabaseContext bibDatabaseContext,
-                                     OOBibStyle style,
+                                     JStyle style,
                                      CitationType citationType,
                                      String pageInfo,
                                      Optional<Update.SyncOptions> syncOptions, StyleSelectDialogViewModel.StyleType selectedStyleType) {
@@ -625,7 +625,7 @@ class OOBibBase {
     /**
      * GUI action "Merge citations"
      */
-    public void guiActionMergeCitationGroups(List<BibDatabase> databases, OOBibStyle style) {
+    public void guiActionMergeCitationGroups(List<BibDatabase> databases, JStyle style) {
         final String errorTitle = Localization.lang("Problem combining cite markers");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
@@ -679,7 +679,7 @@ class OOBibBase {
      * <p>
      * Do the opposite of MergeCitationGroups. Combined markers are split, with a space inserted between.
      */
-    public void guiActionSeparateCitations(List<BibDatabase> databases, OOBibStyle style) {
+    public void guiActionSeparateCitations(List<BibDatabase> databases, JStyle style) {
         final String errorTitle = Localization.lang("Problem during separating cite markers");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
@@ -803,7 +803,7 @@ class OOBibBase {
      * @param databases Must have at least one.
      * @param style     Style.
      */
-    public void guiActionUpdateDocument(List<BibDatabase> databases, OOBibStyle style) {
+    public void guiActionUpdateDocument(List<BibDatabase> databases, JStyle style) {
         final String errorTitle = Localization.lang("Unable to synchronize bibliography");
 
         try {

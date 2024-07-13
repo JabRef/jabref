@@ -31,7 +31,7 @@ import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -78,11 +78,11 @@ public class StyleSelectDialogViewModel {
                       .executeWith(taskExecutor);
     }
 
-    public StyleSelectItemViewModel fromOOBibStyle(OOBibStyle style) {
+    public StyleSelectItemViewModel fromOOBibStyle(JStyle style) {
         return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
     }
 
-    public OOBibStyle toOOBibStyle(StyleSelectItemViewModel item) {
+    public JStyle toOOBibStyle(StyleSelectItemViewModel item) {
         return item.getStyle();
     }
 
@@ -113,7 +113,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public void deleteStyle() {
-        OOBibStyle style = selectedItem.getValue().getStyle();
+        JStyle style = selectedItem.getValue().getStyle();
         if (styleLoader.removeStyle(style)) {
             styles.remove(selectedItem.get());
         }
@@ -124,7 +124,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public void editStyle() {
-        OOBibStyle style = selectedItem.getValue().getStyle();
+        JStyle style = selectedItem.getValue().getStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", filePreferences);
         try {
             JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, style.getPath(), type);
@@ -149,7 +149,7 @@ public class StyleSelectDialogViewModel {
         List<String> externalStyles = styles.stream()
                                             .map(this::toOOBibStyle)
                                             .filter(style -> !style.isInternalStyle())
-                                            .map(OOBibStyle::getPath)
+                                            .map(JStyle::getPath)
                                             .collect(Collectors.toList());
         openOfficePreferences.setExternalStyles(externalStyles);
         openOfficePreferences.setCurrentStyle(selectedItem.getValue().getStylePath());

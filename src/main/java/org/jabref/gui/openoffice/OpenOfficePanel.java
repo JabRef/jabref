@@ -50,7 +50,7 @@ import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -100,7 +100,7 @@ public class OpenOfficePanel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
-    private OOBibStyle jStyle;
+    private JStyle jStyle;
     private StyleSelectDialogViewModel.StyleType currentStyleType;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,

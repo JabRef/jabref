@@ -25,7 +25,7 @@ import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
@@ -38,7 +38,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
-public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
+public class StyleSelectDialogView extends BaseDialog<JStyle> {
 
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
