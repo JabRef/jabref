@@ -81,13 +81,14 @@ public class GroupDialogViewModel {
 
     // Explicit Groups
     private final BooleanProperty explicitIncludeSelectedProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty editingGroupProperty = new SimpleBooleanProperty(false);
 
     // Option Groups
     private final StringProperty keywordGroupSearchTermProperty = new SimpleStringProperty("");
     private final StringProperty keywordGroupSearchFieldProperty = new SimpleStringProperty("");
     private final BooleanProperty keywordGroupCaseSensitiveProperty = new SimpleBooleanProperty();
     private final BooleanProperty keywordGroupRegexProperty = new SimpleBooleanProperty();
-    
+
     private final StringProperty searchGroupSearchTermProperty = new SimpleStringProperty("");
     private final ObjectProperty<EnumSet<SearchFlags>> searchFlagsProperty = new SimpleObjectProperty<>(EnumSet.noneOf(SearchFlags.class));
 
@@ -333,15 +334,14 @@ public class GroupDialogViewModel {
         try {
             String groupName = nameProperty.getValue().trim();
             if (typeExplicitProperty.getValue()) {
-                ExplicitGroup tempResultingGroup = new ExplicitGroup(
-                        groupName,
-                        groupHierarchySelectedProperty.getValue(),
-                        preferencesService.getBibEntryPreferences().getKeywordSeparator()
+                resultingGroup = new ExplicitGroup(
+                    groupName,
+                    groupHierarchySelectedProperty.getValue(),
+                    preferencesService.getBibEntryPreferences().getKeywordSeparator()
                 );
                 if (explicitIncludeSelectedProperty.getValue()) {
-                    tempResultingGroup.add(selectedEntries);
+                    ((ExplicitGroup) resultingGroup).add(selectedEntries);
                 }
-                resultingGroup = tempResultingGroup;
             } else if (typeKeywordsProperty.getValue()) {
                 if (keywordGroupRegexProperty.getValue()) {
                     resultingGroup = new RegexKeywordGroup(
@@ -442,6 +442,7 @@ public class GroupDialogViewModel {
             descriptionProperty.setValue(editedGroup.getDescription().orElse(""));
             iconProperty.setValue(editedGroup.getIconName().orElse(""));
             groupHierarchySelectedProperty.setValue(editedGroup.getHierarchicalContext());
+            editingGroupProperty.setValue(true);
 
             if (editedGroup.getClass() == WordKeywordGroup.class) {
                 typeKeywordsProperty.setValue(true);
@@ -481,11 +482,6 @@ public class GroupDialogViewModel {
                     autoGroupPersonsOptionProperty.setValue(Boolean.TRUE);
                     autoGroupPersonsFieldProperty.setValue(group.getField().getName());
                 }
-            } else if (editedGroup.getClass() == TexGroup.class) {
-                typeTexProperty.setValue(true);
-
-                TexGroup group = (TexGroup) editedGroup;
-                texGroupFilePathProperty.setValue(group.getFilePath().toString());
             }
         }
     }
@@ -616,6 +612,10 @@ public class GroupDialogViewModel {
 
     public BooleanProperty explicitIncludeSelectedProperty() {
         return explicitIncludeSelectedProperty;
+    }
+
+    public BooleanProperty editingGroupProperty() {
+        return editingGroupProperty;
     }
 
     public StringProperty keywordGroupSearchTermProperty() {

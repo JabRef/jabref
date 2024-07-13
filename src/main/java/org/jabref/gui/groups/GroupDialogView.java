@@ -213,6 +213,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
 
         explicitIncludeSelected.selectedProperty().bindBidirectional(viewModel.explicitIncludeSelectedProperty());
+        explicitIncludeSelected.disableProperty().bindBidirectional(viewModel.editingGroupProperty());
 
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());

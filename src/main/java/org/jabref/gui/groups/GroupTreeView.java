@@ -582,7 +582,6 @@ public class GroupTreeView extends BorderPane {
                 removeGroup,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
-                factory.createMenuItem(StandardActions.ADD_SUBGROUP_FROM_SELECTION, new CreateGroupAction(dialogService, stateManager, group.getGroupNode(), null, Selection.INCLUDE_SELECTED_ENTRIES)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, new ContextAction(StandardActions.GROUP_SUBGROUP_SORT_REVERSE, group)),
