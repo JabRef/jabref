@@ -51,6 +51,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -102,6 +103,7 @@ public class OpenOfficePanel {
     private OOBibBase ooBase;
     private JStyle jStyle;
     private StyleSelectDialogViewModel.StyleType currentStyleType;
+    private OOStyle currentStyle;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            PreferencesService preferencesService,
