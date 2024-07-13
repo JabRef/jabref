@@ -1,6 +1,5 @@
 package org.jabref.logic.ai;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -11,8 +10,7 @@ import org.jabref.logic.ai.embeddings.AiEmbeddingModel;
 import org.jabref.logic.ai.embeddings.AiEmbeddingsManager;
 import org.jabref.preferences.AiPreferences;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  *  The main class for the AI functionality.
@@ -22,10 +20,10 @@ import org.slf4j.LoggerFactory;
 public class AiService implements AutoCloseable {
     public static final String VERSION = "1";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
-
     private final AiPreferences aiPreferences;
-    private final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+    private final ExecutorService cachedThreadPool = Executors.newCachedThreadPool(
+            new ThreadFactoryBuilder().setNameFormat("ai-retrieval-pool-%d").build()
+    );
 
     private final AiChatLanguageModel aiChatLanguageModel;
     private final AiChatHistoryManager aiChatHistoryManager;
@@ -44,8 +42,8 @@ public class AiService implements AutoCloseable {
     @Override
     public void close() throws Exception {
         this.cachedThreadPool.shutdownNow();
-        LOGGER.trace("Closing aiChatHistoryManager");
         this.aiChatLanguageModel.close();
+        this.aiEmbeddingModel.close();
         this.aiChatHistoryManager.close();
         this.aiEmbeddingsManager.close();
     }

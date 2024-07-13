@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.preferences.AiPreferences;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -36,7 +37,9 @@ public class AiChatLanguageModel implements ChatLanguageModel, AutoCloseable {
     private final AiPreferences aiPreferences;
 
     private final HttpClient httpClient;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor(
+            new ThreadFactoryBuilder().setNameFormat("ai-api-connection-pool-%d").build()
+    );
     private Optional<ChatClient> chatClient = Optional.empty();
 
     public AiChatLanguageModel(AiPreferences aiPreferences) {
@@ -75,6 +78,14 @@ public class AiChatLanguageModel implements ChatLanguageModel, AutoCloseable {
 
     @Override
     public Response<AiMessage> generate(List<ChatMessage> list) {
+        // The rationale for RuntimeExceptions in this method:
+        // 1. langchain4j error handling is a mess, and it uses RuntimeExceptions
+        //    everywhere. Because this method implements a langchain4j interface,
+        //    we follow the same "practice".
+        // 2. There is no way to encode error information from type system: nor
+        //    in the result type, nor "throws" in method signature. Actually,
+        //    it's possible, but langchain4j doesn't do it.
+
         if (chatClient.isEmpty()) {
             throw new RuntimeException("Chat is not enabled");
         }

@@ -1,23 +1,37 @@
 package org.jabref.logic.ai.embeddings;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.AiPreferences;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import dev.langchain4j.data.embedding.Embedding;
+import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.embedding.AllMiniLmL6V2QuantizedEmbeddingModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.output.Response;
 
 /**
  * Wrapper around langchain4j embedding model.
  * <p>
  * This class listens to preferences changes.
  */
-public class AiEmbeddingModel {
+public class AiEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private final AiPreferences aiPreferences;
 
-    private final ObjectProperty<EmbeddingModel> embeddingModelObjectProperty = new SimpleObjectProperty<>();
+    private final ExecutorService executorService = Executors.newCachedThreadPool(
+            new ThreadFactoryBuilder().setNameFormat("ai-embedding-pool-%d").build()
+    );
+
+    private final ObjectProperty<Optional<EmbeddingModel>> embeddingModelObjectProperty = new SimpleObjectProperty<>(Optional.empty());
 
     public AiEmbeddingModel(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
@@ -26,25 +40,44 @@ public class AiEmbeddingModel {
     }
 
     private void rebuild() {
+        if (!aiPreferences.getEnableChatWithFiles()) {
+            embeddingModelObjectProperty.set(Optional.empty());
+            return;
+        }
+
         EmbeddingModel embeddingModel = switch (aiPreferences.getEmbeddingModel()) {
             case AiPreferences.EmbeddingModel.ALL_MINLM_l6_V2 ->
-                    new AllMiniLmL6V2EmbeddingModel();
+                    new AllMiniLmL6V2EmbeddingModel(executorService);
             case AiPreferences.EmbeddingModel.ALL_MINLM_l6_V2_Q ->
-                    new AllMiniLmL6V2QuantizedEmbeddingModel();
+                    new AllMiniLmL6V2QuantizedEmbeddingModel(executorService);
         };
 
-        embeddingModelObjectProperty.set(embeddingModel);
+        embeddingModelObjectProperty.set(Optional.of(embeddingModel));
     }
 
     private void setupListeningToPreferencesChanges() {
         aiPreferences.embeddingModelProperty().addListener(obs -> rebuild());
     }
 
-    public ObjectProperty<EmbeddingModel> embeddingModelObjectProperty() {
-        return embeddingModelObjectProperty;
+    @Override
+    public Response<List<Embedding>> embedAll(List<TextSegment> list) {
+        if (embeddingModelObjectProperty.get().isEmpty()) {
+            // The rationale for RuntimeException here:
+            // 1. langchain4j error handling is a mess, and it uses RuntimeExceptions
+            //    everywhere. Because this method implements a langchain4j interface,
+            //    we follow the same "practice".
+            // 2. There is no way to encode error information from type system: nor
+            //    in the result type, nor "throws" in method signature. Actually,
+            //    it's possible, but langchain4j doesn't do it.
+
+            throw new RuntimeException(Localization.lang("AI chat is not allowed"));
+        }
+
+        return embeddingModelObjectProperty.get().get().embedAll(list);
     }
 
-    public EmbeddingModel getEmbeddingModel() {
-        return embeddingModelObjectProperty.get();
+    @Override
+    public void close() throws Exception {
+        executorService.shutdownNow();
     }
 }

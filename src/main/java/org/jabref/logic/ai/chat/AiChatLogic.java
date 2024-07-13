@@ -2,6 +2,7 @@ package org.jabref.logic.ai.chat;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.ai.AiService;
@@ -62,22 +63,10 @@ public class AiChatLogic {
     }
 
     private void setupListeningToPreferencesChanges() {
-        aiService.getEmbeddingModel().embeddingModelObjectProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue != null) {
-                rebuild();
-            }
-        });
-
         AiPreferences aiPreferences = aiService.getPreferences();
 
-        aiPreferences.instructionProperty().addListener(obs -> {
-            rebuild();
-        });
-
-        aiPreferences.contextWindowSizeProperty().addListener(obs -> {
-            rebuild();
-        });
-
+        aiPreferences.instructionProperty().addListener(obs -> rebuild());
+        aiPreferences.contextWindowSizeProperty().addListener(obs -> rebuild());
         aiPreferences.onEmbeddingsParametersChange(this::rebuild);
     }
 
@@ -102,7 +91,7 @@ public class AiChatLogic {
                 .builder()
                 .embeddingStore(aiService.getEmbeddingsManager().getEmbeddingsStore())
                 .filter(filter)
-                .embeddingModel(aiService.getEmbeddingModel().getEmbeddingModel())
+                .embeddingModel(aiService.getEmbeddingModel())
                 .maxResults(aiPreferences.getRagMaxResultsCount())
                 .minScore(aiPreferences.getRagMinScore())
                 .build();
@@ -126,7 +115,6 @@ public class AiChatLogic {
     }
 
     public String execute(String prompt) {
-        // chain.execute() will automatically add messages to ChatMemory.
         return chain.execute(prompt);
     }
 

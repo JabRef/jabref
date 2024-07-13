@@ -59,7 +59,7 @@ public class AiIngestor {
         this.ingestor = EmbeddingStoreIngestor
                 .builder()
                 .embeddingStore(aiService.getEmbeddingsManager().getEmbeddingsStore())
-                .embeddingModel(aiService.getEmbeddingModel().getEmbeddingModel())
+                .embeddingModel(aiService.getEmbeddingModel())
                 .documentSplitter(documentSplitter)
                 .build();
     }
@@ -129,7 +129,7 @@ public class AiIngestor {
         }
     }
 
-    private void ingestString(String string, Metadata metadata) throws InterruptedException {
+    private void ingestString(String string, Metadata metadata) {
         ingestDocument(new Document(string, metadata));
     }
 
