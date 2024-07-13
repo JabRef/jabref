@@ -36,12 +36,12 @@ public class ChatMessageComponent extends HBox {
     @FXML
     private void initialize() {
         if (chatMessage instanceof UserMessage userMessage) {
-            setColor("-jr-ai-message-user");
+            setColor("-jr-ai-message-user", "-jr-ai-message-user-border");
             setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
             sourceLabel.setText(Localization.lang("User"));
             contentTextArea.setText(userMessage.singleText());
         } else if (chatMessage instanceof AiMessage aiMessage) {
-            setColor("-jr-ai-message-ai");
+            setColor("-jr-ai-message-ai", "-jr-ai-message-ai-border");
             setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
             sourceLabel.setText(Localization.lang("AI"));
             contentTextArea.setText(aiMessage.text());
@@ -50,14 +50,7 @@ public class ChatMessageComponent extends HBox {
         }
     }
 
-    public ChatMessageComponent withError(String message) {
-        sourceLabel.setText(Localization.lang("Error"));
-        contentTextArea.setText(message);
-        setColor("-jr-red");
-        return this;
-    }
-
-    public void setColor(String color) {
-        vBox.setStyle("-fx-background-color: " + color + ";");
+    public void setColor(String fillColor, String borderColor) {
+        vBox.setStyle("-fx-background-color: " + fillColor + "; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-color: " + borderColor + "; -fx-border-width: 3;");
     }
 }

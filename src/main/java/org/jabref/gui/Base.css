@@ -254,7 +254,9 @@
 
     /* AI chat style */
     -jr-ai-message-user: -jr-accent;
+    -jr-ai-message-user-border: -jr-theme;
     -jr-ai-message-ai: -jr-accent;
+    -jr-ai-message-ai-border: -jr-theme;
 }
 
 .unchanged {
