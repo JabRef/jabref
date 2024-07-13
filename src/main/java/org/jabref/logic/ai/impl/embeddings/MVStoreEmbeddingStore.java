@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.impl.embeddings;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -11,6 +12,9 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import org.jabref.gui.DialogService;
+import org.jabref.logic.ai.AiEmbeddingsManager;
 
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.embedding.Embedding;
@@ -39,16 +43,26 @@ import static java.util.Comparator.comparingDouble;
  * string (the content). Each of those fields is stored in a separate {@link MVMap}.
  * To connect values in those fields we use an id, which is a random {@link UUID}.
  */
-public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
-    public static final String LINKED_FILE_METADATA_KEY = "linkedFile";
-
+public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreEmbeddingStore.class);
+
+    private final MVStore mvStore;
 
     private final Map<String, float[]> embeddingsMap;
     private final Map<String, String> fileMap;
     private final Map<String, String> contentsMap;
 
-    public MVStoreEmbeddingStore(MVStore mvStore) {
+    // TODO: Add documentation about null.
+    public MVStoreEmbeddingStore(@Nullable Path path, DialogService dialogService) {
+        MVStore mvStoreTemp;
+        try {
+            mvStoreTemp = MVStore.open(path == null ? null : path.toString());
+        } catch (Exception e) {
+            dialogService.showErrorDialogAndWait("Unable to open embeddings cache file. Will store cache in RAM", e);
+            mvStoreTemp = MVStore.open(null);
+        }
+
+        this.mvStore = mvStoreTemp;
         this.embeddingsMap = mvStore.openMap("embeddingsMap");
         this.fileMap = mvStore.openMap("fileMap");
         this.contentsMap = mvStore.openMap("contentsMap");
@@ -78,7 +92,7 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
 
         contentsMap.put(id, textSegment.text());
 
-        String linkedFile = textSegment.metadata().getString(LINKED_FILE_METADATA_KEY);
+        String linkedFile = textSegment.metadata().getString(AiEmbeddingsManager.LINK_METADATA_KEY);
         if (linkedFile != null) {
             fileMap.put(id, linkedFile);
         } else {
@@ -157,10 +171,10 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
         return switch (filter) {
             case null -> embeddingsMap.keySet().stream();
 
-            case IsIn isInFilter when Objects.equals(isInFilter.key(), LINKED_FILE_METADATA_KEY) ->
+            case IsIn isInFilter when Objects.equals(isInFilter.key(), AiEmbeddingsManager.LINK_METADATA_KEY) ->
                     filterEntries(entry -> isInFilter.comparisonValues().contains(entry.getValue()));
 
-            case IsEqualTo isEqualToFilter when Objects.equals(isEqualToFilter.key(), LINKED_FILE_METADATA_KEY) ->
+            case IsEqualTo isEqualToFilter when Objects.equals(isEqualToFilter.key(), AiEmbeddingsManager.LINK_METADATA_KEY) ->
                     filterEntries(entry -> isEqualToFilter.comparisonValue().equals(entry.getValue()));
 
             default -> throw new IllegalArgumentException("Wrong filter passed to MVStoreEmbeddingStore");
@@ -169,5 +183,10 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
 
     private Stream<String> filterEntries(Predicate<Map.Entry<String, String>> predicate) {
         return fileMap.entrySet().stream().filter(predicate).map(Map.Entry::getKey);
+    }
+
+    @Override
+    public void close() {
+        mvStore.close();
     }
 }

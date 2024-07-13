@@ -13,8 +13,7 @@ import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.AiEmbeddingsGenerationTask;
-import org.jabref.logic.ai.events.FileIngestedEvent;
+import org.jabref.logic.ai.events.DocumentIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
@@ -49,14 +48,14 @@ public class AiChatTab extends EntryEditorTab {
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
-        aiService.getEmbeddingsManager().getIngestedFilesTracker().registerListener(new FileIngestedListener());
+        aiService.getEmbeddingsManager().registerListener(new FileIngestedListener());
     }
 
     private class FileIngestedListener {
         @Subscribe
-        public void listen(FileIngestedEvent event) {
+        public void listen(DocumentIngestedEvent event) {
             currentBibEntry.ifPresent(entry -> {
-                if (aiService.getEmbeddingsManager().getIngestedFilesTracker().haveIngestedLinkedFiles(entry.getFiles())) {
+                if (aiService.getEmbeddingsManager().hasIngestedLinkedFiles(entry.getFiles())) {
                     UiTaskExecutor.runInJavaFXThread(() -> bindToEntry(entry));
                 }
             });
@@ -80,7 +79,7 @@ public class AiChatTab extends EntryEditorTab {
             showErrorNotPdfs();
         } else if (!citationKeyIsValid(bibDatabaseContext, entry)) {
             tryToGenerateCitationKeyThenBind(entry);
-        } else if (!aiService.getEmbeddingsManager().getIngestedFilesTracker().haveIngestedLinkedFiles(entry.getFiles())) {
+        } else if (!aiService.getEmbeddingsManager().hasIngestedLinkedFiles(entry.getFiles())) {
             showErrorNotIngested();
         } else {
             bindToCorrectEntry(entry);

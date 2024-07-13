@@ -1,10 +1,16 @@
 package org.jabref.logic.ai;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.beans.property.BooleanProperty;
@@ -13,7 +19,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.ai.impl.embeddings.Ingestor;
+import org.jabref.logic.ai.impl.FileToDocument;
+import org.jabref.logic.ai.impl.embeddings.LowLevelIngestor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.model.database.BibDatabaseContext;
@@ -42,8 +49,6 @@ public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
 
-    private final Ingestor ingestor;
-
     // We use an {@link ArrayList} as a queue to implement prioritization of the {@link LinkedFile}s as it provides more
     // methods to manipulate the collection.
     private final List<LinkedFile> linkedFileQueue = Collections.synchronizedList(new ArrayList<>());
@@ -60,8 +65,6 @@ public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
         this.aiService = aiService;
         this.taskExecutor = taskExecutor;
 
-        this.ingestor = new Ingestor(aiService, shutdownProperty);
-
         configure();
 
         setupListeningToPreferencesChanges();
@@ -74,8 +77,6 @@ public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
 
         this.onFailure(e -> {
             LOGGER.error("Failure during configure phase", e);
-            // This is caught by the UI thread to display the error message
-            throw new RuntimeException(e);
         });
     }
 
@@ -126,7 +127,7 @@ public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
     }
 
     public void removeFromStore(LinkedFile linkedFile) {
-        aiService.getEmbeddingsManager().removeIngestedFile(linkedFile.getLink());
+        aiService.getEmbeddingsManager().removeDocument(linkedFile.getLink());
     }
 
     public void removeFromStore(Set<String> linksToRemove) {
@@ -134,11 +135,11 @@ public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
     }
 
     public void removeFromStore(String link) {
-        aiService.getEmbeddingsManager().removeIngestedFile(link);
+        aiService.getEmbeddingsManager().removeDocument(link);
     }
 
     public void updateEmbeddings(BibDatabaseContext bibDatabaseContext) {
-        Set<String> linksToRemove = aiService.getEmbeddingsManager().getIngestedFilesTracker().getIngestedLinkedFiles();
+        Set<String> linksToRemove = aiService.getEmbeddingsManager().getIngestedDocuments();
         bibDatabaseContext.getEntries().stream()
                        .flatMap(entry -> entry.getFiles().stream())
                        .map(LinkedFile::getLink)
@@ -156,9 +157,6 @@ public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
         updateProgress();
 
         while (!linkedFileQueue.isEmpty() && !isCanceled()) {
-            // TODO: there is a very strange error.
-            // It seems between these two statements someone removes a message.
-            // And that is true: it happens in prioritization.
             LinkedFile linkedFile = linkedFileQueue.removeLast();
 
             ingestLinkedFile(linkedFile);
@@ -173,7 +171,33 @@ public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
     }
 
     private void ingestLinkedFile(LinkedFile linkedFile) {
-        ingestor.ingestLinkedFile(linkedFile, databaseContext, filePreferences);
+        Optional<Path> path = linkedFile.findIn(databaseContext, filePreferences);
+
+        if (path.isEmpty()) {
+            LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
+            return;
+        }
+
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(path.get(), BasicFileAttributes.class);
+
+            long currentModificationTimeInSeconds = attributes.lastModifiedTime().to(TimeUnit.SECONDS);
+
+            Optional<Long> ingestedModificationTimeInSeconds = aiService.getEmbeddingsManager().getIngestedDocumentModificationTimeInSeconds(linkedFile.getLink());
+
+            if (ingestedModificationTimeInSeconds.isPresent() && currentModificationTimeInSeconds <= ingestedModificationTimeInSeconds.get()) {
+                return;
+            }
+
+            FileToDocument.fromFile(path.get()).ifPresent(document ->
+                    aiService.getEmbeddingsManager().addDocument(linkedFile.getLink(), document, currentModificationTimeInSeconds, shutdownProperty));
+        } catch (IOException e) {
+            LOGGER.error("Couldn't retrieve attributes of a linked file: {}", linkedFile.getLink(), e);
+            LOGGER.warn("Regenerating embeddings for linked file: {}", linkedFile.getLink());
+
+            FileToDocument.fromFile(path.get()).ifPresent(document ->
+                    aiService.getEmbeddingsManager().addDocument(linkedFile.getLink(), document, 0, shutdownProperty));
+        }
     }
 
     private void updateProgress() {

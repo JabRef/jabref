@@ -35,7 +35,7 @@ public class AiService implements AutoCloseable {
         this.chatLanguageModel = new ChatLanguageModel(aiPreferences);
         this.bibDatabaseChatHistoryManager = new BibDatabaseChatHistoryManager(dialogService);
         this.embeddingModel = new EmbeddingModel(aiPreferences);
-        this.aiEmbeddingsManager = new AiEmbeddingsManager(aiPreferences, dialogService);
+        this.aiEmbeddingsManager = new AiEmbeddingsManager(aiPreferences, embeddingModel, dialogService);
     }
 
     @Override

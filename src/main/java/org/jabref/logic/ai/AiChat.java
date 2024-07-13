@@ -46,7 +46,7 @@ public class AiChat {
 
     public static AiChat forBibEntry(AiService aiService, AiChatHistory aiChatHistory, BibEntry entry) {
         Filter filter = MetadataFilterBuilder
-                .metadataKey("linkedFile")
+                .metadataKey(AiEmbeddingsManager.LINK_METADATA_KEY)
                 .isIn(entry
                         .getFiles()
                         .stream()
