@@ -3,10 +3,12 @@ package org.jabref.logic.ai.chathistory;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.gui.DialogService;
 
 import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.ChatMessageType;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
@@ -24,9 +26,9 @@ public class BibDatabaseChatHistoryFile implements AutoCloseable {
 
     private final MVStore mvStore;
 
-    // Map from citation key to list of messages.
-    // "ArrayList" is used, because it implements Serializable.
-    private final MVMap<String, ArrayList<ChatMessage>> messages;
+    private final Map<Integer, String> messageEntry;
+    private final Map<Integer, String> messageType;
+    private final Map<Integer, String> messageContent;
 
     public BibDatabaseChatHistoryFile(Path bibDatabasePath, DialogService dialogService) {
         MVStore mvStore;
@@ -40,7 +42,9 @@ public class BibDatabaseChatHistoryFile implements AutoCloseable {
 
         this.mvStore = mvStore;
 
-        this.messages = this.mvStore.openMap("messages");
+        this.messageEntry = mvStore.openMap("messageEntry");
+        this.messageType = mvStore.openMap("messageType");
+        this.messageContent = mvStore.openMap("messageContent");
     }
 
     public BibEntryChatHistory getChatHistoryForEntry(String citationKey) {
