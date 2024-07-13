@@ -40,6 +40,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
@@ -395,8 +396,9 @@ public class URLDownload {
                 connection = new URLDownload(newUrl).openConnection();
             }
             if ((status >= 400) && (status < 500)) {
+                SimpleHttpResponse httpResponse = new SimpleHttpResponse(lConnection);
                 LOGGER.info("HTTP {}, details: {}, {}", status, lConnection.getResponseMessage(), lConnection.getContentLength() > 0 ? lConnection.getContent() : "");
-                throw new IOException(new FetcherClientException("Encountered HTTP %s %s".formatted(status, lConnection.getResponseMessage())));
+                throw new IOException(new FetcherClientException("Encountered HTTP %s %s".formatted(status, lConnection.getResponseMessage()),httpResponse));
             }
             if (status >= 500) {
                 LOGGER.info("HTTP {}, details: {}, {}", status, lConnection.getResponseMessage(), lConnection.getContentLength() > 0 ? lConnection.getContent() : "");
