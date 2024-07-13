@@ -103,7 +103,7 @@
                 <Separator orientation="VERTICAL"/>
                 <StackPane HBox.hgrow="ALWAYS">
                     <VBox visible="${explicitRadioButton.selected}" spacing="10.0">
-                        <CheckBox fx:id="explicitIncludeSelected" text="%Include selected entries in new subgroup"/>
+                        <CheckBox fx:id="explicitIncludeSelected" text="%Include selected entries in created subgroup"/>
                     </VBox>
                     <VBox visible="${keywordsRadioButton.selected}" spacing="10.0">
                         <VBox>
