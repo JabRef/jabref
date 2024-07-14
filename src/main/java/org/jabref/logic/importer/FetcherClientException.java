@@ -25,13 +25,12 @@ public class FetcherClientException extends FetcherException {
         super(errorMessage, localizedMessage, cause);
     }
 
-    public FetcherClientException(String errorMessage,SimpleHttpResponse httpResponse) {
+    public FetcherClientException(String errorMessage, SimpleHttpResponse httpResponse) {
         super(errorMessage);
-        this.httpResponse=httpResponse;
+        this.httpResponse = httpResponse;
     }
 
     public SimpleHttpResponse getHttpResponse() {
         return httpResponse;
     }
-
 }

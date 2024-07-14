@@ -398,7 +398,7 @@ public class URLDownload {
             if ((status >= 400) && (status < 500)) {
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(lConnection);
                 LOGGER.info("HTTP {}, details: {}, {}", status, lConnection.getResponseMessage(), lConnection.getContentLength() > 0 ? lConnection.getContent() : "");
-                throw new IOException(new FetcherClientException("Encountered HTTP %s %s".formatted(status, lConnection.getResponseMessage()),httpResponse));
+                throw new IOException(new FetcherClientException("Encountered HTTP %s %s".formatted(status, lConnection.getResponseMessage()), httpResponse));
             }
             if (status >= 500) {
                 LOGGER.info("HTTP {}, details: {}, {}", status, lConnection.getResponseMessage(), lConnection.getContentLength() > 0 ? lConnection.getContent() : "");
