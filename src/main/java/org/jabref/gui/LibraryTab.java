@@ -456,9 +456,11 @@ public class LibraryTab extends Tab {
             indexingTaskManager.updateDatabaseName(tabTitle.toString());
         }
 
+        /*
         if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
             aiEmbeddingsTaskManager.updateDatabaseName(tabTitle.toString());
         }
+         */
     }
 
     @Subscribe

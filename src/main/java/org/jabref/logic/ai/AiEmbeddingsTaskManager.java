@@ -20,6 +20,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.impl.FileToDocument;
+import org.jabref.logic.ai.impl.embeddings.EmbeddingGenerationBackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.model.database.BibDatabaseContext;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This class also provides an ability to prioritize the entry in the queue. But it seems not to work well.
  */
-public class AiEmbeddingsTaskManager extends BackgroundTask<Void> {
+public class AiEmbeddingsTaskManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiEmbeddingsTaskManager.class);
 
     private final BibDatabaseContext databaseContext;
@@ -49,7 +50,6 @@ public class AiEmbeddingsTaskManager extends BackgroundTask<Void> {
     // We use an {@link ArrayList} as a queue to implement prioritization of the {@link LinkedFile}s as it provides more
     // methods to manipulate the collection.
     private final List<LinkedFile> linkedFileQueue = Collections.synchronizedList(new ArrayList<>());
-    private int numOfProcessedFiles = 0;
 
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private final AtomicBoolean isBlockingNewTasks = new AtomicBoolean(false);
@@ -62,19 +62,7 @@ public class AiEmbeddingsTaskManager extends BackgroundTask<Void> {
         this.aiService = aiService;
         this.taskExecutor = taskExecutor;
 
-        configure();
-
         setupListeningToPreferencesChanges();
-    }
-
-    private void configure() {
-        showToUser(true);
-        willBeRecoveredAutomatically(true);
-        titleProperty().set(Localization.lang("Embeddings generation"));
-
-        this.onFailure(e -> {
-            LOGGER.error("Failure during configure phase", e);
-        });
     }
 
     private void setupListeningToPreferencesChanges() {
@@ -98,9 +86,14 @@ public class AiEmbeddingsTaskManager extends BackgroundTask<Void> {
             linkedFileQueue.add(linkedFile);
 
             if (!isRunning.get()) {
-                this.executeWith(taskExecutor);
+                runBackgroundTask();
             }
         }
+    }
+
+    private void runBackgroundTask() {
+        new EmbeddingGenerationBackgroundTask(isRunning, shutdownProperty, linkedFileQueue, databaseContext, filePreferences, aiService.getEmbeddingsManager())
+                .executeWith(taskExecutor);
     }
 
     public AutoCloseable blockNewTasks() {
@@ -147,65 +140,6 @@ public class AiEmbeddingsTaskManager extends BackgroundTask<Void> {
         addToStore(bibDatabaseContext.getEntries());
     }
 
-    @Override
-    protected Void call() throws Exception {
-        isRunning.set(true);
-
-        updateProgress();
-
-        while (!linkedFileQueue.isEmpty() && !isCanceled()) {
-            try {
-                LinkedFile linkedFile = linkedFileQueue.removeLast();
-
-                ingestLinkedFile(linkedFile);
-
-                ++numOfProcessedFiles;
-                updateProgress();
-            } catch (IndexOutOfBoundsException e) {
-                LOGGER.debug("linkedFileQueue was manipulated. Skipping iteration");
-            }
-        }
-
-        isRunning.set(false);
-
-        return null;
-    }
-
-    private void ingestLinkedFile(LinkedFile linkedFile) {
-        Optional<Path> path = linkedFile.findIn(databaseContext, filePreferences);
-
-        if (path.isEmpty()) {
-            LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
-            return;
-        }
-
-        try {
-            BasicFileAttributes attributes = Files.readAttributes(path.get(), BasicFileAttributes.class);
-
-            long currentModificationTimeInSeconds = attributes.lastModifiedTime().to(TimeUnit.SECONDS);
-
-            Optional<Long> ingestedModificationTimeInSeconds = aiService.getEmbeddingsManager().getIngestedDocumentModificationTimeInSeconds(linkedFile.getLink());
-
-            if (ingestedModificationTimeInSeconds.isPresent() && currentModificationTimeInSeconds <= ingestedModificationTimeInSeconds.get()) {
-                return;
-            }
-
-            FileToDocument.fromFile(path.get()).ifPresent(document ->
-                    aiService.getEmbeddingsManager().addDocument(linkedFile.getLink(), document, currentModificationTimeInSeconds, shutdownProperty));
-        } catch (IOException e) {
-            LOGGER.error("Couldn't retrieve attributes of a linked file: {}", linkedFile.getLink(), e);
-            LOGGER.warn("Regenerating embeddings for linked file: {}", linkedFile.getLink());
-
-            FileToDocument.fromFile(path.get()).ifPresent(document ->
-                    aiService.getEmbeddingsManager().addDocument(linkedFile.getLink(), document, 0, shutdownProperty));
-        }
-    }
-
-    private void updateProgress() {
-        updateMessage(Localization.lang("Generated embeddings %0 of %1 linked files", numOfProcessedFiles, numOfProcessedFiles + linkedFileQueue.size()));
-        updateProgress(numOfProcessedFiles, numOfProcessedFiles + linkedFileQueue.size());
-    }
-
     public void invalidate() {
         linkedFileQueue.clear();
         databaseContext.getEntries().forEach(entry -> {
@@ -214,15 +148,8 @@ public class AiEmbeddingsTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void updateDatabaseName(String name) {
-        UiTaskExecutor.runInJavaFXThread(() -> this.titleProperty().set(Localization.lang("Generating embeddings for %0", name)));
-    }
-
     public void shutdown() {
-        LOGGER.trace("Shutting down embeddings generation task.");
-        LOGGER.trace("Clearing linkedFileQueue...");
         linkedFileQueue.clear();
-        LOGGER.trace("Cleared linkedFileQueue");
         shutdownProperty.set(true);
     }
 }
