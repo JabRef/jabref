@@ -87,7 +87,6 @@ public class BibDatabaseChatHistoryFile implements AutoCloseable {
     }
 
     public synchronized void addMessage(String citationKey, ChatMessage message) {
-        // TODO: Add lock on this method.
         int id = messageType.keySet().size() + 1;
 
         messageType.put(id, message.type().name());

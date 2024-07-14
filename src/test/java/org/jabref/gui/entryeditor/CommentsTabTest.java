@@ -13,7 +13,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.AiEmbeddingsGenerationTask;
+import org.jabref.logic.ai.AiEmbeddingsTaskManager;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.logic.preferences.OwnerPreferences;
@@ -75,7 +75,7 @@ class CommentsTabTest {
     @Mock
     private IndexingTaskManager indexingTaskManager;
     @Mock
-    private AiEmbeddingsGenerationTask aiEmbeddingsGenerationTask;
+    private AiEmbeddingsTaskManager aiEmbeddingsTaskManager;
     @Mock
     private OwnerPreferences ownerPreferences;
 
@@ -105,7 +105,7 @@ class CommentsTabTest {
                 stateManager,
                 themeManager,
                 indexingTaskManager,
-                aiEmbeddingsGenerationTask,
+                aiEmbeddingsTaskManager,
                 taskExecutor,
                 journalAbbreviationRepository
         );

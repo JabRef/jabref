@@ -12,7 +12,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.logic.ai.AiEmbeddingsGenerationTask;
+import org.jabref.logic.ai.AiEmbeddingsTaskManager;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
@@ -78,9 +78,9 @@ public class ExternalFilesEntryLinker {
         }
     }
 
-    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, AiEmbeddingsGenerationTask aiEmbeddingsGenerationTask) {
+    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, AiEmbeddingsTaskManager aiEmbeddingsTaskManager) {
         try (AutoCloseable indexingTaskManagerBlocker = indexingTaskManager.blockNewTasks()) {
-            try (AutoCloseable embeddingsGenerationTaskBlocker = aiEmbeddingsGenerationTask.blockNewTasks()) {
+            try (AutoCloseable embeddingsGenerationTaskBlocker = aiEmbeddingsTaskManager.blockNewTasks()) {
                 addFilesToEntry(entry, files);
                 moveLinkedFilesToFileDir(entry);
                 renameLinkedFilesToPattern(entry);
@@ -98,9 +98,9 @@ public class ExternalFilesEntryLinker {
         }
     }
 
-    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, AiEmbeddingsGenerationTask aiEmbeddingsGenerationTask) {
+    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, AiEmbeddingsTaskManager aiEmbeddingsTaskManager) {
         try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
-            try (AutoCloseable blocker2 = aiEmbeddingsGenerationTask.blockNewTasks()) {
+            try (AutoCloseable blocker2 = aiEmbeddingsTaskManager.blockNewTasks()) {
                 for (Path file : files) {
                     copyFileToFileDir(file)
                             .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));

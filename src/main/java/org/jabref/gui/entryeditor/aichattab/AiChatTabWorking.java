@@ -7,21 +7,15 @@ import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.aichat.AiChatComponent;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chathistory.AiChatHistory;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryFile;
-import org.jabref.logic.ai.chathistory.BibEntryChatHistory;
-import org.jabref.logic.ai.AiEmbeddingsGenerationTask;
 import org.jabref.logic.ai.chathistory.InMemoryAiChatHistory;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.UserMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

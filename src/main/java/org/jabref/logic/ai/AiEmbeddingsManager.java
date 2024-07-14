@@ -73,11 +73,7 @@ public class AiEmbeddingsManager implements AutoCloseable {
     }
 
     private void setupListeningToPreferencesChanges() {
-        // TODO: Rethink this.
         // When these properties change, EmbeddingsGenerationTaskManager's should add the entries again.
-        // Unfortunately, they would also remove embeddings. So embeddings will be removed twice:
-        // once there, and the other in EmbeddingsGenerationTaskManager.
-        // It's not an error, but it's a double work.
 
         aiPreferences.onEmbeddingsParametersChange(embeddingStore::removeAll);
     }

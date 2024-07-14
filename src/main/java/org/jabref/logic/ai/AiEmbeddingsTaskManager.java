@@ -20,7 +20,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.impl.FileToDocument;
-import org.jabref.logic.ai.impl.embeddings.LowLevelIngestor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.model.database.BibDatabaseContext;
@@ -38,11 +37,9 @@ import org.slf4j.LoggerFactory;
  * will start a background task for generating the embeddings for each entry in the queue.
  * <p>
  * This class also provides an ability to prioritize the entry in the queue. But it seems not to work well.
- *
- * FIXME: This is a "Manager" (similar to {@link PdfIndexerManager}) and should be renamed to "EmbeddingsGenerationManager".
  */
-public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiEmbeddingsGenerationTask.class);
+public class AiEmbeddingsTaskManager extends BackgroundTask<Void> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiEmbeddingsTaskManager.class);
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
@@ -59,7 +56,7 @@ public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
 
     private final BooleanProperty shutdownProperty = new SimpleBooleanProperty(false);
 
-    public AiEmbeddingsGenerationTask(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiService aiService, TaskExecutor taskExecutor) {
+    public AiEmbeddingsTaskManager(BibDatabaseContext databaseContext, FilePreferences filePreferences, AiService aiService, TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.aiService = aiService;
@@ -157,12 +154,16 @@ public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
         updateProgress();
 
         while (!linkedFileQueue.isEmpty() && !isCanceled()) {
-            LinkedFile linkedFile = linkedFileQueue.removeLast();
+            try {
+                LinkedFile linkedFile = linkedFileQueue.removeLast();
 
-            ingestLinkedFile(linkedFile);
+                ingestLinkedFile(linkedFile);
 
-            ++numOfProcessedFiles;
-            updateProgress();
+                ++numOfProcessedFiles;
+                updateProgress();
+            } catch (IndexOutOfBoundsException e) {
+                LOGGER.debug("linkedFileQueue was manipulated. Skipping iteration");
+            }
         }
 
         isRunning.set(false);
@@ -206,11 +207,6 @@ public class AiEmbeddingsGenerationTask extends BackgroundTask<Void> {
     }
 
     public void invalidate() {
-        // TODO: Is this method right?
-        // 1. How to stop if running.
-        // 2. Is it okay to clear queue?
-        // 3. Is it okay to 1) remove, 2) add to queue everything?
-
         linkedFileQueue.clear();
         databaseContext.getEntries().forEach(entry -> {
             removeFromStore(entry);

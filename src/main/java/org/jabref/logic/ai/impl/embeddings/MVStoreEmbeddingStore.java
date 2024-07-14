@@ -52,7 +52,11 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
     private final Map<String, String> fileMap;
     private final Map<String, String> contentsMap;
 
-    // TODO: Add documentation about null.
+    /**
+     * Construct an embedding store that uses an MVStore for persistence.
+     * @param path - path to MVStore file, if null then in-memory MVStore will be used (without persistence).
+     * @param dialogService - dialog service that is used in case any error happens while opening an MVStore.
+     */
     public MVStoreEmbeddingStore(@Nullable Path path, DialogService dialogService) {
         MVStore mvStoreTemp;
         try {
