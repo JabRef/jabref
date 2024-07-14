@@ -6,12 +6,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 
-public record SimpleHttpResponse(int statusCode, String responseBody , String responseMessage) {
-
-    public SimpleHttpResponse(int statusCode,String responseBody,String responseMessage) {
-        this.statusCode=statusCode;
-        this.responseBody=truncateResponseBody(responseBody);
-        this.responseMessage=responseMessage;
+public record SimpleHttpResponse(int statusCode, String responseBody, String responseMessage) {
+    public SimpleHttpResponse(int statusCode, String responseBody, String responseMessage) {
+        this.statusCode = statusCode;
+        this.responseBody = truncateResponseBody(responseBody);
+        this.responseMessage = responseMessage;
     }
 
     public SimpleHttpResponse(HttpURLConnection connection) throws IOException {
