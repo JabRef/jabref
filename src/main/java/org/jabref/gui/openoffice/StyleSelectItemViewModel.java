@@ -9,7 +9,9 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.logic.openoffice.style.CSLStyle;
 import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
 
 public class StyleSelectItemViewModel {
 
@@ -17,15 +19,17 @@ public class StyleSelectItemViewModel {
     private final StringProperty journals = new SimpleStringProperty("");
     private final StringProperty file = new SimpleStringProperty("");
     private final ObjectProperty<Node> icon = new SimpleObjectProperty<>(IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode());
-    private final JStyle style;
+    private final JStyle jStyle;
+    private final OOStyle ooStyle;
     private final BooleanProperty internalStyle = new SimpleBooleanProperty();
 
-    public StyleSelectItemViewModel(String name, String journals, String file, JStyle style) {
+    public StyleSelectItemViewModel(String name, String journals, String file, JStyle jStyle, OOStyle ooStyle) {
         this.name.setValue(name);
         this.journals.setValue(journals);
         this.file.setValue(file);
-        this.style = style;
-        this.internalStyle.set(style.isInternalStyle());
+        this.jStyle = jStyle;
+        this.ooStyle = ooStyle;
+        this.internalStyle.set(jStyle.isInternalStyle());
     }
 
     public StringProperty nameProperty() {
@@ -44,8 +48,17 @@ public class StyleSelectItemViewModel {
         return file;
     }
 
-    public JStyle getStyle() {
-        return style;
+    public JStyle getjStyle() {
+        return jStyle;
+    }
+
+    public OOStyle getStyleUnified() {
+        if (ooStyle instanceof JStyle jStyle) {
+            return jStyle;
+        } else if (ooStyle instanceof CSLStyle cslStyle) {
+            return cslStyle;
+        }
+        return null;
     }
 
     public BooleanProperty internalStyleProperty() {
@@ -53,6 +66,6 @@ public class StyleSelectItemViewModel {
     }
 
     public String getStylePath() {
-        return style.getPath();
+        return jStyle.getPath();
     }
 }

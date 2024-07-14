@@ -42,14 +42,13 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
-import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
+import org.jabref.logic.openoffice.style.CSLStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
@@ -170,18 +169,20 @@ public class OpenOfficePanel {
         final boolean FAIL = true;
         final boolean PASS = false;
 
-        if (jStyle == null) {
-            jStyle = loader.getUsedStyle();
+        if (currentStyle == null) {
+            currentStyle = loader.getUsedStyleUnified();
         } else {
-            try {
-                jStyle.ensureUpToDate();
-            } catch (IOException ex) {
-                LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
-                String msg = Localization.lang("Unable to reload style file")
-                        + "'" + jStyle.getPath() + "'"
-                        + "\n" + ex.getMessage();
-                new OOError(title, msg, ex).showErrorDialog(dialogService);
-                return FAIL;
+            if (currentStyle instanceof JStyle jStyle) {
+                try {
+                    jStyle.ensureUpToDate();
+                } catch (IOException ex) {
+                    LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
+                    String msg = Localization.lang("Unable to reload style file")
+                            + "'" + jStyle.getPath() + "'"
+                            + "\n" + ex.getMessage();
+                    new OOError(title, msg, ex).showErrorDialog(dialogService);
+                    return FAIL;
+                }
             }
         }
         return PASS;
@@ -199,18 +200,16 @@ public class OpenOfficePanel {
             StyleSelectDialogView styleDialog = new StyleSelectDialogView(loader);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
-                             jStyle = selectedStyle;
-                             currentStyleType = styleDialog.getSelectedStyleType();
-                             try {
-                                 jStyle.ensureUpToDate();
-                             } catch (IOException e) {
-                                 LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), e);
-                             }
-                             if (currentStyleType == StyleSelectDialogViewModel.StyleType.JSTYLE) {
+                             currentStyle = selectedStyle;
+                             if (currentStyle instanceof JStyle jStyle) {
+                                 try {
+                                     jStyle.ensureUpToDate();
+                                 } catch (IOException e) {
+                                     LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), e);
+                                 }
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
-                             } else {
-                                 CitationStyle cslStyle = CSLCitationOOAdapter.getSelectedStyle();
-                                 dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getTitle()));
+                             } else if (currentStyle instanceof CSLStyle cslStyle) { // Unreachable statement, check StyleSelectItemViewModel
+                                 dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
                              }
                          });
         });

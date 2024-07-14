@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
@@ -90,6 +91,9 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.style.CSLStyle;
+import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
@@ -356,6 +360,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
+    public static String OO_CURRENT_STYLE = "ooCurrentStyle";
 
     // Special field preferences
     public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
@@ -505,6 +510,7 @@ public class JabRefPreferences implements PreferencesService {
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private MergeDialogPreferences mergeDialogPreferences;
+    private OOStyle style;
 
     private KeyBindingRepository keyBindingRepository;
 
@@ -1281,7 +1287,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(OO_USE_ALL_OPEN_BASES),
                 getBoolean(OO_SYNC_WHEN_CITING),
                 getStringList(OO_EXTERNAL_STYLE_FILES),
-                get(OO_BIBLIOGRAPHY_STYLE_FILE));
+                get(OO_BIBLIOGRAPHY_STYLE_FILE),
+                get(OO_CURRENT_STYLE)); // Type??
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
@@ -1390,6 +1397,33 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (obs, oldValue, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
 
         return groupsPreferences;
+    }
+
+    private void storeStyle(OOStyle style) { //where to call?
+        if (style instanceof CSLStyle cslStyle) { // why use iscitationstylefile?
+            OO_CURRENT_STYLE = cslStyle.getPath();
+        } else if (style instanceof JStyle jStyle) {
+            OO_CURRENT_STYLE = jStyle.getName();
+        }
+    }
+
+    public OOStyle getStyle() {
+        if (style != null) {
+            return style;
+        }
+
+        String currentStyle = get(OO_CURRENT_STYLE);
+
+        this.style = new OpenOfficePreferences(
+                get(OO_EXECUTABLE_PATH),
+                getBoolean(OO_USE_ALL_OPEN_BASES),
+                getBoolean(OO_SYNC_WHEN_CITING),
+                getStringList(OO_EXTERNAL_STYLE_FILES),
+                get(OO_BIBLIOGRAPHY_STYLE_FILE),
+                get(OO_CURRENT_STYLE));
+
+        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_CURRENT_STYLE, newValue)); // Type??
+        return this.style;
     }
 
     //*************************************************************************************************************

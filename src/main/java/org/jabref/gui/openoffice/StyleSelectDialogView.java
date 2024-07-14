@@ -78,7 +78,7 @@ public class StyleSelectDialogView extends BaseDialog<JStyle> {
             if (button == ButtonType.OK) {
                 viewModel.storePrefs();
                 CSLCitationOOAdapter.setSelectedStyleName(viewModel.getSelectedStyleName());
-                return tvStyles.getSelectionModel().getSelectedItem().getStyle();
+                return tvStyles.getSelectionModel().getSelectedItem().getStyleUnified(); // Take a look here, how to deal with this?
             }
             return null;
         });
@@ -150,8 +150,8 @@ public class StyleSelectDialogView extends BaseDialog<JStyle> {
 
         EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
             tvStyles.getSelectionModel().select(style);
-            previewArticle.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat(StandardEntryType.Article)));
-            previewBook.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat(StandardEntryType.Book)));
+            previewArticle.setLayout(new TextBasedPreviewLayout(style.getjStyle().getReferenceFormat(StandardEntryType.Article)));
+            previewBook.setLayout(new TextBasedPreviewLayout(style.getjStyle().getReferenceFormat(StandardEntryType.Book)));
         });
 
         availableListView.setItems(viewModel.getAvailableLayouts());
@@ -165,7 +165,7 @@ public class StyleSelectDialogView extends BaseDialog<JStyle> {
         availableListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 viewModel.handleCslStyleSelection();
-                this.setResult(tvStyles.getSelectionModel().getSelectedItem().getStyle());
+                this.setResult(tvStyles.getSelectionModel().getSelectedItem().getjStyle());
                 this.close();
             }
         });

@@ -8,9 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,5 +143,31 @@ public class StyleLoader {
         // Pick the first internal
         openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
         return internalStyles.getFirst();
+    }
+
+    public OOStyle getUsedStyleUnified() {
+        OOStyle style = openOfficePreferences.getCurrentStyle();
+        if (style instanceof JStyle jStyle) {
+            String filename = openOfficePreferences.getCurrentJStyle();
+            if (filename != null) {
+                for (JStyle jstyle : getStyles()) {
+                    if (filename.equals(jStyle.getPath())) {
+                        return jstyle;
+                    }
+                }
+            }
+            // Pick the first internal
+            openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
+            return internalStyles.getFirst();
+        } else if (style instanceof CSLStyle cslStyle) {
+            try {
+                CitationStyle citationStyle = CSLCitationOOAdapter.getSelectedStyle();
+                return new CSLStyle(citationStyle);
+            } catch (Exception ex) {
+                LOGGER.error("Error loading CSL style", ex);
+                return null;
+            }
+        }
+        return null;
     }
 }

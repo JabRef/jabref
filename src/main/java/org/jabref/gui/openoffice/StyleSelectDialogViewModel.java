@@ -68,7 +68,7 @@ public class StyleSelectDialogViewModel {
 
         styles.addAll(loadStyles());
 
-        String currentStyle = openOfficePreferences.getCurrentJStyle();
+        String currentStyle = openOfficePreferences.getCurrentStyle().getName();
         selectedItem.setValue(getStyleOrDefault(currentStyle));
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
@@ -83,11 +83,11 @@ public class StyleSelectDialogViewModel {
     }
 
     public StyleSelectItemViewModel fromOOBibStyle(JStyle style) {
-        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
+        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style, style);
     }
 
     public JStyle toOOBibStyle(StyleSelectItemViewModel item) {
-        return item.getStyle();
+        return item.getjStyle();
     }
 
     public void addStyleFile() {
@@ -117,7 +117,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public void deleteStyle() {
-        JStyle style = selectedItem.getValue().getStyle();
+        JStyle style = selectedItem.getValue().getjStyle();
         if (styleLoader.removeStyle(style)) {
             styles.remove(selectedItem.get());
         }
@@ -128,7 +128,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public void editStyle() {
-        JStyle style = selectedItem.getValue().getStyle();
+        JStyle style = selectedItem.getValue().getjStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", filePreferences);
         try {
             JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, style.getPath(), type);
@@ -143,10 +143,10 @@ public class StyleSelectDialogViewModel {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        TextArea styleView = new TextArea(item.getStyle().getLocalCopy());
+        TextArea styleView = new TextArea(item.getjStyle().getLocalCopy());
         scrollPane.setContent(styleView);
         pane.setContent(scrollPane);
-        dialogService.showCustomDialogAndWait(item.getStyle().getName(), pane, ButtonType.OK);
+        dialogService.showCustomDialogAndWait(item.getjStyle().getName(), pane, ButtonType.OK);
     }
 
     public void storePrefs() {
