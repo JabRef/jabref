@@ -2073,7 +2073,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SHOW_ADVANCED_HINTS),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
-                new HashSet<>(getStringList(SELECTED_SLR_FETCHERS)));
+                getStringList(SELECTED_SLR_FETCHERS));
 
         EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
@@ -2091,7 +2091,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
         EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
-        workspacePreferences.getSelectedSlrFetchers().addListener((SetChangeListener<String>) change ->
+        workspacePreferences.getSelectedSlrFetchers().addListener((ListChangeListener<String>) change ->
                 putStringList(SELECTED_SLR_FETCHERS, new ArrayList<>(workspacePreferences.getSelectedSlrFetchers())));
         return workspacePreferences;
     }

@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.ObservableSet;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -238,13 +238,13 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 })
                 .install(catalogTable);
 
-        ObservableSet<String> selectedFetchers = prefs.getWorkspacePreferences().getSelectedSlrFetchers();
+        ObservableList<String> selectedFetchers = prefs.getWorkspacePreferences().getSelectedSlrFetchers();
         for (StudyCatalogItem item : catalogTable.getItems()) {
             item.setEnabled(selectedFetchers.contains(item.getName()));
             item.enabledProperty().addListener((obs, oldValue, newValue) -> {
-                if (newValue) {
+                if (newValue && !selectedFetchers.contains(item.getName())) {
                     selectedFetchers.add(item.getName());
-                } else {
+                } else if (!newValue) {
                     selectedFetchers.remove(item.getName());
                 }
             });

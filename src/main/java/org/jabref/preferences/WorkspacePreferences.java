@@ -1,6 +1,6 @@
 package org.jabref.preferences;
 
-import java.util.Set;
+import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.l10n.Language;
@@ -25,7 +25,7 @@ public class WorkspacePreferences {
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
-    private final ObservableSet<String> selectedSlrFetchers;
+    private final ObservableList<String> selectedSlrFetchers;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -37,7 +37,7 @@ public class WorkspacePreferences {
                                 boolean showAdvancedHints,
                                 boolean warnAboutDuplicatesInInspection,
                                 boolean confirmDelete,
-                                Set<String> selectedSlrFetchers) {
+                                List<String> selectedSlrFetchers) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
@@ -48,7 +48,7 @@ public class WorkspacePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
-        this.selectedSlrFetchers = FXCollections.observableSet(selectedSlrFetchers);
+        this.selectedSlrFetchers = FXCollections.observableArrayList(selectedSlrFetchers);
     }
 
     public Language getLanguage() {
@@ -163,12 +163,11 @@ public class WorkspacePreferences {
         this.confirmDelete.set(confirmDelete);
     }
 
-    public ObservableSet<String> getSelectedSlrFetchers() {
+    public ObservableList<String> getSelectedSlrFetchers() {
         return selectedSlrFetchers;
     }
 
-    public void setSelectedSlrFetchers(Set<String> fetchers) {
-        selectedSlrFetchers.retainAll(fetchers);
-        selectedSlrFetchers.addAll(fetchers);
+    public void setSelectedSlrFetchers(List<String> fetchers) {
+        selectedSlrFetchers.setAll(fetchers);
     }
 }
