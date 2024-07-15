@@ -1,5 +1,6 @@
 package org.jabref.gui.openoffice;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,8 +22,10 @@ import org.jabref.logic.openoffice.action.ManageCitations;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.CitationEntry;
 import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
@@ -509,7 +512,7 @@ class OOBibBase {
      * Note: Undo does not remove or reestablish custom properties.
      *
      * @param entries      The entries to cite.
-     * @param database     The database the entries belong to (all of them). Used when creating the citation mark.
+     * @param bibDatabaseContext     The database the entries belong to (all of them). Used when creating the citation mark.
      *                     <p>
      *                     Consistency: for each entry in {@code entries}: looking it up in {@code syncOptions.get().databases} (if present) should yield {@code database}.
      * @param style        The bibliography style we are using.
@@ -518,11 +521,11 @@ class OOBibBase {
      * @param syncOptions  Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise provides options for refreshing the reference list.
      */
     public void guiActionInsertEntry(List<BibEntry> entries,
-                                     BibDatabase database,
+                                     BibDatabaseContext bibDatabaseContext,
                                      OOBibStyle style,
                                      CitationType citationType,
                                      String pageInfo,
-                                     Optional<Update.SyncOptions> syncOptions) {
+                                     Optional<Update.SyncOptions> syncOptions, StyleSelectDialogViewModel.StyleType selectedStyleType) {
 
         final String errorTitle = "Could not insert citation";
 
@@ -579,15 +582,24 @@ class OOBibBase {
 
         try {
             UnoUndo.enterUndoContext(doc, "Insert citation");
-
-            EditInsert.insertCitationGroup(doc,
-                    frontend.get(),
-                    cursor.get(),
-                    entries,
-                    database,
-                    style,
-                    citationType,
-                    pageInfo);
+            if (selectedStyleType == StyleSelectDialogViewModel.StyleType.CSL) {
+                // Handle CSL Styles
+                if (citationType == CitationType.AUTHORYEAR_INTEXT) {
+                    CSLCitationOOAdapter.insertInText(doc, cursor.get(), entries, bibDatabaseContext);
+                } else {
+                    CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), entries, bibDatabaseContext);
+                }
+            } else {
+                // Handle JStyles
+                EditInsert.insertCitationGroup(doc,
+                        frontend.get(),
+                        cursor.get(),
+                        entries,
+                        bibDatabaseContext.getDatabase(),
+                        style,
+                        citationType,
+                        pageInfo);
+            }
 
             if (syncOptions.isPresent()) {
                 Update.resyncDocument(doc, style, fcursor.get(), syncOptions.get());
@@ -596,11 +608,13 @@ class OOBibBase {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-        } catch (CreationException
-                | IllegalTypeException
-                | NotRemoveableException
-                | PropertyVetoException
-                | WrappedTargetException ex) {
+        } catch (
+                CreationException |
+                WrappedTargetException |
+                IOException |
+                PropertyVetoException |
+                IllegalTypeException |
+                NotRemoveableException ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } finally {
