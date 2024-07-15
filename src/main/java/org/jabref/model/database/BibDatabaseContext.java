@@ -153,41 +153,45 @@ public class BibDatabaseContext {
      *     <li>user-specific metadata directory</li>
      *     <li>general metadata directory</li>
      *     <li>BIB file directory (if configured in the preferences AND none of the two above directories are configured)</li>
-     *     <li>preferences directory (if .bib file directory should not be used according to the preferences)</li>
+     *     <li>preferences directory (if .bib file directory should not be used according to the (global) preferences)</li>
      * </ol>
      *
      * @param preferences The fileDirectory preferences
      */
     public List<Path> getFileDirectories(FilePreferences preferences) {
-        List<Path> fileDirs = new ArrayList<>();
+        List<Path> fileDirs = new ArrayList<>(3);
 
-        // 1. Metadata user-specific directory
-        metaData.getUserFileDirectory(preferences.getUserAndHost())
-                .ifPresent(userFileDirectory -> fileDirs.add(getFileDirectoryPath(userFileDirectory)));
+        Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(dir -> getFileDirectoryPath(dir));
+        userFileDirectory.ifPresent(fileDirs::add);
 
-        // 2. Metadata general directory
-        metaData.getDefaultFileDirectory()
-                .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
+        Optional<Path> generalFileDirectory = metaData.getDefaultFileDirectory().map(dir -> getFileDirectoryPath(dir));
+        generalFileDirectory.ifPresent(fileDirs::add);
 
-        // fileDirs.isEmpty() is true if:
+        // fileDirs.isEmpty() is true after these two if there are no directories set in the BIB file itself:
         //   1) no user-specific file directory set (in the metadata of the bib file) and
         //   2) no general file directory is set (in the metadata of the bib file)
 
-        // 3. BIB file directory or main file directory
+        // BIB file directory or main file directory (according to (global) preferences)
         if (preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
                 if (parentPath == null) {
                     parentPath = Path.of(System.getProperty("user.dir"));
+                    LOGGER.warn("Parent path of database file {} is null. Falling back to {}.", dbPath, parentPath);
                 }
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-                fileDirs.add(parentPath);
+                Path absolutePath = parentPath.toAbsolutePath();
+                if (!fileDirs.contains(absolutePath)) {
+                    fileDirs.add(absolutePath);
+                }
             });
         } else {
-            preferences.getMainFileDirectory().ifPresent(fileDirs::add);
+            preferences.getMainFileDirectory()
+                       .filter(path -> !fileDirs.contains(path))
+                       .ifPresent(fileDirs::add);
         }
 
-        return fileDirs.stream().map(Path::toAbsolutePath).distinct().toList();
+        return fileDirs;
     }
 
     /**
@@ -201,15 +205,19 @@ public class BibDatabaseContext {
                                               .findFirst();
     }
 
-    private Path getFileDirectoryPath(String directoryName) {
-        Path directory = Path.of(directoryName);
-        // If this directory is relative, we try to interpret it as relative to
-        // the file path of this BIB file:
-        Optional<Path> databaseFile = getDatabasePath();
-        if (!directory.isAbsolute() && databaseFile.isPresent()) {
-            return databaseFile.get().getParent().resolve(directory).normalize();
+    /**
+     * @return The absolute path for the given directory
+     */
+    private Path getFileDirectoryPath(String directory) {
+        Path path = Path.of(directory);
+        if (path.isAbsolute()) {
+            return path;
         }
-        return directory;
+
+        // If this path is relative, we try to interpret it as relative to the file path of this BIB file:
+        return getDatabasePath()
+                .map(databaseFile -> databaseFile.getParent().resolve(path).normalize().toAbsolutePath())
+                .orElse(path);
     }
 
     public DatabaseSynchronizer getDBMSSynchronizer() {
