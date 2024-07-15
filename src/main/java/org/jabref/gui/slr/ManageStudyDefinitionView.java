@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -111,7 +114,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     /**
      * This is used to edit an existing study.
      *
-     * @param study          the study to edit
+     * @param study the study to edit
      * @param studyDirectory the directory of the study
      */
     public ManageStudyDefinitionView(Study study, Path studyDirectory) {
@@ -138,10 +141,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
                                                 Bindings.isEmpty(viewModel.getQueries()),
                                                 Bindings.isEmpty(viewModel.getCatalogs())),
-                                                Bindings.isEmpty(viewModel.getAuthors())),
-                                                viewModel.getTitle().isEmpty()),
-                                                viewModel.getDirectory().isEmpty()),
-                                                directoryWarning.visibleProperty()));
+                                        Bindings.isEmpty(viewModel.getAuthors())),
+                                viewModel.getTitle().isEmpty()),
+                        viewModel.getDirectory().isEmpty()),
+                directoryWarning.visibleProperty()));
 
         setResultConverter(button -> {
             if (button == saveSurveyButtonType) {
@@ -237,6 +240,11 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 })
                 .install(catalogTable);
 
+        Set<String> selectedFetchers = prefs.getWorkspacePreferences().getSelectedSlrFetchers();
+        for (StudyCatalogItem item : catalogTable.getItems()) {
+            item.setEnabled(selectedFetchers.contains(item.getName()));
+        }
+
         catalogColumn.setReorderable(false);
         catalogColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
@@ -249,6 +257,14 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
 
         catalogTable.setItems(viewModel.getCatalogs());
+
+        catalogTable.getItems().addListener((ListChangeListener<StudyCatalogItem>) c -> {
+            Set<String> newSelection = catalogTable.getItems().stream()
+                                                   .filter(StudyCatalogItem::isEnabled)
+                                                   .map(StudyCatalogItem::getName)
+                                                   .collect(Collectors.toSet());
+            prefs.getWorkspacePreferences().setSelectedSlrFetchers(newSelection);
+        });
     }
 
     private void setupCommonPropertiesForTables(Node addControl,

@@ -1,11 +1,14 @@
 package org.jabref.preferences;
 
+import java.util.Set;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.l10n.Language;
@@ -21,6 +24,7 @@ public class WorkspacePreferences {
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
+    private final ObjectProperty<Set<String>> selectedSlrFetchers;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -31,7 +35,8 @@ public class WorkspacePreferences {
                                 boolean shouldOpenLastEdited,
                                 boolean showAdvancedHints,
                                 boolean warnAboutDuplicatesInInspection,
-                                boolean confirmDelete) {
+                                boolean confirmDelete,
+                                Set<String> selectedSlrFetchers) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
@@ -42,6 +47,7 @@ public class WorkspacePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
+        this.selectedSlrFetchers = new SimpleObjectProperty<>(FXCollections.observableSet(selectedSlrFetchers));
     }
 
     public Language getLanguage() {
@@ -154,5 +160,17 @@ public class WorkspacePreferences {
 
     public void setConfirmDelete(boolean confirmDelete) {
         this.confirmDelete.set(confirmDelete);
+    }
+
+    public Set<String> getSelectedSlrFetchers() {
+        return selectedSlrFetchers.get();
+    }
+
+    public ObjectProperty<Set<String>> selectedSlrFetchersProperty() {
+        return selectedSlrFetchers;
+    }
+
+    public void setSelectedSlrFetchers(Set<String> selectedSlrFetchers) {
+        this.selectedSlrFetchers.set(FXCollections.observableSet(selectedSlrFetchers));
     }
 }
