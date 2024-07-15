@@ -25,7 +25,7 @@ Following is a list of common errors encountered by developers which lead to fai
 * `org.jabref.logic.citationstyle.CitationStyle` `discoverCitationStyles` <span style="color:red">ERROR: Could not find any citation style. Tried with /ieee.csl.</span>
   * <span style="color:green">Fix</span>: Check the directory `src/main/resources/csl-styles`. If it is missing or empty, run `git submodule update`. Now, check inside if `ieee.csl` exists. If it does not, run `git reset --hard` <b>inside that directory</b>.
 
-* `java.lang.IllegalArgumentException` : Unable to load locale en-US<br> <span style="color:red">ERROR: Could not generate BibEntry citation. The CSL engine could not create a preview for your item.</span>
+* `java.lang.IllegalArgumentException`: Unable to load locale en-US<br> <span style="color:red">ERROR: Could not generate BibEntry citation. The CSL engine could not create a preview for your item.</span>
   * <span style="color:green">Fix</span>: Check the directory `src/main/resources/csl-locales`. If it is missing or empty, run `git submodule update`. If still not fixed, run `git reset --hard` <b>inside that directory</b>.
 
 * `org.jabref.architecture.MainArchitectureTest` `restrictStandardStreams` <span style="color:red">FAILED</span>
