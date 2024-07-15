@@ -56,6 +56,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
     private final ObjectProperty<DateRange> selectedDate = new SimpleObjectProperty<>();
     private final ObjectProperty<ExternalFileSorter> selectedSort = new SimpleObjectProperty<>();
+    private final BooleanProperty storePreferences = new SimpleBooleanProperty(false);
 
     private final ObjectProperty<Optional<FileNodeViewModel>> treeRootProperty = new SimpleObjectProperty<>();
     private final SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -263,6 +264,10 @@ public class UnlinkedFilesDialogViewModel {
 
     public ObjectProperty<ExternalFileSorter> selectedSortProperty() {
         return this.selectedSort;
+    }
+
+    public BooleanProperty storePreferencesProperty() {
+        return this.storePreferences;
     }
 
     public StringProperty directoryPathProperty() {
