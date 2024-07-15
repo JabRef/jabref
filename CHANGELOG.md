@@ -13,6 +13,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- JabRef respects the [configuration for storing files relative to the .bib file](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files) in more cases.
+
 ### Fixed
 
 ### Removed

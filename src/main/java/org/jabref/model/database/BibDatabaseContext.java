@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.LibraryTab;
@@ -170,10 +169,12 @@ public class BibDatabaseContext {
         metaData.getDefaultFileDirectory()
                 .ifPresent(metaDataDirectory -> fileDirs.add(getFileDirectoryPath(metaDataDirectory)));
 
+        // fileDirs.isEmpty() is true if:
+        //   1) no user-specific file directory set (in the metadata of the bib file) and
+        //   2) no general file directory is set (in the metadata of the bib file)
+
         // 3. BIB file directory or main file directory
-        // fileDirs.isEmpty in the case, 1) no user-specific file directory and 2) no general file directory is set
-        // (in the metadata of the bib file)
-        if (fileDirs.isEmpty() && preferences.shouldStoreFilesRelativeToBibFile()) {
+        if (preferences.shouldStoreFilesRelativeToBibFile()) {
             getDatabasePath().ifPresent(dbPath -> {
                 Path parentPath = dbPath.getParent();
                 if (parentPath == null) {
@@ -183,11 +184,10 @@ public class BibDatabaseContext {
                 fileDirs.add(parentPath);
             });
         } else {
-            // Main file directory
             preferences.getMainFileDirectory().ifPresent(fileDirs::add);
         }
 
-        return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
+        return fileDirs.stream().map(Path::toAbsolutePath).distinct().toList();
     }
 
     /**

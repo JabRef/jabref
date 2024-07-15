@@ -190,9 +190,15 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         super.bindToEntry(entry);
 
         if ((entry != null) && preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
+            LOGGER.debug("Auto-linking files for entry {}", entry);
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask
                     .wrap(() -> findAssociatedNotLinkedFiles(entry))
-                    .onSuccess(files::addAll);
+                    .onSuccess(list -> {
+                        if (!list.isEmpty()) {
+                            LOGGER.debug("Found non-associated files:", list);
+                            files.addAll(list);
+                        }
+                    });
             taskExecutor.execute(findAssociatedNotLinkedFiles);
         }
     }
@@ -224,6 +230,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
             dialogService.showErrorDialogAndWait("Error accessing the file system", e);
         }
 
+        LOGGER.trace("Found {} associated files for entry {}", result.size(), entry.getCitationKey());
         return result;
     }
 
