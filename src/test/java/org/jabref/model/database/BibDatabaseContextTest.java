@@ -76,8 +76,10 @@ class BibDatabaseContextTest {
         database.setDatabasePath(file);
         database.getMetaData().setDefaultFileDirectory("../Literature");
         // first directory is the metadata
-        // the bib file location is not included, because only the library-configured directories should be searched and the fallback should be the global directory.
-        assertEquals(List.of(Path.of("/absolute/Literature").toAbsolutePath()),
+        assertEquals(List.of(
+                        Path.of("/absolute/Literature").toAbsolutePath(),
+                        Path.of("/absolute/subdir").toAbsolutePath()
+                ),
                 database.getFileDirectories(fileDirPrefs));
     }
 
@@ -88,9 +90,11 @@ class BibDatabaseContextTest {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         database.getMetaData().setDefaultFileDirectory("Literature");
-        // first directory is the metadata
-        // the bib file location is not included, because only the library-configured directories should be searched and the fallback should be the global directory.
-        assertEquals(List.of(Path.of("/absolute/subdir/Literature").toAbsolutePath()),
+        assertEquals(List.of(
+                        // first directory is the metadata
+                        Path.of("/absolute/subdir/Literature").toAbsolutePath(),
+                        Path.of("/absolute/subdir").toAbsolutePath()
+                ),
                 database.getFileDirectories(fileDirPrefs));
     }
 
