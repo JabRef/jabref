@@ -17,7 +17,7 @@ public enum ExternalFileSorter {
         try {
             return ExternalFileSorter.valueOf(name);
         } catch (IllegalArgumentException e) {
-            return DEFAULT; // default
+            return DEFAULT;
         }
     }
 

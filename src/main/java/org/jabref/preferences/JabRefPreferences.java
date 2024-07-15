@@ -354,7 +354,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String UNLINKED_FILES_SELECTED_EXTENSION = "unlinkedFilesSelectedExtension";
     public static final String UNLINKED_FILES_SELECTED_DATE_RANGE = "unlinkedFilesSelectedDateRange";
     public static final String UNLINKED_FILES_SELECTED_SORT = "unlinkedFilesSelectedSort";
-    public static final String UNLINKED_FILES_STORE_PREFERENCES = "unlinkedFilesStorePreferences";
 
     /**
      * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
@@ -706,7 +705,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(UNLINKED_FILES_SELECTED_EXTENSION, StandardFileType.ANY_FILE.name());
         defaults.put(UNLINKED_FILES_SELECTED_DATE_RANGE, DateRange.ALL_TIME.name());
         defaults.put(UNLINKED_FILES_SELECTED_SORT, ExternalFileSorter.DEFAULT.name());
-        defaults.put(UNLINKED_FILES_STORE_PREFERENCES, Boolean.FALSE);
 
         // OpenOffice/LibreOffice
         if (OS.WINDOWS) {
@@ -2675,14 +2673,12 @@ public class JabRefPreferences implements PreferencesService {
         unlinkedFilesDialogPreferences = new UnlinkedFilesDialogPreferences(
                 get(UNLINKED_FILES_SELECTED_EXTENSION),
                 DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE)),
-                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT)),
-                getBoolean(UNLINKED_FILES_STORE_PREFERENCES)
+                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT))
         );
 
         EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedExtensionProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_EXTENSION, newValue));
         EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedDateRangeProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_DATE_RANGE, newValue.name()));
         EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedSortProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_SORT, newValue.name()));
-        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesStorePreferencesProperty(), (obs, oldValue, newValue) -> putBoolean(UNLINKED_FILES_STORE_PREFERENCES, newValue));
 
         return unlinkedFilesDialogPreferences;
     }

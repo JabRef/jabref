@@ -1,8 +1,6 @@
 package org.jabref.preferences;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -14,16 +12,13 @@ public class UnlinkedFilesDialogPreferences {
     private final StringProperty unlinkedFilesSelectedExtension;
     private final ObjectProperty<DateRange> unlinkedFilesSelectedDateRange;
     private final ObjectProperty<ExternalFileSorter> unlinkedFilesSelectedSort;
-    private final BooleanProperty unlinkedFilesStorePreferences;
 
     public UnlinkedFilesDialogPreferences(String unlinkedFilesSelectedExtension,
                                           DateRange unlinkedFilesSelectedDateRange,
-                                          ExternalFileSorter unlinkedFilesSelectedSort,
-                                          boolean unlinkedFilesStorePreferences) {
+                                          ExternalFileSorter unlinkedFilesSelectedSort) {
         this.unlinkedFilesSelectedExtension = new SimpleStringProperty(unlinkedFilesSelectedExtension);
         this.unlinkedFilesSelectedDateRange = new SimpleObjectProperty<>(unlinkedFilesSelectedDateRange);
         this.unlinkedFilesSelectedSort = new SimpleObjectProperty<>(unlinkedFilesSelectedSort);
-        this.unlinkedFilesStorePreferences = new SimpleBooleanProperty(unlinkedFilesStorePreferences);
     }
 
     public String getUnlinkedFilesSelectedExtension() {
@@ -60,17 +55,5 @@ public class UnlinkedFilesDialogPreferences {
 
     public void setUnlinkedFilesSelectedSort(ExternalFileSorter unlinkedFilesSelectedSort) {
         this.unlinkedFilesSelectedSort.set(unlinkedFilesSelectedSort);
-    }
-
-    public boolean isUnlinkedFilesStorePreferences() {
-        return unlinkedFilesStorePreferences.get();
-    }
-
-    public BooleanProperty unlinkedFilesStorePreferencesProperty() {
-        return unlinkedFilesStorePreferences;
-    }
-
-    public void setUnlinkedFilesStorePreferences(boolean unlinkedFilesStorePreferences) {
-        this.unlinkedFilesStorePreferences.set(unlinkedFilesStorePreferences);
     }
 }

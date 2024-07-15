@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ButtonType?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
@@ -63,8 +62,6 @@
                         <Tooltip text="%Searches the selected directory for unlinked files."/>
                     </tooltip>
                 </Button>
-                <CheckBox fx:id="storePreferencesCheck" GridPane.rowIndex="4"
-                        text="%Save selected options for later usage"/>
             </GridPane>
             <StackPane VBox.vgrow="ALWAYS">
                 <Accordion fx:id="accordion" prefHeight="300.0">

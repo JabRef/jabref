@@ -14,7 +14,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -62,7 +61,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML private ComboBox<FileExtensionViewModel> fileTypeCombo;
     @FXML private ComboBox<DateRange> fileDateCombo;
     @FXML private ComboBox<ExternalFileSorter> fileSortCombo;
-    @FXML private CheckBox storePreferencesCheck;
     @FXML private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
     @FXML private Button scanButton;
     @FXML private Button exportButton;
@@ -174,7 +172,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                 .install(fileSortCombo);
         fileSortCombo.setItems(viewModel.getSorters());
         fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
-        // fileSortCombo.getSelectionModel().selectFirst();
 
         directoryPathField.setText(bibDatabaseContext.getFirstExistingFileDir(preferencesService.getFilePreferences()).map(Path::toString).orElse(""));
         loadSavedConfiguration();
@@ -235,7 +232,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private void loadSavedConfiguration() {
         UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences = preferencesService.getUnlinkedFilesDialogPreferences();
 
-        storePreferencesCheck.setSelected(unlinkedFilesDialogPreferences.isUnlinkedFilesStorePreferences());
         FileExtensionViewModel selectedExtension = fileTypeCombo.getItems()
                                                                 .stream()
                                                                 .filter(item -> Objects.equals(item.getName(), unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedExtension()))
@@ -247,12 +243,9 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     }
 
     public void saveConfiguration() {
-        preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesStorePreferences(storePreferencesCheck.isSelected());
-        if (storePreferencesCheck.isSelected()) {
-            preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedExtension(fileTypeCombo.getValue().getName());
-            preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedDateRange(fileDateCombo.getValue());
-            preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(fileSortCombo.getValue());
-        }
+        preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedExtension(fileTypeCombo.getValue().getName());
+        preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedDateRange(fileDateCombo.getValue());
+        preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(fileSortCombo.getValue());
     }
 
     @FXML

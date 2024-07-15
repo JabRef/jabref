@@ -19,7 +19,7 @@ public enum DateRange {
         try {
             return DateRange.valueOf(name);
         } catch (IllegalArgumentException e) {
-            return ALL_TIME; // default
+            return ALL_TIME;
         }
     }
 
