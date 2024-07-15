@@ -13,6 +13,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We reintroduced the floating search in the main table. [#11326](https://github.com/JabRef/jabref/pull/11326)
 - We made new groups automatically to focus upon creation. [#11449](https://github.com/JabRef/jabref/issues/11449)
+- We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
 
 ### Changed
 
