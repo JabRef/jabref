@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.l10n.Language;
@@ -24,7 +25,7 @@ public class WorkspacePreferences {
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
-    private final ObjectProperty<Set<String>> selectedSlrFetchers;
+    private final ObservableSet<String> selectedSlrFetchers;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -47,7 +48,7 @@ public class WorkspacePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
-        this.selectedSlrFetchers = new SimpleObjectProperty<>(FXCollections.observableSet(selectedSlrFetchers));
+        this.selectedSlrFetchers = FXCollections.observableSet(selectedSlrFetchers);
     }
 
     public Language getLanguage() {
@@ -162,15 +163,12 @@ public class WorkspacePreferences {
         this.confirmDelete.set(confirmDelete);
     }
 
-    public Set<String> getSelectedSlrFetchers() {
-        return selectedSlrFetchers.get();
-    }
-
-    public ObjectProperty<Set<String>> selectedSlrFetchersProperty() {
+    public ObservableSet<String> getSelectedSlrFetchers() {
         return selectedSlrFetchers;
     }
 
-    public void setSelectedSlrFetchers(Set<String> selectedSlrFetchers) {
-        this.selectedSlrFetchers.set(FXCollections.observableSet(selectedSlrFetchers));
+    public void setSelectedSlrFetchers(Set<String> fetchers) {
+        selectedSlrFetchers.retainAll(fetchers);
+        selectedSlrFetchers.addAll(fetchers);
     }
 }

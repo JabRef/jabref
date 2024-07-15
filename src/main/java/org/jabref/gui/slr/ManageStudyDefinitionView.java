@@ -4,15 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -240,9 +238,16 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 })
                 .install(catalogTable);
 
-        Set<String> selectedFetchers = prefs.getWorkspacePreferences().getSelectedSlrFetchers();
+        ObservableSet<String> selectedFetchers = prefs.getWorkspacePreferences().getSelectedSlrFetchers();
         for (StudyCatalogItem item : catalogTable.getItems()) {
             item.setEnabled(selectedFetchers.contains(item.getName()));
+            item.enabledProperty().addListener((obs, oldValue, newValue) -> {
+                if (newValue) {
+                    selectedFetchers.add(item.getName());
+                } else {
+                    selectedFetchers.remove(item.getName());
+                }
+            });
         }
 
         catalogColumn.setReorderable(false);
@@ -257,14 +262,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         catalogColumn.setCellValueFactory(param -> param.getValue().nameProperty());
 
         catalogTable.setItems(viewModel.getCatalogs());
-
-        catalogTable.getItems().addListener((ListChangeListener<StudyCatalogItem>) c -> {
-            Set<String> newSelection = catalogTable.getItems().stream()
-                                                   .filter(StudyCatalogItem::isEnabled)
-                                                   .map(StudyCatalogItem::getName)
-                                                   .collect(Collectors.toSet());
-            prefs.getWorkspacePreferences().setSelectedSlrFetchers(newSelection);
-        });
     }
 
     private void setupCommonPropertiesForTables(Node addControl,
