@@ -2,6 +2,7 @@ package org.jabref.gui.importer.fetcher;
 
 import java.util.concurrent.Callable;
 
+import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -147,19 +148,19 @@ public class WebSearchPaneViewModel {
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
 
-        ParserResult parserResult;
-        try {
-            parserResult = new ParserResult(activeFetcher.performSearch(query));
-        } catch (FetcherException e) {
-            if (e.getCause() != null && e.getCause().getCause() instanceof FetcherClientException clientException) {
-                dialogService.showErrorDialogAndWait(e.getMessage(), clientException.getHttpResponse().responseBody(), clientException);
-            } else {
-                dialogService.showErrorDialogAndWait(e.getMessage(), e);
+        Callable<ParserResult> parserResultCallable = () -> {
+            try {
+                return new ParserResult(activeFetcher.performSearch(query));
+            } catch (FetcherException e) {
+                if (e.getCause() != null && e.getCause().getCause() instanceof FetcherClientException clientException) {
+                     Platform.runLater(() -> dialogService.showErrorDialogAndWait(e.getMessage(), clientException.getHttpResponse().responseBody(), clientException));
+                } else {
+                    Platform.runLater(() -> dialogService.showErrorDialogAndWait(e.getMessage(), e));
+                }
             }
-            return;
-        }
+            return new ParserResult();
+        };
 
-        Callable<ParserResult> parserResultCallable = () -> parserResult;
         String fetcherName = activeFetcher.getName();
 
         if (CompositeIdFetcher.containsValidId(query)) {
