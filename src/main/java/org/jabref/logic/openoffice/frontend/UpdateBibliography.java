@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice.frontend;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import org.jabref.logic.openoffice.style.OOBibStyle;
@@ -44,7 +45,7 @@ public class UpdateBibliography {
             throws
             WrappedTargetException,
             CreationException,
-            NoDocumentException {
+            NoDocumentException, IOException {
 
         clearBibTextSectionContent2(doc);
 
@@ -108,7 +109,7 @@ public class UpdateBibliography {
             CreationException,
             IllegalArgumentException,
             NoDocumentException,
-            WrappedTargetException {
+            WrappedTargetException, IOException {
 
         XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
 
