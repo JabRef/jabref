@@ -3,6 +3,7 @@ package org.jabref.model.database;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -159,7 +160,8 @@ public class BibDatabaseContext {
      * @param preferences The fileDirectory preferences
      */
     public List<Path> getFileDirectories(FilePreferences preferences) {
-        List<Path> fileDirs = new ArrayList<>(3);
+        // Paths are a) ordered and b) should be contained only once in the result
+        LinkedHashSet<Path> fileDirs = new LinkedHashSet<>(3);
 
         Optional<Path> userFileDirectory = metaData.getUserFileDirectory(preferences.getUserAndHost()).map(dir -> getFileDirectoryPath(dir));
         userFileDirectory.ifPresent(fileDirs::add);
@@ -180,10 +182,7 @@ public class BibDatabaseContext {
                     LOGGER.warn("Parent path of database file {} is null. Falling back to {}.", dbPath, parentPath);
                 }
                 Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-                Path absolutePath = parentPath.toAbsolutePath();
-                if (!fileDirs.contains(absolutePath)) {
-                    fileDirs.add(absolutePath);
-                }
+                fileDirs.add(parentPath.toAbsolutePath());
             });
         } else {
             preferences.getMainFileDirectory()
@@ -191,7 +190,7 @@ public class BibDatabaseContext {
                        .ifPresent(fileDirs::add);
         }
 
-        return fileDirs;
+        return new ArrayList<>(fileDirs);
     }
 
     /**
