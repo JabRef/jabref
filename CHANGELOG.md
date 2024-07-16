@@ -12,7 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
-- Added minimal support for [biblatex data annotation](http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsection.3.7) fields in .layout files.
+- Added minimal support for [biblatex data annotation](https://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsection.3.7) fields in .layout files. [#11505](https://github.com/JabRef/jabref/issues/11505)
 
 ### Changed
 
