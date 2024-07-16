@@ -7,6 +7,8 @@ import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 
 public record SimpleHttpResponse(int statusCode, String responseBody, String responseMessage) {
+    private static final int MAX_RESPONSE_LENGTH = 1024; // 1 KB
+
     public SimpleHttpResponse(int statusCode, String responseBody, String responseMessage) {
         this.statusCode = statusCode;
         this.responseBody = truncateResponseBody(responseBody);
@@ -30,10 +32,10 @@ public record SimpleHttpResponse(int statusCode, String responseBody, String res
      */
     private static String truncateResponseBody(String responseBody) {
         byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);
-        int maxLength = 1024; // 1 KB
-        if (bytes.length > maxLength) {
+        if (bytes.length > MAX_RESPONSE_LENGTH) {
             // Truncate the response body to 1 KB and append "... (truncated)"
-            return new String(bytes, 0, maxLength, StandardCharsets.UTF_8) + "... (truncated)";
+            // Response is in English, thus we append English text - and not localized text
+            return new String(bytes, 0, MAX_RESPONSE_LENGTH, StandardCharsets.UTF_8) + "... (truncated)";
         }
         // Return the original response body if it's within the 1 KB limit
         return responseBody;
@@ -52,7 +54,7 @@ public record SimpleHttpResponse(int statusCode, String responseBody, String res
         try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
             String inputLine;
             StringBuilder content = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
+            while ((content.length() < MAX_RESPONSE_LENGTH) && (inputLine = in.readLine()) != null) {
                 content.append(inputLine);
             }
             return truncateResponseBody(content.toString());
