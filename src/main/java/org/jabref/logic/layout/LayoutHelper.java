@@ -352,7 +352,7 @@ public class LayoutHelper {
         return annotation;
     }
 
-    private boolean validChar(int c) throws IOException {
+    private boolean validChar(int c) {
         boolean character = Character.isLetter((char) c) || (c == '_');
 
         return character;
