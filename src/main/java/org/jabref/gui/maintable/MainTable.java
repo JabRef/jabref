@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
+import javafx.css.PseudoClass;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -63,6 +64,10 @@ import org.slf4j.LoggerFactory;
 public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
+    private static final PseudoClass MATCHING_SEARCH_AND_GROUPS = PseudoClass.getPseudoClass("matching-search-and-groups");
+    private static final PseudoClass MATCHING_SEARCH_NOT_GROUPS = PseudoClass.getPseudoClass("matching-search-not-groups");
+    private static final PseudoClass MATCHING_GROUPS_NOT_SEARCH = PseudoClass.getPseudoClass("matching-groups-not-search");
+    private static final PseudoClass NOT_MATCHING_SEARCH_AND_GROUPS = PseudoClass.getPseudoClass("not-matching-search-and-groups");
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -118,16 +123,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setOnDragOver(this::handleOnDragOverTableView);
         this.setOnDragDropped(this::handleOnDragDroppedTableView);
 
-        this.getColumns().addAll(
-                new MainTableColumnFactory(
-                        database,
-                        preferencesService,
-                        preferencesService.getMainTableColumnPreferences(),
-                        undoManager,
-                        dialogService,
-                        stateManager,
-                        taskExecutor).createColumns());
+        MainTableColumnFactory mainTableColumnFactory = new MainTableColumnFactory(
+                database,
+                preferencesService,
+                preferencesService.getMainTableColumnPreferences(),
+                undoManager,
+                dialogService,
+                stateManager,
+                taskExecutor);
 
+        this.getColumns().addAll(mainTableColumnFactory.createColumns());
         this.getColumns().removeIf(LibraryColumn.class::isInstance);
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
@@ -147,6 +152,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
+                .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRankProperty().isEqualTo(1))
+                .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.searchRankProperty().isEqualTo(2))
+                .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.searchRankProperty().isEqualTo(3))
+                .withPseudoClass(NOT_MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRankProperty().isEqualTo(4))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -155,6 +164,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .install(this);
 
         this.getSortOrder().clear();
+
+        // force search rank column to be the first sort order
+        this.getColumns().stream().map(column -> (MainTableColumn<?>) column)
+            .filter(column -> column.getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
+            .findFirst().ifPresent(searchRankColumn -> this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
+                if (!this.getSortOrder().contains(searchRankColumn)) {
+                    this.getSortOrder().addFirst(searchRankColumn);
+                }
+            }));
 
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
@@ -193,17 +211,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         database.getDatabase().registerListener(this);
 
-        MainTableColumnFactory rightClickMenuFactory = new MainTableColumnFactory(
-                database,
-                preferencesService,
-                preferencesService.getMainTableColumnPreferences(),
-                undoManager,
-                dialogService,
-                stateManager,
-                taskExecutor);
-
         // Enable the header right-click menu.
-        new MainTableHeaderContextMenu(this, rightClickMenuFactory, tabContainer, dialogService).show(true);
+        new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
     }
 
     /**

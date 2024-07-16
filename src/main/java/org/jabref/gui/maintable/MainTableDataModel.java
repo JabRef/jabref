@@ -22,6 +22,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -60,29 +61,43 @@ public class MainTableDataModel {
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
+    public void unregisterListeners() {
+        entriesFiltered.predicateProperty().unbind();
+    }
+
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
         return isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry);
     }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return query.map(matcher -> matcher.isMatch(entry.getEntry()))
-                    .orElse(true);
+        if (query.map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true)) {
+            entry.matchedBySearchProperty().set(true);
+            return true;
+        } else {
+            entry.matchedBySearchProperty().set(false);
+            return !query.get().getSearchFlags().contains(SearchRules.SearchFlags.FILTERING_SEARCH);
+        }
     }
 
     private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {
-        return createGroupMatcher(groups)
-                .map(matcher -> matcher.isMatch(entry.getEntry()))
-                .orElse(true);
+        if (createGroupMatcher(groups, groupsPreferences)
+                .map(matcher -> groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT) ^ matcher.isMatch(entry.getEntry())).orElse(true)) {
+            entry.matchedByGroupProperty().set(true);
+            return true;
+        } else {
+            entry.matchedByGroupProperty().set(false);
+            return !groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER);
+        }
     }
 
-    private Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups) {
+    private static Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups, GroupsPreferences groupsPreferences) {
         if ((selectedGroups == null) || selectedGroups.isEmpty()) {
             // No selected group, show all entries
             return Optional.empty();
         }
 
         final MatcherSet searchRules = MatcherSets.build(
-                groupsPreferences.getGroupViewMode() == GroupViewMode.INTERSECTION
+                groupsPreferences.getGroupViewMode().contains(GroupViewMode.INTERSECTION)
                         ? MatcherSets.MatcherType.AND
                         : MatcherSets.MatcherType.OR);
 

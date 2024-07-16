@@ -318,6 +318,7 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
+        this.tableModel.unregisterListeners();
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -880,6 +881,7 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
 
+        tableModel.unregisterListeners();
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }

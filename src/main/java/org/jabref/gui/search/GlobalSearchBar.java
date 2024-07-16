@@ -93,18 +93,16 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton fulltextButton;
     private final Button openGlobalSearchButton;
     private final ToggleButton keepSearchString;
+    private final ToggleButton filterModeButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final Label currentResults = new Label("");
-
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
     private final Validator regexValidator;
     private final UndoManager undoManager;
     private final LibraryTabContainer tabContainer;
-
     private final SearchPreferences searchPreferences;
     private final DialogService dialogService;
-
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private GlobalSearchResultDialog globalSearchResultDialog;
@@ -175,6 +173,7 @@ public class GlobalSearchBar extends HBox {
         fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
         openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
         keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();
+        filterModeButton = IconTheme.JabRefIcons.FILTER.asToggleButton();
 
         initSearchModifierButtons();
 
@@ -183,6 +182,7 @@ public class GlobalSearchBar extends HBox {
                                                     .or(caseSensitiveButton.focusedProperty())
                                                     .or(fulltextButton.focusedProperty())
                                                     .or(keepSearchString.focusedProperty())
+                                                    .or(filterModeButton.focusedProperty())
                                                     .or(searchField.textProperty()
                                                                    .isNotEmpty());
 
@@ -194,10 +194,12 @@ public class GlobalSearchBar extends HBox {
         fulltextButton.visibleProperty().bind(focusedOrActive);
         keepSearchString.visibleProperty().unbind();
         keepSearchString.visibleProperty().bind(focusedOrActive);
+        filterModeButton.visibleProperty().unbind();
+        filterModeButton.visibleProperty().bind(focusedOrActive);
 
         StackPane modifierButtons;
         if (searchType == SearchType.NORMAL_SEARCH) {
-            modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, keepSearchString));
+            modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton, keepSearchString, filterModeButton));
         } else {
             modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton));
         }
@@ -286,6 +288,14 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(keepSearchString);
         keepSearchString.setOnAction(evt -> {
             searchPreferences.setSearchFlag(SearchRules.SearchFlags.KEEP_SEARCH_STRING, keepSearchString.isSelected());
+            updateSearchQuery();
+        });
+
+        filterModeButton.setSelected(searchPreferences.isFilteringMode());
+        filterModeButton.setTooltip(new Tooltip(Localization.lang("Filter search results")));
+        initSearchModifierButton(filterModeButton);
+        filterModeButton.setOnAction(event -> {
+            searchPreferences.setSearchFlag(SearchRules.SearchFlags.FILTERING_SEARCH, filterModeButton.isSelected());
             updateSearchQuery();
         });
 

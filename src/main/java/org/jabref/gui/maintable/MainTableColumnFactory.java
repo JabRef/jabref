@@ -61,7 +61,6 @@ public class MainTableColumnFactory {
     private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
     private final StateManager stateManager;
     private final MainTableTooltip tooltip;
 
@@ -80,13 +79,16 @@ public class MainTableColumnFactory {
         this.cellFactory = new CellFactory(preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager,
-                themeManager, taskExecutor);
+        ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
+        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
+            case SEARCH_RANK:
+                returnColumn = createSearchRankColumn(column);
+                break;
             case INDEX:
                 returnColumn = createIndexColumn(column);
                 break;
@@ -134,10 +136,7 @@ public class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
-        columnPreferences.getColumns().forEach(column -> {
-            columns.add(createColumn(column));
-        });
-
+        columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
         return columns;
     }
 
@@ -147,8 +146,21 @@ public class MainTableColumnFactory {
         column.setMaxWidth(width);
     }
 
+    private TableColumn<BibEntryTableViewModel, Number> createSearchRankColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, Number> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Search rank"));
+        header.getStyleClass().add("mainTable-header");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SEARCH_RANK.getDisplayName()));
+        column.setGraphic(header);
+        column.setCellValueFactory(cellData -> cellData.getValue().searchRankProperty());
+        new ValueTableCellFactory<BibEntryTableViewModel, Number>().withText(String::valueOf).install(column);
+        column.setSortable(true);
+        column.setVisible(false);
+        return column;
+    }
+
     /**
-     * Creates a column with a continous number
+     * Creates a column with a continuous number
      */
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);

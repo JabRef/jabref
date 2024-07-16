@@ -13,7 +13,11 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
@@ -43,6 +47,9 @@ public class BibEntryTableViewModel {
     private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
+    private final BooleanProperty matchedBySearchProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty matchedByGroupProperty = new SimpleBooleanProperty(false);
+    private final IntegerProperty searchRankProperty = new SimpleIntegerProperty();
     private final BibDatabaseContext bibDatabaseContext;
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
@@ -53,6 +60,18 @@ public class BibEntryTableViewModel {
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
+
+        searchRankProperty.bind(Bindings.createIntegerBinding(() -> {
+            if (matchedBySearchProperty.get() && matchedByGroupProperty.get()) {
+                return 1;
+            } else if (matchedBySearchProperty.get() && !matchedByGroupProperty.get()) {
+                return 2;
+            } else if (!matchedBySearchProperty.get() && matchedByGroupProperty.get()) {
+                return 3;
+            } else {
+                return 4;
+            }
+        }, matchedBySearchProperty, matchedByGroupProperty));
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -81,10 +100,10 @@ public class BibEntryTableViewModel {
         return new UiThreadBinding<>(EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
                 (a, b) ->
                         database.getMetaData().getGroups().map(groupTreeNode ->
-                                groupTreeNode.getMatchingGroups(entry).stream()
-                                             .map(GroupTreeNode::getGroup)
-                                             .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
-                                             .collect(Collectors.toList()))
+                                        groupTreeNode.getMatchingGroups(entry).stream()
+                                                     .map(GroupTreeNode::getGroup)
+                                                     .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
+                                                     .collect(Collectors.toList()))
                                 .orElse(Collections.emptyList())));
     }
 
@@ -148,5 +167,17 @@ public class BibEntryTableViewModel {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return bibDatabaseContext;
+    }
+
+    public BooleanProperty matchedBySearchProperty() {
+        return matchedBySearchProperty;
+    }
+
+    public BooleanProperty matchedByGroupProperty() {
+        return matchedByGroupProperty;
+    }
+
+    public IntegerProperty searchRankProperty() {
+        return searchRankProperty;
     }
 }

@@ -54,7 +54,6 @@ import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.push.PushToApplications;
-import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
@@ -285,7 +284,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
-    public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
+    public static final String SEARCH_FILTERING_MODE = "filteringSearch";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
@@ -437,7 +436,9 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
 
     // GroupViewMode
-    private static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
+    private static final String GROUP_VIEW_INTERSECTION = "groupIntersection";
+    private static final String GROUP_VIEW_FILTER = "groupFilter";
+    private static final String GROUP_VIEW_INVERT = "groupInvert";
     private static final String DEFAULT_HIERARCHICAL_CONTEXT = "defaultHierarchicalContext";
 
     // Dialog states
@@ -533,11 +534,11 @@ public class JabRefPreferences implements PreferencesService {
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
         // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
-        // like the SearchDisplayMode will never be translated.
+        // will never be translated.
         Localization.setLanguage(getLanguage());
 
-        defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
+        defaults.put(SEARCH_FILTERING_MODE, Boolean.TRUE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);
         defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);
@@ -643,8 +644,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
 
-        defaults.put(COLUMN_NAMES, "groups;group_icons;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
-        defaults.put(COLUMN_WIDTHS, "28;40;28;28;75;300;470;60;130;50;50;50");
+        defaults.put(COLUMN_NAMES, "search_rank;groups;group_icons;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
+        defaults.put(COLUMN_WIDTHS, "60;28;40;28;28;75;300;470;60;130;50;50;50");
 
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
@@ -687,7 +688,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(DISPLAY_GROUP_COUNT, Boolean.TRUE);
-        defaults.put(GROUP_INTERSECT_UNION_VIEW_MODE, GroupViewMode.INTERSECTION.name());
+        defaults.put(GROUP_VIEW_INTERSECTION, Boolean.TRUE);
+        defaults.put(GROUP_VIEW_FILTER, Boolean.TRUE);
+        defaults.put(GROUP_VIEW_INVERT, Boolean.FALSE);
         defaults.put(DEFAULT_HIERARCHICAL_CONTEXT, GroupHierarchyType.INDEPENDENT.name());
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
@@ -1391,13 +1394,19 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         groupsPreferences = new GroupsPreferences(
-                GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE)),
+                getBoolean(GROUP_VIEW_INTERSECTION),
+                getBoolean(GROUP_VIEW_FILTER),
+                getBoolean(GROUP_VIEW_INVERT),
                 getBoolean(AUTO_ASSIGN_GROUP),
                 getBoolean(DISPLAY_GROUP_COUNT),
                 GroupHierarchyType.valueOf(get(DEFAULT_HIERARCHICAL_CONTEXT))
         );
 
-        EasyBind.listen(groupsPreferences.groupViewModeProperty(), (obs, oldValue, newValue) -> put(GROUP_INTERSECT_UNION_VIEW_MODE, newValue.name()));
+        groupsPreferences.groupViewModeProperty().addListener((SetChangeListener<GroupViewMode>) change -> {
+            putBoolean(GROUP_VIEW_INTERSECTION, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INTERSECTION));
+            putBoolean(GROUP_VIEW_FILTER, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.FILTER));
+            putBoolean(GROUP_VIEW_INVERT, groupsPreferences.groupViewModeProperty().contains(GroupViewMode.INVERT));
+        });
         EasyBind.listen(groupsPreferences.autoAssignGroupProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_ASSIGN_GROUP, newValue));
         EasyBind.listen(groupsPreferences.displayGroupCountProperty(), (obs, oldValue, newValue) -> putBoolean(DISPLAY_GROUP_COUNT, newValue));
         EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (obs, oldValue, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
@@ -2693,30 +2702,22 @@ public class JabRefPreferences implements PreferencesService {
             return searchPreferences;
         }
 
-        SearchDisplayMode searchDisplayMode;
-        try {
-            searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
-        } catch (IllegalArgumentException ex) {
-            // Should only occur when the searchmode is set directly via preferences.put and the enum was not used
-            searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
-        }
-
         searchPreferences = new SearchPreferences(
-                searchDisplayMode,
                 getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_REG_EXP),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
+                getBoolean(SEARCH_FILTERING_MODE),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),
                 getDouble(SEARCH_WINDOW_HEIGHT),
                 getDouble(SEARCH_WINDOW_WIDTH));
 
-        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(searchPreferences.getSearchDisplayMode()).toString()));
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
             putBoolean(SEARCH_CASE_SENSITIVE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE));
             putBoolean(SEARCH_REG_EXP, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION));
             putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT));
             putBoolean(SEARCH_KEEP_SEARCH_STRING, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.KEEP_SEARCH_STRING));
+            putBoolean(SEARCH_FILTERING_MODE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FILTERING_SEARCH));
         });
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
         EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));

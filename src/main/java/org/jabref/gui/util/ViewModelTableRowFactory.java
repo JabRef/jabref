@@ -1,8 +1,14 @@
 package org.jabref.gui.util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import javafx.beans.value.ObservableValue;
+import javafx.css.PseudoClass;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
@@ -19,6 +25,7 @@ import javafx.util.Callback;
 
 import org.jabref.model.strings.StringUtil;
 
+import com.tobiasdiez.easybind.Subscription;
 import org.reactfx.util.TriConsumer;
 
 /**
@@ -37,6 +44,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     private TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragOver;
     private TriConsumer<TableRow<S>, S, ? super MouseDragEvent> toOnMouseDragEntered;
     private Callback<S, String> toTooltip;
+    private final Map<PseudoClass, Callback<S, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
 
     public ViewModelTableRowFactory<S> withOnMouseClickedEvent(BiConsumer<S, ? super MouseEvent> onMouseClickedEvent) {
         this.onMouseClickedEvent = onMouseClickedEvent;
@@ -104,97 +112,128 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         return this;
     }
 
+    public ViewModelTableRowFactory<S> withPseudoClass(PseudoClass pseudoClass, Callback<S, ObservableValue<Boolean>> toCondition) {
+        this.pseudoClasses.putIfAbsent(pseudoClass, toCondition);
+        return this;
+    }
+
     @Override
     public TableRow<S> call(TableView<S> tableView) {
-        TableRow<S> row = new TableRow<>();
+        return new TableRow<>() {
+            final List<Subscription> subscriptions = new ArrayList<>();
 
-        if (toTooltip != null) {
-            String tooltipText = toTooltip.call(row.getItem());
-            if (StringUtil.isNotBlank(tooltipText)) {
-                row.setTooltip(new Tooltip(tooltipText));
-            }
-        }
+            @Override
+            protected void updateItem(S item, boolean empty) {
+                super.updateItem(item, empty);
 
-        if (onMouseClickedEvent != null) {
-            row.setOnMouseClicked(event -> {
-                if (!row.isEmpty()) {
-                    onMouseClickedEvent.accept(row.getItem(), event);
+                // Remove previous subscriptions
+                subscriptions.forEach(Subscription::unsubscribe);
+                subscriptions.clear();
+
+                if (contextMenuFactory != null) {
+                    // We only create the context menu when really necessary
+                    setOnContextMenuRequested(event -> {
+                        if (!isEmpty()) {
+                            setContextMenu(contextMenuFactory.apply(item));
+                            getContextMenu().show(this, event.getScreenX(), event.getScreenY());
+                        }
+                        event.consume();
+                    });
+
+                    // Activate context menu if user presses the "context menu" key
+                    tableView.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+                        boolean rowFocused = !isEmpty() && tableView.getFocusModel().getFocusedIndex() == getIndex();
+                        if (event.getCode() == KeyCode.CONTEXT_MENU && rowFocused) {
+                            // Get center of focused cell
+                            Bounds anchorBounds = getBoundsInParent();
+                            double x = anchorBounds.getMinX() + anchorBounds.getWidth() / 2;
+                            double y = anchorBounds.getMinY() + anchorBounds.getHeight() / 2;
+                            Point2D screenPosition = getParent().localToScreen(x, y);
+
+                            if (getContextMenu() == null) {
+                                setContextMenu(contextMenuFactory.apply(getItem()));
+                            }
+                            getContextMenu().show(this, screenPosition.getX(), screenPosition.getY());
+                        }
+                    });
                 }
-            });
-        }
 
-        if (contextMenuFactory != null) {
-            // We only create the context menu when really necessary
-            row.setOnContextMenuRequested(event -> {
-                if (!row.isEmpty()) {
-                    row.setContextMenu(contextMenuFactory.apply(row.getItem()));
-                    row.getContextMenu().show(row, event.getScreenX(), event.getScreenY());
+                if (empty || (getItem() == null)) {
+                    pseudoClasses.forEach((pseudoClass, toCondition) -> pseudoClassStateChanged(pseudoClass, false));
+                } else {
+                    pseudoClasses.forEach((pseudoClass, toCondition) -> {
+                        ObservableValue<Boolean> condition = toCondition.call(getItem());
+                        subscriptions.add(BindingsHelper.includePseudoClassWhen(
+                                this,
+                                pseudoClass,
+                                condition));
+                    });
                 }
-                event.consume();
-            });
 
-            // Activate context menu if user presses the "context menu" key
-            tableView.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-                boolean rowFocused = !row.isEmpty() && tableView.getFocusModel().getFocusedIndex() == row.getIndex();
-                if (event.getCode() == KeyCode.CONTEXT_MENU && rowFocused) {
-                    // Get center of focused cell
-                    Bounds anchorBounds = row.getBoundsInParent();
-                    double x = anchorBounds.getMinX() + anchorBounds.getWidth() / 2;
-                    double y = anchorBounds.getMinY() + anchorBounds.getHeight() / 2;
-                    Point2D screenPosition = row.getParent().localToScreen(x, y);
-
-                    if (row.getContextMenu() == null) {
-                        row.setContextMenu(contextMenuFactory.apply(row.getItem()));
+                if (toTooltip != null) {
+                    String tooltipText = toTooltip.call(getItem());
+                    if (StringUtil.isNotBlank(tooltipText)) {
+                        setTooltip(new Tooltip(tooltipText));
                     }
-                    row.getContextMenu().show(row, screenPosition.getX(), screenPosition.getY());
                 }
-            });
-        }
 
-        if (toOnDragDetected != null) {
-            row.setOnDragDetected(event -> {
-                if (!row.isEmpty()) {
-                    toOnDragDetected.accept(row, row.getItem(), event);
+                if (onMouseClickedEvent != null) {
+                    setOnMouseClicked(event -> {
+                        if (!isEmpty()) {
+                            onMouseClickedEvent.accept(getItem(), event);
+                        }
+                    });
                 }
-            });
-        }
-        if (toOnDragDropped != null) {
-            row.setOnDragDropped(event -> {
-                if (!row.isEmpty()) {
-                    toOnDragDropped.accept(row, row.getItem(), event);
-                }
-            });
-        }
-        if (toOnDragEntered != null) {
-            row.setOnDragEntered(event -> {
-                if (!row.isEmpty()) {
-                    toOnDragEntered.accept(row.getItem(), event);
-                }
-            });
-        }
-        if (toOnDragExited != null) {
-            row.setOnDragExited(event -> {
-                if (!row.isEmpty()) {
-                    toOnDragExited.accept(row, row.getItem(), event);
-                }
-            });
-        }
-        if (toOnDragOver != null) {
-            row.setOnDragOver(event -> {
-                if (!row.isEmpty()) {
-                    toOnDragOver.accept(row, row.getItem(), event);
-                }
-            });
-        }
 
-        if (toOnMouseDragEntered != null) {
-            row.setOnMouseDragEntered(event -> {
-                if (!row.isEmpty()) {
-                    toOnMouseDragEntered.accept(row, row.getItem(), event);
+                if (toOnDragDetected != null) {
+                    setOnDragDetected(event -> {
+                        if (!isEmpty()) {
+                            toOnDragDetected.accept(this, getItem(), event);
+                        }
+                    });
                 }
-            });
-        }
-        return row;
+
+                if (toOnDragDropped != null) {
+                    setOnDragDropped(event -> {
+                        if (!isEmpty()) {
+                            toOnDragDropped.accept(this, getItem(), event);
+                        }
+                    });
+                }
+
+                if (toOnDragEntered != null) {
+                    setOnDragEntered(event -> {
+                        if (!isEmpty()) {
+                            toOnDragEntered.accept(getItem(), event);
+                        }
+                    });
+                }
+
+                if (toOnDragExited != null) {
+                    setOnDragExited(event -> {
+                        if (!isEmpty()) {
+                            toOnDragExited.accept(this, getItem(), event);
+                        }
+                    });
+                }
+
+                if (toOnDragOver != null) {
+                    setOnDragOver(event -> {
+                        if (!isEmpty()) {
+                            toOnDragOver.accept(this, getItem(), event);
+                        }
+                    });
+                }
+
+                if (toOnMouseDragEntered != null) {
+                    setOnMouseDragEntered(event -> {
+                        if (!isEmpty()) {
+                            toOnMouseDragEntered.accept(this, getItem(), event);
+                        }
+                    });
+                }
+            }
+        };
     }
 
     public void install(TableView<S> table) {
