@@ -66,17 +66,20 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         List<TableColumn<BibEntryTableViewModel, ?>> commonColumns = commonColumns();
 
         // Populate the menu with currently used fields
-        for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
-            // Append only if the column has not already been added (a common column)
-            RightClickMenuItem itemToAdd = createMenuItem(column, true);
-            this.getItems().add(itemToAdd);
+        mainTable.getColumns().stream()
+                 .map(column -> (MainTableColumn<?>) column)
+                 // Search rank column shouldn't be removed from the table (always hide it)
+                 .filter(column -> !column.getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
+                 .forEach(column -> {
+                     // Append only if the column has not already been added (a common column)
+                     RightClickMenuItem itemToAdd = createMenuItem(column, true);
+                     this.getItems().add(itemToAdd);
 
-            // Remove from remaining common columns pool
-            MainTableColumn<?> searchCol = (MainTableColumn<?>) column;
-            if (isACommonColumn(searchCol)) {
-                commonColumns.removeIf(tableCol -> ((MainTableColumn<?>) tableCol).getModel().equals(searchCol.getModel()));
-            }
-        }
+                     // Remove from remaining common columns pool
+                     if (isACommonColumn(column)) {
+                         commonColumns.removeIf(tableCol -> ((MainTableColumn<?>) tableCol).getModel().equals(column.getModel()));
+                     }
+                 });
 
         if (!commonColumns.isEmpty()) {
             this.getItems().add(new SeparatorMenuItem());
@@ -150,8 +153,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      * Determines if a list of TableColumns contains the searched column.
      */
     private boolean isColumnInList(MainTableColumn<?> searchColumn, List<TableColumn<BibEntryTableViewModel, ?>> tableColumns) {
-        for (TableColumn<BibEntryTableViewModel, ?> column:
-        tableColumns) {
+        for (TableColumn<BibEntryTableViewModel, ?> column: tableColumns) {
             MainTableColumnModel model = ((MainTableColumn<?>) column).getModel();
             if (model.equals(searchColumn.getModel())) {
                 return true;

@@ -165,7 +165,12 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     public void fillColumnList() {
         columnsListProperty.getValue().clear();
         if (initialColumnPreferences != null) {
-            initialColumnPreferences.getColumns().forEach(columnsListProperty.getValue()::add);
+            initialColumnPreferences.getColumns().forEach(column -> {
+                // Search rank column shouldn't be removed from the table (always hide it)
+                if (!column.getType().equals(MainTableColumnModel.Type.SEARCH_RANK)) {
+                    columnsListProperty.getValue().add(column);
+                }
+            });
         }
     }
 
@@ -235,6 +240,8 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         mainTablePreferences.getColumnPreferences().setColumns(columnsListProperty.getValue());
+        // Search rank column is filtered out from the columns list, so we need to add it back
+        mainTablePreferences.getColumnPreferences().getColumns().addFirst(new MainTableColumnModel(MainTableColumnModel.Type.SEARCH_RANK));
         mainTablePreferences.setResizeColumnsToFit(autoResizeColumnsProperty.getValue());
         mainTablePreferences.setExtraFileColumnsEnabled(extraFileColumnsEnabledProperty.getValue());
 
