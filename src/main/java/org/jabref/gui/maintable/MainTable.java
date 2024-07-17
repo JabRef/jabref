@@ -203,10 +203,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         setupKeyBindings(keyBindingRepository);
 
         this.setOnKeyTyped(key -> {
-            if (this.getSortOrder().isEmpty()) {
+            if (this.getSortOrder().size() <= 1) {
                 return;
             }
-            this.jumpToSearchKey(getSortOrder().getFirst(), key);
+            // skip search rank column
+            this.jumpToSearchKey(getSortOrder().get(1), key);
         });
 
         database.getDatabase().registerListener(this);
