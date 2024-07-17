@@ -39,7 +39,13 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
     /**
      * Pattern to redact API keys from error messages.
      */
-   Pattern API_KEY_PATTERN = Pattern.compile("(?i)(api[_-]?key)=.*");
+   Pattern API_KEY_PATTERN = Pattern.compile("(?i)(key|api[-_]?key)=[^&]*");
+    /**
+     * A constant string used to replace or mask sensitive information , such as API keys;
+     */
+   String REDACTED_STRING = "[REDACTED]";
+
+
 
     /**
      * This method is used to send queries with advanced URL parameters.
@@ -67,10 +73,10 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
             return fetchedEntries;
         } catch (IOException e) {
             // Regular expression to redact API keys from the error message
-            throw new FetcherException(API_KEY_PATTERN.matcher(("A network error occurred while fetching from " + urlForQuery)).replaceAll("[REDACTED]"), e);
+            throw new FetcherException(API_KEY_PATTERN.matcher(("A network error occurred while fetching from " + urlForQuery)).replaceAll(REDACTED_STRING), e);
         } catch (ParseException e) {
             // Regular expression to redact API keys from the error message
-            throw new FetcherException(API_KEY_PATTERN.matcher(("An internal parser error occurred while fetching from " + urlForQuery)).replaceAll("[REDACTED]"), e);
+            throw new FetcherException(API_KEY_PATTERN.matcher(("An internal parser error occurred while fetching from " + urlForQuery)).replaceAll(REDACTED_STRING), e);
         }
     }
 
