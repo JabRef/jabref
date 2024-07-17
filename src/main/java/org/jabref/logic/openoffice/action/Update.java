@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice.action;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.jabref.logic.openoffice.frontend.OOFrontend;
@@ -16,6 +17,7 @@ import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
+import org.tinylog.Logger;
 
 /**
  * Update document: citation marks and bibliography
@@ -62,11 +64,15 @@ public class Update {
             }
 
             return frontend.citationGroups.getUnresolvedKeys();
+        } catch (
+                IOException e) {
+            Logger.warn("Error while updating document", e);
         } finally {
             if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
                 UnoScreenRefresh.unlockControllers(doc);
             }
         }
+        return frontend.citationGroups.getUnresolvedKeys();
     }
 
     public static class SyncOptions {
