@@ -9,7 +9,8 @@ nav_order: 13
 Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
 
 Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
-Navigate to **File > Settings... > Plugins"**.
+Navigate to **File > Settings... > Plugins"**.<br>
+**Note:** In some MacBooks, `Settings` can be found at the "IntelliJ" button of the app menu instead of at "File".
 On the top, click on "Marketplace".
 Then, search for "Checkstyle".
 Click on "Install" choose "CheckStyle-IDEA".
@@ -157,3 +158,5 @@ Press "OK".
 > Finally, you have Checkstyle running locally so that you can check for styling errors before submitting the pull request.
 
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. Please make sure to also read our [contribution guide](https://devdocs.jabref.org/contributing#contribute-code).
+
+<!-- markdownlint-disable-file MD033 -->
