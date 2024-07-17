@@ -455,12 +455,6 @@ public class LibraryTab extends Tab {
         if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
             indexingTaskManager.updateDatabaseName(tabTitle.toString());
         }
-
-        /*
-        if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-            aiEmbeddingsTaskManager.updateDatabaseName(tabTitle.toString());
-        }
-         */
     }
 
     @Subscribe
