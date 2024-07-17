@@ -288,6 +288,17 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         libraryTab.delete(StandardActions.CUT);
     }
 
+    private void scrollToRank(int delta) {
+        int currentRank = getSelectionModel().getSelectedItem().searchRankProperty().get();
+        getItems().stream()
+                  .filter(item -> item.searchRankProperty().get() == currentRank + delta)
+                  .findFirst()
+                  .ifPresent(item -> {
+                      this.scrollTo(item);
+                      this.clearAndSelect(item.getEntry());
+                  });
+    }
+
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
         EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager);
         EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager);
@@ -328,6 +339,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         break;
                     case DELETE_ENTRY:
                         deleteAction.execute();
+                        event.consume();
+                        break;
+                    case SCROLL_TO_NEXT_RANK:
+                        scrollToRank(1);
+                        event.consume();
+                        break;
+                    case SCROLL_TO_PREVIOUS_RANK:
+                        scrollToRank(-1);
                         event.consume();
                         break;
                     default:
