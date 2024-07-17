@@ -37,21 +37,6 @@
     -fx-padding: -2 0 0 0;
 }
 
-.table-row-cell:matching-search-and-groups {
-}
-
-.table-row-cell:matching-search-not-groups {
-    -fx-background-color: #FFECB3;
-}
-
-.table-row-cell:matching-groups-not-search {
-    -fx-background-color: #C8E6C9;
-}
-
-.table-row-cell:not-matching-search-and-groups {
-    -fx-background-color: #CFD8DC;
-}
-
 .rating > .container {
     -fx-spacing: 2;
 }
