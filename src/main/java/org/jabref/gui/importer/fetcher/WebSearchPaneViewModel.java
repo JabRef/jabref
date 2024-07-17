@@ -152,10 +152,11 @@ public class WebSearchPaneViewModel {
             try {
                 return new ParserResult(activeFetcher.performSearch(query));
             } catch (FetcherException e) {
+                // FetcherException's cause can be both IOException and ParseException
                 if (e.getCause() != null && e.getCause().getCause() instanceof FetcherClientException clientException) {
-                     Platform.runLater(() -> dialogService.showErrorDialogAndWait(e.getMessage(), clientException.getHttpResponse().responseBody(), clientException));
+                     Platform.runLater(() -> dialogService.showErrorDialogAndWait(e.getMessage(), (clientException.getMessage() + "\n" + clientException.getHttpResponse().responseBody()), clientException));
                 } else {
-                    Platform.runLater(() -> dialogService.showErrorDialogAndWait(e.getMessage(), e));
+                    Platform.runLater(() -> dialogService.showErrorDialogAndWait(e.getMessage(), e.getCause().getMessage(), e));
                 }
             }
             return new ParserResult();
