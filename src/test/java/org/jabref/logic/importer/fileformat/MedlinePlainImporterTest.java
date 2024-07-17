@@ -158,19 +158,48 @@ class MedlinePlainImporterTest {
 
     @Test
     void multiLineComments() throws IOException {
-        try (BufferedReader reader = readerForString("PMID-22664220" + "\n" + "CON - Comment1" + "\n" + "CIN - Comment2"
-                + "\n" + "EIN - Comment3" + "\n" + "EFR - Comment4" + "\n" + "CRI - Comment5" + "\n" + "CRF - Comment6"
-                + "\n" + "PRIN- Comment7" + "\n" + "PROF- Comment8" + "\n" + "RPI - Comment9" + "\n" + "RPF - Comment10"
-                + "\n" + "RIN - Comment11" + "\n" + "ROF - Comment12" + "\n" + "UIN - Comment13" + "\n"
-                + "UOF - Comment14" + "\n" + "SPIN- Comment15" + "\n" + "ORI - Comment16")) {
+        try (BufferedReader reader = readerForString("""
+                PMID-22664220
+                CON - Comment1
+                CIN - Comment2\
+
+                EIN - Comment3
+                EFR - Comment4
+                CRI - Comment5
+                CRF - Comment6\
+
+                PRIN- Comment7
+                PROF- Comment8
+                RPI - Comment9
+                RPF - Comment10\
+
+                RIN - Comment11
+                ROF - Comment12
+                UIN - Comment13
+                UOF - Comment14
+                SPIN- Comment15
+                ORI - Comment16""")) {
             List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
             BibEntry expectedEntry = new BibEntry();
 
             expectedEntry.setField(StandardField.COMMENT,
-                    "Comment1" + "\n" + "Comment2" + "\n" + "Comment3" + "\n" + "Comment4" + "\n" + "Comment5" + "\n"
-                            + "Comment6" + "\n" + "Comment7" + "\n" + "Comment8" + "\n" + "Comment9" + "\n"
-                            + "Comment10" + "\n" + "Comment11" + "\n" + "Comment12" + "\n" + "Comment13" + "\n"
-                            + "Comment14" + "\n" + "Comment15" + "\n" + "Comment16");
+                    """
+                            Comment1
+                            Comment2
+                            Comment3
+                            Comment4
+                            Comment5
+                            Comment6
+                            Comment7
+                            Comment8
+                            Comment9
+                            Comment10
+                            Comment11
+                            Comment12
+                            Comment13
+                            Comment14
+                            Comment15
+                            Comment16""");
             assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
     }
@@ -229,9 +258,15 @@ class MedlinePlainImporterTest {
 
     @Test
     void allArticleTypes() throws IOException {
-        try (BufferedReader reader = readerForString("PMID-22664795" + "\n" + "MH  - Female\n" + "PT  - journal article"
-                + "\n" + "PT  - classical article" + "\n" + "PT  - corrected and republished article" + "\n"
-                + "PT  - introductory journal article" + "\n" + "PT  - newspaper article")) {
+        try (BufferedReader reader = readerForString("""
+                PMID-22664795
+                MH  - Female
+                PT  - journal article\
+
+                PT  - classical article
+                PT  - corrected and republished article
+                PT  - introductory journal article
+                PT  - newspaper article""")) {
             List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
 
             BibEntry expectedEntry = new BibEntry();
