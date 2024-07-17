@@ -50,7 +50,7 @@ public class MainTableDataModel {
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
-                EasyBind.combine(stateManager.activeGroupProperty(),
+                EasyBind.combine(libraryTab.selectedGroupsPropertyProperty(),
                         libraryTab.searchQueryProperty(),
                         groupsPreferences.groupViewModeProperty(),
                         (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))

@@ -85,9 +85,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         // Set-up bindings
         filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
-
-        // Init
-        refresh();
     }
 
     private void refresh() {
@@ -278,11 +275,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         // we need to check the old name for duplicates. If the new group name occurs more than once, it won't matter
                         groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(oldGroupName)).size();
                     }
-                    boolean removePreviousAssignments = true;
+                    boolean removePreviousAssignments = groupsWithSameName < 2;
                     // We found more than 2 groups, so we cannot simply remove old assignment
-                    if (groupsWithSameName >= 2) {
-                        removePreviousAssignments = false;
-                    }
 
                     oldGroup.getGroupNode().setGroup(
                             group,
