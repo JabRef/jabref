@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -55,7 +56,6 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -104,8 +104,8 @@ public class GlobalSearchBar extends HBox {
     private final SearchPreferences searchPreferences;
     private final DialogService dialogService;
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
-    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private GlobalSearchResultDialog globalSearchResultDialog;
+    private final SearchType searchType;
 
     public GlobalSearchBar(LibraryTabContainer tabContainer,
                            StateManager stateManager,
@@ -120,12 +120,7 @@ public class GlobalSearchBar extends HBox {
         this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.tabContainer = tabContainer;
-
-        if (searchType == SearchType.NORMAL_SEARCH) {
-            searchQueryProperty = stateManager.activeSearchQueryProperty();
-        } else {
-            searchQueryProperty = stateManager.activeGlobalSearchQueryProperty();
-        }
+        this.searchType = searchType;
 
         KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
 
@@ -134,6 +129,17 @@ public class GlobalSearchBar extends HBox {
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the tabContainer width is too small
         currentResults.setPrefWidth(150);
+        currentResults.visibleProperty().bind(stateManager.activeSearchQuery(searchType).isPresent());
+        currentResults.textProperty().bind(Bindings.createStringBinding(() -> {
+            int matched = stateManager.searchResultSize(searchType).get();
+            if (matched == 0) {
+                searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
+                return Localization.lang("No results found.");
+            } else {
+                searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
+                return Localization.lang("Found %0 results.", String.valueOf(matched));
+            }
+        }, stateManager.searchResultSize(searchType)));
 
         searchField.setTooltip(searchFieldTooltip);
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -229,7 +235,7 @@ public class GlobalSearchBar extends HBox {
 
         Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), this::updateSearchQuery);
         BindingsHelper.bindBidirectional(
-                searchQueryProperty,
+                stateManager.activeSearchQuery(searchType),
                 searchField.textProperty(),
                 searchTerm -> {
                     // Async update
@@ -237,8 +243,8 @@ public class GlobalSearchBar extends HBox {
                 },
                 query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse("")));
 
-        this.searchQueryProperty.addListener((obs, oldValue, newValue) -> newValue.ifPresent(this::updateSearchResultsForQuery));
-        this.stateManager.activeDatabaseProperty().addListener(obs -> searchQueryProperty.get().ifPresent(this::updateSearchResultsForQuery));
+        stateManager.activeSearchQuery(searchType).addListener((obs, oldValue, newValue) ->
+                newValue.ifPresent(query -> setSearchFieldHintTooltip(SearchDescribers.getSearchDescriberFor(query).getDescription())));
         /*
          * The listener tracks a change on the focus property value.
          * This happens, from active (user types a query) to inactive / focus
@@ -251,11 +257,6 @@ public class GlobalSearchBar extends HBox {
                 this.stateManager.addSearchHistory(searchField.textProperty().get());
             }
         });
-    }
-
-    private void updateSearchResultsForQuery(SearchQuery query) {
-        updateResults(this.stateManager.getSearchResultSize(searchQueryProperty).intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
-                query.isGrammarBasedSearch());
     }
 
     private void initSearchModifierButtons() {
@@ -307,7 +308,8 @@ public class GlobalSearchBar extends HBox {
             if (globalSearchResultDialog == null) {
                 globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);
             }
-            stateManager.activeGlobalSearchQueryProperty().setValue(searchQueryProperty.get());
+            stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(query ->
+                    stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).set(Optional.of(query)));
             updateSearchQuery();
             dialogService.showCustomDialogAndWait(globalSearchResultDialog);
             globalSearchActive.setValue(false);
@@ -341,9 +343,8 @@ public class GlobalSearchBar extends HBox {
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
-            currentResults.setText("");
             setSearchFieldHintTooltip(null);
-            stateManager.clearSearchQuery(searchQueryProperty);
+            stateManager.activeSearchQuery(searchType).set(Optional.empty());
             return;
         }
 
@@ -358,7 +359,7 @@ public class GlobalSearchBar extends HBox {
             informUserAboutInvalidSearchQuery();
             return;
         }
-        stateManager.setSearchQuery(searchQueryProperty, searchQuery);
+        stateManager.activeSearchQuery(searchType).set(Optional.of(searchQuery));
     }
 
     private boolean validRegex() {
@@ -374,7 +375,7 @@ public class GlobalSearchBar extends HBox {
     private void informUserAboutInvalidSearchQuery() {
         searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
 
-        stateManager.clearSearchQuery(searchQueryProperty);
+        stateManager.activeSearchQuery(searchType).set(Optional.empty());
 
         String illegalSearch = Localization.lang("Search failed: illegal search expression");
         currentResults.setText(illegalSearch);
@@ -405,25 +406,6 @@ public class GlobalSearchBar extends HBox {
             LOGGER.error("Could not get access to auto completion popup", e);
             return new AutoCompletePopup<>();
         }
-    }
-
-    private void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
-        if (matched == 0) {
-            currentResults.setText(Localization.lang("No results found."));
-            searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
-        } else {
-            currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
-            searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
-        }
-        if (grammarBasedSearch) {
-            // TODO: switch Icon color
-            // searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
-        } else {
-            // TODO: switch Icon color
-            // searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
-        }
-
-        setSearchFieldHintTooltip(description);
     }
 
     private void setSearchFieldHintTooltip(TextFlow description) {

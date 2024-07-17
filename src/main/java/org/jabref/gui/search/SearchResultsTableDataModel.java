@@ -27,13 +27,11 @@ public class SearchResultsTableDataModel {
 
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
-    private final NameDisplayPreferences nameDisplayPreferences;
-    private final BibDatabaseContext bibDatabaseContext;
     private final StateManager stateManager;
+    private final FilteredList<BibEntryTableViewModel> entriesFiltered;
 
     public SearchResultsTableDataModel(BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, StateManager stateManager) {
-        this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
-        this.bibDatabaseContext = bibDatabaseContext;
+        NameDisplayPreferences nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.stateManager = stateManager;
         this.fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
 
@@ -41,10 +39,8 @@ public class SearchResultsTableDataModel {
         populateEntriesViewModel(entriesViewModel);
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) change -> populateEntriesViewModel(entriesViewModel));
 
-        FilteredList<BibEntryTableViewModel> entriesFiltered = new FilteredList<>(entriesViewModel);
-        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeGlobalSearchQueryProperty(), query -> entry -> isMatchedBySearch(query, entry)));
-        stateManager.getGlobalSearchResultSize().bind(Bindings.size(entriesFiltered));
-
+        entriesFiltered = new FilteredList<>(entriesViewModel);
+        stateManager.searchResultSize(SearchType.GLOBAL_SEARCH).bind(Bindings.size(entriesFiltered));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
     }
@@ -59,15 +55,18 @@ public class SearchResultsTableDataModel {
     }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return query.map(matcher -> matcher.isMatch(entry.getEntry()))
-                    .orElse(true);
+        return query.map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
         return entriesSorted;
     }
 
-    public void refresh() {
-        this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
+    public void setBinding() {
+        entriesFiltered.predicateProperty().bind(EasyBind.map(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH), query -> entry -> isMatchedBySearch(query, entry)));
+    }
+
+    public void removeBinding() {
+        entriesFiltered.predicateProperty().unbind();
     }
 }

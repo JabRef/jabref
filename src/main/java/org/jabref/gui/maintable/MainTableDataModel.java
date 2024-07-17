@@ -4,14 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
@@ -35,7 +34,10 @@ public class MainTableDataModel {
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
 
-    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
+    public MainTableDataModel(BibDatabaseContext context,
+                              PreferencesService preferencesService,
+                              StateManager stateManager,
+                              LibraryTab libraryTab) {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.bibDatabaseContext = context;
@@ -49,14 +51,12 @@ public class MainTableDataModel {
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
                 EasyBind.combine(stateManager.activeGroupProperty(),
-                        stateManager.activeSearchQueryProperty(),
+                        libraryTab.searchQueryProperty(),
                         groupsPreferences.groupViewModeProperty(),
                         (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))
         );
 
-        IntegerProperty resultSize = new SimpleIntegerProperty();
-        resultSize.bind(Bindings.size(entriesFiltered));
-        stateManager.setActiveSearchResultSize(context, resultSize);
+        libraryTab.resultSizeProperty().bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRankProperty().isEqualTo(1).get())));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }

@@ -299,10 +299,11 @@ public class EntryEditor extends BorderPane {
                 dialogService,
                 stateManager,
                 bibEntryTypesManager,
-                keyBindingRepository);
+                keyBindingRepository,
+                libraryTab.searchQueryProperty());
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
-        tabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor));
+        tabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor, libraryTab.searchQueryProperty()));
 
         return tabs;
     }
