@@ -13,6 +13,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.gui.entryeditor.aichattab.AiChatTab;
+
 public class AiPreferences {
     public enum ChatModel {
         GPT_3_5_TURBO("gpt-3.5-turbo"),
@@ -252,6 +254,77 @@ public class AiPreferences {
 
         documentSplitterOverlapSize.addListener((observableValue, oldValue, newValue) -> {
             if (!Objects.equals(newValue, oldValue)) {
+                runnable.run();
+            }
+        });
+    }
+
+    /**
+     * Listen to all changes of preferences related to AI.
+     * This method is used in {@link AiChatTab} to update itself when preferences change.
+     * JabRef would close the entry editor, but the last selected entry editor is not refreshed.
+     *
+     * @param runnable The runnable that should be executed when the preferences change.
+     */
+    public void onAnyParametersChange(Runnable runnable) {
+        enableChatWithFiles.addListener((observableValue, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                runnable.run();
+            }
+        });
+
+        openAiToken.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+
+        customizeSettings.addListener((observableValue, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                runnable.run();
+            }
+        });
+
+        chatModel.addListener((observableValue, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                runnable.run();
+            }
+        });
+
+        embeddingModel.addListener((observableValue, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                runnable.run();
+            }
+        });
+
+        instruction.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                runnable.run();
+            }
+        });
+
+        temperature.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                runnable.run();
+            }
+        });
+
+        contextWindowSize.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                runnable.run();
+            }
+        });
+
+        onEmbeddingsParametersChange(runnable);
+
+        ragMaxResultsCount.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                runnable.run();
+            }
+        });
+
+        ragMinScore.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
                 runnable.run();
             }
         });

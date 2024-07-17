@@ -57,7 +57,7 @@ public class EmbeddingGenerationBackgroundTask extends BackgroundTask<Void> {
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             titleProperty().set(Localization.lang("Embeddings generation"));
         } else {
-            titleProperty().set(Localization.lang("Embeddings generation for " + bibDatabaseContext.getDatabasePath().get()));
+            titleProperty().set(Localization.lang("Embeddings generation for %0", bibDatabaseContext.getDatabasePath().get()));
         }
 
         this.onFailure(e -> {

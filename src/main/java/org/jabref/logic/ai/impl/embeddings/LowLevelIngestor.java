@@ -2,7 +2,6 @@ package org.jabref.logic.ai.impl.embeddings;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.AiPreferences;
 
 import dev.langchain4j.data.document.Document;

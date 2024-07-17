@@ -48,7 +48,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator openAiTokenValidator;
     private final Validator instructionValidator;
     private final Validator temperatureValidator;
-    private final Validator messageWindowSizeValidator;
+    private final Validator contextWindowSizeValidator;
     private final Validator documentSplitterChunkSizeValidator;
     private final Validator documentSplitterOverlapSizeValidator;
     private final Validator ragMaxResultsCountValidator;
@@ -73,10 +73,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 temp -> temp.doubleValue() >= 0 && temp.doubleValue() <= 2,
                 ValidationMessage.error(Localization.lang("Temperature must be between 0 and 2")));
 
-        this.messageWindowSizeValidator = new FunctionBasedValidator<>(
+        this.contextWindowSizeValidator = new FunctionBasedValidator<>(
                 contextWindowSize,
                 size -> size.intValue() > 0,
-                ValidationMessage.error(Localization.lang("Message window size must be greater than 0")));
+                ValidationMessage.error(Localization.lang("Context window size must be greater than 0")));
 
         this.documentSplitterChunkSizeValidator = new FunctionBasedValidator<>(
                 documentSplitterChunkSize,
@@ -163,11 +163,26 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
+        if (useAi.get()) {
+            if (customizeSettings.get()) {
+                return validateBasicSettings() && validateExpertSettings();
+            } else {
+                return validateBasicSettings();
+            }
+        }
+
+        return true;
+    }
+
+    public boolean validateBasicSettings() {
+        return openAiTokenValidator.getValidationStatus().isValid();
+    }
+
+    public boolean validateExpertSettings() {
         List<Validator> validators = List.of(
-                openAiTokenValidator,
                 instructionValidator,
                 temperatureValidator,
-                messageWindowSizeValidator,
+                contextWindowSizeValidator,
                 documentSplitterChunkSizeValidator,
                 documentSplitterOverlapSizeValidator,
                 ragMaxResultsCountValidator,
@@ -246,7 +261,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public ValidationStatus getMessageWindowSizeValidatorStatus() {
-        return messageWindowSizeValidator.getValidationStatus();
+        return contextWindowSizeValidator.getValidationStatus();
     }
 
     public ValidationStatus getDocumentSplitterChunkSizeValidatorStatus() {

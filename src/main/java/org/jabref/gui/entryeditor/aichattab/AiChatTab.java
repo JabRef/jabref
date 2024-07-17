@@ -6,6 +6,8 @@ import java.util.Optional;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.ai.components.apikeymissing.ApiKeyMissingComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
@@ -20,12 +22,15 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
 
 public class AiChatTab extends EntryEditorTab {
+    private final LibraryTabContainer libraryTabContainer;
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final EntryEditorPreferences entryEditorPreferences;
@@ -34,10 +39,13 @@ public class AiChatTab extends EntryEditorTab {
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
 
-    private Optional<BibEntry> currentBibEntry = Optional.empty();
-
-    public AiChatTab(DialogService dialogService, PreferencesService preferencesService, AiService aiService,
-                     BibDatabaseContext bibDatabaseContext, TaskExecutor taskExecutor) {
+    public AiChatTab(LibraryTabContainer libraryTabContainer,
+                     DialogService dialogService,
+                     PreferencesService preferencesService,
+                     AiService aiService,
+                     BibDatabaseContext bibDatabaseContext,
+                     TaskExecutor taskExecutor) {
+        this.libraryTabContainer = libraryTabContainer;
         this.dialogService = dialogService;
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
@@ -51,28 +59,24 @@ public class AiChatTab extends EntryEditorTab {
         aiService.getEmbeddingsManager().registerListener(new FileIngestedListener());
     }
 
-    private class FileIngestedListener {
-        @Subscribe
-        public void listen(DocumentIngestedEvent event) {
-            currentBibEntry.ifPresent(entry -> {
-                if (aiService.getEmbeddingsManager().hasIngestedLinkedFiles(entry.getFiles())) {
-                    UiTaskExecutor.runInJavaFXThread(() -> bindToEntry(entry));
-                }
-            });
-        }
-    }
-
     @Override
     public boolean shouldShow(BibEntry entry) {
         return entryEditorPreferences.shouldShowAiChatTab();
     }
 
     @Override
-    protected void bindToEntry(BibEntry entry) {
-        currentBibEntry = Optional.of(entry);
+    protected void handleFocus() {
+        if (currentEntry != null) {
+            bindToEntry(currentEntry);
+        }
+    }
 
+    @Override
+    protected void bindToEntry(BibEntry entry) {
         if (!aiService.getPreferences().getEnableChatWithFiles()) {
             showPrivacyNotice(entry);
+        } else if (aiService.getPreferences().getOpenAiToken().isEmpty()) {
+            showApiKeyMissing();
         } else if (entry.getFiles().isEmpty()) {
             showErrorNoFiles();
         } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {
@@ -89,6 +93,16 @@ public class AiChatTab extends EntryEditorTab {
     private void bindToCorrectEntry(BibEntry entry) {
         AiChatTabWorking aiChatTabWorking = new AiChatTabWorking(aiService, entry, bibDatabaseContext, taskExecutor, dialogService);
         setContent(aiChatTabWorking.getNode());
+    }
+
+    private void showPrivacyNotice(BibEntry entry) {
+        setContent(new PrivacyNoticeComponent(dialogService, aiService.getPreferences(), filePreferences, () -> {
+            bindToEntry(entry);
+        }));
+    }
+
+    private void showApiKeyMissing() {
+        setContent(new ApiKeyMissingComponent(libraryTabContainer, dialogService));
     }
 
     private void showErrorNotIngested() {
@@ -111,12 +125,6 @@ public class AiChatTab extends EntryEditorTab {
         }
     }
 
-    private void showPrivacyNotice(BibEntry entry) {
-        setContent(new PrivacyNoticeComponent(dialogService, aiService.getPreferences(), filePreferences, () -> {
-            bindToEntry(entry);
-        }));
-    }
-
     private static boolean citationKeyIsValid(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
         return !hasEmptyCitationKey(bibEntry) && bibEntry.getCitationKey().map(key -> citationKeyIsUnique(bibDatabaseContext, key)).orElse(false);
     }
@@ -127,5 +135,12 @@ public class AiChatTab extends EntryEditorTab {
 
     private static boolean citationKeyIsUnique(BibDatabaseContext bibDatabaseContext, String citationKey) {
         return bibDatabaseContext.getDatabase().getNumberOfCitationKeyOccurrences(citationKey) == 1;
+    }
+
+    private class FileIngestedListener {
+        @Subscribe
+        public void listen(DocumentIngestedEvent event) {
+             UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
+        }
     }
 }

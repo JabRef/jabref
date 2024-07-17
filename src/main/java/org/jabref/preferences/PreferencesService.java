@@ -148,5 +148,7 @@ public interface PreferencesService {
 
     MergeDialogPreferences getMergeDialogPreferences();
 
+    UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferences();
+
     AiPreferences getAiPreferences();
 }

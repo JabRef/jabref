@@ -27,7 +27,7 @@
                   <Font size="14.0" />
                </font>
             </Text>
-            <TextFlow>
+            <HBox alignment="BASELINE_LEFT" spacing="5.0">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%The privacy policy of OpenAI applies. You find it at">
                      <font>
@@ -40,7 +40,7 @@
                      </font>
                   </Hyperlink>
                </children>
-            </TextFlow>
+            </HBox>
             <Button mnemonicParsing="false" onAction="#onIAgreeButtonClick" text="%I agree">
                <font>
                   <Font size="14.0" />

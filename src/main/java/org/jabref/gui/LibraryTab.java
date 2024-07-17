@@ -60,8 +60,8 @@ import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.AiEmbeddingsTaskManager;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -455,12 +455,6 @@ public class LibraryTab extends Tab {
         if (preferencesService.getFilePreferences().shouldFulltextIndexLinkedFiles()) {
             indexingTaskManager.updateDatabaseName(tabTitle.toString());
         }
-
-        /*
-        if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-            aiEmbeddingsTaskManager.updateDatabaseName(tabTitle.toString());
-        }
-         */
     }
 
     @Subscribe
@@ -1226,5 +1220,9 @@ public class LibraryTab extends Tab {
                 "bibDatabaseContext=" + bibDatabaseContext +
                 ", showing=" + showing +
                 '}';
+    }
+
+    public LibraryTabContainer getLibraryTabContainer() {
+        return tabContainer;
     }
 }
