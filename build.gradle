@@ -10,7 +10,8 @@ plugins {
 
     id 'me.champeau.jmh' version '0.7.2'
 
-    id 'org.javamodularity.moduleplugin' version '1.8.15'
+    // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
+    id 'com.github.koppor.gradle-modules-plugin' version 'jitpack-SNAPSHOT'
 
     id 'org.openjfx.javafxplugin' version '0.1.0'
 
@@ -28,7 +29,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.16.2'
+    id 'org.openrewrite.rewrite' version '6.16.3'
 }
 
 // Enable following for debugging
@@ -167,7 +168,7 @@ dependencies {
         exclude group: 'commons-logging'
     }
 
-    def luceneVersion = "9.11.0"
+    def luceneVersion = "9.11.1"
     implementation "org.apache.lucene:lucene-core:$luceneVersion"
     implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
     implementation "org.apache.lucene:lucene-queries:$luceneVersion"
@@ -197,8 +198,8 @@ dependencies {
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.10.0.202406032230-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.17.1'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.1'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.17.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.2'
 
     implementation 'com.fasterxml:aalto-xml:1.3.3'
 
@@ -234,7 +235,7 @@ dependencies {
         exclude group: 'org.openjfx'
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
-    implementation 'org.fxmisc.richtext:richtextfx:0.11.2'
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.3'
     implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.32.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
@@ -299,7 +300,7 @@ dependencies {
     implementation 'org.glassfish.jersey.core:jersey-server:3.1.7'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.7'
-    implementation 'org.glassfish.hk2:hk2-api:3.1.0'
+    implementation 'org.glassfish.hk2:hk2-api:3.1.1'
     // testImplementation 'org.glassfish.hk2:hk2-testing:3.0.4'
     // implementation 'org.glassfish.hk2:hk2-testing-jersey:3.0.4'
     // testImplementation 'org.glassfish.hk2:hk2-junitrunner:3.0.4'
@@ -344,8 +345,8 @@ dependencies {
     implementation 'commons-io:commons-io:2.16.1'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.174'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.3'
 
     testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.10.0'
@@ -361,7 +362,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.13.2"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.14.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
@@ -550,6 +551,8 @@ run {
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
                 'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
         ]
+
+        createCommandLineArgumentFile = true
     }
 
     if (project.hasProperty('component')){
