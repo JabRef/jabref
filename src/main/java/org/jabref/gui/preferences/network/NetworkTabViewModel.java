@@ -159,6 +159,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        internalPreferences.setVersionCheckEnabled(versionCheckProperty.getValue());
         proxyPreferences.setUseProxy(proxyUseProperty.getValue());
         proxyPreferences.setHostname(proxyHostnameProperty.getValue().trim());
         proxyPreferences.setPort(proxyPortProperty.getValue().trim());

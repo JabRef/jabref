@@ -16,7 +16,7 @@
 <?import org.controlsfx.control.textfield.CustomPasswordField?>
 <fx:root spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.network.NetworkTab">
     <Label styleClass="titleHeader" text="%Network" />
-    <CheckBox fx:id="versionCheck" text="%Check for latest version online"/>
+    <CheckBox fx:id="versionCheck" text="%Check for updates on startup"/>
     <Label text="%If you encounter an issue or a bug, please check the latest version, whether the issue is still present." wrapText="true"/>
 
     <Label styleClass="sectionHeader" text="%Proxy configuration" />

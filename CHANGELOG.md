@@ -17,10 +17,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- The 'Check for updates' menu bar button is now always enabled. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - JabRef respects the [configuration for storing files relative to the .bib file](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files) in more cases. [#11492](https://github.com/JabRef/jabref/pull/11492)
 
 ### Fixed
 
+- We fixed an issue where the 'Check for updates' preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11509](https://github.com/JabRef/jabref/pull/11509)
 
 ### Removed
