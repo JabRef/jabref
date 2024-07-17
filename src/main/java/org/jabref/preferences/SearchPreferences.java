@@ -42,12 +42,6 @@ public class SearchPreferences {
         this.setSearchWindowWidth(searchWindowWidth);
     }
 
-    public SearchPreferences(EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
-        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
-
-        this.searchFlags = FXCollections.observableSet(searchFlags);
-    }
-
     public EnumSet<SearchFlags> getSearchFlags() {
         // copy of returns an exception when the EnumSet is empty
         if (searchFlags.isEmpty()) {

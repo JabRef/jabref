@@ -21,7 +21,6 @@ import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -105,7 +104,6 @@ public class SourceTab extends EntryEditorTab {
                      ImportFormatPreferences importFormatPreferences,
                      FileUpdateMonitor fileMonitor,
                      DialogService dialogService,
-                     StateManager stateManager,
                      BibEntryTypesManager entryTypesManager,
                      KeyBindingRepository keyBindingRepository,
                      OptionalObjectProperty<SearchQuery> searchQueryProperty) {

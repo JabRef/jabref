@@ -297,7 +297,6 @@ public class EntryEditor extends BorderPane {
                 preferencesService.getImportFormatPreferences(),
                 fileMonitor,
                 dialogService,
-                stateManager,
                 bibEntryTypesManager,
                 keyBindingRepository,
                 libraryTab.searchQueryProperty());

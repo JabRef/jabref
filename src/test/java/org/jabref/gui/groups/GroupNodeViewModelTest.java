@@ -45,7 +45,9 @@ class GroupNodeViewModelTest {
         taskExecutor = new CurrentThreadTaskExecutor();
         preferencesService = mock(PreferencesService.class);
         when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
-                GroupViewMode.UNION,
+                false,
+                true,
+                true,
                 true,
                 true,
                 GroupHierarchyType.INDEPENDENT
