@@ -1221,4 +1221,8 @@ public class LibraryTab extends Tab {
                 ", showing=" + showing +
                 '}';
     }
+
+    public LibraryTabContainer getLibraryTabContainer() {
+        return tabContainer;
+    }
 }

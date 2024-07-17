@@ -6,6 +6,8 @@ import java.util.Optional;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.ai.components.apikeymissing.ApiKeyMissingComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
@@ -26,6 +28,7 @@ import org.jabref.preferences.PreferencesService;
 import com.google.common.eventbus.Subscribe;
 
 public class AiChatTab extends EntryEditorTab {
+    private final LibraryTabContainer libraryTabContainer;
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final EntryEditorPreferences entryEditorPreferences;
@@ -36,8 +39,13 @@ public class AiChatTab extends EntryEditorTab {
 
     private Optional<BibEntry> currentBibEntry = Optional.empty();
 
-    public AiChatTab(DialogService dialogService, PreferencesService preferencesService, AiService aiService,
-                     BibDatabaseContext bibDatabaseContext, TaskExecutor taskExecutor) {
+    public AiChatTab(LibraryTabContainer libraryTabContainer,
+                     DialogService dialogService,
+                     PreferencesService preferencesService,
+                     AiService aiService,
+                     BibDatabaseContext bibDatabaseContext,
+                     TaskExecutor taskExecutor) {
+        this.libraryTabContainer = libraryTabContainer;
         this.dialogService = dialogService;
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
@@ -45,6 +53,10 @@ public class AiChatTab extends EntryEditorTab {
         this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
+
+        aiService.getPreferences().onAnyParametersChange(() -> {
+            currentBibEntry.ifPresent(this::bindToEntry);
+        });
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
@@ -73,6 +85,8 @@ public class AiChatTab extends EntryEditorTab {
 
         if (!aiService.getPreferences().getEnableChatWithFiles()) {
             showPrivacyNotice(entry);
+        } else if (aiService.getPreferences().getOpenAiToken().isEmpty()) {
+            showApiKeyMissing();
         } else if (entry.getFiles().isEmpty()) {
             showErrorNoFiles();
         } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {
@@ -89,6 +103,16 @@ public class AiChatTab extends EntryEditorTab {
     private void bindToCorrectEntry(BibEntry entry) {
         AiChatTabWorking aiChatTabWorking = new AiChatTabWorking(aiService, entry, bibDatabaseContext, taskExecutor, dialogService);
         setContent(aiChatTabWorking.getNode());
+    }
+
+    private void showPrivacyNotice(BibEntry entry) {
+        setContent(new PrivacyNoticeComponent(dialogService, aiService.getPreferences(), filePreferences, () -> {
+            bindToEntry(entry);
+        }));
+    }
+
+    private void showApiKeyMissing() {
+        setContent(new ApiKeyMissingComponent(libraryTabContainer, dialogService));
     }
 
     private void showErrorNotIngested() {
@@ -109,12 +133,6 @@ public class AiChatTab extends EntryEditorTab {
         } else {
             bindToEntry(entry);
         }
-    }
-
-    private void showPrivacyNotice(BibEntry entry) {
-        setContent(new PrivacyNoticeComponent(dialogService, aiService.getPreferences(), filePreferences, () -> {
-            bindToEntry(entry);
-        }));
     }
 
     private static boolean citationKeyIsValid(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
