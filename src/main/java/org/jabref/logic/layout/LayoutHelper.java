@@ -48,7 +48,7 @@ public class LayoutHelper {
                         List<Path> fileDirForDatabase,
                         LayoutFormatterPreferences preferences,
                         JournalAbbreviationRepository abbreviationRepository) {
-        this.in = new PushbackReader(Objects.requireNonNull(in));
+        this.in = new PushbackReader(Objects.requireNonNull(in), 2);
         this.preferences = Objects.requireNonNull(preferences);
         this.abbreviationRepository = abbreviationRepository;
         this.fileDirForDatabase = fileDirForDatabase;
@@ -262,7 +262,7 @@ public class LayoutHelper {
                 endOfFile = true;
             }
 
-            if (!Character.isLetter((char) c) && (c != '_')) {
+            if (!validChar(c) && !validAnnotation(c)) {
                 unread(c);
 
                 name = buffer == null ? "" : buffer.toString();
@@ -343,6 +343,19 @@ public class LayoutHelper {
                 buffer.append((char) c);
             }
         }
+    }
+
+    private boolean validAnnotation(int c) throws IOException {
+        // Only accept annotations that are followed by a valid character
+        boolean annotation = ((c == '+') || (c == ':')) && validChar(peek());
+
+        return annotation;
+    }
+
+    private boolean validChar(int c) throws IOException {
+        boolean character = Character.isLetter((char) c) || (c == '_');
+
+        return character;
     }
 
     private int peek() throws IOException {

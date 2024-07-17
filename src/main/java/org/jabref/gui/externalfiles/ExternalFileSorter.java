@@ -13,6 +13,14 @@ public enum ExternalFileSorter {
         this.sorter = sorter;
     }
 
+    public static ExternalFileSorter parse(String name) {
+        try {
+            return ExternalFileSorter.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return DEFAULT;
+        }
+    }
+
     public String getSorter() {
         return sorter;
     }
