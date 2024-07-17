@@ -117,11 +117,13 @@ class MedlinePlainImporterTest {
         assertEquals(Optional.of("Inproceedings book title"), testEntry.getField(StandardField.BOOKTITLE));
 
         BibEntry expectedEntry5 = new BibEntry(StandardEntryType.Proceedings)
-                .withField(StandardField.KEYWORDS, "Female");
+                .withField(StandardField.KEYWORDS, "Female")
+                        .withField(StandardField.PMID, "96578310");
         assertEquals(expectedEntry5, entries.get(5));
 
         BibEntry expectedEntry6 = new BibEntry(StandardEntryType.Misc)
-                .withField(StandardField.KEYWORDS, "Female");
+                .withField(StandardField.KEYWORDS, "Female")
+                        .withField(StandardField.PMID, "45984220");
         assertEquals(expectedEntry6, entries.get(6));
     }
 
@@ -182,6 +184,7 @@ class MedlinePlainImporterTest {
             List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
             BibEntry expectedEntry = new BibEntry();
 
+            expectedEntry.setField(StandardField.PMID, "22664220");
             expectedEntry.setField(StandardField.COMMENT,
                     """
                             Comment1
@@ -213,6 +216,7 @@ class MedlinePlainImporterTest {
             List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
 
             BibEntry expectedEntry = new BibEntry();
+            expectedEntry.setField(StandardField.PMID, "22664795");
             expectedEntry.setField(StandardField.KEYWORDS, "Female, Male");
 
             assertEquals(Collections.singletonList(expectedEntry), actualEntries);
@@ -229,7 +233,7 @@ class MedlinePlainImporterTest {
     }
 
     @Test
-    void withMultipleEntries() throws IOException, URISyntaxException {
+    void withMultipleEntriesInvalidFormat() throws IOException, URISyntaxException {
         Path file = Path.of(MedlinePlainImporter.class.getResource("MedlinePlainImporterStringOutOfBounds.txt").toURI());
 
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
@@ -269,9 +273,9 @@ class MedlinePlainImporterTest {
                 PT  - newspaper article""")) {
             List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
 
-            BibEntry expectedEntry = new BibEntry();
-            expectedEntry.setType(StandardEntryType.Article);
-            expectedEntry.setField(StandardField.KEYWORDS, "Female");
+            BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
+                    .withField(StandardField.KEYWORDS, "Female")
+                    .withField(StandardField.PMID, "22664795");
 
             assertEquals(Collections.singletonList(expectedEntry), actualEntries);
         }
