@@ -163,8 +163,23 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
+        if (useAi.get()) {
+            if (customizeSettings.get()) {
+                return validateBasicSettings() && validateExpertSettings();
+            } else {
+                return validateBasicSettings();
+            }
+        }
+
+        return true;
+    }
+
+    public boolean validateBasicSettings() {
+        return openAiTokenValidator.getValidationStatus().isValid();
+    }
+
+    public boolean validateExpertSettings() {
         List<Validator> validators = List.of(
-                openAiTokenValidator,
                 instructionValidator,
                 temperatureValidator,
                 contextWindowSizeValidator,
