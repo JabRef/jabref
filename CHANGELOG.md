@@ -21,6 +21,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11509](https://github.com/JabRef/jabref/pull/11509)
+
 ### Removed
 
 
