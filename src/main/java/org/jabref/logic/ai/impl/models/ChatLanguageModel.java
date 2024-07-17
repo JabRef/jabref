@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.AiChat;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryFile;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -86,7 +87,13 @@ public class ChatLanguageModel implements dev.langchain4j.model.chat.ChatLanguag
         //    it's possible, but langchain4j doesn't do it.
 
         if (chatClient.isEmpty()) {
-            throw new RuntimeException("Chat is not enabled");
+            if (!aiPreferences.getEnableChatWithFiles()) {
+                throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)"));
+            } else if (aiPreferences.getOpenAiToken().isEmpty()) {
+                throw new RuntimeException(Localization.lang("In order to use AI chat, set OpenAI API key inside JabRef preferences (AI tab)"));
+            } else {
+                throw new RuntimeException(Localization.lang("Unable to chat with AI"));
+            }
         }
 
         List<io.github.stefanbratanov.jvm.openai.ChatMessage> messages =
