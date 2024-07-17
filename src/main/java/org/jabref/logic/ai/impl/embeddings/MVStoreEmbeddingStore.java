@@ -54,6 +54,7 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
 
     /**
      * Construct an embedding store that uses an MVStore for persistence.
+     *
      * @param path - path to MVStore file, if null then in-memory MVStore will be used (without persistence).
      * @param dialogService - dialog service that is used in case any error happens while opening an MVStore.
      */

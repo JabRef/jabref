@@ -99,7 +99,6 @@ public class ChatLanguageModel implements dev.langchain4j.model.chat.ChatLanguag
         List<io.github.stefanbratanov.jvm.openai.ChatMessage> messages =
                 list.stream().map(chatMessage -> {
                     // Do not inline this variable. Java compiler will argue that we return Record & ChatMessage.
-                    //noinspection UnnecessaryLocalVariable
                     io.github.stefanbratanov.jvm.openai.ChatMessage result = switch (chatMessage) {
                         case AiMessage aiMessage ->
                                 io.github.stefanbratanov.jvm.openai.ChatMessage.assistantMessage(aiMessage.text());

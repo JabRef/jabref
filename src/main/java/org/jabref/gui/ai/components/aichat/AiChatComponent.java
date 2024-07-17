@@ -1,7 +1,5 @@
 package org.jabref.gui.ai.components.aichat;
 
-import java.util.function.Consumer;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
