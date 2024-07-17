@@ -22,6 +22,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -36,8 +38,6 @@ public class AiChatTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
-
-    private Optional<BibEntry> currentBibEntry = Optional.empty();
 
     public AiChatTab(LibraryTabContainer libraryTabContainer,
                      DialogService dialogService,
@@ -54,24 +54,9 @@ public class AiChatTab extends EntryEditorTab {
         this.taskExecutor = taskExecutor;
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
 
-        aiService.getPreferences().onAnyParametersChange(() -> {
-            currentBibEntry.ifPresent(this::bindToEntry);
-        });
-
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
         aiService.getEmbeddingsManager().registerListener(new FileIngestedListener());
-    }
-
-    private class FileIngestedListener {
-        @Subscribe
-        public void listen(DocumentIngestedEvent event) {
-            currentBibEntry.ifPresent(entry -> {
-                if (aiService.getEmbeddingsManager().hasIngestedLinkedFiles(entry.getFiles())) {
-                    UiTaskExecutor.runInJavaFXThread(() -> bindToEntry(entry));
-                }
-            });
-        }
     }
 
     @Override
@@ -80,9 +65,14 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     @Override
-    protected void bindToEntry(BibEntry entry) {
-        currentBibEntry = Optional.of(entry);
+    protected void handleFocus() {
+        if (currentEntry != null) {
+            bindToEntry(currentEntry);
+        }
+    }
 
+    @Override
+    protected void bindToEntry(BibEntry entry) {
         if (!aiService.getPreferences().getEnableChatWithFiles()) {
             showPrivacyNotice(entry);
         } else if (aiService.getPreferences().getOpenAiToken().isEmpty()) {
@@ -145,5 +135,12 @@ public class AiChatTab extends EntryEditorTab {
 
     private static boolean citationKeyIsUnique(BibDatabaseContext bibDatabaseContext, String citationKey) {
         return bibDatabaseContext.getDatabase().getNumberOfCitationKeyOccurrences(citationKey) == 1;
+    }
+
+    private class FileIngestedListener {
+        @Subscribe
+        public void listen(DocumentIngestedEvent event) {
+             UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
+        }
     }
 }
