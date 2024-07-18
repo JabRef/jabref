@@ -64,7 +64,7 @@ These third-party services are the following:
 | [MathSciNet](http://www.ams.org/mathscinet)                                                                                  | <https://www.ams.org/about-us/privacy> |
 | [mEDRA](https://www.medra.org/)                                                                                              | <https://www.medra.org/stdoc/en/Servizio_DOI_Informativa_ENG.pdf> |
 | [Mr. DLib](https://mr-dlib.org/) [1]                                                                                         | <https://support.dataverse.harvard.edu/harvard-dataverse-privacy-policy> |
-| [OpenAI](https://openai.com/)                                                                                            | <https://openai.com/policies/row-privacy-policy/> |
+| [OpenAI](https://openai.com/)                                                                                                | <https://openai.com/policies/row-privacy-policy/> |
 | [Openlibrary](https://openlibrary.org)                                                                                       | <https://archive.org/about/terms.php> |
 | [ResearchGate](https://www.researchgate.net/)                                                                                | <https://www.researchgate.net/privacy-policy> |
 | [IETF Datatracker](https://datatracker.ietf.org/)                                                                            | <https://www.ietf.org/privacy-statement/> |
