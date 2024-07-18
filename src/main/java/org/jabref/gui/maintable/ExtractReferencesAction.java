@@ -15,7 +15,6 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.util.GrobidService;
@@ -33,30 +32,30 @@ import org.jspecify.annotations.Nullable;
 /**
  * SIDE EFFECT: Sets the "cites" field of the entry having the linked files
  *
- * Mode choice A: online or offline
- * Mode choice B: complete entry or single file (the latter is not implemented)
+ * <ul>
+ *   <li>Mode choice A: online or offline</li>
+ *   <li>Mode choice B: complete entry or single file (the latter is not implemented)</li>
+ * </ul>
+ *
+ * The mode is selected by the preferences whether to use Grobid or not.
  *
  * The different modes should be implemented as sub classes. However, this was too complicated, thus we use variables at the constructor to parameterize this class.
  */
 public class ExtractReferencesAction extends SimpleCommand {
     private final int FILES_LIMIT = 10;
 
-    private final boolean online;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
     private final BibEntry entry;
     private final LinkedFile linkedFile;
-    private final TaskExecutor taskExecutor;
 
     private final BibliographyFromPdfImporter bibliographyFromPdfImporter;
 
-    public ExtractReferencesAction(boolean online,
-                                   DialogService dialogService,
+    public ExtractReferencesAction(DialogService dialogService,
                                    StateManager stateManager,
-                                   PreferencesService preferencesService,
-                                   TaskExecutor taskExecutor) {
-        this(online, dialogService, stateManager, preferencesService, null, null, taskExecutor);
+                                   PreferencesService preferencesService) {
+        this(dialogService, stateManager, preferencesService, null, null);
     }
 
     /**
@@ -65,20 +64,16 @@ public class ExtractReferencesAction extends SimpleCommand {
      * @param entry the entry to handle (can be null)
      * @param linkedFile the linked file (can be null)
      */
-    private ExtractReferencesAction(boolean online,
-                                    @NonNull DialogService dialogService,
+    private ExtractReferencesAction(@NonNull DialogService dialogService,
                                     @NonNull StateManager stateManager,
                                     @NonNull PreferencesService preferencesService,
                                     @Nullable BibEntry entry,
-                                    @Nullable LinkedFile linkedFile,
-                                    @NonNull TaskExecutor taskExecutor) {
-        this.online = online;
+                                    @Nullable LinkedFile linkedFile) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.entry = entry;
         this.linkedFile = linkedFile;
-        this.taskExecutor = taskExecutor;
         bibliographyFromPdfImporter = new BibliographyFromPdfImporter(preferencesService.getCitationKeyPatternPreferences());
 
         if (this.linkedFile == null) {
@@ -98,8 +93,6 @@ public class ExtractReferencesAction extends SimpleCommand {
 
     private void extractReferences() {
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-            assert online == this.preferencesService.getGrobidPreferences().isGrobidEnabled();
-
             List<BibEntry> selectedEntries;
             if (entry == null) {
                 selectedEntries = stateManager.getSelectedEntries();
@@ -107,6 +100,7 @@ public class ExtractReferencesAction extends SimpleCommand {
                 selectedEntries = List.of(entry);
             }
 
+            boolean online = this.preferencesService.getGrobidPreferences().isGrobidEnabled();
             Callable<ParserResult> parserResultCallable;
             if (online) {
                 Optional<Callable<ParserResult>> parserResultCallableOnline = getParserResultCallableOnline(databaseContext, selectedEntries);
