@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Currently, IEEE two column format is supported.
  * <p>
+ * To extract a {@link BibEntry} matching the PDF, see {@link PdfContentImporter}.
  */
 public class BibliographyFromPdfImporter extends Importer {
 
@@ -93,7 +94,7 @@ public class BibliographyFromPdfImporter extends Importer {
         List<BibEntry> result;
 
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
-            String contents = getLastPageContents(document);
+            String contents = getReferencesPagesText(document);
             result = getEntriesFromPDFContent(contents);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
@@ -130,15 +131,27 @@ public class BibliographyFromPdfImporter extends Importer {
                                 .toList();
     }
 
-    private String getLastPageContents(PDDocument document) throws IOException {
-        PDFTextStripper stripper = new PDFTextStripper();
+    /**
+     * Extracts the text from all pages containing references. It simply goes from the last page backwards until there is probably no reference anymore.
+     */
+    private String getReferencesPagesText(PDDocument document) throws IOException {
+        return prependToResult("", document, new PDFTextStripper(), document.getNumberOfPages());
+    }
 
-        int lastPage = document.getNumberOfPages();
+    private String prependToResult(String currentText, PDDocument document, PDFTextStripper stripper, int pageNumber) throws IOException {
+        String pageContents = getPageContents(document, stripper, pageNumber);
+        String result = pageContents + currentText;
+        if (!pageContents.contains("References") && !pageContents.contains("REFERENCES") && (pageNumber > 0)) {
+            return prependToResult(result, document, stripper, pageNumber - 1);
+        }
+        return result;
+    }
+
+    private static String getPageContents(PDDocument document, PDFTextStripper stripper, int lastPage) throws IOException {
         stripper.setStartPage(lastPage);
         stripper.setEndPage(lastPage);
         StringWriter writer = new StringWriter();
         stripper.writeText(document, writer);
-
         return writer.toString();
     }
 
