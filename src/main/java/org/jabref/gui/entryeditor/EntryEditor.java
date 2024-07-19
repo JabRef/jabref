@@ -393,6 +393,9 @@ public class EntryEditor extends BorderPane {
             getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
         });
 
+        EasyBind.listen(preferencesService.getPreviewPreferences().showPreviewAsExtraTabProperty(),
+                (obs, oldValue, newValue) -> adaptVisibleTabs());
+
         adaptVisibleTabs();
         setupToolBar();
 

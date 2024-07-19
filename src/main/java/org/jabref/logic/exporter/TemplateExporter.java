@@ -1,10 +1,10 @@
 package org.jabref.logic.exporter;
 
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -161,7 +161,7 @@ public class TemplateExporter extends Exporter {
      *
      * @param filename the filename
      * @return a newly created reader
-     * @throws IOException if the reader could not be created
+     * @throws IOException if the reader could not be created (e.g., file is not found)
      */
     private Reader getReader(String filename) throws IOException {
         // If this is a custom export, just use the given filename:
@@ -171,24 +171,24 @@ public class TemplateExporter extends Exporter {
         } else {
             dir = LAYOUT_PREFIX + (directory == null ? "" : directory + '/');
         }
+
         // Attempt to get a Reader for the file path given, either by
         // loading it as a resource (from within JAR), or as a normal file. If
         // unsuccessful (e.g. file not found), an IOException is thrown.
+
         String name = dir + filename;
-        // Try loading as a resource first. This works for files inside the JAR:
-        // If that did not work, try loading as a normal file URL:
-        try {
-            URL res = TemplateExporter.class.getResource(name);
-            Path reso;
-            if (res == null) {
-                reso = Path.of(name);
-            } else {
-                reso = Path.of(res.toURI());
-            }
-            return Files.newBufferedReader(reso, StandardCharsets.UTF_8);
-        } catch (FileNotFoundException | URISyntaxException ex) {
+
+        Path path = Path.of(name);
+        if (Files.exists(path)) {
+            return Files.newBufferedReader(path, StandardCharsets.UTF_8);
+        }
+
+        InputStream inputStream = TemplateExporter.class.getResourceAsStream(name);
+        if (inputStream == null) {
             throw new IOException("Cannot find layout file: '" + name + "'.");
         }
+
+        return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
     }
 
     @Override
