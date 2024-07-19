@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -129,18 +128,8 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
     }
 
     private static void addFromResource(String resource, OutputStream out) {
-        URL url = OpenDocumentSpreadsheetCreator.class.getResource(resource);
-        try (InputStream in = url.openStream()) {
-            byte[] buffer = new byte[256];
-            synchronized (out) {
-                while (true) {
-                    int bytesRead = in.read(buffer);
-                    if (bytesRead == -1) {
-                        break;
-                    }
-                    out.write(buffer, 0, bytesRead);
-                }
-            }
+        try (InputStream in = OpenDocumentSpreadsheetCreator.class.getResourceAsStream(resource)) {
+            in.transferTo(out);
         } catch (IOException e) {
             LOGGER.warn("Cannot get resource", e);
         }
