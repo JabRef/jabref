@@ -148,6 +148,8 @@ public class StyleLoader {
     public OOStyle getUsedStyleUnified() {
         OOStyle style = openOfficePreferences.getCurrentStyle();
         if (style instanceof JStyle jStyle) {
+
+            // TODO: Simplify as we already have the jstyle directly
             String filename = openOfficePreferences.getCurrentJStyle();
             if (filename != null) {
                 for (JStyle jstyle : getStyles()) {
