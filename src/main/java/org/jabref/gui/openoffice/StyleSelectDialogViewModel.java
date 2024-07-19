@@ -161,6 +161,7 @@ public class StyleSelectDialogViewModel {
                                             .map(JStyle::getPath)
                                             .collect(Collectors.toList());
         openOfficePreferences.setExternalStyles(externalStyles);
+        openOfficePreferences.setCurrentStyle(selectedItem.getValue().getStyleUnified());
         openOfficePreferences.setCurrentJStyle(selectedItem.getValue().getStylePath());
     }
 
