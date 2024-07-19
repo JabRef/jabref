@@ -308,7 +308,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         }
 
-        int targetRank = (selectedEntry.searchRankProperty().get());
+        int targetRank = selectedEntry.searchRankProperty().get();
         while (true) {
             targetRank = Math.floorMod(targetRank + delta, 5);
             BibEntryTableViewModel entry = firstEntryOfEachRank.get(targetRank);
