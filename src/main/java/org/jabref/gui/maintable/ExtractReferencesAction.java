@@ -38,8 +38,6 @@ import org.jspecify.annotations.Nullable;
  * </ul>
  *
  * The mode is selected by the preferences whether to use Grobid or not.
- *
- * The different modes should be implemented as sub classes. However, this was too complicated, thus we use variables at the constructor to parameterize this class.
  */
 public class ExtractReferencesAction extends SimpleCommand {
     private final int FILES_LIMIT = 10;

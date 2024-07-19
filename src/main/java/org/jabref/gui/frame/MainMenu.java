@@ -51,6 +51,7 @@ import org.jabref.gui.integrity.IntegrityCheckAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
+import org.jabref.gui.maintable.NewLibraryFromPdfAction;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
@@ -276,6 +277,7 @@ public class MainMenu extends MenuBar {
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.PARSE_LATEX, new ParseLatexAction(stateManager)),
                 factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(frame, stateManager, dialogService)),
+                factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF, new NewLibraryFromPdfAction(frame, stateManager, dialogService, preferencesService, taskExecutor)),
 
                 new SeparatorMenuItem(),
 
