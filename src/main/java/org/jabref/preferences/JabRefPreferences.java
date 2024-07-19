@@ -1307,7 +1307,7 @@ public class JabRefPreferences implements PreferencesService {
             return openOfficePreferences;
         }
 
-        String jstyleOrCslString = get(OO_BIBLIOGRAPHY_STYLE_FILE); //file path to csl or jstyle
+        String jstyleOrCslString = get(OO_BIBLIOGRAPHY_STYLE_FILE); // file path to csl or jstyle
         OOStyle currentStyle = CitationStyle.getDefault();
 
         if (CitationStyle.isCitationStyleFile(OO_CURRENT_STYLE)) {
@@ -1336,12 +1336,10 @@ public class JabRefPreferences implements PreferencesService {
         openOfficePreferences.getExternalStyles().addListener((InvalidationListener) change ->
                 putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles()));
         EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
-        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue ) -> put(OO_CURRENT_STYLE, newValue.getPath()));
+        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()));
 
         return openOfficePreferences;
     }
-
-
 
     @Override
     public LibraryPreferences getLibraryPreferences() {
