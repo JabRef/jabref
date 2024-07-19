@@ -49,7 +49,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
-import org.jabref.logic.openoffice.style.CSLStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
@@ -101,7 +100,7 @@ public class OpenOfficePanel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
-    private JStyle jStyle;
+    private JStyle jStyle;             // TODO: check for jstyle instance
     private StyleSelectDialogViewModel.StyleType currentStyleType;
     private OOStyle currentStyle;
 
@@ -231,6 +230,7 @@ public class OpenOfficePanel {
         update.setTooltip(new Tooltip(Localization.lang("Ensure that the bibliography is up-to-date")));
 
         update.setOnAction(event -> {
+            // TODO: check for jstyle instance
             String title = Localization.lang("Could not update bibliography");
             if (getOrUpdateTheStyle(title)) {
                 return;
@@ -419,25 +419,30 @@ public class OpenOfficePanel {
         connectTask.setOnFailed(value -> {
             Throwable ex = connectTask.getException();
             LOGGER.error("autodetect failed", ex);
-            if (ex instanceof UnsatisfiedLinkError) {
-                LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
+            switch (ex) {
+                case UnsatisfiedLinkError unsatisfiedLinkError -> {
+                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
 
-                dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
-                        + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
-            } else if (ex instanceof IOException) {
-                LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
+                            + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
+                }
+                case IOException ioException -> {
+                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
 
-                dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
-                        Localization.lang("Could not connect to running OpenOffice/LibreOffice.")
-                                + "\n"
-                                + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
-                                + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
-                        ex);
-            } else if (ex instanceof BootstrapException bootstrapEx) {
-               LOGGER.error("Exception boostrap cause", bootstrapEx.getTargetException());
-               dialogService.showErrorDialogAndWait("Bootstrap error", bootstrapEx.getTargetException());
-            } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex);
+                    dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
+                            Localization.lang("Could not connect to running OpenOffice/LibreOffice.")
+                                    + "\n"
+                                    + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
+                                    + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
+                            ex);
+                }
+                case BootstrapException bootstrapEx -> {
+                    LOGGER.error("Exception boostrap cause", bootstrapEx.getTargetException());
+                    dialogService.showErrorDialogAndWait("Bootstrap error", bootstrapEx.getTargetException());
+                }
+                case null,
+                     default ->
+                        dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex);
             }
         });
 
@@ -528,7 +533,7 @@ public class OpenOfficePanel {
                 citationType,
                 pageInfo,
                 syncOptions,
-                currentStyleType);
+                currentStyle.getStyleType());
     }
 
     /**

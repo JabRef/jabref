@@ -9,7 +9,6 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.logic.openoffice.style.CSLStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 
@@ -53,12 +52,7 @@ public class StyleSelectItemViewModel {
     }
 
     public OOStyle getStyleUnified() {
-        if (ooStyle instanceof JStyle jStyle) {
-            return jStyle;
-        } else if (ooStyle instanceof CSLStyle cslStyle) {
-            return cslStyle;
-        }
-        return null;
+        return ooStyle;
     }
 
     public BooleanProperty internalStyleProperty() {

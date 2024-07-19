@@ -31,7 +31,6 @@ import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
-import org.jabref.logic.openoffice.style.CSLStyle;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
@@ -69,7 +68,13 @@ public class StyleSelectDialogViewModel {
         styles.addAll(loadStyles());
 
         OOStyle currentStyle = openOfficePreferences.getCurrentStyle();
-        selectedItem.setValue(getStyleOrDefault(currentStyle));
+
+        if (currentStyle instanceof JStyle jStyle) {
+            selectedItem.setValue(getStyleOrDefault(jStyle.getPath()));
+        }
+        if (currentStyle instanceof CitationStyle citationStyle) {
+            selectedLayoutProperty.set(availableLayouts.stream().filter(csl -> csl.getFilePath().equals(citationStyle.getFilePath())).findFirst().orElse(availableLayouts.getFirst()));
+        }
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
                       .onSuccess(styles -> {
