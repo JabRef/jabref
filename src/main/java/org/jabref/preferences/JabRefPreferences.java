@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
@@ -510,7 +509,7 @@ public class JabRefPreferences implements PreferencesService {
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private MergeDialogPreferences mergeDialogPreferences;
-    private OOStyle style;
+    private OOStyle stylePreferences;
 
     private KeyBindingRepository keyBindingRepository;
 
@@ -1288,7 +1287,13 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(OO_SYNC_WHEN_CITING),
                 getStringList(OO_EXTERNAL_STYLE_FILES),
                 get(OO_BIBLIOGRAPHY_STYLE_FILE),
-                get(OO_CURRENT_STYLE)); // Type??
+                get(OO_CURRENT_STYLE));
+
+        if (CitationStyle.isCitationStyleFile(OO_CURRENT_STYLE)) {
+            stylePreferences = CitationStyle.createCitationStyleFromFile(OO_CURRENT_STYLE);
+        } else {
+          //  stylePreferences = JStyle
+        }
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
@@ -1397,33 +1402,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (obs, oldValue, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
 
         return groupsPreferences;
-    }
-
-    private void storeStyle(OOStyle style) { //where to call?
-        if (style instanceof CSLStyle cslStyle) { // why use iscitationstylefile?
-            OO_CURRENT_STYLE = cslStyle.getPath();
-        } else if (style instanceof JStyle jStyle) {
-            OO_CURRENT_STYLE = jStyle.getName();
-        }
-    }
-
-    public OOStyle getStyle() {
-        if (style != null) {
-            return style;
-        }
-
-        String currentStyle = get(OO_CURRENT_STYLE);
-
-        this.style = new OpenOfficePreferences(
-                get(OO_EXECUTABLE_PATH),
-                getBoolean(OO_USE_ALL_OPEN_BASES),
-                getBoolean(OO_SYNC_WHEN_CITING),
-                getStringList(OO_EXTERNAL_STYLE_FILES),
-                get(OO_BIBLIOGRAPHY_STYLE_FILE),
-                get(OO_CURRENT_STYLE));
-
-        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_CURRENT_STYLE, newValue)); // Type??
-        return this.style;
     }
 
     //*************************************************************************************************************
