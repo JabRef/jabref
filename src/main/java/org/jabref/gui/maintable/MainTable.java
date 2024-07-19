@@ -3,6 +3,8 @@ package org.jabref.gui.maintable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -247,8 +249,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                     .startsWith(columnSearchTerm))
             .findFirst()
             .ifPresent(item -> {
-                this.scrollTo(item);
-                this.clearAndSelect(item.getEntry());
+                getSelectionModel().clearSelection();
+                getSelectionModel().select(item);
+                scrollTo(item);
             });
     }
 
@@ -289,14 +292,33 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void scrollToRank(int delta) {
-        int currentRank = getSelectionModel().getSelectedItem().searchRankProperty().get();
-        getItems().stream()
-                  .filter(item -> item.searchRankProperty().get() == currentRank + delta)
-                  .findFirst()
-                  .ifPresent(item -> {
-                      this.scrollTo(item);
-                      this.clearAndSelect(item.getEntry());
-                  });
+        BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
+        if (selectedEntry == null) {
+            return;
+        }
+
+        List<BibEntryTableViewModel> firstEntryOfEachRank = new ArrayList<>(Collections.nCopies(5, null));
+        for (BibEntryTableViewModel entry : getItems()) {
+            int rank = entry.searchRankProperty().get();
+            if (firstEntryOfEachRank.get(rank) == null) {
+                firstEntryOfEachRank.set(rank, entry);
+            }
+            if (rank == 4) {
+                break;
+            }
+        }
+
+        int targetRank = (selectedEntry.searchRankProperty().get());
+        while (true) {
+            targetRank = Math.floorMod(targetRank + delta, 5);
+            BibEntryTableViewModel entry = firstEntryOfEachRank.get(targetRank);
+            if (entry != null) {
+                getSelectionModel().clearSelection();
+                getSelectionModel().select(entry);
+                scrollTo(entry);
+                return;
+            }
+        }
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
