@@ -104,7 +104,7 @@ class BibliographyFromPdfImporterTest {
 
     @Test
     void tua3i2refpage() throws Exception {
-        Path file = Path.of(BibliographyFromPdfImporterTest.class.getResource("tua3i2refpage.pdf").toURI());
+        Path file = Path.of(BibliographyFromPdfImporterTest.class.getResource("/pdfs/IEEE/tua3i2refpage.pdf").toURI());
         ParserResult parserResult = bibliographyFromPdfImporter.importDatabase(file);
         BibEntry entry02 = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Kondo2020")
