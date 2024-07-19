@@ -16,7 +16,6 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.AiEmbeddingsTaskManager;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
@@ -44,7 +43,6 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                                  StateManager stateManager,
                                  ThemeManager themeManager,
                                  IndexingTaskManager indexingTaskManager,
-                                 AiEmbeddingsTaskManager aiEmbeddingsTaskManager,
                                  BibEntryTypesManager entryTypesManager,
                                  TaskExecutor taskExecutor,
                                  JournalAbbreviationRepository journalAbbreviationRepository) {
@@ -60,8 +58,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                indexingTaskManager,
-                aiEmbeddingsTaskManager);
+                indexingTaskManager);
         this.entryTypesManager = entryTypesManager;
         this.isImportantOptionalFields = isImportantOptionalFields;
         setText(title);

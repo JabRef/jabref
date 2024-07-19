@@ -26,7 +26,6 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.AiEmbeddingsTaskManager;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
@@ -55,7 +54,6 @@ public class CommentsTab extends FieldsEditorTab {
                        StateManager stateManager,
                        ThemeManager themeManager,
                        IndexingTaskManager indexingTaskManager,
-                       AiEmbeddingsTaskManager aiEmbeddingsTaskManager,
                        TaskExecutor taskExecutor,
                        JournalAbbreviationRepository journalAbbreviationRepository) {
         super(
@@ -71,8 +69,7 @@ public class CommentsTab extends FieldsEditorTab {
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                indexingTaskManager,
-                aiEmbeddingsTaskManager
+                indexingTaskManager
         );
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
         setText(Localization.lang("Comments"));

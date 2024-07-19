@@ -12,7 +12,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.logic.ai.AiEmbeddingsTaskManager;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
@@ -78,15 +77,11 @@ public class ExternalFilesEntryLinker {
         }
     }
 
-    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, AiEmbeddingsTaskManager aiEmbeddingsTaskManager) {
+    public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
         try (AutoCloseable indexingTaskManagerBlocker = indexingTaskManager.blockNewTasks()) {
-            try (AutoCloseable embeddingsGenerationTaskBlocker = aiEmbeddingsTaskManager.blockNewTasks()) {
-                addFilesToEntry(entry, files);
-                moveLinkedFilesToFileDir(entry);
-                renameLinkedFilesToPattern(entry);
-            } catch (Exception e) {
-                LOGGER.error("Could not block EmbeddingsGenerationTask", e);
-            }
+            addFilesToEntry(entry, files);
+            moveLinkedFilesToFileDir(entry);
+            renameLinkedFilesToPattern(entry);
         } catch (Exception e) {
             LOGGER.error("Could not block IndexingTaskManager", e);
         }
@@ -98,17 +93,13 @@ public class ExternalFilesEntryLinker {
         }
     }
 
-    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager, AiEmbeddingsTaskManager aiEmbeddingsTaskManager) {
+    public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
         try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
-            try (AutoCloseable blocker2 = aiEmbeddingsTaskManager.blockNewTasks()) {
-                for (Path file : files) {
-                    copyFileToFileDir(file)
-                            .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
-                }
-                renameLinkedFilesToPattern(entry);
-            } catch (Exception e) {
-                LOGGER.error("Could not block EmbeddingsGenerationTaskManager", e);
+            for (Path file : files) {
+                copyFileToFileDir(file)
+                        .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
             }
+            renameLinkedFilesToPattern(entry);
         } catch (Exception e) {
             LOGGER.error("Could not block IndexingTaskManager", e);
         }

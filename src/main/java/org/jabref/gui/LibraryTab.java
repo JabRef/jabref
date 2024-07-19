@@ -60,7 +60,6 @@ import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.ai.AiEmbeddingsTaskManager;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
@@ -161,7 +160,6 @@ public class LibraryTab extends Tab {
 
     private final ClipBoardManager clipBoardManager;
     private final IndexingTaskManager indexingTaskManager;
-    private AiEmbeddingsTaskManager aiEmbeddingsTaskManager;
 
     private final TaskExecutor taskExecutor;
     private final DirectoryMonitorManager directoryMonitorManager;
@@ -188,7 +186,6 @@ public class LibraryTab extends Tab {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
-        this.aiEmbeddingsTaskManager = new AiEmbeddingsTaskManager(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
         this.taskExecutor = taskExecutor;
         this.directoryMonitorManager = new DirectoryMonitorManager(Injector.instantiateModelOrService(DirectoryMonitor.class));
 
@@ -204,7 +201,6 @@ public class LibraryTab extends Tab {
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
-        this.getDatabase().registerListener(new EmbeddingsUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -290,10 +286,6 @@ public class LibraryTab extends Tab {
             }
         }
 
-        if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-            aiEmbeddingsTaskManager.updateEmbeddings(bibDatabaseContext);
-        }
-
         LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;
@@ -334,13 +326,11 @@ public class LibraryTab extends Tab {
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
-        this.aiEmbeddingsTaskManager = new AiEmbeddingsTaskManager(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
 
         setupMainPanel();
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
-        this.getDatabase().registerListener(new EmbeddingsUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -895,8 +885,6 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
 
-        aiEmbeddingsTaskManager.shutdown();
-
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }
@@ -1152,44 +1140,6 @@ public class LibraryTab extends Tab {
 
     public IndexingTaskManager getIndexingTaskManager() {
         return indexingTaskManager;
-    }
-
-    private class EmbeddingsUpdateListener {
-        @Subscribe
-        public void listen(EntriesAddedEvent event) {
-            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-                aiEmbeddingsTaskManager.addToStore(event.getBibEntries());
-            }
-        }
-
-        @Subscribe
-        public void listen(EntriesRemovedEvent event) {
-            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-                aiEmbeddingsTaskManager.removeFromStore(event.getBibEntries());
-            }
-        }
-
-        @Subscribe
-        public void listen(FieldChangedEvent event) {
-            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-                if (event.getField().equals(StandardField.FILE)) {
-                    List<LinkedFile> oldFileList = FileFieldParser.parse(event.getOldValue());
-                    List<LinkedFile> newFileList = FileFieldParser.parse(event.getNewValue());
-
-                    List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
-                    addedFiles.removeAll(oldFileList);
-                    List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
-                    removedFiles.removeAll(newFileList);
-
-                    aiEmbeddingsTaskManager.addToStore(addedFiles);
-                    aiEmbeddingsTaskManager.removeFromStore(removedFiles);
-                }
-            }
-        }
-    }
-
-    public AiEmbeddingsTaskManager getEmbeddingsGenerationTaskManager() {
-        return aiEmbeddingsTaskManager;
     }
 
     public static class DatabaseNotification extends NotificationPane {

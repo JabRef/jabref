@@ -4,6 +4,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -131,5 +132,10 @@ public class AiEmbeddingsManager implements AutoCloseable {
 
     public boolean hasIngestedLinkedFiles(List<LinkedFile> linkedFiles) {
         return hasIngestedDocuments(linkedFiles.stream().map(LinkedFile::getLink).toList());
+    }
+
+    public void invalidate() {
+        Set<String> ingestedClone = new HashSet<>(getIngestedDocuments());
+        ingestedClone.forEach(this::removeDocument);
     }
 }

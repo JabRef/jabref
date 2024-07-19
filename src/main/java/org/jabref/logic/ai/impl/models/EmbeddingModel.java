@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -39,23 +40,23 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
     }
 
     private void rebuild() {
-        if (!aiPreferences.getEnableChatWithFiles()) {
+        if (!aiPreferences.getEnableChatWithFiles() || aiPreferences.getOpenAiToken().isEmpty()) {
             embeddingModelObjectProperty.set(Optional.empty());
             return;
         }
 
-        dev.langchain4j.model.embedding.EmbeddingModel embeddingModel = switch (aiPreferences.getEmbeddingModel()) {
-            case AiPreferences.EmbeddingModel.ALL_MINLM_l6_V2 ->
-                    new AllMiniLmL6V2EmbeddingModel(executorService);
-            case AiPreferences.EmbeddingModel.ALL_MINLM_l6_V2_Q ->
-                    new AllMiniLmL6V2QuantizedEmbeddingModel(executorService);
-        };
+        dev.langchain4j.model.embedding.EmbeddingModel embeddingModel = OpenAiEmbeddingModel
+                .builder()
+                .modelName(aiPreferences.getEmbeddingModel().getLabel())
+                .apiKey(aiPreferences.getOpenAiToken())
+                .build();
 
         embeddingModelObjectProperty.set(Optional.of(embeddingModel));
     }
 
     private void setupListeningToPreferencesChanges() {
         aiPreferences.embeddingModelProperty().addListener(obs -> rebuild());
+        aiPreferences.openAiTokenProperty().addListener(obs -> rebuild());
     }
 
     @Override

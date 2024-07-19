@@ -1,8 +1,11 @@
 package org.jabref.gui.entryeditor.aichattab;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
@@ -14,6 +17,7 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiGenerateEmbeddingsTask;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.events.DocumentIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -38,6 +42,8 @@ public class AiChatTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
+
+    private final List<BibEntry> entriesUnderIngestion = new ArrayList<>();
 
     public AiChatTab(LibraryTabContainer libraryTabContainer,
                      DialogService dialogService,
@@ -84,8 +90,9 @@ public class AiChatTab extends EntryEditorTab {
         } else if (!citationKeyIsValid(bibDatabaseContext, entry)) {
             tryToGenerateCitationKeyThenBind(entry);
         } else if (!aiService.getEmbeddingsManager().hasIngestedLinkedFiles(entry.getFiles())) {
-            showErrorNotIngested();
+            startIngesting(entry);
         } else {
+            entriesUnderIngestion.remove(entry);
             bindToCorrectEntry(entry);
         }
     }
@@ -135,6 +142,24 @@ public class AiChatTab extends EntryEditorTab {
 
     private static boolean citationKeyIsUnique(BibDatabaseContext bibDatabaseContext, String citationKey) {
         return bibDatabaseContext.getDatabase().getNumberOfCitationKeyOccurrences(citationKey) == 1;
+    }
+
+    private void startIngesting(BibEntry entry) {
+        showErrorNotIngested();
+
+        if (!entriesUnderIngestion.contains(entry)) {
+            entriesUnderIngestion.add(entry);
+            new AiGenerateEmbeddingsTask(entry.getFiles(), aiService.getEmbeddingsManager(), bibDatabaseContext, filePreferences, new SimpleBooleanProperty(false))
+                    .onSuccess(res -> handleFocus())
+                    .onFailure(this::showErrorWhileIngesting)
+                    .executeWith(taskExecutor);
+        }
+    }
+
+    private void showErrorWhileIngesting(Exception e) {
+        setContent(ErrorStateComponent.withTextArea(Localization.lang("Unable to chat"), Localization.lang("Got error while processing the file:"), e.getMessage()));
+        entriesUnderIngestion.remove(currentEntry);
+        currentEntry.getFiles().stream().map(LinkedFile::getLink).forEach(link -> aiService.getEmbeddingsManager().removeDocument(link));
     }
 
     private class FileIngestedListener {

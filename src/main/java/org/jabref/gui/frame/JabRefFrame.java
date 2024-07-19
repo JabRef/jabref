@@ -216,7 +216,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
-                this::getOpenDatabaseAction);
+                this::getOpenDatabaseAction,
+                aiService);
 
         VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);

@@ -6,7 +6,7 @@ public class AiDefaultPreferences {
     public static final boolean ENABLE_CHAT = false;
     public static final boolean CUSTOMIZE_SETTINGS = false;
     public static final AiPreferences.ChatModel CHAT_MODEL = AiPreferences.ChatModel.GPT_3_5_TURBO;
-    public static final AiPreferences.EmbeddingModel EMBEDDING_MODEL = AiPreferences.EmbeddingModel.ALL_MINLM_l6_V2;
+    public static final AiPreferences.EmbeddingModel EMBEDDING_MODEL = AiPreferences.EmbeddingModel.TEXT_EMBEDDING_3_SMALL;
     public static final String SYSTEM_MESSAGE = "You are an AI assistant that analyses research papers.";
     public static final double TEMPERATURE = 0.7;
     public static final int MESSAGE_WINDOW_SIZE = 1_000; // "2 + 2 = 4, 3 + 3 = 6" has size 20. Source: {@link dev.langchain4j.memory.chat.TokenWindowChatMemoryTest#should_evict_multiple_orphan_ToolExecutionResultMessages_when_evicting_AiMessage_with_ToolExecutionRequests_when_SystemMessage_is_present}

@@ -445,11 +445,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         }
                         case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager());
+                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                         case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
-                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager(), libraryTab.getEmbeddingsGenerationTaskManager());
+                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                     }
                 }
