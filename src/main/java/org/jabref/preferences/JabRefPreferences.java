@@ -92,6 +92,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
@@ -144,7 +145,7 @@ import org.slf4j.LoggerFactory;
  * Internally it defines symbols used to pick a value from the {@code java.util.prefs} interface and keeps a hashmap
  * with all the default values.
  * <p>
- * There are still some similar preferences classes ({@link org.jabref.logic.openoffice.OpenOfficePreferences} and {@link org.jabref.logic.shared.prefs.SharedDatabasePreferences}) which also use
+ * There are still some similar preferences classes ({@link OpenOfficePreferences} and {@link SharedDatabasePreferences}) which also use
  * the {@code java.util.prefs} API.
  */
 @Singleton
@@ -526,7 +527,8 @@ public class JabRefPreferences implements PreferencesService {
             if (new File("jabref.xml").exists()) {
                 importPreferences(Path.of("jabref.xml"));
             }
-        } catch (JabRefException e) {
+        } catch (
+                JabRefException e) {
             LOGGER.warn("Could not import preferences from jabref.xml: {}", e.getMessage(), e);
         }
 
@@ -1049,13 +1051,15 @@ public class JabRefPreferences implements PreferencesService {
         if (getBoolean(MEMORY_STICK_MODE)) {
             try {
                 exportPreferences(Path.of("jabref.xml"));
-            } catch (JabRefException e) {
+            } catch (
+                    JabRefException e) {
                 LOGGER.warn("Could not export preferences for memory stick mode: {}", e.getMessage(), e);
             }
         }
         try {
             prefs.flush();
-        } catch (BackingStoreException ex) {
+        } catch (
+                BackingStoreException ex) {
             LOGGER.warn("Cannot communicate with backing store", ex);
         }
     }
@@ -1066,7 +1070,8 @@ public class JabRefPreferences implements PreferencesService {
 
         try {
             addPrefsRecursively(this.prefs, result);
-        } catch (BackingStoreException e) {
+        } catch (
+                BackingStoreException e) {
             LOGGER.info("could not retrieve preference keys", e);
         }
         return result;
@@ -1089,13 +1094,16 @@ public class JabRefPreferences implements PreferencesService {
     private Object getObject(Preferences prefs, String key) {
         try {
             return prefs.get(key, (String) defaults.get(key));
-        } catch (ClassCastException e) {
+        } catch (
+                ClassCastException e) {
             try {
                 return prefs.getBoolean(key, getBooleanDefault(key));
-            } catch (ClassCastException e2) {
+            } catch (
+                    ClassCastException e2) {
                 try {
                     return prefs.getInt(key, getIntDefault(key));
-                } catch (ClassCastException e3) {
+                } catch (
+                        ClassCastException e3) {
                     return prefs.getDouble(key, getDoubleDefault(key));
                 }
             }
@@ -1139,7 +1147,9 @@ public class JabRefPreferences implements PreferencesService {
         LOGGER.debug("Exporting preferences {}", path.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(path)) {
             prefs.exportSubtree(os);
-        } catch (BackingStoreException | IOException ex) {
+        } catch (
+                BackingStoreException |
+                IOException ex) {
             throw new JabRefException(
                     "Could not export preferences",
                     Localization.lang("Could not export preferences"),
@@ -1157,7 +1167,9 @@ public class JabRefPreferences implements PreferencesService {
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
-        } catch (InvalidPreferencesFormatException | IOException ex) {
+        } catch (
+                InvalidPreferencesFormatException |
+                IOException ex) {
             throw new JabRefException(
                     "Could not import preferences",
                     Localization.lang("Could not import preferences"),
@@ -1231,7 +1243,8 @@ public class JabRefPreferences implements PreferencesService {
                   .map(key -> prefsNode.get(key, null))
                   .filter(Objects::nonNull)
                   .forEach(typeString -> MetaDataParser.parseCustomEntryType(typeString).ifPresent(storedEntryTypes::add));
-        } catch (BackingStoreException e) {
+        } catch (
+                BackingStoreException e) {
             LOGGER.info("Parsing customized entry types failed.", e);
         }
         return storedEntryTypes;
@@ -1248,7 +1261,8 @@ public class JabRefPreferences implements PreferencesService {
             Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
             prefsNode.clear();
             prefsNode.flush();
-        } catch (BackingStoreException e) {
+        } catch (
+                BackingStoreException e) {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
     }
@@ -1271,7 +1285,8 @@ public class JabRefPreferences implements PreferencesService {
             bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), MetaDataSerializer.serializeCustomEntryTypes(type)));
 
             prefsNode.flush();
-        } catch (BackingStoreException e) {
+        } catch (
+                BackingStoreException e) {
             LOGGER.info("Updating stored custom entry types failed.", e);
         }
     }
@@ -1292,29 +1307,41 @@ public class JabRefPreferences implements PreferencesService {
             return openOfficePreferences;
         }
 
+        String jstyleOrCslString = get(OO_BIBLIOGRAPHY_STYLE_FILE); //file path to csl or jstyle
+        OOStyle currentStyle = CitationStyle.getDefault();
+
+        if (CitationStyle.isCitationStyleFile(OO_CURRENT_STYLE)) {
+            currentStyle = CitationStyle.createCitationStyleFromFile(OO_CURRENT_STYLE).orElse(null);
+        } else {
+            try {
+                currentStyle = new JStyle(jstyleOrCslString, getLayoutFormatterPreferences(),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+            } catch (IOException ex) {
+                LOGGER.warn("Could not create JStyle", ex);
+            }
+        }
+
         openOfficePreferences = new OpenOfficePreferences(
                 get(OO_EXECUTABLE_PATH),
                 getBoolean(OO_USE_ALL_OPEN_BASES),
                 getBoolean(OO_SYNC_WHEN_CITING),
                 getStringList(OO_EXTERNAL_STYLE_FILES),
                 get(OO_BIBLIOGRAPHY_STYLE_FILE),
-                get(OO_CURRENT_STYLE));
-
-        if (CitationStyle.isCitationStyleFile(OO_CURRENT_STYLE)) {
-            stylePreferences = CitationStyle.createCitationStyleFromFile(OO_CURRENT_STYLE);
-        } else {
-          //  stylePreferences = JStyle
-        }
+                currentStyle);
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
         EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (obs, oldValue, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
+
         openOfficePreferences.getExternalStyles().addListener((InvalidationListener) change ->
                 putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles()));
         EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
+        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue ) -> put(OO_CURRENT_STYLE, newValue.getPath()));
 
         return openOfficePreferences;
     }
+
+
 
     @Override
     public LibraryPreferences getLibraryPreferences() {
@@ -1569,7 +1596,8 @@ public class JabRefPreferences implements PreferencesService {
             if (!newValue) {
                 try (final Keyring keyring = Keyring.create()) {
                     keyring.deletePassword("org.jabref", "proxy");
-                } catch (Exception ex) {
+                } catch (
+                        Exception ex) {
                     LOGGER.warn("Unable to remove proxy credentials");
                 }
             }
@@ -1585,9 +1613,11 @@ public class JabRefPreferences implements PreferencesService {
                         keyring.getPassword("org.jabref", "proxy"),
                         getInternalPreferences().getUserAndHost())
                         .decrypt();
-            } catch (PasswordAccessException ex) {
+            } catch (
+                    PasswordAccessException ex) {
                 LOGGER.warn("JabRef uses proxy password from key store but no password is stored");
-            } catch (Exception ex) {
+            } catch (
+                    Exception ex) {
                 LOGGER.warn("JabRef could not open the key store", ex);
             }
         }
@@ -1605,7 +1635,8 @@ public class JabRefPreferences implements PreferencesService {
                             getInternalPreferences().getUserAndHost())
                             .encrypt());
                 }
-            } catch (Exception ex) {
+            } catch (
+                    Exception ex) {
                 LOGGER.warn("Unable to open key store", ex);
             }
         }
@@ -1638,7 +1669,8 @@ public class JabRefPreferences implements PreferencesService {
                         EntryTypeFactory.parse(key),
                         preferences.get(key, null));
             }
-        } catch (BackingStoreException ex) {
+        } catch (
+                BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
         }
 
@@ -1658,7 +1690,8 @@ public class JabRefPreferences implements PreferencesService {
         Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
-        } catch (BackingStoreException ex) {
+        } catch (
+                BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences::putKeyPattern", ex);
         }
 
@@ -1898,7 +1931,8 @@ public class JabRefPreferences implements PreferencesService {
                 .map(string -> {
                     try {
                         return Double.parseDouble(string);
-                    } catch (NumberFormatException e) {
+                    } catch (
+                            NumberFormatException e) {
                         LOGGER.error("Exception while parsing column widths. Choosing default.", e);
                         return defaultWidth;
                     }
@@ -2055,7 +2089,8 @@ public class JabRefPreferences implements PreferencesService {
             if (!newValue) {
                 try {
                     Files.deleteIfExists(Path.of("jabref.xml"));
-                } catch (IOException e) {
+                } catch (
+                        IOException e) {
                     LOGGER.warn("Error accessing filesystem", e);
                 }
             }
@@ -2418,7 +2453,7 @@ public class JabRefPreferences implements PreferencesService {
                         if (BstPreviewLayout.isBstStyleFile(layout)) {
                             return getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
                                                                           .filter(path -> path.endsWith(layout)).map(Path::of)
-                                                                          .map(file -> (BstPreviewLayout) new BstPreviewLayout(file))
+                                                                          .map(BstPreviewLayout::new)
                                                                           .findFirst()
                                                                           .orElse(null);
                         } else {
@@ -2507,9 +2542,11 @@ public class JabRefPreferences implements PreferencesService {
             try {
                 SidePaneType type = Enum.valueOf(SidePaneType.class, name);
                 preferredPositions.put(type, Integer.parseInt(componentPositions.get(i)));
-            } catch (NumberFormatException e) {
+            } catch (
+                    NumberFormatException e) {
                 LOGGER.debug("Invalid number format for side pane component '{}'", name, e);
-            } catch (IllegalArgumentException e) {
+            } catch (
+                    IllegalArgumentException e) {
                 LOGGER.debug("Following component is not a side pane: '{}'", name, e);
             }
         }
@@ -2706,7 +2743,8 @@ public class JabRefPreferences implements PreferencesService {
         SearchDisplayMode searchDisplayMode;
         try {
             searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
-        } catch (IllegalArgumentException ex) {
+        } catch (
+                IllegalArgumentException ex) {
             // Should only occur when the searchmode is set directly via preferences.put and the enum was not used
             searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
         }
@@ -2919,7 +2957,8 @@ public class JabRefPreferences implements PreferencesService {
                     // Old format: name, cliId, className, basePath
                     importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
                 }
-            } catch (Exception e) {
+            } catch (
+                    Exception e) {
                 LOGGER.warn("Could not load {} from preferences. Will ignore.", importerString.getFirst(), e);
             }
         }
@@ -2963,12 +3002,14 @@ public class JabRefPreferences implements PreferencesService {
                             keyring.getPassword("org.jabref.customapikeys", fetcher),
                             getInternalPreferences().getUserAndHost())
                             .decrypt());
-                } catch (PasswordAccessException ex) {
+                } catch (
+                        PasswordAccessException ex) {
                     LOGGER.debug("No api key stored for {} fetcher", fetcher);
                     keys.add("");
                 }
             }
-        } catch (Exception ex) {
+        } catch (
+                Exception ex) {
             LOGGER.warn("JabRef could not open the key store");
         }
 
@@ -3002,7 +3043,8 @@ public class JabRefPreferences implements PreferencesService {
                 if (StringUtil.isNullOrEmpty(keys.get(i))) {
                     try {
                         keyring.deletePassword("org.jabref.customapikeys", names.get(i));
-                    } catch (PasswordAccessException ex) {
+                    } catch (
+                            PasswordAccessException ex) {
                         // Already removed
                     }
                 } else {
@@ -3012,7 +3054,8 @@ public class JabRefPreferences implements PreferencesService {
                             .encrypt());
                 }
             }
-        } catch (Exception ex) {
+        } catch (
+                Exception ex) {
             LOGGER.error("Unable to open key store", ex);
         }
     }
@@ -3024,10 +3067,12 @@ public class JabRefPreferences implements PreferencesService {
                 for (String name : names) {
                     keyring.deletePassword("org.jabref.customapikeys", name);
                 }
-            } catch (PasswordAccessException ex) {
+            } catch (
+                    PasswordAccessException ex) {
                 // nothing to do, no password to remove
             }
-        } catch (Exception ex) {
+        } catch (
+                Exception ex) {
             LOGGER.error("Unable to open key store");
         }
     }

@@ -3,11 +3,15 @@ package org.jabref.logic.openoffice;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import org.jabref.logic.openoffice.style.OOStyle;
 
 public class OpenOfficePreferences {
 
@@ -26,20 +30,20 @@ public class OpenOfficePreferences {
     private final BooleanProperty syncWhenCiting;
     private final ObservableList<String> externalStyles;
     private final StringProperty currentJStyle;
-    private final StringProperty currentStyle;
+    private final ObjectProperty<OOStyle> currentStyle;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
                                  boolean syncWhenCiting,
                                  List<String> externalStyles,
                                  String currentJStyle,
-                                 String currentStyle) {
+                                 OOStyle currentStyle) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
         this.externalStyles = FXCollections.observableArrayList(externalStyles);
         this.currentJStyle = new SimpleStringProperty(currentJStyle);
-        this.currentStyle = new SimpleStringProperty(currentStyle);
+        this.currentStyle = new SimpleObjectProperty<>(currentStyle);
     }
 
     public void clearConnectionSettings() {
@@ -122,15 +126,15 @@ public class OpenOfficePreferences {
         this.currentJStyle.set(currentJStyle);
     }
 
-    public String getCurrentStyle() {
+    public OOStyle getCurrentStyle() {
         return currentStyle.get();
     }
 
-    public StringProperty currentStyleProperty() {
+    public ObjectProperty<OOStyle> currentStyleProperty() {
         return currentStyle;
     }
 
-    public void setCurrentStyle(String style) {
+    public void setCurrentStyle(OOStyle style) {
         this.currentStyle.set(style);
     }
 }

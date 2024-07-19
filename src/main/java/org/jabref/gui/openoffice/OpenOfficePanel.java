@@ -42,6 +42,7 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -208,7 +209,7 @@ public class OpenOfficePanel {
                                      LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), e);
                                  }
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
-                             } else if (currentStyle instanceof CSLStyle cslStyle) { // Unreachable statement, check StyleSelectItemViewModel
+                             } else if (currentStyle instanceof CitationStyle cslStyle) { // Unreachable statement, check StyleSelectItemViewModel
                                  dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
                              }
                          });

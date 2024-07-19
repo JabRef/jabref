@@ -68,7 +68,7 @@ public class StyleSelectDialogViewModel {
 
         styles.addAll(loadStyles());
 
-        String currentStyle = openOfficePreferences.getCurrentStyle();
+        OOStyle currentStyle = openOfficePreferences.getCurrentStyle();
         selectedItem.setValue(getStyleOrDefault(currentStyle));
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
@@ -194,10 +194,6 @@ public class StyleSelectDialogViewModel {
 
     public void handleStyleSelection() {
         OOStyle selected = selectedStyle.get();
-        if (selected instanceof CSLStyle cslStyle) {
-            openOfficePreferences.setCurrentStyle(cslStyle.getName());
-        } else if (selected instanceof JStyle jStyle) {
-            openOfficePreferences.setCurrentStyle(jStyle.getPath());
-        }
+        openOfficePreferences.setCurrentStyle(selected);
     }
 }

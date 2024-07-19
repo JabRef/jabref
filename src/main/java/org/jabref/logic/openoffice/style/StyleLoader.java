@@ -159,10 +159,9 @@ public class StyleLoader {
             // Pick the first internal
             openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
             return internalStyles.getFirst();
-        } else if (style instanceof CSLStyle cslStyle) {
+        } else if (style instanceof CitationStyle cslStyle) {
             try {
-                CitationStyle citationStyle = CSLCitationOOAdapter.getSelectedStyle();
-                return new CSLStyle(citationStyle);
+                return CSLCitationOOAdapter.getSelectedStyle();
             } catch (Exception ex) {
                 LOGGER.error("Error loading CSL style", ex);
                 return null;
