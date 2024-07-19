@@ -158,9 +158,21 @@ public class ExtractReferencesAction extends SimpleCommand {
             result.getDatabase().insertEntries(bibliographyFromPdfImporter.importDatabase(fileListIterator.next()).getDatabase().getEntries());
         }
 
+        String cites = getCites(result.getDatabase().getEntries(), currentEntry);
+        currentEntry.setField(StandardField.CITES, cites);
+    }
+
+    /**
+     * Creates the field content for the "cites" field. The field contains the citation keys of the imported entries.
+     *
+     * TODO: Move this part to logic somehow
+     *
+     * @param currentEntry used to create citation keys if the importer did not provide one from the imported entry
+     */
+    private static String getCites(List<BibEntry> entries, BibEntry currentEntry) {
         StringJoiner cites = new StringJoiner(",");
         int count = 0;
-        for (BibEntry importedEntry : result.getDatabase().getEntries()) {
+        for (BibEntry importedEntry : entries) {
             count++;
             Optional<String> citationKey = importedEntry.getCitationKey();
             String citationKeyToAdd;
@@ -187,7 +199,7 @@ public class ExtractReferencesAction extends SimpleCommand {
             }
             cites.add(citationKeyToAdd);
         }
-        currentEntry.setField(StandardField.CITES, cites.toString());
+        return cites.toString();
     }
 
     private Optional<Callable<ParserResult>> getParserResultCallableOnline(BibDatabaseContext databaseContext, List<BibEntry> selectedEntries) {
