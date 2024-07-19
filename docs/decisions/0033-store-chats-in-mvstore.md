@@ -1,12 +1,12 @@
 ---
-nav_order: 0032
+nav_order: 0033
 parent: Decision Records
 ---
 # Store chats in MVStore
 
 ## Context and Problem Statement
 
-This is a follow-up to [ADR-031](0031-store-chats-alongside-database.md).
+This is a follow-up to [ADR-031](0032-store-chats-in-local-user-folder).
 
 The chats with AI should be saved on exit from JabRef and retrieved on launch. We need to decide the format of
 the serialized messages.

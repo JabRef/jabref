@@ -1,5 +1,5 @@
 ---
-nav_order: 0031
+nav_order: 0032
 parent: Decision Records
 ---
 <!-- markdownlint-disable-next-line MD025 -->
@@ -24,8 +24,10 @@ Chats with AI should be stored somewhere. But where and how?
 
 ## Decision Outcome
 
-Chosen option: "Alongside `.bib` file", because
-simple to implement and gives the user the ability to share or not to share the chats. For pros and cons: See below
+Chosen option: "In local user folder", because
+it's very hard to work with a shared library, if two users will work
+simultaneously on one library, then AI chats file will be absolutely arbitrary
+and unmergable.
 
 ## Pros and Cons of the Options
 
@@ -53,8 +55,6 @@ Example filename: `4a070cf3--Chocolate.bib--2024-03-25--14.20.12.bak`.
 * Bad, because when path of a `.bib` file is changed, the chats are lost
 
 ### Alongside `.bib` file
-
-Refer to positive and negative consequences of the decision outcome.
 
 * Good, because simple implementation
 * Good, because, the user can send the chats file alongside the `.bib` file if they want to share the chats. If users do not want
