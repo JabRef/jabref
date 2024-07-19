@@ -72,16 +72,18 @@ public class StyleSelectDialogViewModel {
         if (currentStyle instanceof JStyle jStyle) {
             selectedItem.setValue(getStyleOrDefault(jStyle.getPath()));
         }
-        if (currentStyle instanceof CitationStyle citationStyle) {
-            selectedLayoutProperty.set(availableLayouts.stream().filter(csl -> csl.getFilePath().equals(citationStyle.getFilePath())).findFirst().orElse(availableLayouts.getFirst()));
-        }
-
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
                       .onSuccess(styles -> {
                           List<CitationStylePreviewLayout> layouts = styles.stream()
                                                                            .map(style -> new CitationStylePreviewLayout(style, bibEntryTypesManager))
                                                                            .collect(Collectors.toList());
                           availableLayouts.setAll(layouts);
+
+
+                          if (currentStyle instanceof CitationStyle citationStyle) {
+                              selectedLayoutProperty.set(availableLayouts.stream().filter(csl -> csl.getFilePath().equals(citationStyle.getFilePath())).findFirst().orElse(availableLayouts.getFirst()));
+                          }
+
                       })
                       .onFailure(ex -> dialogService.showErrorDialogAndWait("Error discovering citation styles", ex))
                       .executeWith(taskExecutor);
@@ -161,7 +163,7 @@ public class StyleSelectDialogViewModel {
                                             .map(JStyle::getPath)
                                             .collect(Collectors.toList());
         openOfficePreferences.setExternalStyles(externalStyles);
-        openOfficePreferences.setCurrentStyle(selectedItem.getValue().getStyleUnified());
+        openOfficePreferences.setCurrentStyle(getSelectedStyle());
         openOfficePreferences.setCurrentJStyle(selectedItem.getValue().getStylePath());
     }
 
@@ -196,6 +198,16 @@ public class StyleSelectDialogViewModel {
         if (selectedLayout != null) {
             CSLCitationOOAdapter.setSelectedStyleName(selectedLayout.getDisplayName());
         }
+    }
+
+    public OOStyle getSelectedStyle() {
+        // TODO: Check tab null
+        if (selectedTab.get().getText().equals("JStyles")) {
+            return selectedItem.get().getStyleUnified();
+        } else if (selectedTab.get().getText().equals("CSL Styles")) {
+            return selectedLayoutProperty.get().getCitationStyle();
+        }
+        return null;
     }
 
     public void handleStyleSelection() {

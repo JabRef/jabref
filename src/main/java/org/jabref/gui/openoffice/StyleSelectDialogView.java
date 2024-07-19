@@ -78,8 +78,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storePrefs();
-                CSLCitationOOAdapter.setSelectedStyleName(viewModel.getSelectedStyleName());
-                return tvStyles.getSelectionModel().getSelectedItem().getStyleUnified(); // Take a look here, how to deal with this?
+                return viewModel.getSelectedStyle();
             }
             return null;
         });
@@ -150,6 +149,10 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         add.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
         EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
+            // TODO: FIXME
+            if(style == null){
+                return;
+            }
             tvStyles.getSelectionModel().select(style);
             previewArticle.setLayout(new TextBasedPreviewLayout(style.getjStyle().getReferenceFormat(StandardEntryType.Article)));
             previewBook.setLayout(new TextBasedPreviewLayout(style.getjStyle().getReferenceFormat(StandardEntryType.Book)));
@@ -159,6 +162,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         searchBox.textProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.setAvailableLayoutsFilter(newValue));
 
+        tabPane.getSelectionModel().select(0);
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.setSelectedTab(newValue);
         });
@@ -166,7 +170,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         availableListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 viewModel.handleCslStyleSelection();
-                this.setResult(tvStyles.getSelectionModel().getSelectedItem().getjStyle());
+                this.setResult(tvStyles.getSelectionModel().getSelectedItem().getStyleUnified());
                 this.close();
             }
         });
