@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.AiChat;
-import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryFile;
+import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.AiPreferences;
 
@@ -57,7 +57,7 @@ public class ChatLanguageModel implements dev.langchain4j.model.chat.ChatLanguag
      * Update the underlying {@link dev.langchain4j.model.chat.ChatLanguageModel} by current {@link AiPreferences} parameters.
      * When the model is updated, the chat messages are not lost.
      * See {@link AiChat}, where messages are stored in {@link ChatMemory},
-     * and {@link BibDatabaseChatHistoryFile}, where messages are stored in {@link MVStore}.
+     * and {@link BibDatabaseChatHistory}, where messages are stored in {@link MVStore}.
      */
     private void rebuild() {
         if (!aiPreferences.getEnableChatWithFiles() || aiPreferences.getOpenAiToken().isEmpty()) {

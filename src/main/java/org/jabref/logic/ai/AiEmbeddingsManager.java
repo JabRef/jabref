@@ -1,5 +1,6 @@
 package org.jabref.logic.ai;
 
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,8 +8,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import jakarta.annotation.Nullable;
 import javafx.beans.property.BooleanProperty;
 
+import org.checkerframework.checker.units.qual.N;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.ai.impl.embeddings.FullyIngestedDocumentsTracker;
@@ -50,23 +53,19 @@ public class AiEmbeddingsManager implements AutoCloseable {
     public AiEmbeddingsManager(AiPreferences aiPreferences, EmbeddingModel embeddingModel, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
 
-        FullyIngestedDocumentsTracker fullyIngestedDocumentsTrackerTemp;
-        MVStoreEmbeddingStore mvStoreEmbeddingStoreTemp;
-        try {
-            Path embeddingStorePath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(EMBEDDING_STORE_FILE_NAME);
-            Path ingestedFilesTrackerPath = JabRefDesktop.getEmbeddingsCacheDirectory().resolve(INGESTED_FILES_FILE_NAME);
+        @Nullable Path embeddingStorePath = JabRefDesktop.getAiFilesDirectory().resolve(EMBEDDING_STORE_FILE_NAME);
+        @Nullable Path ingestedFilesTrackerPath = JabRefDesktop.getAiFilesDirectory().resolve(INGESTED_FILES_FILE_NAME);
 
-            Files.createDirectories(JabRefDesktop.getEmbeddingsCacheDirectory());
-            mvStoreEmbeddingStoreTemp = new MVStoreEmbeddingStore(embeddingStorePath, dialogService);
-            fullyIngestedDocumentsTrackerTemp = new FullyIngestedDocumentsTracker(ingestedFilesTrackerPath, dialogService);
+        try {
+            Files.createDirectories(JabRefDesktop.getAiFilesDirectory());
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait("An error occurred while creating directories for embeddings cache. Will store cache in RAM", e);
-            mvStoreEmbeddingStoreTemp = new MVStoreEmbeddingStore(null, dialogService);
-            fullyIngestedDocumentsTrackerTemp = new FullyIngestedDocumentsTracker(null, dialogService);
+            embeddingStorePath = null;
+            ingestedFilesTrackerPath = null;
         }
 
-        this.fullyIngestedDocumentsTracker = fullyIngestedDocumentsTrackerTemp;
-        this.embeddingStore = mvStoreEmbeddingStoreTemp;
+        this.embeddingStore = new MVStoreEmbeddingStore(embeddingStorePath, dialogService);
+        this.fullyIngestedDocumentsTracker = new FullyIngestedDocumentsTracker(ingestedFilesTrackerPath, dialogService);
         this.lowLevelIngestor = new LowLevelIngestor(aiPreferences, embeddingStore, embeddingModel);
 
         setupListeningToPreferencesChanges();

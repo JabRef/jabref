@@ -104,10 +104,10 @@ public abstract class NativeDesktop {
                                              OS.APP_DIR_APP_AUTHOR));
     }
 
-    public Path getEmbeddingsCacheDirectory() {
+    public Path getAiFilesDirectory() {
         return Path.of(AppDirsFactory.getInstance()
                 .getUserDataDir(OS.APP_DIR_APP_NAME,
-                        "embeddings" + File.separator + AiService.VERSION,
+                        "ai" + File.separator + AiService.VERSION,
                         OS.APP_DIR_APP_AUTHOR));
     }
 

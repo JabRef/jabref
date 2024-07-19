@@ -7,26 +7,26 @@ import dev.langchain4j.data.message.ChatMessage;
 /**
  * This class helps in storing chat messages for a specific entry in a BIB database.
  * <p>
- * It basically wraps the {@link BibDatabaseChatHistoryFile} with the entry's citation key.
+ * It basically wraps the {@link BibDatabaseChatHistory} with the entry's citation key.
  */
 public class BibEntryChatHistory implements AiChatHistory {
-    private final BibDatabaseChatHistoryFile bibDatabaseChatHistoryFile;
+    private final BibDatabaseChatHistory bibDatabaseChatHistory;
     private final String citationKey;
 
-    public BibEntryChatHistory(BibDatabaseChatHistoryFile bibDatabaseChatHistoryFile, String citationKey) {
-        this.bibDatabaseChatHistoryFile = bibDatabaseChatHistoryFile;
+    public BibEntryChatHistory(BibDatabaseChatHistory bibDatabaseChatHistory, String citationKey) {
+        this.bibDatabaseChatHistory = bibDatabaseChatHistory;
         this.citationKey = citationKey;
     }
 
     public List<ChatMessage> getMessages() {
-        return bibDatabaseChatHistoryFile.getMessagesForEntry(citationKey);
+        return bibDatabaseChatHistory.getMessagesForEntry(citationKey);
     }
 
     public void add(ChatMessage message) {
-        bibDatabaseChatHistoryFile.addMessage(citationKey, message);
+        bibDatabaseChatHistory.addMessage(citationKey, message);
     }
 
     public void clear() {
-        bibDatabaseChatHistoryFile.clearMessagesForEntry(citationKey);
+        bibDatabaseChatHistory.clearMessagesForEntry(citationKey);
     }
 }
