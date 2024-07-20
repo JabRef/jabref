@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +28,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
@@ -45,6 +45,7 @@ public class BibliographyFromPdfImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibliographyFromPdfImporter.class);
 
+    private static final Pattern REFERENCES = Pattern.compile("References", Pattern.CASE_INSENSITIVE);
     private static final Pattern REFERENCE_PATTERN = Pattern.compile("\\[(\\d+)\\](.*?)(?=\\[|$)", Pattern.DOTALL);
     private static final Pattern YEAR_AT_END = Pattern.compile(", (\\d{4})\\.$");
     private static final Pattern PAGES = Pattern.compile(", pp\\. (\\d+--?\\d+)\\.?(.*)");
@@ -53,7 +54,7 @@ public class BibliographyFromPdfImporter extends Importer {
     private static final Pattern MONTH_AND_YEAR = Pattern.compile(", ([A-Z][a-z]{2,7}\\.? \\d+),? ?(.*)");
     private static final Pattern VOLUME = Pattern.compile(", vol\\. (\\d+)(.*)");
     private static final Pattern NO = Pattern.compile(", no\\. (\\d+)(.*)");
-    private static final Pattern AUTHORS_AND_TITLE_AT_BEGINNING = Pattern.compile("^([^“]+), “(.*?)”, ");
+    private static final Pattern AUTHORS_AND_TITLE_AT_BEGINNING = Pattern.compile("^([^“]+), “(.*?)(”,|,”) ");
     private static final Pattern TITLE = Pattern.compile("“(.*?)”, (.*)");
 
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
@@ -135,13 +136,34 @@ public class BibliographyFromPdfImporter extends Importer {
      * Extracts the text from all pages containing references. It simply goes from the last page backwards until there is probably no reference anymore.
      */
     private String getReferencesPagesText(PDDocument document) throws IOException {
-        return prependToResult("", document, new PDFTextStripper(), document.getNumberOfPages());
+        int lastPage = document.getNumberOfPages();
+        String lastPageContents = getPageContents(document, new PDFTextStripper(), lastPage);
+        String result = lastPageContents;
+
+        if (!containsWordReferences(lastPageContents)) {
+            result = prependToResult(result, document, new PDFTextStripper(), lastPage);
+        }
+
+        Matcher matcher = REFERENCES.matcher(result);
+        if (!matcher.hasMatch()) {
+            // Ensure that not too much is returned
+            LOGGER.warn("Could not found 'References'. Returning last page only.");
+            return lastPageContents;
+        }
+
+        int start = matcher.start();
+        return result.substring(start);
+    }
+
+    private static boolean containsWordReferences(String result) {
+        Matcher matcher = REFERENCES.matcher(result);
+        return matcher.find();
     }
 
     private String prependToResult(String currentText, PDDocument document, PDFTextStripper stripper, int pageNumber) throws IOException {
         String pageContents = getPageContents(document, stripper, pageNumber);
         String result = pageContents + currentText;
-        if (!pageContents.contains("References") && !pageContents.contains("REFERENCES") && (pageNumber > 0)) {
+        if (!containsWordReferences(pageContents) && (pageNumber > 0)) {
             return prependToResult(result, document, stripper, pageNumber - 1);
         }
         return result;
@@ -185,11 +207,11 @@ public class BibliographyFromPdfImporter extends Importer {
             reference = reference.substring(0, matcher.start()).trim();
         }
 
-        reference = updateEntryAndReferenceIfMatches(reference, PAGES, result, StandardField.PAGES);
+        reference = updateEntryAndReferenceIfMatches(reference, PAGES, result, StandardField.PAGES).newReference;
 
         // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019
-        reference = updateEntryAndReferenceIfMatches(reference, PAGE, result, StandardField.PAGES);
+        reference = updateEntryAndReferenceIfMatches(reference, PAGE, result, StandardField.PAGES).newReference;
 
         matcher = MONTH_RANGE_AND_YEAR.matcher(reference);
         if (matcher.find()) {
@@ -220,9 +242,13 @@ public class BibliographyFromPdfImporter extends Importer {
 
         // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia
-        reference = updateEntryAndReferenceIfMatches(reference, VOLUME, result, StandardField.VOLUME);
+        EntryUpdateResult entryUpdateResult = updateEntryAndReferenceIfMatches(reference, VOLUME, result, StandardField.VOLUME);
+        boolean volumeFound = entryUpdateResult.modified;
+        reference = entryUpdateResult.newReference;
 
-        reference = updateEntryAndReferenceIfMatches(reference, NO, result, StandardField.NUMBER);
+        entryUpdateResult = updateEntryAndReferenceIfMatches(reference, NO, result, StandardField.NUMBER);
+        boolean numberFound = entryUpdateResult.modified;
+        reference = entryUpdateResult.newReference;
 
         // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia
@@ -239,17 +265,15 @@ public class BibliographyFromPdfImporter extends Importer {
         } else {
             // No authors present
             // Example: “AF4.1.1 SRF Linac Engineering Design Report”, Internal note.
-            reference = updateEntryAndReferenceIfMatches(reference, TITLE, result, StandardField.TITLE);
+            reference = updateEntryAndReferenceIfMatches(reference, TITLE, result, StandardField.TITLE).newReference;
         }
 
         // Nucl. Fusion
         // in Proc. IPAC’19, Mel- bourne, Australia
         // presented at th 8th DITANET Topical Workshop on Beam Position Monitors, CERN, Geneva, Switzreland
         List<String> stringsToRemove = List.of("presented at", "to be presented at");
-        // need to use "iterator()" instead of "stream().foreach", because "reference" is modified inside the loop
-        Iterator<String> iterator = stringsToRemove.iterator();
-        while (iterator.hasNext()) {
-            String check = iterator.next();
+        // need to use "for" loop instead of "stream().foreach", because "reference" is modified inside the loop
+        for (String check : stringsToRemove) {
             if (reference.startsWith(check)) {
                 reference = reference.substring(check.length()).trim();
                 result.setType(StandardEntryType.InProceedings);
@@ -257,12 +281,23 @@ public class BibliographyFromPdfImporter extends Importer {
         }
 
         boolean startsWithInProc = reference.startsWith("in Proc.");
-        boolean conainsWorkshop = reference.contains("Workshop");
-        if (startsWithInProc || conainsWorkshop) {
+        boolean containsWorkshop = reference.contains("Workshop");
+        if (startsWithInProc || containsWorkshop || (!volumeFound && !numberFound)) {
             int beginIndex = startsWithInProc ? 3 : 0;
-            result.setField(StandardField.BOOKTITLE, reference.substring(beginIndex).replace("- ", "").trim());
+            String bookTitle = reference.substring(beginIndex).replace("- ", "").trim();
+            int lastDot = bookTitle.lastIndexOf('.');
+            if (lastDot > 0) {
+                String textAfterDot = reference.substring(lastDot + 1).trim();
+                // We use Apache Commons here, because it is fastest - see table at https://stackoverflow.com/a/35242882/873282
+                if (StringUtils.countMatches(textAfterDot, ' ') <= 1) {
+                    bookTitle = bookTitle.substring(0, lastDot).trim();
+                    reference = textAfterDot;
+                }
+            } else {
+                reference = "";
+            }
+            result.setField(StandardField.BOOKTITLE, bookTitle);
             result.setType(StandardEntryType.InProceedings);
-            reference = "";
         }
 
         // Nucl. Fusion
@@ -276,42 +311,40 @@ public class BibliographyFromPdfImporter extends Importer {
             } else {
                 result.setField(StandardField.JOURNAL, reference.replace("- ", ""));
             }
-            reference = "";
         } else {
+            LOGGER.trace("InProceedings fallback used for current state of handled string {}", reference);
             String toAdd = reference;
             result.setType(StandardEntryType.InProceedings);
             if (result.hasField(StandardField.BOOKTITLE)) {
                 String oldTitle = result.getField(StandardField.BOOKTITLE).get();
-                result.setField(StandardField.BOOKTITLE, oldTitle + toAdd);
+                result.setField(StandardField.BOOKTITLE, oldTitle + " " + toAdd);
             } else {
                 result.setField(StandardField.BOOKTITLE, toAdd);
             }
-            reference = "";
-            LOGGER.debug("InProceedings fallback used for current state of handled string {}", reference);
         }
 
-        if (reference.isEmpty()) {
-            result.setField(StandardField.COMMENT, originalReference);
-        } else {
-            result.setField(StandardField.COMMENT, "Unprocessed: " + reference + "\n\n" + originalReference);
-        }
+        result.setField(StandardField.COMMENT, originalReference);
         return result;
     }
 
     /**
      * @param pattern A pattern matching two groups: The first one to take, the second one to leave at the end of the string
      */
-    private static String updateEntryAndReferenceIfMatches(String reference, Pattern pattern, BibEntry result, Field field) {
+    private static EntryUpdateResult updateEntryAndReferenceIfMatches(String reference, Pattern pattern, BibEntry result, Field field) {
         Matcher matcher;
         matcher = pattern.matcher(reference);
-        if (matcher.find()) {
-            result.setField(field, matcher.group(1).replace("- ", ""));
-            String suffix = matcher.group(2);
-            if (!suffix.isEmpty()) {
-                suffix = " " + suffix;
-            }
-            reference = reference.substring(0, matcher.start()).trim() + suffix;
+        if (!matcher.find()) {
+            return new EntryUpdateResult(false, reference);
         }
-        return reference;
+        result.setField(field, matcher.group(1).replace("- ", ""));
+        String suffix = matcher.group(2);
+        if (!suffix.isEmpty()) {
+            suffix = " " + suffix;
+        }
+        reference = reference.substring(0, matcher.start()).trim() + suffix;
+        return new EntryUpdateResult(true, reference);
+    }
+
+    private static final record EntryUpdateResult(boolean modified, String newReference) {
     }
 }

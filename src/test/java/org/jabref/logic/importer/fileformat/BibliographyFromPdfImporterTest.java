@@ -221,6 +221,63 @@ class BibliographyFromPdfImporterTest {
                 parserResult.getDatabase().getEntries());
     }
 
+    @Test
+    void ieeePaper() throws Exception {
+        Path file = Path.of(BibliographyFromPdfImporterTest.class.getResource("/pdfs/IEEE/ieee-paper.pdf").toURI());
+        ParserResult parserResult = bibliographyFromPdfImporter.importDatabase(file);
+        BibEntry entry01 = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Kondo2020")
+                .withField(StandardField.AUTHOR, "M. O. Alver and T. Tennøy and J. A. Alfredsen and G. Øie")
+                .withField(StandardField.TITLE, "Automatic measurement of rotifer brachionus plicatilis densities in first feeding tanks")
+                .withField(StandardField.JOURNAL, "Aquacultural engineering")
+                .withField(StandardField.VOLUME, "36")
+                .withField(StandardField.NUMBER, "2")
+                .withField(StandardField.YEAR, "2007")
+                .withField(StandardField.PAGES, "115-121")
+                .withField(StandardField.COMMENT, "[1] M. O. Alver, T. Tennøy, J. A. Alfredsen, and G. Øie, “Automatic measurement of rotifer brachionus plicatilis densities in first feeding tanks,” Aquacultural engineering, vol. 36, no. 2, pp. 115–121, 2007.");
+
+        BibEntry entry02 = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("Devanz2017")
+                .withField(StandardField.AUTHOR, "M. O. Alver and others")
+                .withField(StandardField.TITLE, "Estimating larval density in cod (gadus morhua) first feeding tanks using measurements of feed density and larval growth rates")
+                .withField(StandardField.BOOKTITLE, "Aquaculture")
+                .withField(StandardField.VOLUME, "268")
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.YEAR, "2007")
+                .withField(StandardField.PAGES, "216-226")
+                .withField(StandardField.COMMENT, "[2] M. O. Alver et al., “Estimating larval density in cod (gadus morhua) first feeding tanks using measurements of feed density and larval growth rates,” Aquaculture, vol. 268, no. 1, pp. 216–226, 2007.");
+
+        BibEntry entry03 = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("Branas2018")
+                .withField(StandardField.AUTHOR, "Oliver Kopp and others")
+                .withField(StandardField.TITLE, "BPMN4TOSCA: A domain-specific language to model management plans for composite applications")
+                .withField(StandardField.BOOKTITLE, "Business Process Model and Notation")
+                .withField(StandardField.SERIES, "LNCS")
+                .withField(StandardField.VOLUME, "125")
+                .withField(StandardField.YEAR, "2018")
+                .withField(StandardField.COMMENT, "[3] O. Kopp et al., “BPMN4TOSCA: A domain-specific language to model management plans for composite applications,” in Business Process Model and Notation, ser. LNCS, vol. 125. Springer, 2012.");
+
+        BibEntry entry04 = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("Scantamburlo2023")
+                .withField(StandardField.AUTHOR, "O. Kopp and A. Armbruster and O. Zimmermann")
+                .withField(StandardField.TITLE, "Markdown architectural decision records: Format and tool support")
+                .withField(StandardField.BOOKTITLE, "ZEUS")
+                .withField(StandardField.YEAR, "2018")
+                .withField(StandardField.PUBLISHER, "CEUR-WS.org")
+                .withField(StandardField.COMMENT, "[4] O. Kopp, A. Armbruster, and O. Zimmermann, “Markdown architectural decision records: Format and tool support,” in ZEUS. CEUR-WS.org, 2018.");
+
+        BibEntry entry05 = new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("Franco2023")
+                .withField(StandardField.AUTHOR, "S. König and others")
+                .withField(StandardField.TITLE, "BPMN4Cars: A car-tailored workflow engine")
+                .withField(StandardField.BOOKTITLE, "INDIN")
+                .withField(StandardField.PUBLISHER, "IEEE")
+                .withField(StandardField.YEAR, "2023")
+                .withField(StandardField.COMMENT, "[5] S. König et al., “BPMN4Cars: A car-tailored workflow engine,” in INDIN. IEEE, 2023.");
+
+        assertEquals(List.of(entry01, entry02, entry03, entry04, entry05), parserResult.getDatabase().getEntries());
+    }
+
     static Stream<Arguments> references() {
         return Stream.of(
                 Arguments.of(
