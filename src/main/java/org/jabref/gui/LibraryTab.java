@@ -415,13 +415,8 @@ public class LibraryTab extends Tab {
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
+                tabTitle.append('*');
                 tabTitle.append(Localization.lang("untitled"));
-                if (bibDatabaseContext.getDatabase().hasEntries()) {
-                    // if the database is not empty and no file is assigned,
-                    // the database came from an import and has to be treated somehow
-                    // -> mark as changed
-                    tabTitle.append('*');
-                }
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
