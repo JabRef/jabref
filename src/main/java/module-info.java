@@ -157,4 +157,6 @@ open module org.jabref {
     requires jakarta.validation;
     requires scala.library;
     requires jvm.openai;
+    requires ai.djl.api;
+    requires ai.djl.tokenizers;
 }
