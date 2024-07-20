@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -15,8 +14,7 @@ import org.jabref.preferences.AiPreferences;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel;
-import dev.langchain4j.model.embedding.AllMiniLmL6V2QuantizedEmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
 import dev.langchain4j.model.output.Response;
 
 /**

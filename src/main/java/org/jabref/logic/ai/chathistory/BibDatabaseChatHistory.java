@@ -2,17 +2,8 @@ package org.jabref.logic.ai.chathistory;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
-import org.jabref.gui.DialogService;
-
-import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.ChatMessageType;
-import dev.langchain4j.data.message.UserMessage;
-import org.h2.mvstore.MVStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BibDatabaseChatHistory {
     private final Path path;

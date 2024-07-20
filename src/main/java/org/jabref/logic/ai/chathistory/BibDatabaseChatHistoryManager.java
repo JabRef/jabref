@@ -9,15 +9,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.JabRefDesktop;
+
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageType;
 import dev.langchain4j.data.message.UserMessage;
 import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
-import org.jabref.gui.DialogService;
-
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

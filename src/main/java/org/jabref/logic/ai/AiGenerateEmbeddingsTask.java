@@ -1,14 +1,5 @@
 package org.jabref.logic.ai;
 
-import javafx.beans.property.BooleanProperty;
-import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.ai.impl.FileToDocument;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +7,17 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import javafx.beans.property.BooleanProperty;
+
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.ai.impl.FileToDocument;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.FilePreferences;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AiGenerateEmbeddingsTask extends BackgroundTask<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiGenerateEmbeddingsTask.class);

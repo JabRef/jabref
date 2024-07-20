@@ -1,7 +1,6 @@
 package org.jabref.gui.ai;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;

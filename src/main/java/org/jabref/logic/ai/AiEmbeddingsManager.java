@@ -1,6 +1,5 @@
 package org.jabref.logic.ai;
 
-import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,10 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import jakarta.annotation.Nullable;
 import javafx.beans.property.BooleanProperty;
 
-import org.checkerframework.checker.units.qual.N;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.ai.impl.embeddings.FullyIngestedDocumentsTracker;
@@ -26,6 +23,7 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
+import jakarta.annotation.Nullable;
 
 /**
  * This class is responsible for managing the embeddings cache. The cache is saved in a local user directory.

@@ -3,7 +3,6 @@ package org.jabref.gui.entryeditor.aichattab;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Tooltip;
@@ -26,8 +25,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
-import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
