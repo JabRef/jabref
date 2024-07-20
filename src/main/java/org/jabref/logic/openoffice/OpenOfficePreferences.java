@@ -127,6 +127,7 @@ public class OpenOfficePreferences {
     }
 
     public OOStyle getCurrentStyle() {
+        System.out.println("HIIIIIIIIIIIII" + currentStyle);
         return currentStyle.get();
     }
 

@@ -1307,14 +1307,14 @@ public class JabRefPreferences implements PreferencesService {
             return openOfficePreferences;
         }
 
-        String jstyleOrCslString = get(OO_BIBLIOGRAPHY_STYLE_FILE); // file path to csl or jstyle
+        String currentJStyle = get(OO_CURRENT_STYLE);
         OOStyle currentStyle = CitationStyle.getDefault();
 
-        if (CitationStyle.isCitationStyleFile(OO_CURRENT_STYLE)) {
-            currentStyle = CitationStyle.createCitationStyleFromFile(OO_CURRENT_STYLE).orElse(null);
+        if (CitationStyle.isCitationStyleFile(get(OO_CURRENT_STYLE))) {
+            currentStyle = CitationStyle.createCitationStyleFromFile(get(OO_CURRENT_STYLE)).orElse(null);
         } else {
             try {
-                currentStyle = new JStyle(jstyleOrCslString, getLayoutFormatterPreferences(),
+                currentStyle = new JStyle(currentJStyle, getLayoutFormatterPreferences(),
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
             } catch (IOException ex) {
                 LOGGER.warn("Could not create JStyle", ex);

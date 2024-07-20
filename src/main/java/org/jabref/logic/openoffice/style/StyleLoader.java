@@ -146,6 +146,7 @@ public class StyleLoader {
 
     public OOStyle getUsedStyleUnified() {
         OOStyle gotStyle = openOfficePreferences.getCurrentStyle();
+
         if (gotStyle instanceof JStyle jStyle) {
             String filename = jStyle.getPath();
             for (JStyle style : getStyles()) {
