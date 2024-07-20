@@ -164,7 +164,7 @@ public class StyleLoaderTest {
         when(preferences.getCurrentJStyle()).thenReturn(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         preferences.clearCurrentJStyle();
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        JStyle style = loader.getUsedStyle();
+        JStyle style = loader.getUsedJstyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, preferences.getCurrentJStyle());
@@ -174,7 +174,7 @@ public class StyleLoaderTest {
     public void getStoredUsedStyle() {
         when(preferences.getCurrentJStyle()).thenReturn(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        JStyle style = loader.getUsedStyle();
+        JStyle style = loader.getUsedJstyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, style.getPath());
         assertEquals(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, preferences.getCurrentJStyle());
@@ -184,7 +184,7 @@ public class StyleLoaderTest {
     public void getDefaultUsedStyleWhenIncorrect() {
         when(preferences.getCurrentJStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        JStyle style = loader.getUsedStyle();
+        JStyle style = loader.getUsedJstyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
     }

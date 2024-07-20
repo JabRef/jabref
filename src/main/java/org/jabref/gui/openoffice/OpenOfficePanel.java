@@ -49,6 +49,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
@@ -100,7 +101,7 @@ public class OpenOfficePanel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
-    private JStyle jStyle;             // TODO: check for jstyle instance
+    // private JStyle jStyle;             // TODO: check for jstyle instance
     private StyleSelectDialogViewModel.StyleType currentStyleType;
     private OOStyle currentStyle;
 
@@ -166,9 +167,10 @@ public class OpenOfficePanel {
      * Return true if failed. In this case the dialog is already shown.
      */
     private boolean getOrUpdateTheStyle(String title) {
+        currentStyle = loader.getUsedStyleUnified();
         final boolean FAIL = true;
         final boolean PASS = false;
-
+        LOGGER.warn("Style is " + currentStyle);
         if (currentStyle == null) {
             currentStyle = loader.getUsedStyleUnified();
         } else {
@@ -183,6 +185,8 @@ public class OpenOfficePanel {
                     new OOError(title, msg, ex).showErrorDialog(dialogService);
                     return FAIL;
                 }
+            } else if (currentStyle instanceof CitationStyle citationStyle) {
+                CSLCitationOOAdapter.setSelectedStyleName(citationStyle.getName());
             }
         }
         return PASS;
@@ -229,23 +233,25 @@ public class OpenOfficePanel {
 
         update.setTooltip(new Tooltip(Localization.lang("Ensure that the bibliography is up-to-date")));
 
-        update.setOnAction(event -> {
-            // TODO: check for jstyle instance
-            String title = Localization.lang("Could not update bibliography");
-            if (getOrUpdateTheStyle(title)) {
-                return;
-            }
-            List<BibDatabase> databases = getBaseList();
-            ooBase.guiActionUpdateDocument(databases, jStyle);
-        });
+        if(currentStyle instanceof JStyle jStyle) {
+            update.setOnAction(event -> {
+                // TODO: check for jstyle instance
+                String title = Localization.lang("Could not update bibliography");
+                if (getOrUpdateTheStyle(title)) {
+                    return;
+                }
+                List<BibDatabase> databases = getBaseList();
+                ooBase.guiActionUpdateDocument(databases, jStyle);
+            });
 
-        merge.setMaxWidth(Double.MAX_VALUE);
-        merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
-        merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), jStyle));
+            merge.setMaxWidth(Double.MAX_VALUE);
+            merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
+            merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), jStyle));
 
-        unmerge.setMaxWidth(Double.MAX_VALUE);
-        unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
-        unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), jStyle));
+            unmerge.setMaxWidth(Double.MAX_VALUE);
+            unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
+            unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), jStyle));
+        }
 
         ContextMenu settingsMenu = createSettingsPopup();
         settingsB.setMaxWidth(Double.MAX_VALUE);
@@ -529,11 +535,10 @@ public class OpenOfficePanel {
 
         ooBase.guiActionInsertEntry(entries,
                 bibDatabaseContext,
-                jStyle,
+                currentStyle,
                 citationType,
                 pageInfo,
-                syncOptions,
-                currentStyle.getStyleType());
+                syncOptions);
     }
 
     /**

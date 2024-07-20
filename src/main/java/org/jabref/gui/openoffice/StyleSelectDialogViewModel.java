@@ -79,11 +79,9 @@ public class StyleSelectDialogViewModel {
                                                                            .collect(Collectors.toList());
                           availableLayouts.setAll(layouts);
 
-
                           if (currentStyle instanceof CitationStyle citationStyle) {
                               selectedLayoutProperty.set(availableLayouts.stream().filter(csl -> csl.getFilePath().equals(citationStyle.getFilePath())).findFirst().orElse(availableLayouts.getFirst()));
                           }
-
                       })
                       .onFailure(ex -> dialogService.showErrorDialogAndWait("Error discovering citation styles", ex))
                       .executeWith(taskExecutor);
@@ -163,8 +161,13 @@ public class StyleSelectDialogViewModel {
                                             .map(JStyle::getPath)
                                             .collect(Collectors.toList());
         openOfficePreferences.setExternalStyles(externalStyles);
-        openOfficePreferences.setCurrentStyle(getSelectedStyle());
-        openOfficePreferences.setCurrentJStyle(selectedItem.getValue().getStylePath());
+        OOStyle selectedStyle = getSelectedStyle();
+        openOfficePreferences.setCurrentStyle(selectedStyle);
+
+        // Handle backward-compatibility with pure JStyle preferences (formerly OOBibStyle):
+        if (selectedStyle instanceof JStyle jStyle) {
+            openOfficePreferences.setCurrentJStyle(jStyle.getPath());
+        }
     }
 
     private StyleSelectItemViewModel getStyleOrDefault(String stylePath) {
@@ -184,13 +187,10 @@ public class StyleSelectDialogViewModel {
                 searchTerm.isEmpty() || layout.getDisplayName().toLowerCase().contains(searchTerm.toLowerCase()));
     }
 
-    public String getSelectedStyleName() {
-        CitationStylePreviewLayout selectedLayout = selectedLayoutProperty.get();
-        return selectedLayout != null ? selectedLayout.getDisplayName() : "";
-    }
-
     public void setSelectedTab(Tab tab) {
-        selectedTab.set(tab);
+        if (tab != null) {
+            selectedTab.set(tab);
+        }
     }
 
     public void handleCslStyleSelection() {
@@ -201,17 +201,17 @@ public class StyleSelectDialogViewModel {
     }
 
     public OOStyle getSelectedStyle() {
-        // TODO: Check tab null
-        if (selectedTab.get().getText().equals("JStyles")) {
-            return selectedItem.get().getStyleUnified();
-        } else if (selectedTab.get().getText().equals("CSL Styles")) {
-            return selectedLayoutProperty.get().getCitationStyle();
+        Tab currentTab = selectedTab.get();
+        if (currentTab == null) {
+            return null;
+        }
+
+        String tabText = currentTab.getText();
+        if ("JStyles".equals(tabText)) {
+            return selectedItem.get() != null ? selectedItem.get().getStyleUnified() : null;
+        } else if ("CSL Styles".equals(tabText)) {
+            return selectedLayoutProperty.get() != null ? selectedLayoutProperty.get().getCitationStyle() : null;
         }
         return null;
-    }
-
-    public void handleStyleSelection() {
-        OOStyle selected = selectedStyle.get();
-        openOfficePreferences.setCurrentStyle(selected);
     }
 }

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.NoDocumentFoundException;
 import org.jabref.logic.openoffice.action.EditInsert;
@@ -24,6 +25,7 @@ import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -297,7 +299,7 @@ class OOBibBase {
         return OOVoidResult.ok();
     }
 
-    OOVoidResult<OOError> styleIsRequired(JStyle style) {
+    OOVoidResult<OOError> styleIsRequired(OOStyle style) {
         if (style == null) {
             return OOVoidResult.error(OOError.noValidStyleSelected());
         } else {
@@ -522,10 +524,10 @@ class OOBibBase {
      */
     public void guiActionInsertEntry(List<BibEntry> entries,
                                      BibDatabaseContext bibDatabaseContext,
-                                     JStyle style,
+                                     OOStyle style,
                                      CitationType citationType,
                                      String pageInfo,
-                                     Optional<Update.SyncOptions> syncOptions, StyleSelectDialogViewModel.StyleType selectedStyleType) {
+                                     Optional<Update.SyncOptions> syncOptions) {
 
         final String errorTitle = "Could not insert citation";
 
@@ -552,10 +554,12 @@ class OOBibBase {
             return;
         }
 
-        if (testDialog(errorTitle,
-                checkStylesExistInTheDocument(style, doc),
-                checkIfOpenOfficeIsRecordingChanges(doc))) {
-            return;
+        if (style instanceof JStyle jStyle) {
+            if (testDialog(errorTitle,
+                    checkStylesExistInTheDocument(jStyle, doc),
+                    checkIfOpenOfficeIsRecordingChanges(doc))) {
+                return;
+            }
         }
 
         /*
@@ -582,27 +586,29 @@ class OOBibBase {
 
         try {
             UnoUndo.enterUndoContext(doc, "Insert citation");
-            if (selectedStyleType == StyleSelectDialogViewModel.StyleType.CSL) {
+            if (style instanceof CitationStyle) {
                 // Handle CSL Styles
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     CSLCitationOOAdapter.insertInText(doc, cursor.get(), entries, bibDatabaseContext);
                 } else {
                     CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), entries, bibDatabaseContext);
                 }
-            } else {
+            } else if (style instanceof JStyle jStyle) {
                 // Handle JStyles
                 EditInsert.insertCitationGroup(doc,
                         frontend.get(),
                         cursor.get(),
                         entries,
                         bibDatabaseContext.getDatabase(),
-                        style,
+                        jStyle,
                         citationType,
                         pageInfo);
             }
 
-            if (syncOptions.isPresent()) {
-                Update.resyncDocument(doc, style, fcursor.get(), syncOptions.get());
+            if (style instanceof JStyle jStyle) {
+                if (syncOptions.isPresent()) {
+                    Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions.get());
+                }
             }
         } catch (NoDocumentException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);

@@ -12,7 +12,6 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,7 +130,7 @@ public class StyleLoader {
         return false;
     }
 
-    public JStyle getUsedStyle() {
+    public JStyle getUsedJstyle() {
         String filename = openOfficePreferences.getCurrentJStyle();
         if (filename != null) {
             for (JStyle style : getStyles()) {
@@ -146,24 +145,20 @@ public class StyleLoader {
     }
 
     public OOStyle getUsedStyleUnified() {
-        OOStyle style = openOfficePreferences.getCurrentStyle();
-        if (style instanceof JStyle jStyle) {
-
-            // TODO: Simplify as we already have the jstyle directly
-            String filename = openOfficePreferences.getCurrentJStyle();
-            if (filename != null) {
-                for (JStyle jstyle : getStyles()) {
-                    if (filename.equals(jStyle.getPath())) {
-                        return jstyle;
-                    }
+        OOStyle gotStyle = openOfficePreferences.getCurrentStyle();
+        if (gotStyle instanceof JStyle jStyle) {
+            String filename = jStyle.getPath();
+            for (JStyle style : getStyles()) {
+                if (filename.equals(style.getPath())) {
+                    return style;
                 }
             }
             // Pick the first internal
             openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
             return internalStyles.getFirst();
-        } else if (style instanceof CitationStyle cslStyle) {
+        } else if (gotStyle instanceof CitationStyle citationStyle) {
             try {
-                return CSLCitationOOAdapter.getSelectedStyle();
+                return citationStyle;
             } catch (Exception ex) {
                 LOGGER.error("Error loading CSL style", ex);
                 return null;

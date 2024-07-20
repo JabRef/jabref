@@ -24,8 +24,6 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
-import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
-import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.TestEntry;
@@ -150,7 +148,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
             // TODO: FIXME
-            if(style == null){
+            if (style == null) {
                 return;
             }
             tvStyles.getSelectionModel().select(style);
@@ -163,6 +161,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 viewModel.setAvailableLayoutsFilter(newValue));
 
         tabPane.getSelectionModel().select(0);
+        viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.setSelectedTab(newValue);
         });
