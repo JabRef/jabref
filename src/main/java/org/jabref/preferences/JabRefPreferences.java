@@ -366,7 +366,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
-    public static String OO_CURRENT_STYLE = "ooCurrentStyle";
+    public static final String OO_CURRENT_STYLE = "ooCurrentStyle";
 
     // Special field preferences
     public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
@@ -516,7 +516,6 @@ public class JabRefPreferences implements PreferencesService {
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private MergeDialogPreferences mergeDialogPreferences;
-    private OOStyle stylePreferences;
     private UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences;
 
     private KeyBindingRepository keyBindingRepository;
@@ -725,6 +724,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
+        defaults.put(OO_CURRENT_STYLE, CitationStyle.getDefault().getPath()); // Default CSL Style is IEEE
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
 
@@ -1307,14 +1307,18 @@ public class JabRefPreferences implements PreferencesService {
             return openOfficePreferences;
         }
 
-        String currentJStyle = get(OO_CURRENT_STYLE);
-        OOStyle currentStyle = CitationStyle.getDefault();
+        String currentStylePath = get(OO_CURRENT_STYLE);
 
-        if (CitationStyle.isCitationStyleFile(get(OO_CURRENT_STYLE))) {
-            currentStyle = CitationStyle.createCitationStyleFromFile(get(OO_CURRENT_STYLE)).orElse(null);
+        OOStyle currentStyle = CitationStyle.getDefault(); // Defaults to IEEE CSL Style
+
+        // Reassign currentStyle if it is not a CSL style
+        if (CitationStyle.isCitationStyleFile(currentStylePath)) {
+            currentStyle = CitationStyle.createCitationStyleFromFile(currentStylePath) // Assigns CSL Style
+                         .orElse(CitationStyle.getDefault());
         } else {
+            // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
             try {
-                currentStyle = new JStyle(currentJStyle, getLayoutFormatterPreferences(),
+                currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(),
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
             } catch (IOException ex) {
                 LOGGER.warn("Could not create JStyle", ex);
