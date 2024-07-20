@@ -38,9 +38,8 @@ public class AiPreferences {
     }
 
     public enum EmbeddingModel {
-        TEXT_EMBEDDING_3_SMALL("text-embedding-3-small"),
-        TEXT_EMBEDDING_3_LARGE("text-embedding-3-large"),
-        TEXT_EMBEDDING_ADA_002("text-embedding-ada-002");
+        ALL_MINILM_L6_V2("all-MiniLM-L6-v2"),
+        ALL_MINILM_L6_V2_Q("all-MiniLM-L6-v2-q");
 
         private final String label;
 

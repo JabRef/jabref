@@ -1,5 +1,17 @@
 package org.jabref.logic.ai.impl.models;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
+import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.AiPreferences;
+
 import ai.djl.MalformedModelException;
 import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
@@ -9,16 +21,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.output.Response;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.AiPreferences;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Wrapper around langchain4j embedding model.
@@ -46,7 +48,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
             return;
         }
 
-        String modelUrl = "djl://ai.djl.huggingface.pytorch/sentence-transformers/all-MiniLM-L6-v2" + (aiPreferences.getEmbeddingModel() == AiPreferences.EmbeddingModel.ALL_MINLM_l6_V2_Q ? "-q" : "");
+        String modelUrl = "djl://ai.djl.huggingface.pytorch/sentence-transformers/" + aiPreferences.getEmbeddingModel().getLabel();
 
         Criteria<String, float[]> criteria =
                 Criteria.builder()

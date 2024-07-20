@@ -1,5 +1,9 @@
 package org.jabref.logic.ai.impl.models;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.repository.zoo.Criteria;
@@ -10,10 +14,6 @@ import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.output.Response;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DeepJavaEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private final ZooModel<String, float[]> model;

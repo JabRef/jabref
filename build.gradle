@@ -100,9 +100,6 @@ modularity.disableEffectiveArgumentsAdjustment()
 
 // Required as workaround for  https://github.com/langchain4j/langchain4j/issues/1066
 modularity.patchModule("langchain4j", "langchain4j-core-0.32.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-embeddings-0.32.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-0.32.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-embeddings-all-minilm-l6-v2-q-0.32.0.jar")
 modularity.patchModule("langchain4j", "langchain4j-open-ai-0.32.0.jar")
 
 sourceSets {

@@ -124,6 +124,9 @@ open module org.jabref {
     // AI
     requires langchain4j;
     requires kotlin.stdlib;
+    requires jvm.openai;
+    requires ai.djl.api;
+    requires ai.djl.tokenizers;
 
     // fulltext search
     requires org.apache.lucene.core;
@@ -156,7 +159,4 @@ open module org.jabref {
     requires org.checkerframework.checker.qual;
     requires jakarta.validation;
     requires scala.library;
-    requires jvm.openai;
-    requires ai.djl.api;
-    requires ai.djl.tokenizers;
 }
