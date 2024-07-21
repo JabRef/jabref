@@ -56,7 +56,6 @@ class AuthorListParserTest {
     @Test
     public void dashedNamesWithSpaceNormalized() {
         assertEquals(Optional.of("Z. Yao and D. S. Weld and W.-P. Chen and H. Sun"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, W.-P. Chen, and H. Sun"));
-
     }
 
     private static Stream<Arguments> parseMultipleCorrectly() {
