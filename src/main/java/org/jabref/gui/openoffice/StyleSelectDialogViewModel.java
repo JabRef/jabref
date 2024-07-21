@@ -67,6 +67,7 @@ public class StyleSelectDialogViewModel {
         if (currentStyle instanceof JStyle jStyle) {
             selectedItem.setValue(getStyleOrDefault(jStyle.getPath()));
         }
+
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
                       .onSuccess(styles -> {
                           List<CitationStylePreviewLayout> layouts = styles.stream()
