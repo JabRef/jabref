@@ -11,8 +11,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.cleanup.URLCleanup;
+import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -41,6 +44,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * To extract a {@link BibEntry} matching the PDF, see {@link PdfContentImporter}.
  */
+@AllowedToUseApacheCommonsLang3("Fastest method to count spaces in a string")
 public class BibliographyFromPdfImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibliographyFromPdfImporter.class);
@@ -54,10 +58,17 @@ public class BibliographyFromPdfImporter extends Importer {
     private static final Pattern MONTH_AND_YEAR = Pattern.compile(", ([A-Z][a-z]{2,7}\\.? \\d+),? ?(.*)");
     private static final Pattern VOLUME = Pattern.compile(", vol\\. (\\d+)(.*)");
     private static final Pattern NO = Pattern.compile(", no\\. (\\d+)(.*)");
+    private static final Pattern PROCEEDINGS_INDICATION = Pattern.compile("^in (Proc\\. )?(.*)");
+    private static final Pattern WORKSHOP = Pattern.compile("Workshop");
     private static final Pattern AUTHORS_AND_TITLE_AT_BEGINNING = Pattern.compile("^([^“]+), “(.*?)(”,|,”) ");
     private static final Pattern TITLE = Pattern.compile("“(.*?)”, (.*)");
 
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final NormalizeUnicodeFormatter normalizeUnicodeFormatter = new NormalizeUnicodeFormatter();
+
+    public BibliographyFromPdfImporter() {
+        this.citationKeyPatternPreferences = null;
+    }
 
     public BibliographyFromPdfImporter(CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this.citationKeyPatternPreferences = citationKeyPatternPreferences;
@@ -104,6 +115,10 @@ public class BibliographyFromPdfImporter extends Importer {
         }
 
         ParserResult parserResult = new ParserResult(result);
+
+        if (citationKeyPatternPreferences == null) {
+            return parserResult;
+        }
 
         // Generate citation keys for result
         CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(parserResult.getDatabaseContext(), citationKeyPatternPreferences);
@@ -184,10 +199,26 @@ public class BibliographyFromPdfImporter extends Importer {
      */
     @VisibleForTesting
     BibEntry parseReference(String number, String reference) {
+        reference = normalizeUnicodeFormatter.format(reference);
         String originalReference = "[" + number + "] " + reference;
-        BibEntry result = new BibEntry(StandardEntryType.Article);
+        BibEntry result = new BibEntry(StandardEntryType.Article)
+                .withCitationKey(number);
 
-        reference = reference.replace(".-", "-");
+        reference = reference
+                .replace(".-", "-")
+                // Remove "- " introduced by linebreaks in the PDF
+                .replace("- ", "");
+
+        // Move URL to URL field
+        Matcher urlPatternMatcher = URLCleanup.URL_PATTERN.matcher(reference);
+        if (urlPatternMatcher.find()) {
+            String url = urlPatternMatcher.group();
+            result.setField(StandardField.URL, url);
+            reference = reference.replace(url, "").trim();
+            if (reference.endsWith(",")) {
+                reference = reference.substring(0, reference.length() - 1);
+            }
+        }
 
         // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017. doi:10.1088/ 1741-4326/aa6a6a
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019, pp. 977-979. doi:10.18429/ JACoW-IPAC2019-MOPTS051
@@ -280,24 +311,45 @@ public class BibliographyFromPdfImporter extends Importer {
             }
         }
 
-        boolean startsWithInProc = reference.startsWith("in Proc.");
-        boolean containsWorkshop = reference.contains("Workshop");
-        if (startsWithInProc || containsWorkshop || (!volumeFound && !numberFound)) {
-            int beginIndex = startsWithInProc ? 3 : 0;
-            String bookTitle = reference.substring(beginIndex).replace("- ", "").trim();
-            int lastDot = bookTitle.lastIndexOf('.');
-            if (lastDot > 0) {
-                String textAfterDot = reference.substring(lastDot + 1).trim();
-                // We use Apache Commons here, because it is fastest - see table at https://stackoverflow.com/a/35242882/873282
-                if (StringUtils.countMatches(textAfterDot, ' ') <= 1) {
-                    bookTitle = bookTitle.substring(0, lastDot).trim();
-                    reference = textAfterDot;
+        Matcher proceedingsMatcher = PROCEEDINGS_INDICATION.matcher(reference);
+        Matcher workshopMatcher = WORKSHOP.matcher(reference);
+        if (proceedingsMatcher.matches() || workshopMatcher.matches() && (!volumeFound && !numberFound)) {
+            result.setType(StandardEntryType.InProceedings);
+
+            String bookTitle;
+            if (proceedingsMatcher.matches()) {
+                String proc = proceedingsMatcher.group(1);
+                if (proc == null) {
+                    bookTitle = proceedingsMatcher.group(2);
+                } else {
+                    // We keep "Proc. "
+                    bookTitle = proc + proceedingsMatcher.group(2);
                 }
             } else {
-                reference = "";
+                bookTitle = reference;
             }
+            reference = "";
+
+            int lastDot = bookTitle.lastIndexOf('.');
+            if (lastDot > 0) {
+                String textAfterDot = bookTitle.substring(lastDot + 1).trim();
+                // We use Apache Commons here, because it is fastest - see table at https://stackoverflow.com/a/35242882/873282
+                if (!textAfterDot.contains("http") && (StringUtils.countMatches(textAfterDot, ' ') <= 1)) {
+                    bookTitle = bookTitle.substring(0, lastDot).trim();
+                    if (bookTitle.startsWith("in ")) {
+                        bookTitle = bookTitle.substring(3);
+                    }
+                    result.setField(StandardField.PUBLISHER, textAfterDot);
+                }
+            }
+
             result.setField(StandardField.BOOKTITLE, bookTitle);
-            result.setType(StandardEntryType.InProceedings);
+        }
+
+        if (reference.isEmpty()) {
+            // Early quit if everything was handled
+            result.setField(StandardField.COMMENT, originalReference);
+            return result;
         }
 
         // Nucl. Fusion
@@ -345,6 +397,6 @@ public class BibliographyFromPdfImporter extends Importer {
         return new EntryUpdateResult(true, reference);
     }
 
-    private static final record EntryUpdateResult(boolean modified, String newReference) {
+    private record EntryUpdateResult(boolean modified, String newReference) {
     }
 }

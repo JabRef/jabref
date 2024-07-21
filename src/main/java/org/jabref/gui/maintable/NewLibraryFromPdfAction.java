@@ -54,7 +54,8 @@ public class NewLibraryFromPdfAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
-        this.bibliographyFromPdfImporter = new BibliographyFromPdfImporter(preferencesService.getCitationKeyPatternPreferences());
+        // Instruct the importer to keep the numbers (instead of generating keys)
+        this.bibliographyFromPdfImporter = new BibliographyFromPdfImporter();
         this.taskExecutor = taskExecutor;
     }
 
