@@ -51,7 +51,6 @@ public class StyleSelectDialogViewModel {
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
     private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
-    private final ObjectProperty<OOStyle> setStyle = new SimpleObjectProperty<>();
 
     public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService, TaskExecutor taskExecutor, BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
@@ -62,7 +61,6 @@ public class StyleSelectDialogViewModel {
         styles.addAll(loadStyles());
 
         OOStyle currentStyle = openOfficePreferences.getCurrentStyle();
-        setStyle.set(currentStyle);
 
         if (currentStyle instanceof JStyle jStyle) {
             selectedItem.setValue(getStyleOrDefault(jStyle.getPath()));
@@ -84,7 +82,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public StyleSelectItemViewModel fromOOBibStyle(JStyle style) {
-        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style, style);
+        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
     }
 
     public JStyle toJStyle(StyleSelectItemViewModel item) {
@@ -156,7 +154,9 @@ public class StyleSelectDialogViewModel {
                                             .filter(style -> !style.isInternalStyle())
                                             .map(JStyle::getPath)
                                             .collect(Collectors.toList());
+
         openOfficePreferences.setExternalStyles(externalStyles);
+
         OOStyle selectedStyle = getSelectedStyle();
         openOfficePreferences.setCurrentStyle(selectedStyle);
 
@@ -202,14 +202,18 @@ public class StyleSelectDialogViewModel {
 
         String tabText = currentTab.getText();
         if ("JStyles".equals(tabText)) {
-            return selectedItem.get() != null ? selectedItem.get().getStyleUnified() : null;
+            if (selectedItem.get() != null) {
+                return selectedItem.get().getJStyle();
+            }
         } else if ("CSL Styles".equals(tabText)) {
-            return selectedLayoutProperty.get() != null ? selectedLayoutProperty.get().getCitationStyle() : null;
+            if (selectedLayoutProperty.get() != null) {
+                return selectedLayoutProperty.get().getCitationStyle();
+            }
         }
-        return null;
+        return openOfficePreferences.getCurrentStyle();
     }
 
     public OOStyle getSetStyle() {
-        return setStyle.get();
+        return openOfficePreferences.getCurrentStyle();
     }
 }
