@@ -208,10 +208,6 @@ public class StyleSelectDialogViewModel {
         return null;
     }
 
-    public ObjectProperty<OOStyle> setStyleProperty() {
-        return setStyle;
-    }
-
     public OOStyle getSetStyle() {
         return setStyle.get();
     }
