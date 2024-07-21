@@ -12,7 +12,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -240,8 +239,6 @@ class BibliographyFromPdfImporterTest {
                 .withField(StandardField.URL, "https://indico.cern.ch/event/1027296/")
                 .withField(StandardField.YEAR, "2021");
 
-        // We use the existing test entries, but add a citation key (which is added by the importer)
-        // We need to clone to keep the static entries unmodified
         assertEquals(List.of(
                         KNASTER_2017,
                         entry02,
@@ -270,70 +267,36 @@ class BibliographyFromPdfImporterTest {
         assertEquals(List.of(ALVER2007, ALVER2007A, KOPP2012, KOPPP2018, KOENIG2023), parserResult.getDatabase().getEntries());
     }
 
-    static Stream<BibEntry> referencesPlain() {
-        return Stream.of(KOENIG2023);
+    static Stream<BibEntry> references() {
+        return Stream.of(KOENIG2023,
+                KNASTER_2017,
+                SHIMOSAKI_2019,
+                BELLAN_2021,
+                MASUDA_2022,
+                PODADERA_2012,
+                KWON_2023,
+                AKAGI_2023,
+                INTERNAL_NOTE,
+                new BibEntry(StandardEntryType.InProceedings)
+                .withCitationKey("18")
+                .withField(StandardField.AUTHOR, "Z. Yao and D. S. Weld and W.-P. Chen and H. Sun")
+                .withField(StandardField.BOOKTITLE, "Proceedings of the 2018 World Wide Web Conference")
+                .withField(StandardField.COMMENT, "[18] Z. Yao, D. S. Weld, W.-P. Chen, and H. Sun, “Staqc: A systematically mined question-code dataset from stack overflow,” in Proceedings of the 2018 World Wide Web Conference, 2018, pp. 1693–1703.")
+                .withField(StandardField.TITLE, "Staqc: A systematically mined question-code dataset from stack overflow")
+                .withField(StandardField.PAGES, "1693-1703")
+                .withField(StandardField.YEAR, "2018")
+        );
     }
 
     @ParameterizedTest
     @MethodSource
-    void referencesPlain(BibEntry expectedEntry) {
+    void references(BibEntry expectedEntry) {
         String number = expectedEntry.getField(StandardField.COMMENT)
                                 .map(comment -> comment.substring(1, 2))
                                 .get();
         String reference = expectedEntry.getField(StandardField.COMMENT)
                                 .map(comment -> comment.substring(4))
                                 .get();
-        assertEquals(expectedEntry, bibliographyFromPdfImporter.parseReference(number, reference));
-    }
-
-    static Stream<Arguments> references() {
-        return Stream.of(
-                Arguments.of(
-                        KNASTER_2017,
-                        "1",
-                        "J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017. doi:10.1088/ 1741-4326/aa6a6a"
-                ),
-                Arguments.of(
-                        SHIMOSAKI_2019,
-                        "3",
-                        "Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019, pp. 977-979. doi:10.18429/ JACoW-IPAC2019-MOPTS051"
-                ),
-                Arguments.of(
-                        BELLAN_2021,
-                        "6",
-                        "L. Bellan et al., “Acceleration of the high current deuteron beam through the IFMIF-EVEDA beam dynamics perfor- mances”, in Proc. HB’21, Batavia, IL, USA, Oct. 2021, pp. 197-202. doi:10.18429/JACoW-HB2021-WEDC2"
-                ),
-                Arguments.of(
-                        MASUDA_2022,
-                        "7",
-                        "K. Masuda et al., “Commissioning of IFMIF Prototype Ac- celerator towards CW operation”, in Proc. LINAC’22, Liv- erpool, UK, Aug.-Sep. 2022, pp. 319-323. doi:10.18429/ JACoW-LINAC2022-TU2AA04"
-                ),
-                Arguments.of(
-                        PODADERA_2012,
-                        "11",
-                        "I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla, “Beam position monitor development for LIPAc”, presented at th 8th DITANET Topical Workshop on Beam Position Monitors, CERN, Geneva, Switzreland, Jan. 2012."
-                ),
-                Arguments.of(
-                        KWON_2023,
-                        "14",
-                        "S. Kwon et al., “High beam current operation with beam di-agnostics at LIPAc”, presented at HB’23, Geneva, Switzer- land, Oct. 2023, paper FRC1I2, this conference."
-                ),
-                Arguments.of(
-                        AKAGI_2023,
-                        "15",
-                        "T. Akagi et al., “Achievement of high-current continuous- wave deuteron injector for Linear IFMIF Prototype Accelera- tor (LIPAc)”, to be presented at IAEA FEC’23, London, UK, Oct. 2023. https://www.iaea.org/events/fec2023"
-                ),
-                Arguments.of(
-                        INTERNAL_NOTE,
-                        "16",
-                        "“AF4.1.1 SRF Linac Engineering Design Report”, Internal note."
-                )
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    void references(BibEntry expectedEntry, String number, String reference) {
         assertEquals(expectedEntry, bibliographyFromPdfImporter.parseReference(number, reference));
     }
 }
