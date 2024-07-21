@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
@@ -56,6 +57,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private ListView<CitationStylePreviewLayout> availableListView;
     @FXML private CustomTextField searchBox;
     @FXML private TabPane tabPane;
+    @FXML private Label currentStyleNameLabel;
 
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
@@ -170,6 +172,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 this.close();
             }
         });
+
+        updateCurrentStyleLabel();
     }
 
     private ContextMenu createContextMenu() {
@@ -187,5 +191,9 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         PreviewViewer viewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         viewer.setEntry(entry);
         return viewer;
+    }
+
+    private void updateCurrentStyleLabel() {
+        currentStyleNameLabel.setText(viewModel.getSetStyle().getName());
     }
 }

@@ -51,6 +51,7 @@ public class StyleSelectDialogViewModel {
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
     private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
+    private final ObjectProperty<OOStyle> setStyle = new SimpleObjectProperty<>();
 
     public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService, TaskExecutor taskExecutor, BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
@@ -61,6 +62,7 @@ public class StyleSelectDialogViewModel {
         styles.addAll(loadStyles());
 
         OOStyle currentStyle = openOfficePreferences.getCurrentStyle();
+        setStyle.set(currentStyle);
 
         if (currentStyle instanceof JStyle jStyle) {
             selectedItem.setValue(getStyleOrDefault(jStyle.getPath()));
@@ -204,5 +206,13 @@ public class StyleSelectDialogViewModel {
             return selectedLayoutProperty.get() != null ? selectedLayoutProperty.get().getCitationStyle() : null;
         }
         return null;
+    }
+
+    public ObjectProperty<OOStyle> setStyleProperty() {
+        return setStyle;
+    }
+
+    public OOStyle getSetStyle() {
+        return setStyle.get();
     }
 }
