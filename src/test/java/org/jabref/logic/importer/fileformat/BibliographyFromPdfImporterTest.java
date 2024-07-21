@@ -89,7 +89,7 @@ class BibliographyFromPdfImporterTest {
             .withField(StandardField.MONTH, "#oct#")
             .withField(StandardField.YEAR, "2023")
             .withField(StandardField.COMMENT, "[14] S. Kwon et al., “High beam current operation with beam di-agnostics at LIPAc”, presented at HB’23, Geneva, Switzer- land, Oct. 2023, paper FRC1I2, this conference.");
-    private static  final BibEntry ALVER2007 = new BibEntry(StandardEntryType.Article)
+    private static final BibEntry ALVER2007 = new BibEntry(StandardEntryType.Article)
             .withCitationKey("1")
             .withField(StandardField.AUTHOR, "M. O. Alver and T. Tennøy and J. A. Alfredsen and G. Øie")
             .withField(StandardField.TITLE, "Automatic measurement of rotifer brachionus plicatilis densities in first feeding tanks")
@@ -103,7 +103,7 @@ class BibliographyFromPdfImporterTest {
             .withCitationKey("2")
             .withField(StandardField.AUTHOR, "M. O. Alver and others")
             .withField(StandardField.TITLE, "Estimating larval density in cod (gadus morhua) first feeding tanks using measurements of feed density and larval growth rates")
-            .withField(StandardField.BOOKTITLE, "Aquaculture")
+            .withField(StandardField.JOURNAL, "Aquaculture")
             .withField(StandardField.VOLUME, "268")
             .withField(StandardField.NUMBER, "1")
             .withField(StandardField.YEAR, "2007")
@@ -111,12 +111,13 @@ class BibliographyFromPdfImporterTest {
             .withField(StandardField.COMMENT, "[2] M. O. Alver et al., “Estimating larval density in cod (gadus morhua) first feeding tanks using measurements of feed density and larval growth rates,” Aquaculture, vol. 268, no. 1, pp. 216–226, 2007.");
     private static final BibEntry KOPP2012 = new BibEntry(StandardEntryType.InProceedings)
             .withCitationKey("3")
-            .withField(StandardField.AUTHOR, "Oliver Kopp and others")
+            .withField(StandardField.AUTHOR, "O. Kopp and others")
             .withField(StandardField.TITLE, "BPMN4TOSCA: A domain-specific language to model management plans for composite applications")
             .withField(StandardField.BOOKTITLE, "Business Process Model and Notation")
             .withField(StandardField.SERIES, "LNCS")
             .withField(StandardField.VOLUME, "125")
-            .withField(StandardField.YEAR, "2018")
+            .withField(StandardField.YEAR, "2012")
+            .withField(StandardField.PUBLISHER, "Springer")
             .withField(StandardField.COMMENT, "[3] O. Kopp et al., “BPMN4TOSCA: A domain-specific language to model management plans for composite applications,” in Business Process Model and Notation, ser. LNCS, vol. 125. Springer, 2012.");
     private static final BibEntry KOPPP2018 = new BibEntry(StandardEntryType.InProceedings)
             .withCitationKey("4")

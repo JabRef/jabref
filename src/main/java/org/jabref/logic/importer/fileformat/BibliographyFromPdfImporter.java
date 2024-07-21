@@ -54,6 +54,7 @@ public class BibliographyFromPdfImporter extends Importer {
     private static final Pattern YEAR_AT_END = Pattern.compile(", (\\d{4})\\.$");
     private static final Pattern PAGES = Pattern.compile(", pp\\. (\\d+--?\\d+)\\.?(.*)");
     private static final Pattern PAGE = Pattern.compile(", p\\. (\\d+)(.*)");
+    private static final Pattern SERIES = Pattern.compile(", ser\\. ([^.,]+)(.*)");
     private static final Pattern MONTH_RANGE_AND_YEAR = Pattern.compile(", ([A-Z][a-z]{2,7}\\.?)-[A-Z][a-z]{2,7}\\.? (\\d+)(.*)");
     private static final Pattern MONTH_AND_YEAR = Pattern.compile(", ([A-Z][a-z]{2,7}\\.? \\d+),? ?(.*)");
     private static final Pattern VOLUME = Pattern.compile(", vol\\. (\\d+)(.*)");
@@ -152,22 +153,18 @@ public class BibliographyFromPdfImporter extends Importer {
      */
     private String getReferencesPagesText(PDDocument document) throws IOException {
         int lastPage = document.getNumberOfPages();
-        String lastPageContents = getPageContents(document, new PDFTextStripper(), lastPage);
-        String result = lastPageContents;
+        String result = prependToResult("", document, new PDFTextStripper(), lastPage);
 
-        if (!containsWordReferences(lastPageContents)) {
-            result = prependToResult(result, document, new PDFTextStripper(), lastPage);
-        }
-
+        // Same matcher uses as in {@link containsWordReferences}
         Matcher matcher = REFERENCES.matcher(result);
-        if (!matcher.hasMatch()) {
+        if (!matcher.find()) {
             // Ensure that not too much is returned
             LOGGER.warn("Could not found 'References'. Returning last page only.");
-            return lastPageContents;
+            return getPageContents(document, new PDFTextStripper(), lastPage);
         }
 
-        int start = matcher.start();
-        return result.substring(start);
+        int end = matcher.end();
+        return result.substring(end);
     }
 
     private static boolean containsWordReferences(String result) {
@@ -206,7 +203,10 @@ public class BibliographyFromPdfImporter extends Importer {
 
         reference = reference
                 .replace(".-", "-")
-                // Remove "- " introduced by linebreaks in the PDF
+                .replace("- ", "")
+                // Unicode en dash (used as page separator)
+                .replace("–", "-")
+        // Remove "- " introduced by linebreaks in the PDF
                 .replace("- ", "");
 
         // Move URL to URL field
@@ -240,13 +240,15 @@ public class BibliographyFromPdfImporter extends Importer {
 
         reference = updateEntryAndReferenceIfMatches(reference, PAGES, result, StandardField.PAGES).newReference;
 
+        reference = updateEntryAndReferenceIfMatches(reference, SERIES, result, StandardField.SERIES).newReference;
+
         // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019
         reference = updateEntryAndReferenceIfMatches(reference, PAGE, result, StandardField.PAGES).newReference;
 
         matcher = MONTH_RANGE_AND_YEAR.matcher(reference);
         if (matcher.find()) {
-            // strip out second month
+            // strip out second monthp
             reference = reference.substring(0, matcher.start()) + ", " + matcher.group(1) + " " + matcher.group(2) + matcher.group(3);
         }
 
@@ -285,9 +287,7 @@ public class BibliographyFromPdfImporter extends Importer {
         // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia
         matcher = AUTHORS_AND_TITLE_AT_BEGINNING.matcher(reference);
         if (matcher.find()) {
-            String authors = matcher.group(1)
-                                      .replace("- ", "")
-                                      .replaceAll("et al\\.?", "and others");
+            String authors = matcher.group(1).replaceAll("et al\\.?", "and others");
             result.setField(StandardField.AUTHOR, AuthorList.fixAuthorFirstNameFirst(authors));
             result.setField(StandardField.TITLE, matcher.group(2)
                                                          .replace("- ", "")
@@ -313,11 +313,11 @@ public class BibliographyFromPdfImporter extends Importer {
 
         Matcher proceedingsMatcher = PROCEEDINGS_INDICATION.matcher(reference);
         Matcher workshopMatcher = WORKSHOP.matcher(reference);
-        if (proceedingsMatcher.matches() || workshopMatcher.matches() && (!volumeFound && !numberFound)) {
+        if (proceedingsMatcher.find() || workshopMatcher.find() && (!volumeFound && !numberFound)) {
             result.setType(StandardEntryType.InProceedings);
 
             String bookTitle;
-            if (proceedingsMatcher.matches()) {
+            if (proceedingsMatcher.hasMatch()) {
                 String proc = proceedingsMatcher.group(1);
                 if (proc == null) {
                     bookTitle = proceedingsMatcher.group(2);
@@ -330,7 +330,10 @@ public class BibliographyFromPdfImporter extends Importer {
             }
             reference = "";
 
-            int lastDot = bookTitle.lastIndexOf('.');
+            int lastDot = bookTitle.lastIndexOf(". ");
+            if (lastDot == -1) {
+                lastDot = bookTitle.lastIndexOf('.');
+            }
             if (lastDot > 0) {
                 String textAfterDot = bookTitle.substring(lastDot + 1).trim();
                 // We use Apache Commons here, because it is fastest - see table at https://stackoverflow.com/a/35242882/873282
@@ -353,25 +356,26 @@ public class BibliographyFromPdfImporter extends Importer {
         }
 
         // Nucl. Fusion
-        reference = reference.trim()
-                             .replace("- ", "")
-                             .replaceAll("\\.$", "");
-        if (!reference.contains(",") && !reference.isEmpty()) {
+        reference = reference.trim().replaceAll("\\.$", "");
+
+        if (volumeFound || numberFound) {
+            result.setField(StandardField.JOURNAL, reference);
+        } else if (!reference.contains(",") && !reference.isEmpty()) {
             if (reference.endsWith(" Note") || reference.endsWith(" note")) {
                 result.setField(StandardField.NOTE, reference);
                 result.setType(StandardEntryType.TechReport);
             } else {
-                result.setField(StandardField.JOURNAL, reference.replace("- ", ""));
+                LOGGER.debug("Falling back to journal even if no volume and no number was found. Reference: {}", reference);
+                result.setField(StandardField.JOURNAL, reference);
             }
         } else {
-            LOGGER.trace("InProceedings fallback used for current state of handled string {}", reference);
-            String toAdd = reference;
+            LOGGER.trace("InProceedings fallback used. Reference: {}", reference);
             result.setType(StandardEntryType.InProceedings);
             if (result.hasField(StandardField.BOOKTITLE)) {
                 String oldTitle = result.getField(StandardField.BOOKTITLE).get();
-                result.setField(StandardField.BOOKTITLE, oldTitle + " " + toAdd);
+                result.setField(StandardField.BOOKTITLE, oldTitle + " " + reference);
             } else {
-                result.setField(StandardField.BOOKTITLE, toAdd);
+                result.setField(StandardField.BOOKTITLE, reference);
             }
         }
 
