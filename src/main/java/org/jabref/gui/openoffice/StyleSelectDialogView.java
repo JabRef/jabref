@@ -169,7 +169,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         availableListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 viewModel.handleCslStyleSelection();
-                this.setResult(tvStyles.getSelectionModel().getSelectedItem().getStyleUnified());
+                this.setResult(viewModel.getSelectedStyle());
                 this.close();
             }
         });
@@ -184,11 +184,5 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML
     private void addStyleFile() {
         viewModel.addStyleFile();
-    }
-
-    public StyleSelectDialogViewModel.StyleType getSelectedStyleType() {
-        return tabPane.getSelectionModel().getSelectedItem().getText().equals("CSL Styles")
-                ? StyleSelectDialogViewModel.StyleType.CSL
-                : StyleSelectDialogViewModel.StyleType.JSTYLE;
     }
 }

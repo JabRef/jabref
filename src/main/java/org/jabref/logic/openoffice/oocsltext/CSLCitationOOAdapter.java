@@ -22,35 +22,26 @@ import org.apache.commons.text.StringEscapeUtils;
 public class CSLCitationOOAdapter {
 
     private static final BibEntryTypesManager BIB_ENTRY_TYPES_MANAGER = new BibEntryTypesManager();
-    private static final List<CitationStyle> STYLE_LIST = CitationStyle.discoverCitationStyles();
     private static final CitationStyleOutputFormat FORMAT = CitationStyleOutputFormat.HTML;
-    private static String selectedStyleName;
 
-    public static CitationStyle getSelectedStyle() {
-        return STYLE_LIST.stream()
-                         .filter(style -> style.getTitle().equals(selectedStyleName))
-                         .findFirst()
-                         .orElse(STYLE_LIST.getFirst());
-    }
-
-    public static void insertBibliography(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
+    public static void insertBibliography(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
             throws IllegalArgumentException, WrappedTargetException, CreationException {
 
-        String selectedStyle = getSelectedStyle().getSource();
+        String style = selectedStyle.getSource();
 
-        List<String> citations = CitationStyleGenerator.generateCitation(entries, selectedStyle, FORMAT, bibDatabaseContext, BIB_ENTRY_TYPES_MANAGER);
+        List<String> citations = CitationStyleGenerator.generateCitation(entries, style, FORMAT, bibDatabaseContext, BIB_ENTRY_TYPES_MANAGER);
 
         for (String citation: citations) {
             writeCitation(doc, cursor, citation);
         }
     }
 
-    public static void insertInText(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
+    public static void insertInText(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
             throws IOException, WrappedTargetException, CreationException {
 
-        String selectedStyle = getSelectedStyle().getSource();
+        String style = selectedStyle.getSource();
 
-        String inTextCitation = CitationStyleGenerator.generateInText(entries, selectedStyle, FORMAT, bibDatabaseContext, BIB_ENTRY_TYPES_MANAGER).getText();
+        String inTextCitation = CitationStyleGenerator.generateInText(entries, style, FORMAT, bibDatabaseContext, BIB_ENTRY_TYPES_MANAGER).getText();
 
         writeCitation(doc, cursor, inTextCitation);
     }
@@ -90,9 +81,5 @@ public class CSLCitationOOAdapter {
         html = html.replaceAll("</?span[^>]*>", "");
 
         return html;
-    }
-
-    public static void setSelectedStyleName(String styleName) {
-        CSLCitationOOAdapter.selectedStyleName = styleName;
     }
 }

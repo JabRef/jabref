@@ -158,12 +158,7 @@ public class StyleLoader {
             openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
             return internalStyles.getFirst();
         } else if (gotStyle instanceof CitationStyle citationStyle) {
-            try {
                 return citationStyle;
-            } catch (Exception ex) {
-                LOGGER.error("Error loading CSL style", ex);
-                return null;
-            }
         }
         return null;
     }

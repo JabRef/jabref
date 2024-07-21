@@ -30,7 +30,6 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
@@ -195,9 +194,7 @@ public class StyleSelectDialogViewModel {
 
     public void handleCslStyleSelection() {
         CitationStylePreviewLayout selectedLayout = selectedLayoutProperty.get();
-        if (selectedLayout != null) {
-            CSLCitationOOAdapter.setSelectedStyleName(selectedLayout.getDisplayName());
-        }
+        openOfficePreferences.setCurrentStyle(selectedLayout.getCitationStyle());
     }
 
     public OOStyle getSelectedStyle() {

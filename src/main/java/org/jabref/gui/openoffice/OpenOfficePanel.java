@@ -49,7 +49,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
-import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
@@ -101,8 +100,6 @@ public class OpenOfficePanel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
-    // private JStyle jStyle;             // TODO: check for jstyle instance
-    private StyleSelectDialogViewModel.StyleType currentStyleType;
     private OOStyle currentStyle;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
@@ -170,7 +167,7 @@ public class OpenOfficePanel {
         currentStyle = loader.getUsedStyleUnified();
         final boolean FAIL = true;
         final boolean PASS = false;
-        LOGGER.warn("Style is " + currentStyle);
+
         if (currentStyle == null) {
             currentStyle = loader.getUsedStyleUnified();
         } else {
@@ -185,8 +182,9 @@ public class OpenOfficePanel {
                     new OOError(title, msg, ex).showErrorDialog(dialogService);
                     return FAIL;
                 }
-            } else if (currentStyle instanceof CitationStyle citationStyle) {
-                CSLCitationOOAdapter.setSelectedStyleName(citationStyle.getName());
+            } else {
+                // CSL Styles don't need to be updated
+                return PASS;
             }
         }
         return PASS;
@@ -212,7 +210,7 @@ public class OpenOfficePanel {
                                      LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), e);
                                  }
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
-                             } else if (currentStyle instanceof CitationStyle cslStyle) { // Unreachable statement, check StyleSelectItemViewModel
+                             } else if (currentStyle instanceof CitationStyle cslStyle) {
                                  dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
                              }
                          });
@@ -233,9 +231,8 @@ public class OpenOfficePanel {
 
         update.setTooltip(new Tooltip(Localization.lang("Ensure that the bibliography is up-to-date")));
 
-        if(currentStyle instanceof JStyle jStyle) {
+        if (currentStyle instanceof JStyle jStyle) {
             update.setOnAction(event -> {
-                // TODO: check for jstyle instance
                 String title = Localization.lang("Could not update bibliography");
                 if (getOrUpdateTheStyle(title)) {
                     return;

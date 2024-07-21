@@ -586,12 +586,12 @@ class OOBibBase {
 
         try {
             UnoUndo.enterUndoContext(doc, "Insert citation");
-            if (style instanceof CitationStyle) {
+            if (style instanceof CitationStyle citationStyle) {
                 // Handle CSL Styles
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                    CSLCitationOOAdapter.insertInText(doc, cursor.get(), entries, bibDatabaseContext);
+                    CSLCitationOOAdapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
                 } else {
-                    CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), entries, bibDatabaseContext);
+                    CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
                 }
             } else if (style instanceof JStyle jStyle) {
                 // Handle JStyles
