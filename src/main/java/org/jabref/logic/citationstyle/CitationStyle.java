@@ -21,7 +21,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
-import org.jabref.gui.openoffice.StyleSelectDialogViewModel;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.util.StandardFileType;
 
@@ -233,10 +232,5 @@ public class CitationStyle implements OOStyle {
     @Override
     public String getPath() {
         return getFilePath();
-    }
-
-    @Override
-    public StyleSelectDialogViewModel.StyleType getStyleType() {
-        return StyleSelectDialogViewModel.StyleType.CSL;
     }
 }

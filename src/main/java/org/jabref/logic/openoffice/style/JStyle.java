@@ -19,7 +19,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.jabref.gui.openoffice.StyleSelectDialogViewModel;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatter;
@@ -574,11 +573,6 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     @Override
     public int hashCode() {
         return Objects.hash(path, name, citProperties, properties);
-    }
-
-    @Override
-    public StyleSelectDialogViewModel.StyleType getStyleType() {
-        return StyleSelectDialogViewModel.StyleType.JSTYLE;
     }
 
     enum BibStyleMode {

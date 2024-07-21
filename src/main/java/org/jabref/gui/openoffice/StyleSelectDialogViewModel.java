@@ -51,12 +51,6 @@ public class StyleSelectDialogViewModel {
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
     private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
-    private final ObjectProperty<OOStyle> selectedStyle = new SimpleObjectProperty<>();
-
-    public enum StyleType {
-        CSL,
-        JSTYLE
-    }
 
     public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader styleLoader, PreferencesService preferencesService, TaskExecutor taskExecutor, BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
@@ -90,7 +84,7 @@ public class StyleSelectDialogViewModel {
         return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style, style);
     }
 
-    public JStyle toOOBibStyle(StyleSelectItemViewModel item) {
+    public JStyle toJStyle(StyleSelectItemViewModel item) {
         return item.getjStyle();
     }
 
@@ -121,8 +115,8 @@ public class StyleSelectDialogViewModel {
     }
 
     public void deleteStyle() {
-        JStyle style = selectedItem.getValue().getjStyle();
-        if (styleLoader.removeStyle(style)) {
+        JStyle jStyle = selectedItem.getValue().getjStyle();
+        if (styleLoader.removeStyle(jStyle)) {
             styles.remove(selectedItem.get());
         }
     }
@@ -132,10 +126,10 @@ public class StyleSelectDialogViewModel {
     }
 
     public void editStyle() {
-        JStyle style = selectedItem.getValue().getjStyle();
+        JStyle jStyle = selectedItem.getValue().getjStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", filePreferences);
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, style.getPath(), type);
+            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, jStyle.getPath(), type);
         } catch (
                 IOException e) {
             dialogService.showErrorDialogAndWait(e);
@@ -155,7 +149,7 @@ public class StyleSelectDialogViewModel {
 
     public void storePrefs() {
         List<String> externalStyles = styles.stream()
-                                            .map(this::toOOBibStyle)
+                                            .map(this::toJStyle)
                                             .filter(style -> !style.isInternalStyle())
                                             .map(JStyle::getPath)
                                             .collect(Collectors.toList());
