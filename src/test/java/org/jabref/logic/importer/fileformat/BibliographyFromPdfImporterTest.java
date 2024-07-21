@@ -31,7 +31,7 @@ class BibliographyFromPdfImporterTest {
     private static final BibEntry SHIMOSAKI_2019 = new BibEntry(StandardEntryType.InProceedings)
             .withCitationKey("3")
             .withField(StandardField.AUTHOR, "Y. Shimosaki and others")
-            .withField(StandardField.TITLE, "Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc")
+            .withField(StandardField.TITLE, "Lattice design for 5 MeV - 125 mA CW RFQ operation in LIPAc")
             .withField(StandardField.BOOKTITLE, "Proc. IPAC’19, Melbourne, Australia")
             .withField(StandardField.MONTH, "#may#")
             .withField(StandardField.YEAR, "2019")
@@ -202,8 +202,9 @@ class BibliographyFromPdfImporterTest {
         BibEntry entry10 = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("10")
                 .withField(StandardField.AUTHOR, "K. Hirosawa and others")
-                .withField(StandardField.BOOKTITLE, "Proc. PASJ’23, 2023, Japan")
+                .withField(StandardField.BOOKTITLE, "Proc. PASJ’23, Japan")
                 .withField(StandardField.TITLE, "High-Power RF tests of repaired circulator for LIPAc RFQ")
+                .withField(StandardField.YEAR, "2023")
                 .withField(StandardField.COMMENT, "[10] K. Hirosawa et al., “High-Power RF tests of repaired circu- lator for LIPAc RFQ”, in Proc. PASJ’23, 2023, Japan.");
 
         BibEntry entry12 = new BibEntry(StandardEntryType.InProceedings)
@@ -268,7 +269,8 @@ class BibliographyFromPdfImporterTest {
     }
 
     static Stream<BibEntry> references() {
-        return Stream.of(KOENIG2023,
+        return Stream.of(
+                KOENIG2023,
                 KNASTER_2017,
                 SHIMOSAKI_2019,
                 BELLAN_2021,
@@ -279,7 +281,7 @@ class BibliographyFromPdfImporterTest {
                 INTERNAL_NOTE,
                 new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("18")
-                .withField(StandardField.AUTHOR, "Z. Yao and D. S. Weld and W.-P. Chen and H. Sun")
+                .withField(StandardField.AUTHOR, "Z. Yao and D. S. Weld and W-P. Chen and H. Sun")
                 .withField(StandardField.BOOKTITLE, "Proceedings of the 2018 World Wide Web Conference")
                 .withField(StandardField.COMMENT, "[18] Z. Yao, D. S. Weld, W.-P. Chen, and H. Sun, “Staqc: A systematically mined question-code dataset from stack overflow,” in Proceedings of the 2018 World Wide Web Conference, 2018, pp. 1693–1703.")
                 .withField(StandardField.TITLE, "Staqc: A systematically mined question-code dataset from stack overflow")
@@ -291,12 +293,9 @@ class BibliographyFromPdfImporterTest {
     @ParameterizedTest
     @MethodSource
     void references(BibEntry expectedEntry) {
-        String number = expectedEntry.getField(StandardField.COMMENT)
-                                .map(comment -> comment.substring(1, 2))
-                                .get();
-        String reference = expectedEntry.getField(StandardField.COMMENT)
-                                .map(comment -> comment.substring(4))
-                                .get();
-        assertEquals(expectedEntry, bibliographyFromPdfImporter.parseReference(number, reference));
+        List<BibliographyFromPdfImporter.IntermediateData> intermediateDataList = BibliographyFromPdfImporter.getIntermediateData(expectedEntry.getField(StandardField.COMMENT).get());
+        assertEquals(1, intermediateDataList.size());
+        BibliographyFromPdfImporter.IntermediateData intermediateData = intermediateDataList.getFirst();
+        assertEquals(expectedEntry, bibliographyFromPdfImporter.parseReference(intermediateData.number(), intermediateData.reference()));
     }
 }
