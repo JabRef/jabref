@@ -183,6 +183,10 @@ public class StyleSelectDialogViewModel {
                 searchTerm.isEmpty() || layout.getDisplayName().toLowerCase().contains(searchTerm.toLowerCase()));
     }
 
+    private Tab getSelectedTab() {
+        return selectedTab.get();
+    }
+
     public void setSelectedTab(Tab tab) {
         if (tab != null) {
             selectedTab.set(tab);
@@ -195,19 +199,17 @@ public class StyleSelectDialogViewModel {
     }
 
     public OOStyle getSelectedStyle() {
-        Tab currentTab = selectedTab.get();
-        if (currentTab == null) {
-            return null;
-        }
-
-        String tabText = currentTab.getText();
-        if ("JStyles".equals(tabText)) {
-            if (selectedItem.get() != null) {
-                return selectedItem.get().getJStyle();
-            }
-        } else if ("CSL Styles".equals(tabText)) {
-            if (selectedLayoutProperty.get() != null) {
-                return selectedLayoutProperty.get().getCitationStyle();
+        Tab currentTab = getSelectedTab();
+        if (currentTab != null) {
+            String tabText = currentTab.getText();
+            if ("JStyles".equals(tabText)) {
+                if (selectedItem.get() != null) {
+                    return selectedItem.get().getJStyle();
+                }
+            } else if ("CSL Styles".equals(tabText)) {
+                if (selectedLayoutProperty.get() != null) {
+                    return selectedLayoutProperty.get().getCitationStyle();
+                }
             }
         }
         return openOfficePreferences.getCurrentStyle();
