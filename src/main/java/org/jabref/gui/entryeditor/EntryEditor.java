@@ -147,6 +147,12 @@ public class EntryEditor extends BorderPane {
                 activeTab.notifyAboutFocus(currentlyEditedEntry);
             }
         });
+        EasyBind.listen(preferencesService.getPreviewPreferences().showPreviewAsExtraTabProperty(),
+                (obs, oldValue, newValue) -> {
+                    if (currentlyEditedEntry != null) {
+                        adaptVisibleTabs();
+                    }
+                });
     }
 
     private void setupDragAndDrop(LibraryTab libraryTab) {
@@ -383,9 +389,6 @@ public class EntryEditor extends BorderPane {
             adaptVisibleTabs();
             getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
         });
-
-        EasyBind.listen(preferencesService.getPreviewPreferences().showPreviewAsExtraTabProperty(),
-                (obs, oldValue, newValue) -> adaptVisibleTabs());
 
         adaptVisibleTabs();
         setupToolBar();
