@@ -29,6 +29,7 @@ import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
@@ -100,12 +101,10 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), cslPreviewViewer::setLayout);
         cslPreviewBox.getChildren().add(cslPreviewViewer);
 
-        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
-        previewArticle.setEntry(TestEntry.getTestEntry());
+        previewArticle = initializePreviewViewer(TestEntry.getTestEntry());
         jstylePreviewBox.getChildren().add(previewArticle);
 
-        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
-        previewBook.setEntry(TestEntry.getTestEntryBook());
+        previewBook = initializePreviewViewer(TestEntry.getTestEntryBook());
         jstylePreviewBox.getChildren().add(previewBook);
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -150,8 +149,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
             if (viewModel.getSelectedStyle() instanceof JStyle) {
                 tvStyles.getSelectionModel().select(style);
-                previewArticle.setLayout(new TextBasedPreviewLayout(style.getjStyle().getReferenceFormat(StandardEntryType.Article)));
-                previewBook.setLayout(new TextBasedPreviewLayout(style.getjStyle().getReferenceFormat(StandardEntryType.Book)));
+                previewArticle.setLayout(new TextBasedPreviewLayout(style.getJStyle().getReferenceFormat(StandardEntryType.Article)));
+                previewBook.setLayout(new TextBasedPreviewLayout(style.getJStyle().getReferenceFormat(StandardEntryType.Book)));
             }
         });
 
@@ -159,7 +158,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         searchBox.textProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.setAvailableLayoutsFilter(newValue));
 
-        // tabPane.getSelectionModel().select(0);
         viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.setSelectedTab(newValue);
@@ -183,5 +181,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML
     private void addStyleFile() {
         viewModel.addStyleFile();
+    }
+
+    private PreviewViewer initializePreviewViewer(BibEntry entry) {
+        PreviewViewer viewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+        viewer.setEntry(entry);
+        return viewer;
     }
 }

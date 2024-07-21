@@ -395,24 +395,24 @@ class OOBibBase {
         return OOVoidResult.ok();
     }
 
-    public OOVoidResult<OOError> checkStylesExistInTheDocument(JStyle style, XTextDocument doc) {
-        String pathToStyleFile = style.getPath();
+    public OOVoidResult<OOError> checkStylesExistInTheDocument(JStyle jStyle, XTextDocument doc) {
+        String pathToStyleFile = jStyle.getPath();
 
         List<OOVoidResult<OOError>> results = new ArrayList<>();
         try {
             results.add(checkStyleExistsInTheDocument(UnoStyle.PARAGRAPH_STYLES,
-                    style.getReferenceHeaderParagraphFormat(),
+                    jStyle.getReferenceHeaderParagraphFormat(),
                     doc,
                     "ReferenceHeaderParagraphFormat",
                     pathToStyleFile));
             results.add(checkStyleExistsInTheDocument(UnoStyle.PARAGRAPH_STYLES,
-                    style.getReferenceParagraphFormat(),
+                    jStyle.getReferenceParagraphFormat(),
                     doc,
                     "ReferenceParagraphFormat",
                     pathToStyleFile));
-            if (style.isFormatCitations()) {
+            if (jStyle.isFormatCitations()) {
                 results.add(checkStyleExistsInTheDocument(UnoStyle.CHARACTER_STYLES,
-                        style.getCitationCharacterFormat(),
+                        jStyle.getCitationCharacterFormat(),
                         doc,
                         "CitationCharacterFormat",
                         pathToStyleFile));
@@ -587,14 +587,14 @@ class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (style instanceof CitationStyle citationStyle) {
-                // Handle CSL Styles
+                // Handle insertion of CSL Style citations
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     CSLCitationOOAdapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
                 } else {
                     CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
                 }
             } else if (style instanceof JStyle jStyle) {
-                // Handle JStyles
+                // Handle insertion of JStyle citations
                 EditInsert.insertCitationGroup(doc,
                         frontend.get(),
                         cursor.get(),
@@ -603,9 +603,7 @@ class OOBibBase {
                         jStyle,
                         citationType,
                         pageInfo);
-            }
 
-            if (style instanceof JStyle jStyle) {
                 if (syncOptions.isPresent()) {
                     Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions.get());
                 }
@@ -631,13 +629,13 @@ class OOBibBase {
     /**
      * GUI action "Merge citations"
      */
-    public void guiActionMergeCitationGroups(List<BibDatabase> databases, JStyle style) {
+    public void guiActionMergeCitationGroups(List<BibDatabase> databases, JStyle jStyle) {
         final String errorTitle = Localization.lang("Problem combining cite markers");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
         if (testDialog(errorTitle,
                 odoc.asVoidResult(),
-                styleIsRequired(style),
+                styleIsRequired(jStyle),
                 databaseIsRequired(databases, OOError::noDataBaseIsOpen))) {
             return;
         }
@@ -647,7 +645,7 @@ class OOBibBase {
 
         if (testDialog(errorTitle,
                 fcursor.asVoidResult(),
-                checkStylesExistInTheDocument(style, doc),
+                checkStylesExistInTheDocument(jStyle, doc),
                 checkIfOpenOfficeIsRecordingChanges(doc))) {
             return;
         }
@@ -656,11 +654,11 @@ class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Merge citations");
 
             OOFrontend frontend = new OOFrontend(doc);
-            boolean madeModifications = EditMerge.mergeCitationGroups(doc, frontend, style);
+            boolean madeModifications = EditMerge.mergeCitationGroups(doc, frontend, jStyle);
             if (madeModifications) {
                 UnoCrossRef.refresh(doc);
                 Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
-                Update.resyncDocument(doc, style, fcursor.get(), syncOptions);
+                Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions);
             }
         } catch (NoDocumentException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
@@ -685,13 +683,13 @@ class OOBibBase {
      * <p>
      * Do the opposite of MergeCitationGroups. Combined markers are split, with a space inserted between.
      */
-    public void guiActionSeparateCitations(List<BibDatabase> databases, JStyle style) {
+    public void guiActionSeparateCitations(List<BibDatabase> databases, JStyle jStyle) {
         final String errorTitle = Localization.lang("Problem during separating cite markers");
 
         OOResult<XTextDocument, OOError> odoc = getXTextDocument();
         if (testDialog(errorTitle,
                 odoc.asVoidResult(),
-                styleIsRequired(style),
+                styleIsRequired(jStyle),
                 databaseIsRequired(databases, OOError::noDataBaseIsOpen))) {
             return;
         }
@@ -701,7 +699,7 @@ class OOBibBase {
 
         if (testDialog(errorTitle,
                 fcursor.asVoidResult(),
-                checkStylesExistInTheDocument(style, doc),
+                checkStylesExistInTheDocument(jStyle, doc),
                 checkIfOpenOfficeIsRecordingChanges(doc))) {
             return;
         }
@@ -710,11 +708,11 @@ class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Separate citations");
 
             OOFrontend frontend = new OOFrontend(doc);
-            boolean madeModifications = EditSeparate.separateCitations(doc, frontend, databases, style);
+            boolean madeModifications = EditSeparate.separateCitations(doc, frontend, databases, jStyle);
             if (madeModifications) {
                 UnoCrossRef.refresh(doc);
                 Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
-                Update.resyncDocument(doc, style, fcursor.get(), syncOptions);
+                Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions);
             }
         } catch (NoDocumentException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
@@ -807,9 +805,9 @@ class OOBibBase {
      * GUI action, refreshes citation markers and bibliography.
      *
      * @param databases Must have at least one.
-     * @param style     Style.
+     * @param jStyle     Style.
      */
-    public void guiActionUpdateDocument(List<BibDatabase> databases, JStyle style) {
+    public void guiActionUpdateDocument(List<BibDatabase> databases, JStyle jStyle) {
         final String errorTitle = Localization.lang("Unable to synchronize bibliography");
 
         try {
@@ -817,7 +815,7 @@ class OOBibBase {
             OOResult<XTextDocument, OOError> odoc = getXTextDocument();
             if (testDialog(errorTitle,
                     odoc.asVoidResult(),
-                    styleIsRequired(style))) {
+                    styleIsRequired(jStyle))) {
                 return;
             }
 
@@ -827,7 +825,7 @@ class OOBibBase {
 
             if (testDialog(errorTitle,
                     fcursor.asVoidResult(),
-                    checkStylesExistInTheDocument(style, doc),
+                    checkStylesExistInTheDocument(jStyle, doc),
                     checkIfOpenOfficeIsRecordingChanges(doc))) {
                 return;
             }
@@ -846,7 +844,7 @@ class OOBibBase {
                         .setUpdateBibliography(true)
                         .setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages);
 
-                unresolvedKeys = Update.synchronizeDocument(doc, frontend, style, fcursor.get(), syncOptions);
+                unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
             } finally {
                 UnoUndo.leaveUndoContext(doc);
                 fcursor.get().restore(doc);

@@ -47,7 +47,7 @@ public class StyleSelectItemViewModel {
         return file;
     }
 
-    public JStyle getjStyle() {
+    public JStyle getJStyle() {
         return jStyle;
     }
 

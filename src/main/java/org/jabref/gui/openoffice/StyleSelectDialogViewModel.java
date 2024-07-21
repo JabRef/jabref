@@ -85,7 +85,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public JStyle toJStyle(StyleSelectItemViewModel item) {
-        return item.getjStyle();
+        return item.getJStyle();
     }
 
     public void addStyleFile() {
@@ -115,7 +115,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public void deleteStyle() {
-        JStyle jStyle = selectedItem.getValue().getjStyle();
+        JStyle jStyle = selectedItem.getValue().getJStyle();
         if (styleLoader.removeStyle(jStyle)) {
             styles.remove(selectedItem.get());
         }
@@ -126,7 +126,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public void editStyle() {
-        JStyle jStyle = selectedItem.getValue().getjStyle();
+        JStyle jStyle = selectedItem.getValue().getJStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", filePreferences);
         try {
             JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, jStyle.getPath(), type);
@@ -141,10 +141,10 @@ public class StyleSelectDialogViewModel {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        TextArea styleView = new TextArea(item.getjStyle().getLocalCopy());
+        TextArea styleView = new TextArea(item.getJStyle().getLocalCopy());
         scrollPane.setContent(styleView);
         pane.setContent(scrollPane);
-        dialogService.showCustomDialogAndWait(item.getjStyle().getName(), pane, ButtonType.OK);
+        dialogService.showCustomDialogAndWait(item.getJStyle().getName(), pane, ButtonType.OK);
     }
 
     public void storePrefs() {

@@ -54,6 +54,15 @@ public class CSLCitationOOAdapter {
         cursor.collapseToEnd();
     }
 
+    /**
+     * Transforms provided HTML into a format that can be fully parsed by OOTextIntoOO.write(...)
+     * The transformed HTML can be used for inserting into a LibreOffice document
+     * Context: The HTML produced by CitationStyleGenerator.generateCitation(...) is not directly (completely) parsable by OOTextIntoOO.write(...)
+     * For more details, read the documentation of the write(...) method in the {@link OOTextIntoOO} class.
+     * Additional information: https://devdocs.jabref.org/code-howtos/openoffice/code-reorganization.html.
+     *
+     * @param html The HTML string to be transformed into OO-write ready HTML.
+     */
     private static String transformHtml(String html) {
         // Initial clean up of escaped characters
         html = StringEscapeUtils.unescapeHtml4(html);
