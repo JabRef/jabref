@@ -69,6 +69,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
+    private PreviewViewer cslPreviewViewer;
 
     public StyleSelectDialogView(StyleLoader loader) {
         this.loader = loader;
@@ -98,8 +99,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         availableListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.selectedLayoutProperty().set(newValue));
 
-        PreviewViewer cslPreviewViewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
-        cslPreviewViewer.setEntry(TestEntry.getTestEntry());
+        cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), cslPreviewViewer::setLayout);
         cslPreviewBox.getChildren().add(cslPreviewViewer);
 
