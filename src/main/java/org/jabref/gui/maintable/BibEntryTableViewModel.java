@@ -51,8 +51,8 @@ public class BibEntryTableViewModel {
     private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
-    private final BooleanProperty matchedBySearchProperty = new SimpleBooleanProperty(false);
-    private final BooleanProperty matchedByGroupProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty matchedBySearchProperty = new SimpleBooleanProperty(true);
+    private final BooleanProperty matchedByGroupProperty = new SimpleBooleanProperty(true);
     private final IntegerProperty searchRankProperty = new SimpleIntegerProperty();
     private final BibDatabaseContext bibDatabaseContext;
 

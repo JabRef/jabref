@@ -649,18 +649,19 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .table-row-cell:matching-search-and-groups {
+    -fx-background-color: white;
 }
 
 .table-row-cell:matching-search-not-groups {
-    -fx-background-color: lightgray;
+    -fx-background-color: rgba(180, 180, 180, 0.86);
 }
 
 .table-row-cell:matching-groups-not-search {
-    -fx-background-color: darkgray;
+    -fx-background-color: rgba(140, 140, 140, 0.86);
 }
 
 .table-row-cell:not-matching-search-and-groups {
-    -fx-opacity: 50%;
+    -fx-opacity: 60%;
 }
 
 .table-row-cell:hover,

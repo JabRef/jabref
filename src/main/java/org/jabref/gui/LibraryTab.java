@@ -195,7 +195,7 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getMetaData().registerListener(this);
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager, this);
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, this);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -326,9 +326,9 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.tableModel.unregisterListeners();
+        this.tableModel.unbind();
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager, this);
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, this);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -892,7 +892,7 @@ public class LibraryTab extends Tab {
         }
 
         if (tableModel != null) {
-            tableModel.unregisterListeners();
+            tableModel.unbind();
         }
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
@@ -935,7 +935,7 @@ public class LibraryTab extends Tab {
         return mainTable;
     }
 
-    public ListProperty<GroupTreeNode> selectedGroupsPropertyProperty() {
+    public ListProperty<GroupTreeNode> selectedGroupsProperty() {
         return selectedGroupsProperty;
     }
 

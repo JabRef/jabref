@@ -11,7 +11,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
 import org.jabref.gui.LibraryTab;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
@@ -25,6 +24,10 @@ import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
 
+import com.tobiasdiez.easybind.EasyBind;
+
+import static org.jabref.gui.maintable.BibEntryTableViewModel.FIRST_RANK;
+
 public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
@@ -35,7 +38,6 @@ public class MainTableDataModel {
 
     public MainTableDataModel(BibDatabaseContext context,
                               PreferencesService preferencesService,
-                              StateManager stateManager,
                               LibraryTab libraryTab) {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
@@ -49,18 +51,18 @@ public class MainTableDataModel {
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
-                EasyBind.combine(libraryTab.selectedGroupsPropertyProperty(),
+                EasyBind.combine(libraryTab.selectedGroupsProperty(),
                         libraryTab.searchQueryProperty(),
                         groupsPreferences.groupViewModeProperty(),
                         (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))
         );
 
-        libraryTab.resultSizeProperty().bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRankProperty().isEqualTo(BibEntryTableViewModel.FIRST_RANK).get())));
+        libraryTab.resultSizeProperty().bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRankProperty().isEqualTo(FIRST_RANK).get())));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
-    public void unregisterListeners() {
+    public void unbind() {
         entriesFiltered.predicateProperty().unbind();
     }
 
