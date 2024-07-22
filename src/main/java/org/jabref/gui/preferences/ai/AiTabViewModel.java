@@ -60,7 +60,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.openAiTokenValidator = new FunctionBasedValidator<>(
                 openAiToken,
                 token -> !StringUtil.isBlank(token),
-                ValidationMessage.error(Localization.lang("The OpenAI token has to be provided")));
+                ValidationMessage.error(Localization.lang("An OpenAI token has to be provided")));
 
         this.instructionValidator = new FunctionBasedValidator<>(
                 instruction,
@@ -145,8 +145,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setInstruction(AiDefaultPreferences.SYSTEM_MESSAGE);
         instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
 
-        aiPreferences.setContextWindowSize(AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
-        contextWindowSize.set(AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
+        aiPreferences.setContextWindowSize(AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
+        contextWindowSize.set(AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
 
         aiPreferences.setDocumentSplitterChunkSize(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
         documentSplitterChunkSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);

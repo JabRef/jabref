@@ -15,7 +15,7 @@ import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
 import org.jabref.gui.ai.components.errormessage.ErrorMessageComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.AiChat;
+import org.jabref.logic.ai.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
 
-    private final AiChat aiChat;
+    private final AiChatLogic aiChatLogic;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
@@ -38,8 +38,8 @@ public class AiChatComponent extends VBox {
     @FXML private Button submitButton;
     @FXML private StackPane stackPane;
 
-    public AiChatComponent(AiChat aiChat, DialogService dialogService, TaskExecutor taskExecutor) {
-        this.aiChat = aiChat;
+    public AiChatComponent(AiChatLogic aiChatLogic, DialogService dialogService, TaskExecutor taskExecutor) {
+        this.aiChatLogic = aiChatLogic;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
@@ -66,7 +66,7 @@ public class AiChatComponent extends VBox {
             }
         });
 
-        chatVBox.getChildren().addAll(aiChat.getChatHistory().getMessages().stream().map(ChatMessageComponent::new).toList());
+        chatVBox.getChildren().addAll(aiChatLogic.getChatHistory().getMessages().stream().map(ChatMessageComponent::new).toList());
 
         Platform.runLater(() -> userPromptTextArea.requestFocus());
     }
@@ -82,7 +82,7 @@ public class AiChatComponent extends VBox {
             addMessage(userMessage);
             setLoading(true);
 
-            BackgroundTask.wrap(() -> aiChat.execute(userMessage))
+            BackgroundTask.wrap(() -> aiChatLogic.execute(userMessage))
                           .onSuccess(aiMessage -> {
                               setLoading(false);
                               addMessage(aiMessage);
@@ -129,7 +129,7 @@ public class AiChatComponent extends VBox {
 
         if (agreed) {
             chatVBox.getChildren().clear();
-            aiChat.getChatHistory().clear();
+            aiChatLogic.getChatHistory().clear();
         }
     }
 }

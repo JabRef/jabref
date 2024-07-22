@@ -2,7 +2,7 @@
 nav_order: 0035
 parent: Decision Records
 ---
-<!-- markdownlint-disable-next-line MD025 -->
+
 # Generate embeddings online
 
 ## Context and Problem Statement

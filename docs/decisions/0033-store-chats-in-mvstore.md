@@ -2,6 +2,7 @@
 nav_order: 0033
 parent: Decision Records
 ---
+
 # Store chats in MVStore
 
 ## Context and Problem Statement
@@ -34,6 +35,7 @@ Chosen option: "MVStore", because it is simple and memory-efficient.
 * Good, because cross-platform
 * Good, because widely used and accepted, so there are lots of libraries for JSON format
 * Good, because it is even possible to reuse the chats file for other purposes
+* Good, because has potential for being mergeable by external tooling
 * Bad, because too verbose (meaning the file size could be much smaller)
 
 ### MVStore
@@ -41,6 +43,7 @@ Chosen option: "MVStore", because it is simple and memory-efficient.
 * Good, because automatic loading and saving to disk
 * Good, because memory-efficient
 * Bad, because the order of messages need to be "hand-crafted" (e.g., by mapping from an Integer to the concrete message)
+* Bad, because it stores data as key-values, but not as a custom data type (like tables in RDBMS)
 
 ### Custom format
 

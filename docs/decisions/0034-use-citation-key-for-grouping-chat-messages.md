@@ -2,7 +2,7 @@
 nav_order: 0034
 parent: Decision Records
 ---
-<!-- markdownlint-disable-next-line MD025 -->
+
 # Use citation key for grouping chat messages
 
 ## Context and Problem Statement
@@ -19,9 +19,9 @@ BIB entry and a list of messages. We need to specify the key of this map. Turns 
 ## Considered Options
 
 * `BibEntry` Java object
-* `BibEntry` ID
+* `BibEntry` `id`
 * Citation key
-* Use `ShareId`
+* `ShareId`
 
 ## Decision Outcome
 
@@ -43,9 +43,9 @@ Chosen option: "Citation key", because this is the only choice that complains to
 
 Very bad, because it works only at run-time and is not stable.
 
-### `BibEntry` ID
+### `BibEntry` `id`
 
-JabRef stores a unique identifier for each BibEntry.
+JabRef stores a unique identifier for each `BibEntry`.
 This identifier is created on each load of a library (and not stored permanently).
 
 Very bad, for the same reasons as `BibEntry` Java object.
@@ -53,8 +53,8 @@ Very bad, for the same reasons as `BibEntry` Java object.
 ### Citation key
 
 * Good, because it is cross-platform, stable (meaning stays the same across launches of JabRef)
-* Bad, because it is not guaranteed that citation key exists on BIB entry, and that it is unique across other
-BIB entries in the library
+* Bad, because it is not guaranteed that citation key exists on `BibEntry`, and that it is unique across other
+`BibEntriy`'s' in the library
 
 ### Use `ShareId`
 

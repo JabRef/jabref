@@ -2,7 +2,7 @@
 nav_order: 0036
 parent: Decision Records
 ---
-<!-- markdownlint-disable-next-line MD025 -->
+
 # Use TextArea for chat message content
 
 ## Context and Problem Statement
@@ -17,7 +17,7 @@ This decision record concerns the UI component that is used for rendering the co
 
 ## Considered Options
 
-* Use TextArea
+* Use `TextArea`
 * Use a [third-party package](https://github.com/JPro-one/jpro-platform)
 * Use a Markdown parser and convert AST nodes to JavaFX TextFlow elements
 * Use a Markdown parser to convert content into HTML and use a WebView for one message
@@ -36,7 +36,7 @@ which for now we value better than Markdown rendering.
 
 * Good, because it is easy to implement
 * Good, because it supports text selection and copying
-* Bad, because it cannot render Markdown
+* Bad, because it does not offer rich text. Thus, Markdown can only be displayed in a plain text form.
 * Bad, because default JavaFX's `TextArea` shrinks
 
 ### Use a third-party package

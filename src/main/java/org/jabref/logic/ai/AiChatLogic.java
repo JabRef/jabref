@@ -25,8 +25,8 @@ import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AiChat {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiChat.class);
+public class AiChatLogic {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiChatLogic.class);
 
     private final AiService aiService;
     private final AiChatHistory aiChatHistory;
@@ -35,7 +35,7 @@ public class AiChat {
     private ChatMemory chatMemory;
     private Chain<String, String> chain;
 
-    public AiChat(AiService aiService, AiChatHistory aiChatHistory, Filter embeddingsFilter) {
+    public AiChatLogic(AiService aiService, AiChatHistory aiChatHistory, Filter embeddingsFilter) {
         this.aiService = aiService;
         this.aiChatHistory = aiChatHistory;
         this.embeddingsFilter = embeddingsFilter;
@@ -44,7 +44,7 @@ public class AiChat {
         rebuildFull(aiChatHistory.getMessages());
     }
 
-    public static AiChat forBibEntry(AiService aiService, AiChatHistory aiChatHistory, BibEntry entry) {
+    public static AiChatLogic forBibEntry(AiService aiService, AiChatHistory aiChatHistory, BibEntry entry) {
         Filter filter = MetadataFilterBuilder
                 .metadataKey(AiEmbeddingsManager.LINK_METADATA_KEY)
                 .isIn(entry
@@ -54,7 +54,7 @@ public class AiChat {
                         .toList()
                 );
 
-        return new AiChat(aiService, aiChatHistory, filter);
+        return new AiChatLogic(aiService, aiChatHistory, filter);
     }
 
     private void setupListeningToPreferencesChanges() {

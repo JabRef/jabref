@@ -3,12 +3,15 @@ package org.jabref.gui.entryeditor.aichattab;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
+import org.jabref.gui.ai.components.aichat.AiChatComponent;
 import org.jabref.gui.ai.components.apikeymissing.ApiKeyMissingComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
@@ -16,8 +19,12 @@ import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiChatLogic;
 import org.jabref.logic.ai.AiGenerateEmbeddingsTask;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.chathistory.AiChatHistory;
+import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
+import org.jabref.logic.ai.chathistory.InMemoryAiChatHistory;
 import org.jabref.logic.ai.events.DocumentIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
@@ -29,8 +36,12 @@ import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AiChatTab extends EntryEditorTab {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiChatTab.class);
+
     private final LibraryTabContainer libraryTabContainer;
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
@@ -94,11 +105,6 @@ public class AiChatTab extends EntryEditorTab {
         }
     }
 
-    private void bindToCorrectEntry(BibEntry entry) {
-        AiChatTabWorking aiChatTabWorking = new AiChatTabWorking(aiService, entry, bibDatabaseContext, taskExecutor, dialogService);
-        setContent(aiChatTabWorking.getNode());
-    }
-
     private void showPrivacyNotice(BibEntry entry) {
         setContent(new PrivacyNoticeComponent(dialogService, aiService.getPreferences(), filePreferences, () -> {
             bindToEntry(entry);
@@ -157,6 +163,30 @@ public class AiChatTab extends EntryEditorTab {
         setContent(ErrorStateComponent.withTextArea(Localization.lang("Unable to chat"), Localization.lang("Got error while processing the file:"), e.getMessage()));
         entriesUnderIngestion.remove(currentEntry);
         currentEntry.getFiles().stream().map(LinkedFile::getLink).forEach(link -> aiService.getEmbeddingsManager().removeDocument(link));
+    }
+
+    private void bindToCorrectEntry(BibEntry entry) {
+        AiChatHistory aiChatHistory = getAiChatHistory(aiService, entry, bibDatabaseContext);
+        AiChatLogic aiChatLogic = AiChatLogic.forBibEntry(aiService, aiChatHistory, entry);
+
+        Node content = new AiChatComponent(aiChatLogic, dialogService, taskExecutor);
+
+        setContent(content);
+    }
+
+    private static AiChatHistory getAiChatHistory(AiService aiService, BibEntry entry, BibDatabaseContext bibDatabaseContext) {
+        Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
+
+        if (databasePath.isEmpty() || entry.getCitationKey().isEmpty()) {
+            LOGGER.warn("AI chat is constructed, but the database path is empty. Cannot store chat history");
+            return new InMemoryAiChatHistory();
+        } else if (entry.getCitationKey().isEmpty()) {
+            LOGGER.warn("AI chat is constructed, but the entry citation key is empty. Cannot store chat history");
+            return new InMemoryAiChatHistory();
+        } else {
+            BibDatabaseChatHistory bibDatabaseChatHistory = aiService.getChatHistoryManager().getChatHistoryForBibDatabase(databasePath.get());
+            return bibDatabaseChatHistory.getChatHistoryForEntry(entry.getCitationKey().get());
+        }
     }
 
     private class FileIngestedListener {

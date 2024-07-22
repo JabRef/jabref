@@ -149,14 +149,8 @@ open module org.jabref {
     requires transitive org.jspecify;
 
     // other libraries
-    requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
-    requires de.saxsys.mvvmfx.validation;
-    requires dd.plist;
     requires mslinks;
-    requires org.apache.httpcomponents.core5.httpcore5;
+    // Provides number input fields for parameters in AI expert settings
     requires com.dlsc.unitfx;
-    requires org.checkerframework.checker.qual;
-    requires jakarta.validation;
-    requires scala.library;
 }

@@ -74,8 +74,6 @@ class CommentsTabTest {
     @Mock
     private IndexingTaskManager indexingTaskManager;
     @Mock
-    private AiEmbeddingsTaskManager aiEmbeddingsTaskManager;
-    @Mock
     private OwnerPreferences ownerPreferences;
 
     @Mock
@@ -104,7 +102,6 @@ class CommentsTabTest {
                 stateManager,
                 themeManager,
                 indexingTaskManager,
-                aiEmbeddingsTaskManager,
                 taskExecutor,
                 journalAbbreviationRepository
         );
