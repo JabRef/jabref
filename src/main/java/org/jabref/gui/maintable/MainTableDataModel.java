@@ -15,6 +15,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.MappedBackedList;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -23,8 +24,6 @@ import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.PreferencesService;
-
-import com.tobiasdiez.easybind.EasyBind;
 
 public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
@@ -45,8 +44,8 @@ public class MainTableDataModel {
         resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
-                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
+        ObservableList<BibEntryTableViewModel> entriesViewModel = new MappedBackedList<>(allEntries, entry ->
+                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
