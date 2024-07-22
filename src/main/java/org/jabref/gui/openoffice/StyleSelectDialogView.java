@@ -1,9 +1,11 @@
 package org.jabref.gui.openoffice;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.DialogEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
@@ -22,6 +24,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
@@ -96,6 +99,9 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         new ViewModelListCellFactory<CitationStylePreviewLayout>()
                 .withText(CitationStylePreviewLayout::getDisplayName)
                 .install(availableListView);
+
+        this.setOnShown(this::onDialogShown);
+
         availableListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.selectedLayoutProperty().set(newValue));
 
@@ -195,5 +201,44 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     private void updateCurrentStyleLabel() {
         currentStyleNameLabel.setText(viewModel.getSetStyle().getName());
+    }
+
+    private void onDialogShown(DialogEvent event) {
+        Platform.runLater(this::scrollToCurrentStyle);
+    }
+
+    private void scrollToCurrentStyle() {
+        OOStyle currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
+        if (currentStyle instanceof CitationStyle citationStyle) {
+            int index = findIndexOfCurrentStyle(citationStyle);
+            if (index != -1) {
+                int itemsPerPage = calculateItemsPerPage();
+                int totalItems = availableListView.getItems().size();
+                int scrollToIndex = Math.max(0, Math.min(index, totalItems - itemsPerPage));
+
+                availableListView.scrollTo(scrollToIndex);
+                availableListView.getSelectionModel().select(index);
+
+                Platform.runLater(() -> {
+                    availableListView.scrollTo(Math.max(0, index - 1));
+                    availableListView.scrollTo(index);
+                });
+            }
+        }
+    }
+
+    private int calculateItemsPerPage() {
+        double cellHeight = 24.0; // Approximate height of a list cell
+        return (int) (availableListView.getHeight() / cellHeight);
+    }
+
+    private int findIndexOfCurrentStyle(CitationStyle currentStyle) {
+        for (int i = 0; i < availableListView.getItems().size(); i++) {
+            CitationStylePreviewLayout layout = availableListView.getItems().get(i);
+            if (layout.getFilePath().equals(currentStyle.getFilePath())) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
