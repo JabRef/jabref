@@ -55,7 +55,7 @@ public class MainTableDataModel {
                         (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))
         );
 
-        libraryTab.resultSizeProperty().bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRankProperty().isEqualTo(1).get())));
+        libraryTab.resultSizeProperty().bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRankProperty().isEqualTo(BibEntryTableViewModel.FIRST_RANK).get())));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }

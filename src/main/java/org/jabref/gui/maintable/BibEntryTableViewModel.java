@@ -40,6 +40,10 @@ import com.tobiasdiez.easybind.optional.OptionalBinding;
 
 public class BibEntryTableViewModel {
 
+    public static final int FIRST_RANK = 1;
+    public static final int SECOND_RANK = 2;
+    public static final int THIRD_RANK = 3;
+    public static final int FOURTH_RANK = 4;
     private final BibEntry entry;
     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
@@ -61,17 +65,19 @@ public class BibEntryTableViewModel {
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
 
-        searchRankProperty.bind(Bindings.createIntegerBinding(() -> {
-            if (matchedBySearchProperty.get() && matchedByGroupProperty.get()) {
-                return 1;
-            } else if (matchedBySearchProperty.get() && !matchedByGroupProperty.get()) {
-                return 2;
-            } else if (!matchedBySearchProperty.get() && matchedByGroupProperty.get()) {
-                return 3;
-            } else {
-                return 4;
-            }
-        }, matchedBySearchProperty, matchedByGroupProperty));
+        searchRankProperty.bind(
+                EasyBind.combine(matchedBySearchProperty, matchedByGroupProperty, (matchedBySearch, matchedByGroup) -> {
+                    if (matchedBySearch && matchedByGroup) {
+                        return FIRST_RANK;
+                    } else if (matchedBySearch) {
+                        return SECOND_RANK;
+                    } else if (matchedByGroup) {
+                        return THIRD_RANK;
+                    } else {
+                        return FOURTH_RANK;
+                    }
+                })
+        );
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
