@@ -22,6 +22,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
+
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
@@ -50,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import static java.util.EnumSet.allOf;
 
+@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class IconTheme {
 
     public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");

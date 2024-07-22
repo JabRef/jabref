@@ -27,6 +27,7 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
@@ -68,6 +69,7 @@ import static org.jabref.gui.maintable.BibEntryTableViewModel.FOURTH_RANK;
 import static org.jabref.gui.maintable.BibEntryTableViewModel.SECOND_RANK;
 import static org.jabref.gui.maintable.BibEntryTableViewModel.THIRD_RANK;
 
+@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
