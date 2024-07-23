@@ -12,6 +12,7 @@ import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
@@ -172,5 +173,17 @@ class LayoutTest {
         String layoutText = layout("\\begin{author}\\format[DCA]{\\author}\\end{author}", entry);
 
         assertEquals("JoeDoe and MaryJ", layoutText);
+    }
+
+    @Test
+    void annotatedField() throws IOException {
+        UnknownField annotatedField = new UnknownField("author+an");
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+            .withField(annotatedField, "1:corresponding,2:highlight")
+            .withField(StandardField.AUTHOR, "Joe Doe and Mary Jane");
+
+        String layoutText = layout("\\author: \\author \\author+an", entry);
+
+        assertEquals("Joe Doe and Mary Jane: Joe Doe and Mary Jane 1:corresponding,2:highlight", layoutText);
     }
 }

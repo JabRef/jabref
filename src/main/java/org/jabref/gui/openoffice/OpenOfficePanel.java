@@ -42,12 +42,14 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
+import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
 import org.jabref.logic.openoffice.style.OOBibStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.model.database.BibDatabase;
@@ -98,7 +100,8 @@ public class OpenOfficePanel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
-    private OOBibStyle style;
+    private OOBibStyle jStyle;
+    private StyleSelectDialogViewModel.StyleType currentStyleType;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            PreferencesService preferencesService,
@@ -165,15 +168,15 @@ public class OpenOfficePanel {
         final boolean FAIL = true;
         final boolean PASS = false;
 
-        if (style == null) {
-            style = loader.getUsedStyle();
+        if (jStyle == null) {
+            jStyle = loader.getUsedStyle();
         } else {
             try {
-                style.ensureUpToDate();
+                jStyle.ensureUpToDate();
             } catch (IOException ex) {
-                LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", ex);
+                LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
                 String msg = Localization.lang("Unable to reload style file")
-                        + "'" + style.getPath() + "'"
+                        + "'" + jStyle.getPath() + "'"
                         + "\n" + ex.getMessage();
                 new OOError(title, msg, ex).showErrorDialog(dialogService);
                 return FAIL;
@@ -190,17 +193,25 @@ public class OpenOfficePanel {
         selectDocument.setOnAction(e -> ooBase.guiActionSelectDocument(false));
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
-        setStyleFile.setOnAction(event ->
-                dialogService.showCustomDialogAndWait(new StyleSelectDialogView(loader))
-                             .ifPresent(selectedStyle -> {
-                                 style = selectedStyle;
-                                 try {
-                                     style.ensureUpToDate();
-                                 } catch (IOException e) {
-                                     LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
-                                 }
-                                 dialogService.notify(Localization.lang("Current style is '%0'", style.getName()));
-                             }));
+        setStyleFile.setOnAction(event -> {
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(loader);
+            dialogService.showCustomDialogAndWait(styleDialog)
+                         .ifPresent(selectedStyle -> {
+                             jStyle = selectedStyle;
+                             currentStyleType = styleDialog.getSelectedStyleType();
+                             try {
+                                 jStyle.ensureUpToDate();
+                             } catch (IOException e) {
+                                 LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), e);
+                             }
+                             if (currentStyleType == StyleSelectDialogViewModel.StyleType.JSTYLE) {
+                                 dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
+                             } else {
+                                 CitationStyle cslStyle = CSLCitationOOAdapter.getSelectedStyle();
+                                 dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getTitle()));
+                             }
+                         });
+        });
 
         pushEntries.setTooltip(new Tooltip(Localization.lang("Cite selected entries between parenthesis")));
         pushEntries.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_PAR, false));
@@ -223,16 +234,16 @@ public class OpenOfficePanel {
                 return;
             }
             List<BibDatabase> databases = getBaseList();
-            ooBase.guiActionUpdateDocument(databases, style);
+            ooBase.guiActionUpdateDocument(databases, jStyle);
         });
 
         merge.setMaxWidth(Double.MAX_VALUE);
         merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
-        merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), style));
+        merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), jStyle));
 
         unmerge.setMaxWidth(Double.MAX_VALUE);
         unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
-        unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), style));
+        unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), jStyle));
 
         ContextMenu settingsMenu = createSettingsPopup();
         settingsB.setMaxWidth(Double.MAX_VALUE);
@@ -318,12 +329,12 @@ public class OpenOfficePanel {
             };
 
             taskConnectIfInstalled.setOnSucceeded(evt -> {
-                var installations = new ArrayList<>(taskConnectIfInstalled.getValue());
+                List<Path> installations = new ArrayList<>(taskConnectIfInstalled.getValue());
                 if (installations.isEmpty()) {
                     officeInstallation.selectInstallationPath().ifPresent(installations::add);
                 }
-                Optional<Path> actualFile = officeInstallation.chooseAmongInstallations(installations);
-                if (actualFile.isPresent() && officeInstallation.setOpenOfficePreferences(actualFile.get())) {
+                Optional<Path> chosenInstallationDirectory = officeInstallation.chooseAmongInstallations(installations);
+                if (chosenInstallationDirectory.isPresent() && officeInstallation.setOpenOfficePreferences(chosenInstallationDirectory.get())) {
                     connect();
                 }
             });
@@ -389,7 +400,7 @@ public class OpenOfficePanel {
             protected OOBibBase call() throws Exception {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
-                var path = Path.of(preferencesService.getOpenOfficePreferences().getExecutablePath());
+                Path path = Path.of(preferencesService.getOpenOfficePreferences().getExecutablePath());
                 return createBibBase(path);
             }
         };
@@ -399,7 +410,7 @@ public class OpenOfficePanel {
 
             ooBase.guiActionSelectDocument(true);
 
-            // Enable actions that depend on Connect:
+            // Enable actions that depend on a connection
             updateButtonAvailability();
         });
 
@@ -462,8 +473,8 @@ public class OpenOfficePanel {
             return;
         }
 
-        final BibDatabase database = stateManager.getActiveDatabase().get().getDatabase();
-        if (database == null) {
+        final BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().get();
+        if (bibDatabaseContext == null) {
             OOError.noDataBaseIsOpenForCiting()
                    .setTitle(errorDialogTitle)
                    .showErrorDialog(dialogService);
@@ -510,11 +521,12 @@ public class OpenOfficePanel {
                         : Optional.empty();
 
         ooBase.guiActionInsertEntry(entries,
-                database,
-                style,
+                bibDatabaseContext,
+                jStyle,
                 citationType,
                 pageInfo,
-                syncOptions);
+                syncOptions,
+                currentStyleType);
     }
 
     /**

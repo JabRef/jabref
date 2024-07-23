@@ -11,6 +11,8 @@ import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -27,14 +29,16 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
                         final FieldCheckers fieldCheckers,
                         final PreferencesService preferences,
                         final boolean isMultiLine,
-                        final UndoManager undoManager) {
+                        final UndoManager undoManager,
+                        UndoAction undoAction,
+                        RedoAction redoAction) {
         this.viewModel = new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager);
         this.isMultiLine = isMultiLine;
 
         textInput = createTextInputControl();
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
-        establishBinding(textInput, viewModel.textProperty());
+        establishBinding(textInput, viewModel.textProperty(), preferences.getKeyBindingRepository(), undoAction, redoAction);
 
         ((ContextMenuAddable) textInput).initContextMenu(new DefaultMenu(textInput), preferences.getKeyBindingRepository());
         this.getChildren().add(textInput);

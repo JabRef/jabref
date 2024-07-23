@@ -378,6 +378,8 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public void notify(String message) {
+        // TODO: Change to a notification overview instead of event log when that is available.
+        //       The event log is not that user friendly (different purpose).
         LOGGER.info(message);
 
         UiTaskExecutor.runInJavaFXThread(() -> {
@@ -389,7 +391,6 @@ public class JabRefDialogService implements DialogService {
                          .threshold(5,
                                  Notifications.create()
                                               .title(Localization.lang("Last notification"))
-                                              // TODO: Change to a notification overview instead of event log when that is available. The event log is not that user friendly (different purpose).
                                               .text(
                                                     "(" + Localization.lang("Check the event log to see all notifications") + ")"
                                                      + "\n\n" + message)

@@ -40,9 +40,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.InternalPreferences;
 import org.jabref.preferences.LibraryPreferences;
-import org.jabref.preferences.MergeDialogPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.WorkspacePreferences;
 
@@ -93,7 +91,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
     private final RemotePreferences remotePreferences;
-    private final MergeDialogPreferences mergeDialogPreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -102,8 +99,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final Validator remotePortValidator;
-    private final InternalPreferences internalPreferences;
-    private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final TrustStoreManager trustStoreManager;
@@ -115,8 +110,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.libraryPreferences = preferences.getLibraryPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.remotePreferences = preferences.getRemotePreferences();
-        this.internalPreferences = preferences.getInternalPreferences();
-        this.mergeDialogPreferences = preferences.getMergeDialogPreferences();
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
 
@@ -245,8 +238,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 remotePreferences.setPort(newPort);
             }
         });
-
-        internalPreferences.setVersionCheckEnabled(versionCheckProperty.getValue());
 
         getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
             if (remotePreferences.isDifferentPort(newPort)) {
