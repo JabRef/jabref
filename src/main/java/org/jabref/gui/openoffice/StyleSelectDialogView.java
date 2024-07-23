@@ -1,6 +1,9 @@
 package org.jabref.gui.openoffice;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -58,6 +61,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private VBox jstylePreviewBox;
     @FXML private VBox cslPreviewBox;
     @FXML private ListView<CitationStylePreviewLayout> availableListView;
+    private final AtomicBoolean initialScrollPerformed = new AtomicBoolean(false);
     @FXML private CustomTextField searchBox;
     @FXML private TabPane tabPane;
     @FXML private Label currentStyleNameLabel;
@@ -101,6 +105,12 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 .install(availableListView);
 
         this.setOnShown(this::onDialogShown);
+
+        availableListView.getItems().addListener((ListChangeListener<CitationStylePreviewLayout>) c -> {
+            if (c.next() && c.wasAdded() && !initialScrollPerformed.get()) {
+                Platform.runLater(this::scrollToCurrentStyle);
+            }
+        });
 
         availableListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.selectedLayoutProperty().set(newValue));
@@ -204,13 +214,20 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     }
 
     private void onDialogShown(DialogEvent event) {
-        Platform.runLater(this::scrollToCurrentStyle);
+        if (!availableListView.getItems().isEmpty()) {
+            Platform.runLater(this::scrollToCurrentStyle);
+        }
+        // If the list is empty, the ListChangeListener will handle scrolling when items are added
     }
 
     private void scrollToCurrentStyle() {
+        if (initialScrollPerformed.getAndSet(true)) {
+            return; // Scroll has already been performed, exit early
+        }
+
         OOStyle currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
-        if (currentStyle instanceof CitationStyle citationStyle) {
-            int index = findIndexOfCurrentStyle(citationStyle);
+        if (currentStyle instanceof CitationStyle currentCitationStyle) {
+            int index = findIndexOfCurrentStyle(currentCitationStyle);
             if (index != -1) {
                 int itemsPerPage = calculateItemsPerPage();
                 int totalItems = availableListView.getItems().size();

@@ -183,7 +183,7 @@ public class StyleSelectDialogViewModel {
                 searchTerm.isEmpty() || layout.getDisplayName().toLowerCase().contains(searchTerm.toLowerCase()));
     }
 
-    private Tab getSelectedTab() {
+    public Tab getSelectedTab() {
         return selectedTab.get();
     }
 
