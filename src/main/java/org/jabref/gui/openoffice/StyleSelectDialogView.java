@@ -213,11 +213,15 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         currentStyleNameLabel.setText(viewModel.getSetStyle().getName());
     }
 
+    /**
+     * On a new run of JabRef, when Select Style dialog is opened for the first time, the CSL styles list takes a while to load.
+     * This function takes care of the case when the list is empty due to the initial loading time.
+     * If the list is empty, the ListChangeListener will handle scrolling when items are added.
+     */
     private void onDialogShown(DialogEvent event) {
         if (!availableListView.getItems().isEmpty()) {
             Platform.runLater(this::scrollToCurrentStyle);
         }
-        // If the list is empty, the ListChangeListener will handle scrolling when items are added
     }
 
     private void scrollToCurrentStyle() {
