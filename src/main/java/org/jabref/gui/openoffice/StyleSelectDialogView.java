@@ -1,6 +1,8 @@
 package org.jabref.gui.openoffice;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.IntStream;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -231,15 +233,31 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         OOStyle currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
         if (currentStyle instanceof CitationStyle currentCitationStyle) {
-            Platform.runLater(() -> {
-                availableListView.getItems().stream()
-                                 .filter(layout -> layout.getFilePath().equals(currentCitationStyle.getFilePath()))
-                                 .findFirst()
-                                 .ifPresent(layout -> {
-                                     availableListView.scrollTo(layout);
-                                     availableListView.getSelectionModel().select(layout);
-                                 });
+            findIndexOfCurrentStyle(currentCitationStyle).ifPresent(index -> {
+                int itemsPerPage = calculateItemsPerPage();
+                int totalItems = availableListView.getItems().size();
+                int scrollToIndex = Math.max(0, Math.min(index, totalItems - itemsPerPage));
+
+                availableListView.scrollTo(scrollToIndex);
+                availableListView.getSelectionModel().select(index);
+
+                Platform.runLater(() -> {
+                    availableListView.scrollTo(Math.max(0, index - 1));
+                    availableListView.scrollTo(index);
+                });
             });
         }
+    }
+
+    private int calculateItemsPerPage() {
+        double cellHeight = 24.0; // Approximate height of a list cell
+        return (int) (availableListView.getHeight() / cellHeight);
+    }
+
+    private Optional<Integer> findIndexOfCurrentStyle(CitationStyle currentStyle) {
+        return IntStream.range(0, availableListView.getItems().size())
+                        .boxed()
+                        .filter(i -> availableListView.getItems().get(i).getFilePath().equals(currentStyle.getFilePath()))
+                        .findFirst();
     }
 }
