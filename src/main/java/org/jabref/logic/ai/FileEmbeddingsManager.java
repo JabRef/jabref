@@ -12,10 +12,10 @@ import javafx.beans.property.BooleanProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.logic.ai.impl.embeddings.FullyIngestedDocumentsTracker;
-import org.jabref.logic.ai.impl.embeddings.LowLevelIngestor;
-import org.jabref.logic.ai.impl.embeddings.MVStoreEmbeddingStore;
-import org.jabref.logic.ai.impl.models.EmbeddingModel;
+import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
+import org.jabref.logic.ai.embeddings.LowLevelIngestor;
+import org.jabref.logic.ai.embeddings.MVStoreEmbeddingStore;
+import org.jabref.logic.ai.models.EmbeddingModel;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.AiPreferences;
 
@@ -37,7 +37,7 @@ import jakarta.annotation.Nullable;
  * This class also listens for changes of embeddings parameters (in AI "Expert settings" section). In case any of them
  * changes, the embeddings should be invalidated (cleared).
  */
-public class AiEmbeddingsManager implements AutoCloseable {
+public class FileEmbeddingsManager implements AutoCloseable {
     public static final String LINK_METADATA_KEY = "link";
 
     private static final String EMBEDDING_STORE_FILE_NAME = "embeddings.mv";
@@ -49,7 +49,7 @@ public class AiEmbeddingsManager implements AutoCloseable {
     private final FullyIngestedDocumentsTracker fullyIngestedDocumentsTracker;
     private final LowLevelIngestor lowLevelIngestor;
 
-    public AiEmbeddingsManager(AiPreferences aiPreferences, EmbeddingModel embeddingModel, DialogService dialogService) {
+    public FileEmbeddingsManager(AiPreferences aiPreferences, EmbeddingModel embeddingModel, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
 
         @Nullable Path embeddingStorePath = JabRefDesktop.getAiFilesDirectory().resolve(EMBEDDING_STORE_FILE_NAME);

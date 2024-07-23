@@ -20,12 +20,12 @@ import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiChatLogic;
-import org.jabref.logic.ai.AiGenerateEmbeddingsTask;
+import org.jabref.logic.ai.GenerateEmbeddingsTask;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chathistory.AiChatHistory;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.logic.ai.chathistory.InMemoryAiChatHistory;
-import org.jabref.logic.ai.events.DocumentIngestedEvent;
+import org.jabref.logic.ai.embeddings.events.DocumentIngestedEvent;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
@@ -152,7 +152,7 @@ public class AiChatTab extends EntryEditorTab {
 
         if (!entriesUnderIngestion.contains(entry)) {
             entriesUnderIngestion.add(entry);
-            new AiGenerateEmbeddingsTask(entry.getFiles(), aiService.getEmbeddingsManager(), bibDatabaseContext, filePreferences, new SimpleBooleanProperty(false))
+            new GenerateEmbeddingsTask(entry.getFiles(), aiService.getEmbeddingsManager(), bibDatabaseContext, filePreferences, new SimpleBooleanProperty(false))
                     .onSuccess(res -> handleFocus())
                     .onFailure(this::showErrorWhileIngesting)
                     .executeWith(taskExecutor);

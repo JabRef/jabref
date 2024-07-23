@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.impl.embeddings;
+package org.jabref.logic.ai.embeddings;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.ai.AiEmbeddingsManager;
+import org.jabref.logic.ai.FileEmbeddingsManager;
 
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.embedding.Embedding;
@@ -97,7 +97,7 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
 
         contentsMap.put(id, textSegment.text());
 
-        String linkedFile = textSegment.metadata().getString(AiEmbeddingsManager.LINK_METADATA_KEY);
+        String linkedFile = textSegment.metadata().getString(FileEmbeddingsManager.LINK_METADATA_KEY);
         if (linkedFile != null) {
             fileMap.put(id, linkedFile);
         } else {
@@ -176,10 +176,10 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
         return switch (filter) {
             case null -> embeddingsMap.keySet().stream();
 
-            case IsIn isInFilter when Objects.equals(isInFilter.key(), AiEmbeddingsManager.LINK_METADATA_KEY) ->
+            case IsIn isInFilter when Objects.equals(isInFilter.key(), FileEmbeddingsManager.LINK_METADATA_KEY) ->
                     filterEntries(entry -> isInFilter.comparisonValues().contains(entry.getValue()));
 
-            case IsEqualTo isEqualToFilter when Objects.equals(isEqualToFilter.key(), AiEmbeddingsManager.LINK_METADATA_KEY) ->
+            case IsEqualTo isEqualToFilter when Objects.equals(isEqualToFilter.key(), FileEmbeddingsManager.LINK_METADATA_KEY) ->
                     filterEntries(entry -> isEqualToFilter.comparisonValue().equals(entry.getValue()));
 
             default -> throw new IllegalArgumentException("Wrong filter passed to MVStoreEmbeddingStore");

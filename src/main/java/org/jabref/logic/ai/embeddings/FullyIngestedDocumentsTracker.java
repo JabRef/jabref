@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.impl.embeddings;
+package org.jabref.logic.ai.embeddings;
 
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.ai.events.DocumentIngestedEvent;
+import org.jabref.logic.ai.embeddings.events.DocumentIngestedEvent;
 
 import com.google.common.eventbus.EventBus;
 import jakarta.annotation.Nullable;

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import javafx.beans.property.BooleanProperty;
 
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.ai.impl.FileToDocument;
+import org.jabref.logic.ai.embeddings.FileToDocument;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
@@ -19,22 +19,22 @@ import org.jabref.preferences.FilePreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AiGenerateEmbeddingsTask extends BackgroundTask<Void> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiGenerateEmbeddingsTask.class);
+public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsTask.class);
 
     private final List<LinkedFile> linkedFiles;
-    private final AiEmbeddingsManager aiEmbeddingsManager;
+    private final FileEmbeddingsManager fileEmbeddingsManager;
     private final BibDatabaseContext bibDatabaseContext;
     private final FilePreferences filePreferences;
     private final BooleanProperty shutdownProperty;
 
-    public AiGenerateEmbeddingsTask(List<LinkedFile> linkedFiles,
-                                    AiEmbeddingsManager aiEmbeddingsManager,
-                                    BibDatabaseContext bibDatabaseContext,
-                                    FilePreferences filePreferences,
-                                    BooleanProperty shutdownProperty) {
+    public GenerateEmbeddingsTask(List<LinkedFile> linkedFiles,
+                                  FileEmbeddingsManager fileEmbeddingsManager,
+                                  BibDatabaseContext bibDatabaseContext,
+                                  FilePreferences filePreferences,
+                                  BooleanProperty shutdownProperty) {
         this.linkedFiles = linkedFiles;
-        this.aiEmbeddingsManager = aiEmbeddingsManager;
+        this.fileEmbeddingsManager = fileEmbeddingsManager;
         this.bibDatabaseContext = bibDatabaseContext;
         this.filePreferences = filePreferences;
         this.shutdownProperty = shutdownProperty;
@@ -59,20 +59,20 @@ public class AiGenerateEmbeddingsTask extends BackgroundTask<Void> {
 
             long currentModificationTimeInSeconds = attributes.lastModifiedTime().to(TimeUnit.SECONDS);
 
-            Optional<Long> ingestedModificationTimeInSeconds = aiEmbeddingsManager.getIngestedDocumentModificationTimeInSeconds(linkedFile.getLink());
+            Optional<Long> ingestedModificationTimeInSeconds = fileEmbeddingsManager.getIngestedDocumentModificationTimeInSeconds(linkedFile.getLink());
 
             if (ingestedModificationTimeInSeconds.isPresent() && currentModificationTimeInSeconds <= ingestedModificationTimeInSeconds.get()) {
                 return;
             }
 
             FileToDocument.fromFile(path.get()).ifPresent(document ->
-                    aiEmbeddingsManager.addDocument(linkedFile.getLink(), document, currentModificationTimeInSeconds, shutdownProperty));
+                    fileEmbeddingsManager.addDocument(linkedFile.getLink(), document, currentModificationTimeInSeconds, shutdownProperty));
         } catch (IOException e) {
             LOGGER.error("Couldn't retrieve attributes of a linked file: {}", linkedFile.getLink(), e);
             LOGGER.warn("Regenerating embeddings for linked file: {}", linkedFile.getLink());
 
             FileToDocument.fromFile(path.get()).ifPresent(document ->
-                    aiEmbeddingsManager.addDocument(linkedFile.getLink(), document, 0, shutdownProperty));
+                    fileEmbeddingsManager.addDocument(linkedFile.getLink(), document, 0, shutdownProperty));
         }
     }
 }

@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.impl.embeddings;
+package org.jabref.logic.ai.embeddings;
 
 import javafx.beans.property.BooleanProperty;
 

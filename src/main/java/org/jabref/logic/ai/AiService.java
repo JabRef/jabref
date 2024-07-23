@@ -5,8 +5,8 @@ import java.util.concurrent.Executors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager;
-import org.jabref.logic.ai.impl.models.ChatLanguageModel;
-import org.jabref.logic.ai.impl.models.EmbeddingModel;
+import org.jabref.logic.ai.models.ChatLanguageModel;
+import org.jabref.logic.ai.models.EmbeddingModel;
 import org.jabref.preferences.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -28,14 +28,14 @@ public class AiService implements AutoCloseable {
     private final BibDatabaseChatHistoryManager bibDatabaseChatHistoryManager;
 
     private final EmbeddingModel embeddingModel;
-    private final AiEmbeddingsManager aiEmbeddingsManager;
+    private final FileEmbeddingsManager fileEmbeddingsManager;
 
     public AiService(AiPreferences aiPreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
         this.chatLanguageModel = new ChatLanguageModel(aiPreferences);
         this.bibDatabaseChatHistoryManager = new BibDatabaseChatHistoryManager(dialogService);
         this.embeddingModel = new EmbeddingModel(aiPreferences);
-        this.aiEmbeddingsManager = new AiEmbeddingsManager(aiPreferences, embeddingModel, dialogService);
+        this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, embeddingModel, dialogService);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class AiService implements AutoCloseable {
         this.chatLanguageModel.close();
         this.embeddingModel.close();
         this.bibDatabaseChatHistoryManager.close();
-        this.aiEmbeddingsManager.close();
+        this.fileEmbeddingsManager.close();
     }
 
     public AiPreferences getPreferences() {
@@ -67,7 +67,7 @@ public class AiService implements AutoCloseable {
         return bibDatabaseChatHistoryManager;
     }
 
-    public AiEmbeddingsManager getEmbeddingsManager() {
-        return aiEmbeddingsManager;
+    public FileEmbeddingsManager getEmbeddingsManager() {
+        return fileEmbeddingsManager;
     }
 }

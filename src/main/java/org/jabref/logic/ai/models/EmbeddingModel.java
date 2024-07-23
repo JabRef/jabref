@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.impl.models;
+package org.jabref.logic.ai.models;
 
 import java.io.IOException;
 import java.util.List;

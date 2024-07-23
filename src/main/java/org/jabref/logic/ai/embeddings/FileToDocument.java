@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.impl;
+package org.jabref.logic.ai.embeddings;
 
 import java.io.StringWriter;
 import java.nio.file.Path;

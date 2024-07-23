@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.impl.models;
+package org.jabref.logic.ai.models;
 
 import java.net.http.HttpClient;
 import java.util.List;
