@@ -231,35 +231,15 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         OOStyle currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
         if (currentStyle instanceof CitationStyle currentCitationStyle) {
-            int index = findIndexOfCurrentStyle(currentCitationStyle);
-            if (index != -1) {
-                int itemsPerPage = calculateItemsPerPage();
-                int totalItems = availableListView.getItems().size();
-                int scrollToIndex = Math.max(0, Math.min(index, totalItems - itemsPerPage));
-
-                availableListView.scrollTo(scrollToIndex);
-                availableListView.getSelectionModel().select(index);
-
-                Platform.runLater(() -> {
-                    availableListView.scrollTo(Math.max(0, index - 1));
-                    availableListView.scrollTo(index);
-                });
-            }
+            Platform.runLater(() -> {
+                availableListView.getItems().stream()
+                                 .filter(layout -> layout.getFilePath().equals(currentCitationStyle.getFilePath()))
+                                 .findFirst()
+                                 .ifPresent(layout -> {
+                                     availableListView.scrollTo(layout);
+                                     availableListView.getSelectionModel().select(layout);
+                                 });
+            });
         }
-    }
-
-    private int calculateItemsPerPage() {
-        double cellHeight = 24.0; // Approximate height of a list cell
-        return (int) (availableListView.getHeight() / cellHeight);
-    }
-
-    private int findIndexOfCurrentStyle(CitationStyle currentStyle) {
-        for (int i = 0; i < availableListView.getItems().size(); i++) {
-            CitationStylePreviewLayout layout = availableListView.getItems().get(i);
-            if (layout.getFilePath().equals(currentStyle.getFilePath())) {
-                return i;
-            }
-        }
-        return -1;
     }
 }
