@@ -6,12 +6,12 @@ import org.jabref.build.xjc.XjcTask
 plugins {
     id 'application'
 
-    id 'com.github.andygoossens.modernizer' version '1.9.2'
+    id 'com.github.andygoossens.modernizer' version '1.9.3'
 
     id 'me.champeau.jmh' version '0.7.2'
 
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
-    id 'com.github.koppor.gradle-modules-plugin' version 'jitpack-SNAPSHOT'
+    id 'com.github.koppor.gradle-modules-plugin' version 'v1.8.15-cmd-1'
 
     id 'org.openjfx.javafxplugin' version '0.1.0'
 
@@ -29,7 +29,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.16.3'
+    id 'org.openrewrite.rewrite' version '6.16.4'
 }
 
 // Enable following for debugging
@@ -134,7 +134,7 @@ dependencyLocking {
 }
 
 javafx {
-    version = "22.0.1"
+    version = "22.0.2"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -166,9 +166,9 @@ dependencies {
     implementation "org.apache.lucene:lucene-highlighter:$luceneVersion"
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.15.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
-    implementation 'commons-logging:commons-logging:1.3.2'
+    implementation 'commons-logging:commons-logging:1.3.3'
     implementation 'com.h2database:h2-mvstore:2.2.224'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
@@ -198,8 +198,8 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.3'
 
     // Support unix socket connection types
-    implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.9.1'
-    implementation 'com.kohlschutter.junixsocket:junixsocket-mysql:2.9.1'
+    implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.0'
+    implementation 'com.kohlschutter.junixsocket:junixsocket-mysql:2.10.0'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -240,7 +240,7 @@ dependencies {
 
     implementation 'org.controlsfx:controlsfx:11.2.1'
 
-    implementation 'org.jsoup:jsoup:1.17.2'
+    implementation 'org.jsoup:jsoup:1.18.1'
     implementation 'com.konghq:unirest-java-core:4.4.0'
     implementation 'com.konghq:unirest-modules-gson:4.4.0'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
@@ -297,7 +297,7 @@ dependencies {
     // implementation 'org.glassfish.jersey.media:jersey-media-json-gson:3.1.1'
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
-    implementation 'org.jspecify:jspecify:0.3.0'
+    implementation 'org.jspecify:jspecify:1.0.0'
 
     // parse plist files
     implementation 'com.googlecode.plist:dd-plist:1.28'
@@ -328,7 +328,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.14.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.15.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
