@@ -49,6 +49,7 @@ public enum HelpFile {
     PUSH_TO_APPLICATION("cite/pushtoapplications"),
     AI_CHAT_MODEL("ai#chat-model"),
     AI_EMBEDDING_MODEL("ai#embedding-model"),
+    AI_API_BASE_URL("ai#api-base-url"),
     AI_INSTRUCTION("ai#instruction"),
     AI_CONTEXT_WINDOW_SIZE("ai#context-window-size"),
     AI_DOCUMENT_SPLITTER_CHUNK_SIZE("ai#document-splitter-chunk-size"),

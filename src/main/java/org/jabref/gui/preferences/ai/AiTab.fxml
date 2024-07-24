@@ -18,14 +18,13 @@
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
                 <Label alignment="BASELINE_CENTER" text="%OpenAI API token" />
-                <CustomPasswordField fx:id="openAiToken" HBox.hgrow="ALWAYS" />
+                <CustomPasswordField fx:id="openAiTokenTextField" HBox.hgrow="ALWAYS" />
             </children>
         </HBox>
 
         <Label styleClass="sectionHeader" text="%Expert settings" />
         <VBox>
             <children>
-
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%These parameters affect how AI will answer you questions." />
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%Leave these fields as is, if you are not sure of their purpose." />
             </children>
@@ -35,8 +34,8 @@
 
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
-                <Label alignment="BASELINE_CENTER" text="%OpenAI model" />
-                <ComboBox fx:id="aiModelComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                <Label alignment="BASELINE_CENTER" text="%Chat model" />
+                <ComboBox fx:id="chatModelComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" editable="true" />
             <Button fx:id="chatModelHelp" prefWidth="20.0" />
             </children>
         </HBox>
@@ -49,7 +48,15 @@
             </children>
         </HBox>
 
-      <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <children>
+                <Label alignment="BASELINE_CENTER" text="%Embedding model" />
+                <TextField fx:id="apiBaseUrlTextField" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                <Button fx:id="apiBaseUrlHelp" prefWidth="20.0" />
+            </children>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
          <children>
             <Label maxWidth="1.7976931348623157E308" text="%Instruction for AI (also known as prompt or system message)" HBox.hgrow="ALWAYS" />
             <Button fx:id="instructionHelp"

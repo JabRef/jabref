@@ -32,8 +32,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty customizeSettings = new SimpleBooleanProperty();
 
-    private final ObjectProperty<AiPreferences.ChatModel> aiChatModel = new SimpleObjectProperty<>();
+    private final StringProperty chatModel = new SimpleStringProperty();
     private final ObjectProperty<AiPreferences.EmbeddingModel> embeddingModel = new SimpleObjectProperty<>();
+    private final StringProperty apiBaseUrl = new SimpleStringProperty();
 
     private final StringProperty instruction = new SimpleStringProperty();
     private final DoubleProperty temperature = new SimpleDoubleProperty();
@@ -46,6 +47,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final AiPreferences aiPreferences;
 
     private final Validator openAiTokenValidator;
+    private final Validator chatModelValidator;
+    private final Validator apiBaseUrlValidator;
     private final Validator instructionValidator;
     private final Validator temperatureValidator;
     private final Validator contextWindowSizeValidator;
@@ -61,6 +64,16 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 openAiToken,
                 token -> !StringUtil.isBlank(token),
                 ValidationMessage.error(Localization.lang("An OpenAI token has to be provided")));
+
+        this.chatModelValidator = new FunctionBasedValidator<>(
+                openAiToken,
+                token -> !StringUtil.isBlank(token),
+                ValidationMessage.error(Localization.lang("Chat model has to be provided")));
+
+        this.apiBaseUrlValidator = new FunctionBasedValidator<>(
+                apiBaseUrl,
+                token -> !StringUtil.isBlank(token),
+                ValidationMessage.error(Localization.lang("API base URL has to be provided")));
 
         this.instructionValidator = new FunctionBasedValidator<>(
                 instruction,
@@ -106,8 +119,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         customizeSettings.setValue(aiPreferences.getCustomizeSettings());
 
-        aiChatModel.setValue(aiPreferences.getChatModel());
+        chatModel.setValue(aiPreferences.getChatModel());
         embeddingModel.setValue(aiPreferences.getEmbeddingModel());
+        apiBaseUrl.setValue(aiPreferences.getApiBaseUrl());
 
         instruction.setValue(aiPreferences.getInstruction());
         temperature.setValue(aiPreferences.getTemperature());
@@ -126,8 +140,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setCustomizeSettings(customizeSettings.get());
 
         if (customizeSettings.get()) {
-            aiPreferences.setChatModel(aiChatModel.get());
+            aiPreferences.setChatModel(chatModel.get());
             aiPreferences.setEmbeddingModel(embeddingModel.get());
+            aiPreferences.setApiBaseUrl(apiBaseUrl.get());
 
             aiPreferences.setInstruction(instruction.get());
             aiPreferences.setTemperature(temperature.get());
@@ -142,6 +157,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetExpertSettings() {
+        aiPreferences.setChatModel(AiDefaultPreferences.CHAT_MODEL);
+        chatModel.setValue(AiDefaultPreferences.CHAT_MODEL);
+
+        aiPreferences.setApiBaseUrl(AiDefaultPreferences.API_BASE_URL);
+        apiBaseUrl.setValue(AiDefaultPreferences.API_BASE_URL);
+
         aiPreferences.setInstruction(AiDefaultPreferences.SYSTEM_MESSAGE);
         instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
 
@@ -180,6 +201,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public boolean validateExpertSettings() {
         List<Validator> validators = List.of(
+                chatModelValidator,
+                apiBaseUrlValidator,
                 instructionValidator,
                 temperatureValidator,
                 contextWindowSizeValidator,
@@ -212,12 +235,16 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return customizeSettings.get();
     }
 
-    public ObjectProperty<AiPreferences.ChatModel> aiChatModelProperty() {
-        return aiChatModel;
+    public StringProperty chatModelProperty() {
+        return chatModel;
     }
 
     public ObjectProperty<AiPreferences.EmbeddingModel> embeddingModelProperty() {
         return embeddingModel;
+    }
+
+    public StringProperty apiBaseUrlProperty() {
+        return apiBaseUrl;
     }
 
     public StringProperty instructionProperty() {
@@ -248,35 +275,43 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return ragMinScore;
     }
 
-    public ValidationStatus getOpenAiTokenValidatorStatus() {
+    public ValidationStatus getOpenAiTokenValidationStatus() {
         return openAiTokenValidator.getValidationStatus();
     }
 
-    public ValidationStatus getSystemMessageValidatorStatus() {
+    public ValidationStatus getChatModelValidationStatus() {
+        return chatModelValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getApiBaseUrlValidationStatus() {
+        return apiBaseUrlValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getSystemMessageValidationStatus() {
         return instructionValidator.getValidationStatus();
     }
 
-    public ValidationStatus getTemperatureValidatorStatus() {
+    public ValidationStatus getTemperatureValidationStatus() {
         return temperatureValidator.getValidationStatus();
     }
 
-    public ValidationStatus getMessageWindowSizeValidatorStatus() {
+    public ValidationStatus getMessageWindowSizeValidationStatus() {
         return contextWindowSizeValidator.getValidationStatus();
     }
 
-    public ValidationStatus getDocumentSplitterChunkSizeValidatorStatus() {
+    public ValidationStatus getDocumentSplitterChunkSizeValidationStatus() {
         return documentSplitterChunkSizeValidator.getValidationStatus();
     }
 
-    public ValidationStatus getDocumentSplitterOverlapSizeValidatorStatus() {
+    public ValidationStatus getDocumentSplitterOverlapSizeValidationStatus() {
         return documentSplitterOverlapSizeValidator.getValidationStatus();
     }
 
-    public ValidationStatus getRagMaxResultsCountValidatorStatus() {
+    public ValidationStatus getRagMaxResultsCountValidationStatus() {
         return ragMaxResultsCountValidator.getValidationStatus();
     }
 
-    public ValidationStatus getRagMinScoreValidatorStatus() {
+    public ValidationStatus getRagMinScoreValidationStatus() {
         return ragMinScoreValidator.getValidationStatus();
     }
 }

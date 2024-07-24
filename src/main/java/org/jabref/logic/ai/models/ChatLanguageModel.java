@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.models;
 
 import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -34,17 +35,20 @@ import org.h2.mvstore.MVStore;
  * This class listens to preferences changes.
  */
 public class ChatLanguageModel implements dev.langchain4j.model.chat.ChatLanguageModel, AutoCloseable {
+    private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(5);
+
     private final AiPreferences aiPreferences;
 
     private final HttpClient httpClient;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor(
             new ThreadFactoryBuilder().setNameFormat("ai-api-connection-pool-%d").build()
     );
+
     private Optional<ChatClient> chatClient = Optional.empty();
 
     public ChatLanguageModel(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
-        this.httpClient = HttpClient.newBuilder().executor(executorService).build();
+        this.httpClient = HttpClient.newBuilder().connectTimeout(CONNECTION_TIMEOUT).executor(executorService).build();
 
         if (aiPreferences.getEnableChatWithFiles()) {
             rebuild();
@@ -65,7 +69,7 @@ public class ChatLanguageModel implements dev.langchain4j.model.chat.ChatLanguag
             return;
         }
 
-        OpenAI openAI = OpenAI.newBuilder(aiPreferences.getOpenAiToken()).httpClient(httpClient).build();
+        OpenAI openAI = OpenAI.newBuilder(aiPreferences.getOpenAiToken()).httpClient(httpClient).baseUrl(aiPreferences.getApiBaseUrl()).build();
         chatClient = Optional.of(openAI.chatClient());
     }
 
@@ -73,6 +77,7 @@ public class ChatLanguageModel implements dev.langchain4j.model.chat.ChatLanguag
         aiPreferences.enableChatWithFilesProperty().addListener(obs -> rebuild());
         aiPreferences.openAiTokenProperty().addListener(obs -> rebuild());
         aiPreferences.chatModelProperty().addListener(obs -> rebuild());
+        aiPreferences.apiBaseUrlProperty().addListener(obs -> rebuild());
         aiPreferences.temperatureProperty().addListener(obs -> rebuild());
     }
 
@@ -116,7 +121,7 @@ public class ChatLanguageModel implements dev.langchain4j.model.chat.ChatLanguag
 
         CreateChatCompletionRequest request = CreateChatCompletionRequest
                 .newBuilder()
-                .model(aiPreferences.getChatModel().getLabel())
+                .model(aiPreferences.getChatModel())
                 .temperature(aiPreferences.getTemperature())
                 .n(1)
                 .messages(messages)

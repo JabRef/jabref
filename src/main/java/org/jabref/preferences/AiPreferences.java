@@ -1,5 +1,6 @@
 package org.jabref.preferences;
 
+import java.util.List;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -16,26 +17,12 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.entryeditor.aichattab.AiChatTab;
 
 public class AiPreferences {
-    public enum ChatModel {
-        GPT_3_5_TURBO("gpt-3.5-turbo"),
-        GPT_4("gpt-4"),
-        GPT_4_TURBO("gpt-4-turbo"),
-        GPT_4O("gpt-4o");
-
-        private final String label;
-
-        ChatModel(String label) {
-            this.label = label;
-        }
-
-        public String toString() {
-            return label;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-    }
+    public static final List<String> OPENAI_CHAT_MODELS = List.of(
+            "gpt-3.5-turbo",
+            "gpt-4",
+            "gpt-4-turbo",
+            "gpt-4o"
+    );
 
     public enum EmbeddingModel {
         ALL_MINILM_L6_V2("all-MiniLM-L6-v2"),
@@ -61,8 +48,9 @@ public class AiPreferences {
 
     private final BooleanProperty customizeSettings;
 
-    private final ObjectProperty<ChatModel> chatModel;
+    private final StringProperty chatModel;
     private final ObjectProperty<EmbeddingModel> embeddingModel;
+    private final StringProperty apiBaseUrl;
 
     private final StringProperty instruction;
     private final DoubleProperty temperature;
@@ -72,14 +60,15 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles, String openAiToken, ChatModel chatModel, EmbeddingModel embeddingModel, boolean customizeSettings, String instruction, double temperature, int contextWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
+    public AiPreferences(boolean enableChatWithFiles, String openAiToken, String chatModel, EmbeddingModel embeddingModel, String apiBaseUrl, boolean customizeSettings, String instruction, double temperature, int contextWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
         this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
         this.openAiToken = new SimpleStringProperty(openAiToken);
 
         this.customizeSettings = new SimpleBooleanProperty(customizeSettings);
 
-        this.chatModel = new SimpleObjectProperty<>(chatModel);
+        this.chatModel = new SimpleStringProperty(chatModel);
         this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
+        this.apiBaseUrl = new SimpleStringProperty(apiBaseUrl);
 
         this.instruction = new SimpleStringProperty(instruction);
         this.temperature = new SimpleDoubleProperty(temperature);
@@ -126,15 +115,15 @@ public class AiPreferences {
         this.customizeSettings.set(customizeSettings);
     }
 
-    public ObjectProperty<ChatModel> chatModelProperty() {
+    public StringProperty chatModelProperty() {
         return chatModel;
     }
 
-    public ChatModel getChatModel() {
+    public String getChatModel() {
         return chatModel.get();
     }
 
-    public void setChatModel(ChatModel chatModel) {
+    public void setChatModel(String chatModel) {
         this.chatModel.set(chatModel);
     }
 
@@ -144,6 +133,18 @@ public class AiPreferences {
 
     public EmbeddingModel getEmbeddingModel() {
         return embeddingModel.get();
+    }
+
+    public void setApiBaseUrl(String apiBaseUrl) {
+        this.apiBaseUrl.set(apiBaseUrl);
+    }
+
+    public StringProperty apiBaseUrlProperty() {
+        return apiBaseUrl;
+    }
+
+    public String getApiBaseUrl() {
+        return apiBaseUrl.get();
     }
 
     public void setEmbeddingModel(EmbeddingModel embeddingModel) {

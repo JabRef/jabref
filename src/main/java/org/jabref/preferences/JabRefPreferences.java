@@ -463,6 +463,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
     private static final String AI_CHAT_MODEL = "aiChatModel";
     private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
+    private static final String AI_API_BASE_URL = "aiApiBaseUrl";
     private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
     private static final String AI_TEMPERATURE = "aiTemperature";
     private static final String AI_CONTEXT_WINDOW_SIZE = "aiMessageWindowSize";
@@ -867,8 +868,9 @@ public class JabRefPreferences implements PreferencesService {
         // AI
         defaults.put(AI_ENABLE_CHAT, AiDefaultPreferences.ENABLE_CHAT);
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
-        defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL.name());
+        defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL);
         defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());
+        defaults.put(AI_API_BASE_URL, AiDefaultPreferences.API_BASE_URL);
         defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
         defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
         defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
@@ -2726,8 +2728,9 @@ public class JabRefPreferences implements PreferencesService {
         aiPreferences = new AiPreferences(
                 getBoolean(AI_ENABLE_CHAT),
                 getOpenAiTokenFromKeyring().orElse(""),
-                AiPreferences.ChatModel.valueOf(get(AI_CHAT_MODEL)),
+                get(AI_CHAT_MODEL),
                 AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
+                get(AI_API_BASE_URL),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_SYSTEM_MESSAGE),
                 getDouble(AI_TEMPERATURE),
@@ -2742,8 +2745,9 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(aiPreferences.customizeSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
-        EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue.name()));
+        EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
+        EasyBind.listen(aiPreferences.apiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_API_BASE_URL, newValue));
 
         EasyBind.listen(aiPreferences.instructionProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
         EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, (double) newValue));

@@ -24,12 +24,13 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
     @FXML private CheckBox enableChat;
-    @FXML private TextField openAiToken;
+    @FXML private TextField openAiTokenTextField;
 
     @FXML private CheckBox customizeSettingsCheckbox;
 
-    @FXML private ComboBox<AiPreferences.ChatModel> aiModelComboBox;
+    @FXML private ComboBox<String> chatModelComboBox;
     @FXML private ComboBox<AiPreferences.EmbeddingModel> embeddingModelComboBox;
+    @FXML private TextField apiBaseUrlTextField;
 
     @FXML private TextArea instructionTextArea;
     @FXML private DoubleInputField temperatureTextField;
@@ -43,6 +44,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     @FXML private Button chatModelHelp;
     @FXML private Button embeddingModelHelp;
+    @FXML private Button apiBaseUrlHelp;
     @FXML private Button instructionHelp;
     @FXML private Button contextWindowSizeHelp;
     @FXML private Button documentSplitterChunkSizeHelp;
@@ -61,16 +63,17 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     public void initialize() {
         this.viewModel = new AiTabViewModel(preferencesService);
 
-        aiModelComboBox.getItems().addAll(AiPreferences.ChatModel.values());
+        chatModelComboBox.getItems().addAll(AiPreferences.OPENAI_CHAT_MODELS);
         embeddingModelComboBox.getItems().addAll(AiPreferences.EmbeddingModel.values());
 
         enableChat.selectedProperty().bindBidirectional(viewModel.useAiProperty());
-        openAiToken.textProperty().bindBidirectional(viewModel.openAiTokenProperty());
+        openAiTokenTextField.textProperty().bindBidirectional(viewModel.openAiTokenProperty());
 
         customizeSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeSettingsProperty());
 
-        aiModelComboBox.valueProperty().bindBidirectional(viewModel.aiChatModelProperty());
+        chatModelComboBox.valueProperty().bindBidirectional(viewModel.chatModelProperty());
         embeddingModelComboBox.valueProperty().bindBidirectional(viewModel.embeddingModelProperty());
+        apiBaseUrlTextField.textProperty().bindBidirectional(viewModel.apiBaseUrlProperty());
 
         instructionTextArea.textProperty().bindBidirectional(viewModel.instructionProperty());
         temperatureTextField.valueProperty().bindBidirectional(viewModel.temperatureProperty().asObject());
@@ -87,19 +90,22 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         customizeSettingsCheckbox.selectedProperty().addListener(obs -> updateDisabledProperties());
 
         Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.getOpenAiTokenValidatorStatus(), openAiToken);
-            visualizer.initVisualization(viewModel.getSystemMessageValidatorStatus(), instructionTextArea);
-            visualizer.initVisualization(viewModel.getTemperatureValidatorStatus(), temperatureTextField);
-            visualizer.initVisualization(viewModel.getMessageWindowSizeValidatorStatus(), contextWindowSizeTextField);
-            visualizer.initVisualization(viewModel.getDocumentSplitterChunkSizeValidatorStatus(), documentSplitterChunkSizeTextField);
-            visualizer.initVisualization(viewModel.getDocumentSplitterOverlapSizeValidatorStatus(), documentSplitterOverlapSizeTextField);
-            visualizer.initVisualization(viewModel.getRagMaxResultsCountValidatorStatus(), ragMaxResultsCountTextField);
-            visualizer.initVisualization(viewModel.getRagMinScoreValidatorStatus(), ragMinScoreTextField);
+            visualizer.initVisualization(viewModel.getOpenAiTokenValidationStatus(), openAiTokenTextField);
+            visualizer.initVisualization(viewModel.getChatModelValidationStatus(), chatModelComboBox);
+            visualizer.initVisualization(viewModel.getApiBaseUrlValidationStatus(), apiBaseUrlTextField);
+            visualizer.initVisualization(viewModel.getSystemMessageValidationStatus(), instructionTextArea);
+            visualizer.initVisualization(viewModel.getTemperatureValidationStatus(), temperatureTextField);
+            visualizer.initVisualization(viewModel.getMessageWindowSizeValidationStatus(), contextWindowSizeTextField);
+            visualizer.initVisualization(viewModel.getDocumentSplitterChunkSizeValidationStatus(), documentSplitterChunkSizeTextField);
+            visualizer.initVisualization(viewModel.getDocumentSplitterOverlapSizeValidationStatus(), documentSplitterOverlapSizeTextField);
+            visualizer.initVisualization(viewModel.getRagMaxResultsCountValidationStatus(), ragMaxResultsCountTextField);
+            visualizer.initVisualization(viewModel.getRagMinScoreValidationStatus(), ragMinScoreTextField);
         });
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_CHAT_MODEL, dialogService, preferencesService.getFilePreferences()), chatModelHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EMBEDDING_MODEL, dialogService, preferencesService.getFilePreferences()), embeddingModelHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_API_BASE_URL, dialogService, preferencesService.getFilePreferences()), apiBaseUrlHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_INSTRUCTION, dialogService, preferencesService.getFilePreferences()), instructionHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_CONTEXT_WINDOW_SIZE, dialogService, preferencesService.getFilePreferences()), contextWindowSizeHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_CHUNK_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterChunkSizeHelp);
@@ -109,12 +115,13 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     }
 
     private void updateDisabledProperties() {
-        openAiToken.setDisable(!viewModel.getUseAi());
+        openAiTokenTextField.setDisable(!viewModel.getUseAi());
 
         customizeSettingsCheckbox.setDisable(!viewModel.getUseAi());
 
-        aiModelComboBox.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        chatModelComboBox.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
         embeddingModelComboBox.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        apiBaseUrlTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
 
         instructionTextArea.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
         temperatureTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());

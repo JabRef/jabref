@@ -5,8 +5,9 @@ import org.jabref.preferences.AiPreferences;
 public class AiDefaultPreferences {
     public static final boolean ENABLE_CHAT = false;
     public static final boolean CUSTOMIZE_SETTINGS = false;
-    public static final AiPreferences.ChatModel CHAT_MODEL = AiPreferences.ChatModel.GPT_3_5_TURBO;
+    public static final String CHAT_MODEL = AiPreferences.OPENAI_CHAT_MODELS.getFirst();
     public static final AiPreferences.EmbeddingModel EMBEDDING_MODEL = AiPreferences.EmbeddingModel.ALL_MINILM_L6_V2;
+    public static final String API_BASE_URL = "https://api.openai.com/v1/";
     public static final String SYSTEM_MESSAGE = "You are an AI assistant that analyses research papers.";
     public static final double TEMPERATURE = 0.7;
     public static final int CONTEXT_WINDOW_SIZE = 4096;
