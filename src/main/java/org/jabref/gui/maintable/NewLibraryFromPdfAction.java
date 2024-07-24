@@ -3,8 +3,6 @@ package org.jabref.gui.maintable;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
-import javafx.application.Platform;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
