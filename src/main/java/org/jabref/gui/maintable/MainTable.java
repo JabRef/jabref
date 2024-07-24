@@ -161,10 +161,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
-                .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRankProperty().isEqualTo(FIRST_RANK))
-                .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.searchRankProperty().isEqualTo(SECOND_RANK))
-                .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.searchRankProperty().isEqualTo(THIRD_RANK))
-                .withPseudoClass(NOT_MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRankProperty().isEqualTo(FOURTH_RANK))
+                .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRank().isEqualTo(FIRST_RANK))
+                .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.searchRank().isEqualTo(SECOND_RANK))
+                .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.searchRank().isEqualTo(THIRD_RANK))
+                .withPseudoClass(NOT_MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRank().isEqualTo(FOURTH_RANK))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -306,7 +306,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         List<BibEntryTableViewModel> firstEntryOfEachRank = new ArrayList<>(Collections.nCopies(FOURTH_RANK + 1, null));
         for (BibEntryTableViewModel entry : getItems()) {
-            int rank = entry.searchRankProperty().get();
+            int rank = entry.searchRank().get();
             if (firstEntryOfEachRank.get(rank) == null) {
                 firstEntryOfEachRank.set(rank, entry);
             }
@@ -315,7 +315,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         }
 
-        for (int i = selectedEntry.searchRankProperty().get() + delta; i > 0 && i < firstEntryOfEachRank.size(); i += delta) {
+        for (int i = selectedEntry.searchRank().get() + delta; i > 0 && i < firstEntryOfEachRank.size(); i += delta) {
             BibEntryTableViewModel entry = firstEntryOfEachRank.get(i);
             if (entry != null) {
                 getSelectionModel().clearSelection();

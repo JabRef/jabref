@@ -51,10 +51,12 @@ public class BibEntryTableViewModel {
     private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
-    private final BooleanProperty matchedBySearchProperty = new SimpleBooleanProperty(true);
-    private final BooleanProperty matchedByGroupProperty = new SimpleBooleanProperty(true);
-    private final IntegerProperty searchRankProperty = new SimpleIntegerProperty();
     private final BibDatabaseContext bibDatabaseContext;
+    private final BooleanProperty isMatchedBySearch = new SimpleBooleanProperty(true);
+    private final BooleanProperty isVisibleBySearch = new SimpleBooleanProperty(true);
+    private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(true);
+    private final BooleanProperty isVisibleByGroup = new SimpleBooleanProperty(true);
+    private final IntegerProperty searchRank = new SimpleIntegerProperty();
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -65,8 +67,8 @@ public class BibEntryTableViewModel {
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
 
-        searchRankProperty.bind(
-                EasyBind.combine(matchedBySearchProperty, matchedByGroupProperty, (matchedBySearch, matchedByGroup) -> {
+        searchRank.bind(
+                EasyBind.combine(isMatchedBySearch, isMatchedByGroup, (matchedBySearch, matchedByGroup) -> {
                     if (matchedBySearch && matchedByGroup) {
                         return FIRST_RANK;
                     } else if (matchedBySearch) {
@@ -175,15 +177,27 @@ public class BibEntryTableViewModel {
         return bibDatabaseContext;
     }
 
-    public BooleanProperty matchedBySearchProperty() {
-        return matchedBySearchProperty;
+    public BooleanProperty isMatchedBySearch() {
+        return isMatchedBySearch;
     }
 
-    public BooleanProperty matchedByGroupProperty() {
-        return matchedByGroupProperty;
+    public BooleanProperty isVisibleBySearch() {
+        return isVisibleBySearch;
     }
 
-    public IntegerProperty searchRankProperty() {
-        return searchRankProperty;
+    public BooleanProperty isMatchedByGroup() {
+        return isMatchedByGroup;
+    }
+
+    public BooleanProperty isVisibleByGroup() {
+        return isVisibleByGroup;
+    }
+
+    public IntegerProperty searchRank() {
+        return searchRank;
+    }
+
+    public boolean isVisible() {
+        return isVisibleBySearch.get() && isVisibleByGroup.get();
     }
 }

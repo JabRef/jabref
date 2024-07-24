@@ -152,7 +152,7 @@ public class MainTableColumnFactory {
         header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SEARCH_RANK.getDisplayName()));
         column.setGraphic(header);
-        column.setCellValueFactory(cellData -> cellData.getValue().searchRankProperty());
+        column.setCellValueFactory(cellData -> cellData.getValue().searchRank());
         new ValueTableCellFactory<BibEntryTableViewModel, Number>().withText(String::valueOf).install(column);
         column.setSortable(true);
         column.setVisible(false);
