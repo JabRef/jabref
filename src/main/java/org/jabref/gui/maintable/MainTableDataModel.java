@@ -96,7 +96,7 @@ public class MainTableDataModel {
         groupViewModeSubscription.unsubscribe();
     }
 
-    private void updateSearchMatches(Optional<SearchQuery> query) {
+    private synchronized void updateSearchMatches(Optional<SearchQuery> query) {
         BackgroundTask.wrap(() -> {
             int matches = 0;
             for (BibEntryTableViewModel entry : entriesViewModel) {
@@ -112,7 +112,7 @@ public class MainTableDataModel {
         }).executeWith(taskExecutor);
     }
 
-    private void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
+    private synchronized void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
         BackgroundTask.wrap(() -> {
             int matches = 0;
             groupsMatcher = createGroupMatcher(groups, groupsPreferences);
