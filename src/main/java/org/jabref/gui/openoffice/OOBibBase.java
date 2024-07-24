@@ -498,9 +498,9 @@ class OOBibBase {
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (PropertyVetoException
-                | IllegalTypeException
-                | WrappedTargetException
-                | com.sun.star.lang.IllegalArgumentException ex) {
+                 | IllegalTypeException
+                 | WrappedTargetException
+                 | com.sun.star.lang.IllegalArgumentException ex) {
             LOGGER.warn(errorTitle, ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         }
@@ -612,13 +612,12 @@ class OOBibBase {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-        } catch (
-                CreationException |
-                WrappedTargetException |
-                IOException |
-                PropertyVetoException |
-                IllegalTypeException |
-                NotRemoveableException ex) {
+        } catch (CreationException
+                 | WrappedTargetException
+                 | IOException
+                 | PropertyVetoException
+                 | IllegalTypeException
+                 | NotRemoveableException ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } finally {
@@ -661,24 +660,16 @@ class OOBibBase {
                     Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
                     Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions);
                 }
-            } catch (
-                    NoDocumentException ex) {
+            } catch (NoDocumentException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            } catch (
-                    DisposedException ex) {
+            } catch (DisposedException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            } catch (
-                    CreationException
-                    |
-                    IllegalTypeException
-                    |
-                    NotRemoveableException
-                    |
-                    PropertyVetoException
-                    |
-                    WrappedTargetException
-                    |
-                    com.sun.star.lang.IllegalArgumentException ex) {
+            } catch (CreationException
+                     | IllegalTypeException
+                     | NotRemoveableException
+                     | PropertyVetoException
+                     | WrappedTargetException
+                     | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Problem combining cite markers", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } finally {
@@ -725,24 +716,16 @@ class OOBibBase {
                     Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
                     Update.resyncDocument(doc, jStyle, fcursor.get(), syncOptions);
                 }
-            } catch (
-                    NoDocumentException ex) {
+            } catch (NoDocumentException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            } catch (
-                    DisposedException ex) {
+            } catch (DisposedException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            } catch (
-                    CreationException
-                    |
-                    IllegalTypeException
-                    |
-                    NotRemoveableException
-                    |
-                    PropertyVetoException
-                    |
-                    WrappedTargetException
-                    |
-                    com.sun.star.lang.IllegalArgumentException ex) {
+            } catch (CreationException
+                     | IllegalTypeException
+                     | NotRemoveableException
+                     | PropertyVetoException
+                     | WrappedTargetException
+                     | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Problem during separating cite markers", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } finally {
@@ -878,18 +861,13 @@ class OOBibBase {
                             unresolvedKeys.getFirst());
                     dialogService.showErrorDialogAndWait(errorTitle, msg);
                 }
-            } catch (
-                    NoDocumentException ex) {
+            } catch (NoDocumentException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            } catch (
-                    DisposedException ex) {
+            } catch (DisposedException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            } catch (
-                    CreationException
-                    |
-                    WrappedTargetException
-                    |
-                    com.sun.star.lang.IllegalArgumentException ex) {
+            } catch (CreationException
+                     | WrappedTargetException
+                     | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not update bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
