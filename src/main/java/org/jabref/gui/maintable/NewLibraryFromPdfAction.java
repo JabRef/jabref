@@ -17,6 +17,7 @@ import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -65,7 +66,7 @@ public class NewLibraryFromPdfAction extends SimpleCommand {
         builder.withDefaultExtension(StandardFileType.PDF);
         // Sensible default for the directory to start browsing is the directory of the currently opened library. The pdf storage dir seems not to be feasible, because extracting references from a PDF itself can be done by the context menu of the respective entry.
         stateManager.getActiveDatabase()
-                    .flatMap(db -> db.getDatabasePath())
+                    .flatMap(BibDatabaseContext::getDatabasePath)
                     .ifPresent(path -> builder.withInitialDirectory(path.getParent()));
         FileDialogConfiguration fileDialogConfiguration = builder.build();
 
@@ -76,7 +77,7 @@ public class NewLibraryFromPdfAction extends SimpleCommand {
             Callable<ParserResult> parserResultCallable = getParserResultCallable(path);
             BackgroundTask.wrap(parserResultCallable)
                           .withInitialMessage(Localization.lang("Processing PDF(s)"))
-                          .onFailure(failure -> Platform.runLater(() -> dialogService.showErrorDialogAndWait(failure)))
+                          .onFailure(dialogService::showErrorDialogAndWait)
                           .onSuccess(result -> {
                               LOGGER.trace("Finished processing PDF(s): {}", result);
                               libraryTabContainer.addTab(result.getDatabaseContext(), true);

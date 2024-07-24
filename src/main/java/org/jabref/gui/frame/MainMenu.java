@@ -315,10 +315,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.REDOWNLOAD_MISSING_FILES, new RedownloadMissingFilesAction(stateManager, dialogService, preferencesService.getFilePreferences(), taskExecutor))
         );
 
-        EasyBind.subscribe(preferencesService.getGrobidPreferences().grobidEnabledProperty(), enabled -> {
-            newLibraryFromPdfMenuItemOnline.setVisible(enabled);
-            newLibraryFromPdfMenuItemOffline.setVisible(!enabled);
-        });
+        EasyBind.subscribe(preferencesService.getGrobidPreferences().grobidEnabledProperty(), newLibraryFromPdfMenuItemOnline::setVisible);
 
         SidePaneType webSearchPane = SidePaneType.WEB_SEARCH;
         SidePaneType groupsPane = SidePaneType.GROUPS;
