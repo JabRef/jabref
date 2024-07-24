@@ -80,6 +80,8 @@ public class MainTableDataModel {
         updateGroupVisibility(groupsMatcher, entry);
         updateSearchVisibility(libraryTab.searchQueryProperty().get(), entry);
         entry.updateSearchRank();
+        // This will refilter the whole list (even for large dbs it's quick enough)
+        entriesFiltered.refilter();
     }
 
     public void unbind() {
