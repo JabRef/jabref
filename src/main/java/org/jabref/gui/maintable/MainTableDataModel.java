@@ -80,7 +80,7 @@ public class MainTableDataModel {
 
         searchQuerySubscription = EasyBind.listen(libraryTab.searchQueryProperty(), (observable, oldValue, newValue) -> updateSearchMatches(newValue));
         selectedGroupsSubscription = EasyBind.listen(libraryTab.selectedGroupsProperty(), (observable, oldValue, newValue) -> updateGroupMatches(newValue));
-        groupViewModeSubscription = EasyBind.listen(preferencesService.getGroupsPreferences().groupViewModeProperty(), (observable) -> updateGroupMatches(libraryTab.selectedGroupsProperty().get()));
+        groupViewModeSubscription = EasyBind.listen(preferencesService.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(libraryTab.selectedGroupsProperty().get()));
 
         libraryTab.resultSizeProperty().bind(resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
