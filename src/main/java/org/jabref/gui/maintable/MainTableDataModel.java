@@ -32,9 +32,9 @@ import com.tobiasdiez.easybind.Subscription;
 import static org.jabref.gui.maintable.BibEntryTableViewModel.FIRST_RANK;
 
 public class MainTableDataModel {
+    private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final CustomFilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
-    private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter = new SimpleObjectProperty<>();
     private final GroupsPreferences groupsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
@@ -44,6 +44,7 @@ public class MainTableDataModel {
     private final Subscription selectedGroupsSubscription;
     private final Subscription groupViewModeSubscription;
     private Optional<MatcherSet> groupsMatcher;
+    private final LibraryTab libraryTab;
 
     public MainTableDataModel(BibDatabaseContext context,
                               PreferencesService preferencesService,
@@ -53,17 +54,16 @@ public class MainTableDataModel {
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.taskExecutor = taskExecutor;
         this.bibDatabaseContext = context;
-        this.groupsMatcher = createGroupMatcher(libraryTab.selectedGroupsProperty(), groupsPreferences);
+        this.libraryTab = libraryTab;
+        this.groupsMatcher = createGroupMatcher(libraryTab.selectedGroupsProperty().get(), groupsPreferences);
 
         resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-        entriesViewModel = new MappedBackedList<>(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
+        entriesViewModel = new MappedBackedList<>(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter, this::updateVisibility), false);
 
-        entriesFiltered = new CustomFilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
-        entriesFiltered.setUpdatePredicate(entry -> {
-            updateGroupVisibility(groupsMatcher, entry);
-            updateSearchVisibility(libraryTab.searchQueryProperty().get(), entry);
+        entriesFiltered = new CustomFilteredList<>(entriesViewModel, entry -> {
+            entry.updateSearchRank();
             return entry.isVisible();
         });
 
@@ -74,6 +74,12 @@ public class MainTableDataModel {
         libraryTab.resultSizeProperty().bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRank().isEqualTo(FIRST_RANK).get())));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
+    }
+
+    private void updateVisibility(BibEntryTableViewModel entry) {
+        updateGroupVisibility(groupsMatcher, entry);
+        updateSearchVisibility(libraryTab.searchQueryProperty().get(), entry);
+        entry.updateSearchRank();
     }
 
     public void unbind() {

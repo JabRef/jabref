@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
@@ -20,6 +22,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.uithreadaware.UiThreadBinding;
@@ -56,9 +60,10 @@ public class BibEntryTableViewModel {
     private final BooleanProperty isVisibleBySearch = new SimpleBooleanProperty(true);
     private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(true);
     private final BooleanProperty isVisibleByGroup = new SimpleBooleanProperty(true);
-    private final IntegerProperty searchRank = new SimpleIntegerProperty();
+    private final IntegerProperty searchRank = new SimpleIntegerProperty(1);
+    private final ObservableList<BibEntry> observables;
 
-    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
+    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter, Consumer<BibEntryTableViewModel> updateVisibility) {
         this.entry = entry;
         this.fieldValueFormatter = fieldValueFormatter;
 
@@ -66,20 +71,9 @@ public class BibEntryTableViewModel {
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
         this.bibDatabaseContext = bibDatabaseContext;
-
-        searchRank.bind(
-                EasyBind.combine(isMatchedBySearch, isMatchedByGroup, (matchedBySearch, matchedByGroup) -> {
-                    if (matchedBySearch && matchedByGroup) {
-                        return FIRST_RANK;
-                    } else if (matchedBySearch) {
-                        return SECOND_RANK;
-                    } else if (matchedByGroup) {
-                        return THIRD_RANK;
-                    } else {
-                        return FOURTH_RANK;
-                    }
-                })
-        );
+        observables = FXCollections.observableArrayList(BibEntry::getObservables);
+        observables.add(entry);
+        observables.addListener((InvalidationListener) c -> updateVisibility.accept(this));
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -199,5 +193,19 @@ public class BibEntryTableViewModel {
 
     public boolean isVisible() {
         return isVisibleBySearch.get() && isVisibleByGroup.get();
+    }
+
+    public void updateSearchRank() {
+        int rank = FOURTH_RANK;
+
+        if (isMatchedBySearch.get() && isMatchedByGroup.get()) {
+            rank = FIRST_RANK;
+        } else if (isMatchedBySearch.get()) {
+            rank = SECOND_RANK;
+        } else if (isMatchedByGroup.get()) {
+            rank = THIRD_RANK;
+        }
+
+        searchRank.set(rank);
     }
 }

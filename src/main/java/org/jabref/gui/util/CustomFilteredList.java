@@ -256,7 +256,7 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
      * the {@link #getDefaultPredicate() defaultPredicate}.
      */
     private void update(ListChangeListener.Change<? extends E> c) {
-        Predicate<? super E> predicateImpl = getUpdatePredicateImpl();
+        Predicate<? super E> predicateImpl = getDefaultPredicateImpl();
         ensureSize(getSource().size());
         int sourceFrom = c.getFrom();
         int sourceTo = c.getTo();
