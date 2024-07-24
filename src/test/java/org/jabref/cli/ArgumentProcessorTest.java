@@ -47,7 +47,7 @@ class ArgumentProcessorTest {
         when(preferencesService.getImporterPreferences()).thenReturn(importerPreferences);
         when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferencesService.getSearchPreferences()).thenReturn(
-                new SearchPreferences(false, false, false, false, false, false, 0, 0)
+                new SearchPreferences(false, false, false, false, false, false, 0, 0, 0)
         );
     }
 

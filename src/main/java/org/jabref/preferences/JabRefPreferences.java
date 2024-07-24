@@ -292,6 +292,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
     public static final String SEARCH_WINDOW_HEIGHT = "searchWindowHeight";
     public static final String SEARCH_WINDOW_WIDTH = "searchWindowWidth";
+    public static final String SEARCH_WINDOW_DIVIDER_POS = "searchWindowDividerPos";
     public static final String SEARCH_CATALOGS = "searchCatalogs";
     public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
@@ -545,6 +546,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
         defaults.put(SEARCH_WINDOW_HEIGHT, 176.0);
         defaults.put(SEARCH_WINDOW_WIDTH, 600.0);
+        defaults.put(SEARCH_WINDOW_DIVIDER_POS, 0.5);
         defaults.put(SEARCH_CATALOGS, convertListToString(List.of(
                 ACMPortalFetcher.FETCHER_NAME,
                 SpringerFetcher.FETCHER_NAME,
@@ -2711,7 +2713,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SEARCH_FILTERING_MODE),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),
                 getDouble(SEARCH_WINDOW_HEIGHT),
-                getDouble(SEARCH_WINDOW_WIDTH));
+                getDouble(SEARCH_WINDOW_WIDTH),
+                getDouble(SEARCH_WINDOW_DIVIDER_POS));
 
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
             putBoolean(SEARCH_CASE_SENSITIVE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE));
@@ -2723,6 +2726,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
         EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
         EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));
+        EasyBind.listen(searchPreferences.getSearchWindowDividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_DIVIDER_POS, searchPreferences.getSearchWindowDividerPosition()));
 
         return searchPreferences;
     }
