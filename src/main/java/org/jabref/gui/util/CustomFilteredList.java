@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javafx.beans.NamedArg;
@@ -17,7 +18,7 @@ import javafx.collections.transformation.TransformationList;
  * A custom class that extends {@link javafx.collections.transformation.FilteredList FilteredList} to provide additional functionality.
  * This class closely mirrors the behavior of {@code FilteredList} with the following key differences:
  * <ol>
- * <li>Supports an additional update predicate that allows filtering of elements during {@link javafx.collections.ListChangeListener.Change#wasUpdated()} events.</li>
+ * <li>Supports setting an update callback that runs a specified function on every updated item.</li>
  * <li>Offers access to the {@link #refilter()} method, enabling explicit re-evaluation of the filter criteria.</li>
  * </ol>
  *
@@ -27,14 +28,14 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
     private int[] filtered;
     private int size;
     private SortHelper helper;
-    private ObjectProperty<Predicate<? super E>> defaultPredicate;
-    private ObjectProperty<Predicate<? super E>> updatePredicate;
+    private ObjectProperty<Predicate<? super E>> predicate;
+    private ObjectProperty<Consumer<E>> onUpdateCallback;
 
-    public CustomFilteredList(@NamedArg("source") ObservableList<E> source, @NamedArg("defaultPredicate") Predicate<? super E> defaultPredicate) {
+    public CustomFilteredList(@NamedArg("source") ObservableList<E> source, @NamedArg("predicate") Predicate<? super E> predicate) {
         super(source);
         filtered = new int[source.size() * 3 / 2 + 1];
-        if (defaultPredicate != null) {
-            setDefaultPredicate(defaultPredicate);
+        if (predicate != null) {
+            setPredicate(predicate);
         } else {
             for (size = 0; size < source.size(); size++) {
                 filtered[size] = size;
@@ -46,9 +47,9 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         this(source, null);
     }
 
-    public final ObjectProperty<Predicate<? super E>> defaultPredicateProperty() {
-        if (defaultPredicate == null) {
-            defaultPredicate = new ObjectPropertyBase<>() {
+    public final ObjectProperty<Predicate<? super E>> predicateProperty() {
+        if (predicate == null) {
+            predicate = new ObjectPropertyBase<>() {
                 @Override
                 protected void invalidated() {
                     refilter();
@@ -61,31 +62,31 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
 
                 @Override
                 public String getName() {
-                    return "defaultPredicate";
+                    return "predicate";
                 }
             };
         }
-        return defaultPredicate;
+        return predicate;
     }
 
-    public final Predicate<? super E> getDefaultPredicate() {
-        return defaultPredicate == null ? null : defaultPredicate.get();
+    public final Predicate<? super E> getPredicate() {
+        return predicate == null ? null : predicate.get();
     }
 
-    public final void setDefaultPredicate(Predicate<? super E> defaultPredicate) {
-        defaultPredicateProperty().set(defaultPredicate);
+    public final void setPredicate(Predicate<? super E> predicate) {
+        predicateProperty().set(predicate);
     }
 
-    private Predicate<? super E> getDefaultPredicateImpl() {
-        if (getDefaultPredicate() != null) {
-            return getDefaultPredicate();
+    private Predicate<? super E> getPredicateImpl() {
+        if (getPredicate() != null) {
+            return getPredicate();
         }
         return t -> true;
     }
 
-    public final ObjectProperty<Predicate<? super E>> updatePredicateProperty() {
-        if (updatePredicate == null) {
-            updatePredicate = new ObjectPropertyBase<>() {
+    public final ObjectProperty<Consumer<E>> onUpdateCallbackProperty() {
+        if (onUpdateCallback == null) {
+            onUpdateCallback = new ObjectPropertyBase<>() {
                 @Override
                 public Object getBean() {
                     return CustomFilteredList.this;
@@ -93,26 +94,19 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
 
                 @Override
                 public String getName() {
-                    return "updatePredicate";
+                    return "onUpdateCallback";
                 }
             };
         }
-        return updatePredicate;
+        return onUpdateCallback;
     }
 
-    public final Predicate<? super E> getUpdatePredicate() {
-        return updatePredicate == getDefaultPredicate() ? null : updatePredicate.get();
+    public final Consumer<E> getOnUpdateCallback() {
+        return onUpdateCallback == null ? null : onUpdateCallback.get();
     }
 
-    public final void setUpdatePredicate(Predicate<? super E> updatePredicate) {
-        updatePredicateProperty().set(updatePredicate);
-    }
-
-    private Predicate<? super E> getUpdatePredicateImpl() {
-        if (getUpdatePredicate() != null) {
-            return getUpdatePredicate();
-        }
-        return t -> true;
+    public final void setOnUpdateCallback(Consumer<E> onUpdateCallback) {
+        onUpdateCallbackProperty().set(onUpdateCallback);
     }
 
     @Override
@@ -206,7 +200,7 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
     }
 
     private void addRemove(ListChangeListener.Change<? extends E> c) {
-        Predicate<? super E> predicateImpl = getDefaultPredicateImpl();
+        Predicate<? super E> predicateImpl = getPredicateImpl();
         ensureSize(getSource().size());
         final int from = findPosition(c.getFrom());
         final int to = findPosition(c.getFrom() + c.getRemovedSize());
@@ -251,12 +245,9 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         }
     }
 
-    /**
-     * This method applies the {@link #getUpdatePredicate() updatePredicate} if it is set; otherwise, it uses
-     * the {@link #getDefaultPredicate() defaultPredicate}.
-     */
     private void update(ListChangeListener.Change<? extends E> c) {
-        Predicate<? super E> predicateImpl = getDefaultPredicateImpl();
+        Predicate<? super E> predicateImpl = getPredicateImpl();
+        Consumer<E> callback = getOnUpdateCallback();
         ensureSize(getSource().size());
         int sourceFrom = c.getFrom();
         int sourceTo = c.getTo();
@@ -266,6 +257,9 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         int pos = filterFrom;
         while (pos < filterTo || sourceFrom < sourceTo) {
             E el = it.next();
+            if (callback != null) {
+                callback.accept(el);
+            }
             if (pos < size && filtered[pos] == sourceFrom) {
                 if (!predicateImpl.test(el)) {
                     nextRemove(pos, el);
@@ -298,7 +292,7 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         }
         size = 0;
         int i = 0;
-        Predicate<? super E> predicateImpl = getDefaultPredicateImpl();
+        Predicate<? super E> predicateImpl = getPredicateImpl();
         for (final E next : getSource()) {
             if (predicateImpl.test(next)) {
                 filtered[size++] = i;

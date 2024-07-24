@@ -1,5 +1,6 @@
 package org.jabref.gui.search;
 
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
@@ -48,8 +49,8 @@ public class SearchResultsTableDataModel {
         entriesViewModel.clear();
         for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
             ObservableList<BibEntry> entriesForDb = context.getDatabase().getEntries();
-//            List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter));
-//            entriesViewModel.addAll(viewModelForDb);
+            List<BibEntryTableViewModel> viewModelForDb = EasyBind.mapBacked(entriesForDb, entry -> new BibEntryTableViewModel(entry, context, fieldValueFormatter));
+            entriesViewModel.addAll(viewModelForDb);
         }
     }
 

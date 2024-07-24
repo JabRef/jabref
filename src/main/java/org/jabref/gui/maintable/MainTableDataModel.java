@@ -44,7 +44,6 @@ public class MainTableDataModel {
     private final Subscription selectedGroupsSubscription;
     private final Subscription groupViewModeSubscription;
     private Optional<MatcherSet> groupsMatcher;
-    private final LibraryTab libraryTab;
 
     public MainTableDataModel(BibDatabaseContext context,
                               PreferencesService preferencesService,
@@ -54,17 +53,21 @@ public class MainTableDataModel {
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.taskExecutor = taskExecutor;
         this.bibDatabaseContext = context;
-        this.libraryTab = libraryTab;
         this.groupsMatcher = createGroupMatcher(libraryTab.selectedGroupsProperty().get(), groupsPreferences);
 
         resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-        entriesViewModel = new MappedBackedList<>(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter, this::updateVisibility), false);
+        entriesViewModel = new MappedBackedList<>(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
 
         entriesFiltered = new CustomFilteredList<>(entriesViewModel, entry -> {
             entry.updateSearchRank();
             return entry.isVisible();
+        });
+
+        entriesFiltered.setOnUpdateCallback(entry -> {
+            updateGroupVisibility(groupsMatcher, entry);
+            updateSearchVisibility(libraryTab.searchQueryProperty().get(), entry);
         });
 
         searchQuerySubscription = EasyBind.listen(libraryTab.searchQueryProperty(), (observable, oldValue, newValue) -> updateSearchMatches(newValue));
@@ -76,17 +79,8 @@ public class MainTableDataModel {
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
-    private void updateVisibility(BibEntryTableViewModel entry) {
-        updateGroupVisibility(groupsMatcher, entry);
-        updateSearchVisibility(libraryTab.searchQueryProperty().get(), entry);
-        entry.updateSearchRank();
-        // This will refilter the whole list (even for large dbs it's quick enough)
-        entriesFiltered.refilter();
-    }
-
     public void unbind() {
-        entriesFiltered.defaultPredicateProperty().unbind();
-        entriesFiltered.updatePredicateProperty().unbind();
+        entriesFiltered.predicateProperty().unbind();
 
         searchQuerySubscription.unsubscribe();
         selectedGroupsSubscription.unsubscribe();

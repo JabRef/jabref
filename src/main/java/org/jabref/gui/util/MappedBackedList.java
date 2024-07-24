@@ -56,11 +56,9 @@ public class MappedBackedList<E, F> extends TransformationList<E, F> implements 
                 nextPermutation(from, to, permutation);
             } else if (change.wasUpdated()) {
                 if (mapOnUpdate) {
-                    E old = backingList.set(change.getFrom(), mapper.apply(getSource().get(change.getFrom())));
-                    nextSet(change.getFrom(), old);
-                } else {
-                    nextUpdate(change.getFrom());
+                    backingList.set(change.getFrom(), mapper.apply(getSource().get(change.getFrom())));
                 }
+                nextUpdate(change.getFrom());
             } else {
                 if (change.wasRemoved()) {
                     int removePosition = change.getFrom();
