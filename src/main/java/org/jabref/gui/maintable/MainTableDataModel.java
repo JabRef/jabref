@@ -3,9 +3,8 @@ package org.jabref.gui.maintable;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
@@ -44,7 +43,6 @@ public class MainTableDataModel {
     private final Subscription searchQuerySubscription;
     private final Subscription selectedGroupsSubscription;
     private final Subscription groupViewModeSubscription;
-    private final IntegerProperty resultSize = new SimpleIntegerProperty(0);
     private Optional<MatcherSet> groupsMatcher;
 
     public MainTableDataModel(BibDatabaseContext context,
@@ -64,17 +62,8 @@ public class MainTableDataModel {
 
         entriesFiltered = new CustomFilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
         entriesFiltered.setUpdatePredicate(entry -> {
-            int rankBeforeUpdate = entry.searchRank().get();
             updateGroupVisibility(groupsMatcher, entry);
             updateSearchVisibility(libraryTab.searchQueryProperty().get(), entry);
-            int rankAfterUpdate = entry.searchRank().get();
-            if (rankBeforeUpdate != rankAfterUpdate) {
-                if (rankAfterUpdate == FIRST_RANK) {
-                    resultSize.set(resultSize.get() + 1);
-                } else if (rankBeforeUpdate == FIRST_RANK) {
-                    resultSize.set(resultSize.get() - 1);
-                }
-            }
             return entry.isVisible();
         });
 
@@ -82,7 +71,7 @@ public class MainTableDataModel {
         selectedGroupsSubscription = EasyBind.listen(libraryTab.selectedGroupsProperty(), (observable, oldValue, newValue) -> updateGroupMatches(newValue));
         groupViewModeSubscription = EasyBind.listen(preferencesService.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(libraryTab.selectedGroupsProperty().get()));
 
-        libraryTab.resultSizeProperty().bind(resultSize);
+        libraryTab.resultSizeProperty().bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRank().isEqualTo(FIRST_RANK).get())));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
@@ -96,37 +85,17 @@ public class MainTableDataModel {
         groupViewModeSubscription.unsubscribe();
     }
 
-    private synchronized void updateSearchMatches(Optional<SearchQuery> query) {
+    private void updateSearchMatches(Optional<SearchQuery> query) {
         BackgroundTask.wrap(() -> {
-            int matches = 0;
-            for (BibEntryTableViewModel entry : entriesViewModel) {
-                updateSearchVisibility(query, entry);
-                if (entry.searchRank().isEqualTo(FIRST_RANK).get()) {
-                    matches++;
-                }
-            }
-            return matches;
-        }).onSuccess(matches -> {
-            resultSize.set(matches);
-            entriesFiltered.refilter();
-        }).executeWith(taskExecutor);
+            entriesViewModel.forEach(entry -> updateSearchVisibility(query, entry));
+        }).onSuccess(result -> entriesFiltered.refilter()).executeWith(taskExecutor);
     }
 
-    private synchronized void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
+    private void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
         BackgroundTask.wrap(() -> {
-            int matches = 0;
             groupsMatcher = createGroupMatcher(groups, groupsPreferences);
-            for (BibEntryTableViewModel entry : entriesViewModel) {
-                updateGroupVisibility(groupsMatcher, entry);
-                if (entry.searchRank().isEqualTo(FIRST_RANK).get()) {
-                    matches++;
-                }
-            }
-            return matches;
-        }).onSuccess(matches -> {
-            resultSize.set(matches);
-            entriesFiltered.refilter();
-        }).executeWith(taskExecutor);
+            entriesViewModel.forEach(entry -> updateGroupVisibility(groupsMatcher, entry));
+        }).onSuccess(result -> entriesFiltered.refilter()).executeWith(taskExecutor);
     }
 
     private void updateSearchVisibility(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
