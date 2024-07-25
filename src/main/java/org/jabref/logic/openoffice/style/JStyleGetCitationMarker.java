@@ -22,11 +22,11 @@ import org.jabref.model.strings.StringUtil;
 
 import org.jspecify.annotations.NonNull;
 
-class OOBibStyleGetCitationMarker {
+class JStyleGetCitationMarker {
 
     private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
-    private OOBibStyleGetCitationMarker() {
+    private JStyleGetCitationMarker() {
     }
 
     /**
@@ -58,7 +58,7 @@ class OOBibStyleGetCitationMarker {
         return stringBuilder.toString();
     }
 
-    private static String markupAuthorName(OOBibStyle style, String name) {
+    private static String markupAuthorName(JStyle style, String name) {
         return style.getAuthorNameMarkupBefore()
                 + name
                 + style.getAuthorNameMarkupAfter();
@@ -90,7 +90,7 @@ class OOBibStyleGetCitationMarker {
      *          - OXFORD_COMMA is only emitted if nAuthors is at least 3.
      *          - andString  is only emitted if nAuthors is at least 2.
      */
-    private static String formatAuthorList(OOBibStyle style,
+    private static String formatAuthorList(JStyle style,
                                            @NonNull AuthorList authorList,
                                            int maxAuthors,
                                            String andString) {
@@ -261,7 +261,7 @@ class OOBibStyleGetCitationMarker {
      *
      *
      */
-    private static String getCitationMarkerField(OOBibStyle style,
+    private static String getCitationMarkerField(JStyle style,
                                                  @NonNull CitationLookupResult db,
                                                  OrFields fields) {
         Optional<FieldAndContent> optionalFieldAndContent =
@@ -286,7 +286,7 @@ class OOBibStyleGetCitationMarker {
         return result;
     }
 
-    private static AuthorList getAuthorList(OOBibStyle style, CitationLookupResult db) {
+    private static AuthorList getAuthorList(JStyle style, CitationLookupResult db) {
         // The bibtex fields providing author names, e.g. "author" or
         // "editor".
         OrFields authorFieldNames = style.getAuthorFieldNames();
@@ -307,7 +307,7 @@ class OOBibStyleGetCitationMarker {
      *
      * If entry is unresolved, return 0.
      */
-    private static int calculateNAuthorsToEmit(OOBibStyle style, CitationMarkerEntry entry) {
+    private static int calculateNAuthorsToEmit(JStyle style, CitationMarkerEntry entry) {
         if (entry.getLookupResult().isEmpty()) {
             // unresolved
             return 0;
@@ -363,7 +363,7 @@ class OOBibStyleGetCitationMarker {
      * @return The formatted citation.
      *
      */
-    private static OOText getAuthorYearParenthesisMarker2(OOBibStyle style,
+    private static OOText getAuthorYearParenthesisMarker2(JStyle style,
                                                           AuthorYearMarkerPurpose purpose,
                                                           List<CitationMarkerEntry> entries,
                                                           boolean[] startsNewGroup,
@@ -540,7 +540,7 @@ class OOBibStyleGetCitationMarker {
      *
      * Note: now includes some markup.
      */
-    static OOText getNormalizedCitationMarker(OOBibStyle style,
+    static OOText getNormalizedCitationMarker(JStyle style,
                                               CitationMarkerNormEntry normEntry,
                                               Optional<Integer> maxAuthorsOverride) {
         boolean[] startsNewGroup = {true};
@@ -553,7 +553,7 @@ class OOBibStyleGetCitationMarker {
     }
 
     private static List<OOText>
-    getNormalizedCitationMarkers(OOBibStyle style,
+    getNormalizedCitationMarkers(JStyle style,
                                  List<CitationMarkerEntry> citationMarkerEntries,
                                  Optional<Integer> maxAuthorsOverride) {
 
@@ -597,7 +597,7 @@ class OOBibStyleGetCitationMarker {
      *
      */
     public static OOText
-    createCitationMarker(OOBibStyle style,
+    createCitationMarker(JStyle style,
                          List<CitationMarkerEntry> citationMarkerEntries,
                          boolean inParenthesis,
                          NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {

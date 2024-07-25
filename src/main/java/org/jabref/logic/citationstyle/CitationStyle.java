@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.util.StandardFileType;
 
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ import org.xml.sax.SAXException;
  * Representation of a CitationStyle. Stores its name, the file path and the style itself
  */
 @AllowedToUseClassGetResource("org.jabref.logic.citationstyle.CitationStyle.discoverCitationStyles reads the whole path to discover all available styles. Should be converted to a build-time job.")
-public class CitationStyle {
+public class CitationStyle implements OOStyle {
 
     public static final String DEFAULT = "/ieee.csl";
 
@@ -216,5 +217,20 @@ public class CitationStyle {
     @Override
     public int hashCode() {
         return Objects.hash(source);
+    }
+
+    @Override
+    public String getName() {
+        return getTitle();
+    }
+
+    @Override
+    public boolean isInternalStyle() {
+        return true;
+    }
+
+    @Override
+    public String getPath() {
+        return getFilePath();
     }
 }

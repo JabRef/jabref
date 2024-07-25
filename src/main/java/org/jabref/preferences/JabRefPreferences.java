@@ -92,6 +92,8 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
@@ -143,7 +145,7 @@ import org.slf4j.LoggerFactory;
  * Internally it defines symbols used to pick a value from the {@code java.util.prefs} interface and keeps a hashmap
  * with all the default values.
  * <p>
- * There are still some similar preferences classes ({@link org.jabref.logic.openoffice.OpenOfficePreferences} and {@link org.jabref.logic.shared.prefs.SharedDatabasePreferences}) which also use
+ * There are still some similar preferences classes ({@link OpenOfficePreferences} and {@link SharedDatabasePreferences}) which also use
  * the {@code java.util.prefs} API.
  */
 @Singleton
@@ -365,6 +367,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
+    public static final String OO_CURRENT_STYLE = "ooCurrentStyle";
 
     // Special field preferences
     public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
@@ -722,6 +725,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
+        defaults.put(OO_CURRENT_STYLE, CitationStyle.getDefault().getPath()); // Default CSL Style is IEEE
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
 
@@ -1138,7 +1142,8 @@ public class JabRefPreferences implements PreferencesService {
         LOGGER.debug("Exporting preferences {}", path.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(path)) {
             prefs.exportSubtree(os);
-        } catch (BackingStoreException | IOException ex) {
+        } catch (BackingStoreException
+                 | IOException ex) {
             throw new JabRefException(
                     "Could not export preferences",
                     Localization.lang("Could not export preferences"),
@@ -1156,7 +1161,8 @@ public class JabRefPreferences implements PreferencesService {
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
-        } catch (InvalidPreferencesFormatException | IOException ex) {
+        } catch (InvalidPreferencesFormatException
+                 | IOException ex) {
             throw new JabRefException(
                     "Could not import preferences",
                     Localization.lang("Could not import preferences"),
@@ -1291,19 +1297,40 @@ public class JabRefPreferences implements PreferencesService {
             return openOfficePreferences;
         }
 
+        String currentStylePath = get(OO_CURRENT_STYLE);
+
+        OOStyle currentStyle = CitationStyle.getDefault(); // Defaults to IEEE CSL Style
+
+        // Reassign currentStyle if it is not a CSL style
+        if (CitationStyle.isCitationStyleFile(currentStylePath)) {
+            currentStyle = CitationStyle.createCitationStyleFromFile(currentStylePath) // Assigns CSL Style
+                         .orElse(CitationStyle.getDefault());
+        } else {
+            // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
+            try {
+                currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+            } catch (IOException ex) {
+                LOGGER.warn("Could not create JStyle", ex);
+            }
+        }
+
         openOfficePreferences = new OpenOfficePreferences(
                 get(OO_EXECUTABLE_PATH),
                 getBoolean(OO_USE_ALL_OPEN_BASES),
                 getBoolean(OO_SYNC_WHEN_CITING),
                 getStringList(OO_EXTERNAL_STYLE_FILES),
-                get(OO_BIBLIOGRAPHY_STYLE_FILE));
+                get(OO_BIBLIOGRAPHY_STYLE_FILE),
+                currentStyle);
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
         EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (obs, oldValue, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
+
         openOfficePreferences.getExternalStyles().addListener((InvalidationListener) change ->
                 putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles()));
-        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
+        EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
+        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()));
 
         return openOfficePreferences;
     }
@@ -2410,7 +2437,7 @@ public class JabRefPreferences implements PreferencesService {
                         if (BstPreviewLayout.isBstStyleFile(layout)) {
                             return getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
                                                                           .filter(path -> path.endsWith(layout)).map(Path::of)
-                                                                          .map(file -> (BstPreviewLayout) new BstPreviewLayout(file))
+                                                                          .map(BstPreviewLayout::new)
                                                                           .findFirst()
                                                                           .orElse(null);
                         } else {

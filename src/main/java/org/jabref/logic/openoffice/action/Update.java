@@ -6,7 +6,7 @@ import java.util.List;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateBibliography;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOProcess;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
@@ -33,7 +33,7 @@ public class Update {
     private static List<String> updateDocument(XTextDocument doc,
                                                OOFrontend frontend,
                                                List<BibDatabase> databases,
-                                               OOBibStyle style,
+                                               JStyle style,
                                                FunctionalTextViewCursor fcursor,
                                                boolean doUpdateBibliography,
                                                boolean alwaysAddCitedOnPages)
@@ -100,7 +100,7 @@ public class Update {
 
     public static List<String> synchronizeDocument(XTextDocument doc,
                                                    OOFrontend frontend,
-                                                   OOBibStyle style,
+                                                   JStyle style,
                                                    FunctionalTextViewCursor fcursor,
                                                    SyncOptions syncOptions)
             throws
@@ -122,7 +122,7 @@ public class Update {
      * Reread document before sync
      */
     public static List<String> resyncDocument(XTextDocument doc,
-                                              OOBibStyle style,
+                                              JStyle style,
                                               FunctionalTextViewCursor fcursor,
                                               SyncOptions syncOptions)
             throws
