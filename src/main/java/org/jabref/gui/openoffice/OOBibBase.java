@@ -72,6 +72,8 @@ class OOBibBase {
 
     private final OOBibBaseConnect connection;
 
+    private final CSLCitationOOAdapter cslCitationOOAdapter;
+
     public OOBibBase(Path loPath, DialogService dialogService)
             throws
             BootstrapException,
@@ -82,6 +84,8 @@ class OOBibBase {
 
         this.refreshBibliographyDuringSyncWhenCiting = false;
         this.alwaysAddCitedOnPages = false;
+
+        cslCitationOOAdapter = new CSLCitationOOAdapter();
     }
 
     public void guiActionSelectDocument(boolean autoSelectForSingle) {
@@ -589,9 +593,9 @@ class OOBibBase {
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                    CSLCitationOOAdapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
+                    cslCitationOOAdapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
                 } else {
-                    CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
+                    cslCitationOOAdapter.insertBibliography(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
                 }
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
