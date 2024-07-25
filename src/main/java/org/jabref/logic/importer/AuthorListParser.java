@@ -37,7 +37,7 @@ public class AuthorListParser {
     private static final Set<String> TEX_NAMES = Set.of(
             "aa", "ae", "l", "o", "oe", "i", "AA", "AE", "L", "O", "OE", "j");
 
-    private static final Pattern STARTS_WITH_CAPITAL_LETTER_DOT = Pattern.compile("^[A-Z]\\. ");
+    private static final Pattern STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH = Pattern.compile("^[A-Z](\\.[ -]| ?-)");
 
     /**
      * the raw bibtex author/editor field
@@ -95,16 +95,14 @@ public class AuthorListParser {
         return stringBuilder;
     }
 
-    /**
-     * Parses the String containing person names and returns a list of person information.
-     *
-     * @param listOfNames the String containing the person names to be parsed
-     * @return a parsed list of persons
-     */
-    public AuthorList parse(@NonNull String listOfNames) {
+    private record SimpleNormalFormResult(String authors, boolean andOthersPresent) {
+    }
+
+    private static SimpleNormalFormResult getSimpleNormalForm(String listOfNames) {
+        listOfNames = listOfNames.replace(" -", "-").trim();
+
         // Handling of "and others"
         // Remove it from the list; it will be added at the very end of this method as special Author.OTHERS
-        listOfNames = listOfNames.trim();
         final String andOthersSuffix = " and others";
         final boolean andOthersPresent;
         if (StringUtil.endsWithIgnoreCase(listOfNames, andOthersSuffix)) {
@@ -114,7 +112,40 @@ public class AuthorListParser {
             andOthersPresent = false;
         }
 
-        listOfNames = checkNamesCommaSeparated(listOfNames);
+        return new SimpleNormalFormResult(checkNamesCommaSeparated(listOfNames), andOthersPresent);
+    }
+
+    /**
+     * Tries to get a simple BibTeX author list of the given string.
+     *
+     * This is an intermediate step in {@link #parse}. Since parse does not work in all cases,
+     * this method can be used to get more valid BibTeX.
+     *
+     * @return Optional.empty if there was no normalization.
+     */
+    public static Optional<String> normalizeSimply(String listOfNames) {
+        SimpleNormalFormResult simpleNormalForm = getSimpleNormalForm(listOfNames);
+        String result = simpleNormalForm.authors;
+        if (simpleNormalForm.andOthersPresent) {
+            result += " and others";
+        }
+        if (result.equals(listOfNames)) {
+            // No changes were done inside the method
+            return Optional.empty();
+        }
+        return Optional.of(result);
+    }
+
+    /**
+     * Parses the String containing person names and returns a list of person information.
+     *
+     * @param listOfNames the String containing the person names to be parsed
+     * @return a parsed list of persons
+     */
+    public AuthorList parse(@NonNull String listOfNames) {
+        SimpleNormalFormResult simpleNormalForm = getSimpleNormalForm(listOfNames);
+        listOfNames = simpleNormalForm.authors;
+        boolean andOthersPresent = simpleNormalForm.andOthersPresent;
 
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
@@ -188,11 +219,11 @@ public class AuthorListParser {
         int commandAndPos = listOfNames.lastIndexOf(", and ");
         if (commandAndPos >= 0) {
             String lastContainedName = listOfNames.substring(commandAndPos + ", and ".length());
-            Matcher matcher = STARTS_WITH_CAPITAL_LETTER_DOT.matcher(lastContainedName);
+            Matcher matcher = STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH.matcher(lastContainedName);
             if (matcher.find()) {
                 String namesBeforeAndString = listOfNames.substring(0, commandAndPos);
                 String[] namesBeforeAnd = namesBeforeAndString.split(", ");
-                if (Arrays.stream(namesBeforeAnd).allMatch(name -> STARTS_WITH_CAPITAL_LETTER_DOT.matcher(name).find())) {
+                if (Arrays.stream(namesBeforeAnd).allMatch(name -> STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH.matcher(name).find())) {
                     // Format found
                     listOfNames = Arrays.stream(namesBeforeAnd).collect(Collectors.joining(" and ", "", " and " + lastContainedName));
                 }
