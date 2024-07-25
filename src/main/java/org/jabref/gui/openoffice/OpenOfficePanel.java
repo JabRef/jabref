@@ -231,22 +231,22 @@ public class OpenOfficePanel {
 
         update.setTooltip(new Tooltip(Localization.lang("Ensure that the bibliography is up-to-date")));
 
-            update.setOnAction(event -> {
-                String title = Localization.lang("Could not update bibliography");
-                if (getOrUpdateTheStyle(title)) {
-                    return;
-                }
-                List<BibDatabase> databases = getBaseList();
-                ooBase.guiActionUpdateDocument(databases, currentStyle);
-            });
+        update.setOnAction(event -> {
+            String title = Localization.lang("Could not update bibliography");
+            if (getOrUpdateTheStyle(title)) {
+                return;
+            }
+            List<BibDatabase> databases = getBaseList();
+            ooBase.guiActionUpdateDocument(databases, currentStyle);
+        });
 
-            merge.setMaxWidth(Double.MAX_VALUE);
-            merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
-            merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), currentStyle));
+        merge.setMaxWidth(Double.MAX_VALUE);
+        merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
+        merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), currentStyle));
 
-            unmerge.setMaxWidth(Double.MAX_VALUE);
-            unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
-            unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), currentStyle));
+        unmerge.setMaxWidth(Double.MAX_VALUE);
+        unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
+        unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), currentStyle));
 
         ContextMenu settingsMenu = createSettingsPopup();
         settingsB.setMaxWidth(Double.MAX_VALUE);
