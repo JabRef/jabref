@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
          fx:controller="org.jabref.gui.fieldeditors.LinkedFilesEditor">
     <ListView fx:id="listView" prefHeight="0" HBox.hgrow="ALWAYS" maxHeight="100" />
@@ -37,6 +38,15 @@
             </graphic>
             <tooltip>
                 <Tooltip text="%Download from URL"/>
+            </tooltip>
+        </Button>
+        <!-- New Button for opening a blank text document -->
+        <Button fx:id="openBlankTxtButton" onAction="#openBlankTextFile" styleClass="icon-button">
+            <graphic>
+                <JabRefIconView glyph="ADD"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Create a file"/>
             </tooltip>
         </Button>
     </VBox>

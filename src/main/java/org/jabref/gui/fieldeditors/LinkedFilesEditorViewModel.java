@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFilesEditorViewModel.class);
-
+    private ObservableList<Path> fileList = FXCollections.observableArrayList();
     private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
     private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
     private final DialogService dialogService;
@@ -103,7 +103,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, filePreferences)
                                                               .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
-        return new LinkedFile("", relativePath, suggestedFileType.getName());
+        return new LinkedFile("", file, suggestedFileType.getName());
     }
 
     public LinkedFileViewModel fromFile(Path file, FilePreferences filePreferences) {
@@ -117,6 +117,17 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 taskExecutor,
                 dialogService,
                 preferences);
+    }
+
+    public void addFile(Path filePath, List<Path> root) {
+        System.out.println("path is: "+ filePath);
+        System.out.println("root is: "+ root);
+        addNewLinkedFile(filePath, root);
+
+    }
+
+    public ObservableList<Path> getFileList() {
+        return fileList;
     }
 
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {
@@ -162,6 +173,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     Path correctPath = fileToAdd.resolveSibling(newFilename);
                     try {
                         Files.move(fileToAdd, correctPath);
+
                         addNewLinkedFile(correctPath, fileDirectories);
                     } catch (IOException ex) {
                         LOGGER.error("Error moving file", ex);
@@ -169,6 +181,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     }
                 }
             } else {
+
                 addNewLinkedFile(fileToAdd, fileDirectories);
             }
         }
@@ -258,17 +271,17 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         }
         if (urlField.isEmpty() || !download_success) {
             BackgroundTask
-                .wrap(() -> fetcher.findFullTextPDF(entry))
-                .onRunning(() -> fulltextLookupInProgress.setValue(true))
-                .onFinished(() -> fulltextLookupInProgress.setValue(false))
-                .onSuccess(url -> {
-                    if (url.isPresent()) {
-                        addFromURLAndDownload(url.get());
-                    } else {
-                        dialogService.notify(Localization.lang("No full text document found"));
-                    }
-                })
-                .executeWith(taskExecutor);
+                    .wrap(() -> fetcher.findFullTextPDF(entry))
+                    .onRunning(() -> fulltextLookupInProgress.setValue(true))
+                    .onFinished(() -> fulltextLookupInProgress.setValue(false))
+                    .onSuccess(url -> {
+                        if (url.isPresent()) {
+                            addFromURLAndDownload(url.get());
+                        } else {
+                            dialogService.notify(Localization.lang("No full text document found"));
+                        }
+                    })
+                    .executeWith(taskExecutor);
         }
     }
 

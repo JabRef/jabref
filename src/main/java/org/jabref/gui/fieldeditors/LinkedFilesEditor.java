@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -31,6 +33,34 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import org.jabref.gui.DialogService;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.FilePreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Random;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
@@ -65,9 +95,12 @@ import jakarta.inject.Inject;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFilesEditor.class);
+
     @FXML private ListView<LinkedFileViewModel> listView;
     @FXML private JabRefIconView fulltextFetcher;
     @FXML private ProgressIndicator progressIndicator;
+    @FXML private Button openBlankTxtButton;
 
     private final Field field;
     private final BibDatabaseContext databaseContext;
@@ -80,6 +113,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @Inject private JournalAbbreviationRepository abbreviationRepository;
     @Inject private TaskExecutor taskExecutor;
     @Inject private UndoManager undoManager;
+
 
     private LinkedFilesEditorViewModel viewModel;
 
@@ -102,6 +136,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
     }
+
 
     @FXML
     private void initialize() {
@@ -131,6 +166,71 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.visibleProperty().bind(viewModel.fulltextLookupInProgressProperty());
 
         setUpKeyBindings();
+        openBlankTxtButton.setOnAction(event -> openBlankTextFile());
+    }
+
+    @FXML
+    private void openBlankTextFile() {
+        Stage formStage = new Stage(StageStyle.UTILITY);
+        formStage.initModality(Modality.APPLICATION_MODAL);
+        formStage.setTitle("Create New File");
+
+        TextArea textArea = new TextArea();
+        Button saveButton = new Button("Save");
+
+        saveButton.setOnAction(event -> {
+            String text = textArea.getText();
+            if (text.isEmpty()) {
+                showAlert("Text area cannot be empty.");
+                return;
+            }
+            processTextContent(text, formStage);
+        });
+
+        VBox vbox = new VBox(textArea, saveButton);
+        formStage.setScene(new Scene(vbox, 400, 300));
+        formStage.showAndWait();
+    }
+
+    private void processTextContent(String text, Stage stage) {
+        List<Path> fileDirectories = new ArrayList<>();
+        String randomFileName = generateRandomFileName();
+        try {
+            String userHome = System.getProperty("user.home");
+            Path userHomePath = Paths.get(userHome);
+
+            fileDirectories.add(userHomePath);
+            File file = new File(userHome + File.separator + randomFileName + ".txt");
+            if (file.createNewFile()) {
+                try (FileWriter writer = new FileWriter(file)) {
+                    writer.write(text);
+                }
+                viewModel.addFile(file.toPath(), fileDirectories);
+                stage.close();
+            } else {
+                showAlert("File already exists or could not be created.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("An error occurred while creating the file: " + e.getMessage());
+        }
+    }
+
+    private String generateRandomFileName() {
+        Random random = new Random();
+        StringBuilder fileName = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            fileName.append(random.nextInt(10));
+        }
+        return fileName.toString();
+    }
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void handleOnDragOver(LinkedFileViewModel originalItem, DragEvent event) {

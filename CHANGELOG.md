@@ -34,8 +34,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 
 
-
-
+## Added – 2024-07-25
+- Manual File Entry Creation:
+  Added a new button to the LinkedFilesEditor.fxml.
+  Clicking this button displays a textbox where users can manually enter text/URLs. [#11017](...)
 
 
 ## [5.15] – 2024-07-10
