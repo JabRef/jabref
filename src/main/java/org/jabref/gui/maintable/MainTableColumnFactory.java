@@ -155,6 +155,7 @@ public class MainTableColumnFactory {
         column.setCellValueFactory(cellData -> cellData.getValue().searchRank());
         new ValueTableCellFactory<BibEntryTableViewModel, Number>().withText(String::valueOf).install(column);
         column.setSortable(true);
+        column.setSortType(TableColumn.SortType.ASCENDING);
         column.setVisible(false);
         return column;
     }
