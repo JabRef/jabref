@@ -39,6 +39,8 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.externalfiles.DateRange;
+import org.jabref.gui.externalfiles.ExternalFileSorter;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.GroupViewMode;
@@ -89,6 +91,8 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
@@ -102,6 +106,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
@@ -139,7 +144,7 @@ import org.slf4j.LoggerFactory;
  * Internally it defines symbols used to pick a value from the {@code java.util.prefs} interface and keeps a hashmap
  * with all the default values.
  * <p>
- * There are still some similar preferences classes ({@link org.jabref.logic.openoffice.OpenOfficePreferences} and {@link org.jabref.logic.shared.prefs.SharedDatabasePreferences}) which also use
+ * There are still some similar preferences classes ({@link OpenOfficePreferences} and {@link SharedDatabasePreferences}) which also use
  * the {@code java.util.prefs} API.
  */
 @Singleton
@@ -288,6 +293,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = "keepOnTop";
     public static final String SEARCH_WINDOW_HEIGHT = "searchWindowHeight";
     public static final String SEARCH_WINDOW_WIDTH = "searchWindowWidth";
+    public static final String SEARCH_WINDOW_DIVIDER_POS = "searchWindowDividerPos";
     public static final String SEARCH_CATALOGS = "searchCatalogs";
     public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
@@ -345,6 +351,11 @@ public class JabRefPreferences implements PreferencesService {
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
     public static final String SHOW_SCITE_TAB = "showSciteTab";
 
+    // Lookup -> Unlinked Files Search dialog preferences
+    public static final String UNLINKED_FILES_SELECTED_EXTENSION = "unlinkedFilesSelectedExtension";
+    public static final String UNLINKED_FILES_SELECTED_DATE_RANGE = "unlinkedFilesSelectedDateRange";
+    public static final String UNLINKED_FILES_SELECTED_SORT = "unlinkedFilesSelectedSort";
+
     /**
      * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
      */
@@ -354,6 +365,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
+    public static final String OO_CURRENT_STYLE = "ooCurrentStyle";
 
     // Special field preferences
     public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
@@ -505,6 +517,7 @@ public class JabRefPreferences implements PreferencesService {
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
     private MergeDialogPreferences mergeDialogPreferences;
+    private UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences;
 
     private KeyBindingRepository keyBindingRepository;
 
@@ -534,6 +547,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);
         defaults.put(SEARCH_WINDOW_HEIGHT, 176.0);
         defaults.put(SEARCH_WINDOW_WIDTH, 600.0);
+        defaults.put(SEARCH_WINDOW_DIVIDER_POS, 0.5);
         defaults.put(SEARCH_CATALOGS, convertListToString(List.of(
                 ACMPortalFetcher.FETCHER_NAME,
                 SpringerFetcher.FETCHER_NAME,
@@ -695,6 +709,10 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, "");
         defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, "");
 
+        defaults.put(UNLINKED_FILES_SELECTED_EXTENSION, StandardFileType.ANY_FILE.name());
+        defaults.put(UNLINKED_FILES_SELECTED_DATE_RANGE, DateRange.ALL_TIME.name());
+        defaults.put(UNLINKED_FILES_SELECTED_SORT, ExternalFileSorter.DEFAULT.name());
+
         // OpenOffice/LibreOffice
         if (OS.WINDOWS) {
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);
@@ -709,6 +727,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
+        defaults.put(OO_CURRENT_STYLE, CitationStyle.getDefault().getPath()); // Default CSL Style is IEEE
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
 
@@ -1125,7 +1144,8 @@ public class JabRefPreferences implements PreferencesService {
         LOGGER.debug("Exporting preferences {}", path.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(path)) {
             prefs.exportSubtree(os);
-        } catch (BackingStoreException | IOException ex) {
+        } catch (BackingStoreException
+                 | IOException ex) {
             throw new JabRefException(
                     "Could not export preferences",
                     Localization.lang("Could not export preferences"),
@@ -1143,7 +1163,8 @@ public class JabRefPreferences implements PreferencesService {
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
-        } catch (InvalidPreferencesFormatException | IOException ex) {
+        } catch (InvalidPreferencesFormatException
+                 | IOException ex) {
             throw new JabRefException(
                     "Could not import preferences",
                     Localization.lang("Could not import preferences"),
@@ -1278,19 +1299,40 @@ public class JabRefPreferences implements PreferencesService {
             return openOfficePreferences;
         }
 
+        String currentStylePath = get(OO_CURRENT_STYLE);
+
+        OOStyle currentStyle = CitationStyle.getDefault(); // Defaults to IEEE CSL Style
+
+        // Reassign currentStyle if it is not a CSL style
+        if (CitationStyle.isCitationStyleFile(currentStylePath)) {
+            currentStyle = CitationStyle.createCitationStyleFromFile(currentStylePath) // Assigns CSL Style
+                         .orElse(CitationStyle.getDefault());
+        } else {
+            // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
+            try {
+                currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+            } catch (IOException ex) {
+                LOGGER.warn("Could not create JStyle", ex);
+            }
+        }
+
         openOfficePreferences = new OpenOfficePreferences(
                 get(OO_EXECUTABLE_PATH),
                 getBoolean(OO_USE_ALL_OPEN_BASES),
                 getBoolean(OO_SYNC_WHEN_CITING),
                 getStringList(OO_EXTERNAL_STYLE_FILES),
-                get(OO_BIBLIOGRAPHY_STYLE_FILE));
+                get(OO_BIBLIOGRAPHY_STYLE_FILE),
+                currentStyle);
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
         EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (obs, oldValue, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
+
         openOfficePreferences.getExternalStyles().addListener((InvalidationListener) change ->
                 putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles()));
-        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
+        EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
+        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()));
 
         return openOfficePreferences;
     }
@@ -2403,7 +2445,7 @@ public class JabRefPreferences implements PreferencesService {
                         if (BstPreviewLayout.isBstStyleFile(layout)) {
                             return getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
                                                                           .filter(path -> path.endsWith(layout)).map(Path::of)
-                                                                          .map(file -> (BstPreviewLayout) new BstPreviewLayout(file))
+                                                                          .map(BstPreviewLayout::new)
                                                                           .findFirst()
                                                                           .orElse(null);
                         } else {
@@ -2659,6 +2701,25 @@ public class JabRefPreferences implements PreferencesService {
         return mergeDialogPreferences;
     }
 
+    @Override
+    public UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferences() {
+        if (unlinkedFilesDialogPreferences != null) {
+            return unlinkedFilesDialogPreferences;
+        }
+
+        unlinkedFilesDialogPreferences = new UnlinkedFilesDialogPreferences(
+                get(UNLINKED_FILES_SELECTED_EXTENSION),
+                DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE)),
+                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT))
+        );
+
+        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedExtensionProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_EXTENSION, newValue));
+        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedDateRangeProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_DATE_RANGE, newValue.name()));
+        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedSortProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_SORT, newValue.name()));
+
+        return unlinkedFilesDialogPreferences;
+    }
+
     //*************************************************************************************************************
     // Misc preferences
     //*************************************************************************************************************
@@ -2676,7 +2737,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(SEARCH_FILTERING_MODE),
                 getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),
                 getDouble(SEARCH_WINDOW_HEIGHT),
-                getDouble(SEARCH_WINDOW_WIDTH));
+                getDouble(SEARCH_WINDOW_WIDTH),
+                getDouble(SEARCH_WINDOW_DIVIDER_POS));
 
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) c -> {
             putBoolean(SEARCH_REG_EXP, searchPreferences.getObservableSearchFlags().contains(SearchFlags.REGULAR_EXPRESSION));
@@ -2687,6 +2749,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
         EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
         EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));
+        EasyBind.listen(searchPreferences.getSearchWindowDividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_DIVIDER_POS, searchPreferences.getSearchWindowDividerPosition()));
 
         return searchPreferences;
     }

@@ -15,11 +15,15 @@ public class SearchPreferences {
 
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
-    private final DoubleProperty searchWindowHeight = new SimpleDoubleProperty();
-    private final DoubleProperty searchWindowWidth = new SimpleDoubleProperty();
+    private final DoubleProperty searchWindowHeight;
+    private final DoubleProperty searchWindowWidth;
+    private final DoubleProperty searchWindowDividerPosition;
 
-    public SearchPreferences(boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean isFilteringMode, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth) {
+    public SearchPreferences(boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean isFilteringMode, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
+        this.searchWindowHeight = new SimpleDoubleProperty(searchWindowHeight);
+        this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
+        this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
 
         searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
         if (isRegularExpression) {
@@ -34,15 +38,6 @@ public class SearchPreferences {
         if (isFilteringMode) {
             searchFlags.add(SearchFlags.FILTERING_SEARCH);
         }
-
-        this.setSearchWindowHeight(searchWindowHeight);
-        this.setSearchWindowWidth(searchWindowWidth);
-    }
-
-    public SearchPreferences(EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
-        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
-
-        this.searchFlags = FXCollections.observableSet(searchFlags);
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
@@ -101,6 +96,10 @@ public class SearchPreferences {
         return this.searchWindowWidth.get();
     }
 
+    public Double getSearchWindowDividerPosition() {
+        return this.searchWindowDividerPosition.get();
+    }
+
     public DoubleProperty getSearchWindowHeightProperty() {
         return this.searchWindowHeight;
     }
@@ -109,11 +108,19 @@ public class SearchPreferences {
         return this.searchWindowWidth;
     }
 
+    public DoubleProperty getSearchWindowDividerPositionProperty() {
+        return this.searchWindowDividerPosition;
+    }
+
     public void setSearchWindowHeight(double height) {
         this.searchWindowHeight.set(height);
     }
 
     public void setSearchWindowWidth(double width) {
         this.searchWindowWidth.set(width);
+    }
+
+    public void setSearchWindowDividerPosition(double position) {
+        this.searchWindowDividerPosition.set(position);
     }
 }

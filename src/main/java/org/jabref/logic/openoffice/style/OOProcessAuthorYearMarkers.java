@@ -27,7 +27,7 @@ class OOProcessAuthorYearMarkers {
     /**
      *  Fills {@code sortedCitedKeys//normCitMarker}
      */
-    private static void createNormalizedCitationMarkers(CitedKeys sortedCitedKeys, OOBibStyle style) {
+    private static void createNormalizedCitationMarkers(CitedKeys sortedCitedKeys, JStyle style) {
         for (CitedKey ck : sortedCitedKeys.values()) {
             ck.setNormalizedCitationMarker(Optional.of(style.getNormalizedCitationMarker(ck)));
         }
@@ -126,7 +126,7 @@ class OOProcessAuthorYearMarkers {
      *
      * @param style              Bibliography style.
      */
-    static void produceCitationMarkers(CitationGroups citationGroups, OOBibStyle style) {
+    static void produceCitationMarkers(CitationGroups citationGroups, JStyle style) {
         assert !style.isCitationKeyCiteMarkers();
         assert !style.isNumberEntries();
         // Citations in (Au1, Au2 2000) form

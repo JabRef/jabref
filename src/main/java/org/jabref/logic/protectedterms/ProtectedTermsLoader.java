@@ -112,8 +112,8 @@ public class ProtectedTermsLoader {
         return new ArrayList<>(result);
     }
 
-    public void addProtectedTermsListFromFile(String fileName, boolean enabled) {
-        mainList.add(readProtectedTermsListFromFile(Path.of(fileName), enabled));
+    public void addProtectedTermsListFromFile(Path path, boolean enabled) {
+        mainList.add(readProtectedTermsListFromFile(path, enabled));
     }
 
     public static ProtectedTermsList readProtectedTermsListFromResource(String resource, String description, boolean enabled) {

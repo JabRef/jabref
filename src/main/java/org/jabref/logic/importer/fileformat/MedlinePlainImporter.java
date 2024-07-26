@@ -149,6 +149,7 @@ public class MedlinePlainImporter extends Importer {
 
                 // store the fields in a map
                 Map<String, Field> hashMap = new HashMap<>();
+                hashMap.put("PMID", StandardField.PMID);
                 hashMap.put("PG", StandardField.PAGES);
                 hashMap.put("PL", StandardField.ADDRESS);
                 hashMap.put("PHST", new UnknownField("history"));
