@@ -3,6 +3,7 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
+
 plugins {
     id 'application'
 
