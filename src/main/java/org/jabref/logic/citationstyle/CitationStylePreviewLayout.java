@@ -39,4 +39,8 @@ public final class CitationStylePreviewLayout implements PreviewLayout {
     public String getName() {
         return citationStyle.getTitle();
     }
+
+    public CitationStyle getCitationStyle() {
+        return citationStyle;
+    }
 }

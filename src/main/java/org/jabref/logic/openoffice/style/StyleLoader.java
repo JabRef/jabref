@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -32,8 +33,8 @@ public class StyleLoader {
 
     // Lists of the internal
     // and external styles
-    private final List<OOBibStyle> internalStyles = new ArrayList<>();
-    private final List<OOBibStyle> externalStyles = new ArrayList<>();
+    private final List<JStyle> internalStyles = new ArrayList<>();
+    private final List<JStyle> externalStyles = new ArrayList<>();
 
     public StyleLoader(OpenOfficePreferences openOfficePreferences,
                        LayoutFormatterPreferences formatterPreferences,
@@ -45,8 +46,8 @@ public class StyleLoader {
         loadExternalStyles();
     }
 
-    public List<OOBibStyle> getStyles() {
-        List<OOBibStyle> result = new ArrayList<>(internalStyles);
+    public List<JStyle> getStyles() {
+        List<JStyle> result = new ArrayList<>(internalStyles);
         result.addAll(externalStyles);
         return result;
     }
@@ -60,7 +61,7 @@ public class StyleLoader {
     public boolean addStyleIfValid(String filename) {
         Objects.requireNonNull(filename);
         try {
-            OOBibStyle newStyle = new OOBibStyle(Path.of(filename), layoutFormatterPreferences, abbreviationRepository);
+            JStyle newStyle = new JStyle(Path.of(filename), layoutFormatterPreferences, abbreviationRepository);
             if (externalStyles.contains(newStyle)) {
                 LOGGER.info("External style file {} already existing.", filename);
             } else if (newStyle.isValid()) {
@@ -85,7 +86,7 @@ public class StyleLoader {
         List<String> lists = openOfficePreferences.getExternalStyles();
         for (String filename : lists) {
             try {
-                OOBibStyle style = new OOBibStyle(Path.of(filename), layoutFormatterPreferences, abbreviationRepository);
+                JStyle style = new JStyle(Path.of(filename), layoutFormatterPreferences, abbreviationRepository);
                 if (style.isValid()) { // Problem!
                     externalStyles.add(style);
                 } else {
@@ -104,7 +105,7 @@ public class StyleLoader {
         internalStyles.clear();
         for (String filename : internalStyleFiles) {
             try {
-                internalStyles.add(new OOBibStyle(filename, layoutFormatterPreferences, abbreviationRepository));
+                internalStyles.add(new JStyle(filename, layoutFormatterPreferences, abbreviationRepository));
             } catch (IOException e) {
                 LOGGER.info("Problem reading internal style file {}", filename, e);
             }
@@ -113,13 +114,13 @@ public class StyleLoader {
 
     private void storeExternalStyles() {
         List<String> filenames = new ArrayList<>(externalStyles.size());
-        for (OOBibStyle style : externalStyles) {
+        for (JStyle style : externalStyles) {
             filenames.add(style.getPath());
         }
         openOfficePreferences.setExternalStyles(filenames);
     }
 
-    public boolean removeStyle(OOBibStyle style) {
+    public boolean removeStyle(JStyle style) {
         Objects.requireNonNull(style);
         if (!style.isInternalStyle()) {
             boolean result = externalStyles.remove(style);
@@ -129,17 +130,36 @@ public class StyleLoader {
         return false;
     }
 
-    public OOBibStyle getUsedStyle() {
-        String filename = openOfficePreferences.getCurrentStyle();
+    public JStyle getUsedJstyle() {
+        String filename = openOfficePreferences.getCurrentJStyle();
         if (filename != null) {
-            for (OOBibStyle style : getStyles()) {
+            for (JStyle style : getStyles()) {
                 if (filename.equals(style.getPath())) {
                     return style;
                 }
             }
         }
         // Pick the first internal
-        openOfficePreferences.setCurrentStyle(internalStyles.getFirst().getPath());
+        openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
         return internalStyles.getFirst();
+    }
+
+    public OOStyle getUsedStyleUnified() {
+        OOStyle gotStyle = openOfficePreferences.getCurrentStyle();
+
+        if (gotStyle instanceof JStyle jStyle) {
+            String filename = jStyle.getPath();
+            for (JStyle style : getStyles()) {
+                if (filename.equals(style.getPath())) {
+                    return style;
+                }
+            }
+            // Pick the first internal
+            openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
+            return internalStyles.getFirst();
+        } else if (gotStyle instanceof CitationStyle citationStyle) {
+                return citationStyle;
+        }
+        return null;
     }
 }

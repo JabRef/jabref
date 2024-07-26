@@ -38,9 +38,6 @@ public class UiTaskExecutor implements TaskExecutor {
     private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
     private final WeakHashMap<DelayTaskThrottler, Void> throttlers = new WeakHashMap<>();
 
-    /**
-     *
-     */
     public static <V> V runInJavaFXThread(Callable<V> callable) {
         if (Platform.isFxApplicationThread()) {
             try {

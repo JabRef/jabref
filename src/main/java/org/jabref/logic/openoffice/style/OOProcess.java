@@ -41,7 +41,7 @@ public class OOProcess {
      *
      *  Yes, they are always sorted one way or another.
      */
-    public static Comparator<BibEntry> comparatorForMulticite(OOBibStyle style) {
+    public static Comparator<BibEntry> comparatorForMulticite(JStyle style) {
         if (style.getMultiCiteChronological()) {
             return OOProcess.YEAR_AUTHOR_TITLE_COMPARATOR;
         } else {
@@ -53,7 +53,7 @@ public class OOProcess {
      *  Fill citationGroups.bibliography and cgs.citationGroupsUnordered//CitationMarker
      *  according to style.
      */
-    public static void produceCitationMarkers(CitationGroups citationGroups, List<BibDatabase> databases, OOBibStyle style) {
+    public static void produceCitationMarkers(CitationGroups citationGroups, List<BibDatabase> databases, JStyle style) {
         if (!citationGroups.hasGlobalOrder()) {
             throw new IllegalStateException("produceCitationMarkers: globalOrder is misssing in citationGroups");
         }
