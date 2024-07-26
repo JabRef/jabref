@@ -12,7 +12,7 @@ import com.tobiasdiez.easybind.EasyObservableList;
 
 /**
  * Implementation of a mapped list that mirrors the functionality of {@link com.tobiasdiez.easybind.EasyBind#mapBacked}.
- * This class serves as a temporary solution until the fix proposed in <a href="https://github.com/tobiasdiez/EasyBind/pull/87">tobiasdiez/EasyBind#87</a>
+ * This class serves as a temporary solution until the fix proposed in <a href="https://github.com/JabRef/EasyBind/pull/5">JabRef/EasyBind#5</a>
  * is merged and released.
  */
 public class MappedBackedList<E, F> extends TransformationList<E, F> implements EasyObservableList<E> {

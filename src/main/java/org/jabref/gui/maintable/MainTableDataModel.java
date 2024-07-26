@@ -65,7 +65,7 @@ public class MainTableDataModel {
             return entry.isVisible();
         });
 
-        entriesFiltered.setOnUpdateCallback(entry -> {
+        entriesFiltered.setOnUpdate(entry -> {
             updateGroupVisibility(groupsMatcher, entry);
             updateSearchVisibility(libraryTab.searchQueryProperty().get(), entry);
         });

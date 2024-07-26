@@ -18,8 +18,8 @@ import javafx.collections.transformation.TransformationList;
  * A custom class that extends {@link javafx.collections.transformation.FilteredList FilteredList} to provide additional functionality.
  * This class closely mirrors the behavior of {@code FilteredList} with the following key differences:
  * <ol>
- * <li>Supports setting an update callback that runs a specified function on every updated item.</li>
- * <li>Offers access to the {@link #refilter()} method, enabling explicit re-evaluation of the filter criteria.</li>
+ * <li>Supports setting an update callback {@link #setOnUpdate(Consumer)} that runs a specified function on every updated item before testing the predicate.</li>
+ * <li>Offers access to the {@link #refilter()} method, to explicit re-evaluation of the filter predicate.</li>
  * </ol>
  *
  */
@@ -29,7 +29,7 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
     private int size;
     private SortHelper helper;
     private ObjectProperty<Predicate<? super E>> predicate;
-    private ObjectProperty<Consumer<E>> onUpdateCallback;
+    private ObjectProperty<Consumer<E>> onUpdate;
 
     public CustomFilteredList(@NamedArg("source") ObservableList<E> source, @NamedArg("predicate") Predicate<? super E> predicate) {
         super(source);
@@ -84,9 +84,9 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         return t -> true;
     }
 
-    public final ObjectProperty<Consumer<E>> onUpdateCallbackProperty() {
-        if (onUpdateCallback == null) {
-            onUpdateCallback = new ObjectPropertyBase<>() {
+    public final ObjectProperty<Consumer<E>> onUpdateProperty() {
+        if (onUpdate == null) {
+            onUpdate = new ObjectPropertyBase<>() {
                 @Override
                 public Object getBean() {
                     return CustomFilteredList.this;
@@ -94,19 +94,19 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
 
                 @Override
                 public String getName() {
-                    return "onUpdateCallback";
+                    return "onUpdate";
                 }
             };
         }
-        return onUpdateCallback;
+        return onUpdate;
     }
 
-    public final Consumer<E> getOnUpdateCallback() {
-        return onUpdateCallback == null ? null : onUpdateCallback.get();
+    public final Consumer<E> getOnUpdate() {
+        return onUpdate == null ? null : onUpdate.get();
     }
 
-    public final void setOnUpdateCallback(Consumer<E> onUpdateCallback) {
-        onUpdateCallbackProperty().set(onUpdateCallback);
+    public final void setOnUpdate(Consumer<E> onUpdate) {
+        onUpdateProperty().set(onUpdate);
     }
 
     @Override
@@ -247,7 +247,7 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
 
     private void update(ListChangeListener.Change<? extends E> c) {
         Predicate<? super E> predicateImpl = getPredicateImpl();
-        Consumer<E> callback = getOnUpdateCallback();
+        Consumer<E> onUpdateConsumer = getOnUpdate();
         ensureSize(getSource().size());
         int sourceFrom = c.getFrom();
         int sourceTo = c.getTo();
@@ -257,8 +257,8 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         int pos = filterFrom;
         while (pos < filterTo || sourceFrom < sourceTo) {
             E el = it.next();
-            if (callback != null) {
-                callback.accept(el);
+            if (onUpdateConsumer != null) {
+                onUpdateConsumer.accept(el);
             }
             if (pos < size && filtered[pos] == sourceFrom) {
                 if (!predicateImpl.test(el)) {
