@@ -72,7 +72,7 @@ public class CitationStyle implements OOStyle {
             }
 
             return Optional.of(new CitationStyle(filename, title.get(), content));
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+        } catch (ParserConfigurationException | SAXException | NullPointerException | IOException e) {
             LOGGER.error("Error while parsing source", e);
             return Optional.empty();
         }
@@ -118,6 +118,10 @@ public class CitationStyle implements OOStyle {
         Path internalFilePath = Path.of(internalFile);
         boolean isExternalFile = Files.exists(internalFilePath);
         try (InputStream inputStream = isExternalFile ? Files.newInputStream(internalFilePath) : CitationStyle.class.getResourceAsStream(internalFile)) {
+            if (inputStream == null) {
+                LOGGER.error("Could not find file: {}", styleFile);
+                return Optional.empty();
+            }
             return createCitationStyleFromSource(inputStream, styleFile);
         } catch (NoSuchFileException e) {
             LOGGER.error("Could not find file: {}", styleFile, e);
