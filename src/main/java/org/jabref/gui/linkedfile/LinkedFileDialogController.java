@@ -18,7 +18,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
+public class LinkedFileDialogController extends BaseDialog<LinkedFile> {
 
     @FXML private TextField link;
     @FXML private TextField description;
@@ -27,26 +27,27 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
 
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
-
     @Inject private PreferencesService preferences;
 
     private LinkedFilesEditDialogViewModel viewModel;
-
     private final LinkedFile linkedFile;
+    private final boolean isEditMode;
 
-    public LinkedFileEditDialogView(LinkedFile linkedFile) {
-        this.linkedFile = linkedFile;
+    public LinkedFileDialogController(LinkedFile linkedFile, boolean isEditMode) {
+        this.linkedFile = linkedFile != null ? linkedFile : new LinkedFile("", "", "");
+        this.isEditMode = isEditMode;
 
         ViewLoader.view(this)
                   .load()
                   .setAsContent(this.getDialogPane());
 
-        this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
+        ButtonType primaryButtonType = isEditMode ? ButtonType.APPLY : new ButtonType(Localization.lang("Add"), ButtonType.OK.getButtonData());
+        this.getDialogPane().getButtonTypes().addAll(primaryButtonType, ButtonType.CANCEL);
         this.setResizable(false);
-        this.setTitle(Localization.lang("Edit file link"));
+        this.setTitle(isEditMode ? Localization.lang("Edit file link") : Localization.lang("Add file link"));
 
         this.setResultConverter(button -> {
-            if (button == ButtonType.APPLY) {
+            if (button == primaryButtonType) {
                 return viewModel.getNewLinkedFile();
             } else {
                 return null;

@@ -12,7 +12,7 @@
 <?import org.jabref.gui.icon.JabRefIconView?>
 <DialogPane minHeight="140.0" minWidth="550.0"
             xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.jabref.gui.linkedfile.LinkedFileEditDialogView">
+            fx:controller="org.jabref.gui.linkedfile.LinkedFileDialogController">
     <content>
         <GridPane vgap="4" hgap="4">
             <columnConstraints>
@@ -24,9 +24,10 @@
                 <RowConstraints/>
                 <RowConstraints/>
                 <RowConstraints/>
+                <RowConstraints/>
             </rowConstraints>
 
-            <Label text="%Link"/>
+            <Label text="Link"/>
             <TextField fx:id="link" prefHeight="25.0"
                        GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
             <Button id="browse" onAction="#openBrowseDialog"
@@ -36,7 +37,7 @@
                     <JabRefIconView glyph="OPEN"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Browse"/>
+                    <Tooltip text="Browse"/>
                 </tooltip>
             </Button>
 
@@ -48,7 +49,7 @@
             <ComboBox fx:id="fileType"
                       GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2"/>
 
-            <Label text="%Source URL" GridPane.rowIndex="3"/>
+            <Label text="Source URL" GridPane.rowIndex="3"/>
             <TextField fx:id="sourceUrl" prefHeight="25.0"
                        GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3"/>
         </GridPane>

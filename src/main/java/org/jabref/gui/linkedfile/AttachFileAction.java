@@ -66,7 +66,7 @@ public class AttachFileAction extends SimpleCommand {
                     databaseContext.getFileDirectories(filePreferences),
                     filePreferences);
 
-            LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
+            LinkedFileDialogController dialog = new LinkedFileDialogController(linkedFile, true);
 
             dialogService.showCustomDialogAndWait(dialog)
                   .ifPresent(editedLinkedFile -> {
