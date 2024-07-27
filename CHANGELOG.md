@@ -14,6 +14,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
 - Added minimal support for [biblatex data annotation](https://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsection.3.7) fields in .layout files. [#11505](https://github.com/JabRef/jabref/issues/11505)
 - Added saving of selected options in the [Lookup -> Search for unlinked local files dialog](https://docs.jabref.org/collect/findunlinkedfiles#link-the-pdfs-to-your-bib-library). [#11439](https://github.com/JabRef/jabref/issues/11439)
+- Added a method to create a new link manually. [#11017](...)
 
 ### Changed
 
