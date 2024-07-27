@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -9,8 +11,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -31,6 +35,8 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
@@ -44,6 +50,8 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.GrobidOptInDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
+
+import org.jabref.gui.linkedfile.LinkedFileAddDialogController;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -285,7 +293,11 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void addNewFile() {
-        viewModel.addNewFile();
+        LinkedFileAddDialogController dialog = new LinkedFileAddDialogController();
+        dialog.showAndWait().ifPresent(result -> {
+            // Handle adding the new file
+            viewModel.addNewManualFile(result);
+        });
     }
 
     @FXML
