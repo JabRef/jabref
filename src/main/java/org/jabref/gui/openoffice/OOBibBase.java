@@ -29,6 +29,7 @@ import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.CitationEntry;
 import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
 import org.jabref.model.openoffice.style.CitationGroupId;
@@ -528,6 +529,7 @@ class OOBibBase {
      */
     public void guiActionInsertEntry(List<BibEntry> entries,
                                      BibDatabaseContext bibDatabaseContext,
+                                     BibEntryTypesManager bibEntryTypesManager,
                                      OOStyle style,
                                      CitationType citationType,
                                      String pageInfo,
@@ -593,9 +595,9 @@ class OOBibBase {
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                    cslCitationOOAdapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
+                    cslCitationOOAdapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else {
-                    cslCitationOOAdapter.insertBibliography(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
+                    cslCitationOOAdapter.insertBibliography(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 }
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations

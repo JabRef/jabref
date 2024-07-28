@@ -22,9 +22,8 @@ import org.apache.commons.text.StringEscapeUtils;
 public class CSLCitationOOAdapter {
 
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
-    private final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
 
-    public void insertBibliography(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
+    public void insertBibliography(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws IllegalArgumentException, WrappedTargetException, CreationException {
 
         String style = selectedStyle.getSource();
@@ -36,7 +35,7 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    public void insertInText(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext)
+    public void insertInText(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws IOException, WrappedTargetException, CreationException {
 
         String style = selectedStyle.getSource();
