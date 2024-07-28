@@ -287,7 +287,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void addNewFile() {
-        LinkedFileDialogController controller = new LinkedFileDialogController(null, false);
+        LinkedFileDialogController controller = new LinkedFileDialogController();
 
         controller.showAndWait().ifPresent(result -> {
             // Handle adding the new file
