@@ -263,7 +263,7 @@ public class BibDatabaseContext {
 
         if (getDatabasePath().isPresent()) {
             Path databasePath = getDatabasePath().get();
-            String fileName = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
+            String fileName = BackupFileUtil.getUniqueFilePrefix(databasePath) + "-" + databasePath.getFileName();
             indexPath = appData.resolve(fileName);
             LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);
             return indexPath;

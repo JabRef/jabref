@@ -4,36 +4,28 @@ import java.util.EnumSet;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
-import org.jabref.gui.search.SearchDisplayMode;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
 
 public class SearchPreferences {
 
-    private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
     private final ObservableSet<SearchFlags> searchFlags;
     private final BooleanProperty keepWindowOnTop;
     private final DoubleProperty searchWindowHeight;
     private final DoubleProperty searchWindowWidth;
     private final DoubleProperty searchWindowDividerPosition;
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
-        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
+    public SearchPreferences(boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean isFilteringMode, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
         this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
         this.searchWindowHeight = new SimpleDoubleProperty(searchWindowHeight);
         this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
         this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
 
         searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
-        if (isCaseSensitive) {
-            searchFlags.add(SearchFlags.CASE_SENSITIVE);
-        }
         if (isRegularExpression) {
             searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
         }
@@ -42,6 +34,9 @@ public class SearchPreferences {
         }
         if (isKeepSearchString) {
             searchFlags.add(SearchFlags.KEEP_SEARCH_STRING);
+        }
+        if (isFilteringMode) {
+            searchFlags.add(SearchFlags.FILTERING_SEARCH);
         }
     }
 
@@ -55,22 +50,6 @@ public class SearchPreferences {
 
     public ObservableSet<SearchFlags> getObservableSearchFlags() {
         return searchFlags;
-    }
-
-    public SearchDisplayMode getSearchDisplayMode() {
-        return searchDisplayMode.get();
-    }
-
-    public ObjectProperty<SearchDisplayMode> searchDisplayModeProperty() {
-        return searchDisplayMode;
-    }
-
-    public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
-        this.searchDisplayMode.set(searchDisplayMode);
-    }
-
-    public boolean isCaseSensitive() {
-        return searchFlags.contains(SearchFlags.CASE_SENSITIVE);
     }
 
     public void setSearchFlag(SearchFlags flag, boolean value) {
@@ -91,6 +70,10 @@ public class SearchPreferences {
 
     public boolean shouldKeepSearchString() {
         return searchFlags.contains(SearchFlags.KEEP_SEARCH_STRING);
+    }
+
+    public boolean isFilteringMode() {
+        return searchFlags.contains(SearchFlags.FILTERING_SEARCH);
     }
 
     public boolean shouldKeepWindowOnTop() {

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
+import javafx.css.PseudoClass;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -71,7 +72,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final StateManager stateManager;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
-
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
     private final ClipBoardManager clipBoardManager;
@@ -88,7 +88,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      PreferencesService preferencesService,
                      DialogService dialogService,
                      StateManager stateManager,
-                     KeyBindingRepository keyBindingRepository,
                      ClipBoardManager clipBoardManager,
                      BibEntryTypesManager entryTypesManager,
                      TaskExecutor taskExecutor,
@@ -139,7 +138,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     }
                 })
                 .withContextMenu(entry -> RightClickMenu.create(entry,
-                        keyBindingRepository,
+                        preferencesService.getKeyBindingRepository(),
                         libraryTab,
                         dialogService,
                         stateManager,
@@ -149,6 +148,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-search-and-groups"), entry -> entry.matchedBySearchProperty().and(entry.matchedByGroupProperty()))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-search-not-groups"), entry -> entry.matchedBySearchProperty().and(entry.matchedByGroupProperty().not()))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-groups-not-search"), entry -> entry.matchedByGroupProperty().and(entry.matchedBySearchProperty().not()))
+                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search-and-groups"), entry -> entry.matchedBySearchProperty().not().and(entry.matchedByGroupProperty().not()))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -157,6 +160,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .install(this);
 
         this.getSortOrder().clear();
+
+        this.getColumns().stream().map(column -> (MainTableColumn<?>) column)
+            .filter(column -> column.getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
+            .findFirst().ifPresent(searchRankColumn -> this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
+                if (!this.getSortOrder().contains(searchRankColumn)) {
+                    this.getSortOrder().addFirst(searchRankColumn);
+                }
+            }));
 
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
@@ -184,7 +195,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Store visual state
         new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
 
-        setupKeyBindings(keyBindingRepository);
+        setupKeyBindings(preferencesService.getKeyBindingRepository());
 
         this.setOnKeyTyped(key -> {
             if (this.getSortOrder().isEmpty()) {
@@ -445,11 +456,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         }
                         case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
+                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getLuceneManager());
                         }
                         case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
-                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
+                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getLuceneManager());
                         }
                     }
                 }

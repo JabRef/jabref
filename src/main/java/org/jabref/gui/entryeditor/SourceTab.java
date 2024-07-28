@@ -42,7 +42,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -120,12 +119,12 @@ public class SourceTab extends EntryEditorTab {
         this.keyBindingRepository = keyBindingRepository;
 
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
-            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+            // searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords); TODO btut: Pattern-Highlighting with lucene
             highlightSearchPattern();
         });
 
         stateManager.activeGlobalSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
-            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+            // searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
             highlightSearchPattern();
         });
     }

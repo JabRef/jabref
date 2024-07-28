@@ -35,9 +35,6 @@ public abstract class MatcherSet implements SearchMatcher {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("MatcherSet{");
-        sb.append("matchers=").append(matchers);
-        sb.append('}');
-        return sb.toString();
+        return "MatcherSet{" + "matchers=" + matchers + '}';
     }
 }

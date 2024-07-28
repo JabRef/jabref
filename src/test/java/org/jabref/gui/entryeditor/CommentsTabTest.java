@@ -14,7 +14,6 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -72,8 +71,6 @@ class CommentsTabTest {
     @Mock
     private JournalAbbreviationRepository journalAbbreviationRepository;
     @Mock
-    private IndexingTaskManager indexingTaskManager;
-    @Mock
     private OwnerPreferences ownerPreferences;
 
     @Mock
@@ -101,7 +98,6 @@ class CommentsTabTest {
                 dialogService,
                 stateManager,
                 themeManager,
-                indexingTaskManager,
                 taskExecutor,
                 journalAbbreviationRepository
         );

@@ -13,7 +13,11 @@ import java.util.stream.Collectors;
 import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.FloatProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
@@ -44,6 +48,10 @@ public class BibEntryTableViewModel {
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
     private final BibDatabaseContext bibDatabaseContext;
+    private final FloatProperty searchScore = new SimpleFloatProperty(0);
+    private final BooleanProperty isMatchedBySearch = new SimpleBooleanProperty(false);
+    private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(false);
+    private final BooleanProperty hasFullTextResults = new SimpleBooleanProperty(false);
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -148,5 +156,33 @@ public class BibEntryTableViewModel {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return bibDatabaseContext;
+    }
+
+    public FloatProperty searchScoreProperty() {
+        return searchScore;
+    }
+
+    public BooleanProperty hasFullTextResultsProperty() {
+        return hasFullTextResults;
+    }
+
+    public BooleanProperty matchedBySearchProperty() {
+        return isMatchedBySearch;
+    }
+
+    public BooleanProperty matchedByGroupProperty() {
+        return isMatchedByGroup;
+    }
+
+    public int getSearchRank() {
+        if (matchedBySearchProperty().and(matchedByGroupProperty()).get()) {
+            return 1;
+        } else if (matchedBySearchProperty().and(matchedByGroupProperty().not()).get()) {
+            return 2;
+        } else if (matchedByGroupProperty().and(matchedBySearchProperty().not()).get()) {
+            return 3;
+        } else {
+            return 4;
+        }
     }
 }

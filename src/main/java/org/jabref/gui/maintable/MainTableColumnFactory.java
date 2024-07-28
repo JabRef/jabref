@@ -51,7 +51,6 @@ import org.slf4j.LoggerFactory;
 public class MainTableColumnFactory {
 
     public static final String STYLE_ICON_COLUMN = "column-icon";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
     private final PreferencesService preferencesService;
@@ -61,7 +60,6 @@ public class MainTableColumnFactory {
     private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
     private final StateManager stateManager;
     private final MainTableTooltip tooltip;
 
@@ -80,13 +78,19 @@ public class MainTableColumnFactory {
         this.cellFactory = new CellFactory(preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager,
-                themeManager, taskExecutor);
+        ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
+        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
+            case SCORE:
+                returnColumn = createScoreColumn(column);
+                break;
+            case SEARCH_RANK:
+                returnColumn = createSearchRankColumn(column);
+                break;
             case INDEX:
                 returnColumn = createIndexColumn(column);
                 break;
@@ -134,10 +138,7 @@ public class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
-        columnPreferences.getColumns().forEach(column -> {
-            columns.add(createColumn(column));
-        });
-
+        columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
         return columns;
     }
 
@@ -148,7 +149,38 @@ public class MainTableColumnFactory {
     }
 
     /**
-     * Creates a column with a continous number
+     * Creates a column with the search score
+     */
+    private TableColumn<BibEntryTableViewModel, Float> createScoreColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, Float> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Score"));
+        header.getStyleClass().add("mainTable-header");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SCORE.getDisplayName()));
+        column.setGraphic(header);
+        column.setStyle("-fx-alignment: CENTER-RIGHT;");
+        column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().searchScoreProperty().getValue()));
+        new ValueTableCellFactory<BibEntryTableViewModel, Float>().withText(String::valueOf).install(column);
+        column.setSortable(true);
+        column.setReorderable(false);
+        column.visibleProperty().bind(stateManager.activeSearchQueryProperty().isPresent());
+        return column;
+    }
+
+    private TableColumn<BibEntryTableViewModel, Integer> createSearchRankColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, Integer> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Search rank"));
+        header.getStyleClass().add("mainTable-header");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SEARCH_RANK.getDisplayName()));
+        column.setGraphic(header);
+        column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getSearchRank()));
+        new ValueTableCellFactory<BibEntryTableViewModel, Integer>().withText(String::valueOf).install(column);
+        column.setSortable(true);
+//        column.setVisible(false);
+        return column;
+    }
+
+    /**
+     * Creates a column with a continuous number
      */
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);

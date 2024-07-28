@@ -1,8 +1,14 @@
 package org.jabref.gui.util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import javafx.beans.value.ObservableValue;
+import javafx.css.PseudoClass;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
@@ -19,6 +25,7 @@ import javafx.util.Callback;
 
 import org.jabref.model.strings.StringUtil;
 
+import com.tobiasdiez.easybind.Subscription;
 import org.reactfx.util.TriConsumer;
 
 /**
@@ -37,6 +44,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     private TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragOver;
     private TriConsumer<TableRow<S>, S, ? super MouseDragEvent> toOnMouseDragEntered;
     private Callback<S, String> toTooltip;
+    private final Map<PseudoClass, Callback<S, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
 
     public ViewModelTableRowFactory<S> withOnMouseClickedEvent(BiConsumer<S, ? super MouseEvent> onMouseClickedEvent) {
         this.onMouseClickedEvent = onMouseClickedEvent;
@@ -101,6 +109,11 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
 
     public ViewModelTableRowFactory<S> withTooltip(Callback<S, String> toTooltip) {
         this.toTooltip = toTooltip;
+        return this;
+    }
+
+    public ViewModelTableRowFactory<S> withPseudoClass(PseudoClass pseudoClass, Callback<S, ObservableValue<Boolean>> toCondition) {
+        this.pseudoClasses.putIfAbsent(pseudoClass, toCondition);
         return this;
     }
 
@@ -194,6 +207,21 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
                 }
             });
         }
+
+        final List<Subscription> subscriptions = new ArrayList<>();
+        row.itemProperty().addListener((observable, oldValue, newValue) -> {
+            subscriptions.forEach(Subscription::unsubscribe);
+            subscriptions.clear();
+            if (row.getItem() != null) {
+                for (Map.Entry<PseudoClass, Callback<S, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
+                    ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(row.getItem());
+                    subscriptions.add(BindingsHelper.includePseudoClassWhen(
+                            row,
+                            pseudoClassWithCondition.getKey(),
+                            condition));
+                }
+            }
+        });
         return row;
     }
 
