@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javafx.beans.NamedArg;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
-import javafx.collections.ListChangeListener;
+import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.TransformationList;
 
@@ -18,18 +17,17 @@ import javafx.collections.transformation.TransformationList;
  * A custom class that extends {@link javafx.collections.transformation.FilteredList FilteredList} to provide additional functionality.
  * This class closely mirrors the behavior of {@code FilteredList} with the following key differences:
  * <ol>
- * <li>Supports setting an update callback {@link #setOnUpdate(Consumer)} that runs a specified function on every updated item before testing the predicate.</li>
- * <li>Offers access to the {@link #refilter()} method, to explicit re-evaluation of the filter predicate.</li>
+ * <li>Offers access to the {@link #refilter()} method, to re-evaluation of the filter predicate over the entire list.</li>
+ * <li>Adds the {@link #refilter(int, int)} method to re-evaluate the filter predicate over a specific range of elements.</li>
  * </ol>
  *
  */
-public class CustomFilteredList<E> extends TransformationList<E, E> {
 
+public final class CustomFilteredList<E> extends TransformationList<E, E> {
     private int[] filtered;
     private int size;
     private SortHelper helper;
     private ObjectProperty<Predicate<? super E>> predicate;
-    private ObjectProperty<Consumer<E>> onUpdate;
 
     public CustomFilteredList(@NamedArg("source") ObservableList<E> source, @NamedArg("predicate") Predicate<? super E> predicate) {
         super(source);
@@ -84,33 +82,8 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         return t -> true;
     }
 
-    public final ObjectProperty<Consumer<E>> onUpdateProperty() {
-        if (onUpdate == null) {
-            onUpdate = new ObjectPropertyBase<>() {
-                @Override
-                public Object getBean() {
-                    return CustomFilteredList.this;
-                }
-
-                @Override
-                public String getName() {
-                    return "onUpdate";
-                }
-            };
-        }
-        return onUpdate;
-    }
-
-    public final Consumer<E> getOnUpdate() {
-        return onUpdate == null ? null : onUpdate.get();
-    }
-
-    public final void setOnUpdate(Consumer<E> onUpdate) {
-        onUpdateProperty().set(onUpdate);
-    }
-
     @Override
-    protected void sourceChanged(ListChangeListener.Change<? extends E> c) {
+    protected void sourceChanged(Change<? extends E> c) {
         beginChange();
         while (c.next()) {
             if (c.wasPermutated()) {
@@ -124,11 +97,23 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         endChange();
     }
 
+    /**
+     * Returns the number of elements in this list.
+     *
+     * @return the number of elements in this list
+     */
     @Override
     public int size() {
         return size;
     }
 
+    /**
+     * Returns the element at the specified position in this list.
+     *
+     * @param  index index of the element to return
+     * @return the element at the specified position in this list
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     */
     @Override
     public E get(int index) {
         if (index >= size) {
@@ -185,7 +170,7 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         }
     }
 
-    private void permutate(ListChangeListener.Change<? extends E> c) {
+    private void permutate(Change<? extends E> c) {
         int from = findPosition(c.getFrom());
         int to = findPosition(c.getTo());
 
@@ -199,7 +184,7 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         }
     }
 
-    private void addRemove(ListChangeListener.Change<? extends E> c) {
+    private void addRemove(Change<? extends E> c) {
         Predicate<? super E> predicateImpl = getPredicateImpl();
         ensureSize(getSource().size());
         final int from = findPosition(c.getFrom());
@@ -245,9 +230,8 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         }
     }
 
-    private void update(ListChangeListener.Change<? extends E> c) {
+    private void update(Change<? extends E> c) {
         Predicate<? super E> predicateImpl = getPredicateImpl();
-        Consumer<E> onUpdateConsumer = getOnUpdate();
         ensureSize(getSource().size());
         int sourceFrom = c.getFrom();
         int sourceTo = c.getTo();
@@ -257,9 +241,6 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         int pos = filterFrom;
         while (pos < filterTo || sourceFrom < sourceTo) {
             E el = it.next();
-            if (onUpdateConsumer != null) {
-                onUpdateConsumer.accept(el);
-            }
             if (pos < size && filtered[pos] == sourceFrom) {
                 if (!predicateImpl.test(el)) {
                     nextRemove(pos, el);
@@ -302,5 +283,39 @@ public class CustomFilteredList<E> extends TransformationList<E, E> {
         if (hasListeners()) {
             fireChange(new NonIterableChange.GenericAddRemoveChange<>(0, size, removed, this));
         }
+    }
+
+    public void refilter(int sourceFrom, int sourceTo) {
+        if (sourceFrom < 0 || sourceTo > getSource().size() || sourceFrom > sourceTo) {
+            throw new IndexOutOfBoundsException();
+        }
+        beginChange();
+        ensureSize(getSource().size());
+        Predicate<? super E> predicateImpl = getPredicateImpl();
+        ListIterator<? extends E> it = getSource().listIterator(sourceFrom);
+        for (int i = sourceFrom; i < sourceTo; ++i) {
+            E el = it.next();
+            int pos = Arrays.binarySearch(filtered, 0, size, i);
+            boolean passedBefore = pos >= 0;
+            boolean passedNow = predicateImpl.test(el);
+            /* 1. passed before and now -> nextUpdate
+             * 2. passed before and not now -> nextRemove
+             * 3. not passed before and now -> nextAdd
+             * 4. not passed before and not now -> do nothing */
+            if (passedBefore && passedNow) {
+                nextUpdate(pos);
+            } else if (passedBefore) {
+                nextRemove(pos, el);
+                System.arraycopy(filtered, pos + 1, filtered, pos, size - pos - 1);
+                --size;
+            } else if (passedNow) {
+                int insertionPoint = ~pos;
+                System.arraycopy(filtered, insertionPoint, filtered, insertionPoint + 1, size - insertionPoint);
+                filtered[insertionPoint] = i;
+                nextAdd(insertionPoint, insertionPoint + 1);
+                ++size;
+            }
+        }
+        endChange();
     }
 }

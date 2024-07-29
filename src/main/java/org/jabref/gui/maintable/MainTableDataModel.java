@@ -6,6 +6,7 @@ import java.util.Optional;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 
@@ -59,15 +60,20 @@ public class MainTableDataModel {
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
         entriesViewModel = new MappedBackedList<>(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
+        entriesFiltered = new CustomFilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
 
-        entriesFiltered = new CustomFilteredList<>(entriesViewModel, entry -> {
-            entry.updateSearchRank();
-            return entry.isVisible();
-        });
-
-        entriesFiltered.setOnUpdate(entry -> {
-            updateGroupVisibility(groupsMatcher, entry);
-            updateSearchVisibility(libraryTab.searchQueryProperty().get(), entry);
+        entriesViewModel.addListener((ListChangeListener.Change<? extends BibEntryTableViewModel> change) -> {
+            while (change.next()) {
+                if (change.wasAdded() || change.wasUpdated()) {
+                    BackgroundTask.wrap(() -> {
+                        for (BibEntryTableViewModel entry : change.getList().subList(change.getFrom(), change.getTo())) {
+                            updateSearchVisibility(libraryTab.searchQueryProperty().get(), entry);
+                            updateGroupVisibility(groupsMatcher, entry);
+                            entry.updateSearchRank();
+                        }
+                    }).onSuccess(result -> entriesFiltered.refilter(change.getFrom(), change.getTo())).executeWith(taskExecutor);
+                }
+            }
         });
 
         searchQuerySubscription = EasyBind.listen(libraryTab.searchQueryProperty(), (observable, oldValue, newValue) -> updateSearchMatches(newValue));
@@ -89,14 +95,20 @@ public class MainTableDataModel {
 
     private void updateSearchMatches(Optional<SearchQuery> query) {
         BackgroundTask.wrap(() -> {
-            entriesViewModel.forEach(entry -> updateSearchVisibility(query, entry));
+            entriesViewModel.forEach(entry -> {
+                updateSearchVisibility(query, entry);
+                entry.updateSearchRank();
+            });
         }).onSuccess(result -> entriesFiltered.refilter()).executeWith(taskExecutor);
     }
 
     private void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
         BackgroundTask.wrap(() -> {
             groupsMatcher = createGroupMatcher(groups, groupsPreferences);
-            entriesViewModel.forEach(entry -> updateGroupVisibility(groupsMatcher, entry));
+            entriesViewModel.forEach(entry -> {
+                updateGroupVisibility(groupsMatcher, entry);
+                entry.updateSearchRank();
+            });
         }).onSuccess(result -> entriesFiltered.refilter()).executeWith(taskExecutor);
     }
 
