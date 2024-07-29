@@ -18,7 +18,7 @@
                         <Font name="System Bold" size="12.0" />
                     </font>
                 </Label>
-                <ExpandingTextArea fx:id="contentTextArea" text="Content" editable="false" nodeOrientation="LEFT_TO_RIGHT"/>
+                <ExpandingTextArea fx:id="contentTextArea" editable="false" nodeOrientation="LEFT_TO_RIGHT" text="Content" />
             </children>
       </VBox>
     </children>

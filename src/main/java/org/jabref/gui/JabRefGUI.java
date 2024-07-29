@@ -55,8 +55,10 @@ public class JabRefGUI extends Application {
 
     private static List<UiCommand> uiCommands;
     private static JabRefPreferences preferencesService;
-    private static AiService aiService;
     private static FileUpdateMonitor fileUpdateMonitor;
+
+    // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
+    private static AiService aiService;
 
     private static StateManager stateManager;
     private static ThemeManager themeManager;
@@ -209,9 +211,11 @@ public class JabRefGUI extends Application {
         debugLogWindowState(mainStage);
 
         Scene scene = new Scene(JabRefGUI.mainFrame);
+
+        LOGGER.debug("installing CSS");
         themeManager.installCss(scene);
 
-        // Handle TextEditor key bindings
+        LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(
                 scene,
                 event,
@@ -223,7 +227,11 @@ public class JabRefGUI extends Application {
         mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
         mainStage.setOnHiding(this::onHiding);
+
+        LOGGER.debug("Showing mainStage");
         mainStage.show();
+
+        LOGGER.debug("frame initialized");
 
         Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
     }
@@ -269,7 +277,7 @@ public class JabRefGUI extends Application {
     }
 
     /**
-     * outprints the Data from the Screen (only in debug mode)
+     * Logs data from the Screen (only in debug mode)
      *
      * @param mainStage JabRefs stage
      */
@@ -313,10 +321,19 @@ public class JabRefGUI extends Application {
 
     @Override
     public void stop() {
+        LOGGER.trace("Closing AI service");
+        try {
+            aiService.close();
+        } catch (Exception e) {
+            LOGGER.error("Unable to close AI service", e);
+        }
+        LOGGER.trace("Closing OpenOffice connection");
         OOBibBaseConnect.closeOfficeConnection();
+        LOGGER.trace("Stopping background tasks");
         stopBackgroundTasks();
+        LOGGER.trace("Shutting down thread pools");
         shutdownThreadPools();
-        aiService.close();
+        LOGGER.trace("Finished stop");
     }
 
     public void stopBackgroundTasks() {
@@ -324,14 +341,15 @@ public class JabRefGUI extends Application {
     }
 
     public static void shutdownThreadPools() {
+        LOGGER.trace("Shutting down taskExecutor");
         taskExecutor.shutdown();
+        LOGGER.trace("Shutting down fileUpdateMonitor");
         fileUpdateMonitor.shutdown();
+        LOGGER.trace("Shutting down directoryMonitor");
         DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
         directoryMonitor.shutdown();
+        LOGGER.trace("Shutting down HeadlessExecutorService");
         HeadlessExecutorService.INSTANCE.shutdownEverything();
-    }
-
-    public static AiService getAiService() {
-        return aiService;
+        LOGGER.trace("Finished shutdownThreadPools");
     }
 }

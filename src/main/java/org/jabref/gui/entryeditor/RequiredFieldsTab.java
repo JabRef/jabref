@@ -13,8 +13,9 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
@@ -35,17 +36,18 @@ public class RequiredFieldsTab extends FieldsEditorTab {
     public RequiredFieldsTab(BibDatabaseContext databaseContext,
                              SuggestionProviders suggestionProviders,
                              UndoManager undoManager,
+                             UndoAction undoAction,
+                             RedoAction redoAction,
                              DialogService dialogService,
                              PreferencesService preferences,
                              StateManager stateManager,
                              ThemeManager themeManager,
                              IndexingTaskManager indexingTaskManager,
-                             EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager,
                              BibEntryTypesManager entryTypesManager,
                              TaskExecutor taskExecutor,
                              JournalAbbreviationRepository journalAbbreviationRepository) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService,
-                preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, indexingTaskManager, embeddingsGenerationTaskManager);
+        super(false, databaseContext, suggestionProviders, undoManager, undoAction, redoAction, dialogService,
+                preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, indexingTaskManager);
         this.entryTypesManager = entryTypesManager;
         setText(Localization.lang("Required fields"));
         setTooltip(new Tooltip(Localization.lang("Show required fields")));

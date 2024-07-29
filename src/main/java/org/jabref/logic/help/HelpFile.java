@@ -47,16 +47,17 @@ public enum HelpFile {
     FIND_DUPLICATES("finding-sorting-and-cleaning-entries/findduplicates"),
     SQL_DATABASE_MIGRATION("collaborative-work/sqldatabase/sqldatabasemigration"),
     PUSH_TO_APPLICATION("cite/pushtoapplications"),
-    AI_PROVIDER("advanced/ai#providers"),
-    AI_CHAT_MODEL("advanced/ai#chat-model"),
-    AI_API_TOKEN("advanced/ai#api-token"),
-    AI_EMBEDDING_MODEL("advanced/ai#embedding-model"),
-    AI_SYSTEM_MESSAGE("advanced/ai#instruction"),
-    AI_MESSAGE_WINDOW_SIZE("advanced/ai#message-window-size"),
-    AI_DOCUMENT_SPLITTER_CHUNK_SIZE("advanced/ai#document-splitter-chunk-size"),
-    AI_DOCUMENT_SPLITTER_OVERLAP_SIZE("advanced/ai#document-splitter-overlap-size"),
-    AI_RAG_MAX_RESULTS_COUNT("advanced/ai#retrieval-augmented-generation-maximum-results-count"),
-    AI_RAG_MIN_SCORE("advanced/ai#retrieval-augmented-generation-minimum-score");
+    AI_PROVIDER("ai#providers"),
+    AI_CHAT_MODEL("ai#chat-model"),
+    AI_API_TOKEN("ai#api-token"),
+    AI_EMBEDDING_MODEL("ai#embedding-model"),
+    AI_API_BASE_URL("ai#api-base-url"),
+    AI_INSTRUCTION("ai#instruction"),
+    AI_CONTEXT_WINDOW_SIZE("ai#context-window-size"),
+    AI_DOCUMENT_SPLITTER_CHUNK_SIZE("ai#document-splitter-chunk-size"),
+    AI_DOCUMENT_SPLITTER_OVERLAP_SIZE("ai#document-splitter-overlap-size"),
+    AI_RAG_MAX_RESULTS_COUNT("ai#retrieval-augmented-generation-maximum-results-count"),
+    AI_RAG_MIN_SCORE("ai#retrieval-augmented-generation-minimum-score");
 
     private final String pageName;
 

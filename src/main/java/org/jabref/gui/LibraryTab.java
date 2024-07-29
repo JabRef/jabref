@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -51,6 +52,8 @@ import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -58,7 +61,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -158,7 +160,6 @@ public class LibraryTab extends Tab {
 
     private final ClipBoardManager clipBoardManager;
     private final IndexingTaskManager indexingTaskManager;
-    private EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager;
 
     private final TaskExecutor taskExecutor;
     private final DirectoryMonitorManager directoryMonitorManager;
@@ -185,7 +186,6 @@ public class LibraryTab extends Tab {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.indexingTaskManager = new IndexingTaskManager(taskExecutor);
-        this.embeddingsGenerationTaskManager = new EmbeddingsGenerationTaskManager(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
         this.taskExecutor = taskExecutor;
         this.directoryMonitorManager = new DirectoryMonitorManager(Injector.instantiateModelOrService(DirectoryMonitor.class));
 
@@ -201,7 +201,6 @@ public class LibraryTab extends Tab {
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
-        this.getDatabase().registerListener(new EmbeddingsUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -211,7 +210,7 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
-        this.entryEditor = new EntryEditor(this);
+        this.entryEditor = createEntryEditor();
 
         // set LibraryTab ID for drag'n'drop
         // ID content doesn't matter, we only need different tabs to have different ID
@@ -225,6 +224,14 @@ public class LibraryTab extends Tab {
 
         setOnCloseRequest(this::onCloseRequest);
         setOnClosed(this::onClosed);
+    }
+
+    private EntryEditor createEntryEditor() {
+        Supplier<LibraryTab> tabSupplier = () -> this;
+        return new EntryEditor(this,
+                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
+                new UndoAction(tabSupplier, dialogService, stateManager),
+                new RedoAction(tabSupplier, dialogService, stateManager));
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -279,10 +286,6 @@ public class LibraryTab extends Tab {
             }
         }
 
-        if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-            embeddingsGenerationTaskManager.updateEmbeddings(bibDatabaseContext);
-        }
-
         LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;
@@ -323,13 +326,11 @@ public class LibraryTab extends Tab {
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
-        this.embeddingsGenerationTaskManager = new EmbeddingsGenerationTaskManager(bibDatabaseContext, preferencesService.getFilePreferences(), aiService, taskExecutor);
 
         setupMainPanel();
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
-        this.getDatabase().registerListener(new EmbeddingsUpdateListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
@@ -339,7 +340,7 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
-        this.entryEditor = new EntryEditor(this);
+        this.entryEditor = createEntryEditor();
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -419,13 +420,8 @@ public class LibraryTab extends Tab {
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
+                tabTitle.append('*');
                 tabTitle.append(Localization.lang("untitled"));
-                if (bibDatabaseContext.getDatabase().hasEntries()) {
-                    // if the database is not empty and no file is assigned,
-                    // the database came from an import and has to be treated somehow
-                    // -> mark as changed
-                    tabTitle.append('*');
-                }
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
@@ -712,7 +708,6 @@ public class LibraryTab extends Tab {
     /**
      * Put an asterisk behind the filename to indicate the database has changed.
      */
-
     public synchronized void markChangedOrUnChanged() {
         if (undoManager.hasChanged()) {
             this.changedProperty.setValue(true);
@@ -1142,44 +1137,6 @@ public class LibraryTab extends Tab {
         return indexingTaskManager;
     }
 
-    private class EmbeddingsUpdateListener {
-        @Subscribe
-        public void listen(EntriesAddedEvent event) {
-            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-                embeddingsGenerationTaskManager.addToProcess(event.getBibEntries());
-            }
-        }
-
-        @Subscribe
-        public void listen(EntriesRemovedEvent event) {
-            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-                embeddingsGenerationTaskManager.removeFromProcess(event.getBibEntries());
-            }
-        }
-
-        @Subscribe
-        public void listen(FieldChangedEvent event) {
-            if (preferencesService.getAiPreferences().getEnableChatWithFiles()) {
-                if (event.getField().equals(StandardField.FILE)) {
-                    List<LinkedFile> oldFileList = FileFieldParser.parse(event.getOldValue());
-                    List<LinkedFile> newFileList = FileFieldParser.parse(event.getNewValue());
-
-                    List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
-                    addedFiles.removeAll(oldFileList);
-                    List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
-                    removedFiles.removeAll(newFileList);
-
-                    embeddingsGenerationTaskManager.addToProcess(addedFiles);
-                    embeddingsGenerationTaskManager.removeFromProcess(removedFiles);
-                }
-            }
-        }
-    }
-
-    public EmbeddingsGenerationTaskManager getEmbeddingsGenerationTaskManager() {
-        return embeddingsGenerationTaskManager;
-    }
-
     public static class DatabaseNotification extends NotificationPane {
         public DatabaseNotification(Node content) {
             super(content);
@@ -1208,5 +1165,9 @@ public class LibraryTab extends Tab {
                 "bibDatabaseContext=" + bibDatabaseContext +
                 ", showing=" + showing +
                 '}';
+    }
+
+    public LibraryTabContainer getLibraryTabContainer() {
+        return tabContainer;
     }
 }

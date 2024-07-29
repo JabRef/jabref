@@ -11,7 +11,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.index.DirectoryReader;
@@ -35,8 +34,6 @@ public class PdfIndexerTest {
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
-        AiPreferences aiPreferences = mock(AiPreferences.class);
-
         this.database = new BibDatabase();
 
         this.context = mock(BibDatabaseContext.class);

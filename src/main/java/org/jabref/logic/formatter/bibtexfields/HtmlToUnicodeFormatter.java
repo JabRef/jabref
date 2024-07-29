@@ -1,13 +1,13 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.jabref.architecture.ApacheCommonsLang3Allowed;
+import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
-@ApacheCommonsLang3Allowed("There is no equivalent in Google's Guava")
+@AllowedToUseApacheCommonsLang3("There is no equivalent in Google's Guava")
 public class HtmlToUnicodeFormatter extends Formatter implements LayoutFormatter {
 
     @Override

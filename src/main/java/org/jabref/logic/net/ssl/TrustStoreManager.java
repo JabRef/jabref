@@ -3,7 +3,6 @@ package org.jabref.logic.net.ssl;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyManagementException;
@@ -148,9 +147,10 @@ public class TrustStoreManager {
         try {
             LOGGER.debug("Trust store path: {}", storePath.toAbsolutePath());
             if (Files.notExists(storePath)) {
-                Path storeResourcePath = Path.of(TrustStoreManager.class.getResource("/ssl/truststore.jks").toURI());
                 Files.createDirectories(storePath.getParent());
-                Files.copy(storeResourcePath, storePath);
+                try (InputStream inputStream = TrustStoreManager.class.getResourceAsStream("/ssl/truststore.jks")) {
+                    Files.copy(inputStream, storePath);
+                }
             }
 
             try {
@@ -160,8 +160,6 @@ public class TrustStoreManager {
             }
         } catch (IOException e) {
             LOGGER.warn("Bad truststore path", e);
-        } catch (URISyntaxException e) {
-            LOGGER.warn("Bad resource path", e);
         }
     }
 

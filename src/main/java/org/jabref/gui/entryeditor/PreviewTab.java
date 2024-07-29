@@ -6,7 +6,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.embeddings.EmbeddingsGenerationTaskManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,7 +20,6 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
     private final StateManager stateManager;
     private final ThemeManager themeManager;
     private final IndexingTaskManager indexingTaskManager;
-    private final EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager;
     private final TaskExecutor taskExecutor;
     private PreviewPanel previewPanel;
 
@@ -31,7 +29,6 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
                       StateManager stateManager,
                       ThemeManager themeManager,
                       IndexingTaskManager indexingTaskManager,
-                      EmbeddingsGenerationTaskManager embeddingsGenerationTaskManager,
                       TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
@@ -39,7 +36,6 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
         this.stateManager = stateManager;
         this.themeManager = themeManager;
         this.indexingTaskManager = indexingTaskManager;
-        this.embeddingsGenerationTaskManager = embeddingsGenerationTaskManager;
         this.taskExecutor = taskExecutor;
 
         setGraphic(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getGraphicNode());
@@ -68,7 +64,7 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (previewPanel == null) {
-            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager, embeddingsGenerationTaskManager, taskExecutor);
+            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager, indexingTaskManager, taskExecutor);
             setContent(previewPanel);
         }
 

@@ -1,10 +1,20 @@
 package org.jabref.gui.preferences.ai;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import javafx.collections.FXCollections;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -20,26 +30,29 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
-    private final BooleanProperty useAi = new SimpleBooleanProperty();
+    private final BooleanProperty enableChatWithFiles = new SimpleBooleanProperty();
 
-    private final ReadOnlyListProperty<AiPreferences.AiProvider> aiProvidersList =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(AiPreferences.AiProvider.values()));
+    private final ListProperty<AiPreferences.AiProvider> aiProvidersList =
+            new SimpleListProperty<>(FXCollections.observableArrayList(AiPreferences.AiProvider.values()));
     private final ObjectProperty<AiPreferences.AiProvider> selectedAiProvider = new SimpleObjectProperty<>();
 
     private final ListProperty<String> chatModelsList = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty selectedChatModel = new SimpleStringProperty();
+    private final BooleanProperty allowToEditChatModel = new SimpleBooleanProperty(false);
 
     private final StringProperty apiToken = new SimpleStringProperty();
 
     private final BooleanProperty customizeSettings = new SimpleBooleanProperty();
 
-    private final ReadOnlyListProperty<AiPreferences.EmbeddingModel> embeddingModelsList =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(AiPreferences.EmbeddingModel.values()));
+    private final ListProperty<AiPreferences.EmbeddingModel> embeddingModelsList =
+            new SimpleListProperty<>(FXCollections.observableArrayList(AiPreferences.EmbeddingModel.values()));
     private final ObjectProperty<AiPreferences.EmbeddingModel> selectedEmbeddingModel = new SimpleObjectProperty<>();
 
-    private final StringProperty systemMessage = new SimpleStringProperty();
+    private final StringProperty apiBaseUrl = new SimpleStringProperty();
+
+    private final StringProperty instruction = new SimpleStringProperty();
     private final DoubleProperty temperature = new SimpleDoubleProperty();
-    private final IntegerProperty messageWindowSize = new SimpleIntegerProperty();
+    private final IntegerProperty contextWindowSize = new SimpleIntegerProperty();
     private final IntegerProperty documentSplitterChunkSize = new SimpleIntegerProperty();
     private final IntegerProperty documentSplitterOverlapSize = new SimpleIntegerProperty();
     private final IntegerProperty ragMaxResultsCount = new SimpleIntegerProperty();
@@ -48,9 +61,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final AiPreferences aiPreferences;
 
     private final Validator apiTokenValidator;
-    private final Validator systemMessageValidator;
+    private final Validator chatModelValidator;
+    private final Validator apiBaseUrlValidator;
+    private final Validator instructionValidator;
     private final Validator temperatureValidator;
-    private final Validator messageWindowSizeValidator;
+    private final Validator contextWindowSizeValidator;
     private final Validator documentSplitterChunkSizeValidator;
     private final Validator documentSplitterOverlapSizeValidator;
     private final Validator ragMaxResultsCountValidator;
@@ -62,7 +77,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         selectedAiProvider.addListener((observable, oldValue, newValue) -> {
             List<String> models = AiPreferences.CHAT_MODELS.get(newValue);
             chatModelsList.setAll(models);
-            if (!models.isEmpty()) {
+            if (models.isEmpty()) {
+                allowToEditChatModel.set(true);
+                selectedChatModel.setValue(chatModelsList.getFirst());
+            } else {
+                allowToEditChatModel.set(false);
                 selectedChatModel.setValue(chatModelsList.getFirst());
             }
         });
@@ -70,47 +89,58 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.apiTokenValidator = new FunctionBasedValidator<>(
                 apiToken,
                 token -> !StringUtil.isBlank(token),
-                ValidationMessage.error(Localization.lang("The OpenAI token cannot be empty")));
+                ValidationMessage.error(Localization.lang("An OpenAI token has to be provided")));
 
-        this.systemMessageValidator = new FunctionBasedValidator<>(
-                systemMessage,
+        this.chatModelValidator = new FunctionBasedValidator<>(
+                selectedChatModel,
+                chatModel -> !StringUtil.isBlank(chatModel),
+                ValidationMessage.error(Localization.lang("Chat model has to be provided")));
+
+        this.apiBaseUrlValidator = new FunctionBasedValidator<>(
+                apiBaseUrl,
+                token -> !StringUtil.isBlank(token),
+                ValidationMessage.error(Localization.lang("API base URL has to be provided")));
+
+        this.instructionValidator = new FunctionBasedValidator<>(
+                instruction,
                 message -> !StringUtil.isBlank(message),
-                ValidationMessage.error(Localization.lang("The system message cannot be empty")));
+                ValidationMessage.error(Localization.lang("The instruction has to be provided")));
 
+        // Source: https://platform.openai.com/docs/api-reference/chat/create#chat-create-temperature
         this.temperatureValidator = new FunctionBasedValidator<>(
                 temperature,
-                temp -> (double) temp >= 0 && (double) temp <= 2,
+                temp -> temp.doubleValue() >= 0 && temp.doubleValue() <= 2,
                 ValidationMessage.error(Localization.lang("Temperature must be between 0 and 2")));
 
-        this.messageWindowSizeValidator = new FunctionBasedValidator<>(
-                messageWindowSize,
-                size -> (int) size > 0,
-                ValidationMessage.error(Localization.lang("Message window size must be greater than 0")));
+        this.contextWindowSizeValidator = new FunctionBasedValidator<>(
+                contextWindowSize,
+                size -> size.intValue() > 0,
+                ValidationMessage.error(Localization.lang("Context window size must be greater than 0")));
 
         this.documentSplitterChunkSizeValidator = new FunctionBasedValidator<>(
                 documentSplitterChunkSize,
-                size -> (int) size > 0,
+                size -> size.intValue() > 0,
                 ValidationMessage.error(Localization.lang("Document splitter chunk size must be greater than 0")));
 
         this.documentSplitterOverlapSizeValidator = new FunctionBasedValidator<>(
                 documentSplitterOverlapSize,
-                size -> (int) size > 0 && (int) size < documentSplitterChunkSize.get(),
+                size -> size.intValue() > 0 && size.intValue() < documentSplitterChunkSize.get(),
                 ValidationMessage.error(Localization.lang("Document splitter overlap size must be greater than 0 and less than chunk size")));
 
         this.ragMaxResultsCountValidator = new FunctionBasedValidator<>(
                 ragMaxResultsCount,
-                count -> (int) count > 0,
+                count -> count.intValue() > 0,
                 ValidationMessage.error(Localization.lang("RAG max results count must be greater than 0")));
 
         this.ragMinScoreValidator = new FunctionBasedValidator<>(
                 ragMinScore,
-                score -> (double) score > 0 && (double) score < 1,
+                score -> score.doubleValue() > 0 && score.doubleValue() < 1,
                 ValidationMessage.error(Localization.lang("RAG min score must be greater than 0 and less than 1")));
     }
 
     @Override
     public void setValues() {
-        useAi.setValue(aiPreferences.getEnableChatWithFiles());
+        enableChatWithFiles.setValue(aiPreferences.getEnableChatWithFiles());
 
         selectedAiProvider.setValue(aiPreferences.getAiProvider());
         selectedChatModel.setValue(aiPreferences.getChatModel());
@@ -119,9 +149,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         customizeSettings.setValue(aiPreferences.getCustomizeSettings());
 
         selectedEmbeddingModel.setValue(aiPreferences.getEmbeddingModel());
-        systemMessage.setValue(aiPreferences.getSystemMessage());
+        apiBaseUrl.setValue(aiPreferences.getApiBaseUrl());
+        instruction.setValue(aiPreferences.getInstruction());
         temperature.setValue(aiPreferences.getTemperature());
-        messageWindowSize.setValue(aiPreferences.getMessageWindowSize());
+        contextWindowSize.setValue(aiPreferences.getContextWindowSize());
         documentSplitterChunkSize.setValue(aiPreferences.getDocumentSplitterChunkSize());
         documentSplitterOverlapSize.setValue(aiPreferences.getDocumentSplitterOverlapSize());
         ragMaxResultsCount.setValue(aiPreferences.getRagMaxResultsCount());
@@ -130,7 +161,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        aiPreferences.setEnableChatWithFiles(useAi.get());
+        aiPreferences.setEnableChatWithFiles(enableChatWithFiles.get());
 
         aiPreferences.setAiProvider(selectedAiProvider.get());
         aiPreferences.setChatModel(selectedChatModel.get());
@@ -140,9 +171,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         if (customizeSettings.get()) {
             aiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
-            aiPreferences.setSystemMessage(systemMessage.get());
+            aiPreferences.setApiBaseUrl(apiBaseUrl.get());
+            aiPreferences.setInstruction(instruction.get());
             aiPreferences.setTemperature(temperature.get());
-            aiPreferences.setMessageWindowSize(messageWindowSize.get());
+            aiPreferences.setContextWindowSize(contextWindowSize.get());
             aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
             aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
             aiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());
@@ -153,11 +185,21 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetExpertSettings() {
-        aiPreferences.setSystemMessage(AiDefaultPreferences.SYSTEM_MESSAGE);
-        systemMessage.set(AiDefaultPreferences.SYSTEM_MESSAGE);
+        aiPreferences.setAiProvider(AiDefaultPreferences.PROVIDER);
+        selectedAiProvider.set(AiDefaultPreferences.PROVIDER);
 
-        aiPreferences.setMessageWindowSize(AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
-        messageWindowSize.set(AiDefaultPreferences.MESSAGE_WINDOW_SIZE);
+        aiPreferences.setChatModel(AiDefaultPreferences.CHAT_MODEL);
+        chatModelsList.setAll(AiPreferences.CHAT_MODELS.get(AiDefaultPreferences.PROVIDER));
+        selectedChatModel.setValue(AiDefaultPreferences.CHAT_MODEL);
+
+        aiPreferences.setApiBaseUrl(AiDefaultPreferences.API_BASE_URL);
+        apiBaseUrl.setValue(AiDefaultPreferences.API_BASE_URL);
+
+        aiPreferences.setInstruction(AiDefaultPreferences.SYSTEM_MESSAGE);
+        instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
+
+        aiPreferences.setContextWindowSize(AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
+        contextWindowSize.set(AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
 
         aiPreferences.setDocumentSplitterChunkSize(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
         documentSplitterChunkSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
@@ -174,26 +216,48 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        Validator[] validators = {
-                apiTokenValidator,
-                systemMessageValidator,
+        if (enableChatWithFiles.get()) {
+            if (customizeSettings.get()) {
+                return validateBasicSettings() && validateExpertSettings();
+            } else {
+                return validateBasicSettings();
+            }
+        }
+
+        return true;
+    }
+
+    public boolean validateBasicSettings() {
+        List<Validator> validators = List.of(
+                chatModelValidator,
+                apiTokenValidator
+        );
+
+        return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
+    }
+
+    public boolean validateExpertSettings() {
+        List<Validator> validators = List.of(
+                chatModelValidator,
+                apiBaseUrlValidator,
+                instructionValidator,
                 temperatureValidator,
-                messageWindowSizeValidator,
+                contextWindowSizeValidator,
                 documentSplitterChunkSizeValidator,
                 documentSplitterOverlapSizeValidator,
                 ragMaxResultsCountValidator,
                 ragMinScoreValidator
-        };
+        );
 
-        return Arrays.stream(validators).map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
+        return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
     }
 
-    public BooleanProperty useAiProperty() {
-        return useAi;
+    public BooleanProperty enableChatWithFilesProperty() {
+        return enableChatWithFiles;
     }
 
-    public boolean getUseAi() {
-        return useAi.get();
+    public boolean getEnableChatWithFiles() {
+        return enableChatWithFiles.get();
     }
 
     public ReadOnlyListProperty<AiPreferences.AiProvider> aiProvidersProperty() {
@@ -232,16 +296,20 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return selectedEmbeddingModel;
     }
 
-    public StringProperty systemMessageProperty() {
-        return systemMessage;
+    public StringProperty apiBaseUrlProperty() {
+        return apiBaseUrl;
+    }
+
+    public StringProperty instructionProperty() {
+        return instruction;
     }
 
     public DoubleProperty temperatureProperty() {
         return temperature;
     }
 
-    public IntegerProperty messageWindowSizeProperty() {
-        return messageWindowSize;
+    public IntegerProperty contextWindowSizeProperty() {
+        return contextWindowSize;
     }
 
     public IntegerProperty documentSplitterChunkSizeProperty() {
@@ -264,31 +332,39 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return apiTokenValidator.getValidationStatus();
     }
 
-    public ValidationStatus getSystemMessageValidatorStatus() {
-        return systemMessageValidator.getValidationStatus();
+    public ValidationStatus getChatModelValidationStatus() {
+        return chatModelValidator.getValidationStatus();
     }
 
-    public ValidationStatus getTemperatureValidatorStatus() {
+    public ValidationStatus getApiBaseUrlValidationStatus() {
+        return apiBaseUrlValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getSystemMessageValidationStatus() {
+        return instructionValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getTemperatureValidationStatus() {
         return temperatureValidator.getValidationStatus();
     }
 
-    public ValidationStatus getMessageWindowSizeValidatorStatus() {
-        return messageWindowSizeValidator.getValidationStatus();
+    public ValidationStatus getMessageWindowSizeValidationStatus() {
+        return contextWindowSizeValidator.getValidationStatus();
     }
 
-    public ValidationStatus getDocumentSplitterChunkSizeValidatorStatus() {
+    public ValidationStatus getDocumentSplitterChunkSizeValidationStatus() {
         return documentSplitterChunkSizeValidator.getValidationStatus();
     }
 
-    public ValidationStatus getDocumentSplitterOverlapSizeValidatorStatus() {
+    public ValidationStatus getDocumentSplitterOverlapSizeValidationStatus() {
         return documentSplitterOverlapSizeValidator.getValidationStatus();
     }
 
-    public ValidationStatus getRagMaxResultsCountValidatorStatus() {
+    public ValidationStatus getRagMaxResultsCountValidationStatus() {
         return ragMaxResultsCountValidator.getValidationStatus();
     }
 
-    public ValidationStatus getRagMinScoreValidatorStatus() {
+    public ValidationStatus getRagMinScoreValidationStatus() {
         return ragMinScoreValidator.getValidationStatus();
     }
 }

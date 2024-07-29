@@ -338,7 +338,7 @@ public class JabRefDesktop {
         return NATIVE_DESKTOP.getFulltextIndexBaseDirectory();
     }
 
-    public static Path getEmbeddingsCacheDirectory() {
-        return NATIVE_DESKTOP.getEmbeddingsCacheDirectory();
+    public static Path getAiFilesDirectory() {
+        return NATIVE_DESKTOP.getAiFilesDirectory();
     }
 }

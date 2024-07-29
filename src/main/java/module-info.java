@@ -100,7 +100,6 @@ open module org.jabref {
     requires org.apache.commons.logging;
 
     requires com.github.tomtung.latex2unicode;
-    requires fastparse;
 
     requires jbibtex;
     requires citeproc.java;
@@ -109,7 +108,6 @@ open module org.jabref {
 
     requires org.apache.pdfbox;
     requires org.apache.xmpbox;
-    requires com.ibm.icu;
 
     requires flexmark;
     requires flexmark.html2md.converter;
@@ -126,6 +124,9 @@ open module org.jabref {
     // AI
     requires langchain4j;
     requires kotlin.stdlib;
+    requires jvm.openai;
+    requires ai.djl.api;
+    requires ai.djl.tokenizers;
 
     // fulltext search
     requires org.apache.lucene.core;
@@ -148,15 +149,10 @@ open module org.jabref {
     requires transitive org.jspecify;
 
     // other libraries
-    requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires mslinks;
+    // Provides number input fields for parameters in AI expert settings
+    requires com.dlsc.unitfx;
     requires de.saxsys.mvvmfx.validation;
     requires dd.plist;
-    requires mslinks;
-    requires org.apache.httpcomponents.core5.httpcore5;
-    requires com.dlsc.unitfx;
-    requires org.checkerframework.checker.qual;
-    requires jakarta.validation;
-    requires one.jpro.platform.mdfx;
-    requires scala.library;
 }

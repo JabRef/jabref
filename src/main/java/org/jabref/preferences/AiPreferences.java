@@ -1,5 +1,6 @@
 package org.jabref.preferences;
 
+import java.util.List;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -16,33 +17,26 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.gui.entryeditor.aichattab.AiChatTab;
+
 public class AiPreferences {
     public enum AiProvider {
         OPEN_AI("OpenAI"),
         MISTRAL_AI("Mistral AI"),
         HUGGING_FACE("Hugging Face");
 
-        private final String name;
+        private final String label;
 
-        AiProvider(String name) {
-            this.name = name;
+        AiProvider(String label) {
+            this.label = label;
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public static AiProvider fromString(String text) {
-            for (AiProvider b : AiProvider.values()) {
-                if (b.name.equals(text)) {
-                    return b;
-                }
-            }
-            return OPEN_AI;
+        public String getLabel() {
+            return label;
         }
 
         public String toString() {
-            return name;
+            return label;
         }
     }
 
@@ -55,31 +49,21 @@ public class AiPreferences {
     }
 
     public enum EmbeddingModel {
-        ALL_MINLM_l6_V2("all-MiniLM-L6-v2"),
-        ALL_MINLM_l6_V2_Q("all-MiniLM-L6-v2 (quantized)");
+        ALL_MINILM_L6_V2("all-MiniLM-L6-v2"),
+        ALL_MINILM_L6_V2_Q("all-MiniLM-L6-v2-q");
 
-        private final String name;
+        private final String label;
 
-        EmbeddingModel(String name) {
-            this.name = name;
+        EmbeddingModel(String label) {
+            this.label = label;
         }
 
-        public static EmbeddingModel fromString(String text) {
-            for (EmbeddingModel b : EmbeddingModel.values()) {
-                if (b.name.equals(text)) {
-                    return b;
-                }
-            }
-            assert false;
-            return null;
+        public String getLabel() {
+             return label;
         }
 
         public String toString() {
-            return name;
-        }
-
-        public String getName() {
-            return name;
+            return label;
         }
     }
 
@@ -92,15 +76,30 @@ public class AiPreferences {
     private final BooleanProperty customizeSettings;
 
     private final ObjectProperty<EmbeddingModel> embeddingModel;
-    private final StringProperty systemMessage;
+    private final StringProperty apiBaseUrl;
+    private final StringProperty instruction;
     private final DoubleProperty temperature;
-    private final IntegerProperty messageWindowSize;
+    private final IntegerProperty contextWindowSize;
     private final IntegerProperty documentSplitterChunkSize;
     private final IntegerProperty documentSplitterOverlapSize;
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles, AiProvider aiProvider, String chatModel, String apiToken, EmbeddingModel embeddingModel, boolean customizeSettings, String systemMessage, double temperature, int messageWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
+    public AiPreferences(boolean enableChatWithFiles,
+                         AiProvider aiProvider,
+                         String chatModel,
+                         String apiToken,
+                         boolean customizeSettings,
+                         EmbeddingModel embeddingModel,
+                         String apiBaseUrl,
+                         String instruction,
+                         double temperature,
+                         int contextWindowSize,
+                         int documentSplitterChunkSize,
+                         int documentSplitterOverlapSize,
+                         int ragMaxResultsCount,
+                         double ragMinScore
+    ) {
         this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
@@ -110,9 +109,10 @@ public class AiPreferences {
         this.customizeSettings = new SimpleBooleanProperty(customizeSettings);
 
         this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
-        this.systemMessage = new SimpleStringProperty(systemMessage);
+        this.apiBaseUrl = new SimpleStringProperty(apiBaseUrl);
+        this.instruction = new SimpleStringProperty(instruction);
         this.temperature = new SimpleDoubleProperty(temperature);
-        this.messageWindowSize = new SimpleIntegerProperty(messageWindowSize);
+        this.contextWindowSize = new SimpleIntegerProperty(contextWindowSize);
         this.documentSplitterChunkSize = new SimpleIntegerProperty(documentSplitterChunkSize);
         this.documentSplitterOverlapSize = new SimpleIntegerProperty(documentSplitterOverlapSize);
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
@@ -187,20 +187,32 @@ public class AiPreferences {
         return embeddingModel.get();
     }
 
+    public void setApiBaseUrl(String apiBaseUrl) {
+        this.apiBaseUrl.set(apiBaseUrl);
+    }
+
+    public StringProperty apiBaseUrlProperty() {
+        return apiBaseUrl;
+    }
+
+    public String getApiBaseUrl() {
+        return apiBaseUrl.get();
+    }
+
     public void setEmbeddingModel(EmbeddingModel embeddingModel) {
         this.embeddingModel.set(embeddingModel);
     }
 
-    public StringProperty systemMessageProperty() {
-        return systemMessage;
+    public StringProperty instructionProperty() {
+        return instruction;
     }
 
-    public String getSystemMessage() {
-        return systemMessage.get();
+    public String getInstruction() {
+        return instruction.get();
     }
 
-    public void setSystemMessage(String systemMessage) {
-        this.systemMessage.set(systemMessage);
+    public void setInstruction(String instruction) {
+        this.instruction.set(instruction);
     }
 
     public DoubleProperty temperatureProperty() {
@@ -215,16 +227,16 @@ public class AiPreferences {
         this.temperature.set(temperature);
     }
 
-    public IntegerProperty messageWindowSizeProperty() {
-        return messageWindowSize;
+    public IntegerProperty contextWindowSizeProperty() {
+        return contextWindowSize;
     }
 
-    public int getMessageWindowSize() {
-        return messageWindowSize.get();
+    public int getContextWindowSize() {
+        return contextWindowSize.get();
     }
 
-    public void setMessageWindowSize(int messageWindowSize) {
-        this.messageWindowSize.set(messageWindowSize);
+    public void setContextWindowSize(int contextWindowSize) {
+        this.contextWindowSize.set(contextWindowSize);
     }
 
     public IntegerProperty documentSplitterChunkSizeProperty() {
@@ -295,6 +307,77 @@ public class AiPreferences {
 
         documentSplitterOverlapSize.addListener((observableValue, oldValue, newValue) -> {
             if (!Objects.equals(newValue, oldValue)) {
+                runnable.run();
+            }
+        });
+    }
+
+    /**
+     * Listen to all changes of preferences related to AI.
+     * This method is used in {@link AiChatTab} to update itself when preferences change.
+     * JabRef would close the entry editor, but the last selected entry editor is not refreshed.
+     *
+     * @param runnable The runnable that should be executed when the preferences change.
+     */
+    public void onAnyParametersChange(Runnable runnable) {
+        enableChatWithFiles.addListener((observableValue, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                runnable.run();
+            }
+        });
+
+        apiToken.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+
+        customizeSettings.addListener((observableValue, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                runnable.run();
+            }
+        });
+
+        chatModel.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                runnable.run();
+            }
+        });
+
+        embeddingModel.addListener((observableValue, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                runnable.run();
+            }
+        });
+
+        instruction.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                runnable.run();
+            }
+        });
+
+        temperature.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                runnable.run();
+            }
+        });
+
+        contextWindowSize.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                runnable.run();
+            }
+        });
+
+        onEmbeddingsParametersChange(runnable);
+
+        ragMaxResultsCount.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                runnable.run();
+            }
+        });
+
+        ragMinScore.addListener((observableValue, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
                 runnable.run();
             }
         });

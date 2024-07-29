@@ -14,6 +14,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
@@ -31,16 +33,18 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private StateManager stateManager;
-    @Inject private KeyBindingRepository keyBindingRepository;
 
     private Optional<BibEntry> entry = Optional.empty();
 
     public ISSNEditor(Field field,
                       SuggestionProvider<?> suggestionProvider,
-                      FieldCheckers fieldCheckers) {
+                      FieldCheckers fieldCheckers,
+                      UndoAction undoAction,
+                      RedoAction redoAction) {
 
         ViewLoader.view(this)
                   .root(this)
@@ -56,10 +60,8 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
                 stateManager,
                 preferencesService);
 
-        establishBinding(textArea, viewModel.textProperty());
-
+        establishBinding(textArea, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
         textArea.initContextMenu(new DefaultMenu(textArea), keyBindingRepository);
-
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 

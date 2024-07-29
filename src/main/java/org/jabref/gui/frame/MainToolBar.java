@@ -34,7 +34,8 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.undo.UndoRedoAction;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -126,8 +127,8 @@ public class MainToolBar extends ToolBar {
                 new Separator(Orientation.VERTICAL),
 
                 new HBox(
-                        factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
-                        factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
                         factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
                         factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
                         factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager))),

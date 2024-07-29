@@ -2,6 +2,7 @@ package org.jabref.gui.ai.components.errorstate;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -11,6 +12,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class ErrorStateComponent extends BorderPane {
     @FXML private Text titleText;
     @FXML private Text contentText;
+    @FXML private VBox contentsVBox;
 
     public ErrorStateComponent(String title, String content) {
         ViewLoader.view(this)
@@ -24,7 +26,18 @@ public class ErrorStateComponent extends BorderPane {
     public static ErrorStateComponent withSpinner(String title, String content) {
         ErrorStateComponent errorStateComponent = new ErrorStateComponent(title, content);
 
-        ((VBox) errorStateComponent.getCenter()).getChildren().add(new ProgressIndicator());
+        errorStateComponent.contentsVBox.getChildren().add(new ProgressIndicator());
+
+        return errorStateComponent;
+    }
+
+    public static ErrorStateComponent withTextArea(String title, String content, String additional) {
+        ErrorStateComponent errorStateComponent = new ErrorStateComponent(title, content);
+
+        TextArea textArea = new TextArea(additional);
+        textArea.setEditable(false);
+
+        errorStateComponent.contentsVBox.getChildren().add(textArea);
 
         return errorStateComponent;
     }

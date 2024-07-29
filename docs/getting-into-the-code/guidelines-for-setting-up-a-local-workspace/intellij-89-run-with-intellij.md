@@ -12,24 +12,27 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
 
 1. Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle**.
 2. Change the setting "Build and run using:" to "IntelliJ IDEA".
-3. Navigate to **File > Settings... > Build, Execution, Deployment > Compiler > Java Compiler**.
-4. Uncheck `--Use 'release' option for cross-compilation`.
-5. **Build > Build Project**
-6. Open the project view (<kbd>Alt</kbd>+<kbd>1</kbd>, on macOS <kbd>cmd</kbd>+<kbd>1</kbd>)
-7. Copy all build resources to the folder of the build classes
-   1. Navigate to the folder `build/resources/main`
-   1. Right click -> "Open In" -> "Explorer (Finder on macOS)"
-   1. Navigate into directory "main"
-   1. Select the folder `out/production/classes`
-   1. Right click -> "Open In" -> "Explorer (Finder on macOS)"
-   1. Navigate into directory "classes"
-   1. Now you have two Explorer windows opened. Copy all files and directories from the first one to the second one.
-8. Locate the class `Launcher` (e.g., by <kbd>ctrl</kbd>+<kbd>N</kbd> and then typing `Launcher`). Press <kbd>Enter</kbd> to jump to that class.
+3. Navigate to **File > Settings... > Build, Execution, Deployment > Compiler**.
+4. Uncheck `Clear output directory on rebuild`.
+5. Navigate to **File > Settings... > Build, Execution, Deployment > Compiler > Java Compiler**.
+6. Uncheck `--Use 'release' option for cross-compilation`.
+7. Click "OK" to store the preferences and close the dialog.
+8. **Build > Build Project** (<kbd>Ctrl</kbd>+<kbd>F9</kbd>)
+9. Open the project view (<kbd>Alt</kbd>+<kbd>1</kbd>, on macOS <kbd>cmd</kbd>+<kbd>1</kbd>)
+10. Copy all build resources to the folder of the build classes
+    1. Navigate to the folder `build/resources/main`
+    1. Right click -> "Open In" -> "Explorer (Finder on macOS)"
+    1. Navigate into directory "main"
+    1. Select the folder `out/production/classes`
+    1. Right click -> "Open In" -> "Explorer (Finder on macOS)"
+    1. Navigate into directory "classes"
+    1. Now you have two Explorer windows opened. Copy all files and directories from the first one to the second one.
+11. Locate the class `Launcher` (e.g., by <kbd>ctrl</kbd>+<kbd>N</kbd> and then typing `Launcher`). Press <kbd>Enter</kbd> to jump to that class.
    <figure>
      <img src="intellij-search-for-launcher.png" alt="IntelliJ search for class “Launcher”">
      <figcaption>IntelliJ search for class “Launcher”</figcaption>
    </figure>
-9. Click on the green play button next to the `main` method to create a Launch configuration. IntelliJ will fail in launching.
+12. Click on the green play button next to the `main` method to create a Launch configuration. IntelliJ will fail in launching.
    <figure>
      <img src="intellij-hover-on-play-button.png" alt="However on green play">
      <figcaption>However on green play</figcaption>
@@ -40,12 +43,12 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
      <figcaption>Run JabRef via launcher</figcaption>
    </figure>
 
-10. On the top right of the IntelliJ window, next to the newly created launch configuration, click on the drop down
-11. Click on "Edit Configurations..."
-12. On the right, click on "Modify options"
-13. Ensure that "Use classpath of module" is checked
-14. Select "Add VM options"
-15. In the newly appearing field for VM options, insert:
+13. On the top right of the IntelliJ window, next to the newly created launch configuration, click on the drop down
+14. Click on "Edit Configurations..."
+15. On the right, click on "Modify options"
+16. Ensure that "Use classpath of module" is checked
+17. Select "Add VM options"
+18. In the newly appearing field for VM options, insert:
    ```text
    --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
    --add-opens=org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref
@@ -68,8 +71,8 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
    --add-reads org.jabref=org.fxmisc.flowless
    --add-reads org.jabref=org.apache.commons.csv
    ```
-16. Click "Apply"
-17. Click "Run". You can also click on the debug symbol next to it to enable stopping at breakpoints.
+19. Click "Apply"
+20. Click "Run". You can also click on the debug symbol next to it to enable stopping at breakpoints.
     <figure>
       <img src="intellij-run-launcher.png" alt="Launch menu contains “Launcher”">
       <figcaption>Launch menu contains “Launcher”</figcaption>

@@ -9,6 +9,9 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.component.TemporalAccessorPicker;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
@@ -25,18 +28,21 @@ public class DateEditor extends HBox implements FieldEditorFX {
 
     @Inject private UndoManager undoManager;
     @Inject private PreferencesService preferencesService;
+    @Inject private KeyBindingRepository keyBindingRepository;
 
-    public DateEditor(Field field, DateTimeFormatter dateFormatter, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public DateEditor(Field field,
+                      DateTimeFormatter dateFormatter,
+                      SuggestionProvider<?> suggestionProvider,
+                      FieldCheckers fieldCheckers,
+                      UndoAction undoAction,
+                      RedoAction redoAction) {
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
         this.viewModel = new DateEditorViewModel(field, suggestionProvider, dateFormatter, fieldCheckers, undoManager);
-
         datePicker.setStringConverter(viewModel.getDateToStringConverter());
-
-        establishBinding(datePicker.getEditor(), viewModel.textProperty());
-
+        establishBinding(datePicker.getEditor(), viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
         new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), datePicker.getEditor());
     }
 

@@ -11,6 +11,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
@@ -19,6 +20,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.preferences.PreferencesService;
 
+@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class ThreeWayMergeView extends VBox {
     public static final int GRID_COLUMN_MIN_WIDTH = 250;
 
