@@ -72,12 +72,14 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
                         .apiKey(aiPreferences.getApiToken())
                         .modelName(aiPreferences.getChatModel())
                         .temperature(aiPreferences.getTemperature())
+                        .baseUrl(aiPreferences.getApiBaseUrl())
                         .logRequests(true)
                         .logResponses(true)
                         .build()
                 );
             }
             case HUGGING_FACE -> {
+                // NOTE: {@link HuggingFaceChatModel} doesn't support API base url :(
                 langchainChatModel = Optional.of(HuggingFaceChatModel
                         .builder()
                         .accessToken(aiPreferences.getApiToken())
