@@ -2774,7 +2774,7 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE_CHAT, newValue));
 
-        EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue.name()));
+        EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_PROVIDER, newValue.name()));
         EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.apiTokenProperty(), (obs, oldValue, newValue) -> storeAiApiTokenInKeyring(newValue));
 

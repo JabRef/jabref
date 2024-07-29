@@ -17,6 +17,7 @@ import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import org.h2.mvstore.MVStore;
@@ -66,23 +67,34 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
                 langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
             }
             case MISTRAL_AI -> {
-                langchainChatModel = Optional.of(MistralAiChatModel.builder()
-                                                                   .apiKey(aiPreferences.getApiToken())
-                                                                   .modelName(aiPreferences.getChatModel())
-                                                                   .temperature(aiPreferences.getTemperature())
-                                                                   .logRequests(true)
-                                                                   .logResponses(true)
-                                                                   .build());
+                langchainChatModel = Optional.of(MistralAiChatModel
+                        .builder()
+                        .apiKey(aiPreferences.getApiToken())
+                        .modelName(aiPreferences.getChatModel())
+                        .temperature(aiPreferences.getTemperature())
+                        .logRequests(true)
+                        .logResponses(true)
+                        .build()
+                );
             }
             case HUGGING_FACE -> {
+                langchainChatModel = Optional.of(HuggingFaceChatModel
+                        .builder()
+                        .accessToken(aiPreferences.getApiToken())
+                        .modelId(aiPreferences.getChatModel())
+                        .temperature(aiPreferences.getTemperature())
+                        .timeout(Duration.ofMinutes(1))
+                        .build()
+                );
             }
         }
     }
 
     private void setupListeningToPreferencesChanges() {
         aiPreferences.enableChatWithFilesProperty().addListener(obs -> rebuild());
-        aiPreferences.apiTokenProperty().addListener(obs -> rebuild());
+        aiPreferences.aiProviderProperty().addListener(obs -> rebuild());
         aiPreferences.chatModelProperty().addListener(obs -> rebuild());
+        aiPreferences.apiTokenProperty().addListener(obs -> rebuild());
         aiPreferences.apiBaseUrlProperty().addListener(obs -> rebuild());
         aiPreferences.temperatureProperty().addListener(obs -> rebuild());
     }
@@ -107,6 +119,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
             }
         }
 
+        return langchainChatModel.get().generate(list);
     }
 
     @Override
