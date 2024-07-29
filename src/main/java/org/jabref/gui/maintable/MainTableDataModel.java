@@ -85,8 +85,6 @@ public class MainTableDataModel {
     }
 
     public void unbind() {
-        entriesFiltered.predicateProperty().unbind();
-
         searchQuerySubscription.unsubscribe();
         selectedGroupsSubscription.unsubscribe();
         groupViewModeSubscription.unsubscribe();

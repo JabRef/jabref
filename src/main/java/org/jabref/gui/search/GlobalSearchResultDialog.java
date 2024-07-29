@@ -68,7 +68,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
 
-        SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
+        SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager, taskExecutor);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, taskExecutor);
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
@@ -96,7 +96,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
                 stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).get());
                 stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
-                model.removeBinding();
                 stage.close();
             }
         });
@@ -113,7 +112,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         });
 
         stage.setOnShown(event -> {
-            model.setBinding();
             stage.setHeight(preferencesService.getSearchPreferences().getSearchWindowHeight());
             stage.setWidth(preferencesService.getSearchPreferences().getSearchWindowWidth());
             container.setDividerPositions(preferencesService.getSearchPreferences().getSearchWindowDividerPosition());
