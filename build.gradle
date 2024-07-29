@@ -119,9 +119,9 @@ sourceSets {
 
 repositories {
     mavenCentral()
-    maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://sandec.jfrog.io/artifactory/repo' }
 }
 
@@ -221,7 +221,7 @@ dependencies {
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1'
     implementation 'com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9' //jitpack
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation('com.tobiasdiez:easybind:2.2.1-SNAPSHOT') {
+    implementation('org.jabref:easybind:2.2.1-SNAPSHOT') {
         exclude group: 'org.openjfx'
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
