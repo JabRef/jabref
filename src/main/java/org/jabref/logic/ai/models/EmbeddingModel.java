@@ -23,11 +23,13 @@ import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.output.Response;
 
 /**
- * Wrapper around langchain4j embedding model.
+ * Wrapper around langchain4j {@link dev.langchain4j.model.embedding.EmbeddingModel}.
  * <p>
  * This class listens to preferences changes.
  */
 public class EmbeddingModel implements dev.langchain4j.model.embedding.EmbeddingModel, AutoCloseable {
+    private static final String DJL_AI_DJL_HUGGINGFACE_PYTORCH_SENTENCE_TRANSFORMERS = "djl://ai.djl.huggingface.pytorch/sentence-transformers/";
+
     private final AiPreferences aiPreferences;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool(
@@ -48,7 +50,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
             return;
         }
 
-        String modelUrl = "djl://ai.djl.huggingface.pytorch/sentence-transformers/" + aiPreferences.getEmbeddingModel().getLabel();
+        String modelUrl = DJL_AI_DJL_HUGGINGFACE_PYTORCH_SENTENCE_TRANSFORMERS + aiPreferences.getEmbeddingModel().getLabel();
 
         Criteria<String, float[]> criteria =
                 Criteria.builder()

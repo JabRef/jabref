@@ -46,7 +46,7 @@ public class ChatMessageComponent extends HBox {
             sourceLabel.setText(Localization.lang("AI"));
             contentTextArea.setText(aiMessage.text());
         } else {
-            LOGGER.warn("ChatMessageComponent supports only user or AI messages, but other type was passed: " + chatMessage.type().name());
+            LOGGER.warn("ChatMessageComponent supports only user or AI messages, but other type was passed: {}", chatMessage.type().name());
         }
     }
 

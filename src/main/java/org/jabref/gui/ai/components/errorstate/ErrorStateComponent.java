@@ -12,6 +12,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class ErrorStateComponent extends BorderPane {
     @FXML private Text titleText;
     @FXML private Text contentText;
+    @FXML private VBox contentsVBox;
 
     public ErrorStateComponent(String title, String content) {
         ViewLoader.view(this)
@@ -25,7 +26,7 @@ public class ErrorStateComponent extends BorderPane {
     public static ErrorStateComponent withSpinner(String title, String content) {
         ErrorStateComponent errorStateComponent = new ErrorStateComponent(title, content);
 
-        ((VBox) errorStateComponent.getCenter()).getChildren().add(new ProgressIndicator());
+        errorStateComponent.contentsVBox.getChildren().add(new ProgressIndicator());
 
         return errorStateComponent;
     }
@@ -36,7 +37,7 @@ public class ErrorStateComponent extends BorderPane {
         TextArea textArea = new TextArea(additional);
         textArea.setEditable(false);
 
-        ((VBox) errorStateComponent.getCenter()).getChildren().add(textArea);
+        errorStateComponent.contentsVBox.getChildren().add(textArea);
 
         return errorStateComponent;
     }

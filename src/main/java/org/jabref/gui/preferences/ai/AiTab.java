@@ -40,8 +40,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private IntegerInputField ragMaxResultsCountTextField;
     @FXML private DoubleInputField ragMinScoreTextField;
 
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
-
     @FXML private Button chatModelHelp;
     @FXML private Button embeddingModelHelp;
     @FXML private Button apiBaseUrlHelp;
@@ -53,6 +51,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private Button ragMinScoreHelp;
 
     @FXML private Button resetExpertSettingsButton;
+
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public AiTab() {
         ViewLoader.view(this)

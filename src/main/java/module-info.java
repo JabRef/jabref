@@ -154,4 +154,5 @@ open module org.jabref {
     // Provides number input fields for parameters in AI expert settings
     requires com.dlsc.unitfx;
     requires de.saxsys.mvvmfx.validation;
+    requires dd.plist;
 }
