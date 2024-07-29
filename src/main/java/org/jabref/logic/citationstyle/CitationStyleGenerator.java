@@ -27,7 +27,7 @@ public class CitationStyleGenerator {
     }
 
     /**
-     * Generates a Citation based on the given entry and style with a default {@link BibDatabaseContext}
+     * Generates a Citation based on a given list of entries and a style with a default {@link BibDatabaseContext}
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
@@ -36,7 +36,7 @@ public class CitationStyleGenerator {
     }
 
     /**
-     * Generates a Citation based on the given entry and style with a default {@link BibDatabaseContext}
+     * Generates a Citation based on a given list of entries and a style with a default {@link BibDatabaseContext}
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
@@ -45,7 +45,7 @@ public class CitationStyleGenerator {
     }
 
     /**
-     * Generates a Citation based on the given entry, style, and output format
+     * Generates a Citation based on a given list of entries, style, and output format
      *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */

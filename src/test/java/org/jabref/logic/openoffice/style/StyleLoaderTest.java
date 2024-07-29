@@ -106,15 +106,15 @@ public class StyleLoaderTest {
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
 
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        List<OOBibStyle> toremove = new ArrayList<>();
+        List<JStyle> toremove = new ArrayList<>();
         int beforeRemoving = loader.getStyles().size();
-        for (OOBibStyle style : loader.getStyles()) {
+        for (JStyle style : loader.getStyles()) {
             if (!style.isInternalStyle()) {
                 toremove.add(style);
             }
         }
 
-        for (OOBibStyle style : toremove) {
+        for (JStyle style : toremove) {
             assertTrue(loader.removeStyle(style));
         }
         assertEquals(beforeRemoving - 1, loader.getStyles().size());
@@ -127,14 +127,14 @@ public class StyleLoaderTest {
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
 
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        List<OOBibStyle> toremove = new ArrayList<>();
-        for (OOBibStyle style : loader.getStyles()) {
+        List<JStyle> toremove = new ArrayList<>();
+        for (JStyle style : loader.getStyles()) {
             if (!style.isInternalStyle()) {
                 toremove.add(style);
             }
         }
 
-        for (OOBibStyle style : toremove) {
+        for (JStyle style : toremove) {
             assertTrue(loader.removeStyle(style));
         }
         // As the prefs are mocked away, the getExternalStyles still returns the initial one
@@ -161,30 +161,30 @@ public class StyleLoaderTest {
 
     @Test
     public void getDefaultUsedStyleWhenEmpty() {
-        when(preferences.getCurrentStyle()).thenReturn(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
-        preferences.clearCurrentStyle();
+        when(preferences.getCurrentJStyle()).thenReturn(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
+        preferences.clearCurrentJStyle();
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        OOBibStyle style = loader.getUsedStyle();
+        JStyle style = loader.getUsedJstyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
-        assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, preferences.getCurrentStyle());
+        assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, preferences.getCurrentJStyle());
     }
 
     @Test
     public void getStoredUsedStyle() {
-        when(preferences.getCurrentStyle()).thenReturn(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
+        when(preferences.getCurrentJStyle()).thenReturn(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        OOBibStyle style = loader.getUsedStyle();
+        JStyle style = loader.getUsedJstyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, style.getPath());
-        assertEquals(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, preferences.getCurrentStyle());
+        assertEquals(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, preferences.getCurrentJStyle());
     }
 
     @Test
     public void getDefaultUsedStyleWhenIncorrect() {
-        when(preferences.getCurrentStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
+        when(preferences.getCurrentJStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        OOBibStyle style = loader.getUsedStyle();
+        JStyle style = loader.getUsedJstyle();
         assertTrue(style.isValid());
         assertEquals(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, style.getPath());
     }
@@ -194,8 +194,8 @@ public class StyleLoaderTest {
         preferences.setExternalStyles(Collections.emptyList());
 
         loader = new StyleLoader(preferences, layoutPreferences, abbreviationRepository);
-        List<OOBibStyle> toremove = new ArrayList<>();
-        for (OOBibStyle style : loader.getStyles()) {
+        List<JStyle> toremove = new ArrayList<>();
+        for (JStyle style : loader.getStyles()) {
             if (style.isInternalStyle()) {
                 toremove.add(style);
             }
