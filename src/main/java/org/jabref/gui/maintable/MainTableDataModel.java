@@ -16,7 +16,6 @@ import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.CustomFilteredList;
-import org.jabref.gui.util.MappedBackedList;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
@@ -59,7 +58,7 @@ public class MainTableDataModel {
         resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-        entriesViewModel = new MappedBackedList<>(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
+        entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
         entriesFiltered = new CustomFilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
 
         entriesViewModel.addListener((ListChangeListener.Change<? extends BibEntryTableViewModel> change) -> {
