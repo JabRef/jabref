@@ -41,6 +41,11 @@ public class AiPreferences {
     }
 
     public static final Map<AiProvider, List<String>> CHAT_MODELS = new EnumMap<>(AiProvider.class);
+    public static final Map<AiProvider, String> PROVIDERS_API_URLS = Map.of(
+            AiProvider.OPEN_AI, "https://api.openai.com/v1",
+            AiProvider.MISTRAL_AI, "https://api.mistral.ai/v1",
+            AiProvider.HUGGING_FACE, "https://huggingface.co/api"
+    );
 
     static {
         CHAT_MODELS.put(AiProvider.OPEN_AI, List.of("gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"));

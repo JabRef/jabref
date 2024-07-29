@@ -83,6 +83,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 allowToEditChatModel.set(false);
                 selectedChatModel.setValue(chatModelsList.getFirst());
             }
+
+            apiBaseUrl.set(AiPreferences.PROVIDERS_API_URLS.get(newValue));
         });
 
         this.apiTokenValidator = new FunctionBasedValidator<>(
