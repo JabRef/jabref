@@ -5,7 +5,7 @@ import java.util.concurrent.Executors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager;
-import org.jabref.logic.ai.models.ChatLanguageModel;
+import org.jabref.logic.ai.models.JabRefChatLanguageModel;
 import org.jabref.logic.ai.models.EmbeddingModel;
 import org.jabref.preferences.AiPreferences;
 
@@ -24,7 +24,7 @@ public class AiService implements AutoCloseable {
             new ThreadFactoryBuilder().setNameFormat("ai-retrieval-pool-%d").build()
     );
 
-    private final ChatLanguageModel chatLanguageModel;
+    private final JabRefChatLanguageModel jabRefChatLanguageModel;
     private final BibDatabaseChatHistoryManager bibDatabaseChatHistoryManager;
 
     private final EmbeddingModel embeddingModel;
@@ -32,7 +32,7 @@ public class AiService implements AutoCloseable {
 
     public AiService(AiPreferences aiPreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
-        this.chatLanguageModel = new ChatLanguageModel(aiPreferences);
+        this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
         this.bibDatabaseChatHistoryManager = new BibDatabaseChatHistoryManager(dialogService);
         this.embeddingModel = new EmbeddingModel(aiPreferences);
         this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, embeddingModel, dialogService);
@@ -41,7 +41,7 @@ public class AiService implements AutoCloseable {
     @Override
     public void close() throws Exception {
         this.cachedThreadPool.shutdownNow();
-        this.chatLanguageModel.close();
+        this.jabRefChatLanguageModel.close();
         this.embeddingModel.close();
         this.bibDatabaseChatHistoryManager.close();
         this.fileEmbeddingsManager.close();
@@ -55,8 +55,8 @@ public class AiService implements AutoCloseable {
         return cachedThreadPool;
     }
 
-    public ChatLanguageModel getChatLanguageModel() {
-        return chatLanguageModel;
+    public JabRefChatLanguageModel getChatLanguageModel() {
+        return jabRefChatLanguageModel;
     }
 
     public EmbeddingModel getEmbeddingModel() {

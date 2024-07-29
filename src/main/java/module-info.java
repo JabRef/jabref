@@ -124,7 +124,6 @@ open module org.jabref {
     // AI
     requires langchain4j;
     requires kotlin.stdlib;
-    requires jvm.openai;
     requires ai.djl.api;
     requires ai.djl.tokenizers;
 

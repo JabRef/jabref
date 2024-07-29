@@ -89,7 +89,7 @@ public class AiChatTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (!aiService.getPreferences().getEnableChatWithFiles()) {
             showPrivacyNotice(entry);
-        } else if (aiService.getPreferences().getOpenAiToken().isEmpty()) {
+        } else if (aiService.getPreferences().getApiToken().isEmpty()) {
             showApiKeyMissing();
         } else if (entry.getFiles().isEmpty()) {
             showErrorNoFiles();

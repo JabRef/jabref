@@ -71,7 +71,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     public void initialize() {
         this.viewModel = new AiTabViewModel(preferencesService);
 
-        enableChat.selectedProperty().bindBidirectional(viewModel.useAiProperty());
+        enableChat.selectedProperty().bindBidirectional(viewModel.enableChatWithFilesProperty());
 
         new ViewModelListCellFactory<AiPreferences.AiProvider>()
                 .withText(AiPreferences.AiProvider::toString)
@@ -91,7 +91,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         embeddingModelComboBox.setItems(viewModel.embeddingModelsProperty());
         embeddingModelComboBox.valueProperty().bindBidirectional(viewModel.selectedEmbeddingModelProperty());
 
-        apiTokenTextField.textProperty().bindBidirectional(viewModel.openAiTokenProperty());
+        apiTokenTextField.textProperty().bindBidirectional(viewModel.apiTokenProperty());
 
         customizeSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeSettingsProperty());
 
@@ -143,22 +143,25 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     }
 
     private void updateDisabledProperties() {
-        aiProviderComboBox.setDisable(!viewModel.getUseAi());
-        chatModelComboBox.setDisable(!viewModel.getUseAi());
-        apiTokenTextField.setDisable(!viewModel.getUseAi());
+        boolean basicPropertiesDisabled = !viewModel.getEnableChatWithFiles();
+        boolean expertSettingsPropertiesDisabled = !(viewModel.getEnableChatWithFiles() && viewModel.getCustomizeSettings());
 
-        customizeSettingsCheckbox.setDisable(!viewModel.getUseAi());
+        aiProviderComboBox.setDisable(basicPropertiesDisabled);
+        chatModelComboBox.setDisable(basicPropertiesDisabled);
+        apiTokenTextField.setDisable(basicPropertiesDisabled);
 
-        embeddingModelComboBox.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        apiBaseUrlTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        instructionTextArea.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        temperatureTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        contextWindowSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        documentSplitterChunkSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        documentSplitterOverlapSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        ragMaxResultsCountTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        ragMinScoreTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        resetExpertSettingsButton.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
+        customizeSettingsCheckbox.setDisable(basicPropertiesDisabled);
+
+        embeddingModelComboBox.setDisable(expertSettingsPropertiesDisabled);
+        apiBaseUrlTextField.setDisable(expertSettingsPropertiesDisabled);
+        instructionTextArea.setDisable(expertSettingsPropertiesDisabled);
+        temperatureTextField.setDisable(expertSettingsPropertiesDisabled);
+        contextWindowSizeTextField.setDisable(expertSettingsPropertiesDisabled);
+        documentSplitterChunkSizeTextField.setDisable(expertSettingsPropertiesDisabled);
+        documentSplitterOverlapSizeTextField.setDisable(expertSettingsPropertiesDisabled);
+        ragMaxResultsCountTextField.setDisable(expertSettingsPropertiesDisabled);
+        ragMinScoreTextField.setDisable(expertSettingsPropertiesDisabled);
+        resetExpertSettingsButton.setDisable(expertSettingsPropertiesDisabled);
     }
 
     @Override

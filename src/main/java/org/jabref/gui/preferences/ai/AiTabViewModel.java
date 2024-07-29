@@ -79,7 +79,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             chatModelsList.setAll(models);
             if (models.isEmpty()) {
                 allowToEditChatModel.set(true);
-                selectedChatModel.setValue(chatModelsList.getFirst());
             } else {
                 allowToEditChatModel.set(false);
                 selectedChatModel.setValue(chatModelsList.getFirst());
@@ -185,13 +184,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetExpertSettings() {
-        aiPreferences.setAiProvider(AiDefaultPreferences.PROVIDER);
-        selectedAiProvider.set(AiDefaultPreferences.PROVIDER);
-
-        aiPreferences.setChatModel(AiDefaultPreferences.CHAT_MODEL);
-        chatModelsList.setAll(AiPreferences.CHAT_MODELS.get(AiDefaultPreferences.PROVIDER));
-        selectedChatModel.setValue(AiDefaultPreferences.CHAT_MODEL);
-
         aiPreferences.setApiBaseUrl(AiDefaultPreferences.API_BASE_URL);
         apiBaseUrl.setValue(AiDefaultPreferences.API_BASE_URL);
 

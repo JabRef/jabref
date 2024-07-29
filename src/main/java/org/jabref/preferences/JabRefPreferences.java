@@ -2760,7 +2760,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(AI_ENABLE_CHAT),
                 AiPreferences.AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_CHAT_MODEL),
-                getOpenAiTokenFromKeyring().orElse(""),
+                getAiApiTokenFromKeyring().orElse(""),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 get(AI_API_BASE_URL),
@@ -2774,9 +2774,9 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE_CHAT, newValue));
 
-        EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue.getName()));
+        EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue.name()));
         EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue));
-        EasyBind.listen(aiPreferences.apiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
+        EasyBind.listen(aiPreferences.apiTokenProperty(), (obs, oldValue, newValue) -> storeAiApiTokenInKeyring(newValue));
 
         EasyBind.listen(aiPreferences.customizeSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
@@ -2793,7 +2793,7 @@ public class JabRefPreferences implements PreferencesService {
         return aiPreferences;
     }
 
-    private Optional<String> getOpenAiTokenFromKeyring() {
+    private Optional<String> getAiApiTokenFromKeyring() {
         try (final Keyring keyring = Keyring.create()) {
             String rawPassword = keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT);
             Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
@@ -2804,7 +2804,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private void storeOpenAiTokenToKeyring(String newToken) {
+    private void storeAiApiTokenInKeyring(String newToken) {
         try (final Keyring keyring = Keyring.create()) {
             Password password = new Password(newToken, getInternalPreferences().getUserAndHost());
             String rawPassword = password.encrypt();

@@ -49,8 +49,7 @@ public class AiPreferences {
     }
 
     public enum EmbeddingModel {
-        ALL_MINILM_L6_V2("all-MiniLM-L6-v2"),
-        ALL_MINILM_L6_V2_Q("all-MiniLM-L6-v2-q");
+        ALL_MINILM_L6_V2("all-MiniLM-L6-v2");
 
         private final String label;
 
