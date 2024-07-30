@@ -93,10 +93,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         customizeExpertSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeExpertSettingsProperty());
         customizeExpertSettingsCheckbox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
-        chatModelComboBox.getItems().addAll(AiPreferences.OPENAI_CHAT_MODELS);
-        chatModelComboBox.valueProperty().bindBidirectional(viewModel.chatModelProperty());
-        chatModelComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
-
         new ViewModelListCellFactory<AiPreferences.EmbeddingModel>()
                 .withText(AiPreferences.EmbeddingModel::toString)
                 .install(embeddingModelComboBox);
@@ -129,7 +125,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         ragMinScoreTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.getApiTokenValidatorStatus(), apiTokenTextField);
+            visualizer.initVisualization(viewModel.getApiTokenValidationStatus(), apiTokenTextField);
             visualizer.initVisualization(viewModel.getChatModelValidationStatus(), chatModelComboBox);
             visualizer.initVisualization(viewModel.getApiBaseUrlValidationStatus(), apiBaseUrlTextField);
             visualizer.initVisualization(viewModel.getSystemMessageValidationStatus(), instructionTextArea);
