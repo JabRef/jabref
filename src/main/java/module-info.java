@@ -157,4 +157,5 @@ open module org.jabref {
     requires fastparse;
     requires com.ibm.icu;
     requires jvm.openai;
+    requires langchain4j.core;
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.summary.SummaryComponent">
+   <children>
+      <TextArea fx:id="summaryTextArea" editable="false" VBox.vgrow="ALWAYS" />
+      <Button mnemonicParsing="false" onAction="#onRegenerateButtonClick" text="%Regenerate" />
+   </children>
+</fx:root>

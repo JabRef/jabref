@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.aichattab;
+package org.jabref.gui.entryeditor;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,8 +15,6 @@ import org.jabref.gui.ai.components.aichat.AiChatComponent;
 import org.jabref.gui.ai.components.apikeymissing.ApiKeyMissingComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
-import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiChatLogic;
@@ -25,7 +23,7 @@ import org.jabref.logic.ai.GenerateEmbeddingsTask;
 import org.jabref.logic.ai.chathistory.AiChatHistory;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.logic.ai.chathistory.InMemoryAiChatHistory;
-import org.jabref.logic.ai.embeddings.events.DocumentIngestedEvent;
+import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.models.EmbeddingModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
@@ -241,7 +239,7 @@ public class AiChatTab extends EntryEditorTab {
 
     private class FileIngestedListener {
         @Subscribe
-        public void listen(DocumentIngestedEvent event) {
+        public void listen(FullyIngestedDocumentsTracker.DocumentIngestedEvent event) {
              UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
         }
     }

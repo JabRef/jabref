@@ -34,8 +34,6 @@ public class BibDatabaseChatHistoryManager implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseChatHistoryManager.class);
     private static final String CHAT_HISTORY_FILE_NAME = "chat-history.mv";
 
-    private final MVStore mvStore;
-
     private record ChatHistoryRecord(String library, String citationKey, String type, String content) implements Serializable {
         public ChatMessage toLangchainMessage() {
             if (type.equals(ChatMessageType.AI.name())) {
@@ -53,28 +51,7 @@ public class BibDatabaseChatHistoryManager implements AutoCloseable {
 
     private final Map<Path, BibDatabaseChatHistory> bibDatabaseChatHistoryMap = new HashMap<>();
 
-    public BibDatabaseChatHistoryManager(DialogService dialogService) {
-        @Nullable Path ingestedFilesTrackerPath = JabRefDesktop.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME);
-
-        try {
-            Files.createDirectories(JabRefDesktop.getAiFilesDirectory());
-        } catch (IOException e) {
-            LOGGER.error("An error occurred while creating directories for storing chat history. Chat history won't be remembered in next session", e);
-            dialogService.notify("An error occurred while creating directories for storing chat history. Chat history won't be remembered in next session");
-            ingestedFilesTrackerPath = null;
-        }
-
-        MVStore mvStore;
-
-        try {
-            mvStore = MVStore.open(ingestedFilesTrackerPath == null ? null : ingestedFilesTrackerPath.toString());
-        } catch (Exception e) {
-            LOGGER.error("An error occurred while creating directories for storing chat history. Chat history won't be remembered in next session", e);
-            dialogService.notify("An error occurred while creating directories for storing chat history. Chat history won't be remembered in next session");
-            mvStore = MVStore.open(null);
-        }
-
-        this.mvStore = mvStore;
+    public BibDatabaseChatHistoryManager(MVStore mvStore) {
         this.messages = mvStore.openMap("messages");
     }
 
@@ -124,6 +101,5 @@ public class BibDatabaseChatHistoryManager implements AutoCloseable {
     @Override
     public void close() {
         bibDatabaseChatHistoryMap.clear();
-        mvStore.close();
     }
 }
