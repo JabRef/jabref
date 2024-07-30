@@ -26,6 +26,7 @@ import org.jabref.logic.ai.chathistory.AiChatHistory;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.logic.ai.chathistory.InMemoryAiChatHistory;
 import org.jabref.logic.ai.embeddings.events.DocumentIngestedEvent;
+import org.jabref.logic.ai.models.EmbeddingModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
@@ -70,7 +71,9 @@ public class AiChatTab extends EntryEditorTab {
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("AI chat with full-text article")));
+
         aiService.getEmbeddingsManager().registerListener(new FileIngestedListener());
+        aiService.getEmbeddingModel().registerListener(new EmbeddingModelBuiltListener());
     }
 
     @Override
@@ -97,6 +100,12 @@ public class AiChatTab extends EntryEditorTab {
             showErrorNotPdfs();
         } else if (!citationKeyIsValid(bibDatabaseContext, entry)) {
             tryToGenerateCitationKeyThenBind(entry);
+        } else if (!aiService.getEmbeddingModel().isPresent()) {
+            if (aiService.getEmbeddingModel().hadErrorWhileBuildingModel()) {
+                showErrorWhileBuildingEmbeddingModel();
+            } else {
+                showBuildingEmbeddingModel();
+            }
         } else if (!aiService.getEmbeddingsManager().hasIngestedLinkedFiles(entry.getFiles())) {
             startIngesting(entry);
         } else {
@@ -116,23 +125,64 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void showErrorNotIngested() {
-        setContent(ErrorStateComponent.withSpinner(Localization.lang("Please wait"), Localization.lang("The embeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")));
+        setContent(
+                ErrorStateComponent.withSpinner(
+                        Localization.lang("Please wait"),
+                        Localization.lang("The embeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")
+                )
+        );
     }
 
     private void showErrorNotPdfs() {
-        setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Only PDF files are supported.")));
+        setContent(
+                new ErrorStateComponent(
+                        Localization.lang("Unable to chat"),
+                        Localization.lang("Only PDF files are supported.")
+                )
+        );
     }
 
     private void showErrorNoFiles() {
-        setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")));
+        setContent(
+                new ErrorStateComponent(
+                        Localization.lang("Unable to chat"),
+                        Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")
+                )
+        );
     }
 
     private void tryToGenerateCitationKeyThenBind(BibEntry entry) {
         if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
-            setContent(new ErrorStateComponent(Localization.lang("Unable to chat"), Localization.lang("Please provide a non-empty and unique citation key for this entry.")));
+            setContent(
+                    new ErrorStateComponent(
+                            Localization.lang("Unable to chat"),
+                            Localization.lang("Please provide a non-empty and unique citation key for this entry.")
+                    )
+            );
         } else {
             bindToEntry(entry);
         }
+    }
+
+    private void showErrorWhileBuildingEmbeddingModel() {
+        setContent(
+                ErrorStateComponent.withTextAreaAndButton(
+                        Localization.lang("Unable to chat"),
+                        Localization.lang("An error occurred while building the embedding model"),
+                        aiService.getEmbeddingModel().getErrorWhileBuildingModel(),
+                        Localization.lang("Try to rebuild again"),
+                        () -> aiService.getEmbeddingModel().startRebuildingTask()
+                )
+        );
+    }
+
+    public void showBuildingEmbeddingModel() {
+        setContent(
+                ErrorStateComponent.withSpinner(
+                        Localization.lang("Please wait"),
+                        Localization.lang("Embedding model is currently being downloaded. After the download is complete, you will be able to chat with your files")
+                )
+        );
     }
 
     private static boolean citationKeyIsValid(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
@@ -193,6 +243,13 @@ public class AiChatTab extends EntryEditorTab {
         @Subscribe
         public void listen(DocumentIngestedEvent event) {
              UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
+        }
+    }
+
+    private class EmbeddingModelBuiltListener {
+        @Subscribe
+        public void listen(EmbeddingModel.EmbeddingModelBuiltEvent event) {
+            UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
         }
     }
 }

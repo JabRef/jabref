@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BibDatabaseChatHistoryManager implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseChatHistoryManager.class);
-    private static final String CHAT_HISTORY_FILE_NAME = "chatHistory.mv";
+    private static final String CHAT_HISTORY_FILE_NAME = "chat-history.mv";
 
     private final MVStore mvStore;
 
@@ -61,7 +61,8 @@ public class BibDatabaseChatHistoryManager implements AutoCloseable {
         try {
             Files.createDirectories(JabRefDesktop.getAiFilesDirectory());
         } catch (IOException e) {
-            dialogService.showErrorDialogAndWait("An error occurred while creating directories for storing chat history. Will store history in RAM", e);
+            LOGGER.error("An error occurred while creating directories for storing chat history. Chat history won't be remembered in next session", e);
+            dialogService.notify("An error occurred while creating directories for storing chat history. Chat history won't be remembered in next session");
             ingestedFilesTrackerPath = null;
         }
 
@@ -70,7 +71,8 @@ public class BibDatabaseChatHistoryManager implements AutoCloseable {
         try {
             mvStore = MVStore.open(ingestedFilesTrackerPath == null ? null : ingestedFilesTrackerPath.toString());
         } catch (Exception e) {
-            dialogService.showErrorDialogAndWait("An error occurred while creating file for storing chat history. Will store history in RAM", e);
+            LOGGER.error("An error occurred while creating directories for storing chat history. Chat history won't be remembered in next session", e);
+            dialogService.notify("An error occurred while creating directories for storing chat history. Chat history won't be remembered in next session");
             mvStore = MVStore.open(null);
         }
 

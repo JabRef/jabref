@@ -1,6 +1,7 @@
 package org.jabref.gui.ai.components.errorstate;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
@@ -31,13 +32,24 @@ public class ErrorStateComponent extends BorderPane {
         return errorStateComponent;
     }
 
-    public static ErrorStateComponent withTextArea(String title, String content, String additional) {
+    public static ErrorStateComponent withTextArea(String title, String content, String textAreaContent) {
         ErrorStateComponent errorStateComponent = new ErrorStateComponent(title, content);
 
-        TextArea textArea = new TextArea(additional);
+        TextArea textArea = new TextArea(textAreaContent);
         textArea.setEditable(false);
 
         errorStateComponent.contentsVBox.getChildren().add(textArea);
+
+        return errorStateComponent;
+    }
+
+    public static ErrorStateComponent withTextAreaAndButton(String title, String content, String textAreaContent, String buttonText, Runnable onClick) {
+        ErrorStateComponent errorStateComponent = ErrorStateComponent.withTextArea(title, content, textAreaContent);
+
+        Button button = new Button(buttonText);
+        button.setOnAction(e -> onClick.run());
+
+        errorStateComponent.contentsVBox.getChildren().add(button);
 
         return errorStateComponent;
     }
