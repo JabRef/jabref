@@ -46,11 +46,11 @@ public class AiPreferences {
     private final BooleanProperty enableChatWithFiles;
     private final StringProperty openAiToken;
 
-    private final BooleanProperty customizeSettings;
+    private final BooleanProperty customizeExpertSettings;
 
     private final StringProperty chatModel;
-    private final ObjectProperty<EmbeddingModel> embeddingModel;
     private final StringProperty apiBaseUrl;
+    private final ObjectProperty<EmbeddingModel> embeddingModel;
 
     private final StringProperty instruction;
     private final DoubleProperty temperature;
@@ -60,15 +60,15 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles, String openAiToken, String chatModel, EmbeddingModel embeddingModel, String apiBaseUrl, boolean customizeSettings, String instruction, double temperature, int contextWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
+    public AiPreferences(boolean enableChatWithFiles, String openAiToken, String chatModel, String apiBaseUrl, EmbeddingModel embeddingModel, boolean customizeExpertSettings, String instruction, double temperature, int contextWindowSize, int documentSplitterChunkSize, int documentSplitterOverlapSize, int ragMaxResultsCount, double ragMinScore) {
         this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
         this.openAiToken = new SimpleStringProperty(openAiToken);
 
-        this.customizeSettings = new SimpleBooleanProperty(customizeSettings);
+        this.customizeExpertSettings = new SimpleBooleanProperty(customizeExpertSettings);
 
         this.chatModel = new SimpleStringProperty(chatModel);
-        this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
         this.apiBaseUrl = new SimpleStringProperty(apiBaseUrl);
+        this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
 
         this.instruction = new SimpleStringProperty(instruction);
         this.temperature = new SimpleDoubleProperty(temperature);
@@ -103,16 +103,16 @@ public class AiPreferences {
         this.openAiToken.set(openAiToken);
     }
 
-    public BooleanProperty customizeSettingsProperty() {
-        return customizeSettings;
+    public BooleanProperty customizeExpertSettingsProperty() {
+        return customizeExpertSettings;
     }
 
-    public boolean getCustomizeSettings() {
-        return customizeSettings.get();
+    public boolean getCustomizeExpertSettings() {
+        return customizeExpertSettings.get();
     }
 
-    public void setCustomizeSettings(boolean customizeSettings) {
-        this.customizeSettings.set(customizeSettings);
+    public void setCustomizeExpertSettings(boolean customizeExpertSettings) {
+        this.customizeExpertSettings.set(customizeExpertSettings);
     }
 
     public StringProperty chatModelProperty() {
@@ -280,7 +280,7 @@ public class AiPreferences {
             }
         });
 
-        customizeSettings.addListener((observableValue, oldValue, newValue) -> {
+        customizeExpertSettings.addListener((observableValue, oldValue, newValue) -> {
             if (oldValue != newValue) {
                 runnable.run();
             }

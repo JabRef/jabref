@@ -2758,8 +2758,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(AI_ENABLE_CHAT),
                 getOpenAiTokenFromKeyring().orElse(""),
                 get(AI_CHAT_MODEL),
-                AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 get(AI_API_BASE_URL),
+                AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_SYSTEM_MESSAGE),
                 getDouble(AI_TEMPERATURE),
@@ -2772,7 +2772,7 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE_CHAT, newValue));
         EasyBind.listen(aiPreferences.openAiTokenProperty(), (obs, oldValue, newValue) -> storeOpenAiTokenToKeyring(newValue));
 
-        EasyBind.listen(aiPreferences.customizeSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
+        EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
         EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));

@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.embeddings;
 
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -42,15 +44,18 @@ import static java.util.Comparator.comparingDouble;
  * Every embedding has 3 fields: float array (the embedding itself), file where it was generated from, and the embedded
  * string (the content). Each of those fields is stored in a separate {@link MVMap}.
  * To connect values in those fields we use an id, which is a random {@link UUID}.
+ * <p>
  */
 public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreEmbeddingStore.class);
 
     private final MVStore mvStore;
 
-    private final Map<String, float[]> embeddingsMap;
-    private final Map<String, String> fileMap;
-    private final Map<String, String> contentsMap;
+    // `file` field is nullable, because {@link Optional} can't be serialized.
+    private record EmbeddingRecord(
+            @Nullable String file, String content, float[] embeddingVector) implements Serializable {}
+
+    private final Map<String, EmbeddingRecord> embeddingsMap;
 
     /**
      * Construct an embedding store that uses an MVStore for persistence.
@@ -69,8 +74,6 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
 
         this.mvStore = mvStoreTemp;
         this.embeddingsMap = mvStore.openMap("embeddingsMap");
-        this.fileMap = mvStore.openMap("fileMap");
-        this.contentsMap = mvStore.openMap("contentsMap");
     }
 
     @Override
@@ -84,25 +87,18 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
 
     @Override
     public void add(String id, Embedding embedding) {
-        embeddingsMap.put(id, embedding.vector());
+        // It doesn't make much sense to store single embedding vector, but this is a requirement from `langchain4j`
+        // {@link EmbeddingStore}.
+        embeddingsMap.put(id, new EmbeddingRecord(null, "", embedding.vector()));
     }
 
     @Override
     public String add(Embedding embedding, TextSegment textSegment) {
-        // Every embedding must have a unique id (conventions in `langchain4j` + it's a key to the {@link Map}.
-        // Most of the code in this class was borrowed from {@link InMemoryEmbeddingStore}.
         String id = String.valueOf(UUID.randomUUID());
 
-        add(id, embedding);
-
-        contentsMap.put(id, textSegment.text());
-
         String linkedFile = textSegment.metadata().getString(FileEmbeddingsManager.LINK_METADATA_KEY);
-        if (linkedFile != null) {
-            fileMap.put(id, linkedFile);
-        } else {
-            LOGGER.debug("MVStoreEmbeddingStore got an embedding without a 'linkedFile' metadata entry. This embedding will be filtered out in AI chats.");
-        }
+
+        embeddingsMap.put(id, new EmbeddingRecord(linkedFile, textSegment.text(), embedding.vector()));
 
         return id;
     }
@@ -120,8 +116,6 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
     @Override
     public void remove(String id) {
         embeddingsMap.remove(id);
-        contentsMap.remove(id);
-        fileMap.remove(id);
     }
 
     @Override
@@ -133,10 +127,18 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
     @Override
     public void removeAll() {
         embeddingsMap.clear();
-        contentsMap.clear();
-        fileMap.clear();
     }
 
+    /**
+     * The main function of finding most relevant text segments.
+     * Note: the only filters supported are:
+     * - {@link IsIn} with key {@link FileEmbeddingsManager.LINK_METADATA_KEY}
+     * - {@link IsEqualTo} with key {@link FileEmbeddingsManager.LINK_METADATA_KEY}
+     *
+     * @param request embedding search request
+     *
+     * @return an {@link EmbeddingSearchResult}, which contains most relevant text segments
+     */
     @Override
     public EmbeddingSearchResult<TextSegment> search(EmbeddingSearchRequest request) {
         // Source: {@link InMemoryEmbeddingStore}.
@@ -145,13 +147,13 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
         PriorityQueue<EmbeddingMatch<TextSegment>> matches = new PriorityQueue<>(comparator);
 
         applyFilter(request.filter()).forEach(id -> {
-            Embedding embedding = new Embedding(embeddingsMap.get(id));
+            EmbeddingRecord record = embeddingsMap.get(id);
 
-            double cosineSimilarity = CosineSimilarity.between(embedding, request.queryEmbedding());
+            double cosineSimilarity = CosineSimilarity.between(Embedding.from(record.embeddingVector), request.queryEmbedding());
             double score = RelevanceScore.fromCosineSimilarity(cosineSimilarity);
 
             if (score >= request.minScore()) {
-                matches.add(new EmbeddingMatch<>(score, id, embedding, new TextSegment(contentsMap.get(id), new Metadata())));
+                matches.add(new EmbeddingMatch<>(score, id, Embedding.from(record.embeddingVector), new TextSegment(record.content, new Metadata())));
 
                 if (matches.size() > request.maxResults()) {
                     matches.poll();
@@ -168,8 +170,6 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
     @Override
     public void removeAll(Collection ids) {
         embeddingsMap.entrySet().removeIf(entry -> ids.contains(entry.getKey()));
-        contentsMap.entrySet().removeIf(entry -> ids.contains(entry.getKey()));
-        fileMap.entrySet().removeIf(entry -> ids.contains(entry.getKey()));
     }
 
     private Stream<String> applyFilter(@Nullable Filter filter) {
@@ -177,17 +177,17 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
             case null -> embeddingsMap.keySet().stream();
 
             case IsIn isInFilter when Objects.equals(isInFilter.key(), FileEmbeddingsManager.LINK_METADATA_KEY) ->
-                    filterEntries(entry -> isInFilter.comparisonValues().contains(entry.getValue()));
+                    filterEntries(entry -> isInFilter.comparisonValues().contains(entry.getValue().file));
 
             case IsEqualTo isEqualToFilter when Objects.equals(isEqualToFilter.key(), FileEmbeddingsManager.LINK_METADATA_KEY) ->
-                    filterEntries(entry -> isEqualToFilter.comparisonValue().equals(entry.getValue()));
+                    filterEntries(entry -> isEqualToFilter.comparisonValue().equals(entry.getValue().file));
 
             default -> throw new IllegalArgumentException("Wrong filter passed to MVStoreEmbeddingStore");
         };
     }
 
-    private Stream<String> filterEntries(Predicate<Map.Entry<String, String>> predicate) {
-        return fileMap.entrySet().stream().filter(predicate).map(Map.Entry::getKey);
+    private Stream<String> filterEntries(Predicate<Map.Entry<String, EmbeddingRecord>> predicate) {
+        return embeddingsMap.entrySet().stream().filter(predicate).map(Map.Entry::getKey);
     }
 
     @Override

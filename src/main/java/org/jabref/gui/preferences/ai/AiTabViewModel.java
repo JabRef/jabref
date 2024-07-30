@@ -30,7 +30,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty openAiToken = new SimpleStringProperty();
 
-    private final BooleanProperty customizeSettings = new SimpleBooleanProperty();
+    private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
 
     private final StringProperty chatModel = new SimpleStringProperty();
     private final ObjectProperty<AiPreferences.EmbeddingModel> embeddingModel = new SimpleObjectProperty<>();
@@ -43,6 +43,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final IntegerProperty documentSplitterOverlapSize = new SimpleIntegerProperty();
     private final IntegerProperty ragMaxResultsCount = new SimpleIntegerProperty();
     private final DoubleProperty ragMinScore = new SimpleDoubleProperty();
+
+    private final BooleanProperty disableBasicSettings = new SimpleBooleanProperty(true);
+    private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);
 
     private final AiPreferences aiPreferences;
 
@@ -59,6 +62,15 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public AiTabViewModel(PreferencesService preferencesService) {
         this.aiPreferences = preferencesService.getAiPreferences();
+
+        this.useAi.addListener((observable, oldValue, newValue) -> {
+            disableBasicSettings.set(!newValue);
+            disableExpertSettings.set(!newValue || !customizeExpertSettings.get());
+        });
+
+        this.customizeExpertSettings.addListener((observableValue, oldValue, newValue) ->
+                disableExpertSettings.set(!newValue || !useAi.get())
+        );
 
         this.openAiTokenValidator = new FunctionBasedValidator<>(
                 openAiToken,
@@ -117,7 +129,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         useAi.setValue(aiPreferences.getEnableChatWithFiles());
         openAiToken.setValue(aiPreferences.getOpenAiToken());
 
-        customizeSettings.setValue(aiPreferences.getCustomizeSettings());
+        customizeExpertSettings.setValue(aiPreferences.getCustomizeExpertSettings());
 
         chatModel.setValue(aiPreferences.getChatModel());
         embeddingModel.setValue(aiPreferences.getEmbeddingModel());
@@ -137,9 +149,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setEnableChatWithFiles(useAi.get());
         aiPreferences.setOpenAiToken(openAiToken.get());
 
-        aiPreferences.setCustomizeSettings(customizeSettings.get());
+        aiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
 
-        if (customizeSettings.get()) {
+        if (customizeExpertSettings.get()) {
             aiPreferences.setChatModel(chatModel.get());
             aiPreferences.setEmbeddingModel(embeddingModel.get());
             aiPreferences.setApiBaseUrl(apiBaseUrl.get());
@@ -185,7 +197,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     @Override
     public boolean validateSettings() {
         if (useAi.get()) {
-            if (customizeSettings.get()) {
+            if (customizeExpertSettings.get()) {
                 return validateBasicSettings() && validateExpertSettings();
             } else {
                 return validateBasicSettings();
@@ -227,12 +239,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return useAi.get();
     }
 
-    public BooleanProperty customizeSettingsProperty() {
-        return customizeSettings;
+    public BooleanProperty customizeExpertSettingsProperty() {
+        return customizeExpertSettings;
     }
 
-    public boolean getCustomizeSettings() {
-        return customizeSettings.get();
+    public boolean getCustomizeExpertSettings() {
+        return customizeExpertSettings.get();
     }
 
     public StringProperty chatModelProperty() {
@@ -273,6 +285,14 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public DoubleProperty ragMinScoreProperty() {
         return ragMinScore;
+    }
+
+    public BooleanProperty disableBasicSettingsProperty() {
+        return disableBasicSettings;
+    }
+
+    public BooleanProperty disableExpertSettingsProperty() {
+        return disableExpertSettings;
     }
 
     public ValidationStatus getOpenAiTokenValidationStatus() {

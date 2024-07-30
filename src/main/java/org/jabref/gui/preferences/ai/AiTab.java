@@ -26,7 +26,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private CheckBox enableChat;
     @FXML private TextField openAiTokenTextField;
 
-    @FXML private CheckBox customizeSettingsCheckbox;
+    @FXML private CheckBox customizeExpertSettingsCheckbox;
 
     @FXML private ComboBox<String> chatModelComboBox;
     @FXML private ComboBox<AiPreferences.EmbeddingModel> embeddingModelComboBox;
@@ -63,31 +63,45 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     public void initialize() {
         this.viewModel = new AiTabViewModel(preferencesService);
 
-        chatModelComboBox.getItems().addAll(AiPreferences.OPENAI_CHAT_MODELS);
-        embeddingModelComboBox.getItems().addAll(AiPreferences.EmbeddingModel.values());
-
         enableChat.selectedProperty().bindBidirectional(viewModel.useAiProperty());
+
         openAiTokenTextField.textProperty().bindBidirectional(viewModel.openAiTokenProperty());
+        openAiTokenTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
-        customizeSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeSettingsProperty());
+        customizeExpertSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeExpertSettingsProperty());
+        customizeExpertSettingsCheckbox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
+        chatModelComboBox.getItems().addAll(AiPreferences.OPENAI_CHAT_MODELS);
         chatModelComboBox.valueProperty().bindBidirectional(viewModel.chatModelProperty());
+        chatModelComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
+        embeddingModelComboBox.getItems().addAll(AiPreferences.EmbeddingModel.values());
         embeddingModelComboBox.valueProperty().bindBidirectional(viewModel.embeddingModelProperty());
+        embeddingModelComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         apiBaseUrlTextField.textProperty().bindBidirectional(viewModel.apiBaseUrlProperty());
+        apiBaseUrlTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         instructionTextArea.textProperty().bindBidirectional(viewModel.instructionProperty());
+        instructionTextArea.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         temperatureTextField.valueProperty().bindBidirectional(viewModel.temperatureProperty().asObject());
+        temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         contextWindowSizeTextField.valueProperty().bindBidirectional(viewModel.contextWindowSizeProperty().asObject());
+        contextWindowSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         documentSplitterChunkSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterChunkSizeProperty().asObject());
+        documentSplitterChunkSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         documentSplitterOverlapSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterOverlapSizeProperty().asObject());
+        documentSplitterOverlapSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         ragMaxResultsCountTextField.valueProperty().bindBidirectional(viewModel.ragMaxResultsCountProperty().asObject());
+        ragMaxResultsCountTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         ragMinScoreTextField.valueProperty().bindBidirectional(viewModel.ragMinScoreProperty().asObject());
-
-        updateDisabledProperties();
-
-        enableChat.selectedProperty().addListener(obs -> updateDisabledProperties());
-
-        customizeSettingsCheckbox.selectedProperty().addListener(obs -> updateDisabledProperties());
+        ragMinScoreTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         Platform.runLater(() -> {
             visualizer.initVisualization(viewModel.getOpenAiTokenValidationStatus(), openAiTokenTextField);
@@ -112,25 +126,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterOverlapSizeHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MAX_RESULTS_COUNT, dialogService, preferencesService.getFilePreferences()), ragMaxResultsCountHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MIN_SCORE, dialogService, preferencesService.getFilePreferences()), ragMinScoreHelp);
-    }
-
-    private void updateDisabledProperties() {
-        openAiTokenTextField.setDisable(!viewModel.getUseAi());
-
-        customizeSettingsCheckbox.setDisable(!viewModel.getUseAi());
-
-        chatModelComboBox.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        embeddingModelComboBox.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        apiBaseUrlTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-
-        instructionTextArea.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        temperatureTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        contextWindowSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        documentSplitterChunkSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        documentSplitterOverlapSizeTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        ragMaxResultsCountTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        ragMinScoreTextField.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
-        resetExpertSettingsButton.setDisable(!viewModel.getUseAi() || !viewModel.getCustomizeSettings());
     }
 
     @Override
