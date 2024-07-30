@@ -2762,8 +2762,8 @@ public class JabRefPreferences implements PreferencesService {
                 get(AI_CHAT_MODEL),
                 getAiApiTokenFromKeyring().orElse(""),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
-                AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 get(AI_API_BASE_URL),
+                AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 get(AI_SYSTEM_MESSAGE),
                 getDouble(AI_TEMPERATURE),
                 getInt(AI_CONTEXT_WINDOW_SIZE),
@@ -2778,10 +2778,10 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.apiTokenProperty(), (obs, oldValue, newValue) -> storeAiApiTokenInKeyring(newValue));
 
-        EasyBind.listen(aiPreferences.customizeSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
+        EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
-        EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
         EasyBind.listen(aiPreferences.apiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
         EasyBind.listen(aiPreferences.instructionProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
         EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, (double) newValue));
         EasyBind.listen(aiPreferences.contextWindowSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_CONTEXT_WINDOW_SIZE, newValue));

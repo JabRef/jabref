@@ -15,13 +15,13 @@
 
         <CheckBox fx:id="enableChat" mnemonicParsing="false" text="%Enable chat with attached PDF files" />
 
-      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="306.0" spacing="10.0">
-         <children>
-            <Label alignment="BASELINE_CENTER" text="%AI provider" />
-            <ComboBox fx:id="aiProviderComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-            <Button fx:id="aiProviderHelp" prefWidth="20.0" />
-         </children>
-      </HBox>
+        <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="306.0" spacing="10.0">
+            <children>
+                <Label alignment="BASELINE_CENTER" text="%AI provider" />
+                <ComboBox fx:id="aiProviderComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                <Button fx:id="aiProviderHelp" prefWidth="20.0" />
+            </children>
+        </HBox>
 
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
@@ -47,21 +47,22 @@
             </children>
         </VBox>
 
-      <CheckBox fx:id="customizeSettingsCheckbox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%Customize AI settings" />
+      <CheckBox fx:id="customizeExpertSettingsCheckbox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%Customize AI settings" />
+
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <children>
+                <Label alignment="BASELINE_CENTER" text="%API base URL (used only for LLM)" />
+                <TextField fx:id="apiBaseUrlTextField" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                <Button fx:id="apiBaseUrlHelp" prefWidth="20.0" />
+            </children>
+        </HBox>
+
 
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
                 <Label alignment="BASELINE_CENTER" text="%Embedding model" />
                 <ComboBox fx:id="embeddingModelComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
             <Button fx:id="embeddingModelHelp" prefWidth="20.0" />
-            </children>
-        </HBox>
-
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <children>
-                <Label alignment="BASELINE_CENTER" text="%Embedding model" />
-                <TextField fx:id="apiBaseUrlTextField" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                <Button fx:id="apiBaseUrlHelp" prefWidth="20.0" />
             </children>
         </HBox>
 

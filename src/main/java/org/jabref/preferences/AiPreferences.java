@@ -77,10 +77,10 @@ public class AiPreferences {
     private final StringProperty chatModel;
     private final StringProperty apiToken;
 
-    private final BooleanProperty customizeSettings;
+    private final BooleanProperty customizeExpertSettings;
 
-    private final ObjectProperty<EmbeddingModel> embeddingModel;
     private final StringProperty apiBaseUrl;
+    private final ObjectProperty<EmbeddingModel> embeddingModel;
     private final StringProperty instruction;
     private final DoubleProperty temperature;
     private final IntegerProperty contextWindowSize;
@@ -93,9 +93,9 @@ public class AiPreferences {
                          AiProvider aiProvider,
                          String chatModel,
                          String apiToken,
-                         boolean customizeSettings,
-                         EmbeddingModel embeddingModel,
+                         boolean customizeExpertSettings,
                          String apiBaseUrl,
+                         EmbeddingModel embeddingModel,
                          String instruction,
                          double temperature,
                          int contextWindowSize,
@@ -110,10 +110,10 @@ public class AiPreferences {
         this.chatModel = new SimpleStringProperty(chatModel);
         this.apiToken = new SimpleStringProperty(apiToken);
 
-        this.customizeSettings = new SimpleBooleanProperty(customizeSettings);
+        this.customizeExpertSettings = new SimpleBooleanProperty(customizeExpertSettings);
 
-        this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
         this.apiBaseUrl = new SimpleStringProperty(apiBaseUrl);
+        this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
         this.instruction = new SimpleStringProperty(instruction);
         this.temperature = new SimpleDoubleProperty(temperature);
         this.contextWindowSize = new SimpleIntegerProperty(contextWindowSize);
@@ -171,16 +171,16 @@ public class AiPreferences {
         this.apiToken.set(apiToken);
     }
 
-    public BooleanProperty customizeSettingsProperty() {
-        return customizeSettings;
+    public BooleanProperty customizeExpertSettingsProperty() {
+        return customizeExpertSettings;
     }
 
-    public boolean getCustomizeSettings() {
-        return customizeSettings.get();
+    public boolean getCustomizeExpertSettings() {
+        return customizeExpertSettings.get();
     }
 
-    public void setCustomizeSettings(boolean customizeSettings) {
-        this.customizeSettings.set(customizeSettings);
+    public void setCustomizeExpertSettings(boolean customizeExpertSettings) {
+        this.customizeExpertSettings.set(customizeExpertSettings);
     }
 
     public ObjectProperty<EmbeddingModel> embeddingModelProperty() {
@@ -336,7 +336,7 @@ public class AiPreferences {
             }
         });
 
-        customizeSettings.addListener((observableValue, oldValue, newValue) -> {
+        customizeExpertSettings.addListener((observableValue, oldValue, newValue) -> {
             if (oldValue != newValue) {
                 runnable.run();
             }

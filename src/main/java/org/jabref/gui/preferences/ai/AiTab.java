@@ -34,10 +34,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private ComboBox<String> chatModelComboBox;
     @FXML private CustomPasswordField apiTokenTextField;
 
-    @FXML private CheckBox customizeSettingsCheckbox;
+    @FXML private CheckBox customizeExpertSettingsCheckbox;
 
-    @FXML private ComboBox<AiPreferences.EmbeddingModel> embeddingModelComboBox;
     @FXML private TextField apiBaseUrlTextField;
+    @FXML private ComboBox<AiPreferences.EmbeddingModel> embeddingModelComboBox;
     @FXML private TextArea instructionTextArea;
     @FXML private DoubleInputField temperatureTextField;
     @FXML private IntegerInputField contextWindowSizeTextField;
@@ -49,8 +49,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private Button aiProviderHelp;
     @FXML private Button chatModelHelp;
     @FXML private Button apiTokenHelp;
-    @FXML private Button embeddingModelHelp;
     @FXML private Button apiBaseUrlHelp;
+    @FXML private Button embeddingModelHelp;
     @FXML private Button instructionHelp;
     @FXML private Button contextWindowSizeHelp;
     @FXML private Button documentSplitterChunkSizeHelp;
@@ -78,37 +78,55 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
                 .install(aiProviderComboBox);
         aiProviderComboBox.setItems(viewModel.aiProvidersProperty());
         aiProviderComboBox.valueProperty().bindBidirectional(viewModel.selectedAiProviderProperty());
+        aiProviderComboBox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
         new ViewModelListCellFactory<String>()
                 .withText(text -> text)
                 .install(chatModelComboBox);
         chatModelComboBox.setItems(viewModel.chatModelsProperty());
         chatModelComboBox.valueProperty().bindBidirectional(viewModel.selectedChatModelProperty());
+        chatModelComboBox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+
+        apiTokenTextField.textProperty().bindBidirectional(viewModel.apiTokenProperty());
+        apiTokenTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+
+        customizeExpertSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeExpertSettingsProperty());
+        customizeExpertSettingsCheckbox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+
+        chatModelComboBox.getItems().addAll(AiPreferences.OPENAI_CHAT_MODELS);
+        chatModelComboBox.valueProperty().bindBidirectional(viewModel.chatModelProperty());
+        chatModelComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         new ViewModelListCellFactory<AiPreferences.EmbeddingModel>()
                 .withText(AiPreferences.EmbeddingModel::toString)
                 .install(embeddingModelComboBox);
         embeddingModelComboBox.setItems(viewModel.embeddingModelsProperty());
         embeddingModelComboBox.valueProperty().bindBidirectional(viewModel.selectedEmbeddingModelProperty());
-
-        apiTokenTextField.textProperty().bindBidirectional(viewModel.apiTokenProperty());
-
-        customizeSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeSettingsProperty());
+        embeddingModelComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         apiBaseUrlTextField.textProperty().bindBidirectional(viewModel.apiBaseUrlProperty());
+        apiBaseUrlTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         instructionTextArea.textProperty().bindBidirectional(viewModel.instructionProperty());
+        instructionTextArea.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         temperatureTextField.valueProperty().bindBidirectional(viewModel.temperatureProperty().asObject());
+        temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         contextWindowSizeTextField.valueProperty().bindBidirectional(viewModel.contextWindowSizeProperty().asObject());
+        contextWindowSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         documentSplitterChunkSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterChunkSizeProperty().asObject());
+        documentSplitterChunkSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         documentSplitterOverlapSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterOverlapSizeProperty().asObject());
+        documentSplitterOverlapSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         ragMaxResultsCountTextField.valueProperty().bindBidirectional(viewModel.ragMaxResultsCountProperty().asObject());
+        ragMaxResultsCountTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
         ragMinScoreTextField.valueProperty().bindBidirectional(viewModel.ragMinScoreProperty().asObject());
-
-        updateDisabledProperties();
-
-        enableChat.selectedProperty().addListener(obs -> updateDisabledProperties());
-
-        customizeSettingsCheckbox.selectedProperty().addListener(obs -> updateDisabledProperties());
+        ragMinScoreTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         Platform.runLater(() -> {
             visualizer.initVisualization(viewModel.getApiTokenValidatorStatus(), apiTokenTextField);
@@ -135,33 +153,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterOverlapSizeHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MAX_RESULTS_COUNT, dialogService, preferencesService.getFilePreferences()), ragMaxResultsCountHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MIN_SCORE, dialogService, preferencesService.getFilePreferences()), ragMinScoreHelp);
-
-        // TODO: Move editable property to View Model.
-        viewModel.selectedAiProviderProperty().addListener((observable, oldValue, newValue) -> {
-            chatModelComboBox.setEditable(newValue == AiPreferences.AiProvider.HUGGING_FACE);
-        });
-    }
-
-    private void updateDisabledProperties() {
-        boolean basicPropertiesDisabled = !viewModel.getEnableChatWithFiles();
-        boolean expertSettingsPropertiesDisabled = !(viewModel.getEnableChatWithFiles() && viewModel.getCustomizeSettings());
-
-        aiProviderComboBox.setDisable(basicPropertiesDisabled);
-        chatModelComboBox.setDisable(basicPropertiesDisabled);
-        apiTokenTextField.setDisable(basicPropertiesDisabled);
-
-        customizeSettingsCheckbox.setDisable(basicPropertiesDisabled);
-
-        embeddingModelComboBox.setDisable(expertSettingsPropertiesDisabled);
-        apiBaseUrlTextField.setDisable(expertSettingsPropertiesDisabled);
-        instructionTextArea.setDisable(expertSettingsPropertiesDisabled);
-        temperatureTextField.setDisable(expertSettingsPropertiesDisabled);
-        contextWindowSizeTextField.setDisable(expertSettingsPropertiesDisabled);
-        documentSplitterChunkSizeTextField.setDisable(expertSettingsPropertiesDisabled);
-        documentSplitterOverlapSizeTextField.setDisable(expertSettingsPropertiesDisabled);
-        ragMaxResultsCountTextField.setDisable(expertSettingsPropertiesDisabled);
-        ragMinScoreTextField.setDisable(expertSettingsPropertiesDisabled);
-        resetExpertSettingsButton.setDisable(expertSettingsPropertiesDisabled);
     }
 
     @Override

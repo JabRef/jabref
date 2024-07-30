@@ -154,4 +154,6 @@ open module org.jabref {
     requires com.dlsc.unitfx;
     requires de.saxsys.mvvmfx.validation;
     requires dd.plist;
+    requires fastparse;
+    requires com.ibm.icu;
 }

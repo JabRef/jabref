@@ -36,13 +36,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             new SimpleListProperty<>(FXCollections.observableArrayList(AiPreferences.AiProvider.values()));
     private final ObjectProperty<AiPreferences.AiProvider> selectedAiProvider = new SimpleObjectProperty<>();
 
-    private final ListProperty<String> chatModelsList = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<String> chatModelsList =
+            new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty selectedChatModel = new SimpleStringProperty();
-    private final BooleanProperty allowToEditChatModel = new SimpleBooleanProperty(false);
 
     private final StringProperty apiToken = new SimpleStringProperty();
 
-    private final BooleanProperty customizeSettings = new SimpleBooleanProperty();
+    private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
 
     private final ListProperty<AiPreferences.EmbeddingModel> embeddingModelsList =
             new SimpleListProperty<>(FXCollections.observableArrayList(AiPreferences.EmbeddingModel.values()));
@@ -57,6 +57,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final IntegerProperty documentSplitterOverlapSize = new SimpleIntegerProperty();
     private final IntegerProperty ragMaxResultsCount = new SimpleIntegerProperty();
     private final DoubleProperty ragMinScore = new SimpleDoubleProperty();
+
+    private final BooleanProperty disableBasicSettings = new SimpleBooleanProperty(true);
+    private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);
 
     private final AiPreferences aiPreferences;
 
@@ -74,13 +77,19 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public AiTabViewModel(PreferencesService preferencesService) {
         this.aiPreferences = preferencesService.getAiPreferences();
 
+        this.enableChatWithFiles.addListener((observable, oldValue, newValue) -> {
+            disableBasicSettings.set(!newValue);
+            disableExpertSettings.set(!newValue || !customizeExpertSettings.get());
+        });
+
+        this.customizeExpertSettings.addListener((observableValue, oldValue, newValue) ->
+                disableExpertSettings.set(!newValue || !enableChatWithFiles.get())
+        );
+
         selectedAiProvider.addListener((observable, oldValue, newValue) -> {
             List<String> models = AiPreferences.CHAT_MODELS.get(newValue);
             chatModelsList.setAll(models);
-            if (models.isEmpty()) {
-                allowToEditChatModel.set(true);
-            } else {
-                allowToEditChatModel.set(false);
+            if (!models.isEmpty()) {
                 selectedChatModel.setValue(chatModelsList.getFirst());
             }
 
@@ -147,7 +156,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         selectedChatModel.setValue(aiPreferences.getChatModel());
         apiToken.setValue(aiPreferences.getApiToken());
 
-        customizeSettings.setValue(aiPreferences.getCustomizeSettings());
+        customizeExpertSettings.setValue(aiPreferences.getCustomizeExpertSettings());
 
         selectedEmbeddingModel.setValue(aiPreferences.getEmbeddingModel());
         apiBaseUrl.setValue(aiPreferences.getApiBaseUrl());
@@ -168,9 +177,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setChatModel(selectedChatModel.get());
         aiPreferences.setApiToken(apiToken.get());
 
-        aiPreferences.setCustomizeSettings(customizeSettings.get());
+        aiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
 
-        if (customizeSettings.get()) {
+        if (customizeExpertSettings.get()) {
             aiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
             aiPreferences.setApiBaseUrl(apiBaseUrl.get());
             aiPreferences.setInstruction(instruction.get());
@@ -211,7 +220,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     @Override
     public boolean validateSettings() {
         if (enableChatWithFiles.get()) {
-            if (customizeSettings.get()) {
+            if (customizeExpertSettings.get()) {
                 return validateBasicSettings() && validateExpertSettings();
             } else {
                 return validateBasicSettings();
@@ -274,12 +283,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return apiToken;
     }
 
-    public BooleanProperty customizeSettingsProperty() {
-        return customizeSettings;
+    public BooleanProperty customizeExpertSettingsProperty() {
+        return customizeExpertSettings;
     }
 
-    public boolean getCustomizeSettings() {
-        return customizeSettings.get();
+    public boolean getCustomizeExpertSettings() {
+        return customizeExpertSettings.get();
     }
 
     public ReadOnlyListProperty<AiPreferences.EmbeddingModel> embeddingModelsProperty() {
@@ -322,7 +331,15 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return ragMinScore;
     }
 
-    public ValidationStatus getApiTokenValidatorStatus() {
+    public BooleanProperty disableBasicSettingsProperty() {
+        return disableBasicSettings;
+    }
+
+    public BooleanProperty disableExpertSettingsProperty() {
+        return disableExpertSettings;
+    }
+
+    public ValidationStatus getApiTokenValidationStatus() {
         return apiTokenValidator.getValidationStatus();
     }
 

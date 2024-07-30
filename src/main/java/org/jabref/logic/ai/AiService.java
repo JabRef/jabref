@@ -4,6 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager;
 import org.jabref.logic.ai.models.JabRefChatLanguageModel;
 import org.jabref.logic.ai.models.EmbeddingModel;
@@ -30,11 +31,11 @@ public class AiService implements AutoCloseable {
     private final EmbeddingModel embeddingModel;
     private final FileEmbeddingsManager fileEmbeddingsManager;
 
-    public AiService(AiPreferences aiPreferences, DialogService dialogService) {
+    public AiService(AiPreferences aiPreferences, DialogService dialogService, TaskExecutor taskExecutor) {
         this.aiPreferences = aiPreferences;
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
         this.bibDatabaseChatHistoryManager = new BibDatabaseChatHistoryManager(dialogService);
-        this.embeddingModel = new EmbeddingModel(aiPreferences);
+        this.embeddingModel = new EmbeddingModel(aiPreferences, dialogService, taskExecutor);
         this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, embeddingModel, dialogService);
     }
 

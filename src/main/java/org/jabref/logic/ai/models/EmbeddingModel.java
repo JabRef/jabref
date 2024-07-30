@@ -8,7 +8,11 @@ import java.util.concurrent.Executors;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.concurrent.Task;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.AiPreferences;
 
@@ -17,10 +21,13 @@ import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.training.util.ProgressBar;
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.output.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wrapper around langchain4j {@link dev.langchain4j.model.embedding.EmbeddingModel}.
@@ -28,9 +35,13 @@ import dev.langchain4j.model.output.Response;
  * This class listens to preferences changes.
  */
 public class EmbeddingModel implements dev.langchain4j.model.embedding.EmbeddingModel, AutoCloseable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddingModel.class);
+
     private static final String DJL_AI_DJL_HUGGINGFACE_PYTORCH_SENTENCE_TRANSFORMERS = "djl://ai.djl.huggingface.pytorch/sentence-transformers/";
 
     private final AiPreferences aiPreferences;
+    private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
 
     private final ExecutorService executorService = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("ai-embedding-pool-%d").build()
@@ -38,10 +49,53 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
 
     private final ObjectProperty<Optional<DeepJavaEmbeddingModel>> predictorProperty = new SimpleObjectProperty<>(Optional.empty());
 
-    public EmbeddingModel(AiPreferences aiPreferences) {
+    private final EventBus eventBus = new EventBus();
+
+    public static class EmbeddingModelBuiltEvent {}
+
+    // Empty if there is no error.
+    private String errorWhileBuildingModel = "";
+
+    public EmbeddingModel(AiPreferences aiPreferences, DialogService dialogService, TaskExecutor taskExecutor) {
         this.aiPreferences = aiPreferences;
-        rebuild();
+        this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
+
+        startRebuildingTask();
+
         setupListeningToPreferencesChanges();
+    }
+
+    public void registerListener(Object object) {
+        eventBus.register(object);
+    }
+
+    public void startRebuildingTask() {
+        predictorProperty.set(Optional.empty());
+
+        BackgroundTask.wrap(this::rebuild)
+                .onSuccess(v -> {
+                    errorWhileBuildingModel = "";
+                    eventBus.post(new EmbeddingModelBuiltEvent());
+                })
+                .onFailure(e -> {
+                    LOGGER.error("An error occurred while building the embedding model", e);
+                    dialogService.notify("An error occurred while building the embedding model: " + e.getMessage());
+                    errorWhileBuildingModel = e.getMessage();
+                })
+                .executeWith(taskExecutor);
+    }
+
+    public boolean isPresent() {
+        return predictorProperty.get().isPresent();
+    }
+
+    public boolean hadErrorWhileBuildingModel() {
+        return !errorWhileBuildingModel.isEmpty();
+    }
+
+    public String getErrorWhileBuildingModel() {
+        return errorWhileBuildingModel;
     }
 
     private void rebuild() {
@@ -76,7 +130,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
     }
 
     private void setupListeningToPreferencesChanges() {
-        aiPreferences.embeddingModelProperty().addListener(obs -> rebuild());
+        aiPreferences.embeddingModelProperty().addListener(obs -> startRebuildingTask());
     }
 
     @Override
@@ -90,7 +144,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
             //    in the result type, nor "throws" in method signature. Actually,
             //    it's possible, but langchain4j doesn't do it.
 
-            throw new RuntimeException(Localization.lang("AI chat is not allowed"));
+            throw new RuntimeException(Localization.lang("Embedding model is not set up"));
         }
 
         return predictorProperty.get().get().embedAll(list);
