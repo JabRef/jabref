@@ -6,8 +6,8 @@ import java.util.concurrent.Executors;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager;
-import org.jabref.logic.ai.models.JabRefChatLanguageModel;
 import org.jabref.logic.ai.models.EmbeddingModel;
+import org.jabref.logic.ai.models.JabRefChatLanguageModel;
 import org.jabref.preferences.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;

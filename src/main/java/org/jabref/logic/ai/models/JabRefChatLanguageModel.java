@@ -18,8 +18,8 @@ import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
-import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
+import dev.langchain4j.model.output.Response;
 import org.h2.mvstore.MVStore;
 
 /**

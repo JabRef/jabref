@@ -8,7 +8,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -53,7 +52,7 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
 
     // `file` field is nullable, because {@link Optional} can't be serialized.
     private record EmbeddingRecord(
-            @Nullable String file, String content, float[] embeddingVector) implements Serializable {}
+            @Nullable String file, String content, float[] embeddingVector) implements Serializable { }
 
     private final Map<String, EmbeddingRecord> embeddingsMap;
 
@@ -147,13 +146,13 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
         PriorityQueue<EmbeddingMatch<TextSegment>> matches = new PriorityQueue<>(comparator);
 
         applyFilter(request.filter()).forEach(id -> {
-            EmbeddingRecord record = embeddingsMap.get(id);
+            EmbeddingRecord eRecord = embeddingsMap.get(id);
 
-            double cosineSimilarity = CosineSimilarity.between(Embedding.from(record.embeddingVector), request.queryEmbedding());
+            double cosineSimilarity = CosineSimilarity.between(Embedding.from(eRecord.embeddingVector), request.queryEmbedding());
             double score = RelevanceScore.fromCosineSimilarity(cosineSimilarity);
 
             if (score >= request.minScore()) {
-                matches.add(new EmbeddingMatch<>(score, id, Embedding.from(record.embeddingVector), new TextSegment(record.content, new Metadata())));
+                matches.add(new EmbeddingMatch<>(score, id, Embedding.from(eRecord.embeddingVector), new TextSegment(eRecord.content, new Metadata())));
 
                 if (matches.size() > request.maxResults()) {
                     matches.poll();

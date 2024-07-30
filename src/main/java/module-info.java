@@ -156,4 +156,5 @@ open module org.jabref {
     requires dd.plist;
     requires fastparse;
     requires com.ibm.icu;
+    requires jvm.openai;
 }

@@ -1,8 +1,6 @@
 package org.jabref.preferences;
 
 import java.util.List;
-import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -40,18 +38,17 @@ public class AiPreferences {
         }
     }
 
-    public static final Map<AiProvider, List<String>> CHAT_MODELS = new EnumMap<>(AiProvider.class);
+    public static final Map<AiProvider, List<String>> CHAT_MODELS = Map.of(
+            AiProvider.OPEN_AI, List.of("gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"),
+            AiProvider.MISTRAL_AI, List.of("open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-small-latest", "mistral-medium-latest", "mistral-large-latest"),
+            AiProvider.HUGGING_FACE, List.of()
+    );
+
     public static final Map<AiProvider, String> PROVIDERS_API_URLS = Map.of(
             AiProvider.OPEN_AI, "https://api.openai.com/v1",
             AiProvider.MISTRAL_AI, "https://api.mistral.ai/v1",
             AiProvider.HUGGING_FACE, "https://huggingface.co/api"
     );
-
-    static {
-        CHAT_MODELS.put(AiProvider.OPEN_AI, List.of("gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"));
-        CHAT_MODELS.put(AiProvider.MISTRAL_AI, List.of("open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-small-latest", "mistral-medium-latest", "mistral-large-latest"));
-        CHAT_MODELS.put(AiProvider.HUGGING_FACE, List.of());
-    }
 
     public enum EmbeddingModel {
         ALL_MINILM_L6_V2("all-MiniLM-L6-v2");

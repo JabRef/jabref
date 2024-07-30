@@ -8,7 +8,6 @@ import java.util.concurrent.Executors;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
@@ -51,7 +50,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
 
     private final EventBus eventBus = new EventBus();
 
-    public static class EmbeddingModelBuiltEvent {}
+    public static class EmbeddingModelBuiltEvent { }
 
     // Empty if there is no error.
     private String errorWhileBuildingModel = "";

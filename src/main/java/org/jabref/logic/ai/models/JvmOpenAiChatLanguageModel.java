@@ -2,7 +2,6 @@ package org.jabref.logic.ai.models;
 
 import java.net.http.HttpClient;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.preferences.AiPreferences;
 

@@ -8,7 +8,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-import org.controlsfx.control.textfield.CustomPasswordField;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -23,9 +22,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.unitfx.DoubleInputField;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.slf4j.Logger;
-
-import java.util.List;import java.util.Map;
+import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
     @FXML private CheckBox enableChat;
