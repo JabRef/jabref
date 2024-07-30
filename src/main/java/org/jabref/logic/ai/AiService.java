@@ -1,6 +1,5 @@
 package org.jabref.logic.ai;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
@@ -16,7 +15,6 @@ import org.jabref.logic.ai.summarization.SummariesStorage;
 import org.jabref.preferences.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

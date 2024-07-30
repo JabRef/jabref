@@ -9,7 +9,7 @@ import com.google.common.eventbus.EventBus;
 import org.h2.mvstore.MVStore;
 
 public class SummariesStorage {
-    private record SummarizationRecord (String library, String citationKey, String contents) implements Serializable { }
+    private record SummarizationRecord(String library, String citationKey, String contents) implements Serializable { }
 
     private final Map<Integer, SummarizationRecord> summarizationRecords;
 

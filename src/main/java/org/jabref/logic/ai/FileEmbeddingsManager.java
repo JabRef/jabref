@@ -1,8 +1,5 @@
 package org.jabref.logic.ai;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -10,8 +7,6 @@ import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.embeddings.LowLevelIngestor;
 import org.jabref.logic.ai.embeddings.MVStoreEmbeddingStore;
@@ -23,7 +18,6 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
-import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
 
 /**

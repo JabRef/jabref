@@ -3,13 +3,7 @@ package org.jabref.gui.ai.components.summary;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-
-import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTabContainer;
-import org.jabref.gui.preferences.ShowPreferencesAction;
-import org.jabref.gui.preferences.ai.AiTab;
 
 import com.airhacks.afterburner.views.ViewLoader;
 

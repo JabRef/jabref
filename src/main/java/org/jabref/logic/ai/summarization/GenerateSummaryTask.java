@@ -1,27 +1,17 @@
 package org.jabref.logic.ai.summarization;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
-import javafx.beans.property.BooleanProperty;
 
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.ai.FileEmbeddingsManager;
 import org.jabref.logic.ai.embeddings.FileToDocument;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import jakarta.ws.rs.core.Link;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

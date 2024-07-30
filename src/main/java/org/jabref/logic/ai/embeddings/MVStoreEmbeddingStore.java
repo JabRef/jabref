@@ -1,7 +1,6 @@
 package org.jabref.logic.ai.embeddings;
 
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -14,7 +13,6 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.FileEmbeddingsManager;
 
 import dev.langchain4j.data.document.Metadata;

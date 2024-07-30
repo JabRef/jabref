@@ -5,27 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
-import org.jabref.gui.ai.components.aichat.AiChatComponent;
 import org.jabref.gui.ai.components.apikeymissing.ApiKeyMissingComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.ai.components.summary.SummaryComponent;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.ai.AiChatLogic;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.GenerateEmbeddingsTask;
-import org.jabref.logic.ai.chathistory.AiChatHistory;
-import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
-import org.jabref.logic.ai.chathistory.InMemoryAiChatHistory;
-import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
-import org.jabref.logic.ai.models.EmbeddingModel;
 import org.jabref.logic.ai.summarization.GenerateSummaryTask;
 import org.jabref.logic.ai.summarization.SummariesStorage;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;

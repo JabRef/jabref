@@ -15,8 +15,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.gui.entryeditor.AiChatTab;
-
 public class AiPreferences {
     public enum AiProvider {
         OPEN_AI("OpenAI"),
