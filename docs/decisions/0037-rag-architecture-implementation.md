@@ -10,13 +10,14 @@ parent: Decision Records
 The current trend in questions and answering (Q&A) using large language models (LLMs) or other
 AI related technology is retrieval-augmented-generation (RAG).
 
-RAG is related to [Open Generative QA](https://huggingface.co/tasks/question-answering) 
+RAG is related to [Open Generative QA](https://huggingface.co/tasks/question-answering)
 that means LLM (which generates text) is supplied with context (chunks of information extracted
 from various sources) and then it generates answer.
 
 RAG architecture consists of [these steps](https://www.linkedin.com/pulse/rag-architecture-deep-dive-frank-denneman-4lple) (simplified):
 
 How source data is processed:
+
 1. **Indexing**: application is supplied with information sources (PDFs, text files, web pages, etc.)
 2. **Conversion**: files are converted to string (because LLM works on text data).
 3. **Splitting**: the string from previous step is split into parts (because LLM has fixed context window, meaning
@@ -27,6 +28,7 @@ Generation of such a vector is achieved by using a separate model called *embedd
 5. **Store**: chunks with relevant metadata (for example, from which document they were generated) and embedding vector are stored in a vector database.
 
 How answer is generated:
+
 1. **Ask**: user asks AI a question.
 2. **Question embedding**: an embedding model generates embedding vector of a query.
 3. **Data finding**: vector database performs search of most relevant pieces of information (a finite count of pieces).
@@ -58,13 +60,13 @@ Chosen option: mix of "Use a hand-crafted RAG" and "Use a third-party Java libra
 
 Third-party libraries provide excellent resources for connecting to an LLM or extracting text from PDF files. For RAG,
 we mostly used all the machinery provided by `langchain4j`, but there were moments that should be hand-crafted:
-- **LLM connection**: due to https://github.com/langchain4j/langchain4j/issues/1454 (https://github.com/InAnYan/jabref/issues/77)
-  this was delegated to another library `jvm-openai`.
-- **Embedding generation**: due to https://github.com/langchain4j/langchain4j/issues/1492 (https://github.com/InAnYan/jabref/issues/79),
+
+* **LLM connection**: due to <https://github.com/langchain4j/langchain4j/issues/1454> (<https://github.com/InAnYan/jabref/issues/77>) this was delegated to another library `jvm-openai`.
+* **Embedding generation**: due to <https://github.com/langchain4j/langchain4j/issues/1492> (<https://github.com/InAnYan/jabref/issues/79>),
   this was delegated to another library `djl`.
-- **Indexing**: `langchain4j` is just a bunch of useful tools, but we still have to orchestrate when indexing should
+* **Indexing**: `langchain4j` is just a bunch of useful tools, but we still have to orchestrate when indexing should
 happen and what files should be processed.
-- **Vector database**: there seems to be no embedded vector database (except SQLite with `sqlite-vss` extension). We
+* **Vector database**: there seems to be no embedded vector database (except SQLite with `sqlite-vss` extension). We
 implemented vector database using `MVStore` because that was easy.
 
 ## Pros and Cons of the Options
@@ -103,5 +105,5 @@ implemented vector database using `MVStore` because that was easy.
 * Neutral, because they provide not that many LLM integrations, embedding models, and vector storages
 * Bad, because requires connection to Internet
 * Bad, because data is processed by a third party company
-* Bad, because most of them require additional payment (in fact, it would be impossible to develop a free service like 
+* Bad, because most of them require additional payment (in fact, it would be impossible to develop a free service like
 that)

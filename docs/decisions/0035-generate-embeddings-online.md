@@ -51,4 +51,3 @@ and have better performance, in comparison to available in `langchain4j` model `
 * Good, because JabRef distribution size will practically be unaffected
 * Bad, because user should agree to send data to a third-party service, Internet connection is required
 * Bad, because user pay for embedding generation (see also [OpenAI embedding models pricing](https://platform.openai.com/docs/guides/embeddings/embedding-models))
-
