@@ -44,6 +44,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -237,7 +238,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                                                                 .stream()
                                                                 .filter(item -> Objects.equals(item.getName(), unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedExtension()))
                                                                 .findFirst()
-                                                                .orElseThrow();
+                                                                .orElseGet(() -> new FileExtensionViewModel(StandardFileType.ANY_FILE, preferencesService.getFilePreferences()));
         fileTypeCombo.getSelectionModel().select(selectedExtension);
         fileDateCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedDateRange());
         fileSortCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedSort());
