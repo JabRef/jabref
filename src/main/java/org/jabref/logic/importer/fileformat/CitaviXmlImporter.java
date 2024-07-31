@@ -419,7 +419,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         mapper.registerModule(JaxbAnnotationModule());
     }
 
-    private Object unmarshallRoot(BufferedReader reader) throws XMLStreamException, Exception {
+    private Object mapperRoot(BufferedReader reader) throws XMLStreamException, Exception {
         initMapper();
 
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
