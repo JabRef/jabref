@@ -182,13 +182,16 @@ public class JabRefGUI extends Application {
 
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
 
+        LOGGER.debug("Reading from prefs: isMaximized {}", guiPreferences.isWindowMaximised());
+        LOGGER.debug("Reading from prefs: isFullScreen {}", guiPreferences.isWindowFullscreen());
+
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
         mainStage.setFullScreen(guiPreferences.isWindowFullscreen());
         mainStage.setMaximized(guiPreferences.isWindowMaximised());
         if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
             // corrects the Window, if it is outside the mainscreen
-            LOGGER.debug("The Jabref window is outside the main screen");
+            LOGGER.info("The Jabref window is outside the main screen. Setting size to 1024x768");
             mainStage.setX(0);
             mainStage.setY(0);
             mainStage.setWidth(1024);
@@ -227,7 +230,7 @@ public class JabRefGUI extends Application {
 
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
-            && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
+                && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
             mainFrame.openLastEditedDatabases();
         }
     }
@@ -242,8 +245,10 @@ public class JabRefGUI extends Application {
         if (!correctedWindowPos) {
             // saves the window position only if its not corrected -> the window will rest at the old Position,
             // if the external Screen is connected again.
+            LOGGER.debug("Save window positions");
             saveWindowState();
         }
+        LOGGER.debug("NOT saving window position ");
 
         preferencesService.flush();
 
@@ -257,26 +262,26 @@ public class JabRefGUI extends Application {
         preferences.setPositionY(mainStage.getY());
         preferences.setSizeX(mainStage.getWidth());
         preferences.setSizeY(mainStage.getHeight());
+
         preferences.setWindowMaximised(mainStage.isMaximized());
         preferences.setWindowFullScreen(mainStage.isFullScreen());
         debugLogWindowState(mainStage);
     }
 
     /**
-     * outprints the Data from the Screen (only in debug mode)
+     * print out the Data from the Screen (only in debug mode)
      *
      * @param mainStage JabRefs stage
      */
     private void debugLogWindowState(Stage mainStage) {
-        if (LOGGER.isDebugEnabled()) {
             String debugLogString = "SCREEN DATA:" +
                     "mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n" +
+                    "mainStage.FULL_SCREEN: " + mainStage.isFullScreen() + "\n" +
                     "mainStage.POS_X: " + mainStage.getX() + "\n" +
                     "mainStage.POS_Y: " + mainStage.getY() + "\n" +
                     "mainStage.SIZE_X: " + mainStage.getWidth() + "\n" +
                     "mainStages.SIZE_Y: " + mainStage.getHeight() + "\n";
             LOGGER.debug(debugLogString);
-        }
     }
 
     /**
