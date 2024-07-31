@@ -1,16 +1,11 @@
 package org.jabref.logic.ai.embeddings;
 
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.DialogService;
-import org.jabref.logic.ai.embeddings.events.DocumentIngestedEvent;
-
 import com.google.common.eventbus.EventBus;
-import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
 
 /**
@@ -20,9 +15,7 @@ import org.h2.mvstore.MVStore;
  * <p>
  * The class also records the document modification time.
  */
-public class FullyIngestedDocumentsTracker implements AutoCloseable {
-    private final MVStore mvStore;
-
+public class FullyIngestedDocumentsTracker {
     // This map stores the ingested documents. The key is LinkedDocument.getLink(), and the value is the modification time in seconds.
     // If an entry is present, then it means the document was ingested. Otherwise, document was not ingested.
     // The reason why we need to track ingested documents is because we cannot use AiEmbeddingsManager and see if there are
@@ -32,16 +25,7 @@ public class FullyIngestedDocumentsTracker implements AutoCloseable {
 
     private final EventBus eventBus = new EventBus();
 
-    public FullyIngestedDocumentsTracker(@Nullable Path path, DialogService dialogService) {
-        MVStore mvStoreTemp;
-        try {
-            mvStoreTemp = MVStore.open(path == null ? null : path.toString());
-        } catch (Exception e) {
-            dialogService.showErrorDialogAndWait("Unable to open ingested documents cache document. Will store cache in RAM", e);
-            mvStoreTemp = MVStore.open(null);
-        }
-
-        this.mvStore = mvStoreTemp;
+    public FullyIngestedDocumentsTracker(MVStore mvStore) {
         this.ingestedMap = mvStore.openMap("ingestedMap");
     }
 
@@ -49,9 +33,11 @@ public class FullyIngestedDocumentsTracker implements AutoCloseable {
         return ingestedMap.containsKey(link);
     }
 
+    public static class DocumentIngestedEvent { }
+
     public void markDocumentAsFullyIngested(String link, long modificationTimeInSeconds) {
         ingestedMap.put(link, modificationTimeInSeconds);
-        eventBus.post(new DocumentIngestedEvent(link));
+        eventBus.post(new DocumentIngestedEvent());
     }
 
     public Optional<Long> getIngestedDocumentModificationTimeInSeconds(String link) {
@@ -68,10 +54,5 @@ public class FullyIngestedDocumentsTracker implements AutoCloseable {
 
     public Set<String> getFullyIngestedDocuments() {
         return new HashSet<>(ingestedMap.keySet());
-    }
-
-    @Override
-    public void close() {
-        mvStore.close();
     }
 }

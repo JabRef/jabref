@@ -150,7 +150,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         executorService.shutdownNow();
         if (predictorProperty.get().isPresent()) {
             predictorProperty.get().get().close();

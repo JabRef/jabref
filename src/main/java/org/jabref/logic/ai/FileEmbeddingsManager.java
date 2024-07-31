@@ -1,8 +1,5 @@
 package org.jabref.logic.ai;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -10,8 +7,6 @@ import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.embeddings.LowLevelIngestor;
 import org.jabref.logic.ai.embeddings.MVStoreEmbeddingStore;
@@ -23,7 +18,7 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
-import jakarta.annotation.Nullable;
+import org.h2.mvstore.MVStore;
 
 /**
  * This class is responsible for managing the embeddings cache. The cache is saved in a local user directory.
@@ -37,11 +32,8 @@ import jakarta.annotation.Nullable;
  * This class also listens for changes of embeddings parameters (in AI "Expert settings" section). In case any of them
  * changes, the embeddings should be invalidated (cleared).
  */
-public class FileEmbeddingsManager implements AutoCloseable {
+public class FileEmbeddingsManager {
     public static final String LINK_METADATA_KEY = "link";
-
-    private static final String EMBEDDING_STORE_FILE_NAME = "embeddings.mv";
-    private static final String INGESTED_FILES_FILE_NAME = "fullyIngested.mv";
 
     private final AiPreferences aiPreferences;
 
@@ -49,22 +41,10 @@ public class FileEmbeddingsManager implements AutoCloseable {
     private final FullyIngestedDocumentsTracker fullyIngestedDocumentsTracker;
     private final LowLevelIngestor lowLevelIngestor;
 
-    public FileEmbeddingsManager(AiPreferences aiPreferences, EmbeddingModel embeddingModel, DialogService dialogService) {
+    public FileEmbeddingsManager(AiPreferences aiPreferences, EmbeddingModel embeddingModel, MVStore mvStore) {
         this.aiPreferences = aiPreferences;
-
-        @Nullable Path embeddingStorePath = JabRefDesktop.getAiFilesDirectory().resolve(EMBEDDING_STORE_FILE_NAME);
-        @Nullable Path ingestedFilesTrackerPath = JabRefDesktop.getAiFilesDirectory().resolve(INGESTED_FILES_FILE_NAME);
-
-        try {
-            Files.createDirectories(JabRefDesktop.getAiFilesDirectory());
-        } catch (IOException e) {
-            dialogService.showErrorDialogAndWait("An error occurred while creating directories for embeddings cache. Will store cache in RAM", e);
-            embeddingStorePath = null;
-            ingestedFilesTrackerPath = null;
-        }
-
-        this.embeddingStore = new MVStoreEmbeddingStore(embeddingStorePath, dialogService);
-        this.fullyIngestedDocumentsTracker = new FullyIngestedDocumentsTracker(ingestedFilesTrackerPath, dialogService);
+        this.embeddingStore = new MVStoreEmbeddingStore(mvStore);
+        this.fullyIngestedDocumentsTracker = new FullyIngestedDocumentsTracker(mvStore);
         this.lowLevelIngestor = new LowLevelIngestor(aiPreferences, embeddingStore, embeddingModel);
 
         setupListeningToPreferencesChanges();
@@ -97,11 +77,6 @@ public class FileEmbeddingsManager implements AutoCloseable {
     public void removeDocument(String link) {
         embeddingStore.removeAll(MetadataFilterBuilder.metadataKey(LINK_METADATA_KEY).isEqualTo(link));
         fullyIngestedDocumentsTracker.unmarkDocumentAsFullyIngested(link);
-    }
-
-    public void close() {
-        embeddingStore.close();
-        fullyIngestedDocumentsTracker.close();
     }
 
     public EmbeddingStore<TextSegment> getEmbeddingsStore() {

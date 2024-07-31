@@ -125,7 +125,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         httpClient.shutdownNow();
         executorService.shutdownNow();
     }

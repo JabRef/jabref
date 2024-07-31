@@ -1,7 +1,6 @@
 package org.jabref.logic.ai.embeddings;
 
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -14,7 +13,6 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.FileEmbeddingsManager;
 
 import dev.langchain4j.data.document.Metadata;
@@ -45,10 +43,8 @@ import static java.util.Comparator.comparingDouble;
  * To connect values in those fields we use an id, which is a random {@link UUID}.
  * <p>
  */
-public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoCloseable {
+public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreEmbeddingStore.class);
-
-    private final MVStore mvStore;
 
     // `file` field is nullable, because {@link Optional} can't be serialized.
     private record EmbeddingRecord(
@@ -56,22 +52,7 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
 
     private final Map<String, EmbeddingRecord> embeddingsMap;
 
-    /**
-     * Construct an embedding store that uses an MVStore for persistence.
-     *
-     * @param path - path to MVStore file, if null then in-memory MVStore will be used (without persistence).
-     * @param dialogService - dialog service that is used in case any error happens while opening an MVStore.
-     */
-    public MVStoreEmbeddingStore(@Nullable Path path, DialogService dialogService) {
-        MVStore mvStoreTemp;
-        try {
-            mvStoreTemp = MVStore.open(path == null ? null : path.toString());
-        } catch (Exception e) {
-            dialogService.showErrorDialogAndWait("Unable to open embeddings cache file. Will store cache in RAM", e);
-            mvStoreTemp = MVStore.open(null);
-        }
-
-        this.mvStore = mvStoreTemp;
+    public MVStoreEmbeddingStore(MVStore mvStore) {
         this.embeddingsMap = mvStore.openMap("embeddingsMap");
     }
 
@@ -187,10 +168,5 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment>, AutoC
 
     private Stream<String> filterEntries(Predicate<Map.Entry<String, EmbeddingRecord>> predicate) {
         return embeddingsMap.entrySet().stream().filter(predicate).map(Map.Entry::getKey);
-    }
-
-    @Override
-    public void close() {
-        mvStore.close();
     }
 }
