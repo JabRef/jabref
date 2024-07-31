@@ -37,7 +37,7 @@ public class AiPreferences {
     }
 
     public static final Map<AiProvider, List<String>> CHAT_MODELS = Map.of(
-            AiProvider.OPEN_AI, List.of("gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o"),
+            AiProvider.OPEN_AI, List.of("gpt-4o-mini", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"),
             AiProvider.MISTRAL_AI, List.of("open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-small-latest", "mistral-medium-latest", "mistral-large-latest"),
             AiProvider.HUGGING_FACE, List.of()
     );
