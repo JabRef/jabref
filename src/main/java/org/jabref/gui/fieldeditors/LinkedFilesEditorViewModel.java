@@ -175,7 +175,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void addNewManualFile(LinkedFile linkedFile) {
-
         files.add(new LinkedFileViewModel(
                 linkedFile,
                 entry,
