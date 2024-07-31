@@ -41,6 +41,11 @@
                   </Hyperlink>
                </children>
             </HBox>
+            <Text layoutX="20.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%Additionally, we use Deep Java Library for running embedding model. The embedding model will be downloaded in background from Deep Java Library servers">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Text>
             <Button mnemonicParsing="false" onAction="#onIAgreeButtonClick" text="%I agree">
                <font>
                   <Font size="14.0" />
