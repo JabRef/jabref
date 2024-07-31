@@ -411,10 +411,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private void initMapper() throws Exception {
-            // Lazy init because this is expensive
-            // JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.citavi");
-            // unmarshaller = context.createUnmarshaller();
-            
+        // Lazy init because this is expensive     
         mapper = new XMLMapper();
         mapper.registerModule(JaxbAnnotationModule());
     }
