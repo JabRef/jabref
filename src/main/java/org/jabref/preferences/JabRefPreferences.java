@@ -707,7 +707,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, "");
         defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, "");
 
-        defaults.put(UNLINKED_FILES_SELECTED_EXTENSION, StandardFileType.ANY_FILE.name());
+        defaults.put(UNLINKED_FILES_SELECTED_EXTENSION, StandardFileType.ANY_FILE.getName());
         defaults.put(UNLINKED_FILES_SELECTED_DATE_RANGE, DateRange.ALL_TIME.name());
         defaults.put(UNLINKED_FILES_SELECTED_SORT, ExternalFileSorter.DEFAULT.name());
 

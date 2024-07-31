@@ -104,6 +104,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             if (button == ButtonType.CANCEL) {
                 viewModel.cancelTasks();
             }
+            saveConfiguration();
             return null;
         });
 
@@ -256,7 +257,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML
     void scanFiles() {
         viewModel.startSearch();
-        saveConfiguration();
     }
 
     @FXML
