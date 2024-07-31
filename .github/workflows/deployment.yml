@@ -150,6 +150,7 @@ jobs:
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
           --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref
+          --java-options --add-modules=jdk.incubator.vector
       - name: Build pkg (macOS)
         if: (matrix.os == 'macos-13') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -187,6 +188,7 @@ jobs:
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
           --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref
+          --java-options --add-modules=jdk.incubator.vector
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-13') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
