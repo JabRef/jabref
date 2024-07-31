@@ -26,7 +26,7 @@
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
                 <Label alignment="BASELINE_CENTER" text="%Chat model" />
-                <ComboBox fx:id="chatModelComboBox" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                <ComboBox fx:id="chatModelComboBox" editable="true" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                 <Button fx:id="chatModelHelp" prefWidth="20.0" />
             </children>
         </HBox>
