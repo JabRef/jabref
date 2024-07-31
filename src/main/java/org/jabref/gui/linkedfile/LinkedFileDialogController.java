@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -13,10 +14,14 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
+
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
 public class LinkedFileDialogController extends BaseDialog<LinkedFile> {
+
+    private static final ButtonType ADD_BUTTON = new ButtonType(Localization.lang("Add"), ButtonType.OK.getButtonData());
+    private static final ButtonType EDIT_BUTTON = ButtonType.APPLY;
 
     @FXML private TextField link;
     @FXML private TextField description;
@@ -29,9 +34,6 @@ public class LinkedFileDialogController extends BaseDialog<LinkedFile> {
 
     private LinkedFilesEditDialogViewModel viewModel;
     private final LinkedFile linkedFile;
-
-    private static final ButtonType ADD_BUTTON = new ButtonType(Localization.lang("Add"), ButtonType.OK.getButtonData());
-    private static final ButtonType EDIT_BUTTON = ButtonType.APPLY;
 
     /**
      * Constructor for adding a new LinkedFile.
