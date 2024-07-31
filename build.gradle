@@ -97,13 +97,6 @@ application {
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
 modularity.disableEffectiveArgumentsAdjustment()
-/*
-// Required as workaround for  https://github.com/langchain4j/langchain4j/issues/1066
-modularity.patchModule("langchain4j", "langchain4j-core-0.32.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-open-ai-0.32.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-mistral-ai-0.32.0.jar")
-modularity.patchModule("langchain4j", "langchain4j-hugging-face-0.32.0.jar")
- */
 
 sourceSets {
     main {
@@ -486,7 +479,7 @@ compileJava {
         addExports = [
                 // TODO: Remove access to internal api
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
         ]
     }
 }
