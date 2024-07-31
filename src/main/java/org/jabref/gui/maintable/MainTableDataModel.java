@@ -4,18 +4,20 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.CustomFilteredList;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
@@ -48,12 +50,14 @@ public class MainTableDataModel {
     public MainTableDataModel(BibDatabaseContext context,
                               PreferencesService preferencesService,
                               TaskExecutor taskExecutor,
-                              LibraryTab libraryTab) {
+                              ListProperty<GroupTreeNode> selectedGroupsProperty,
+                              OptionalObjectProperty<SearchQuery> searchQueryProperty,
+                              IntegerProperty resultSizeProperty) {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.taskExecutor = taskExecutor;
         this.bibDatabaseContext = context;
-        this.groupsMatcher = createGroupMatcher(libraryTab.selectedGroupsProperty().get(), groupsPreferences);
+        this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
 
         resetFieldFormatter();
 
@@ -66,7 +70,7 @@ public class MainTableDataModel {
                 if (change.wasAdded() || change.wasUpdated()) {
                     BackgroundTask.wrap(() -> {
                         for (BibEntryTableViewModel entry : change.getList().subList(change.getFrom(), change.getTo())) {
-                            updateSearchVisibility(libraryTab.searchQueryProperty().get(), entry);
+                            updateSearchVisibility(searchQueryProperty.get(), entry);
                             updateGroupVisibility(groupsMatcher, entry);
                             entry.updateSearchRank();
                         }
@@ -75,11 +79,11 @@ public class MainTableDataModel {
             }
         });
 
-        searchQuerySubscription = EasyBind.listen(libraryTab.searchQueryProperty(), (observable, oldValue, newValue) -> updateSearchMatches(newValue));
-        selectedGroupsSubscription = EasyBind.listen(libraryTab.selectedGroupsProperty(), (observable, oldValue, newValue) -> updateGroupMatches(newValue));
-        groupViewModeSubscription = EasyBind.listen(preferencesService.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(libraryTab.selectedGroupsProperty().get()));
+        searchQuerySubscription = EasyBind.listen(searchQueryProperty, (observable, oldValue, newValue) -> updateSearchMatches(newValue));
+        selectedGroupsSubscription = EasyBind.listen(selectedGroupsProperty, (observable, oldValue, newValue) -> updateGroupMatches(newValue));
+        groupViewModeSubscription = EasyBind.listen(preferencesService.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(selectedGroupsProperty.get()));
 
-        libraryTab.resultSizeProperty().bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRank().isEqualTo(FIRST_RANK).get())));
+        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRank().isEqualTo(FIRST_RANK).get())));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
