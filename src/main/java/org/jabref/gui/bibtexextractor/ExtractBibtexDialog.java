@@ -9,12 +9,14 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -44,8 +46,13 @@ public abstract class ExtractBibtexDialog extends BaseDialog<Void> {
         BibtexExtractorViewModel viewModel = getViewModel(database);
 
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
-        input.setPromptText(Localization.lang("Please enter the plain references to extract from separated by double empty lines."));
-        input.selectAll();
+        String clipText = ClipBoardManager.getContents();
+        if (StringUtil.isBlank(clipText)) {
+            input.setPromptText(Localization.lang("Please enter the plain references to extract from separated by double empty lines."));
+        } else {
+            input.setText(clipText);
+            input.selectAll();
+        }
 
         Platform.runLater(() -> {
             input.requestFocus();
