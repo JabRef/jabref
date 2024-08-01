@@ -32,6 +32,7 @@ The actual usage might look like:
 ## Localization in FXML
 
 To write a localized string in FXML file, prepend it with `%`, like in this code:
+
 ```xml
 <HBox alignment="CENTER_LEFT">
     <Label styleClass="space-after" text="%Want to help?" wrapText="true"/>
