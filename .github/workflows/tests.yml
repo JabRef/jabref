@@ -5,9 +5,10 @@ on:
     branches:
       - main
       - main-release
-  pull_request:
   merge_group:
   workflow_dispatch:
+  # The checkers should write comments on the PR if something fails. For this, we need to have a proper GITHUB_TOKEN. This is enabled by ..._target.
+  pull_request_target:
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
