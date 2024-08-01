@@ -66,20 +66,20 @@ public class MainTableHeaderContextMenu extends ContextMenu {
         List<TableColumn<BibEntryTableViewModel, ?>> commonColumns = commonColumns();
 
         // Populate the menu with currently used fields
-        mainTable.getColumns().stream()
-                 .map(column -> (MainTableColumn<?>) column)
-                 // Search rank column shouldn't be removed from the table (always hide it)
-                 .filter(column -> !column.getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
-                 .forEach(column -> {
-                     // Append only if the column has not already been added (a common column)
-                     RightClickMenuItem itemToAdd = createMenuItem(column, true);
-                     this.getItems().add(itemToAdd);
+        for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
+            if (((MainTableColumn<?>) column).getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK)) {
+                continue;
+            }
+            // Append only if the column has not already been added (a common column)
+            RightClickMenuItem itemToAdd = createMenuItem(column, true);
+            this.getItems().add(itemToAdd);
 
-                     // Remove from remaining common columns pool
-                     if (isACommonColumn(column)) {
-                         commonColumns.removeIf(tableCol -> ((MainTableColumn<?>) tableCol).getModel().equals(column.getModel()));
-                     }
-                 });
+            // Remove from remaining common columns pool
+            MainTableColumn<?> searchCol = (MainTableColumn<?>) column;
+            if (isACommonColumn(searchCol)) {
+                commonColumns.removeIf(tableCol -> ((MainTableColumn<?>) tableCol).getModel().equals(searchCol.getModel()));
+            }
+        }
 
         if (!commonColumns.isEmpty()) {
             this.getItems().add(new SeparatorMenuItem());

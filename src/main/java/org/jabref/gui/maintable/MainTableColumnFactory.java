@@ -86,9 +86,6 @@ public class MainTableColumnFactory {
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
-            case SEARCH_RANK:
-                returnColumn = createSearchRankColumn(column);
-                break;
             case INDEX:
                 returnColumn = createIndexColumn(column);
                 break;
@@ -136,6 +133,7 @@ public class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
+        columns.add(createSearchRankColumn(new MainTableColumnModel(MainTableColumnModel.Type.SEARCH_RANK)));
         columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
         return columns;
     }
@@ -205,7 +203,7 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, ?> createGroupIconColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(columnModel);
         Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLUMN.getGraphicNode();
-        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group icons")));
+        Tooltip.install(headerGraphic, new Tooltip(MainTableColumnModel.Type.GROUP_ICONS.getDisplayName()));
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(STYLE_ICON_COLUMN);
         column.setResizable(true);

@@ -1,6 +1,7 @@
 package org.jabref.gui.groups;
 
-import javafx.collections.ObservableSet;
+import java.util.Set;
+
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
@@ -9,9 +10,9 @@ import org.jabref.logic.l10n.Localization;
 
 public class GroupModeViewModel {
 
-    private final ObservableSet<GroupViewMode> mode;
+    private final Set<GroupViewMode> mode;
 
-    public GroupModeViewModel(ObservableSet<GroupViewMode> mode) {
+    public GroupModeViewModel(Set<GroupViewMode> mode) {
         this.mode = mode;
     }
 

@@ -63,7 +63,6 @@ public class PreferencesMigrations {
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
         changeColumnVariableNamesFor51(preferences);
         upgradeColumnPreferences(preferences);
-        addSearchRankColumn(preferences);
         restoreVariablesForBackwardCompatibility(preferences);
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
@@ -408,29 +407,6 @@ public class PreferencesMigrations {
         }
     }
 
-    /**
-     * Adds the search rank column to the main table if it is not already present.
-     * This column is necessary for sorting the table in floating mode.
-     */
-    static void addSearchRankColumn(JabRefPreferences preferences) {
-        List<String> columnNames = new ArrayList<>(preferences.getStringList(JabRefPreferences.COLUMN_NAMES));
-        if (!columnNames.contains(MainTableColumnModel.Type.SEARCH_RANK.getName())) {
-            List<String> sortOrder = new ArrayList<>(preferences.getStringList(JabRefPreferences.COLUMN_SORT_ORDER));
-            List<String> columnSortTypes = new ArrayList<>(preferences.getStringList(JabRefPreferences.COLUMN_SORT_TYPES));
-            List<String> columnWidths = new ArrayList<>(preferences.getStringList(JabRefPreferences.COLUMN_WIDTHS));
-
-            columnNames.addFirst(MainTableColumnModel.Type.SEARCH_RANK.getName());
-            sortOrder.addFirst(MainTableColumnModel.Type.SEARCH_RANK.getName());
-            columnSortTypes.addFirst(TableColumn.SortType.ASCENDING.toString());
-            columnWidths.addFirst(String.valueOf(ColumnPreferences.DEFAULT_COLUMN_WIDTH));
-
-            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columnNames);
-            preferences.putStringList(JabRefPreferences.COLUMN_SORT_ORDER, sortOrder);
-            preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES, columnSortTypes);
-            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columnWidths);
-        }
-    }
-
     static void changeColumnVariableNamesFor51(JabRefPreferences preferences) {
         // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
         final String V5_0_COLUMN_NAMES = "columnNames";
@@ -460,7 +436,7 @@ public class PreferencesMigrations {
      * they can deal with.
      */
     static void restoreVariablesForBackwardCompatibility(JabRefPreferences preferences) {
-        List<String> oldColumnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        List<String> oldColumnNames = preferences.getStringList("columnNames");
         List<String> fieldColumnNames = oldColumnNames.stream()
                                                       .filter(columnName -> columnName.startsWith("field:") || columnName.startsWith("special:"))
                                                       .map(columnName -> {

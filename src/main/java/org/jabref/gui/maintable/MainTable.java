@@ -174,14 +174,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.getSortOrder().clear();
 
-        // force search rank column to be the first sort order
-        this.getColumns().stream().map(column -> (MainTableColumn<?>) column)
-            .filter(column -> column.getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
-            .findFirst().ifPresent(searchRankColumn -> this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
-                if (!this.getSortOrder().contains(searchRankColumn)) {
-                    this.getSortOrder().addFirst(searchRankColumn);
+        // force search rank column to be the first sort order, (search_rank column is always the first column)
+        this.getSortOrder().addFirst(getColumns().getFirst());
+        this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
+                if (!this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
+                    this.getSortOrder().addFirst(getColumns().getFirst());
                 }
-            }));
+            });
 
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
