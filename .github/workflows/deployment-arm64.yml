@@ -109,7 +109,7 @@ jobs:
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
-          --add-modules=jdk.incubator.vector \
+          --add-modules jdk.incubator.vector \
           --dest build/distribution \
           --app-content buildres/mac/jabrefHost.py \
           --app-content buildres/mac/native-messaging-host \
