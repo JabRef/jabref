@@ -16,9 +16,11 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.model.Tokenizer;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
+import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.model.output.Response;
 import org.h2.mvstore.MVStore;
 
@@ -66,6 +68,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
             case OPEN_AI -> {
                 langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
             }
+
             case MISTRAL_AI -> {
                 langchainChatModel = Optional.of(MistralAiChatModel
                         .builder()
@@ -78,6 +81,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
                         .build()
                 );
             }
+
             case HUGGING_FACE -> {
                 // NOTE: {@link HuggingFaceChatModel} doesn't support API base url :(
                 langchainChatModel = Optional.of(HuggingFaceChatModel
@@ -85,7 +89,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
                         .accessToken(aiPreferences.getApiToken())
                         .modelId(aiPreferences.getChatModel())
                         .temperature(aiPreferences.getTemperature())
-                        .timeout(Duration.ofMinutes(1))
+                        .timeout(Duration.ofMinutes(2))
                         .build()
                 );
             }

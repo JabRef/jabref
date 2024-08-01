@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.ai;
 
 import java.util.List;
+import java.util.Map;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -86,7 +87,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 disableExpertSettings.set(!newValue || !enableChatWithFiles.get())
         );
 
-        selectedAiProvider.addListener((observable, oldValue, newValue) -> {
+        this.selectedAiProvider.addListener((observable, oldValue, newValue) -> {
             List<String> models = AiPreferences.CHAT_MODELS.get(newValue);
             chatModelsList.setAll(models);
             if (!models.isEmpty()) {
@@ -94,6 +95,19 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
 
             apiBaseUrl.set(AiPreferences.PROVIDERS_API_URLS.get(newValue));
+        });
+
+        this.selectedChatModel.addListener((observable, oldValue, newValue) -> {
+            Map<String, Integer> modelContextWindows = AiPreferences.CONTEXT_WINDOW_SIZES.get(selectedAiProvider.get());
+
+            if (modelContextWindows == null) {
+                contextWindowSize.set(0);
+                return;
+            }
+
+            Integer value = modelContextWindows.get(newValue);
+
+            contextWindowSize.set(value == null ? 0 : value);
         });
 
         this.apiTokenValidator = new FunctionBasedValidator<>(

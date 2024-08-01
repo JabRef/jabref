@@ -38,7 +38,8 @@ public class AiPreferences {
 
     public static final Map<AiProvider, List<String>> CHAT_MODELS = Map.of(
             AiProvider.OPEN_AI, List.of("gpt-4o-mini", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"),
-            AiProvider.MISTRAL_AI, List.of("open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-small-latest", "mistral-medium-latest", "mistral-large-latest"),
+            // "mistral" and "mixtral" are not language mistakes.
+            AiProvider.MISTRAL_AI, List.of("open-mistral-nemo", "open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-large-latest"),
             AiProvider.HUGGING_FACE, List.of()
     );
 
@@ -46,6 +47,23 @@ public class AiPreferences {
             AiProvider.OPEN_AI, "https://api.openai.com/v1",
             AiProvider.MISTRAL_AI, "https://api.mistral.ai/v1",
             AiProvider.HUGGING_FACE, "https://huggingface.co/api"
+    );
+
+    public static final Map<AiProvider, Map<String, Integer>> CONTEXT_WINDOW_SIZES = Map.of(
+            AiProvider.OPEN_AI, Map.of(
+                    "gpt-4o-mini", 128000,
+                    "gpt-4o", 128000,
+                    "gpt-4", 8192,
+                    "gpt-4-turbo", 128000,
+                    "gpt-3.5-turbo", 16385
+            ),
+            AiProvider.MISTRAL_AI, Map.of(
+                    "mistral-large-latest", 128000,
+                    "open-mistral-nemo", 1280000,
+                    "open-mistral-7b", 32000,
+                    "open-mixtral-8x7b", 32000,
+                    "open-mixtral-8x22b", 64000
+            )
     );
 
     public enum EmbeddingModel {

@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.embeddings.FileToDocument;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
+import dev.langchain4j.agent.tool.P;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import org.slf4j.Logger;
@@ -21,21 +23,18 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
     private final BibDatabaseContext bibDatabaseContext;
     private final String citationKey;
     private final List<LinkedFile> linkedFiles;
-    private final ChatLanguageModel chatLanguageModel;
-    private final SummariesStorage summariesStorage;
+    private final AiService aiService;
     private final FilePreferences filePreferences;
 
     public GenerateSummaryTask(BibDatabaseContext bibDatabaseContext,
                                String citationKey,
                                List<LinkedFile> linkedFiles,
-                               ChatLanguageModel chatLanguageModel,
-                               SummariesStorage summariesStorage,
+                               AiService aiService,
                                FilePreferences filePreferences) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.citationKey = citationKey;
         this.linkedFiles = linkedFiles;
-        this.chatLanguageModel = chatLanguageModel;
-        this.summariesStorage = summariesStorage;
+        this.aiService = aiService;
         this.filePreferences = filePreferences;
     }
 
@@ -58,9 +57,15 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
             return null;
         }
 
-        String finalSummary = SummarizationAlgorithm.summarize(chatLanguageModel, linkedFilesSummary.stream());
+        String finalSummary;
 
-        summariesStorage.set(bibDatabaseContext.getDatabasePath().get(), citationKey, finalSummary);
+        if (linkedFilesSummary.size() == 1) {
+            finalSummary = linkedFilesSummary.getFirst();
+        } else {
+            finalSummary = SummarizationAlgorithm.summarize(aiService.getChatLanguageModel(), aiService.getPreferences().getContextWindowSize(), linkedFilesSummary.stream());
+        }
+
+        aiService.getSummariesStorage().set(bibDatabaseContext.getDatabasePath().get(), citationKey, finalSummary);
 
         return null;
     }
@@ -80,7 +85,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
             return Optional.empty();
         }
 
-        String linkedFileSummary = SummarizationAlgorithm.summarize(chatLanguageModel, document.get().text());
+        String linkedFileSummary = SummarizationAlgorithm.summarize(aiService.getChatLanguageModel(), aiService.getPreferences().getContextWindowSize(), document.get().text());
 
         return Optional.of(linkedFileSummary);
     }

@@ -106,7 +106,16 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         temperatureTextField.valueProperty().bindBidirectional(viewModel.temperatureProperty().asObject());
         temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        contextWindowSizeTextField.valueProperty().bindBidirectional(viewModel.contextWindowSizeProperty().asObject());
+        // bindBidirectional doesn't work with contextWindowSizeTextField. Thus, it's written manually.
+
+        contextWindowSizeTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.contextWindowSizeProperty().set(newValue);
+        });
+
+        viewModel.contextWindowSizeProperty().addListener((observable, oldValue, newValue) -> {
+            contextWindowSizeTextField.valueProperty().set(newValue.intValue());
+        });
+
         contextWindowSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         documentSplitterChunkSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterChunkSizeProperty().asObject());

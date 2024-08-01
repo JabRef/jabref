@@ -158,4 +158,5 @@ open module org.jabref {
     requires com.ibm.icu;
     requires jvm.openai;
     requires langchain4j.core;
+    requires langchain4j.open.ai;
 }

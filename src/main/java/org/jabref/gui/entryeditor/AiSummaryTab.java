@@ -174,7 +174,7 @@ public class AiSummaryTab extends EntryEditorTab {
         if (!entriesUnderSummarization.contains(entry)) {
             entriesUnderSummarization.add(entry);
 
-            new GenerateSummaryTask(bibDatabaseContext, entry.getCitationKey().get(), entry.getFiles(), aiService.getChatLanguageModel(), aiService.getSummariesStorage(), filePreferences)
+            new GenerateSummaryTask(bibDatabaseContext, entry.getCitationKey().get(), entry.getFiles(), aiService, filePreferences)
                     .onSuccess(res -> handleFocus())
                     .onFailure(this::showErrorWhileSummarizing)
                     .executeWith(taskExecutor);
