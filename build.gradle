@@ -499,6 +499,10 @@ run {
                 'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
         ]
 
+        addModules = [
+                'jdk.incubator.vector'
+        ]
+
         createCommandLineArgumentFile = true
     }
 

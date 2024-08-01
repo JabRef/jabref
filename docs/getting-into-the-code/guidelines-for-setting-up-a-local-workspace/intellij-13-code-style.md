@@ -104,6 +104,8 @@ Also, set the "Scan Scope" to "Only Java sources (including tests)".
 
 Save settings by clicking "Apply" and then "OK"
 
+## Run checkstyle
+
 In the lower part of IntelliJ's window, click on "Checkstyle".
 In "Rules", change to "JabRef".
 Then, you can run a check on all modified files.
