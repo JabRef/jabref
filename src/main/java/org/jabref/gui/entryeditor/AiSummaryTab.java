@@ -68,7 +68,7 @@ public class AiSummaryTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return entryEditorPreferences.shouldShowAiChatTab();
+        return entryEditorPreferences.shouldShowAiSummaryTab();
     }
 
     @Override
@@ -80,7 +80,7 @@ public class AiSummaryTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (!aiService.getPreferences().getEnableChatWithFiles()) {
+        if (!aiService.getPreferences().getEnableAi()) {
             showPrivacyNotice(entry);
         } else if (aiService.getPreferences().getApiToken().isEmpty()) {
             showApiKeyMissing();

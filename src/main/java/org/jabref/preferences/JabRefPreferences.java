@@ -346,6 +346,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
+    public static final String SHOW_AI_SUMMARY = "showAiSummary";
     public static final String SHOW_AI_CHAT = "showAiChat";
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
     public static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
@@ -463,7 +464,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
-    private static final String AI_ENABLE_CHAT = "aiEnableChat";
+    private static final String AI_ENABLE = "aiEnable";
     private static final String AI_PROVIDER = "aiProvider";
     private static final String AI_CHAT_MODEL = "aiChatModel";
     private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
@@ -699,6 +700,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(SHOW_AI_CHAT, Boolean.TRUE);
+        defaults.put(SHOW_AI_SUMMARY, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
         defaults.put(SHOW_SCITE_TAB, Boolean.TRUE);
@@ -873,7 +875,7 @@ public class JabRefPreferences implements PreferencesService {
         setLanguageDependentDefaultValues();
 
         // AI
-        defaults.put(AI_ENABLE_CHAT, AiDefaultPreferences.ENABLE_CHAT);
+        defaults.put(AI_ENABLE, AiDefaultPreferences.ENABLE_CHAT);
         defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
         defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL);
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
@@ -1485,6 +1487,7 @@ public class JabRefPreferences implements PreferencesService {
                 getDefaultEntryEditorTabs(),
                 getBoolean(AUTO_OPEN_FORM),
                 getBoolean(SHOW_RECOMMENDATIONS),
+                getBoolean(SHOW_AI_SUMMARY),
                 getBoolean(SHOW_AI_CHAT),
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
@@ -1501,6 +1504,7 @@ public class JabRefPreferences implements PreferencesService {
         // defaultEntryEditorTabs are read-only
         EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
         EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
+        EasyBind.listen(entryEditorPreferences.shouldShowAiSummaryTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_AI_SUMMARY, newValue));
         EasyBind.listen(entryEditorPreferences.shouldShowAiChatTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_AI_CHAT, newValue));
         EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
         EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (obs, oldValue, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
@@ -2757,7 +2761,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         aiPreferences = new AiPreferences(
-                getBoolean(AI_ENABLE_CHAT),
+                getBoolean(AI_ENABLE),
                 AiPreferences.AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_CHAT_MODEL),
                 getAiApiTokenFromKeyring().orElse(""),
@@ -2772,7 +2776,7 @@ public class JabRefPreferences implements PreferencesService {
                 getInt(AI_RAG_MAX_RESULTS_COUNT),
                 getDouble(AI_RAG_MIN_SCORE));
 
-        EasyBind.listen(aiPreferences.enableChatWithFilesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE_CHAT, newValue));
+        EasyBind.listen(aiPreferences.enableAiProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE, newValue));
 
         EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_PROVIDER, newValue.name()));
         EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue));

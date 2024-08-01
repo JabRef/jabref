@@ -84,7 +84,7 @@ public class AiPreferences {
         }
     }
 
-    private final BooleanProperty enableChatWithFiles;
+    private final BooleanProperty enableAi;
 
     private final ObjectProperty<AiProvider> aiProvider;
     private final StringProperty chatModel;
@@ -102,7 +102,7 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableChatWithFiles,
+    public AiPreferences(boolean enableAi,
                          AiProvider aiProvider,
                          String chatModel,
                          String apiToken,
@@ -117,7 +117,7 @@ public class AiPreferences {
                          int ragMaxResultsCount,
                          double ragMinScore
     ) {
-        this.enableChatWithFiles = new SimpleBooleanProperty(enableChatWithFiles);
+        this.enableAi = new SimpleBooleanProperty(enableAi);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
         this.chatModel = new SimpleStringProperty(chatModel);
@@ -136,16 +136,16 @@ public class AiPreferences {
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
     }
 
-    public BooleanProperty enableChatWithFilesProperty() {
-        return enableChatWithFiles;
+    public BooleanProperty enableAiProperty() {
+        return enableAi;
     }
 
-    public boolean getEnableChatWithFiles() {
-        return enableChatWithFiles.get();
+    public boolean getEnableAi() {
+        return enableAi.get();
     }
 
-    public void setEnableChatWithFiles(boolean enableChatWithFiles) {
-        this.enableChatWithFiles.set(enableChatWithFiles);
+    public void setEnableAi(boolean enableAi) {
+        this.enableAi.set(enableAi);
     }
 
     public ObjectProperty<AiProvider> aiProviderProperty() {

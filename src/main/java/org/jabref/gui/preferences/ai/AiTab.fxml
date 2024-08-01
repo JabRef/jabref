@@ -13,7 +13,13 @@
 
         <Label styleClass="sectionHeader" text="%General" />
 
-        <CheckBox fx:id="enableChat" mnemonicParsing="false" text="%Enable chat with attached PDF files" />
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <children>
+                <CheckBox fx:id="enableAi"
+                          mnemonicParsing="false" text="%Enable AI functionality (summary generation and chatting) in JabRef" />
+                <Button fx:id="enableAiHelp" prefWidth="20.0" />
+            </children>
+        </HBox>
 
         <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="306.0" spacing="10.0">
             <children>
@@ -27,7 +33,6 @@
             <children>
                 <Label alignment="BASELINE_CENTER" text="%Chat model" />
                 <ComboBox fx:id="chatModelComboBox" editable="true" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                <Button fx:id="chatModelHelp" prefWidth="20.0" />
             </children>
         </HBox>
 
@@ -133,7 +138,7 @@
             <IntegerInputField fx:id="documentSplitterOverlapSizeTextField" />
          </children>
       </VBox>
-      <Button fx:id="resetExpertSettingsButton" onAction="#onResetExpertSettingsButtonClick" text="%Reset expert settings to default">
+      <Button onAction="#onResetExpertSettingsButtonClick" text="%Reset expert settings to default">
           <graphic>
               <JabRefIconView glyph="REFRESH"/>
           </graphic>

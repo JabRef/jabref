@@ -32,6 +32,7 @@
             <Insets left="20.0"/>
         </padding>
     </CheckBox>
+    <CheckBox fx:id="enableAiSummaryTab" text="%Show 'AI Summary' tab"/>
     <CheckBox fx:id="enableAiChatTab" text="%Show 'AI Chat' tab"/>
     <CheckBox fx:id="enableLatexCitationsTab" text="%Show 'LaTeX Citations' tab"/>
     <CheckBox fx:id="enableValidation" text="%Show validation messages"/>

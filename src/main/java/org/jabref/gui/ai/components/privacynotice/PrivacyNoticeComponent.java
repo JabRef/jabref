@@ -48,7 +48,7 @@ public class PrivacyNoticeComponent extends Pane {
 
     @FXML
     private void onIAgreeButtonClick() {
-        aiPreferences.setEnableChatWithFiles(true);
+        aiPreferences.setEnableAi(true);
         onIAgreeButtonClickCallback.run();
     }
 }

@@ -25,7 +25,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
-    @FXML private CheckBox enableChat;
+    @FXML private CheckBox enableAi;
 
     @FXML private ComboBox<AiPreferences.AiProvider> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
@@ -43,8 +43,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private IntegerInputField ragMaxResultsCountTextField;
     @FXML private DoubleInputField ragMinScoreTextField;
 
+    @FXML private Button enableAiHelp;
     @FXML private Button aiProviderHelp;
-    @FXML private Button chatModelHelp;
     @FXML private Button apiTokenHelp;
     @FXML private Button apiBaseUrlHelp;
     @FXML private Button embeddingModelHelp;
@@ -54,8 +54,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private Button documentSplitterOverlapSizeHelp;
     @FXML private Button ragMaxResultsCountHelp;
     @FXML private Button ragMinScoreHelp;
-
-    @FXML private Button resetExpertSettingsButton;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
@@ -68,7 +66,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     public void initialize() {
         this.viewModel = new AiTabViewModel(preferencesService);
 
-        enableChat.selectedProperty().bindBidirectional(viewModel.enableChatWithFilesProperty());
+        enableAi.selectedProperty().bindBidirectional(viewModel.enableAi());
 
         new ViewModelListCellFactory<AiPreferences.AiProvider>()
                 .withText(AiPreferences.AiProvider::toString)
@@ -144,8 +142,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         });
 
         ActionFactory actionFactory = new ActionFactory();
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_ENABLE, dialogService, preferencesService.getFilePreferences()), enableAiHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_PROVIDER, dialogService, preferencesService.getFilePreferences()), aiProviderHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_CHAT_MODEL, dialogService, preferencesService.getFilePreferences()), chatModelHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_API_TOKEN, dialogService, preferencesService.getFilePreferences()), apiTokenHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EMBEDDING_MODEL, dialogService, preferencesService.getFilePreferences()), embeddingModelHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_API_BASE_URL, dialogService, preferencesService.getFilePreferences()), apiBaseUrlHelp);

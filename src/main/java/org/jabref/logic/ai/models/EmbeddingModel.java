@@ -98,7 +98,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
     }
 
     private void rebuild() {
-        if (!aiPreferences.getEnableChatWithFiles()) {
+        if (!aiPreferences.getEnableAi()) {
             predictorProperty.set(Optional.empty());
             return;
         }

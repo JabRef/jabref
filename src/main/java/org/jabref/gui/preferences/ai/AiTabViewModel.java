@@ -31,7 +31,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AiTabViewModel implements PreferenceTabViewModel {
-    private final BooleanProperty enableChatWithFiles = new SimpleBooleanProperty();
+    private final BooleanProperty enableAi = new SimpleBooleanProperty();
 
     private final ListProperty<AiPreferences.AiProvider> aiProvidersList =
             new SimpleListProperty<>(FXCollections.observableArrayList(AiPreferences.AiProvider.values()));
@@ -78,13 +78,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public AiTabViewModel(PreferencesService preferencesService) {
         this.aiPreferences = preferencesService.getAiPreferences();
 
-        this.enableChatWithFiles.addListener((observable, oldValue, newValue) -> {
+        this.enableAi.addListener((observable, oldValue, newValue) -> {
             disableBasicSettings.set(!newValue);
             disableExpertSettings.set(!newValue || !customizeExpertSettings.get());
         });
 
         this.customizeExpertSettings.addListener((observableValue, oldValue, newValue) ->
-                disableExpertSettings.set(!newValue || !enableChatWithFiles.get())
+                disableExpertSettings.set(!newValue || !enableAi.get())
         );
 
         this.selectedAiProvider.addListener((observable, oldValue, newValue) -> {
@@ -164,7 +164,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        enableChatWithFiles.setValue(aiPreferences.getEnableChatWithFiles());
+        enableAi.setValue(aiPreferences.getEnableAi());
 
         selectedAiProvider.setValue(aiPreferences.getAiProvider());
         selectedChatModel.setValue(aiPreferences.getChatModel());
@@ -185,7 +185,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        aiPreferences.setEnableChatWithFiles(enableChatWithFiles.get());
+        aiPreferences.setEnableAi(enableAi.get());
 
         aiPreferences.setAiProvider(selectedAiProvider.get());
         aiPreferences.setChatModel(selectedChatModel.get());
@@ -233,7 +233,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        if (enableChatWithFiles.get()) {
+        if (enableAi.get()) {
             if (customizeExpertSettings.get()) {
                 return validateBasicSettings() && validateExpertSettings();
             } else {
@@ -269,12 +269,12 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
     }
 
-    public BooleanProperty enableChatWithFilesProperty() {
-        return enableChatWithFiles;
+    public BooleanProperty enableAi() {
+        return enableAi;
     }
 
-    public boolean getEnableChatWithFiles() {
-        return enableChatWithFiles.get();
+    public boolean getEnableAi() {
+        return enableAi.get();
     }
 
     public ReadOnlyListProperty<AiPreferences.AiProvider> aiProvidersProperty() {

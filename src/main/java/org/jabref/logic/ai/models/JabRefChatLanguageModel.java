@@ -43,7 +43,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         this.aiPreferences = aiPreferences;
         this.httpClient = HttpClient.newBuilder().connectTimeout(CONNECTION_TIMEOUT).executor(executorService).build();
 
-        if (aiPreferences.getEnableChatWithFiles()) {
+        if (aiPreferences.getEnableAi()) {
             rebuild();
         }
 
@@ -57,7 +57,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
      * and {@link BibDatabaseChatHistory}, where messages are stored in {@link MVStore}.
      */
     private void rebuild() {
-        if (!aiPreferences.getEnableChatWithFiles() || aiPreferences.getApiToken().isEmpty()) {
+        if (!aiPreferences.getEnableAi() || aiPreferences.getApiToken().isEmpty()) {
             langchainChatModel = Optional.empty();
             return;
         }
@@ -95,7 +95,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
     }
 
     private void setupListeningToPreferencesChanges() {
-        aiPreferences.enableChatWithFilesProperty().addListener(obs -> rebuild());
+        aiPreferences.enableAiProperty().addListener(obs -> rebuild());
         aiPreferences.aiProviderProperty().addListener(obs -> rebuild());
         aiPreferences.chatModelProperty().addListener(obs -> rebuild());
         aiPreferences.apiTokenProperty().addListener(obs -> rebuild());
@@ -114,7 +114,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         //    it's possible, but langchain4j doesn't do it.
 
         if (langchainChatModel.isEmpty()) {
-            if (!aiPreferences.getEnableChatWithFiles()) {
+            if (!aiPreferences.getEnableAi()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)"));
             } else if (aiPreferences.getApiToken().isEmpty()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, set OpenAI API key inside JabRef preferences (AI tab)"));
