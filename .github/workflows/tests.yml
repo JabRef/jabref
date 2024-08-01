@@ -351,8 +351,10 @@ jobs:
         run: |
           if [ "$CODECOV_TOKEN" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
+            echo "❌ Secret CODECOV_TOKEN not present"
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
+            echo "✔️ Secret CODECOV_TOKEN present"
           fi
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
