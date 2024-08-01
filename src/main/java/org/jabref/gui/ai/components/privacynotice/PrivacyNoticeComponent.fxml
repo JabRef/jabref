@@ -17,31 +17,59 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%JabRef uses OpenAI to enable 'chatting' with PDF files. OpenAI is an external service. To enable JabRef chatting with PDF files, the content of the PDF files need to be shared with OpenAI.">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%JabRef uses AI providers to enable 'chatting' with PDF files. AI provider is an external service. To enable JabRef chatting with PDF files, the content of the PDF files need to be shared with the currently selected AI provider.">
                <font>
                   <Font size="14.0" />
                </font>
             </Text>
-            <Text layoutX="20.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%As soon as you ask a question, the text content of all PDFs attached to the entry are send to OpenAI.">
+            <Text layoutX="20.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%As soon as you ask a question, the text content of all PDFs attached to the entry are send to external service.">
                <font>
                   <Font size="14.0" />
                </font>
             </Text>
             <HBox alignment="BASELINE_LEFT" spacing="5.0">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%The privacy policy of OpenAI applies. You find it at">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the OpenAI as AI provider, the privacy policy of OpenAI applies. You find it at">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <Hyperlink onAction="#onPrivacyHyperlinkClick" text="https://openai.com/policies/privacy-policy/">
+                  <Hyperlink onAction="#onPrivacyHyperlinkClick" text="https://openai.com/policies/privacy-policy">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Hyperlink>
                </children>
             </HBox>
-            <Text layoutX="20.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%Additionally, we use Deep Java Library for running embedding model. The embedding model will be downloaded in background from Deep Java Library servers">
+            <HBox alignment="BASELINE_LEFT" spacing="5.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the Mistral AI as AI provider, the privacy policy of Mistral AI applies. You find it at">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
+                  <Hyperlink onAction="#onPrivacyHyperlinkClick" text="https://mistral.ai/terms/#privacy-policy">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Hyperlink>
+               </children>
+            </HBox>
+            <HBox alignment="BASELINE_LEFT" layoutX="20.0" layoutY="112.0" spacing="5.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the Hugging Face as AI provider, the privacy policy of Hugging Face applies. You find it at">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
+                  <Hyperlink onAction="#onPrivacyHyperlinkClick" text="https://huggingface.co/privacy">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Hyperlink>
+               </children>
+            </HBox>
+            <Text layoutX="20.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%Additionally, we use Deep Java Library for running embedding model. The embedding model will be downloaded in background from Deep Java Library servers.">
                <font>
                   <Font size="14.0" />
                </font>
