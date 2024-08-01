@@ -151,6 +151,7 @@ jobs:
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
           --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-modules=jdk.incubator.vector
       - name: Build pkg (macOS)
         if: (matrix.os == 'macos-13') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -159,6 +160,7 @@ jobs:
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
+          --add-modules jdk.incubator.vector \
           --dest build/distribution \
           --app-content buildres/mac/jabrefHost.py \
           --app-content buildres/mac/native-messaging-host \
