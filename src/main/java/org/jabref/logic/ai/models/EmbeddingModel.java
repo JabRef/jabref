@@ -80,7 +80,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
                 })
                 .onFailure(e -> {
                     LOGGER.error("An error occurred while building the embedding model", e);
-                    dialogService.notify("An error occurred while building the embedding model: " + e.getMessage());
+                    dialogService.notify(Localization.lang("An error occurred while building the embedding model"));
                     errorWhileBuildingModel = e.getMessage();
                 })
                 .executeWith(taskExecutor);
