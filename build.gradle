@@ -310,10 +310,6 @@ dependencies {
 
     implementation 'commons-io:commons-io:2.16.1'
 
-    // https://github.com/skinny85/jilt
-    compileOnly 'cc.jilt:jilt:1.6.1'
-    annotationProcessor 'cc.jilt:jilt:1.6.1'
-
     testImplementation 'io.github.classgraph:classgraph:4.8.174'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.3'
