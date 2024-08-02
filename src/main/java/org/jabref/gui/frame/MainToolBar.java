@@ -103,7 +103,7 @@ public class MainToolBar extends ToolBar {
 
         // The action itself asks the user if it is OK to use Grobid (in some cases).
         // Therefore, the condition of enablement is "only" if a library is opened. (Parameter "false")
-        Button newEntryFromPlainTextOnlineButton = factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT_ONLINE, new ExtractBibtexActionOnline(dialogService, preferencesService, stateManager, false));
+        Button newEntryFromPlainTextOnlineButton = factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexActionOnline(dialogService, preferencesService, stateManager, false));
 
         getItems().addAll(
                 new HBox(
