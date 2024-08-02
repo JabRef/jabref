@@ -873,9 +873,10 @@ public class JabRefPreferences implements PreferencesService {
         // set default theme
         defaults.put(THEME, Theme.BASE_CSS);
         defaults.put(THEME_SYNC_OS, Boolean.FALSE);
+
         setLanguageDependentDefaultValues();
 
-        // AI
+        // region:AI
         defaults.put(AI_ENABLE, AiDefaultPreferences.ENABLE_CHAT);
         defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
         defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL);
@@ -889,6 +890,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
         defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);
+        // endregion
     }
 
     public void setLanguageDependentDefaultValues() {
