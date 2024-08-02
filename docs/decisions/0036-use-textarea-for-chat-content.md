@@ -12,8 +12,8 @@ This decision record concerns the UI component that is used for rendering the co
 ## Decision Drivers
 
 * Looks good (renders Markdown)
-* Can select and copy text
-* Have good performance
+* User can select and copy text
+* Has good performance
 
 ## Considered Options
 
@@ -26,9 +26,9 @@ This decision record concerns the UI component that is used for rendering the co
 ## Decision Outcome
 
 Chosen option: "Use TextArea".
-All other options require some time to implement.
-Some of the options doesn't support text selection and copying,
-which for now we value better than Markdown rendering.
+All other options require more time to implement.
+Some of the options do not support text selection and copying,
+which for now we value more than Markdown rendering.
 
 ## Pros and Cons of the Options
 
