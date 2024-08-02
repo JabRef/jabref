@@ -182,15 +182,22 @@ public class JabRefGUI extends Application {
 
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
 
-        mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
+        mainStage.setMinHeight(330);
+
         // maximized target state is stored, because "saveWindowState" saves x and y only if not maximized
         boolean windowMaximised = guiPreferences.isWindowMaximised();
 
         LOGGER.debug("Screens: {}", Screen.getScreens());
         debugLogWindowState(mainStage);
 
-        if (isWindowPositionOutOfBounds()) {
+        if (isWindowPositionInBounds()) {
+            LOGGER.debug("The JabRef window is inside screen bounds.");
+            mainStage.setX(guiPreferences.getPositionX());
+            mainStage.setY(guiPreferences.getPositionY());
+            mainStage.setWidth(guiPreferences.getSizeX());
+            mainStage.setHeight(guiPreferences.getSizeY());
+        } else {
             LOGGER.debug("The JabRef window is outside of screen bounds. Position and size will be corrected. Main screen will be used.");
             Rectangle2D bounds = Screen.getPrimary().getBounds();
             mainStage.setX(bounds.getMinX());
@@ -198,12 +205,6 @@ public class JabRefGUI extends Application {
             mainStage.setWidth(Math.min(bounds.getWidth(), 1024.0));
             mainStage.setHeight(Math.min(bounds.getHeight(), 786.0));
             saveWindowState();
-        } else {
-            LOGGER.debug("The JabRef window is inside screen bounds.");
-            mainStage.setX(guiPreferences.getPositionX());
-            mainStage.setY(guiPreferences.getPositionY());
-            mainStage.setWidth(guiPreferences.getSizeX());
-            mainStage.setHeight(guiPreferences.getSizeY());
         }
         // after calling "saveWindowState" the maximized state can be set
         mainStage.setMaximized(windowMaximised);
@@ -281,21 +282,39 @@ public class JabRefGUI extends Application {
     }
 
     /**
-     * Tests if the window coordinates are out of the mainscreen
+     * Tests if the window coordinates are inside any screen
      */
-    private boolean isWindowPositionOutOfBounds() {
+    private boolean isWindowPositionInBounds() {
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
-
-        // The upper right corner is checked as there are most probably the window controls.
-        double rightX = guiPreferences.getPositionX() + guiPreferences.getSizeX();
-        double topY = guiPreferences.getPositionY();
-        LOGGER.debug("right x: {}, top y: {}", rightX, topY);
 
         if (LOGGER.isDebugEnabled()) {
             Screen.getScreens().forEach(screen -> LOGGER.debug("Screen bounds: {}", screen.getBounds()));
         }
-        return Screen.getScreens().stream().noneMatch((screen -> screen.getBounds().contains(
-                rightX, topY)));
+
+        return lowerLeftIsInBounds(guiPreferences) && upperRightIsInBounds(guiPreferences);
+    }
+
+    private boolean lowerLeftIsInBounds(GuiPreferences guiPreferences) {
+        // Windows/PowerToys somehow removes 10 pixels to the left; they are re-added
+        double leftX = guiPreferences.getPositionX() + 10.0;
+        double bottomY = guiPreferences.getPositionY() + guiPreferences.getSizeY();
+        LOGGER.debug("left x: {}, bottom y: {}", leftX, bottomY);
+
+        boolean inBounds = Screen.getScreens().stream().anyMatch((screen -> screen.getBounds().contains(leftX, bottomY)));
+        LOGGER.debug("lower left corner is in bounds: {}", inBounds);
+        return inBounds;
+    }
+
+    private boolean upperRightIsInBounds(GuiPreferences guiPreferences) {
+        // The upper right corner is checked as there are most probably the window controls.
+        // Windows/PowerToys somehow adds 10 pixels to the right and top of the screen, they are removed
+        double rightX = guiPreferences.getPositionX() + guiPreferences.getSizeX() - 10.0;
+        double topY = guiPreferences.getPositionY();
+        LOGGER.debug("right x: {}, top y: {}", rightX, topY);
+
+        boolean inBounds = Screen.getScreens().stream().anyMatch((screen -> screen.getBounds().contains(rightX, topY)));
+        LOGGER.debug("upper right corner is in bounds: {}", inBounds);
+        return inBounds;
     }
 
     // Background tasks
