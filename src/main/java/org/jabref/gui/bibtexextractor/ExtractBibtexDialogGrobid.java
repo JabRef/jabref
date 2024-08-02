@@ -15,7 +15,7 @@ public class ExtractBibtexDialogGrobid extends ExtractBibtexDialog {
                   .controller(this)
                   .load()
                   .setAsDialogPane(this);
-        this.setTitle(Localization.lang("Plain References Parser (%0)", Localization.lang("online")));
+        this.setTitle(Localization.lang("Plain References Parser (online)"));
     }
 
     @Override

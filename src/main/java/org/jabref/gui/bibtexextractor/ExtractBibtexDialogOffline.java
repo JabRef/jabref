@@ -15,7 +15,7 @@ public class ExtractBibtexDialogOffline extends ExtractBibtexDialog {
                   .controller(this)
                   .load()
                   .setAsDialogPane(this);
-        this.setTitle(Localization.lang("Plain References Parser (%0)", Localization.lang("offline")));
+        this.setTitle(Localization.lang("Plain References Parser (offline)"));
     }
 
     @Override

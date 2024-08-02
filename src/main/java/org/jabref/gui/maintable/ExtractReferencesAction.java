@@ -115,13 +115,13 @@ public class ExtractReferencesAction extends SimpleCommand {
             task.onFailure(dialogService::showErrorDialogAndWait);
 
             ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
-            String onlineOffline;
+            String title;
             if (online) {
-                onlineOffline = Localization.lang("online");
+                title = Localization.lang("Extract References (online)");
             } else {
-                onlineOffline = Localization.lang("offline");
+                title = Localization.lang("Extract References (offline)");
             }
-            dialog.setTitle(Localization.lang("Extract References (%0)", onlineOffline));
+            dialog.setTitle(title);
             dialogService.showCustomDialogAndWait(dialog);
         });
     }
