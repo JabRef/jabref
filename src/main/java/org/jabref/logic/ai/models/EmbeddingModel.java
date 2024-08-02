@@ -48,6 +48,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
 
     private final ObjectProperty<Optional<DeepJavaEmbeddingModel>> predictorProperty = new SimpleObjectProperty<>(Optional.empty());
 
+    // Used to update the tab content after the data is available
     private final EventBus eventBus = new EventBus();
 
     public static class EmbeddingModelBuiltEvent { }

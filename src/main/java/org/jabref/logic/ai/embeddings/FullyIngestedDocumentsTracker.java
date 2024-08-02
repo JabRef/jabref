@@ -23,6 +23,7 @@ public class FullyIngestedDocumentsTracker {
     // it doesn't mean the document is fully ingested.
     private final Map<String, Long> ingestedMap;
 
+    // Used to update the tab content after the data is available
     private final EventBus eventBus = new EventBus();
 
     public FullyIngestedDocumentsTracker(MVStore mvStore) {
