@@ -2,30 +2,30 @@ package org.jabref.gui.bibtexextractor;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.Tooltip;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
 /**
  * GUI Dialog for the feature "Extract BibTeX from plain text".
+ * Handles both online and offline case.
+ *
+ * @implNote Instead of using inherticance, we do if/else checks
+ *
  */
-public abstract class ExtractBibtexDialog extends BaseDialog<Void> {
+public class ExtractBibtexDialog extends BaseDialog<Void> {
 
     @Inject protected StateManager stateManager;
     @Inject protected DialogService dialogService;
@@ -38,28 +38,26 @@ public abstract class ExtractBibtexDialog extends BaseDialog<Void> {
 
     @FXML private ButtonType parseButtonType;
 
-    protected abstract BibtexExtractorViewModel getViewModel(BibDatabaseContext database);
+    public ExtractBibtexDialog() {
+        ViewLoader.view(ExtractBibtexDialogHelper.class)
+                  .controller(this)
+                  .load()
+                  .setAsDialogPane(this);
+        this.setTitle(Localization.lang("Plain References Parser (online)"));
+    }
 
     @FXML
     private void initialize() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        BibtexExtractorViewModel viewModel = getViewModel(database);
-
-        input.textProperty().bindBidirectional(viewModel.inputTextProperty());
-        String clipText = ClipBoardManager.getContents();
-        if (StringUtil.isBlank(clipText)) {
-            input.setPromptText(Localization.lang("Please enter the plain references to extract from separated by double empty lines."));
-        } else {
-            input.setText(clipText);
-            input.selectAll();
-        }
-
-        Platform.runLater(() -> {
-            input.requestFocus();
-            Button buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
-            buttonParse.setTooltip(new Tooltip((Localization.lang("Starts the extraction and adds the resulting entries to the currently opened database"))));
-            buttonParse.setOnAction(event -> viewModel.startParsing());
-            buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
-        });
+        BibtexExtractorViewModelGrobid bibtexExtractorViewModel = new BibtexExtractorViewModelGrobid(
+                database,
+                dialogService,
+                preferencesService,
+                fileUpdateMonitor,
+                taskExecutor,
+                undoManager,
+                stateManager);
+        Runnable parsingRunnable = () -> bibtexExtractorViewModel.startParsing();
+        ExtractBibtexDialogHelper.initialize(input, parseButtonType, bibtexExtractorViewModel.inputTextProperty(), getDialogPane(), parsingRunnable);
     }
 }
