@@ -11,6 +11,8 @@ import javafx.collections.ObservableSet;
 
 import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class SearchPreferences {
 
     private final ObservableSet<SearchFlags> searchFlags;
@@ -44,6 +46,15 @@ public class SearchPreferences {
 
         this.setSearchWindowHeight(searchWindowHeight);
         this.setSearchWindowWidth(searchWindowWidth);
+    }
+
+    @VisibleForTesting
+    public SearchPreferences(EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
+        this.searchFlags = FXCollections.observableSet(searchFlags);
+        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
+        this.searchWindowHeight = new SimpleDoubleProperty(0);
+        this.searchWindowWidth = new SimpleDoubleProperty(0);
+        this.searchWindowDividerPosition = new SimpleDoubleProperty(0);
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {

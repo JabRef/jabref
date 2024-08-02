@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.util.EnumSet;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -46,9 +47,7 @@ class GroupTreeViewModelTest {
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
 
         when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
-                false,
-                true,
-                true,
+                EnumSet.noneOf(GroupViewMode.class),
                 true,
                 true,
                 GroupHierarchyType.INDEPENDENT));
