@@ -119,7 +119,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
             predictorProperty.set(Optional.of(new DeepJavaEmbeddingModel(criteria)));
         } catch (ModelNotFoundException e) {
             predictorProperty.set(Optional.empty());
-            throw new RuntimeException(Localization.lang("Unable to find the embedding model by the URL: %0", modelUrl), e);
+            throw new RuntimeException(Localization.lang("Unable to find the embedding model by the URL %0", modelUrl), e);
         } catch (MalformedModelException e) {
             predictorProperty.set(Optional.empty());
             throw new RuntimeException(Localization.lang("The model by URL %0 is malformed", modelUrl), e);
