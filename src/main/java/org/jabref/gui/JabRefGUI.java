@@ -181,6 +181,7 @@ public class JabRefGUI extends Application {
         LOGGER.debug("Initializing frame");
 
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
+        LOGGER.debug("Reading from prefs: isMaximized {}", guiPreferences.isWindowMaximised());
 
         mainStage.setMinWidth(580);
         mainStage.setMinHeight(330);
@@ -197,13 +198,15 @@ public class JabRefGUI extends Application {
             mainStage.setY(guiPreferences.getPositionY());
             mainStage.setWidth(guiPreferences.getSizeX());
             mainStage.setHeight(guiPreferences.getSizeY());
+            LOGGER.debug("NOT saving window positions");
         } else {
-            LOGGER.debug("The JabRef window is outside of screen bounds. Position and size will be corrected. Main screen will be used.");
+            LOGGER.info("The JabRef window is outside of screen bounds. Position and size will be corrected to 1024x768. Primary screen will be used.");
             Rectangle2D bounds = Screen.getPrimary().getBounds();
             mainStage.setX(bounds.getMinX());
             mainStage.setY(bounds.getMinY());
             mainStage.setWidth(Math.min(bounds.getWidth(), 1024.0));
             mainStage.setHeight(Math.min(bounds.getHeight(), 786.0));
+            LOGGER.debug("Saving window positions");
             saveWindowState();
         }
         // after calling "saveWindowState" the maximized state can be set
@@ -270,15 +273,15 @@ public class JabRefGUI extends Application {
      * @param mainStage JabRef's stage
      */
     private void debugLogWindowState(Stage mainStage) {
-        if (LOGGER.isDebugEnabled()) {
-            String debugLogString = "screen data:\n" +
-                    "  mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n" +
-                    "  mainStage.POS_X: " + mainStage.getX() + "\n" +
-                    "  mainStage.POS_Y: " + mainStage.getY() + "\n" +
-                    "  mainStage.SIZE_X: " + mainStage.getWidth() + "\n" +
-                    "  mainStages.SIZE_Y: " + mainStage.getHeight() + "\n";
-            LOGGER.debug(debugLogString);
-        }
+        LOGGER.debug("""
+                        screen data:
+                          mainStage.WINDOW_MAXIMISED: {}
+                          mainStage.POS_X: {}
+                          mainStage.POS_Y: {}
+                          mainStage.SIZE_X: {}
+                          mainStage.SIZE_Y: {}
+                        """,
+                mainStage.isMaximized(), mainStage.getX(), mainStage.getY(), mainStage.getWidth(), mainStage.getHeight());
     }
 
     /**
