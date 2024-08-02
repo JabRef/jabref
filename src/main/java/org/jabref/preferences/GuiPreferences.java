@@ -24,14 +24,17 @@ public class GuiPreferences {
 
     private final BooleanProperty windowMaximised;
 
+    private final DoubleProperty sidePaneWidth;
+
     // the last libraries that were open when jabref closes and should be reopened on startup
     private final ObservableList<Path> lastFilesOpened;
+
     private final ObjectProperty<Path> lastFocusedFile;
+
     // observable list last files opened in the file menu
     private final FileHistory fileHistory;
 
     private final StringProperty lastSelectedIdBasedFetcher;
-    private final DoubleProperty sidePaneWidth;
 
     public GuiPreferences(double positionX,
                           double positionY,

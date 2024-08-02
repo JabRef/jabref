@@ -181,29 +181,33 @@ public class JabRefGUI extends Application {
         LOGGER.debug("Initializing frame");
 
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
+        LOGGER.debug("Reading from prefs: isMaximized {}", guiPreferences.isWindowMaximised());
 
-        mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
+        mainStage.setMinHeight(330);
+
         // maximized target state is stored, because "saveWindowState" saves x and y only if not maximized
         boolean windowMaximised = guiPreferences.isWindowMaximised();
 
         LOGGER.debug("Screens: {}", Screen.getScreens());
         debugLogWindowState(mainStage);
 
-        if (isWindowPositionOutOfBounds()) {
-            LOGGER.debug("The JabRef window is outside of screen bounds. Position and size will be corrected. Main screen will be used.");
-            Rectangle2D bounds = Screen.getPrimary().getBounds();
-            mainStage.setX(bounds.getMinX());
-            mainStage.setY(bounds.getMinY());
-            mainStage.setHeight(Math.min(bounds.getHeight(), 786.0));
-            mainStage.setWidth(Math.min(bounds.getWidth(), 1024.0));
-            saveWindowState();
-        } else {
+        if (isWindowPositionInBounds()) {
             LOGGER.debug("The JabRef window is inside screen bounds.");
             mainStage.setX(guiPreferences.getPositionX());
             mainStage.setY(guiPreferences.getPositionY());
             mainStage.setWidth(guiPreferences.getSizeX());
             mainStage.setHeight(guiPreferences.getSizeY());
+            LOGGER.debug("NOT saving window positions");
+        } else {
+            LOGGER.info("The JabRef window is outside of screen bounds. Position and size will be corrected to 1024x768. Primary screen will be used.");
+            Rectangle2D bounds = Screen.getPrimary().getBounds();
+            mainStage.setX(bounds.getMinX());
+            mainStage.setY(bounds.getMinY());
+            mainStage.setWidth(Math.min(bounds.getWidth(), 1024.0));
+            mainStage.setHeight(Math.min(bounds.getHeight(), 786.0));
+            LOGGER.debug("Saving window positions");
+            saveWindowState();
         }
         // after calling "saveWindowState" the maximized state can be set
         mainStage.setMaximized(windowMaximised);
@@ -264,32 +268,56 @@ public class JabRefGUI extends Application {
     }
 
     /**
-     * outprints the Data from the Screen (only in debug mode)
+     * prints the data from the screen (only in debug mode)
      *
-     * @param mainStage JabRefs stage
+     * @param mainStage JabRef's stage
      */
     private void debugLogWindowState(Stage mainStage) {
-        if (LOGGER.isDebugEnabled()) {
-            String debugLogString = "SCREEN DATA:" +
-                    "mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n" +
-                    "mainStage.POS_X: " + mainStage.getX() + "\n" +
-                    "mainStage.POS_Y: " + mainStage.getY() + "\n" +
-                    "mainStage.SIZE_X: " + mainStage.getWidth() + "\n" +
-                    "mainStages.SIZE_Y: " + mainStage.getHeight() + "\n";
-            LOGGER.debug(debugLogString);
-        }
+        LOGGER.debug("""
+                        screen data:
+                          mainStage.WINDOW_MAXIMISED: {}
+                          mainStage.POS_X: {}
+                          mainStage.POS_Y: {}
+                          mainStage.SIZE_X: {}
+                          mainStage.SIZE_Y: {}
+                        """,
+                mainStage.isMaximized(), mainStage.getX(), mainStage.getY(), mainStage.getWidth(), mainStage.getHeight());
     }
 
     /**
-     * Tests if the window coordinates are out of the mainscreen
+     * Tests if the window coordinates are inside any screen
      */
-    private boolean isWindowPositionOutOfBounds() {
-        // The upper right corner is checked as there are most probably the window controls.
+    private boolean isWindowPositionInBounds() {
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
-        double rightX = guiPreferences.getPositionX() + guiPreferences.getSizeX();
+
+        if (LOGGER.isDebugEnabled()) {
+            Screen.getScreens().forEach(screen -> LOGGER.debug("Screen bounds: {}", screen.getBounds()));
+        }
+
+        return lowerLeftIsInBounds(guiPreferences) && upperRightIsInBounds(guiPreferences);
+    }
+
+    private boolean lowerLeftIsInBounds(GuiPreferences guiPreferences) {
+        // Windows/PowerToys somehow removes 10 pixels to the left; they are re-added
+        double leftX = guiPreferences.getPositionX() + 10.0;
+        double bottomY = guiPreferences.getPositionY() + guiPreferences.getSizeY();
+        LOGGER.debug("left x: {}, bottom y: {}", leftX, bottomY);
+
+        boolean inBounds = Screen.getScreens().stream().anyMatch((screen -> screen.getBounds().contains(leftX, bottomY)));
+        LOGGER.debug("lower left corner is in bounds: {}", inBounds);
+        return inBounds;
+    }
+
+    private boolean upperRightIsInBounds(GuiPreferences guiPreferences) {
+        // The upper right corner is checked as there are most probably the window controls.
+        // Windows/PowerToys somehow adds 10 pixels to the right and top of the screen, they are removed
+        double rightX = guiPreferences.getPositionX() + guiPreferences.getSizeX() - 10.0;
         double topY = guiPreferences.getPositionY();
-        return Screen.getScreens().stream().noneMatch((screen -> screen.getBounds().contains(
-                rightX, topY)));
+        LOGGER.debug("right x: {}, top y: {}", rightX, topY);
+
+        boolean inBounds = Screen.getScreens().stream().anyMatch((screen -> screen.getBounds().contains(rightX, topY)));
+        LOGGER.debug("upper right corner is in bounds: {}", inBounds);
+        return inBounds;
     }
 
     // Background tasks
