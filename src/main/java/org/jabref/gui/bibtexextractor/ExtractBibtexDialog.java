@@ -47,7 +47,6 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     public ExtractBibtexDialog(boolean onlineMode) {
         this.onlineMode = onlineMode;
         ViewLoader.view(this)
-                  .controller(this)
                   .load()
                   .setAsDialogPane(this);
         if (onlineMode) {
