@@ -43,7 +43,7 @@ Chosen option: "MVStore", because it is simple and memory-efficient.
 * Good, because automatic loading and saving to disk
 * Good, because memory-efficient
 * Bad, because does not support mutable values in maps.
-* Bad, because the order of messages need to be "hand-crafted" (e.g., by mapping from an Integer to the concrete message)
+* Bad, because the order of messages need to be "hand-crafted" (e.g., by mapping from an Integer to the concrete message), since [MVStore does not support storing list which update](https://github.com/koppor/mvstore-mwe/pull/1).
 * Bad, because it stores data as key-values, but not as a custom data type (like tables in RDBMS)
 
 ### Custom format
