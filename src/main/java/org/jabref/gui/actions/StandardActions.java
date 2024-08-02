@@ -94,7 +94,7 @@ public enum StandardActions implements Action {
     PARSE_LATEX(Localization.lang("Search for citations in LaTeX files..."), IconTheme.JabRefIcons.LATEX_CITATIONS),
     NEW_SUB_LIBRARY_FROM_AUX(Localization.lang("New sublibrary based on AUX file") + "...", Localization.lang("New BibTeX sublibrary") + Localization.lang("This feature generates a new library based on which entries are needed in an existing LaTeX document."), IconTheme.JabRefIcons.NEW),
     NEW_LIBRARY_FROM_PDF_ONLINE(Localization.lang("New library based on references in PDF file... (online)"), Localization.lang("This feature generates a new library based on the list of references in a PDF file. Thereby, it uses Grobid's functionality."), IconTheme.JabRefIcons.NEW),
-    NEW_LIBRARY_FROM_PDF_OFFLINE(Localization.lang("New library based on references in PDF file... (offline)"), Localization.lang("This feature generates a new library based on the list of references in a PDF file. Thereby, it uses JabRef's build-in functionality.."), IconTheme.JabRefIcons.NEW),
+    NEW_LIBRARY_FROM_PDF_OFFLINE(Localization.lang("New library based on references in PDF file... (offline)"), Localization.lang("This feature generates a new library based on the list of references in a PDF file. Thereby, it uses JabRef's built-in functionality."), IconTheme.JabRefIcons.NEW),
     WRITE_METADATA_TO_PDF(Localization.lang("Write metadata to PDF files"), Localization.lang("Will write metadata to the PDFs linked from selected entries."), KeyBinding.WRITE_METADATA_TO_PDF),
 
     START_NEW_STUDY(Localization.lang("Start new systematic literature review")),
