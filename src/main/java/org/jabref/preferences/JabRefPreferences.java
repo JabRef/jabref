@@ -618,8 +618,12 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MAIN_WINDOW_POS_Y, 0);
         defaults.put(MAIN_WINDOW_WIDTH, 1024);
         defaults.put(MAIN_WINDOW_HEIGHT, 768);
+
         defaults.put(WINDOW_MAXIMISED, Boolean.TRUE);
-        defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE); // By default disable "Fit table horizontally on the screen"
+
+        // By default disable "Fit table horizontally on the screen"
+        defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
+
         defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
         defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
