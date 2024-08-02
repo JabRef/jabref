@@ -3,8 +3,6 @@ package org.jabref.gui.maintable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -156,10 +154,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
-                .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_SEARCH_AND_GROUPS.getValue()))
-                .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_SEARCH_NOT_GROUPS.getValue()))
-                .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_GROUPS_NOT_SEARCH.getValue()))
-                .withPseudoClass(NOT_MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRank().isEqualTo(SearchRank.NOT_MATCHING_SEARCH_AND_GROUPS.getValue()))
+                .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_SEARCH_AND_GROUPS))
+                .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_SEARCH_NOT_GROUPS))
+                .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_GROUPS_NOT_SEARCH))
+                .withPseudoClass(NOT_MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRank().isEqualTo(SearchRank.NOT_MATCHING_SEARCH_AND_GROUPS))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -292,29 +290,40 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         libraryTab.delete(StandardActions.CUT);
     }
 
-    private void scrollToRank(int delta) {
+    private void scrollToNextRank() {
         BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
         if (selectedEntry == null) {
             return;
         }
 
-        List<BibEntryTableViewModel> firstEntryOfEachRank = new ArrayList<>(Collections.nCopies(SearchRank.NOT_MATCHING_SEARCH_AND_GROUPS.getValue() + 1, null));
-        for (BibEntryTableViewModel entry : getItems()) {
-            int rank = entry.searchRank().get();
-            if (firstEntryOfEachRank.get(rank) == null) {
-                firstEntryOfEachRank.set(rank, entry);
-            }
-            if (rank == SearchRank.NOT_MATCHING_SEARCH_AND_GROUPS.getValue()) {
-                break;
+        SearchRank currentRank = selectedEntry.searchRank().get();
+        for (int i = getSelectionModel().getSelectedIndex(); i < getItems().size(); i++) {
+            if (!getItems().get(i).searchRank().get().equals(currentRank)) {
+                getSelectionModel().clearSelection();
+                getSelectionModel().select(i);
+                scrollTo(i);
+                return;
             }
         }
+    }
 
-        for (int i = selectedEntry.searchRank().get() + delta; i > 0 && i < firstEntryOfEachRank.size(); i += delta) {
-            BibEntryTableViewModel entry = firstEntryOfEachRank.get(i);
-            if (entry != null) {
+    private void scrollToPreviousRank() {
+        BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
+        if (selectedEntry == null) {
+            return;
+        }
+
+        SearchRank currentRank = selectedEntry.searchRank().get();
+        for (int i = getSelectionModel().getSelectedIndex(); i >= 0; i--) {
+            if (!getItems().get(i).searchRank().get().equals(currentRank)) {
+                SearchRank targetRank = getItems().get(i).searchRank().get();
+                // found the previous rank, scroll to the first entry of that rank
+                while ((i >= 0) && getItems().get(i).searchRank().get().equals(targetRank)) {
+                    i--;
+                }
                 getSelectionModel().clearSelection();
-                getSelectionModel().select(entry);
-                scrollTo(entry);
+                getSelectionModel().select(i + 1);
+                scrollTo(i + 1);
                 return;
             }
         }
@@ -363,11 +372,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case SCROLL_TO_NEXT_RANK:
-                        scrollToRank(1);
+                        scrollToNextRank();
                         event.consume();
                         break;
                     case SCROLL_TO_PREVIOUS_RANK:
-                        scrollToRank(-1);
+                         scrollToPreviousRank();
                         event.consume();
                         break;
                     default:

@@ -14,10 +14,10 @@ import javafx.beans.Observable;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
@@ -51,7 +51,7 @@ public class BibEntryTableViewModel {
     private final BooleanProperty isVisibleBySearch = new SimpleBooleanProperty(true);
     private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(true);
     private final BooleanProperty isVisibleByGroup = new SimpleBooleanProperty(true);
-    private final IntegerProperty searchRank = new SimpleIntegerProperty(1);
+    private final ObjectProperty<SearchRank> searchRank = new SimpleObjectProperty<>(SearchRank.MATCHING_SEARCH_AND_GROUPS);
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -174,7 +174,7 @@ public class BibEntryTableViewModel {
         return isVisibleByGroup;
     }
 
-    public IntegerProperty searchRank() {
+    public ObjectProperty<SearchRank> searchRank() {
         return searchRank;
     }
 
@@ -183,14 +183,14 @@ public class BibEntryTableViewModel {
     }
 
     public void updateSearchRank() {
-        int rank = SearchRank.NOT_MATCHING_SEARCH_AND_GROUPS.getValue();
+        SearchRank rank = SearchRank.NOT_MATCHING_SEARCH_AND_GROUPS;
 
         if (isMatchedBySearch.get() && isMatchedByGroup.get()) {
-            rank = SearchRank.MATCHING_SEARCH_AND_GROUPS.getValue();
+            rank = SearchRank.MATCHING_SEARCH_AND_GROUPS;
         } else if (isMatchedBySearch.get()) {
-            rank = SearchRank.MATCHING_SEARCH_NOT_GROUPS.getValue();
+            rank = SearchRank.MATCHING_SEARCH_NOT_GROUPS;
         } else if (isMatchedByGroup.get()) {
-            rank = SearchRank.MATCHING_GROUPS_NOT_SEARCH.getValue();
+            rank = SearchRank.MATCHING_GROUPS_NOT_SEARCH;
         }
 
         searchRank.set(rank);

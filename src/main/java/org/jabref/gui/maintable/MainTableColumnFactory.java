@@ -144,14 +144,14 @@ public class MainTableColumnFactory {
         column.setMaxWidth(width);
     }
 
-    private TableColumn<BibEntryTableViewModel, Number> createSearchRankColumn(MainTableColumnModel columnModel) {
-        TableColumn<BibEntryTableViewModel, Number> column = new MainTableColumn<>(columnModel);
+    private TableColumn<BibEntryTableViewModel, SearchRank> createSearchRankColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, SearchRank> column = new MainTableColumn<>(columnModel);
         Node header = new Text(Localization.lang("Search rank"));
         header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SEARCH_RANK.getDisplayName()));
         column.setGraphic(header);
         column.setCellValueFactory(cellData -> cellData.getValue().searchRank());
-        new ValueTableCellFactory<BibEntryTableViewModel, Number>().withText(String::valueOf).install(column);
+        new ValueTableCellFactory<BibEntryTableViewModel, SearchRank>().withText(String::valueOf).install(column);
         column.setSortable(true);
         column.setSortType(TableColumn.SortType.ASCENDING);
         column.setVisible(false);
