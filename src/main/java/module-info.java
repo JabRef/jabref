@@ -15,9 +15,12 @@ open module org.jabref {
     requires afterburner.fx;
     requires com.dlsc.gemsfx;
     uses com.dlsc.gemsfx.TagsField;
+    // Provides number input fields for parameters in AI expert settings
+    requires com.dlsc.unitfx;
     requires de.saxsys.mvvmfx;
     requires reactfx;
     requires org.fxmisc.flowless;
+    requires de.saxsys.mvvmfx.validation;
 
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
@@ -100,6 +103,7 @@ open module org.jabref {
     requires org.apache.commons.logging;
 
     requires com.github.tomtung.latex2unicode;
+    requires fastparse;
 
     requires jbibtex;
     requires citeproc.java;
@@ -108,6 +112,7 @@ open module org.jabref {
 
     requires org.apache.pdfbox;
     requires org.apache.xmpbox;
+    requires com.ibm.icu;
 
     requires flexmark;
     requires flexmark.html2md.converter;
@@ -123,9 +128,11 @@ open module org.jabref {
 
     // AI
     requires langchain4j;
-    requires kotlin.stdlib;
     requires ai.djl.api;
     requires ai.djl.tokenizers;
+    requires jvm.openai;
+    requires langchain4j.core;
+    requires langchain4j.open.ai;
 
     // fulltext search
     requires org.apache.lucene.core;
@@ -147,16 +154,16 @@ open module org.jabref {
 
     requires transitive org.jspecify;
 
-    // other libraries
+    // region: other libraries
+
+    // required by okhttp and some AI library
+    requires kotlin.stdlib;
+
+    requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires mslinks;
-    // Provides number input fields for parameters in AI expert settings
-    requires com.dlsc.unitfx;
-    requires de.saxsys.mvvmfx.validation;
+
     requires dd.plist;
-    requires fastparse;
-    requires com.ibm.icu;
-    requires jvm.openai;
-    requires langchain4j.core;
-    requires langchain4j.open.ai;
+
+    // endregion
 }
