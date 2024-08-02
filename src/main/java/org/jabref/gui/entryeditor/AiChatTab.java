@@ -216,9 +216,7 @@ public class AiChatTab extends EntryEditorTab {
     private void bindToCorrectEntry(BibEntry entry) {
         AiChatHistory aiChatHistory = getAiChatHistory(aiService, entry, bibDatabaseContext);
         AiChatLogic aiChatLogic = AiChatLogic.forBibEntry(aiService, aiChatHistory, entry);
-
         Node content = new AiChatComponent(aiChatLogic, dialogService, taskExecutor);
-
         setContent(content);
     }
 

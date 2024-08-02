@@ -53,7 +53,6 @@ public class AiChatLogic {
                         .map(LinkedFile::getLink)
                         .toList()
                 );
-
         return new AiChatLogic(aiService, aiChatHistory, filter);
     }
 
