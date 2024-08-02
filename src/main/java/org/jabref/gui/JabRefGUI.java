@@ -7,6 +7,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
@@ -70,7 +71,6 @@ public class JabRefGUI extends Application {
 
     private static RemoteListenerServerManager remoteListenerServerManager;
 
-    private boolean correctedWindowPos = false;
     private Stage mainStage;
 
     public static void setup(List<UiCommand> uiCommands,
@@ -192,22 +192,29 @@ public class JabRefGUI extends Application {
 
         mainStage.setMinHeight(330);
         mainStage.setMinWidth(580);
-        mainStage.setFullScreen(guiPreferences.isWindowFullscreen());
-        mainStage.setMaximized(guiPreferences.isWindowMaximised());
-        if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
-            // corrects the Window, if it is outside the mainscreen
-            LOGGER.debug("The Jabref window is outside the main screen");
-            mainStage.setX(0);
-            mainStage.setY(0);
-            mainStage.setWidth(1024);
-            mainStage.setHeight(768);
-            correctedWindowPos = true;
+        // maximized target state is stored, because "saveWindowState" saves x and y only if not maximized
+        boolean windowMaximised = guiPreferences.isWindowMaximised();
+
+        LOGGER.debug("Screens: {}", Screen.getScreens());
+        debugLogWindowState(mainStage);
+
+        if (isWindowPositionOutOfBounds()) {
+            LOGGER.debug("The JabRef window is outside of screen bounds. Position and size will be corrected. Main screen will be used.");
+            Rectangle2D bounds = Screen.getPrimary().getBounds();
+            mainStage.setX(bounds.getMinX());
+            mainStage.setY(bounds.getMinY());
+            mainStage.setHeight(Math.min(bounds.getHeight(), 786.0));
+            mainStage.setWidth(Math.min(bounds.getWidth(), 1024.0));
+            saveWindowState();
         } else {
+            LOGGER.debug("The JabRef window is inside screen bounds.");
             mainStage.setX(guiPreferences.getPositionX());
             mainStage.setY(guiPreferences.getPositionY());
             mainStage.setWidth(guiPreferences.getSizeX());
             mainStage.setHeight(guiPreferences.getSizeY());
         }
+        // after calling "saveWindowState" the maximized state can be set
+        mainStage.setMaximized(windowMaximised);
         debugLogWindowState(mainStage);
 
         Scene scene = new Scene(JabRefGUI.mainFrame);
@@ -253,26 +260,20 @@ public class JabRefGUI extends Application {
     }
 
     public void onHiding(WindowEvent event) {
-        if (!correctedWindowPos) {
-            // saves the window position only if its not corrected -> the window will rest at the old Position,
-            // if the external Screen is connected again.
-            saveWindowState();
-        }
-
+        saveWindowState();
         preferencesService.flush();
-
-        // Goodbye!
         Platform.exit();
     }
 
     private void saveWindowState() {
         GuiPreferences preferences = preferencesService.getGuiPreferences();
-        preferences.setPositionX(mainStage.getX());
-        preferences.setPositionY(mainStage.getY());
-        preferences.setSizeX(mainStage.getWidth());
-        preferences.setSizeY(mainStage.getHeight());
+        if (!mainStage.isMaximized()) {
+            preferences.setPositionX(mainStage.getX());
+            preferences.setPositionY(mainStage.getY());
+            preferences.setSizeX(mainStage.getWidth());
+            preferences.setSizeY(mainStage.getHeight());
+        }
         preferences.setWindowMaximised(mainStage.isMaximized());
-        preferences.setWindowFullScreen(mainStage.isFullScreen());
         debugLogWindowState(mainStage);
     }
 
@@ -295,13 +296,14 @@ public class JabRefGUI extends Application {
 
     /**
      * Tests if the window coordinates are out of the mainscreen
-     *
-     * @return outbounds
      */
     private boolean isWindowPositionOutOfBounds() {
-        return !Screen.getPrimary().getBounds().contains(
-                preferencesService.getGuiPreferences().getPositionX(),
-                preferencesService.getGuiPreferences().getPositionY());
+        // The upper right corner is checked as there are most probably the window controls.
+        GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
+        double rightX = guiPreferences.getPositionX() + guiPreferences.getSizeX();
+        double topY = guiPreferences.getPositionY();
+        return Screen.getScreens().stream().noneMatch((screen -> screen.getBounds().contains(
+                rightX, topY)));
     }
 
     // Background tasks

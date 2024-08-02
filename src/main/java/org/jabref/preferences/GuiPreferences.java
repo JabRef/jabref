@@ -23,7 +23,6 @@ public class GuiPreferences {
     private final DoubleProperty sizeY;
 
     private final BooleanProperty windowMaximised;
-    private final BooleanProperty windowFullScreen;
 
     // the last libraries that were open when jabref closes and should be reopened on startup
     private final ObservableList<Path> lastFilesOpened;
@@ -39,7 +38,6 @@ public class GuiPreferences {
                           double sizeX,
                           double sizeY,
                           boolean windowMaximised,
-                          boolean windowFullScreen,
                           List<Path> lastFilesOpened,
                           Path lastFocusedFile,
                           FileHistory fileHistory,
@@ -50,7 +48,6 @@ public class GuiPreferences {
         this.sizeX = new SimpleDoubleProperty(sizeX);
         this.sizeY = new SimpleDoubleProperty(sizeY);
         this.windowMaximised = new SimpleBooleanProperty(windowMaximised);
-        this.windowFullScreen = new SimpleBooleanProperty(windowFullScreen);
         this.lastFilesOpened = FXCollections.observableArrayList(lastFilesOpened);
         this.lastFocusedFile = new SimpleObjectProperty<>(lastFocusedFile);
         this.lastSelectedIdBasedFetcher = new SimpleStringProperty(lastSelectedIdBasedFetcher);
@@ -116,18 +113,6 @@ public class GuiPreferences {
 
     public void setWindowMaximised(boolean windowMaximised) {
         this.windowMaximised.set(windowMaximised);
-    }
-
-    public BooleanProperty windowFullScreenProperty() {
-        return windowFullScreen;
-    }
-
-    public void setWindowFullScreen(boolean windowFullScreen) {
-        this.windowFullScreen.set(windowFullScreen);
-    }
-
-    public boolean isWindowFullscreen() {
-        return windowFullScreen.get();
     }
 
     public ObservableList<Path> getLastFilesOpened() {
