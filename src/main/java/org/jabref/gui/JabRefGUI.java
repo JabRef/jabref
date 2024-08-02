@@ -264,9 +264,9 @@ public class JabRefGUI extends Application {
     }
 
     /**
-     * outprints the Data from the Screen (only in debug mode)
+     * prints the data from the screen (only in debug mode)
      *
-     * @param mainStage JabRefs stage
+     * @param mainStage JabRef's stage
      */
     private void debugLogWindowState(Stage mainStage) {
         if (LOGGER.isDebugEnabled()) {
