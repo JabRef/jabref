@@ -195,8 +195,8 @@ public class JabRefGUI extends Application {
             Rectangle2D bounds = Screen.getPrimary().getBounds();
             mainStage.setX(bounds.getMinX());
             mainStage.setY(bounds.getMinY());
-            mainStage.setHeight(Math.min(bounds.getHeight(), 786.0));
             mainStage.setWidth(Math.min(bounds.getWidth(), 1024.0));
+            mainStage.setHeight(Math.min(bounds.getHeight(), 786.0));
             saveWindowState();
         } else {
             LOGGER.debug("The JabRef window is inside screen bounds.");
@@ -270,12 +270,12 @@ public class JabRefGUI extends Application {
      */
     private void debugLogWindowState(Stage mainStage) {
         if (LOGGER.isDebugEnabled()) {
-            String debugLogString = "SCREEN DATA:" +
-                    "mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n" +
-                    "mainStage.POS_X: " + mainStage.getX() + "\n" +
-                    "mainStage.POS_Y: " + mainStage.getY() + "\n" +
-                    "mainStage.SIZE_X: " + mainStage.getWidth() + "\n" +
-                    "mainStages.SIZE_Y: " + mainStage.getHeight() + "\n";
+            String debugLogString = "screen data:\n" +
+                    "  mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n" +
+                    "  mainStage.POS_X: " + mainStage.getX() + "\n" +
+                    "  mainStage.POS_Y: " + mainStage.getY() + "\n" +
+                    "  mainStage.SIZE_X: " + mainStage.getWidth() + "\n" +
+                    "  mainStages.SIZE_Y: " + mainStage.getHeight() + "\n";
             LOGGER.debug(debugLogString);
         }
     }
@@ -284,10 +284,16 @@ public class JabRefGUI extends Application {
      * Tests if the window coordinates are out of the mainscreen
      */
     private boolean isWindowPositionOutOfBounds() {
-        // The upper right corner is checked as there are most probably the window controls.
         GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
+
+        // The upper right corner is checked as there are most probably the window controls.
         double rightX = guiPreferences.getPositionX() + guiPreferences.getSizeX();
         double topY = guiPreferences.getPositionY();
+        LOGGER.debug("right x: {}, top y: {}", rightX, topY);
+
+        if (LOGGER.isDebugEnabled()) {
+            Screen.getScreens().forEach(screen -> LOGGER.debug("Screen bounds: {}", screen.getBounds()));
+        }
         return Screen.getScreens().stream().noneMatch((screen -> screen.getBounds().contains(
                 rightX, topY)));
     }
