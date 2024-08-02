@@ -278,7 +278,7 @@ public class JabRefGUI extends Application {
     }
 
     /**
-     * Logs data from the Screen (only in debug mode)
+     * outprints the Data from the Screen (only in debug mode)
      *
      * @param mainStage JabRefs stage
      */
