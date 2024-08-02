@@ -149,7 +149,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(DialogService.class, dialogService);
 
         JabRefGUI.clipBoardManager = new ClipBoardManager();
-        Injector.setModelOrService(TaskExecutor.class, taskExecutor);
+        Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
     }
 
     private void setupProxy() {
