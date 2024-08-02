@@ -19,13 +19,13 @@ BIB entry and a list of messages. We need to specify the key of this map. Turns 
 ## Considered Options
 
 * `BibEntry` Java object
-* `BibEntry` `id`
-* Citation key
-* `ShareId`
+* `BibEntry`'s `id`
+* `BibEntry`'s Citation key
+* `BibEntry`'s `ShareId`
 
 ## Decision Outcome
 
-Chosen option: "Citation key", because this is the only choice that complains to the third point in Decision Drivers.
+Chosen option: "`BibEntry`'s Citation key", because this is the only choice that complains to the third point in Decision Drivers.
 
 ### Positive Consequences
 
@@ -43,20 +43,20 @@ Chosen option: "Citation key", because this is the only choice that complains to
 
 Very bad, because it works only at run-time and is not stable.
 
-### `BibEntry` `id`
+### `BibEntry`'s `id`
 
 JabRef stores a unique identifier for each `BibEntry`.
 This identifier is created on each load of a library (and not stored permanently).
 
 Very bad, for the same reasons as `BibEntry` Java object.
 
-### Citation key
+### `BibEntry`'s Citation key
 
 * Good, because it is cross-platform, stable (meaning stays the same across launches of JabRef)
 * Bad, because it is not guaranteed that citation key exists on `BibEntry`, and that it is unique across other
 `BibEntriy`'s' in the library
 
-### Use `ShareId`
+### `BibEntry`'s `ShareId`
 
 [ADR-0027](0027-synchronization.md) describes the procedure of synchronization of a Bib(La)TeX library with a server.
 Thereby, also local and remote entries need to be kept consistent.
