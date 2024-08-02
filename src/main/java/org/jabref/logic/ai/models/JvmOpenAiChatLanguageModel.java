@@ -39,14 +39,6 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
 
     @Override
     public Response<AiMessage> generate(List<ChatMessage> list) {
-        // The rationale for RuntimeExceptions in this method:
-        // 1. langchain4j error handling is a mess, and it uses RuntimeExceptions
-        //    everywhere. Because this method implements a langchain4j interface,
-        //    we follow the same "practice".
-        // 2. There is no way to encode error information from type system: nor
-        //    in the result type, nor "throws" in method signature. Actually,
-        //    it's possible, but langchain4j doesn't do it.
-
         List<io.github.stefanbratanov.jvm.openai.ChatMessage> messages =
                 list.stream().map(chatMessage -> {
                     // Do not inline this variable. Java compiler will argue that we return Record & ChatMessage.
@@ -78,6 +70,13 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
         List<ChatCompletion.Choice> choices = chatCompletion.choices();
 
         if (choices.isEmpty()) {
+            // The rationale for RuntimeExceptions in this method:
+            // 1. langchain4j error handling is a mess, and it uses RuntimeExceptions
+            //    everywhere. Because this method implements a langchain4j interface,
+            //    we follow the same "practice".
+            // 2. There is no way to encode error information from type system: nor
+            //    in the result type, nor "throws" in method signature. Actually,
+            //    it's possible, but langchain4j doesn't do it.
             throw new RuntimeException("OpenAI returned no chat completion");
         }
 
