@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -58,7 +58,7 @@ public class EditInsert {
                                            XTextCursor cursor,
                                            List<BibEntry> entries,
                                            BibDatabase database,
-                                           OOBibStyle style,
+                                           JStyle style,
                                            CitationType citationType,
                                            String pageInfo)
             throws

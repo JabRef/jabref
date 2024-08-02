@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.style.Citation;
 import org.jabref.model.openoffice.style.CitationGroup;
@@ -39,7 +39,7 @@ public class EditMerge {
     /**
      * @return true if modified document
      */
-    public static boolean mergeCitationGroups(XTextDocument doc, OOFrontend frontend, OOBibStyle style)
+    public static boolean mergeCitationGroups(XTextDocument doc, OOFrontend frontend, JStyle style)
             throws
             CreationException,
             IllegalArgumentException,

@@ -51,6 +51,7 @@ import org.jabref.gui.integrity.IntegrityCheckAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
+import org.jabref.gui.maintable.NewLibraryFromPdfAction;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
@@ -65,7 +66,8 @@ import org.jabref.gui.slr.ExistingStudySearchAction;
 import org.jabref.gui.slr.StartNewStudyAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
-import org.jabref.gui.undo.UndoRedoAction;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
@@ -78,6 +80,8 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
+
+import com.tobiasdiez.easybind.EasyBind;
 
 public class MainMenu extends MenuBar {
     private final JabRefFrame frame;
@@ -174,8 +178,8 @@ public class MainMenu extends MenuBar {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, frame::getCurrentLibraryTab, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -272,9 +276,17 @@ public class MainMenu extends MenuBar {
         final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
         pushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);
 
+        NewLibraryFromPdfAction newLibraryFromPdfAction = new NewLibraryFromPdfAction(frame, stateManager, dialogService, preferencesService, taskExecutor);
+        // Action used twice, because it distinguishes internally between online and offline
+        // We want the UI to show "online" and "offline" explicitly
+        MenuItem newLibraryFromPdfMenuItemOnline = factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF_ONLINE, newLibraryFromPdfAction);
+        MenuItem newLibraryFromPdfMenuItemOffline = factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF_OFFLINE, newLibraryFromPdfAction);
+
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.PARSE_LATEX, new ParseLatexAction(stateManager)),
                 factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(frame, stateManager, dialogService)),
+                newLibraryFromPdfMenuItemOnline,
+                newLibraryFromPdfMenuItemOffline,
 
                 new SeparatorMenuItem(),
 
@@ -302,6 +314,9 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(StandardActions.REDOWNLOAD_MISSING_FILES, new RedownloadMissingFilesAction(stateManager, dialogService, preferencesService.getFilePreferences(), taskExecutor))
         );
+
+        EasyBind.subscribe(preferencesService.getGrobidPreferences().grobidEnabledProperty(), newLibraryFromPdfMenuItemOnline::setVisible);
+
         SidePaneType webSearchPane = SidePaneType.WEB_SEARCH;
         SidePaneType groupsPane = SidePaneType.GROUPS;
         SidePaneType openOfficePane = SidePaneType.OPEN_OFFICE;
