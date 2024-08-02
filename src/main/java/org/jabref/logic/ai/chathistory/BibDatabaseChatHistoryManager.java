@@ -2,10 +2,9 @@ package org.jabref.logic.ai.chathistory;
 
 import java.io.Serializable;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -26,13 +25,12 @@ import org.slf4j.LoggerFactory;
  */
 public class BibDatabaseChatHistoryManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseChatHistoryManager.class);
-    private static final String CHAT_HISTORY_FILE_NAME = "chat-history.mv";
 
-    private record ChatHistoryRecord(String library, String citationKey, String type, String content) implements Serializable {
+    private record ChatHistoryRecord(ChatMessageType type, String content) implements Serializable {
         public ChatMessage toLangchainMessage() {
-            if (type.equals(ChatMessageType.AI.name())) {
+            if (type == ChatMessageType.AI) {
                 return new AiMessage(content);
-            } else if (type.equals(ChatMessageType.USER.name())) {
+            } else if (type == ChatMessageType.USER) {
                 return new UserMessage(content);
             } else {
                 LOGGER.warn("BibDatabaseChatHistoryManager supports only AI and user messages, but retrieved message has other type: {}. Will treat as an AI message", type);
@@ -41,54 +39,53 @@ public class BibDatabaseChatHistoryManager {
         }
     }
 
-    private final Map<Integer, ChatHistoryRecord> messages;
-
-    private final Map<Path, BibDatabaseChatHistory> bibDatabaseChatHistoryMap = new HashMap<>();
+    private final MVStore mvStore;
 
     public BibDatabaseChatHistoryManager(MVStore mvStore) {
-        this.messages = mvStore.openMap("messages");
+        this.mvStore = mvStore;
     }
 
-    public BibDatabaseChatHistory getChatHistoryForBibDatabase(Path bibDatabasePath) {
-        return bibDatabaseChatHistoryMap.computeIfAbsent(
-                bibDatabasePath,
-                path -> new BibDatabaseChatHistory(bibDatabasePath, this)
-        );
+    private Map<Integer, ChatHistoryRecord> getMap(Path bibDatabasePath, String citationKey) {
+        return mvStore.openMap("chathistory-" + bibDatabasePath + "-" + citationKey);
     }
 
-    public List<ChatMessage> getMessagesForEntry(Path bibDatabasePath, String citationKey) {
-        return filterMessagesByLibraryAndEntry(bibDatabasePath, citationKey)
-                .sorted() // Assuming old message key is less than new message key.
-                .map(id -> messages.get(id).toLangchainMessage())
-                .toList();
-    }
+    public AiChatHistory getChatHistory(Path bibDatabasePath, String citationKey) {
+        return new AiChatHistory() {
+            @Override
+            public List<ChatMessage> getMessages() {
+                Map<Integer, ChatHistoryRecord> messages = getMap(bibDatabasePath, citationKey);
+                return IntStream.range(0, messages.size())
+                                .mapToObj(key -> messages.get(key).toLangchainMessage())
+                                .toList();
+            }
 
-    public synchronized void addMessage(Path bibDatabasePath, String citationKey, ChatMessage message) {
-        int id = messages.keySet().size() + 1;
+            @Override
+            public void add(ChatMessage chatMessage) {
+                Map<Integer, ChatHistoryRecord> map = getMap(bibDatabasePath, citationKey);
 
-        String content;
+                // We count 0-based, thus "size()" is the next number
+                // 0 entries -> 0 is the first new id
+                // 1 entry -> 0 is assigned, 1 is the next number, which is also the size
+                int id = map.keySet().size();
 
-        if (message instanceof AiMessage aiMessage) {
-            content = aiMessage.text();
-        } else if (message instanceof UserMessage userMessage) {
-            content = userMessage.singleText();
-        } else {
-            LOGGER.warn("BibDatabaseChatHistoryFile supports only AI and user messages, but added message has other type: {}", message.type().name());
-            return;
-        }
+                String content;
 
-        messages.put(id, new ChatHistoryRecord(bibDatabasePath.toString(), citationKey, message.type().name(), content));
-    }
+                if (chatMessage instanceof AiMessage aiMessage) {
+                    content = aiMessage.text();
+                } else if (chatMessage instanceof UserMessage userMessage) {
+                    content = userMessage.singleText();
+                } else {
+                    LOGGER.warn("BibDatabaseChatHistoryFile supports only AI and user messages, but added message has other type: {}", chatMessage.type().name());
+                    return;
+                }
 
-    public void clearMessagesForEntry(Path bibDatabasePath, String citationKey) {
-        filterMessagesByLibraryAndEntry(bibDatabasePath, citationKey).forEach(messages::remove);
-    }
+                map.put(id, new ChatHistoryRecord(chatMessage.type(), content));
+            }
 
-    private Stream<Integer> filterMessagesByLibraryAndEntry(Path bibDatabasePath, String citationKey) {
-        return messages
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue().library.equals(bibDatabasePath.toString()) && entry.getValue().citationKey.equals(citationKey))
-                .map(Map.Entry::getKey);
+            @Override
+            public void clear() {
+                getMap(bibDatabasePath, citationKey).clear();
+            }
+        };
     }
 }

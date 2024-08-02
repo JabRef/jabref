@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.AiChatLogic;
-import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.AiPreferences;
 
@@ -54,7 +53,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
      * Update the underlying {@link dev.langchain4j.model.chat.ChatLanguageModel} by current {@link AiPreferences} parameters.
      * When the model is updated, the chat messages are not lost.
      * See {@link AiChatLogic}, where messages are stored in {@link ChatMemory},
-     * and {@link BibDatabaseChatHistory}, where messages are stored in {@link MVStore}.
+     * and using {@link org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager}, where messages are stored in {@link MVStore}.
      */
     private void rebuild() {
         if (!aiPreferences.getEnableAi() || aiPreferences.getApiToken().isEmpty()) {

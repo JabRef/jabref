@@ -21,7 +21,6 @@ import org.jabref.logic.ai.AiChatLogic;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.GenerateEmbeddingsTask;
 import org.jabref.logic.ai.chathistory.AiChatHistory;
-import org.jabref.logic.ai.chathistory.BibDatabaseChatHistory;
 import org.jabref.logic.ai.chathistory.InMemoryAiChatHistory;
 import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.models.EmbeddingModel;
@@ -230,8 +229,7 @@ public class AiChatTab extends EntryEditorTab {
             LOGGER.warn("AI chat is constructed, but the entry citation key is empty. Cannot store chat history");
             return new InMemoryAiChatHistory();
         } else {
-            BibDatabaseChatHistory bibDatabaseChatHistory = aiService.getChatHistoryManager().getChatHistoryForBibDatabase(databasePath.get());
-            return bibDatabaseChatHistory.getChatHistoryForEntry(entry.getCitationKey().get());
+            return aiService.getChatHistoryManager().getChatHistory(databasePath.get(), entry.getCitationKey().get());
         }
     }
 
