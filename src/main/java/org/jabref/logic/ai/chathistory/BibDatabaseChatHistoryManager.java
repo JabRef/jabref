@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote If something is changed in the data model, increase {@link org.jabref.logic.ai.AiService#VERSION}
  */
-public class BibDatabaseChatHistoryManager implements AutoCloseable {
+public class BibDatabaseChatHistoryManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseChatHistoryManager.class);
     private static final String CHAT_HISTORY_FILE_NAME = "chat-history.mv";
 
@@ -90,10 +90,5 @@ public class BibDatabaseChatHistoryManager implements AutoCloseable {
                 .stream()
                 .filter(entry -> entry.getValue().library.equals(bibDatabasePath.toString()) && entry.getValue().citationKey.equals(citationKey))
                 .map(Map.Entry::getKey);
-    }
-
-    @Override
-    public void close() {
-        bibDatabaseChatHistoryMap.clear();
     }
 }
