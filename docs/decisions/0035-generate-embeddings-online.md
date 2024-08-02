@@ -24,14 +24,14 @@ Where these embeddings should be generated?
 * Embedding generation should be fast
 * Embeddings should have good performance (performance mean they "catch the semantics" good, see also [MTEB](https://huggingface.co/blog/mteb))
 * Generating embeddings should be cheap
-* Embeddings shouldn't be of a big size
+* Embeddings should not be of a big size
 * Embedding models and library to generate embeddings shouldn't be big in distribution binary.
 
 ## Decision Outcome
 
 Chosen option: "OpenAI embedding API", because
 the distribution size of JabRef will be nearly unaffected. Also, it's fast
-and have better performance, in comparison to available in `langchain4j` model `all-MiniLM-L6-v2`.
+and has a better performance, in comparison to available in `langchain4j`'s model `all-MiniLM-L6-v2`.
 
 ## Pros and Cons of the Options
 
