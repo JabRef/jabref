@@ -3,7 +3,7 @@ nav_order: 0037
 parent: Decision Records
 ---
 
-# RAG architecture implementation
+# RAG Architecture Implementation
 
 ## Context and Problem Statement
 
@@ -105,5 +105,4 @@ implemented vector database using `MVStore` because that was easy.
 * Neutral, because they provide not that many LLM integrations, embedding models, and vector storages
 * Bad, because requires connection to Internet
 * Bad, because data is processed by a third party company
-* Bad, because most of them require additional payment (in fact, it would be impossible to develop a free service like
-that)
+* Bad, because most of them require additional payment (in fact, it would be impossible to develop a free service like that)
