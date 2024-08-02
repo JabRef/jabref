@@ -36,7 +36,6 @@ public class GuiPreferences {
 
     private final StringProperty lastSelectedIdBasedFetcher;
 
-
     public GuiPreferences(double positionX,
                           double positionY,
                           double sizeX,
