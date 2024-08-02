@@ -32,10 +32,6 @@ public class ExtractBibtexActionOnline extends SimpleCommand {
     @Override
     public void execute() {
         boolean useGrobid = GrobidOptInDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferencesService.getGrobidPreferences());
-        if (useGrobid) {
-            dialogService.showCustomDialogAndWait(new ExtractBibtexDialogGrobid());
-        } else {
-            dialogService.showCustomDialogAndWait(new ExtractBibtexDialogOffline());
-        }
+        dialogService.showCustomDialogAndWait(new ExtractBibtexDialog(useGrobid));
     }
 }

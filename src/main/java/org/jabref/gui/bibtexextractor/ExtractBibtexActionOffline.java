@@ -17,6 +17,6 @@ public class ExtractBibtexActionOffline extends SimpleCommand {
 
     @Override
     public void execute() {
-        dialogService.showCustomDialogAndWait(new ExtractBibtexDialogOffline());
+        dialogService.showCustomDialogAndWait(new ExtractBibtexDialog(false));
     }
 }
