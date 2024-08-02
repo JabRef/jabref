@@ -125,7 +125,7 @@ public class AiChatComponent extends VBox {
 
     @FXML
     private void onClearChatHistory() {
-        boolean agreed = dialogService.showConfirmationDialogAndWait(Localization.lang("Clear chat history"), Localization.lang("Are you sure you want to clear the chat history with this entry?"));
+        boolean agreed = dialogService.showConfirmationDialogAndWait(Localization.lang("Clear chat history"), Localization.lang("Are you sure you want to clear the chat history of this entry?"));
 
         if (agreed) {
             chatVBox.getChildren().clear();
