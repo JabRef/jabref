@@ -2,8 +2,7 @@
 nav_order: 0032
 parent: Decision Records
 ---
-<!-- markdownlint-disable-next-line MD025 -->
-# Store chats alongside database
+# Store Chats Alongside Database
 
 ## Context and Problem Statement
 

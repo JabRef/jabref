@@ -3,7 +3,7 @@ nav_order: 0033
 parent: Decision Records
 ---
 
-# Store chats in MVStore
+# Store Chats in MVStore
 
 ## Context and Problem Statement
 

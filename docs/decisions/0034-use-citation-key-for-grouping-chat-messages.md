@@ -3,7 +3,7 @@ nav_order: 0034
 parent: Decision Records
 ---
 
-# Use citation key for grouping chat messages
+# Use Citation Key for Grouping Chat Messages
 
 ## Context and Problem Statement
 

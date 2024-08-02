@@ -3,7 +3,7 @@ nav_order: 0036
 parent: Decision Records
 ---
 
-# Use TextArea for chat message content
+# Use TextArea for Chat Message Content
 
 ## Context and Problem Statement
 

@@ -3,7 +3,7 @@ nav_order: 0035
 parent: Decision Records
 ---
 
-# Generate embeddings online
+# Generate Embeddings Online
 
 ## Context and Problem Statement
 
