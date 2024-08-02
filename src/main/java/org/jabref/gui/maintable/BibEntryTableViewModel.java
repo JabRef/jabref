@@ -39,11 +39,6 @@ import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
 
 public class BibEntryTableViewModel {
-
-    public static final int FIRST_RANK = 1;
-    public static final int SECOND_RANK = 2;
-    public static final int THIRD_RANK = 3;
-    public static final int FOURTH_RANK = 4;
     private final BibEntry entry;
     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
@@ -188,14 +183,14 @@ public class BibEntryTableViewModel {
     }
 
     public void updateSearchRank() {
-        int rank = FOURTH_RANK;
+        int rank = SearchRank.NOT_MATCHING_SEARCH_AND_GROUPS.getValue();
 
         if (isMatchedBySearch.get() && isMatchedByGroup.get()) {
-            rank = FIRST_RANK;
+            rank = SearchRank.MATCHING_SEARCH_AND_GROUPS.getValue();
         } else if (isMatchedBySearch.get()) {
-            rank = SECOND_RANK;
+            rank = SearchRank.MATCHING_SEARCH_NOT_GROUPS.getValue();
         } else if (isMatchedByGroup.get()) {
-            rank = THIRD_RANK;
+            rank = SearchRank.MATCHING_GROUPS_NOT_SEARCH.getValue();
         }
 
         searchRank.set(rank);

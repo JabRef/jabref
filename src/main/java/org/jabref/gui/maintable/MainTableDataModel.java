@@ -31,8 +31,6 @@ import org.jabref.preferences.PreferencesService;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 
-import static org.jabref.gui.maintable.BibEntryTableViewModel.FIRST_RANK;
-
 public class MainTableDataModel {
     private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final CustomFilteredList<BibEntryTableViewModel> entriesFiltered;
@@ -83,7 +81,7 @@ public class MainTableDataModel {
         selectedGroupsSubscription = EasyBind.listen(selectedGroupsProperty, (observable, oldValue, newValue) -> updateGroupMatches(newValue));
         groupViewModeSubscription = EasyBind.listen(preferencesService.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(selectedGroupsProperty.get()));
 
-        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRank().isEqualTo(FIRST_RANK).get())));
+        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_SEARCH_AND_GROUPS.getValue()).get())));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
