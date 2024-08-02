@@ -31,6 +31,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.Importer;
@@ -86,7 +89,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private CitaviExchangeData.ReferenceKeywords refKeywords;
     private CitaviExchangeData.ReferencePublishers refPublishers;
 
-    private Unmarshaller unmarshaller;
+    private XmlMapper mapper;
 
     public CitaviXmlImporter() {
         xmlInputFactory = XMLInputFactory.newFactory();
@@ -145,7 +148,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             } else {
                 return ParserResult.fromErrorMessage("File does not start with xml tag.");
             }
-        } catch (JAXBException | XMLStreamException e) {
+        } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
@@ -407,16 +410,14 @@ public class CitaviXmlImporter extends Importer implements Parser {
               .replaceAll(" +\n", "\n");
     }
 
-    private void initUnmarshaller() throws JAXBException {
-        if (unmarshaller == null) {
-            // Lazy init because this is expensive
-            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.citavi");
-            unmarshaller = context.createUnmarshaller();
-        }
+    private void initMapper() throws Exception {
+        // Lazy init because this is expensive     
+        mapper = new XMLMapper();
+        mapper.registerModule(JaxbAnnotationModule());
     }
 
-    private Object unmarshallRoot(BufferedReader reader) throws XMLStreamException, JAXBException {
-        initUnmarshaller();
+    private Object mapperRoot(BufferedReader reader) throws XMLStreamException, Exception {
+        initMapper();
 
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
 
@@ -425,7 +426,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             xmlStreamReader.next();
         }
 
-        return unmarshaller.unmarshal(xmlStreamReader);
+        return mapper.readValue(xmlStreamReader, Object.Class);
     }
 
     @Override
