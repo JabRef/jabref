@@ -75,7 +75,6 @@ public class AiService implements AutoCloseable {
         this.cachedThreadPool.shutdownNow();
         this.jabRefChatLanguageModel.close();
         this.embeddingModel.close();
-        this.bibDatabaseChatHistoryManager.close();
         this.mvStore.close();
     }
 
