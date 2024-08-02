@@ -12,7 +12,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
-- Added minimal support for [biblatex data annotation](https://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsection.3.7) fields in .layout files. [#11505](https://github.com/JabRef/jabref/issues/11505)
+- We added Tools > New library based on references in PDF file... to create a new library based on the references section in a PDF file. [#11522](https://github.com/JabRef/jabref/pull/11522)
+- When converting the references section of a paper (PDF file), more than the last page is treated. [#11522](https://github.com/JabRef/jabref/pull/11522)
+- Added minimal support for [biblatex data annotation](https://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsection.3.7) fields in `.layout` files. [#11505](https://github.com/JabRef/jabref/issues/11505)
 - Added saving of selected options in the [Lookup -> Search for unlinked local files dialog](https://docs.jabref.org/collect/findunlinkedfiles#link-the-pdfs-to-your-bib-library). [#11439](https://github.com/JabRef/jabref/issues/11439)
 
 ### Changed
@@ -20,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The Pubmed/Medline Plain importer now imports the PMID field as well [#11488](https://github.com/JabRef/jabref/issues/11488)
 - The 'Check for updates' menu bar button is now always enabled. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - JabRef respects the [configuration for storing files relative to the .bib file](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files) in more cases. [#11492](https://github.com/JabRef/jabref/pull/11492)
+- We enhanced the indexing speed. [#11502](https://github.com/JabRef/jabref/pull/11502)
 
 ### Fixed
 

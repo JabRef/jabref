@@ -29,7 +29,7 @@ class MainArchitectureTest {
 
     @ArchTest
     public void doNotUseApacheCommonsLang3(JavaClasses classes) {
-        noClasses().that().areNotAnnotatedWith(ApacheCommonsLang3Allowed.class)
+        noClasses().that().areNotAnnotatedWith(AllowedToUseApacheCommonsLang3.class)
                    .should().accessClassesThat().resideInAPackage("org.apache.commons.lang3")
                    .check(classes);
     }
