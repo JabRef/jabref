@@ -83,6 +83,7 @@ open module org.jabref {
     // http clients
     requires unirest.java.core;
     requires unirest.modules.gson;
+    requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
 
     // SQL databases
