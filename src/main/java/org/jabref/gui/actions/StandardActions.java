@@ -201,7 +201,7 @@ public enum StandardActions implements Action {
     GROUP_ENTRIES_ADD(Localization.lang("Add selected entries to this group")),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
 
-    REGENERATE_EMBEDDINGS_CACHE(Localization.lang("Regenerate embeddings cache"));
+    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache"));
 
     private String text;
     private final String description;

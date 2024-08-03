@@ -1,6 +1,5 @@
 package org.jabref.logic.ai;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -107,8 +106,7 @@ public class FileEmbeddingsManager {
         return hasIngestedDocuments(linkedFiles.stream().map(LinkedFile::getLink).toList());
     }
 
-    public void invalidate() {
-        Set<String> ingestedClone = new HashSet<>(getIngestedDocuments());
-        ingestedClone.forEach(this::removeDocument);
+    public void clearEmbeddingsFor(List<LinkedFile> linkedFiles) {
+        linkedFiles.stream().map(LinkedFile::getLink).forEach(this::removeDocument);
     }
 }

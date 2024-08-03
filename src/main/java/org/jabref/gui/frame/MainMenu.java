@@ -15,7 +15,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.ai.RegenerateEmbeddingsAction;
+import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
@@ -314,7 +314,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, frame::getCurrentLibraryTab, dialogService, preferencesService.getFilePreferences(), taskExecutor)),
-                factory.createMenuItem(StandardActions.REGENERATE_EMBEDDINGS_CACHE, new RegenerateEmbeddingsAction(stateManager, dialogService, aiService, taskExecutor)),
+                factory.createMenuItem(StandardActions.CLEAR_EMBEDDINGS_CACHE, new ClearEmbeddingsAction(stateManager, dialogService, aiService, taskExecutor)),
 
                 new SeparatorMenuItem(),
 
