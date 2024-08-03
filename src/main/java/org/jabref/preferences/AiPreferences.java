@@ -59,7 +59,7 @@ public class AiPreferences {
             ),
             AiProvider.MISTRAL_AI, Map.of(
                     "mistral-large-latest", 128000,
-                    "open-mistral-nemo", 1280000,
+                    "open-mistral-nemo", 128000,
                     "open-mistral-7b", 32000,
                     "open-mixtral-8x7b", 32000,
                     "open-mixtral-8x22b", 64000

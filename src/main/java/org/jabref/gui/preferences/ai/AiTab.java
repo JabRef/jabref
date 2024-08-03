@@ -104,26 +104,67 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         temperatureTextField.valueProperty().bindBidirectional(viewModel.temperatureProperty().asObject());
         temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        // bindBidirectional doesn't work with contextWindowSizeTextField. Thus, it is written manually..
+        // bindBidirectional doesn't work well with number input fields ({@link IntegerInputField}, {@link DoubleInputField}),
+        // so they are expanded into `addListener` calls.
+
         contextWindowSizeTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
-            viewModel.contextWindowSizeProperty().set(newValue);
+            viewModel.contextWindowSizeProperty().set(newValue == null ? 0 : newValue);
         });
+
         viewModel.contextWindowSizeProperty().addListener((observable, oldValue, newValue) -> {
-            contextWindowSizeTextField.valueProperty().set(newValue.intValue());
+            contextWindowSizeTextField.valueProperty().set(newValue == null ? 0 : newValue.intValue());
         });
+
+        temperatureTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.temperatureProperty().set(newValue == null ? 0 : newValue);
+        });
+
+        viewModel.temperatureProperty().addListener((observable, oldValue, newValue) -> {
+            temperatureTextField.valueProperty().set(newValue == null ? 0 : newValue.doubleValue());
+        });
+
+        temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         contextWindowSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        documentSplitterChunkSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterChunkSizeProperty().asObject());
+        documentSplitterChunkSizeTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.documentSplitterChunkSizeProperty().set(newValue == null ? 0 : newValue);
+        });
+
+        viewModel.documentSplitterChunkSizeProperty().addListener((observable, oldValue, newValue) -> {
+            documentSplitterChunkSizeTextField.valueProperty().set(newValue == null ? 0 : newValue.intValue());
+        });
+
         documentSplitterChunkSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        documentSplitterOverlapSizeTextField.valueProperty().bindBidirectional(viewModel.documentSplitterOverlapSizeProperty().asObject());
+        documentSplitterOverlapSizeTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.documentSplitterOverlapSizeProperty().set(newValue == null ? 0 : newValue);
+        });
+
+        viewModel.documentSplitterOverlapSizeProperty().addListener((observable, oldValue, newValue) -> {
+            documentSplitterOverlapSizeTextField.valueProperty().set(newValue == null ? 0 : newValue.intValue());
+        });
+
         documentSplitterOverlapSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        ragMaxResultsCountTextField.valueProperty().bindBidirectional(viewModel.ragMaxResultsCountProperty().asObject());
+        ragMaxResultsCountTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.ragMaxResultsCountProperty().set(newValue == null ? 0 : newValue);
+        });
+
+        viewModel.ragMaxResultsCountProperty().addListener((observable, oldValue, newValue) -> {
+            ragMaxResultsCountTextField.valueProperty().set(newValue == null ? 0 : newValue.intValue());
+        });
+
         ragMaxResultsCountTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        ragMinScoreTextField.valueProperty().bindBidirectional(viewModel.ragMinScoreProperty().asObject());
+        ragMinScoreTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.ragMinScoreProperty().set(newValue == null ? 0.0 : newValue);
+        });
+
+        viewModel.ragMinScoreProperty().addListener((observable, oldValue, newValue) -> {
+            ragMinScoreTextField.valueProperty().set(newValue == null ? 0.0 : newValue.doubleValue());
+        });
+
         ragMinScoreTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         Platform.runLater(() -> {

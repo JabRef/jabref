@@ -886,10 +886,10 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL);
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
         defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());
-        defaults.put(AI_API_BASE_URL, AiDefaultPreferences.API_BASE_URL);
+        defaults.put(AI_API_BASE_URL, AiPreferences.PROVIDERS_API_URLS.get(AiDefaultPreferences.PROVIDER));
         defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
         defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
-        defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
+        defaults.put(AI_CONTEXT_WINDOW_SIZE, AiPreferences.CONTEXT_WINDOW_SIZES.get(AiDefaultPreferences.PROVIDER).get(AiDefaultPreferences.CHAT_MODEL));
         defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);

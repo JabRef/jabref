@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.ai;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -209,14 +210,19 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetExpertSettings() {
-        aiPreferences.setApiBaseUrl(AiDefaultPreferences.API_BASE_URL);
-        apiBaseUrl.setValue(AiDefaultPreferences.API_BASE_URL);
+        String resetApiBaseUrl = AiPreferences.PROVIDERS_API_URLS.get(selectedAiProvider.get());
+        aiPreferences.setApiBaseUrl(resetApiBaseUrl);
+        apiBaseUrl.setValue(resetApiBaseUrl);
 
         aiPreferences.setInstruction(AiDefaultPreferences.SYSTEM_MESSAGE);
         instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
 
-        aiPreferences.setContextWindowSize(AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
-        contextWindowSize.set(AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
+        int resetContextWindowSize = Optional.ofNullable(AiPreferences.CONTEXT_WINDOW_SIZES.get(selectedAiProvider.get()).get(selectedChatModel.get())).orElse(0);
+        aiPreferences.setContextWindowSize(resetContextWindowSize);
+        contextWindowSize.set(resetContextWindowSize);
+
+        aiPreferences.setTemperature(AiDefaultPreferences.TEMPERATURE);
+        temperature.set(AiDefaultPreferences.TEMPERATURE);
 
         aiPreferences.setDocumentSplitterChunkSize(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
         documentSplitterChunkSize.set(AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
