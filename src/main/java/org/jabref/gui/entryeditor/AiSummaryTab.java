@@ -61,7 +61,7 @@ public class AiSummaryTab extends EntryEditorTab {
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
 
         setText(Localization.lang("AI summary"));
-        setTooltip(new Tooltip(Localization.lang("AI summary of full-text articles")));
+        setTooltip(new Tooltip(Localization.lang("AI-generated summary of attached files")));
 
         aiService.getSummariesStorage().registerListener(new SummarySetListener());
     }
@@ -199,7 +199,7 @@ public class AiSummaryTab extends EntryEditorTab {
         setContent(
                 ErrorStateComponent.withSpinner(
                         Localization.lang("Please wait"),
-                        Localization.lang("The full-text article is currently being processed by AI. Once completed, you will be able to see the summary.")
+                        Localization.lang("The attached files are currently being processed by AI. Once completed, you will be able to see the summary.")
                 )
         );
     }

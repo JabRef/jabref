@@ -16,7 +16,8 @@
             </Text>
             <TextFlow textAlignment="CENTER">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%API key is missing. Click" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%API key is missing." />
+                  <Text layoutX="40.0" layoutY="10.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%Click" />
                   <Hyperlink onAction="#onHereHyperlinkClick" style="-fx-padding: 0.166667em 0.25em 0.166667em 0.25em;" text="%here" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%to navigate to AI preferences" />
                </children>
