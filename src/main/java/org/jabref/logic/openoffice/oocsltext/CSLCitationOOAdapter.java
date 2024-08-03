@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice.oocsltext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,15 +71,56 @@ public class CSLCitationOOAdapter {
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
-        // Create a single reference mark for the entire in-text citation
-        ReferenceMark mark = markManager.createReferenceMark(entries.get(0), "InTextReferenceMark");
-        System.out.println(ooText);
-
-        // Insert the citation text wrapped in a reference mark
-        mark.insertReferenceIntoOO(doc, cursor, ooText);
+        // Insert the citation text with multiple reference marks
+        insertMultipleReferenceMarks(doc, cursor, entries, ooText);
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
+    }
+
+    private void insertMultipleReferenceMarks(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception {
+        String fullCitation = ooText.toString();
+
+        // Split the citation into parts
+        List<String> citationParts = splitCitation(fullCitation);
+
+        int lastEnd = 0;
+        for (int i = 0; i < Math.min(citationParts.size(), entries.size()); i++) {
+            String part = citationParts.get(i);
+            int start = fullCitation.indexOf(part, lastEnd);
+
+            // Insert text before the current part
+            if (start > lastEnd) {
+                String beforeText = fullCitation.substring(lastEnd, start);
+                OOText beforeOOText = OOFormat.setLocaleNone(OOText.fromString(beforeText));
+                OOTextIntoOO.write(doc, cursor, beforeOOText);
+            }
+
+            // Create and insert a reference mark for the current entry
+            BibEntry entry = entries.get(i);
+            ReferenceMark mark = markManager.createReferenceMark(entry, "InTextReferenceMark");
+            OOText partOOText = OOFormat.setLocaleNone(OOText.fromString(part));
+            mark.insertReferenceIntoOO(doc, cursor, partOOText);
+
+            lastEnd = start + part.length();
+        }
+
+        // Insert any remaining text after the last part
+        if (lastEnd < fullCitation.length()) {
+            String afterText = fullCitation.substring(lastEnd);
+            OOText afterOOText = OOFormat.setLocaleNone(OOText.fromString(afterText));
+            OOTextIntoOO.write(doc, cursor, afterOOText);
+        }
+    }
+
+    private List<String> splitCitation(String citation) {
+        List<String> parts = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\[\\d+\\]|\\([^)]+\\)|[^,;]+");
+        Matcher matcher = pattern.matcher(citation);
+        while (matcher.find()) {
+            parts.add(matcher.group());
+        }
+        return parts;
     }
 
     private String updateMultipleCitations(String citation, List<BibEntry> entries) {
