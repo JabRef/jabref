@@ -12,6 +12,7 @@ import javafx.beans.property.BooleanProperty;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.ai.embeddings.FileToDocument;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
@@ -28,7 +29,8 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     private final FilePreferences filePreferences;
     private final BooleanProperty shutdownProperty;
 
-    public GenerateEmbeddingsTask(List<LinkedFile> linkedFiles,
+    public GenerateEmbeddingsTask(String citationKey,
+                                  List<LinkedFile> linkedFiles,
                                   FileEmbeddingsManager fileEmbeddingsManager,
                                   BibDatabaseContext bibDatabaseContext,
                                   FilePreferences filePreferences,
@@ -38,11 +40,15 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         this.bibDatabaseContext = bibDatabaseContext;
         this.filePreferences = filePreferences;
         this.shutdownProperty = shutdownProperty;
+
+        showToUser(true);
+        titleProperty().set(Localization.lang("Generating embeddings for for %0", citationKey));
     }
 
     @Override
     protected Void call() throws Exception {
         linkedFiles.forEach(this::ingestLinkedFile);
+        showToUser(false);
         return null;
     }
 

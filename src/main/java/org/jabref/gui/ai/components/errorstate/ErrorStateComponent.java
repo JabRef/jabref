@@ -37,6 +37,7 @@ public class ErrorStateComponent extends BorderPane {
 
         TextArea textArea = new TextArea(textAreaContent);
         textArea.setEditable(false);
+        textArea.setWrapText(true);
 
         errorStateComponent.contentsVBox.getChildren().add(textArea);
 

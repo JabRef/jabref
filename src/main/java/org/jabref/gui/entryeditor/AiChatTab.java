@@ -195,11 +195,14 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void startIngesting(BibEntry entry) {
+        // This method should be called if entry is fully prepared for chatting.
+        assert entry.getCitationKey().isPresent();
+
         showErrorNotIngested();
 
         if (!entriesUnderIngestion.contains(entry)) {
             entriesUnderIngestion.add(entry);
-            new GenerateEmbeddingsTask(entry.getFiles(), aiService.getEmbeddingsManager(), bibDatabaseContext, filePreferences, new SimpleBooleanProperty(false))
+            new GenerateEmbeddingsTask(entry.getCitationKey().get(), entry.getFiles(), aiService.getEmbeddingsManager(), bibDatabaseContext, filePreferences, new SimpleBooleanProperty(false))
                     .onSuccess(res -> handleFocus())
                     .onFailure(this::showErrorWhileIngesting)
                     .executeWith(taskExecutor);

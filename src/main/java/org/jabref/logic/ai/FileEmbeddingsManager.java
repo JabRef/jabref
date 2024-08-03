@@ -50,8 +50,6 @@ public class FileEmbeddingsManager {
     }
 
     private void setupListeningToPreferencesChanges() {
-        // When these properties change, EmbeddingsGenerationTaskManager's should add the entries again.
-
         aiPreferences.onEmbeddingsParametersChange(embeddingStore::removeAll);
     }
 
