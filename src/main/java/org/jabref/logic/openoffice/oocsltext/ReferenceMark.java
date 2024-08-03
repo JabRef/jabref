@@ -28,8 +28,8 @@ public class ReferenceMark {
         }
     }
 
-    public void insertInText(XTextDocument doc, XTextCursor cursor, OOText ooText) throws Exception {
-        // To debug: mark doesn't wrap around text!??
+    public void insertReferenceIntoOO(XTextDocument doc, XTextCursor cursor, OOText ooText) throws Exception {
+        // TODO: Debug - mark doesn't wrap around text!??
 
         // Insert the text content at the cursor position
         OOTextIntoOO.write(doc, cursor, ooText);

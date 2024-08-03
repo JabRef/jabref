@@ -43,14 +43,12 @@ public class CSLCitationOOAdapter {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
 
-        // TODO: constructor injection for style
-
         List<String> citations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, bibEntryTypesManager);
 
         for (int i = 0; i < citations.size(); i++) {
             BibEntry entry = entries.get(i);
             String citation = citations.get(i);
-            insertCitation(doc, cursor, entry, citation);
+            writeCitation(doc, cursor, entry, citation);
         }
     }
 
@@ -63,11 +61,11 @@ public class CSLCitationOOAdapter {
         String inTextCitation = CitationStyleGenerator.generateInText(entries, style, format, bibDatabaseContext, bibEntryTypesManager).getText();
 
         for (BibEntry entry : entries) {
-            insertCitation(doc, cursor, entry, inTextCitation);
+            writeCitation(doc, cursor, entry, inTextCitation);
         }
     }
 
-    private void insertCitation(XTextDocument doc, XTextCursor cursor, BibEntry entry, String citation) throws Exception {
+    private void writeCitation(XTextDocument doc, XTextCursor cursor, BibEntry entry, String citation) throws Exception {
         String citationKey = entry.getCitationKey().orElse("");
         int currentNumber = markManager.getCitationNumber(citationKey);
 
@@ -81,7 +79,7 @@ public class CSLCitationOOAdapter {
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
         // Insert the citation text wrapped in a reference mark
-        mark.insertInText(doc, cursor, ooText);
+        mark.insertReferenceIntoOO(doc, cursor, ooText);
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
