@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -55,9 +56,6 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,9 +137,12 @@ public class CitaviXmlImporter extends Importer implements Parser {
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
-            Object unmarshalledObject = unmarshallRoot(reader);
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
-            if (unmarshalledObject instanceof CitaviExchangeData data) {
+            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(reader);
+
+            if (xmlReader instanceof CitaviExchangeData data) {
                 List<BibEntry> bibEntries = parseDataList(data);
 
                 return new ParserResult(bibEntries);
@@ -411,9 +412,9 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private void initMapper() throws Exception {
-        // Lazy init because this is expensive     
-        mapper = new XMLMapper();
-        mapper.registerModule(JaxbAnnotationModule());
+        // Lazy init because this is expensive
+        mapper = new XmlMapper();
+        mapper.registerModule(new JaxbAnnotationModule());
     }
 
     private Object mapperRoot(BufferedReader reader) throws XMLStreamException, Exception {
@@ -426,7 +427,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             xmlStreamReader.next();
         }
 
-        return mapper.readValue(xmlStreamReader, Object.Class);
+        return mapper.readValue(xmlStreamReader, Object.class);
     }
 
     @Override
