@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.NoSuchElementException;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
@@ -135,12 +136,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
-            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-
-            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(reader);
-
-            if (xmlReader instanceof CitaviExchangeData data) {
+            if (mapperRoot(reader) instanceof CitaviExchangeData data) {
                 List<BibEntry> bibEntries = parseDataList(data);
 
                 return new ParserResult(bibEntries);
@@ -415,17 +411,24 @@ public class CitaviXmlImporter extends Importer implements Parser {
         mapper.registerModule(new JaxbAnnotationModule());
     }
 
-    private Object mapperRoot(BufferedReader reader) throws XMLStreamException, Exception {
-        initMapper();
+    private Object mapperRoot(BufferedReader reader) throws XMLStreamException {
+        Objects.requireNonNull(reader);
 
-        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
+        try {
+            initMapper();
 
-        // Go to the root element
-        while (!xmlStreamReader.isStartElement()) {
-            xmlStreamReader.next();
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
+
+            // Go to the root element
+            while (!xmlStreamReader.isStartElement()) {
+                xmlStreamReader.next();
+            }
+
+            return mapper.readValue(xmlStreamReader, Object.class);
+        } catch(Exception e) {
+            LOGGER.debug("could not read document");
+            return ParserResult.fromError(e);
         }
-
-        return mapper.readValue(xmlStreamReader, Object.class);
     }
 
     @Override
