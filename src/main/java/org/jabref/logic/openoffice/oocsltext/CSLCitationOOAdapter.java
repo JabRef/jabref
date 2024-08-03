@@ -79,38 +79,18 @@ public class CSLCitationOOAdapter {
     }
 
     private void insertMultipleReferenceMarks(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception {
-        String fullCitation = ooText.toString();
+        // Insert the entire citation text as-is
+        OOTextIntoOO.write(doc, cursor, ooText);
 
-        // Split the citation into parts
-        List<String> citationParts = splitCitation(fullCitation);
-
-        int lastEnd = 0;
-        for (int i = 0; i < Math.min(citationParts.size(), entries.size()); i++) {
-            String part = citationParts.get(i);
-            int start = fullCitation.indexOf(part, lastEnd);
-
-            // Insert text before the current part
-            if (start > lastEnd) {
-                String beforeText = fullCitation.substring(lastEnd, start);
-                OOText beforeOOText = OOFormat.setLocaleNone(OOText.fromString(beforeText));
-                OOTextIntoOO.write(doc, cursor, beforeOOText);
-            }
-
-            // Create and insert a reference mark for the current entry
-            BibEntry entry = entries.get(i);
+        // Insert reference marks for each entry after the citation
+        for (BibEntry entry : entries) {
             ReferenceMark mark = markManager.createReferenceMark(entry, "InTextReferenceMark");
-            OOText partOOText = OOFormat.setLocaleNone(OOText.fromString(part));
-            mark.insertReferenceIntoOO(doc, cursor, partOOText);
-
-            lastEnd = start + part.length();
+            OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
+            mark.insertReferenceIntoOO(doc, cursor, emptyOOText);
         }
 
-        // Insert any remaining text after the last part
-        if (lastEnd < fullCitation.length()) {
-            String afterText = fullCitation.substring(lastEnd);
-            OOText afterOOText = OOFormat.setLocaleNone(OOText.fromString(afterText));
-            OOTextIntoOO.write(doc, cursor, afterOOText);
-        }
+        // Move the cursor to the end of the inserted text
+        cursor.collapseToEnd();
     }
 
     private List<String> splitCitation(String citation) {
