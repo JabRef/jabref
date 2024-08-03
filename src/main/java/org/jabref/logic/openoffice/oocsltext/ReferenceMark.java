@@ -30,10 +30,8 @@ public class ReferenceMark {
     }
 
     public void insertInText(XTextDocument doc, XTextCursor cursor, OOText ooText) throws WrappedTargetException, CreationException {
-        // First, insert the text content (ReferenceMark) at the cursor position
-        cursor.getText().insertTextContent(cursor, textContent, true);
 
-        // Then, insert the formatted text inside the ReferenceMark
+        cursor.getText().insertTextContent(cursor, textContent, true);
         XTextCursor markCursor = textContent.getAnchor().getText().createTextCursorByRange(textContent.getAnchor());
         OOTextIntoOO.write(doc, markCursor, ooText);
     }
