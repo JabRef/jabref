@@ -23,7 +23,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import java.util.NoSuchElementException;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
