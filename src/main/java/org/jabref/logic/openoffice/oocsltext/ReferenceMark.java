@@ -2,13 +2,12 @@ package org.jabref.logic.openoffice.oocsltext;
 
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
-import org.jabref.model.openoffice.uno.CreationException;
 
 import com.sun.star.container.XNamed;
-import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.text.XTextRange;
 import com.sun.star.uno.UnoRuntime;
 
 public class ReferenceMark {
@@ -29,11 +28,20 @@ public class ReferenceMark {
         }
     }
 
-    public void insertInText(XTextDocument doc, XTextCursor cursor, OOText ooText) throws WrappedTargetException, CreationException {
+    public void insertInText(XTextDocument doc, XTextCursor cursor, OOText ooText) throws Exception {
+        // To debug: mark doesn't wrap around text!??
 
-        cursor.getText().insertTextContent(cursor, textContent, true);
-        XTextCursor markCursor = textContent.getAnchor().getText().createTextCursorByRange(textContent.getAnchor());
-        OOTextIntoOO.write(doc, markCursor, ooText);
+        // Insert the text content at the cursor position
+        OOTextIntoOO.write(doc, cursor, ooText);
+
+        // Create a text range covering the just-inserted text
+        XTextRange start = cursor.getStart();
+        XTextRange end = cursor.getEnd();
+        cursor.gotoRange(start, false);
+        cursor.gotoRange(end, true);
+
+        // Attach the reference mark to this range
+        textContent.attach(cursor);
     }
 
     public String getName() {

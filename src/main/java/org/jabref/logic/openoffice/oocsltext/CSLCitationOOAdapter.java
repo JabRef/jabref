@@ -80,7 +80,10 @@ public class CSLCitationOOAdapter {
         }
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
+        // Insert the citation text wrapped in a reference mark
         mark.insertInText(doc, cursor, ooText);
+
+        // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
     }
 

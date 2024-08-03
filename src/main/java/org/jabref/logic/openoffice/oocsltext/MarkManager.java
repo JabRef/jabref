@@ -3,6 +3,8 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -12,7 +14,6 @@ import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XReferenceMarksSupplier;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.UnoRuntime;
-import org.tinylog.Logger;
 
 public class MarkManager {
     private final HashMap<String, ReferenceMark> marksByName;
@@ -20,7 +21,6 @@ public class MarkManager {
     private final IdentityHashMap<ReferenceMark, Integer> idsByMark;
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
-    private int lastUsedCitationNumber = 0;
     private HashMap<String, Integer> citationKeyToNumber;
     private int highestCitationNumber = 0;
 
@@ -41,7 +41,19 @@ public class MarkManager {
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
                 ReferenceMark mark = new ReferenceMark(document, named, name);
                 addMark(mark);
+                updateCitationInfo(name);
             }
+        }
+    }
+
+    private void updateCitationInfo(String name) {
+        Pattern pattern = Pattern.compile("JABREF_(.+) RND(\\d+)"); // Format: JABREF_{citationKey} RND{citationNumber}
+        Matcher matcher = pattern.matcher(name);
+        if (matcher.find()) {
+            String citationKey = matcher.group(1);
+            int citationNumber = Integer.parseInt(matcher.group(2));
+            citationKeyToNumber.put(citationKey, citationNumber);
+            highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
         }
     }
 
@@ -50,21 +62,6 @@ public class MarkManager {
         idsByMark.put(mark, marksByID.size());
         marksByID.add(mark);
         updateCitationInfo(mark.getName());
-    }
-
-    private void updateCitationInfo(String name) {
-        String[] parts = name.split(" ");
-        if (parts.length >= 3) {
-            String citationKey = parts[1];
-            try {
-                int citationNumber = Integer.parseInt(parts[parts.length - 1]);
-                citationKeyToNumber.put(citationKey, citationNumber);
-                highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
-            } catch (NumberFormatException e) {
-                Logger.warn("WHat", e);
-                // Ignore if we can't parse the number
-            }
-        }
     }
 
     public int getCitationNumber(String citationKey) {
@@ -87,25 +84,5 @@ public class MarkManager {
         addMark(referenceMark);
 
         return referenceMark;
-    }
-
-    public int getHighestCitationNumber() {
-        return highestCitationNumber;
-    }
-
-    public void setHighestCitationNumber(int number) {
-        this.highestCitationNumber = number;
-    }
-
-    public ReferenceMark getMarkByName(String name) {
-        return marksByName.get(name);
-    }
-
-    public ReferenceMark getMarkByID(int id) {
-        return marksByID.get(id);
-    }
-
-    public int getIDForMark(ReferenceMark mark) {
-        return idsByMark.get(mark);
     }
 }
