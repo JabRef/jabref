@@ -43,6 +43,7 @@ import org.jabref.model.openoffice.uno.UnoUndo;
 import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyVetoException;
@@ -835,9 +836,8 @@ public class OOBibBase {
      * @param style     Style.
      */
     public void guiActionUpdateDocument(List<BibDatabase> databases, OOStyle style) {
+        final String errorTitle = Localization.lang("Unable to synchronize bibliography");
         if (style instanceof JStyle jStyle) {
-            final String errorTitle = Localization.lang("Unable to synchronize bibliography");
-
             try {
 
                 OOResult<XTextDocument, OOError> odoc = getXTextDocument();
@@ -885,24 +885,17 @@ public class OOBibBase {
                             unresolvedKeys.getFirst());
                     dialogService.showErrorDialogAndWait(errorTitle, msg);
                 }
-            } catch (
-                    NoDocumentException ex) {
+            } catch (NoDocumentException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            } catch (
-                    DisposedException ex) {
+            } catch (DisposedException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            } catch (
-                    CreationException
-                    |
-                    WrappedTargetException
-                    |
-                    com.sun.star.lang.IllegalArgumentException ex) {
+            } catch (CreationException
+                    | WrappedTargetException
+                    | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not update bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         } else if (style instanceof CitationStyle citationStyle) {
-            final String errorTitle = Localization.lang("Unable to synchronize bibliography");
-
             try {
                 OOResult<XTextDocument, OOError> odoc = getXTextDocument();
                 if (testDialog(errorTitle, odoc.asVoidResult())) {
@@ -949,30 +942,31 @@ public class OOBibBase {
                     bibliographyCursor.gotoEnd(false);
 
                     // Insert bibliography title
-                    String bibliographyTitle = Localization.lang("Bibliography");
-                    bibliographyCursor.setString(bibliographyTitle + "\n");
+                    String bibliographyTitle = Localization.lang("References");
+                    bibliographyCursor.setString("\n");
 
-                    // Apply formatting to the title (e.g., make it bold and larger)
+                    // Apply formatting to the title (here, we make it bold and larger)
                     XTextRange titleRange = bibliographyCursor.getStart();
                     titleRange.setString(bibliographyTitle);
                     XPropertySet titleProps = UnoRuntime.queryInterface(XPropertySet.class, titleRange);
                     titleProps.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
-                    titleProps.setPropertyValue("CharHeight", 16f); // Adjust the size as needed
+                    titleProps.setPropertyValue("CharHeight", 16f);
 
-                    // Move cursor to the next line for bibliography entries
+                    // Move cursor to prevent reference mark bleed-out (current implementation) TODO: Remove once bleed-out is fixed
                     bibliographyCursor.goRight((short) 1, false);
 
                     // Insert bibliography entries
-                    BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(databases.get(0)); // Assuming the first database is the main one
-                    BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager(); // You might need to inject this
+                    // BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(databases.getFirst());
+                    // TODO: Ask Chris if injecting database context is a good idea
+                    BibDatabaseContext bibDatabaseContext = Injector.instantiateModelOrService(BibDatabaseContext.class);
+                    BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
 
                     adapter.insertBibliography(doc, bibliographyCursor, citationStyle, citedEntries, bibDatabaseContext, bibEntryTypesManager);
                 } finally {
                     UnoUndo.leaveUndoContext(doc);
                     fcursor.get().restore(doc);
                 }
-            } catch (
-                    Exception ex) {
+            } catch (Exception ex) {
                 LOGGER.warn("Could not create bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
