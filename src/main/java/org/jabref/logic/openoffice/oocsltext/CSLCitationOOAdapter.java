@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Random;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,7 +17,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
-import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.uno.CreationException;
 
 import com.sun.star.lang.WrappedTargetException;
@@ -32,10 +30,18 @@ import org.xml.sax.InputSource;
 
 public class CSLCitationOOAdapter {
 
+    public static final String[] PREFIXES = {"JABREF_", "CSL_"};
+    public static final int REFMARK_ADD_CHARS = 8;
+
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
     private final List<BibEntry> citedEntries = new ArrayList<>();
     private int lastCitationNumber = 0;
     private boolean isNumericStyle = false;
+    private MarkManager markManager;
+
+    public CSLCitationOOAdapter(XTextDocument doc) throws Exception {
+        this.markManager = new MarkManager(doc);
+    }
 
     public void insertBibliography(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws IllegalArgumentException, WrappedTargetException, CreationException {
@@ -44,12 +50,11 @@ public class CSLCitationOOAdapter {
         isNumericStyle = checkIfNumericStyle(style);
 
         List<String> citations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, bibEntryTypesManager);
-        if (isNumericStyle) {
-            citations = updateCitationNumbers(citations, entries);
-        }
 
-        for (String citation : citations) {
-            writeCitation(doc, cursor, citation);
+        for (int i = 0; i < citations.size(); i++) {
+            BibEntry entry = entries.get(i);
+            String citation = citations.get(i);
+            insertCitation(doc, cursor, entry, citation);
         }
     }
 
@@ -57,59 +62,41 @@ public class CSLCitationOOAdapter {
             throws IOException, WrappedTargetException, CreationException {
 
         String style = selectedStyle.getSource();
+        isNumericStyle = checkIfNumericStyle(style);
 
         String inTextCitation = CitationStyleGenerator.generateInText(entries, style, format, bibDatabaseContext, bibEntryTypesManager).getText();
-        if (isNumericStyle) {
-            inTextCitation = updateCitationNumbers(List.of(inTextCitation), entries).getFirst();
-        }
 
-        writeCitation(doc, cursor, inTextCitation);
+        for (BibEntry entry : entries) {
+            insertCitation(doc, cursor, entry, inTextCitation);
+        }
     }
 
-    private List<String> updateCitationNumbers(List<String> citations, List<BibEntry> entries) {
-        List<String> updatedCitations = new ArrayList<>();
-        for (int i = 0; i < citations.size(); i++) {
-            updatedCitations.add(updateSingleCitation(citations.get(i), entries));
-        }
-        return updatedCitations;
-    }
+    private void insertCitation(XTextDocument doc, XTextCursor cursor, BibEntry entry, String citation) throws WrappedTargetException, CreationException {
+        try {
+            ReferenceMark mark = markManager.createReferenceMark(entry, "ReferenceMark");
 
-    private String updateSingleCitation(String citation, List<BibEntry> entries) {
-        Pattern pattern = Pattern.compile("(\\[?)(\\d+)(\\]?)(\\.)?(\\s*)");
-        Matcher matcher = pattern.matcher(citation);
-        StringBuilder sb = new StringBuilder();
-
-        while (matcher.find()) {
-            try {
-                int index = Integer.parseInt(matcher.group(2)) - 1;
-                if (index >= 0 && index < entries.size()) {
-                    BibEntry currentEntry = entries.get(index);
-                    if (!citedEntries.contains(currentEntry)) {
-                        lastCitationNumber++;
-                        citedEntries.add(currentEntry);
-                    }
-                    int currentNumber = citedEntries.indexOf(currentEntry) + 1;
-
-                    String prefix = matcher.group(1);
-                    String suffix = matcher.group(3);
-                    String dot = matcher.group(4) != null ? "." : "";
-                    String space = matcher.group(5);
-
-                    String replacement = prefix + currentNumber + suffix + dot + space;
-                    matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-                } else {
-                    // If the index is out of bounds, append the original match
-                    matcher.appendReplacement(sb, matcher.group());
-                }
-            } catch (NumberFormatException e) {
-                // If parsing fails, append the original match
-                matcher.appendReplacement(sb, matcher.group());
-                Logger.warn("Failed to parse citation number: " + matcher.group(2));
+            if (!citedEntries.contains(entry)) {
+                lastCitationNumber++;
+                citedEntries.add(entry);
             }
-        }
-        matcher.appendTail(sb);
+            int currentNumber = citedEntries.indexOf(entry) + 1;
 
-        return sb.toString();
+            if (isNumericStyle) {
+                citation = updateCitationNumber(citation, currentNumber);
+            }
+
+            String formattedCitation = transformHtml(citation);
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+
+            mark.insertInText(doc, cursor, ooText);
+            cursor.collapseToEnd();
+        } catch (Exception e) {
+            Logger.error("Error inserting citation", e);
+        }
+    }
+
+    private String updateCitationNumber(String citation, int currentNumber) {
+        return citation.replaceFirst("\\d+", String.valueOf(currentNumber));
     }
 
     private boolean checkIfNumericStyle(String styleXml) {
@@ -130,48 +117,27 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    private void writeCitation(XTextDocument doc, XTextCursor cursor, String citation) throws WrappedTargetException, CreationException {
-        String formattedCitation = transformHtml(citation);
-        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-        OOTextIntoOO.write(doc, cursor, ooText);
-        cursor.collapseToEnd();
-    }
-
-    /**
-     * Transforms provided HTML into a format that can be fully parsed by OOTextIntoOO.write(...)
-     * The transformed HTML can be used for inserting into a LibreOffice document
-     * Context: The HTML produced by CitationStyleGenerator.generateCitation(...) is not directly (completely) parsable by OOTextIntoOO.write(...)
-     * For more details, read the documentation of the write(...) method in the {@link OOTextIntoOO} class.
-     * Additional information: <a href="https://devdocs.jabref.org/code-howtos/openoffice/code-reorganization.html">...</a>.
-     *
-     * @param html The HTML string to be transformed into OO-write ready HTML.
-     */
     private String transformHtml(String html) {
-        // Initial clean up of escaped characters
         html = StringEscapeUtils.unescapeHtml4(html);
-
-        // Handle margins (spaces between citation number and text)
         html = html.replaceAll("<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>", "$1 $2");
-
-        // Remove unsupported tags
         html = html.replaceAll("<div[^>]*>", "");
         html = html.replace("</div>", "");
-
-        // Remove unsupported links
         html = html.replaceAll("<a[^>]*>", "");
         html = html.replace("</a>", "");
-
-        // Replace span tags with inline styles for bold
         html = html.replaceAll("<span style=\"font-weight: ?bold;?\">(.*?)</span>", "<b>$1</b>");
-
-        // Replace span tags with inline styles for italic
         html = html.replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
-
         html = html.replaceAll("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>", "<smallcaps>$1</smallcaps>");
-
-        // Clean up any remaining span tags
         html = html.replaceAll("</?span[^>]*>", "");
-
         return html;
+    }
+
+    public static String getRandomString(int len) {
+        String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        Random rnd = new Random();
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 }

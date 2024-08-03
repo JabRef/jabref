@@ -1,6 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +72,7 @@ class OOBibBase {
 
     private final OOBibBaseConnect connection;
 
-    private final CSLCitationOOAdapter cslCitationOOAdapter;
+    private CSLCitationOOAdapter cslCitationOOAdapter;
 
     public OOBibBase(Path loPath, DialogService dialogService)
             throws
@@ -85,8 +84,6 @@ class OOBibBase {
 
         this.refreshBibliographyDuringSyncWhenCiting = false;
         this.alwaysAddCitedOnPages = false;
-
-        cslCitationOOAdapter = new CSLCitationOOAdapter();
     }
 
     public void guiActionSelectDocument(boolean autoSelectForSingle) {
@@ -593,6 +590,7 @@ class OOBibBase {
         try {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (style instanceof CitationStyle citationStyle) {
+                CSLCitationOOAdapter adapter = getOrCreateCSLCitationOOAdapter(doc);
                 // Handle insertion of CSL Style citations
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     cslCitationOOAdapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
@@ -618,12 +616,8 @@ class OOBibBase {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-        } catch (CreationException
-                 | WrappedTargetException
-                 | IOException
-                 | PropertyVetoException
-                 | IllegalTypeException
-                 | NotRemoveableException ex) {
+        } catch (
+                Exception ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } finally {
@@ -878,5 +872,12 @@ class OOBibBase {
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         }
+    }
+
+    private CSLCitationOOAdapter getOrCreateCSLCitationOOAdapter(XTextDocument doc) throws Exception {
+        if (cslCitationOOAdapter == null) {
+            cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
+        }
+        return cslCitationOOAdapter;
     }
 }
