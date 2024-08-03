@@ -1,13 +1,9 @@
 package org.jabref.logic.openoffice.oocsltext;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
@@ -17,16 +13,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
-import org.jabref.model.openoffice.uno.CreationException;
 
-import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import org.apache.commons.text.StringEscapeUtils;
-import org.tinylog.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 
 public class CSLCitationOOAdapter {
 
@@ -34,20 +24,22 @@ public class CSLCitationOOAdapter {
     public static final int REFMARK_ADD_CHARS = 8;
 
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
-    private final List<BibEntry> citedEntries = new ArrayList<>();
-    private int lastCitationNumber = 0;
-    private boolean isNumericStyle = false;
+    private final XTextDocument document;
     private MarkManager markManager;
 
     public CSLCitationOOAdapter(XTextDocument doc) throws Exception {
+        this.document = doc;
         this.markManager = new MarkManager(doc);
     }
 
+    public void readExistingMarks() throws Exception {
+        markManager.readExistingMarks();
+    }
+
     public void insertBibliography(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws IllegalArgumentException, WrappedTargetException, CreationException {
+            throws Exception {
 
         String style = selectedStyle.getSource();
-        isNumericStyle = checkIfNumericStyle(style);
 
         List<String> citations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, bibEntryTypesManager);
 
@@ -59,10 +51,9 @@ public class CSLCitationOOAdapter {
     }
 
     public void insertInText(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws IOException, WrappedTargetException, CreationException {
+            throws Exception {
 
         String style = selectedStyle.getSource();
-        isNumericStyle = checkIfNumericStyle(style);
 
         String inTextCitation = CitationStyleGenerator.generateInText(entries, style, format, bibDatabaseContext, bibEntryTypesManager).getText();
 
@@ -71,50 +62,41 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    private void insertCitation(XTextDocument doc, XTextCursor cursor, BibEntry entry, String citation) throws WrappedTargetException, CreationException {
-        try {
-            ReferenceMark mark = markManager.createReferenceMark(entry, "ReferenceMark");
+    private void insertCitation(XTextDocument doc, XTextCursor cursor, BibEntry entry, String citation) throws Exception {
+        String citationKey = entry.getCitationKey().orElse("");
+        int currentNumber = markManager.getCitationNumber(citationKey);
 
-            if (!citedEntries.contains(entry)) {
-                lastCitationNumber++;
-                citedEntries.add(entry);
-            }
-            int currentNumber = citedEntries.indexOf(entry) + 1;
+        ReferenceMark mark = markManager.createReferenceMark(entry, "ReferenceMark");
 
-            if (isNumericStyle) {
-                citation = updateCitationNumber(citation, currentNumber);
-            }
+        String formattedCitation = updateSingleCitation(transformHtml(citation), currentNumber);
+        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
-            String formattedCitation = transformHtml(citation);
-            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-
-            mark.insertInText(doc, cursor, ooText);
-            cursor.collapseToEnd();
-        } catch (Exception e) {
-            Logger.error("Error inserting citation", e);
-        }
+        mark.insertInText(doc, cursor, ooText);
+        cursor.collapseToEnd();
     }
 
-    private String updateCitationNumber(String citation, int currentNumber) {
-        return citation.replaceFirst("\\d+", String.valueOf(currentNumber));
-    }
+    private String updateSingleCitation(String citation, int currentNumber) {
+        Pattern pattern = Pattern.compile("(\\[?)(\\d+)(\\]?)(\\.)?(\\s*)");
+        Matcher matcher = pattern.matcher(citation);
+        StringBuilder sb = new StringBuilder();
+        boolean numberReplaced = false;
 
-    private boolean checkIfNumericStyle(String styleXml) {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(new InputSource(new StringReader(styleXml)));
-
-            Element styleElement = doc.getDocumentElement();
-            Element infoElement = (Element) styleElement.getElementsByTagName("info").item(0);
-            Element categoryElement = (Element) infoElement.getElementsByTagName("category").item(0);
-
-            String citationFormat = categoryElement.getAttribute("citation-format");
-            return "numeric".equals(citationFormat);
-        } catch (Exception e) {
-            Logger.error("Error parsing CSL style XML", e);
-            return false;
+        while (matcher.find()) {
+            if (!numberReplaced) {
+                String prefix = matcher.group(1);
+                String suffix = matcher.group(3);
+                String dot = matcher.group(4) != null ? "." : "";
+                String space = matcher.group(5);
+                String replacement = prefix + currentNumber + suffix + dot + space;
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+                numberReplaced = true;
+            } else {
+                // If we've already replaced the number, keep any subsequent numbers as they are
+                matcher.appendReplacement(sb, matcher.group());
+            }
         }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     private String transformHtml(String html) {

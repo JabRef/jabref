@@ -6,8 +6,10 @@ import java.util.IdentityHashMap;
 
 import org.jabref.model.entry.BibEntry;
 
+import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
 import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.text.XReferenceMarksSupplier;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.UnoRuntime;
 
@@ -17,6 +19,9 @@ public class MarkManager {
     private final IdentityHashMap<ReferenceMark, Integer> idsByMark;
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
+    private int lastUsedCitationNumber = 0;
+    private HashMap<String, Integer> citationKeyToNumber; // Add this line
+    private int highestCitationNumber = 0;
 
     public MarkManager(XTextDocument document) throws Exception {
         this.document = document;
@@ -24,64 +29,81 @@ public class MarkManager {
         this.marksByName = new HashMap<>();
         this.marksByID = new ArrayList<>();
         this.idsByMark = new IdentityHashMap<>();
+        this.citationKeyToNumber = new HashMap<>();
     }
 
-    public void renameMark(String oldName, String newName) {
-        ReferenceMark mark = marksByName.remove(oldName);
-        if (mark != null) {
-            marksByName.put(newName, mark);
-        }
-    }
-
-    public int getIDForMark(ReferenceMark mark) {
-        return idsByMark.getOrDefault(mark, -1);
-    }
-
-    public ReferenceMark getMarkForID(int id) {
-        return (id >= 0 && id < marksByID.size()) ? marksByID.get(id) : null;
-    }
-
-    public ReferenceMark getMark(Object mark, String fieldType) {
-        if (mark == null) {
-            return null;
-        }
-
-        XNamed named = UnoRuntime.queryInterface(XNamed.class, mark);
-        String name = named.getName();
-
-        ReferenceMark referenceMark = marksByName.get(name);
-        if (referenceMark != null) {
-            return referenceMark;
-        }
-
-        for (String prefix : CSLCitationOOAdapter.PREFIXES) {
-            if (name.contains(prefix)) {
-                try {
-                    referenceMark = new ReferenceMark(document, named, name);
-                    marksByName.put(name, referenceMark);
-                    idsByMark.put(referenceMark, marksByID.size());
-                    marksByID.add(referenceMark);
-                    return referenceMark;
-                } catch (IllegalArgumentException e) {
-                    // Ignore and continue
-                }
+    public void readExistingMarks() throws Exception {
+        XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
+        XNameAccess marks = supplier.getReferenceMarks();
+        for (String name : marks.getElementNames()) {
+            if (name.startsWith(CSLCitationOOAdapter.PREFIXES[0])) {
+                XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
+                ReferenceMark mark = new ReferenceMark(document, named, name);
+                addMark(mark);
             }
         }
+    }
 
-        return null;
+    public void addMark(ReferenceMark mark) {
+        marksByName.put(mark.getName(), mark);
+        idsByMark.put(mark, marksByID.size());
+        marksByID.add(mark);
+        updateCitationInfo(mark.getName());
+    }
+
+    private void updateCitationInfo(String name) {
+        String[] parts = name.split(" ");
+        if (parts.length >= 3) {
+            String citationKey = parts[1];
+            try {
+                int citationNumber = Integer.parseInt(parts[parts.length - 1]);
+                citationKeyToNumber.put(citationKey, citationNumber);
+                highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
+            } catch (NumberFormatException e) {
+                // Ignore if we can't parse the number
+            }
+        }
+    }
+
+    public int getCitationNumber(String citationKey) {
+        return citationKeyToNumber.computeIfAbsent(citationKey, k -> {
+            highestCitationNumber++;
+            return highestCitationNumber;
+        });
     }
 
     public ReferenceMark createReferenceMark(BibEntry entry, String fieldType) throws Exception {
-        String name = CSLCitationOOAdapter.PREFIXES[0] + entry.getCitationKey().orElse("") + " RND" + CSLCitationOOAdapter.getRandomString(CSLCitationOOAdapter.REFMARK_ADD_CHARS);
+        String citationKey = entry.getCitationKey().orElse("");
+        int citationNumber = getCitationNumber(citationKey);
+
+        String name = CSLCitationOOAdapter.PREFIXES[0] + citationKey + " RND" + citationNumber;
         Object mark = factory.createInstance("com.sun.star.text.ReferenceMark");
         XNamed named = UnoRuntime.queryInterface(XNamed.class, mark);
         named.setName(name);
 
         ReferenceMark referenceMark = new ReferenceMark(document, named, name);
-        marksByName.put(name, referenceMark);
-        idsByMark.put(referenceMark, marksByID.size());
-        marksByID.add(referenceMark);
+        addMark(referenceMark);
 
         return referenceMark;
+    }
+
+    public int getHighestCitationNumber() {
+        return highestCitationNumber;
+    }
+
+    public void setHighestCitationNumber(int number) {
+        this.highestCitationNumber = number;
+    }
+
+    public ReferenceMark getMarkByName(String name) {
+        return marksByName.get(name);
+    }
+
+    public ReferenceMark getMarkByID(int id) {
+        return marksByID.get(id);
+    }
+
+    public int getIDForMark(ReferenceMark mark) {
+        return idsByMark.get(mark);
     }
 }

@@ -16,12 +16,17 @@ public class ReferenceMark {
     private final XNamed named;
     private final String name;
     private XTextContent textContent;
+    private String citationKey;
 
     public ReferenceMark(XTextDocument document, XNamed named, String name) {
         this.document = document;
         this.named = named;
         this.name = name;
         this.textContent = UnoRuntime.queryInterface(XTextContent.class, named);
+        String[] parts = name.split(" ");
+        if (parts.length >= 2) {
+            this.citationKey = parts[1];
+        }
     }
 
     public void insertInText(XTextDocument doc, XTextCursor cursor, OOText ooText) throws WrappedTargetException, CreationException {
@@ -39,5 +44,9 @@ public class ReferenceMark {
 
     public XTextContent getTextContent() {
         return textContent;
+    }
+
+    public String getCitationKey() {
+        return citationKey;
     }
 }
