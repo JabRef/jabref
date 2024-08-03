@@ -120,17 +120,12 @@ public class OOBibBase {
             initializeCitationAdapter(this.getXTextDocument().get());
             dialogService.notify(Localization.lang("Connected to document") + ": "
                     + this.getCurrentDocumentTitle().orElse(""));
-        }
-
-        if (this.isConnectedToDocument()) {
             try {
                 this.cslCitationOOAdapter = new CSLCitationOOAdapter(this.getXTextDocument().get());
                 this.cslCitationOOAdapter.readExistingMarks();
             } catch (Exception e) {
                 LOGGER.error("Error initializing CSLCitationOOAdapter", e);
             }
-            dialogService.notify(Localization.lang("Connected to document") + ": "
-                    + this.getCurrentDocumentTitle().orElse(""));
         }
     }
 

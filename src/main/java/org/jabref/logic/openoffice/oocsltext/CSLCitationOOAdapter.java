@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +53,7 @@ public class CSLCitationOOAdapter {
         for (int i = 0; i < citations.size(); i++) {
             BibEntry entry = entries.get(i);
             String citation = citations.get(i);
-            insertCitation(doc, cursor, entry, citation);
+            writeCitation(doc, cursor, entry, citation);
         }
     }
 
@@ -62,15 +63,70 @@ public class CSLCitationOOAdapter {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
 
-        entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
+        // Generate a single in-text citation for all entries
         String inTextCitation = CitationStyleGenerator.generateInText(entries, style, format, bibDatabaseContext, bibEntryTypesManager).getText();
 
-        for (BibEntry entry : entries) {
-            insertCitation(doc, cursor, entry, inTextCitation);
+        String formattedCitation = transformHtml(inTextCitation);
+        System.out.println(formattedCitation);
+
+        if (isNumericStyle) {
+            formattedCitation = updateMultipleCitations(formattedCitation, entries);
         }
+
+        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+
+        // Insert the citation text with multiple reference marks
+        insertMultipleReferenceMarks(doc, cursor, entries, ooText);
+
+        // Move the cursor to the end of the inserted text
+        cursor.collapseToEnd();
     }
 
-    private void insertCitation(XTextDocument doc, XTextCursor cursor, BibEntry entry, String citation) throws Exception {
+    private void insertMultipleReferenceMarks(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception {
+        // Insert the entire citation text as-is
+        OOTextIntoOO.write(doc, cursor, ooText);
+
+        // Insert reference marks for each entry after the citation
+        for (BibEntry entry : entries) {
+            ReferenceMark mark = markManager.createReferenceMark(entry, "InTextReferenceMark");
+            OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
+            mark.insertReferenceIntoOO(doc, cursor, emptyOOText);
+        }
+
+        // Move the cursor to the end of the inserted text
+        cursor.collapseToEnd();
+    }
+
+    private List<String> splitCitation(String citation) {
+        List<String> parts = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\[\\d+\\]|\\([^)]+\\)|[^,;]+");
+        Matcher matcher = pattern.matcher(citation);
+        while (matcher.find()) {
+            parts.add(matcher.group());
+        }
+        return parts;
+    }
+
+    private String updateMultipleCitations(String citation, List<BibEntry> entries) {
+        Pattern pattern = Pattern.compile("(\\D*)(\\d+)(\\D*)");
+        Matcher matcher = pattern.matcher(citation);
+        StringBuilder sb = new StringBuilder();
+        int entryIndex = 0;
+
+        while (matcher.find() && entryIndex < entries.size()) {
+            String prefix = matcher.group(1);
+            String suffix = matcher.group(3);
+
+            int currentNumber = markManager.getCitationNumber(entries.get(entryIndex).getCitationKey().orElse(""));
+
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(prefix + currentNumber + suffix));
+            entryIndex++;
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
+    private void writeCitation(XTextDocument doc, XTextCursor cursor, BibEntry entry, String citation) throws Exception {
         String citationKey = entry.getCitationKey().orElse("");
         int currentNumber = markManager.getCitationNumber(citationKey);
 
@@ -84,7 +140,7 @@ public class CSLCitationOOAdapter {
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
         // Insert the citation text wrapped in a reference mark
-        mark.insertInText(doc, cursor, ooText);
+        mark.insertReferenceIntoOO(doc, cursor, ooText);
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
