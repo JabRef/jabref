@@ -76,7 +76,7 @@ public class CSLCitationOOAdapter {
     }
 
     private String updateSingleCitation(String citation, int currentNumber) {
-        // This pattern now accounts for [1], (1), 1., and 1
+
         Pattern pattern = Pattern.compile("(\\[|\\()?(\\d+)(\\]|\\))?(\\.)?\\s*");
         Matcher matcher = pattern.matcher(citation);
         StringBuilder sb = new StringBuilder();
@@ -88,7 +88,6 @@ public class CSLCitationOOAdapter {
                 String suffix = matcher.group(3) != null ? matcher.group(3) : "";
                 String dot = matcher.group(4) != null ? "." : "";
 
-                // Ensure we maintain the original format (brackets, parentheses, or neither)
                 String replacement;
                 if (prefix.isEmpty() && suffix.isEmpty()) {
                     replacement = currentNumber + dot + " ";
