@@ -165,6 +165,7 @@ open module org.jabref {
     requires mslinks;
 
     requires dd.plist;
+    requires scala.library;
 
     // endregion
 }

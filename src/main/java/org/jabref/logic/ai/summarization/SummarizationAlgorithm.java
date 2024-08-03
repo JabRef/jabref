@@ -1,9 +1,12 @@
 package org.jabref.logic.ai.summarization;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
@@ -43,19 +46,28 @@ public class SummarizationAlgorithm {
     private static final int MAX_OVERLAP_SIZE_IN_CHARS = 100;
     private static final int CHAR_TOKEN_FACTOR = 4; // Means, every token is roughly 4 characters.
 
-    public static String summarize(ChatLanguageModel chatLanguageModel, int contextWindowSize, String content) {
+    public static String summarize(ReadOnlyBooleanProperty shutdownProperty, ChatLanguageModel chatLanguageModel, int contextWindowSize, String content) throws InterruptedException {
         DocumentSplitter documentSplitter = DocumentSplitters.recursive(contextWindowSize - MAX_OVERLAP_SIZE_IN_CHARS * 2 - estimateTokenCount(CHUNK_PROMPT_TEMPLATE), MAX_OVERLAP_SIZE_IN_CHARS);
 
-        List<String> chunkSummaries;
+        List<String> chunkSummaries = documentSplitter.split(new Document(content)).stream().map(TextSegment::text).toList();
 
         do {
-            chunkSummaries = documentSplitter.split(new Document(content)).stream().map(TextSegment::text).map(doc -> {
+            List<String> list = new ArrayList<>();
+
+            for (String chunkSummary : chunkSummaries) {
+                if (shutdownProperty.get()) {
+                    throw new InterruptedException();
+                }
+
                 // Be careful, langchain really requires that it should be a map of strings to objects.
                 // Source: dev.langchain4j.model.input.PromptTemplate.apply(java.util.Map<java.lang.String,java.lang.Object>)
-                Prompt prompt = CHUNK_PROMPT_TEMPLATE.apply(Collections.singletonMap("document", content));
+                Prompt prompt = CHUNK_PROMPT_TEMPLATE.apply(Collections.singletonMap("document", chunkSummary));
 
-                return chatLanguageModel.generate(prompt.toString());
-            }).toList();
+                String document = chatLanguageModel.generate(prompt.toString());
+                list.add(document);
+            }
+
+            chunkSummaries = list;
         } while (estimateTokenCount(chunkSummaries) > contextWindowSize - estimateTokenCount(COMBINE_PROMPT_TEMPLATE));
 
         if (chunkSummaries.size() == 1) {
@@ -67,8 +79,8 @@ public class SummarizationAlgorithm {
         return chatLanguageModel.generate(prompt.toString());
     }
 
-    public static String summarize(ChatLanguageModel chatLanguageModel, int contextWindowSize, Stream<String> chunks) {
-        return summarize(chatLanguageModel, contextWindowSize, chunks.collect(Collectors.joining("\n\n")));
+    public static String summarize(ReadOnlyBooleanProperty shutdownProperty, ChatLanguageModel chatLanguageModel, int contextWindowSize, Stream<String> chunks) throws InterruptedException {
+        return summarize(shutdownProperty, chatLanguageModel, contextWindowSize, chunks.collect(Collectors.joining("\n\n")));
     }
 
     private static int estimateTokenCount(List<String> chunkSummaries) {

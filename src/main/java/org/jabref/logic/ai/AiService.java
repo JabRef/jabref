@@ -5,6 +5,10 @@ import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
@@ -31,6 +35,12 @@ public class AiService implements AutoCloseable {
     private static final String AI_SERVICE_MVSTORE_FILE_NAME = "ai.mv";
 
     private final AiPreferences aiPreferences;
+
+    // This field is used to shut down AI-related background tasks.
+    // If a background task processes a big document and has a loop, then the task should check the status
+    // of this property for being true. If it's true, then it should abort the cycle.
+    private final BooleanProperty shutdownSignal = new SimpleBooleanProperty(false);
+
     private final ExecutorService cachedThreadPool = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("ai-retrieval-pool-%d").build()
     );
@@ -66,12 +76,14 @@ public class AiService implements AutoCloseable {
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
         this.bibDatabaseChatHistoryManager = new BibDatabaseChatHistoryManager(mvStore);
         this.embeddingModel = new EmbeddingModel(aiPreferences, dialogService, taskExecutor);
-        this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, embeddingModel, mvStore);
+        this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, shutdownSignal, embeddingModel, mvStore);
         this.summariesStorage = new SummariesStorage(mvStore);
     }
 
     @Override
     public void close() {
+        shutdownSignal.set(true);
+
         this.cachedThreadPool.shutdownNow();
         this.jabRefChatLanguageModel.close();
         this.embeddingModel.close();
@@ -104,5 +116,9 @@ public class AiService implements AutoCloseable {
 
     public SummariesStorage getSummariesStorage() {
         return summariesStorage;
+    }
+
+    public ReadOnlyBooleanProperty getShutdownSignal() {
+        return shutdownSignal;
     }
 }

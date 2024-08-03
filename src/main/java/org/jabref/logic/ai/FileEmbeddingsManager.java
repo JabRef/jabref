@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyListProperty;
 
 import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.embeddings.LowLevelIngestor;
@@ -35,13 +37,16 @@ public class FileEmbeddingsManager {
     public static final String LINK_METADATA_KEY = "link";
 
     private final AiPreferences aiPreferences;
+    private final ReadOnlyBooleanProperty shutdownProperty;
 
     private final MVStoreEmbeddingStore embeddingStore;
     private final FullyIngestedDocumentsTracker fullyIngestedDocumentsTracker;
     private final LowLevelIngestor lowLevelIngestor;
 
-    public FileEmbeddingsManager(AiPreferences aiPreferences, EmbeddingModel embeddingModel, MVStore mvStore) {
+    public FileEmbeddingsManager(AiPreferences aiPreferences, ReadOnlyBooleanProperty shutdownProperty, EmbeddingModel embeddingModel, MVStore mvStore) {
         this.aiPreferences = aiPreferences;
+        this.shutdownProperty = shutdownProperty;
+
         this.embeddingStore = new MVStoreEmbeddingStore(mvStore);
         this.fullyIngestedDocumentsTracker = new FullyIngestedDocumentsTracker(mvStore);
         this.lowLevelIngestor = new LowLevelIngestor(aiPreferences, embeddingStore, embeddingModel);
@@ -53,20 +58,11 @@ public class FileEmbeddingsManager {
         aiPreferences.onEmbeddingsParametersChange(embeddingStore::removeAll);
     }
 
-    /**
-     * Add document to embedding store. At the end of addition, mark document as ingested.
-     * This method does not check if document was already ingested.
-     *
-     * @param link - path of the Document or any string that uniquely identifies the document.
-     * @param document - document to add.
-     * @param modificationTimeInSeconds - modification time in seconds of the document.
-     * @param stopProperty - in case you want to stop ingestion process, set this property to true.
-     */
-    public void addDocument(String link, Document document, long modificationTimeInSeconds, BooleanProperty stopProperty) {
+    public void addDocument(String link, Document document, long modificationTimeInSeconds) throws InterruptedException {
         document.metadata().put(LINK_METADATA_KEY, link);
-        lowLevelIngestor.ingestDocument(document, stopProperty);
+        lowLevelIngestor.ingestDocument(document, shutdownProperty);
 
-        if (!stopProperty.get()) {
+        if (!shutdownProperty.get()) {
             fullyIngestedDocumentsTracker.markDocumentAsFullyIngested(link, modificationTimeInSeconds);
         }
     }

@@ -1,12 +1,14 @@
 package org.jabref.logic.ai.summarization;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.embeddings.FileToDocument;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
@@ -34,25 +36,44 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
         this.linkedFiles = linkedFiles;
         this.aiService = aiService;
         this.filePreferences = filePreferences;
+
+        titleProperty().set(Localization.lang("Generating summary for for %0", citationKey));
     }
 
     @Override
     protected Void call() throws Exception {
-        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-            LOGGER.error("No summary can be generated for entry as the database doesn't have path");
-            return null;
+        showToUser(true);
+
+        try {
+            summarizeAll();
+        } catch (InterruptedException e) {
+            LOGGER.info("There was a summarization task for {}. It will be canceled, because user quits JabRef", citationKey);
         }
 
-        List<String> linkedFilesSummary = linkedFiles
-                .stream()
-                .map(this::generateSummary)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
+        showToUser(false);
+
+        return null;
+    }
+
+    private void summarizeAll() throws InterruptedException {
+        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
+            LOGGER.error("No summary can be generated for entry as the database doesn't have path");
+            return;
+        }
+
+        // Stream API would look better here, but we need to catch InterruptedException.
+        List<String> linkedFilesSummary = new ArrayList<>();
+        for (LinkedFile linkedFile : linkedFiles) {
+            Optional<String> s = generateSummary(linkedFile);
+            if (s.isPresent()) {
+                String string = s.get();
+                linkedFilesSummary.add(string);
+            }
+        }
 
         if (linkedFilesSummary.isEmpty()) {
             LOGGER.error("No summary can be generated for entry");
-            return null;
+            return;
         }
 
         String finalSummary;
@@ -60,15 +81,13 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
         if (linkedFilesSummary.size() == 1) {
             finalSummary = linkedFilesSummary.getFirst();
         } else {
-            finalSummary = SummarizationAlgorithm.summarize(aiService.getChatLanguageModel(), aiService.getPreferences().getContextWindowSize(), linkedFilesSummary.stream());
+            finalSummary = SummarizationAlgorithm.summarize(aiService.getShutdownSignal(), aiService.getChatLanguageModel(), aiService.getPreferences().getContextWindowSize(), linkedFilesSummary.stream());
         }
 
         aiService.getSummariesStorage().set(bibDatabaseContext.getDatabasePath().get(), citationKey, finalSummary);
-
-        return null;
     }
 
-    private Optional<String> generateSummary(LinkedFile linkedFile) {
+    private Optional<String> generateSummary(LinkedFile linkedFile) throws InterruptedException {
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
 
         if (path.isEmpty()) {
@@ -83,7 +102,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
             return Optional.empty();
         }
 
-        String linkedFileSummary = SummarizationAlgorithm.summarize(aiService.getChatLanguageModel(), aiService.getPreferences().getContextWindowSize(), document.get().text());
+        String linkedFileSummary = SummarizationAlgorithm.summarize(aiService.getShutdownSignal(), aiService.getChatLanguageModel(), aiService.getPreferences().getContextWindowSize(), document.get().text());
 
         return Optional.of(linkedFileSummary);
     }

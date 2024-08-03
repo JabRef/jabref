@@ -17,42 +17,54 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
+import dev.langchain4j.data.document.Document;
+import org.apache.lucene.util.ThreadInterruptedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Int;
 
 public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsTask.class);
 
+    private final String citationKey;
     private final List<LinkedFile> linkedFiles;
     private final FileEmbeddingsManager fileEmbeddingsManager;
     private final BibDatabaseContext bibDatabaseContext;
     private final FilePreferences filePreferences;
-    private final BooleanProperty shutdownProperty;
 
     public GenerateEmbeddingsTask(String citationKey,
                                   List<LinkedFile> linkedFiles,
                                   FileEmbeddingsManager fileEmbeddingsManager,
                                   BibDatabaseContext bibDatabaseContext,
-                                  FilePreferences filePreferences,
-                                  BooleanProperty shutdownProperty) {
+                                  FilePreferences filePreferences) {
+        this.citationKey = citationKey;
         this.linkedFiles = linkedFiles;
         this.fileEmbeddingsManager = fileEmbeddingsManager;
         this.bibDatabaseContext = bibDatabaseContext;
         this.filePreferences = filePreferences;
-        this.shutdownProperty = shutdownProperty;
 
-        showToUser(true);
         titleProperty().set(Localization.lang("Generating embeddings for for %0", citationKey));
     }
 
     @Override
     protected Void call() throws Exception {
-        linkedFiles.forEach(this::ingestLinkedFile);
+        showToUser(true);
+
+        try {
+            // forEach() method would look better here, but we need to catch the {@link InterruptedException}.
+            for (LinkedFile linkedFile : linkedFiles) {
+                ingestLinkedFile(linkedFile);
+            }
+        } catch (InterruptedException e) {
+            LOGGER.info("There is a embeddings generation task for {}. It will be cancelled, because user quits JabRef", citationKey);
+        }
+
         showToUser(false);
+
         return null;
     }
 
-    private void ingestLinkedFile(LinkedFile linkedFile) {
+    private void ingestLinkedFile(LinkedFile linkedFile) throws InterruptedException {
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
 
         if (path.isEmpty()) {
@@ -71,14 +83,18 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
                 return;
             }
 
-            FileToDocument.fromFile(path.get()).ifPresent(document ->
-                    fileEmbeddingsManager.addDocument(linkedFile.getLink(), document, currentModificationTimeInSeconds, shutdownProperty));
+            Optional<Document> document = FileToDocument.fromFile(path.get());
+            if (document.isPresent()) {
+                fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), currentModificationTimeInSeconds);
+            }
         } catch (IOException e) {
             LOGGER.error("Couldn't retrieve attributes of a linked file: {}", linkedFile.getLink(), e);
             LOGGER.warn("Regenerating embeddings for linked file: {}", linkedFile.getLink());
 
-            FileToDocument.fromFile(path.get()).ifPresent(document ->
-                    fileEmbeddingsManager.addDocument(linkedFile.getLink(), document, 0, shutdownProperty));
+            Optional<Document> document = FileToDocument.fromFile(path.get());
+            if (document.isPresent()) {
+                fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), 0);
+            }
         }
     }
 }
