@@ -63,9 +63,15 @@ public class OOBibBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBase.class);
 
     private final DialogService dialogService;
+
+    // After inserting a citation, if ooPrefs.getSyncWhenCiting() returns true, shall we also update the bibliography?
     private final boolean refreshBibliographyDuringSyncWhenCiting;
+
+    // Shall we add "Cited on pages: ..." to resolved bibliography entries?
     private final boolean alwaysAddCitedOnPages;
+
     private final OOBibBaseConnect connection;
+
     private CSLCitationOOAdapter cslCitationOOAdapter;
 
     public OOBibBase(Path loPath, DialogService dialogService)
@@ -75,6 +81,7 @@ public class OOBibBase {
 
         this.dialogService = dialogService;
         this.connection = new OOBibBaseConnect(loPath, dialogService);
+
         this.refreshBibliographyDuringSyncWhenCiting = false;
         this.alwaysAddCitedOnPages = false;
     }
@@ -92,6 +99,7 @@ public class OOBibBase {
         final String errorTitle = Localization.lang("Problem connecting");
 
         try {
+
             this.connection.selectDocument(autoSelectForSingle);
         } catch (NoDocumentFoundException ex) {
             OOError.from(ex).showErrorDialog(dialogService);
@@ -567,6 +575,9 @@ public class OOBibBase {
             }
         }
 
+        /*
+         * For sync we need a FunctionalTextViewCursor.
+         */
         OOResult<FunctionalTextViewCursor, OOError> fcursor = null;
         if (syncOptions.isPresent()) {
             fcursor = getFunctionalTextViewCursor(doc, errorTitle);
@@ -587,8 +598,10 @@ public class OOBibBase {
         }
 
         try {
+
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (style instanceof CitationStyle citationStyle) {
+                // Handle insertion of CSL Style citations
                 CSLCitationOOAdapter adapter = getOrCreateCSLCitationOOAdapter(doc);
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     adapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
@@ -596,6 +609,7 @@ public class OOBibBase {
                     adapter.insertBibliography(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 }
             } else if (style instanceof JStyle jStyle) {
+                // Handle insertion of JStyle citations
                 EditInsert.insertCitationGroup(doc,
                         frontend.get(),
                         cursor.get(),

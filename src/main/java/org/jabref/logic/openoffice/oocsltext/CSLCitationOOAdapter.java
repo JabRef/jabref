@@ -1,7 +1,6 @@
 package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.List;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,7 +12,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
+import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+import org.jabref.model.openoffice.uno.CreationException;
 
+import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import org.apache.commons.text.StringEscapeUtils;
@@ -37,7 +39,7 @@ public class CSLCitationOOAdapter {
     }
 
     public void insertBibliography(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws Exception {
+            throws IllegalArgumentException {
 
         String style = selectedStyle.getSource();
 
@@ -99,27 +101,41 @@ public class CSLCitationOOAdapter {
         return sb.toString();
     }
 
+    /**
+     * Transforms provided HTML into a format that can be fully parsed by OOTextIntoOO.write(...)
+     * The transformed HTML can be used for inserting into a LibreOffice document
+     * Context: The HTML produced by CitationStyleGenerator.generateCitation(...) is not directly (completely) parsable by OOTextIntoOO.write(...)
+     * For more details, read the documentation of the write(...) method in the {@link OOTextIntoOO} class.
+     * Additional information: <a href="https://devdocs.jabref.org/code-howtos/openoffice/code-reorganization.html">...</a>.
+     *
+     * @param html The HTML string to be transformed into OO-write ready HTML.
+     */
     private String transformHtml(String html) {
+        // Initial clean up of escaped characters
         html = StringEscapeUtils.unescapeHtml4(html);
+
+        // Handle margins (spaces between citation number and text)
         html = html.replaceAll("<div class=\"csl-left-margin\">(.*?)</div><div class=\"csl-right-inline\">(.*?)</div>", "$1 $2");
+
+        // Remove unsupported tags
         html = html.replaceAll("<div[^>]*>", "");
         html = html.replace("</div>", "");
+
+        // Remove unsupported links
         html = html.replaceAll("<a[^>]*>", "");
         html = html.replace("</a>", "");
-        html = html.replaceAll("<span style=\"font-weight: ?bold;?\">(.*?)</span>", "<b>$1</b>");
-        html = html.replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
-        html = html.replaceAll("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>", "<smallcaps>$1</smallcaps>");
-        html = html.replaceAll("</?span[^>]*>", "");
-        return html;
-    }
 
-    public static String getRandomString(int len) {
-        String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        Random rnd = new Random();
-        StringBuilder sb = new StringBuilder(len);
-        for (int i = 0; i < len; i++) {
-            sb.append(chars.charAt(rnd.nextInt(chars.length())));
-        }
-        return sb.toString();
+        // Replace span tags with inline styles for bold
+        html = html.replaceAll("<span style=\"font-weight: ?bold;?\">(.*?)</span>", "<b>$1</b>");
+
+        // Replace span tags with inline styles for italic
+        html = html.replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
+
+        html = html.replaceAll("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>", "<smallcaps>$1</smallcaps>");
+
+        // Clean up any remaining span tags
+        html = html.replaceAll("</?span[^>]*>", "");
+
+        return html;
     }
 }
