@@ -39,7 +39,7 @@ public class CSLCitationOOAdapter {
     }
 
     public void insertBibliography(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws IllegalArgumentException {
+            throws Exception {
 
         String style = selectedStyle.getSource();
 
