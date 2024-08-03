@@ -102,40 +102,41 @@ public class CSLCitationOOAdapter {
 
             String citationFormat = categoryElement.getAttribute("citation-format");
             return "numeric".equals(citationFormat);
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             Logger.error("Error parsing CSL style XML", e);
             return false;
         }
     }
 
     private String updateSingleCitation(String citation, int currentNumber) {
-            Pattern pattern = Pattern.compile("(\\[|\\()?(\\d+)(\\]|\\))?(\\.)?\\s*");
-            Matcher matcher = pattern.matcher(citation);
-            StringBuilder sb = new StringBuilder();
-            boolean numberReplaced = false;
+        Pattern pattern = Pattern.compile("(\\[|\\()?(\\d+)(\\]|\\))?(\\.)?\\s*");
+        Matcher matcher = pattern.matcher(citation);
+        StringBuilder sb = new StringBuilder();
+        boolean numberReplaced = false;
 
-            while (matcher.find()) {
-                if (!numberReplaced) {
-                    String prefix = matcher.group(1) != null ? matcher.group(1) : "";
-                    String suffix = matcher.group(3) != null ? matcher.group(3) : "";
-                    String dot = matcher.group(4) != null ? "." : "";
+        while (matcher.find()) {
+            if (!numberReplaced) {
+                String prefix = matcher.group(1) != null ? matcher.group(1) : "";
+                String suffix = matcher.group(3) != null ? matcher.group(3) : "";
+                String dot = matcher.group(4) != null ? "." : "";
 
-                    String replacement;
-                    if (prefix.isEmpty() && suffix.isEmpty()) {
-                        replacement = currentNumber + dot + " ";
-                    } else {
-                        replacement = prefix + currentNumber + suffix + dot + " ";
-                    }
-
-                    matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-                    numberReplaced = true;
+                String replacement;
+                if (prefix.isEmpty() && suffix.isEmpty()) {
+                    replacement = currentNumber + dot + " ";
                 } else {
-                    // If we've already replaced the number, keep any subsequent numbers as they are
-                    matcher.appendReplacement(sb, matcher.group());
+                    replacement = prefix + currentNumber + suffix + dot + " ";
                 }
+
+                matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+                numberReplaced = true;
+            } else {
+                // If we've already replaced the number, keep any subsequent numbers as they are
+                matcher.appendReplacement(sb, matcher.group());
             }
-            matcher.appendTail(sb);
-            return sb.toString();
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     /**
