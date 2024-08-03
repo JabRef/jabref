@@ -1,12 +1,8 @@
 package org.jabref.logic.openoffice.oocsltext;
 
-import java.io.StringReader;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
@@ -21,10 +17,6 @@ import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import org.apache.commons.text.StringEscapeUtils;
-import org.tinylog.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 
 public class CSLCitationOOAdapter {
 
@@ -49,7 +41,9 @@ public class CSLCitationOOAdapter {
             throws Exception {
 
         String style = selectedStyle.getSource();
-        isNumericStyle = checkIfNumericStyle(style);
+        isNumericStyle = selectedStyle.isNumericStyle();
+
+        // TODO: constructor injection for style
 
         List<String> citations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, bibEntryTypesManager);
 
@@ -64,7 +58,7 @@ public class CSLCitationOOAdapter {
             throws Exception {
 
         String style = selectedStyle.getSource();
-        isNumericStyle = checkIfNumericStyle(style);
+        isNumericStyle = selectedStyle.isNumericStyle();
 
         String inTextCitation = CitationStyleGenerator.generateInText(entries, style, format, bibDatabaseContext, bibEntryTypesManager).getText();
 
@@ -88,25 +82,6 @@ public class CSLCitationOOAdapter {
 
         mark.insertInText(doc, cursor, ooText);
         cursor.collapseToEnd();
-    }
-
-    private boolean checkIfNumericStyle(String styleXml) {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(new InputSource(new StringReader(styleXml)));
-
-            Element styleElement = doc.getDocumentElement();
-            Element infoElement = (Element) styleElement.getElementsByTagName("info").item(0);
-            Element categoryElement = (Element) infoElement.getElementsByTagName("category").item(0);
-
-            String citationFormat = categoryElement.getAttribute("citation-format");
-            return "numeric".equals(citationFormat);
-        } catch (
-                Exception e) {
-            Logger.error("Error parsing CSL style XML", e);
-            return false;
-        }
     }
 
     private String updateSingleCitation(String citation, int currentNumber) {

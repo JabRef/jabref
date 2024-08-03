@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -236,5 +237,24 @@ public class CitationStyle implements OOStyle {
     @Override
     public String getPath() {
         return getFilePath();
+    }
+
+    public boolean isNumericStyle() {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new InputSource(new StringReader(source)));
+
+            Element styleElement = doc.getDocumentElement();
+            Element infoElement = (Element) styleElement.getElementsByTagName("info").item(0);
+            Element categoryElement = (Element) infoElement.getElementsByTagName("category").item(0);
+
+            String citationFormat = categoryElement.getAttribute("citation-format");
+            return "numeric".equals(citationFormat);
+        } catch (
+                Exception e) {
+            org.tinylog.Logger.error("Error parsing CSL style XML", e);
+            return false;
+        }
     }
 }
