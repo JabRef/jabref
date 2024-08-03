@@ -49,14 +49,11 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-<<<<<<< HEAD
-=======
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
->>>>>>> 8a0edc251fa3158bd478810105cfeeda4854e6f7
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

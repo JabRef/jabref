@@ -126,8 +126,6 @@ repositories {
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://oss.sonatype.org/content/groups/public' }
-
-    // Required for one.jpro.jproutils:tree-showing
     maven { url 'https://sandec.jfrog.io/artifactory/repo' }
 }
 
