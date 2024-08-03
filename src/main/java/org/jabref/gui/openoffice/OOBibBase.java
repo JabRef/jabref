@@ -46,12 +46,15 @@ import org.jabref.model.openoffice.util.OOVoidResult;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyVetoException;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.text.XTextRange;
+import com.sun.star.uno.UnoRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -882,14 +885,95 @@ public class OOBibBase {
                             unresolvedKeys.getFirst());
                     dialogService.showErrorDialogAndWait(errorTitle, msg);
                 }
-            } catch (NoDocumentException ex) {
+            } catch (
+                    NoDocumentException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            } catch (DisposedException ex) {
+            } catch (
+                    DisposedException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-            } catch (CreationException
-                     | WrappedTargetException
-                     | com.sun.star.lang.IllegalArgumentException ex) {
+            } catch (
+                    CreationException
+                    |
+                    WrappedTargetException
+                    |
+                    com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not update bibliography", ex);
+                OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
+            }
+        } else if (style instanceof CitationStyle citationStyle) {
+            final String errorTitle = Localization.lang("Unable to synchronize bibliography");
+
+            try {
+                OOResult<XTextDocument, OOError> odoc = getXTextDocument();
+                if (testDialog(errorTitle, odoc.asVoidResult())) {
+                    return;
+                }
+
+                XTextDocument doc = odoc.get();
+
+                OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
+
+                if (testDialog(errorTitle,
+                        fcursor.asVoidResult(),
+                        checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    return;
+                }
+
+                try {
+                    UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
+
+                    CSLCitationOOAdapter adapter = new CSLCitationOOAdapter(doc);
+                    adapter.readExistingMarks();
+
+                    // Collect only cited entries from all databases
+                    List<BibEntry> citedEntries = new ArrayList<>();
+                    for (BibDatabase database : databases) {
+                        for (BibEntry entry : database.getEntries()) {
+                            if (adapter.isCitedEntry(entry)) {
+                                citedEntries.add(entry);
+                            }
+                        }
+                    }
+
+                    // If no entries are cited, show a message and return
+                    if (citedEntries.isEmpty()) {
+                        dialogService.showInformationDialogAndWait(
+                                Localization.lang("Bibliography"),
+                                Localization.lang("No cited entries found in the document.")
+                        );
+                        return;
+                    }
+
+                    // Create a new cursor at the end of the document for bibliography insertion
+                    XTextCursor bibliographyCursor = doc.getText().createTextCursor();
+                    bibliographyCursor.gotoEnd(false);
+
+                    // Insert bibliography title
+                    String bibliographyTitle = Localization.lang("Bibliography");
+                    bibliographyCursor.setString(bibliographyTitle + "\n");
+
+                    // Apply formatting to the title (e.g., make it bold and larger)
+                    XTextRange titleRange = bibliographyCursor.getStart();
+                    titleRange.setString(bibliographyTitle);
+                    XPropertySet titleProps = UnoRuntime.queryInterface(XPropertySet.class, titleRange);
+                    titleProps.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
+                    titleProps.setPropertyValue("CharHeight", 16f); // Adjust the size as needed
+
+                    // Move cursor to the next line for bibliography entries
+                    bibliographyCursor.goRight((short) 1, false);
+
+                    // Insert bibliography entries
+                    BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(databases.get(0)); // Assuming the first database is the main one
+                    BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager(); // You might need to inject this
+
+                    adapter.insertBibliography(doc, bibliographyCursor, citationStyle, citedEntries, bibDatabaseContext, bibEntryTypesManager);
+                } finally {
+                    UnoUndo.leaveUndoContext(doc);
+                    fcursor.get().restore(doc);
+                }
+            } catch (
+                    Exception ex) {
+                LOGGER.warn("Could not create bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         }

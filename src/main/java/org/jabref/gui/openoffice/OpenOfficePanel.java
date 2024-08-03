@@ -229,7 +229,7 @@ public class OpenOfficePanel {
         pushEntriesAdvanced.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_INTEXT, true));
         pushEntriesAdvanced.setMaxWidth(Double.MAX_VALUE);
 
-        update.setTooltip(new Tooltip(Localization.lang("Ensure that the bibliography is up-to-date")));
+        update.setTooltip(new Tooltip(Localization.lang("Make or update the bibliography")));
 
         update.setOnAction(event -> {
             String title = Localization.lang("Could not update bibliography");

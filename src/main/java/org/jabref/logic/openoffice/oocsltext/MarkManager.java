@@ -85,4 +85,8 @@ public class MarkManager {
 
         return referenceMark;
     }
+
+    public boolean hasCitationForKey(String citationKey) {
+        return citationKeyToNumber.containsKey(citationKey);
+    }
 }

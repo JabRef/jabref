@@ -154,4 +154,9 @@ public class CSLCitationOOAdapter {
 
         return html;
     }
+
+    public boolean isCitedEntry(BibEntry entry) {
+        String citationKey = entry.getCitationKey().orElse("");
+        return markManager.hasCitationForKey(citationKey);
+    }
 }
