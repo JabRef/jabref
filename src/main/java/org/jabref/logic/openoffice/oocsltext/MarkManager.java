@@ -12,6 +12,7 @@ import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XReferenceMarksSupplier;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.UnoRuntime;
+import org.tinylog.Logger;
 
 public class MarkManager {
     private final HashMap<String, ReferenceMark> marksByName;
@@ -20,7 +21,7 @@ public class MarkManager {
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
     private int lastUsedCitationNumber = 0;
-    private HashMap<String, Integer> citationKeyToNumber; // Add this line
+    private HashMap<String, Integer> citationKeyToNumber;
     private int highestCitationNumber = 0;
 
     public MarkManager(XTextDocument document) throws Exception {
@@ -60,6 +61,7 @@ public class MarkManager {
                 citationKeyToNumber.put(citationKey, citationNumber);
                 highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
             } catch (NumberFormatException e) {
+                Logger.warn("WHat", e);
                 // Ignore if we can't parse the number
             }
         }
