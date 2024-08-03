@@ -76,18 +76,26 @@ public class CSLCitationOOAdapter {
     }
 
     private String updateSingleCitation(String citation, int currentNumber) {
-        Pattern pattern = Pattern.compile("(\\[?)(\\d+)(\\]?)(\\.)?(\\s*)");
+        // This pattern now accounts for [1], (1), 1., and 1
+        Pattern pattern = Pattern.compile("(\\[|\\()?(\\d+)(\\]|\\))?(\\.)?\\s*");
         Matcher matcher = pattern.matcher(citation);
         StringBuilder sb = new StringBuilder();
         boolean numberReplaced = false;
 
         while (matcher.find()) {
             if (!numberReplaced) {
-                String prefix = matcher.group(1);
-                String suffix = matcher.group(3);
+                String prefix = matcher.group(1) != null ? matcher.group(1) : "";
+                String suffix = matcher.group(3) != null ? matcher.group(3) : "";
                 String dot = matcher.group(4) != null ? "." : "";
-                String space = matcher.group(5);
-                String replacement = prefix + currentNumber + suffix + dot + space;
+
+                // Ensure we maintain the original format (brackets, parentheses, or neither)
+                String replacement;
+                if (prefix.isEmpty() && suffix.isEmpty()) {
+                    replacement = currentNumber + dot + " ";
+                } else {
+                    replacement = prefix + currentNumber + suffix + dot + " ";
+                }
+
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
                 numberReplaced = true;
             } else {
