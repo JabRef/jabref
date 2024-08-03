@@ -3,6 +3,7 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
@@ -60,9 +61,44 @@ public class CSLCitationOOAdapter {
 
         String inTextCitation = CitationStyleGenerator.generateInText(entries, style, format, bibDatabaseContext, bibEntryTypesManager).getText();
 
-        for (BibEntry entry : entries) {
-            writeCitation(doc, cursor, entry, inTextCitation);
+        writeInTextCitation(doc, cursor, entries, inTextCitation);
+    }
+
+    private void writeInTextCitation(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, String citation) throws Exception {
+        String formattedCitation = transformHtml(citation);
+
+        if (isNumericStyle) {
+            formattedCitation = updateMultipleCitations(formattedCitation, entries);
         }
+
+        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+
+        // Create a single reference mark for the entire in-text citation
+        ReferenceMark mark = markManager.createReferenceMark(entries.get(0), "InTextReferenceMark");
+
+        // Insert the citation text wrapped in a reference mark
+        mark.insertReferenceIntoOO(doc, cursor, ooText);
+
+        // Move the cursor to the end of the inserted text
+        cursor.collapseToEnd();
+    }
+
+    private String updateMultipleCitations(String citation, List<BibEntry> entries) {
+        Pattern pattern = Pattern.compile("\\[(.*?)\\]");
+        Matcher matcher = pattern.matcher(citation);
+        StringBuffer sb = new StringBuffer();
+
+        while (matcher.find()) {
+            String[] numbers = matcher.group(1).split(",");
+            List<String> updatedNumbers = entries.stream()
+                                                 .map(entry -> String.valueOf(markManager.getCitationNumber(entry.getCitationKey().orElse(""))))
+                                                 .collect(Collectors.toList());
+
+            String replacement = "[" + String.join(",", updatedNumbers) + "]";
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     private void writeCitation(XTextDocument doc, XTextCursor cursor, BibEntry entry, String citation) throws Exception {
