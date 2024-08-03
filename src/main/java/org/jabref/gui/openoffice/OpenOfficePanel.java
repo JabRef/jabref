@@ -121,6 +121,7 @@ public class OpenOfficePanel {
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
+        this.currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
 
         ActionFactory factory = new ActionFactory();
 
@@ -229,7 +230,11 @@ public class OpenOfficePanel {
         pushEntriesAdvanced.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_INTEXT, true));
         pushEntriesAdvanced.setMaxWidth(Double.MAX_VALUE);
 
-        update.setTooltip(new Tooltip(Localization.lang("Make or update the bibliography")));
+        if (currentStyle instanceof CitationStyle) {
+            update.setTooltip(new Tooltip(Localization.lang("Make bibliography")));
+        } else if (currentStyle instanceof JStyle) {
+            update.setTooltip(new Tooltip(Localization.lang("Make or update the bibliography")));
+        }
 
         update.setOnAction(event -> {
             String title = Localization.lang("Could not update bibliography");

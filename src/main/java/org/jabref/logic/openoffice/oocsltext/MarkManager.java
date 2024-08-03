@@ -3,6 +3,7 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +24,8 @@ public class MarkManager {
     private final XMultiServiceFactory factory;
     private HashMap<String, Integer> citationKeyToNumber;
     private int highestCitationNumber = 0;
+    private Map<String, Integer> citationOrder = new HashMap<>();
+    private int citationCounter = 0;
 
     public MarkManager(XTextDocument document) throws Exception {
         this.document = document;
@@ -36,14 +39,59 @@ public class MarkManager {
     public void readExistingMarks() throws Exception {
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
+
+        citationOrder.clear();
+        citationCounter = 0;
+
         for (String name : marks.getElementNames()) {
-            if (name.startsWith(CSLCitationOOAdapter.PREFIXES[0])) {
+            String citationKey = extractCitationKey(name);
+            if (!citationKey.isEmpty()) {
+                citationOrder.putIfAbsent(citationKey, ++citationCounter);
+
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
                 ReferenceMark mark = new ReferenceMark(document, named, name);
                 addMark(mark);
-                updateCitationInfo(name);
             }
         }
+    }
+
+    /**
+     * Extracts the citation key from a reference mark name.
+     *
+     * @param name The name of the reference mark
+     * @return The extracted citation key, or an empty string if no key could be extracted
+     */
+    private String extractCitationKey(String name) {
+        // Check if the name starts with one of the known prefixes
+        for (String prefix : CSLCitationOOAdapter.PREFIXES) {
+            if (name.startsWith(prefix)) {
+                // Remove the prefix
+                String withoutPrefix = name.substring(prefix.length());
+
+                // Split the remaining string by space
+                String[] parts = withoutPrefix.split("\\s+");
+
+                if (parts.length > 0) {
+                    // The first part should be the citation key
+                    String key = parts[0];
+
+                    // Remove any non-alphanumeric characters from the start and end
+                    key = key.replaceAll("^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$", "");
+
+                    // If we have a non-empty key, return it
+                    if (!key.isEmpty()) {
+                        return key;
+                    }
+                }
+
+                // If we couldn't extract a key after removing the prefix,
+                // no need to check other prefixes
+                break;
+            }
+        }
+
+        // If no key could be extracted, return an empty string
+        return "";
     }
 
     private void updateCitationInfo(String name) {
