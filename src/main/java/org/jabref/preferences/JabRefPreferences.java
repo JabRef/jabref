@@ -214,11 +214,11 @@ public class JabRefPreferences implements PreferencesService {
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
     public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
-    // Window sizes
-    public static final String SIZE_Y = "mainWindowSizeY";
-    public static final String SIZE_X = "mainWindowSizeX";
-    public static final String POS_Y = "mainWindowPosY";
-    public static final String POS_X = "mainWindowPosX";
+
+    public static final String MAIN_WINDOW_POS_X = "mainWindowPosX";
+    public static final String MAIN_WINDOW_POS_Y = "mainWindowPosY";
+    public static final String MAIN_WINDOW_WIDTH = "mainWindowSizeX";
+    public static final String MAIN_WINDOW_HEIGHT = "mainWindowSizeY";
 
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
@@ -635,12 +635,16 @@ public class JabRefPreferences implements PreferencesService {
                                         .getSslDirectory()
                                         .resolve("truststore.jks").toString());
 
-        defaults.put(POS_X, 0);
-        defaults.put(POS_Y, 0);
-        defaults.put(SIZE_X, 1024);
-        defaults.put(SIZE_Y, 768);
+        defaults.put(MAIN_WINDOW_POS_X, 0);
+        defaults.put(MAIN_WINDOW_POS_Y, 0);
+        defaults.put(MAIN_WINDOW_WIDTH, 1024);
+        defaults.put(MAIN_WINDOW_HEIGHT, 768);
+
         defaults.put(WINDOW_MAXIMISED, Boolean.TRUE);
-        defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE); // By default disable "Fit table horizontally on the screen"
+
+        // By default disable "Fit table horizontally on the screen"
+        defaults.put(AUTO_RESIZE_MODE, Boolean.FALSE);
+
         defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
         defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
@@ -2654,10 +2658,10 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         guiPreferences = new GuiPreferences(
-                getDouble(POS_X),
-                getDouble(POS_Y),
-                getDouble(SIZE_X),
-                getDouble(SIZE_Y),
+                getDouble(MAIN_WINDOW_POS_X),
+                getDouble(MAIN_WINDOW_POS_Y),
+                getDouble(MAIN_WINDOW_WIDTH),
+                getDouble(MAIN_WINDOW_HEIGHT),
                 getBoolean(WINDOW_MAXIMISED),
                 getStringList(LAST_EDITED).stream()
                                           .map(Path::of)
@@ -2667,11 +2671,13 @@ public class JabRefPreferences implements PreferencesService {
                 get(ID_ENTRY_GENERATOR),
                 getDouble(SIDE_PANE_WIDTH));
 
-        EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(POS_X, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(POS_Y, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_X, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(SIZE_Y, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_POS_X, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_POS_Y, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_WIDTH, newValue.doubleValue()));
+        EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_HEIGHT, newValue.doubleValue()));
         EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
+        EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
+
         guiPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
             if (change.getList().isEmpty()) {
                 prefs.remove(LAST_EDITED);
@@ -2691,7 +2697,6 @@ public class JabRefPreferences implements PreferencesService {
         });
         guiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
         EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
-        EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
         return guiPreferences;
     }
