@@ -218,7 +218,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setInstruction(AiDefaultPreferences.SYSTEM_MESSAGE);
         instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
 
-        int resetContextWindowSize = Optional.ofNullable(AiPreferences.CONTEXT_WINDOW_SIZES.get(selectedAiProvider.get()).get(selectedChatModel.get())).orElse(0);
+        int resetContextWindowSize = Optional
+                .ofNullable(AiPreferences.CONTEXT_WINDOW_SIZES.get(selectedAiProvider.get()))
+                .map(map -> map.getOrDefault(selectedChatModel.get(), 0))
+                .orElse(0);
         aiPreferences.setContextWindowSize(resetContextWindowSize);
         contextWindowSize.set(resetContextWindowSize);
 
