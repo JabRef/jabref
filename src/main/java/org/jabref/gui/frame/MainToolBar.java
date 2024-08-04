@@ -216,6 +216,10 @@ public class MainToolBar extends ToolBar {
         });
 
         indicator.setOnMouseClicked(event -> {
+            if ((progressViewPopOver != null) && (progressViewPopOver.isShowing())) {
+                progressViewPopOver.hide();
+            }
+
             TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
             EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
             taskProgressView.setRetainTasks(false);
@@ -225,14 +229,10 @@ public class MainToolBar extends ToolBar {
                 progressViewPopOver = new PopOver(taskProgressView);
                 progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
                 progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
-                progressViewPopOver.setContentNode(taskProgressView);
-                progressViewPopOver.show(indicator);
-            } else if (progressViewPopOver.isShowing()) {
-                progressViewPopOver.hide();
-            } else {
-                progressViewPopOver.setContentNode(taskProgressView);
-                progressViewPopOver.show(indicator);
             }
+
+            progressViewPopOver.setContentNode(taskProgressView);
+            progressViewPopOver.show(indicator);
         });
 
         return new Group(indicator);
