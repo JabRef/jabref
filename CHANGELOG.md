@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Added saving of selected options in the [Lookup -> Search for unlinked local files dialog](https://docs.jabref.org/collect/findunlinkedfiles#link-the-pdfs-to-your-bib-library). [#11439](https://github.com/JabRef/jabref/issues/11439)
 - We added a toggle button to invert the selected groups. [#9073](https://github.com/JabRef/jabref/issues/9073)
 - We reintroduced the floating search in the main table. [#4237](https://github.com/JabRef/jabref/issues/4237)
+- We fixed an issue where the selection of an entry in the table lost after searching for a group. [#3176](https://github.com/JabRef/jabref/issues/3176)
 
 ### Changed
 
