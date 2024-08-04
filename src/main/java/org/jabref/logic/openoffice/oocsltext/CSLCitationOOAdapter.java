@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice.oocsltext;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,15 +43,18 @@ public class CSLCitationOOAdapter {
         isNumericStyle = selectedStyle.isNumericStyle();
 
         // Sort entries based on their order of appearance in the document
-        entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
-
-        List<String> citations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, bibEntryTypesManager);
-
-        for (int i = 0; i < citations.size(); i++) {
-            BibEntry entry = entries.get(i);
-            String citation = citations.get(i);
+        // entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
+        for (BibEntry entry: entries) {
+            String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, bibDatabaseContext, bibEntryTypesManager).getFirst();
             writeCitation(document, cursor, entry, citation);
         }
+        // List<String> citations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, bibEntryTypesManager);
+
+//        for (int i = 0; i < citations.size(); i++) {
+//            BibEntry entry = entries.get(i);
+//            String citation = citations.get(i);
+//            writeCitation(document, cursor, entry, citation);
+//        }
     }
 
     public void insertInText(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
