@@ -18,6 +18,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -135,7 +136,7 @@ public class PdfMergeMetadataImporter extends Importer {
 
     @Override
     public String getName() {
-        return "PDFmergemetadata";
+        return "PDF meta data merger";
     }
 
     @Override
@@ -145,7 +146,7 @@ public class PdfMergeMetadataImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "PdfMergeMetadataImporter imports metadata from a PDF using multiple strategies and merging the result.";
+        return Localization.lang("Imports BibTeX data from a PDF using multiple strategies (e.g., XMP, embedded BibTeX, text parsing, Grobid, and DOI lookup) and merges the result.");
     }
 
     public static class EntryBasedFetcherWrapper extends PdfMergeMetadataImporter implements EntryBasedFetcher {
