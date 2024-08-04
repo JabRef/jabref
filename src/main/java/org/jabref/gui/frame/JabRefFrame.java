@@ -326,18 +326,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
         // Subscribe to the search
-        EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
-                query -> {
-                    if (prefs.getSearchPreferences().shouldKeepSearchString()) {
-                        for (LibraryTab tab : getLibraryTabs()) {
-                            tab.setCurrentSearchQuery(query);
-                        }
-                    } else {
-                        if (getCurrentLibraryTab() != null) {
-                            getCurrentLibraryTab().setCurrentSearchQuery(query);
-                        }
-                    }
-                });
+        EasyBind.subscribe(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH), query -> {
+            if (getCurrentLibraryTab() != null) {
+                getCurrentLibraryTab().searchQueryProperty().set(query);
+            }
+        });
 
         // Wait for the scene to be created, otherwise focusOwnerProperty is not provided
         Platform.runLater(() -> stateManager.focusOwnerProperty().bind(
@@ -371,12 +364,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
 
             // Update active search query when switching between databases
-            if (prefs.getSearchPreferences().shouldKeepSearchString() && libraryTab.getCurrentSearchQuery().isEmpty() && stateManager.activeSearchQueryProperty().get().isPresent()) {
-                // apply search query also when opening a new library and keep search string is activated
-                libraryTab.setCurrentSearchQuery(stateManager.activeSearchQueryProperty().get());
+            if (prefs.getSearchPreferences().shouldKeepSearchString()) {
+                libraryTab.searchQueryProperty().set(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
             } else {
-                stateManager.activeSearchQueryProperty().set(libraryTab.getCurrentSearchQuery());
+                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(libraryTab.searchQueryProperty().get());
             }
+            stateManager.searchResultSize(SearchType.NORMAL_SEARCH).bind(libraryTab.resultSizeProperty());
 
             // Update search autocompleter with information for the correct database:
             globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());

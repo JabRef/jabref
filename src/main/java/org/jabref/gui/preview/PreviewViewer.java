@@ -21,6 +21,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -169,8 +170,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 return;
             }
             if (!registered) {
-                stateManager.activeSearchQueryProperty().addListener(listener);
-                stateManager.activeGlobalSearchQueryProperty().addListener(listener);
+                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener(listener);
+                stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).addListener(listener);
                 registered = true;
             }
             highlightSearchPattern();
