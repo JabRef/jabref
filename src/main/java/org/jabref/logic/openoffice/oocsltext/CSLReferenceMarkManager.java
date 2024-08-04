@@ -124,7 +124,7 @@ public class CSLReferenceMarkManager {
         int citationNumber = getCitationNumber(citationKey);
 
         String name = CSLCitationOOAdapter.PREFIXES[0] + citationKey + " RND" + citationNumber;
-        Object mark = factory.createInstance("com.sun.star.text.CSLReferenceMark");
+        Object mark = factory.createInstance("com.sun.star.text.ReferenceMark");
         XNamed named = UnoRuntime.queryInterface(XNamed.class, mark);
         named.setName(name);
 

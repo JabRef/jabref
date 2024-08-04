@@ -612,7 +612,8 @@ public class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
-                CSLCitationOOAdapter adapter = getOrCreateCSLCitationOOAdapter(doc);
+                CSLCitationOOAdapter adapter = new CSLCitationOOAdapter(doc);
+                adapter.readExistingMarks();
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     adapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else {
@@ -937,7 +938,7 @@ public class OOBibBase {
                     bibliographyCursor.gotoEnd(false);
 
                     // Insert bibliography title
-                    String bibliographyTitle = Localization.lang("References");
+                    String bibliographyTitle = Localization.lang("\nReferences");
                     bibliographyCursor.setString("\n");
 
                     // Apply formatting to the title (here, we make it bold and larger)
@@ -971,8 +972,8 @@ public class OOBibBase {
     private CSLCitationOOAdapter getOrCreateCSLCitationOOAdapter(XTextDocument doc) throws Exception {
         if (cslCitationOOAdapter == null) {
             cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
-            cslCitationOOAdapter.readExistingMarks();
         }
+        cslCitationOOAdapter.readExistingMarks();
         return cslCitationOOAdapter;
     }
 }
