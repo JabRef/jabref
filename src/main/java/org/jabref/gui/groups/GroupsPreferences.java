@@ -12,16 +12,19 @@ public class GroupsPreferences {
     private final ObjectProperty<GroupViewMode> groupViewMode;
     private final BooleanProperty shouldAutoAssignGroup;
     private final BooleanProperty shouldDisplayGroupCount;
+    private final BooleanProperty shouldAutoIncludeSelected;
     private final ObjectProperty<GroupHierarchyType> defaultHierarchicalContext;
 
     public GroupsPreferences(GroupViewMode groupViewMode,
                              boolean shouldAutoAssignGroup,
                              boolean shouldDisplayGroupCount,
+                             boolean shouldAutoIncludeSelected,
                              GroupHierarchyType defaultHierarchicalContext) {
 
         this.groupViewMode = new SimpleObjectProperty<>(groupViewMode);
         this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
         this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
+        this.shouldAutoIncludeSelected = new SimpleBooleanProperty(shouldAutoIncludeSelected);
         this.defaultHierarchicalContext = new SimpleObjectProperty<>(defaultHierarchicalContext);
     }
 
@@ -71,5 +74,17 @@ public class GroupsPreferences {
 
     public void setDefaultHierarchicalContext(GroupHierarchyType defaultHierarchicalContext) {
         this.defaultHierarchicalContext.set(defaultHierarchicalContext);
+    }
+
+    public BooleanProperty autoIncludeSelectedProperty() {
+        return shouldAutoIncludeSelected;
+    }
+
+    public boolean shouldAutoIncludeSelected() {
+        return shouldAutoIncludeSelected.getValue();
+    }
+
+    public void setAutoIncludeSelected(boolean shouldAutoIncludeSelected) {
+        this.shouldAutoIncludeSelected.set(shouldAutoIncludeSelected);
     }
 }

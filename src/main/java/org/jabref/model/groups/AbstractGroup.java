@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.paint.Color;
@@ -29,6 +31,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     protected boolean isExpanded = true;
     protected Optional<String> description = Optional.empty();
     protected Optional<String> iconName = Optional.empty();
+    protected IntegerProperty versionNumber = new SimpleIntegerProperty();
 
     protected AbstractGroup(String name, GroupHierarchyType context) {
         this.name.setValue(name);
@@ -40,10 +43,10 @@ public abstract class AbstractGroup implements SearchMatcher {
         return "AbstractGroup{" +
                 "name='" + name.getValue() + '\'' +
                 ", context=" + context +
-                ", color=" + color +
+                ", color=" + color.orElse(Color.BLACK) +
                 ", isExpanded=" + isExpanded +
-                ", description=" + description +
-                ", iconName=" + iconName +
+                ", description=" + description.orElse("null") +
+                ", iconName=" + iconName.orElse("null") +
                 '}';
     }
 
@@ -56,13 +59,14 @@ public abstract class AbstractGroup implements SearchMatcher {
             return false;
         }
         AbstractGroup that = (AbstractGroup) other;
-        return Objects.equals(this.name.getValue(), that.name.getValue()) && Objects.equals(this.description, that.description)
+        return Objects.equals(this.name.getValue(), that.name.getValue())
+                && Objects.equals(this.description, that.description)
                 && Objects.equals(this.context, that.context);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name.getValue(), description, context);
+        return Objects.hash(name.getValue(), getDescription().orElse("null"), getHierarchicalContext());
     }
 
     public Optional<Color> getColor() {
@@ -75,7 +79,7 @@ public abstract class AbstractGroup implements SearchMatcher {
 
     public void setColor(String colorString) {
         if (StringUtil.isBlank(colorString)) {
-            color = Optional.empty();
+            setColor((Color) null);
         } else {
             setColor(Color.valueOf(colorString));
         }

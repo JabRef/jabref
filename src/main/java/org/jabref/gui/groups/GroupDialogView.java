@@ -35,12 +35,14 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabrefIconProvider;
+import org.jabref.gui.maintable.Selection;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -83,6 +85,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private RadioButton texRadioButton;
 
     // Option Groups
+    @FXML private CheckBox explicitIncludeSelected;
+
     @FXML private TextField keywordGroupSearchTerm;
     @FXML private TextField keywordGroupSearchField;
     @FXML private CheckBox keywordGroupCaseSensitive;
@@ -109,6 +113,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final BibDatabaseContext currentDatabase;
     private final @Nullable GroupTreeNode parentNode;
     private final @Nullable AbstractGroup editedGroup;
+    private final List<BibEntry> selectedEntries;
+    private final Selection includeSelectedEntries;
 
     private GroupDialogViewModel viewModel;
 
@@ -119,10 +125,15 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     public GroupDialogView(BibDatabaseContext currentDatabase,
                            @Nullable GroupTreeNode parentNode,
                            @Nullable AbstractGroup editedGroup,
-                           GroupDialogHeader groupDialogHeader) {
+                           GroupDialogHeader groupDialogHeader,
+                           List<BibEntry> selectedEntries,
+                           Selection includeSelectedEntries
+    ) {
         this.currentDatabase = currentDatabase;
         this.parentNode = parentNode;
         this.editedGroup = editedGroup;
+        this.selectedEntries = selectedEntries;
+        this.includeSelectedEntries = includeSelectedEntries;
 
         ViewLoader.view(this)
                   .load()
@@ -172,7 +183,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, selectedEntries, includeSelectedEntries);
 
         setResultConverter(viewModel::resultConverter);
 
@@ -200,6 +211,9 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         searchRadioButton.selectedProperty().bindBidirectional(viewModel.typeSearchProperty());
         autoRadioButton.selectedProperty().bindBidirectional(viewModel.typeAutoProperty());
         texRadioButton.selectedProperty().bindBidirectional(viewModel.typeTexProperty());
+
+        explicitIncludeSelected.selectedProperty().bindBidirectional(viewModel.explicitIncludeSelectedProperty());
+        explicitIncludeSelected.disableProperty().bindBidirectional(viewModel.editingGroupProperty());
 
         keywordGroupSearchTerm.textProperty().bindBidirectional(viewModel.keywordGroupSearchTermProperty());
         keywordGroupSearchField.textProperty().bindBidirectional(viewModel.keywordGroupSearchFieldProperty());
@@ -247,7 +261,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.keywordRegexValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordFieldEmptyValidationStatus(), keywordGroupSearchField);
-            validationVisualizer.initVisualization(viewModel.texGroupFilePathValidatonStatus(), texGroupFilePath);
+            validationVisualizer.initVisualization(viewModel.texGroupFilePathValidationStatus(), texGroupFilePath);
             nameField.requestFocus();
         });
 
@@ -261,10 +275,14 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 viewModel.colorFieldProperty().setValue(IconTheme.getDefaultGroupColor());
                 return;
             }
-            List<Color> colorsOfSiblings = parentNode.getChildren().stream().map(child -> child.getGroup().getColor())
-                                                     .flatMap(Optional::stream)
-                                                     .toList();
-            Optional<Color> parentColor = parentGroup().getColor();
+
+            List<Color> colorsOfSiblings = parentNode.getChildren()
+                    .stream()
+                    .map(GroupTreeNode::getGroup)
+                    .map(AbstractGroup::getColor)
+                    .flatMap(Optional::stream)
+                    .toList();
+            Optional<Color> parentColor = parentNode.getGroup().getColor();
             Color color;
             color = parentColor.map(value -> GroupColorPicker.generateColor(colorsOfSiblings, value)).orElseGet(() -> GroupColorPicker.generateColor(colorsOfSiblings));
             viewModel.colorFieldProperty().setValue(color);

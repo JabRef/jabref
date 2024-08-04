@@ -62,14 +62,14 @@ class GroupDialogViewModelTest {
         when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.of(temporaryFolder));
 
         viewModel.texGroupFilePathProperty().setValue(anAuxFile.toString());
-        assertTrue(viewModel.texGroupFilePathValidatonStatus().isValid());
+        assertTrue(viewModel.texGroupFilePathValidationStatus().isValid());
     }
 
     @Test
     void validateNonExistingAbsolutePath() {
         var notAnAuxFile = temporaryFolder.resolve("notanauxfile.aux").toAbsolutePath();
         viewModel.texGroupFilePathProperty().setValue(notAnAuxFile.toString());
-        assertFalse(viewModel.texGroupFilePathValidatonStatus().isValid());
+        assertFalse(viewModel.texGroupFilePathValidationStatus().isValid());
     }
 
     @Test
@@ -81,7 +81,7 @@ class GroupDialogViewModelTest {
         when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.of(temporaryFolder));
 
         viewModel.texGroupFilePathProperty().setValue(anAuxFile.toString());
-        assertTrue(viewModel.texGroupFilePathValidatonStatus().isValid());
+        assertTrue(viewModel.texGroupFilePathValidationStatus().isValid());
     }
 
     @Test

@@ -49,8 +49,10 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
             return false;
         }
         AutomaticKeywordGroup that = (AutomaticKeywordGroup) o;
-        return Objects.equals(keywordDelimiter, that.keywordDelimiter) &&
-                Objects.equals(field, that.field);
+        return
+            super.equals(that)
+            && Objects.equals(keywordDelimiter, that.keywordDelimiter)
+            && Objects.equals(field, that.field);
     }
 
     @Override
@@ -62,9 +64,9 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
         KeywordList keywordList = entry.getFieldAsKeywords(field, keywordDelimiter);
         return keywordList.stream()
-                          .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
-                          .map(this::createGroup)
-                          .collect(Collectors.toSet());
+              .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
+              .map(this::createGroup)
+              .collect(Collectors.toSet());
     }
 
     private GroupTreeNode createGroup(Keyword keywordChain) {

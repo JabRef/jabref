@@ -40,7 +40,9 @@ class GroupNodeViewModelTest {
     @BeforeEach
     void setUp() {
         stateManager = mock(StateManager.class);
+        StateManager templateStateManager = new StateManager();
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
+        when(stateManager.activeGroupProperty()).thenReturn(templateStateManager.activeGroupProperty());
         databaseContext = new BibDatabaseContext();
         taskExecutor = new CurrentThreadTaskExecutor();
         preferencesService = mock(PreferencesService.class);
@@ -48,6 +50,7 @@ class GroupNodeViewModelTest {
                 GroupViewMode.UNION,
                 true,
                 true,
+                false,
                 GroupHierarchyType.INDEPENDENT
         ));
 
@@ -96,9 +99,9 @@ class GroupNodeViewModelTest {
         expectedA.addSubgroup(expectedGroupC);
         expectedA.addSubgroup(expectedGroupD);
         GroupNodeViewModel expectedE = getViewModelForGroup(expectedGroupE);
-        ObservableList<GroupNodeViewModel> expected = FXCollections.observableArrayList(expectedA, expectedE);
+        ObservableList<GroupTreeNode> expected = FXCollections.observableArrayList(expectedA.getGroupNode(), expectedE.getGroupNode());
 
-        assertEquals(expected, groupViewModel.getChildren());
+        assertEquals(expected, groupViewModel.getGroupNode().getChildren());
     }
 
     @Test

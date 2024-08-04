@@ -52,7 +52,7 @@ import com.tobiasdiez.easybind.EasyObservableList;
 
 public class GroupNodeViewModel {
 
-    private final String displayName;
+    private String displayName;
     private final boolean isRoot;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
@@ -65,9 +65,10 @@ public class GroupNodeViewModel {
     private final BooleanBinding allSelectedEntriesMatched;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
-    private final ObservableList<BibEntry> entriesList;
     private final PreferencesService preferencesService;
     private final InvalidationListener onInvalidatedGroup = listener -> refreshGroup();
+
+    private final ObservableList<BibEntry> entriesList;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -76,15 +77,17 @@ public class GroupNodeViewModel {
         this.groupNode = Objects.requireNonNull(groupNode);
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
         this.preferencesService = preferencesService;
-
-        displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
+        LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
+        groupNode.nameSubscription(name -> displayName = formatter.format(name));
         isRoot = groupNode.isRoot();
         if (groupNode.getGroup() instanceof AutomaticGroup automaticGroup) {
-            children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())
-                                     .stream()
-                                     .map(this::toViewModel)
-                                     .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
-                                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
+            children = automaticGroup
+                .createSubgroups(this.databaseContext.getDatabase().getEntries())
+                .stream()
+                .map(this::toViewModel)
+                .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
+                .collect(Collectors.toCollection(FXCollections::observableArrayList));
+            children.forEach(c -> groupNode.addChild(c.getGroupNode()));
         } else {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
@@ -93,19 +96,29 @@ public class GroupNodeViewModel {
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
+
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
+        if (stateManager.activeGroupProperty() != null && !stateManager.activeGroupProperty().isEmpty()) {
+            this.updateMatchedEntries();
+        }
+        stateManager.activeGroupProperty().subscribe(this::updateMatchedEntries);
+
         expandedProperty.set(groupNode.getGroup().isExpanded());
         expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
         // Register listener
-        // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
+        // The wrapper created by the FXCollections will set a weak listener on the wrapped list.
+        // This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
         entriesList = databaseContext.getDatabase().getEntries();
-        entriesList.addListener(this::onDatabaseChanged);
+        entriesList.addListener(this::onEntriesChanged);
 
-        EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
-        anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
+        EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(
+                this.stateManager.getSelectedEntries(),
+                this.groupNode::matches
+        );
         // 'all' returns 'true' for empty streams, so this has to be checked explicitly
-        allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
+        allSelectedEntriesMatched = selectedEntriesMatchStatus.allMatch(matched -> matched).and(selectedEntriesMatchStatus.isEmptyBinding().not());
+        anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
     }
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, PreferencesService preferencesService) {
@@ -190,7 +203,7 @@ public class GroupNodeViewModel {
         return "GroupNodeViewModel{" +
                 "displayName='" + displayName + '\'' +
                 ", isRoot=" + isRoot +
-                ", icon='" + getIcon() + '\'' +
+                ", icon='" + getIcon().name() + '\'' +
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
@@ -229,14 +242,17 @@ public class GroupNodeViewModel {
     /**
      * Gets invoked if an entry in the current database changes.
      */
-    private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
+    private void onEntriesChanged(ListChangeListener.Change<? extends BibEntry> change) {
         while (change.next()) {
             if (change.wasPermutated()) {
-                // Nothing to do, as permutation doesn't change matched entries
+                // do nothing
             } else if (change.wasUpdated()) {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
                     if (groupNode.matches(changedEntry)) {
                         if (!matchedEntries.contains(changedEntry)) {
+                            matchedEntries.add(changedEntry);
+                        } else if (matchedEntries.stream().map(BibEntry::getId).noneMatch(changedEntry.getId()::equals)) {
+                            // Deals with potentially-identical newly created entries
                             matchedEntries.add(changedEntry);
                         }
                     } else {
@@ -248,8 +264,10 @@ public class GroupNodeViewModel {
                     matchedEntries.remove(removedEntry);
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
-                    if (groupNode.matches(addedEntry)) {
-                        if (!matchedEntries.contains(addedEntry)) {
+                    // Check for ID equality, otherwise new entries with no field info aren't added
+                    // and entry count doesn't increment.
+                    if (matchedEntries.stream().noneMatch(e -> e.getId().equals(addedEntry.getId()))) {
+                        if (groupNode.matches(addedEntry)) {
                             matchedEntries.add(addedEntry);
                         }
                     }
@@ -389,7 +407,7 @@ public class GroupNodeViewModel {
             return true;
         } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
                             .orElse(false);
         } else if (group instanceof KeywordGroup) {
@@ -492,7 +510,7 @@ public class GroupNodeViewModel {
         } else if (group instanceof KeywordGroup) {
             // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
         } else if (group instanceof SearchGroup) {

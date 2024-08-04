@@ -20,4 +20,6 @@
                  toggleGroup="$groupViewMode"/>
     <CheckBox fx:id="autoAssignGroup" text="%Automatically assign new entry to selected groups"/>
     <CheckBox fx:id="displayGroupCount" text="%Display count of items in group"/>
+    <CheckBox fx:id="autoIncludeSelected" text="%Automatically include selected entries when a new group is created"/>
+
 </fx:root>

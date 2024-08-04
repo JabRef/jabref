@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.maintable.CreateGroupAction;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
@@ -40,7 +41,7 @@ class GroupTreeViewModelTest {
     void setUp() {
         databaseContext = new BibDatabaseContext();
         stateManager = new StateManager();
-        stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
+        stateManager.setActiveDatabase(databaseContext);
         taskExecutor = new CurrentThreadTaskExecutor();
         preferencesService = mock(PreferencesService.class);
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
@@ -49,6 +50,7 @@ class GroupTreeViewModelTest {
                 GroupViewMode.UNION,
                 true,
                 true,
+                false,
                 GroupHierarchyType.INDEPENDENT));
         groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), preferencesService, taskExecutor, new CustomLocalDragboard());
     }
@@ -56,12 +58,12 @@ class GroupTreeViewModelTest {
     @Test
     void rootGroupIsAllEntriesByDefault() {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
-        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferencesService), groupTree.rootGroupProperty().getValue());
+        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), preferencesService).getGroupNode(), groupTree.rootGroup().getGroupNode());
     }
 
     @Test
     void rootGroupIsSelectedByDefault() {
-        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroups(databaseContext).getFirst());
+        assertEquals(groupTree.rootGroup().getGroupNode(), stateManager.getSelectedGroups(databaseContext).getFirst());
     }
 
     @Test
@@ -72,7 +74,7 @@ class GroupTreeViewModelTest {
 
         GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
         model.addEntriesToGroup(databaseContext.getEntries());
-        groupTree.removeGroupsAndSubGroupsFromEntries(model);
+        groupTree.removeGroupsAndSubGroupsFromEntries(model.getGroupNode());
 
         assertEquals(Optional.empty(), entry.getField(StandardField.GROUPS));
     }
@@ -86,7 +88,7 @@ class GroupTreeViewModelTest {
 
         GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), preferencesService);
         model.addEntriesToGroup(databaseContext.getEntries());
-        groupTree.removeGroupsAndSubGroupsFromEntries(model);
+        groupTree.removeGroupsAndSubGroupsFromEntries(model.getGroupNode());
 
         assertEquals(groupName, entry.getField(StandardField.KEYWORDS).get());
     }
@@ -97,9 +99,7 @@ class GroupTreeViewModelTest {
         AbstractGroup newGroup = new ExplicitGroup("newGroupName", GroupHierarchyType.INDEPENDENT, ',');
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
-
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
-        assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
+        assertTrue(CreateGroupAction.changesAreMinor(oldGroup, newGroup));
     }
 
     @Test
@@ -109,9 +109,7 @@ class GroupTreeViewModelTest {
 
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
-
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
-        assertTrue(model.onlyMinorChanges(oldGroup, newGroup));
+        assertTrue(CreateGroupAction.changesAreMinor(oldGroup, newGroup));
     }
 
     @Test
@@ -122,8 +120,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
-        assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
+        assertFalse(CreateGroupAction.changesAreMinor(oldGroup, newGroup));
     }
 
     @Test
@@ -133,8 +130,6 @@ class GroupTreeViewModelTest {
 
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
-
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, new CustomLocalDragboard());
-        assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
+        assertFalse(CreateGroupAction.changesAreMinor(oldGroup, newGroup));
     }
 }

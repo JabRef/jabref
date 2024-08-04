@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import javafx.collections.ObservableList;
+
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -249,7 +251,7 @@ public class BibDatabaseContext {
         this.location = DatabaseLocation.LOCAL;
     }
 
-    public List<BibEntry> getEntries() {
+    public ObservableList<BibEntry> getEntries() {
         return database.getEntries();
     }
 

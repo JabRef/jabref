@@ -13,6 +13,7 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty groupViewModeUnionProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoAssignGroupProperty = new SimpleBooleanProperty();
     private final BooleanProperty displayGroupCountProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autoIncludeSelectedEntriesProperty = new SimpleBooleanProperty();
 
     private final GroupsPreferences groupsPreferences;
 
@@ -34,6 +35,7 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
         }
         autoAssignGroupProperty.setValue(groupsPreferences.shouldAutoAssignGroup());
         displayGroupCountProperty.setValue(groupsPreferences.shouldDisplayGroupCount());
+        autoIncludeSelectedEntriesProperty.setValue(groupsPreferences.shouldAutoIncludeSelected());
     }
 
     @Override
@@ -41,6 +43,7 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
         groupsPreferences.setGroupViewMode(groupViewModeIntersectionProperty.getValue() ? GroupViewMode.INTERSECTION : GroupViewMode.UNION);
         groupsPreferences.setAutoAssignGroup(autoAssignGroupProperty.getValue());
         groupsPreferences.setDisplayGroupCount(displayGroupCountProperty.getValue());
+        groupsPreferences.setAutoIncludeSelected(autoIncludeSelectedEntriesProperty.getValue());
     }
 
     public BooleanProperty groupViewModeIntersectionProperty() {
@@ -53,6 +56,10 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty autoAssignGroupProperty() {
         return autoAssignGroupProperty;
+    }
+
+    public BooleanProperty autoIncludeSelectedEntriesProperty() {
+        return autoIncludeSelectedEntriesProperty;
     }
 
     public BooleanProperty displayGroupCount() {

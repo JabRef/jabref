@@ -16,6 +16,7 @@ public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> imp
     @FXML private RadioButton groupViewModeUnion;
     @FXML private CheckBox autoAssignGroup;
     @FXML private CheckBox displayGroupCount;
+    @FXML private CheckBox autoIncludeSelected;
 
     public GroupsTab() {
         ViewLoader.view(this)
@@ -30,10 +31,10 @@ public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> imp
 
     public void initialize() {
         this.viewModel = new GroupsTabViewModel(preferencesService.getGroupsPreferences());
-
         groupViewModeIntersection.selectedProperty().bindBidirectional(viewModel.groupViewModeIntersectionProperty());
         groupViewModeUnion.selectedProperty().bindBidirectional(viewModel.groupViewModeUnionProperty());
         autoAssignGroup.selectedProperty().bindBidirectional(viewModel.autoAssignGroupProperty());
         displayGroupCount.selectedProperty().bindBidirectional(viewModel.displayGroupCount());
+        autoIncludeSelected.selectedProperty().bindBidirectional(viewModel.autoIncludeSelectedEntriesProperty());
     }
 }
