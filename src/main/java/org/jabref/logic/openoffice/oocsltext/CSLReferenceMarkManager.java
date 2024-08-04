@@ -26,7 +26,7 @@ public class CSLReferenceMarkManager {
     private int highestCitationNumber = 0;
     private final Map<String, Integer> citationOrder = new HashMap<>();
 
-    public CSLReferenceMarkManager(XTextDocument document) throws Exception {
+    public CSLReferenceMarkManager(XTextDocument document) {
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
         this.marksByName = new HashMap<>();
