@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 
@@ -58,9 +59,9 @@ public class FileEmbeddingsManager {
         aiPreferences.onEmbeddingsParametersChange(embeddingStore::removeAll);
     }
 
-    public void addDocument(String link, Document document, long modificationTimeInSeconds) throws InterruptedException {
+    public void addDocument(String link, Document document, long modificationTimeInSeconds, IntegerProperty workDone, IntegerProperty workMax) throws InterruptedException {
         document.metadata().put(LINK_METADATA_KEY, link);
-        lowLevelIngestor.ingestDocument(document, shutdownProperty);
+        lowLevelIngestor.ingestDocument(document, shutdownProperty, workDone, workMax);
 
         if (!shutdownProperty.get()) {
             fullyIngestedDocumentsTracker.markDocumentAsFullyIngested(link, modificationTimeInSeconds);

@@ -1,6 +1,9 @@
 package org.jabref.logic.ai.embeddings;
 
+import java.util.List;
+
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import org.jabref.preferences.AiPreferences;
@@ -57,13 +60,18 @@ public class LowLevelIngestor {
      * @param document - document to add.
      * @param stopProperty - in case you want to stop the ingestion process, set this property to true.
      */
-    public void ingestDocument(Document document, ReadOnlyBooleanProperty stopProperty) throws InterruptedException {
-        for (TextSegment documentPart : documentSplitter.split(document)) {
+    public void ingestDocument(Document document, ReadOnlyBooleanProperty stopProperty, IntegerProperty workDone, IntegerProperty workMax) throws InterruptedException {
+        List<TextSegment> textSegments = documentSplitter.split(document);
+        workMax.set(textSegments.size());
+
+        for (TextSegment documentPart : textSegments) {
             if (stopProperty.get()) {
                 throw new InterruptedException();
             }
 
             ingestor.ingest(new Document(documentPart.text(), document.metadata()));
+
+            workDone.set(workDone.get() + 1);
         }
     }
 }

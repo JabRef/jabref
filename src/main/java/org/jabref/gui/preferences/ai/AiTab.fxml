@@ -47,12 +47,12 @@
         <Label styleClass="sectionHeader" text="%Expert settings" />
         <VBox>
             <children>
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%These parameters affect how AI will answer you questions." />
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%These parameters affect how the AI will answer you questions." />
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%Leave these fields as is, if you are not sure of their purpose." />
             </children>
         </VBox>
 
-      <CheckBox fx:id="customizeExpertSettingsCheckbox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%Customize AI settings" />
+      <CheckBox fx:id="customizeExpertSettingsCheckbox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%Customize expert settings settings" />
 
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>

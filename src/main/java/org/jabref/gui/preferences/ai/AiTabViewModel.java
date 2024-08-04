@@ -96,6 +96,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
 
             apiBaseUrl.set(AiPreferences.PROVIDERS_API_URLS.get(newValue));
+            apiToken.set("");
         });
 
         this.selectedChatModel.addListener((observable, oldValue, newValue) -> {

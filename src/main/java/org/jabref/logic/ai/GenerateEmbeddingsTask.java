@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.ai.embeddings.FileToDocument;
@@ -32,6 +34,9 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     private final BibDatabaseContext bibDatabaseContext;
     private final FilePreferences filePreferences;
 
+    private final IntegerProperty workDone = new SimpleIntegerProperty(0);
+    private final IntegerProperty workMax = new SimpleIntegerProperty(0);
+
     public GenerateEmbeddingsTask(String citationKey,
                                   List<LinkedFile> linkedFiles,
                                   FileEmbeddingsManager fileEmbeddingsManager,
@@ -44,12 +49,14 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         this.filePreferences = filePreferences;
 
         titleProperty().set(Localization.lang("Generating embeddings for for %0", citationKey));
+        showToUser(true);
+
+        workDone.addListener(obs -> updateProgress());
+        workMax.addListener(obs -> updateProgress());
     }
 
     @Override
     protected Void call() throws Exception {
-        showToUser(true);
-
         try {
             // forEach() method would look better here, but we need to catch the {@link InterruptedException}.
             for (LinkedFile linkedFile : linkedFiles) {
@@ -85,7 +92,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
             Optional<Document> document = FileToDocument.fromFile(path.get());
             if (document.isPresent()) {
-                fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), currentModificationTimeInSeconds);
+                fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), currentModificationTimeInSeconds, workDone, workMax);
             }
         } catch (IOException e) {
             LOGGER.error("Couldn't retrieve attributes of a linked file: {}", linkedFile.getLink(), e);
@@ -93,8 +100,13 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
             Optional<Document> document = FileToDocument.fromFile(path.get());
             if (document.isPresent()) {
-                fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), 0);
+                fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), 0, workDone, workMax);
             }
         }
+    }
+
+    private void updateProgress() {
+        updateProgress(workDone.get(), workMax.get());
+        updateMessage(Localization.lang("%0% work done for embeddings generation", Math.round((float) workDone.get() / (float) workMax.get() * 100)));
     }
 }
