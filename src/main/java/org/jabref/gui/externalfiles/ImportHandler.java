@@ -53,6 +53,7 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -99,7 +100,7 @@ public class ImportHandler {
         return linker;
     }
 
-    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files) {
+    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(final List<Path> files, final BibDatabaseContext bibDatabaseContext, final FilePreferences filePreferences) {
         return new BackgroundTask<>() {
             private int counter;
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
@@ -130,7 +131,7 @@ public class ImportHandler {
                             }
 
                             if (!pdfEntriesInFile.isEmpty()) {
-                                entriesToAdd.addAll(pdfEntriesInFile);
+                                entriesToAdd.addAll(FileUtil.relativize(pdfEntriesInFile, bibDatabaseContext, filePreferences));
                                 addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                             } else {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));

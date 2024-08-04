@@ -27,6 +27,8 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
@@ -266,6 +268,30 @@ public class FileUtil {
     public static Path relativize(Path path, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
         return relativize(path, fileDirectories);
+    }
+
+    /**
+     * Relativizes all BibEntries given to (!) the given database context
+     * <p>
+     * ⚠ Modifies the entries in the list ⚠
+     */
+    public static List<BibEntry> relativize(List<BibEntry> entries, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
+
+        return entries.stream()
+                      .map(entry -> {
+                          if (entry.hasField(StandardField.FILE)) {
+                              List<LinkedFile> updatedLinkedFiles = entry.getFiles().stream().map(linkedFile -> {
+                                  if (!linkedFile.isOnlineLink()) {
+                                      String newPath = FileUtil.relativize(Path.of(linkedFile.getLink()), fileDirectories).toString();
+                                      linkedFile.setLink(newPath);
+                                  }
+                                  return linkedFile;
+                              }).toList();
+                              entry.setFiles(updatedLinkedFiles);
+                          }
+                          return entry;
+                      }).toList();
     }
 
     /**

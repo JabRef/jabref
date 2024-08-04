@@ -20,6 +20,7 @@ import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -130,6 +131,8 @@ public class PdfMergeMetadataImporter extends Importer {
             }
         }
 
+        // We use the absolute path here as we do not know the context where this import will be used.
+        // The caller is responsible for making the path relative if necessary.
         entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
         return new ParserResult(List.of(entry));
     }
@@ -169,7 +172,7 @@ public class PdfMergeMetadataImporter extends Importer {
                     try {
                         ParserResult result = importDatabase(filePath.get());
                         if (!result.isEmpty()) {
-                            return result.getDatabase().getEntries();
+                            return FileUtil.relativize(result.getDatabase().getEntries(), databaseContext, filePreferences);
                         }
                     } catch (IOException e) {
                         LOGGER.error("Cannot read {}", filePath.get(), e);
