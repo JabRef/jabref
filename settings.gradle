@@ -5,7 +5,7 @@ pluginManagement {
             // Updated solution at https://github.com/foodiestudio/convention-plugins?tab=readme-ov-file#convention-plugins
             if (requested.id.id.startsWith("com.github.koppor")) {
                 // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
-                useModule("com.github.koppor:gradle-modules-plugin:jitpack-SNAPSHOT")
+                useModule("com.github.koppor:gradle-modules-plugin:1.8.15-cmd-1")
             }
         }
     }
@@ -19,7 +19,7 @@ pluginManagement {
 }
 
 plugins {
-  id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 rootProject.name = "JabRef"
