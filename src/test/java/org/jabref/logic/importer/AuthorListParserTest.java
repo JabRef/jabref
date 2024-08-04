@@ -1,10 +1,12 @@
 package org.jabref.logic.importer;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -44,6 +46,16 @@ class AuthorListParserTest {
     @MethodSource
     void parseSingleAuthorCorrectly(String authorsString, Author authorsParsed) {
         assertEquals(AuthorList.of(authorsParsed), parser.parse(authorsString));
+    }
+
+    @Test
+    public void dashedNamesWithoutSpaceNormalized() {
+        assertEquals(Optional.of("Z. Yao and D. S. Weld and W-P. Chen and H. Sun"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, W-P. Chen, and H. Sun"));
+    }
+
+    @Test
+    public void dashedNamesWithSpaceNormalized() {
+        assertEquals(Optional.of("Z. Yao and D. S. Weld and W.-P. Chen and H. Sun"), AuthorListParser.normalizeSimply("Z. Yao, D. S. Weld, W.-P. Chen, and H. Sun"));
     }
 
     private static Stream<Arguments> parseMultipleCorrectly() {

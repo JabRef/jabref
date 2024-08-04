@@ -28,7 +28,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import jakarta.ws.rs.core.MediaType;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;

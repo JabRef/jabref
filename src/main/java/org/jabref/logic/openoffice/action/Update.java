@@ -1,11 +1,12 @@
 package org.jabref.logic.openoffice.action;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateBibliography;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOProcess;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
@@ -16,6 +17,7 @@ import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
+import org.tinylog.Logger;
 
 /**
  * Update document: citation marks and bibliography
@@ -31,7 +33,7 @@ public class Update {
     private static List<String> updateDocument(XTextDocument doc,
                                                OOFrontend frontend,
                                                List<BibDatabase> databases,
-                                               OOBibStyle style,
+                                               JStyle style,
                                                FunctionalTextViewCursor fcursor,
                                                boolean doUpdateBibliography,
                                                boolean alwaysAddCitedOnPages)
@@ -62,11 +64,15 @@ public class Update {
             }
 
             return frontend.citationGroups.getUnresolvedKeys();
+        } catch (
+                IOException e) {
+            Logger.warn("Error while updating document", e);
         } finally {
             if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
                 UnoScreenRefresh.unlockControllers(doc);
             }
         }
+        return frontend.citationGroups.getUnresolvedKeys();
     }
 
     public static class SyncOptions {
@@ -94,7 +100,7 @@ public class Update {
 
     public static List<String> synchronizeDocument(XTextDocument doc,
                                                    OOFrontend frontend,
-                                                   OOBibStyle style,
+                                                   JStyle style,
                                                    FunctionalTextViewCursor fcursor,
                                                    SyncOptions syncOptions)
             throws
@@ -116,7 +122,7 @@ public class Update {
      * Reread document before sync
      */
     public static List<String> resyncDocument(XTextDocument doc,
-                                              OOBibStyle style,
+                                              JStyle style,
                                               FunctionalTextViewCursor fcursor,
                                               SyncOptions syncOptions)
             throws

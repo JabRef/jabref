@@ -147,4 +147,6 @@ public interface PreferencesService {
     ProtectedTermsPreferences getProtectedTermsPreferences();
 
     MergeDialogPreferences getMergeDialogPreferences();
+
+    UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferences();
 }

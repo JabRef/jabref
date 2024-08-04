@@ -829,7 +829,7 @@ class BibtexParserTest {
     @Test
     void parseRecognizesStringAndEntry() throws IOException {
         ParserResult result = parser.parse(
-                new StringReader("" + "@string{bourdieu = {Bourdieu, Pierre}}"
+                new StringReader("@string{bourdieu = {Bourdieu, Pierre}}"
                         + "@book{bourdieu-2002-questions-sociologie, " + "    Address = {Paris}," + "    Author = bourdieu,"
                         + "    Isbn = 2707318256," + "    Publisher = {Minuit}," + "    Title = {Questions de sociologie},"
                         + "    Year = 2002" + "}"));
@@ -954,7 +954,14 @@ class BibtexParserTest {
     @Test
     void parsKeepsMultipleNewlines() throws IOException {
         ParserResult result = parser
-                .parse(new StringReader("@article{test,a = {a\n\nb}," + "b = {a\n \nb}," + "c = {a \n \n b}}"));
+                .parse(new StringReader("""
+                        @article{test,a = {a
+
+                        b},b = {a
+                        \s
+                        b},c = {a\s
+                        \s
+                         b}}"""));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
@@ -1247,26 +1254,36 @@ class BibtexParserTest {
     @Test
     void parseRecognizesCRLFLineBreak() throws IOException {
         ParserResult result = parser.parse(
-                new StringReader("@InProceedings{6055279,\r\n" + "  Title                    = {Educational session 1},\r\n"
-                        + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\r\n"
-                        + "  Year                     = {2011},\r\n" + "  Month                    = {Sept},\r\n"
-                        + "  Pages                    = {1-7},\r\n"
-                        + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\r\n"
-                        + "  DOI                      = {10.1109/CICC.2011.6055279},\r\n"
-                        + "  ISSN                     = {0886-5930}\r\n" + "}\r\n"));
+                new StringReader("""
+                        @InProceedings{6055279,\r
+                          Title                    = {Educational session 1},\r
+                          Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\r
+                          Year                     = {2011},\r
+                          Month                    = {Sept},\r
+                          Pages                    = {1-7},\r
+                          Abstract                 = {Start of the above-titled section of the conference proceedings record.},\r
+                          DOI                      = {10.1109/CICC.2011.6055279},\r
+                          ISSN                     = {0886-5930}\r
+                        }\r
+                        """));
         assertEquals("\r\n", result.getDatabase().getNewLineSeparator());
     }
 
     @Test
     void parseRecognizesLFLineBreak() throws IOException {
         ParserResult result = parser.parse(
-                new StringReader("@InProceedings{6055279,\n" + "  Title                    = {Educational session 1},\n"
-                        + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n"
-                        + "  Year                     = {2011},\n" + "  Month                    = {Sept},\n"
-                        + "  Pages                    = {1-7},\n"
-                        + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\n"
-                        + "  DOI                      = {10.1109/CICC.2011.6055279},\n"
-                        + "  ISSN                     = {0886-5930}\n" + "}\n"));
+                new StringReader("""
+                        @InProceedings{6055279,
+                          Title                    = {Educational session 1},
+                          Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},
+                          Year                     = {2011},
+                          Month                    = {Sept},
+                          Pages                    = {1-7},
+                          Abstract                 = {Start of the above-titled section of the conference proceedings record.},
+                          DOI                      = {10.1109/CICC.2011.6055279},
+                          ISSN                     = {0886-5930}
+                        }
+                        """));
         assertEquals("\n", result.getDatabase().getNewLineSeparator());
     }
 
@@ -1343,7 +1360,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void integrationTestGroupTree() throws IOException, ParseException {
+    void integrationTestGroupTree() throws IOException {
         ParserResult result = parser.parse(new StringReader("""
                 @comment{jabref-meta: groupsversion:3;}
                 @comment{jabref-meta: groupstree:
@@ -1756,12 +1773,11 @@ class BibtexParserTest {
     @Test
     void parseRecognizesDatabaseID() throws Exception {
         String expectedDatabaseID = "q1w2e3r4t5z6";
-        StringBuilder sharedDatabaseFileContent = new StringBuilder()
-                .append("\\% DBID: ").append(expectedDatabaseID)
-                .append(OS.NEWLINE)
-                .append("@Article{a}");
+        String sharedDatabaseFileContent = "\\% DBID: " + expectedDatabaseID +
+                OS.NEWLINE +
+                "@Article{a}";
 
-        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent));
         String actualDatabaseID = parserResult.getDatabase().getSharedDatabaseID().get();
 
         assertEquals(expectedDatabaseID, actualDatabaseID);
@@ -1769,12 +1785,11 @@ class BibtexParserTest {
 
     @Test
     void parseDoesNotRecognizeDatabaseIDasUserComment() throws Exception {
-        StringBuilder sharedDatabaseFileContent = new StringBuilder()
-                .append("\\% Encoding: UTF-8").append(OS.NEWLINE)
-                .append("\\% DBID: q1w2e3r4t5z6").append(OS.NEWLINE)
-                .append("@Article{a}");
+        String sharedDatabaseFileContent = "\\% Encoding: UTF-8" + OS.NEWLINE +
+                "\\% DBID: q1w2e3r4t5z6" + OS.NEWLINE +
+                "@Article{a}";
 
-        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent));
         List<BibEntry> entries = parserResult.getDatabase().getEntries();
 
         assertEquals(1, entries.size());
@@ -2121,10 +2136,11 @@ class BibtexParserTest {
 
     @Test
     void parseDuplicateKeywordsWithOnlyOneEntry() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Article{,\n"
-                + "Keywords={asdf,asdf,asdf},\n"
-                + "}\n"
-                + "");
+        Optional<BibEntry> result = parser.parseSingleEntry("""
+                @Article{,
+                Keywords={asdf,asdf,asdf},
+                }
+                """);
 
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.KEYWORDS, "asdf,asdf,asdf");

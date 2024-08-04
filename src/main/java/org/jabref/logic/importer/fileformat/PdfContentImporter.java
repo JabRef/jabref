@@ -35,6 +35,8 @@ import org.apache.pdfbox.text.PDFTextStripper;
  * <p>
  * Currently, Springer, and IEEE formats are supported.
  * <p>
+ * In case one wants to have a list of {@link BibEntry} matching the bibliography of a PDF,
+ * please see {@link BibliographyFromPdfImporter}.
  */
 public class PdfContentImporter extends Importer {
 

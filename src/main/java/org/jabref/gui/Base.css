@@ -1072,29 +1072,25 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 /* search modifier buttons */
-.mainToolbar .search-field .toggle-button:selected {
+.global-search-bar .toggle-button:selected {
     -fx-background-color: transparent;
 }
 
-.mainToolbar .search-field .toggle-button:hover,
-.mainToolbar .search-field .toggle-button:selected:hover {
+.global-search-bar .toggle-button:hover,
+.global-search-bar .toggle-button:selected:hover {
     -fx-background-color: -jr-icon-background-active;
 }
 
-.mainToolbar .search-field .toggle-button .glyph-icon {
-    -fx-fill: derive(-jr-search-text, 80%);
-    -fx-text-fill: derive(-jr-search-text, 80%);
+.global-search-bar .toggle-button .glyph-icon {
     -fx-icon-color: derive(-jr-search-text, 80%);
 }
 
-.mainToolbar .search-field .toggle-button:selected .glyph-icon {
-    -fx-fill: -jr-search-text;
-    -fx-text-fill: -jr-search-text;
+.global-search-bar .toggle-button:selected .glyph-icon {
     -fx-icon-color: -jr-search-text;
 }
 
 /* search text */
-.mainToolbar .search-field .label {
+.global-search-bar .label {
     -fx-padding: 0em 1.8em 0em 0em;
 }
 

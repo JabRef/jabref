@@ -178,7 +178,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     groupDialogHeader));
 
             newGroup.ifPresent(group -> {
-                parent.addSubgroup(group);
+                GroupTreeNode newSubgroup = parent.addSubgroup(group);
+                selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
 
                 // TODO: Add undo
                 // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
@@ -186,7 +187,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 // TODO: Expand parent to make new group visible
                 // parent.expand();
-
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
             });

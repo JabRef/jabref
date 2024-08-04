@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 
 import org.jabref.logic.importer.ParseException;
 
-import kong.unirest.json.JSONObject;
+import kong.unirest.core.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

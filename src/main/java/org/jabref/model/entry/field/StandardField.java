@@ -11,7 +11,7 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
 
 /**
  * Standard BibTeX and BibLaTeX fields, as well as "normal" JabRef specific fields.
- *
+ * <p>
  * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
  */
 public enum StandardField implements Field {
@@ -141,7 +141,7 @@ public enum StandardField implements Field {
     CREATIONDATE("creationdate", FieldProperty.DATE),
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
 
-    public static Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
+    public static final Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
 
     private static final Map<String, StandardField> NAME_TO_STANDARD_FIELD = new HashMap<>();
 

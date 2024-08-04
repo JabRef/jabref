@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -52,6 +51,7 @@ public class AutoSetFileLinksUtil {
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetFileLinksUtil.class);
+
     private final List<Path> directories;
     private final AutoLinkPreferences autoLinkPreferences;
     private final FilePreferences filePreferences;
@@ -106,7 +106,9 @@ public class AutoSetFileLinksUtil {
     public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
         List<LinkedFile> linkedFiles = new ArrayList<>();
 
-        List<String> extensions = filePreferences.getExternalFileTypes().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
+        List<String> extensions = filePreferences.getExternalFileTypes().stream().map(ExternalFileType::getExtension).toList();
+
+        LOGGER.debug("Searching for extensions {} in directories {}", extensions, directories);
 
         // Run the search operation
         FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);
@@ -134,6 +136,7 @@ public class AutoSetFileLinksUtil {
                 Path relativeFilePath = FileUtil.relativize(foundFile, directories);
                 LinkedFile linkedFile = new LinkedFile("", relativeFilePath, strType);
                 linkedFiles.add(linkedFile);
+                LOGGER.debug("Found file {} for entry {}", linkedFile, entry.getCitationKey());
             }
         }
 

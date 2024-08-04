@@ -52,8 +52,7 @@ public class ImporterTestEngine {
         if (parserResult.isInvalid()) {
             throw new ImportException(parserResult.getErrorMessage());
         }
-        List<BibEntry> entries = parserResult.getDatabase()
-                                             .getEntries();
+        List<BibEntry> entries = parserResult.getDatabase().getEntries();
         BibEntryAssert.assertEquals(ImporterTestEngine.class, fileName.replaceAll(fileType, ".bib"), entries);
     }
 

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -51,6 +52,8 @@ import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -202,7 +205,7 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
-        this.entryEditor = new EntryEditor(this);
+        this.entryEditor = createEntryEditor();
 
         // set LibraryTab ID for drag'n'drop
         // ID content doesn't matter, we only need different tabs to have different ID
@@ -216,6 +219,14 @@ public class LibraryTab extends Tab {
 
         setOnCloseRequest(this::onCloseRequest);
         setOnClosed(this::onClosed);
+    }
+
+    private EntryEditor createEntryEditor() {
+        Supplier<LibraryTab> tabSupplier = () -> this;
+        return new EntryEditor(this,
+                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
+                new UndoAction(tabSupplier, dialogService, stateManager),
+                new RedoAction(tabSupplier, dialogService, stateManager));
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -324,7 +335,7 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
-        this.entryEditor = new EntryEditor(this);
+        this.entryEditor = createEntryEditor();
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -404,13 +415,8 @@ public class LibraryTab extends Tab {
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
+                tabTitle.append('*');
                 tabTitle.append(Localization.lang("untitled"));
-                if (bibDatabaseContext.getDatabase().hasEntries()) {
-                    // if the database is not empty and no file is assigned,
-                    // the database came from an import and has to be treated somehow
-                    // -> mark as changed
-                    tabTitle.append('*');
-                }
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
@@ -697,7 +703,6 @@ public class LibraryTab extends Tab {
     /**
      * Put an asterisk behind the filename to indicate the database has changed.
      */
-
     public synchronized void markChangedOrUnChanged() {
         if (undoManager.hasChanged()) {
             this.changedProperty.setValue(true);
@@ -753,14 +758,11 @@ public class LibraryTab extends Tab {
     }
 
     public boolean requestClose() {
-        if (isModified() && (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL)) {
-            return confirmClose();
-        } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
-            bibDatabaseContext.convertToLocalDatabase();
-            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
-            bibDatabaseContext.clearDBMSSynchronizer();
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL) {
+            if (isModified()) {
+                return confirmClose();
+            }
         }
-
         return true;
     }
 
@@ -840,6 +842,11 @@ public class LibraryTab extends Tab {
         if (dataLoadingTask != null) {
             dataLoadingTask.cancel();
         }
+        if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
+            bibDatabaseContext.convertToLocalDatabase();
+            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();
+            bibDatabaseContext.clearDBMSSynchronizer();
+        }
         try {
             changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
         } catch (RuntimeException e) {
@@ -867,6 +874,7 @@ public class LibraryTab extends Tab {
         } catch (RuntimeException e) {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
+
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }
