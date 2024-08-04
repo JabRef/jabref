@@ -1,7 +1,5 @@
 package org.jabref.preferences;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -14,6 +12,8 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+
+import org.jabref.logic.ai.AiDefaultPreferences;
 
 public class AiPreferences {
     public enum AiProvider {
@@ -35,36 +35,6 @@ public class AiPreferences {
             return label;
         }
     }
-
-    public static final Map<AiProvider, List<String>> CHAT_MODELS = Map.of(
-            AiProvider.OPEN_AI, List.of("gpt-4o-mini", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"),
-            // "mistral" and "mixtral" are not language mistakes.
-            AiProvider.MISTRAL_AI, List.of("open-mistral-nemo", "open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-large-latest"),
-            AiProvider.HUGGING_FACE, List.of()
-    );
-
-    public static final Map<AiProvider, String> PROVIDERS_API_URLS = Map.of(
-            AiProvider.OPEN_AI, "https://api.openai.com/v1",
-            AiProvider.MISTRAL_AI, "https://api.mistral.ai/v1",
-            AiProvider.HUGGING_FACE, "https://huggingface.co/api"
-    );
-
-    public static final Map<AiProvider, Map<String, Integer>> CONTEXT_WINDOW_SIZES = Map.of(
-            AiProvider.OPEN_AI, Map.of(
-                    "gpt-4o-mini", 128000,
-                    "gpt-4o", 128000,
-                    "gpt-4", 8192,
-                    "gpt-4-turbo", 128000,
-                    "gpt-3.5-turbo", 16385
-            ),
-            AiProvider.MISTRAL_AI, Map.of(
-                    "mistral-large-latest", 128000,
-                    "open-mistral-nemo", 128000,
-                    "open-mistral-7b", 32000,
-                    "open-mixtral-8x7b", 32000,
-                    "open-mixtral-8x22b", 64000
-            )
-    );
 
     public enum EmbeddingModel {
         ALL_MINILM_L6_V2("all-MiniLM-L6-v2");
@@ -201,7 +171,11 @@ public class AiPreferences {
     }
 
     public EmbeddingModel getEmbeddingModel() {
-        return embeddingModel.get();
+        if (getCustomizeExpertSettings()) {
+            return embeddingModel.get();
+        } else {
+            return AiDefaultPreferences.EMBEDDING_MODEL;
+        }
     }
 
     public void setApiBaseUrl(String apiBaseUrl) {
@@ -213,7 +187,11 @@ public class AiPreferences {
     }
 
     public String getApiBaseUrl() {
-        return apiBaseUrl.get();
+        if (getCustomizeExpertSettings()) {
+            return apiBaseUrl.get();
+        } else {
+            return AiDefaultPreferences.PROVIDERS_API_URLS.get(getAiProvider());
+        }
     }
 
     public void setEmbeddingModel(EmbeddingModel embeddingModel) {
@@ -225,7 +203,11 @@ public class AiPreferences {
     }
 
     public String getInstruction() {
-        return instruction.get();
+        if (getCustomizeExpertSettings()) {
+            return instruction.get();
+        } else {
+            return AiDefaultPreferences.SYSTEM_MESSAGE;
+        }
     }
 
     public void setInstruction(String instruction) {
@@ -237,7 +219,11 @@ public class AiPreferences {
     }
 
     public double getTemperature() {
-        return temperature.get();
+        if (getCustomizeExpertSettings()) {
+            return temperature.get();
+        } else {
+            return AiDefaultPreferences.TEMPERATURE;
+        }
     }
 
     public void setTemperature(double temperature) {
@@ -249,7 +235,11 @@ public class AiPreferences {
     }
 
     public int getContextWindowSize() {
-        return contextWindowSize.get();
+        if (getCustomizeExpertSettings()) {
+            return contextWindowSize.get();
+        } else {
+            return AiDefaultPreferences.CONTEXT_WINDOW_SIZE;
+        }
     }
 
     public void setContextWindowSize(int contextWindowSize) {
@@ -261,7 +251,11 @@ public class AiPreferences {
     }
 
     public int getDocumentSplitterChunkSize() {
-        return documentSplitterChunkSize.get();
+        if (getCustomizeExpertSettings()) {
+            return documentSplitterChunkSize.get();
+        } else {
+            return AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE;
+        }
     }
 
     public void setDocumentSplitterChunkSize(int documentSplitterChunkSize) {
@@ -273,7 +267,11 @@ public class AiPreferences {
     }
 
     public int getDocumentSplitterOverlapSize() {
-        return documentSplitterOverlapSize.get();
+        if (getCustomizeExpertSettings()) {
+            return documentSplitterOverlapSize.get();
+        } else {
+            return AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP;
+        }
     }
 
     public void setDocumentSplitterOverlapSize(int documentSplitterOverlapSize) {
@@ -285,7 +283,11 @@ public class AiPreferences {
     }
 
     public int getRagMaxResultsCount() {
-        return ragMaxResultsCount.get();
+        if (getCustomizeExpertSettings()) {
+            return ragMaxResultsCount.get();
+        } else {
+            return AiDefaultPreferences.RAG_MAX_RESULTS_COUNT;
+        }
     }
 
     public void setRagMaxResultsCount(int ragMaxResultsCount) {
@@ -297,7 +299,11 @@ public class AiPreferences {
     }
 
     public double getRagMinScore() {
-        return ragMinScore.get();
+        if (getCustomizeExpertSettings()) {
+            return ragMinScore.get();
+        } else {
+            return AiDefaultPreferences.RAG_MIN_SCORE;
+        }
     }
 
     public void setRagMinScore(double ragMinScore) {

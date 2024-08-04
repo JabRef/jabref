@@ -27,64 +27,34 @@
                   <Font size="14.0" />
                </font>
             </Text>
-            <HBox alignment="BASELINE_LEFT">
+            <TextFlow fx:id="openAiPrivacyTextFlow">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the OpenAI as AI provider, the privacy policy of OpenAI applies. You find it at">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Text>
-                  <Hyperlink onAction="#onPrivacyHyperlinkClick" style="-fx-padding: 0.166667em 0.25em 0.166667em 0.25em;" text="https://openai.com/policies/privacy-policy">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Hyperlink>
-                  <Text layoutX="10.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text=".">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the OpenAI as AI provider, the privacy policy of OpenAI applies. You find it at %0.">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
                </children>
-            </HBox>
-            <HBox alignment="BASELINE_LEFT">
+            </TextFlow>
+            <TextFlow fx:id="mistralAiPrivacyTextFlow">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the Mistral AI as AI provider, the privacy policy of Mistral AI applies. You find it at">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Text>
-                  <Hyperlink onAction="#onPrivacyHyperlinkClick" style="-fx-padding: 0.166667em 0.25em 0.166667em 0.25em;" text="https://mistral.ai/terms/#privacy-policy">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Hyperlink>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text=".">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the Mistral AI as AI provider, the privacy policy of Mistral AI applies. You find it at %0.">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
                </children>
-            </HBox>
-            <HBox alignment="BASELINE_LEFT" layoutX="20.0" layoutY="112.0">
+            </TextFlow>
+            <TextFlow fx:id="huggingFacePrivacyTextFlow">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the Hugging Face as AI provider, the privacy policy of Hugging Face applies. You find it at">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Text>
-                  <Hyperlink onAction="#onPrivacyHyperlinkClick" style="-fx-padding: 0.166667em 0.25em 0.166667em 0.25em;" text="https://huggingface.co/privacy">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </Hyperlink>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text=".">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the Hugging Face as AI provider, the privacy policy of Hugging Face applies. You find it at %0.">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
                </children>
-            </HBox>
-            <Text layoutX="20.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%Additionally, we use Deep Java Library embedding models for both chatting and summarization. The embedding model will be downloaded in background from Deep Java Library servers anonymously">
+            </TextFlow>
+            <Text layoutX="20.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%Additionally, we use Deep Java Library embedding models for both chatting and summarization. The embedding model will be downloaded in background from Deep Java Library servers anonymously.">
                <font>
                   <Font size="14.0" />
                </font>

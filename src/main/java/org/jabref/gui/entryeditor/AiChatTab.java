@@ -66,7 +66,7 @@ public class AiChatTab extends EntryEditorTab {
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
 
         setText(Localization.lang("AI chat"));
-        setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached files")));
+        setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));
 
         aiService.getEmbeddingsManager().registerListener(new FileIngestedListener());
         aiService.getEmbeddingModel().registerListener(new EmbeddingModelBuiltListener());

@@ -335,7 +335,6 @@ dependencies {
     // GemxFX also (transitively) depends on kotlin
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24'
 
-
     implementation 'commons-io:commons-io:2.16.1'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.174'

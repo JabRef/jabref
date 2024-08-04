@@ -77,7 +77,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
         this.aiService = aiService;
         this.filePreferences = filePreferences;
 
-        titleProperty().set(Localization.lang("Generating summary for for %0", citationKey));
+        titleProperty().set(Localization.lang("Generating summary for %0...", citationKey));
         showToUser(true);
     }
 
@@ -86,7 +86,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
         try {
             summarizeAll();
         } catch (InterruptedException e) {
-            LOGGER.info("There was a summarization task for {}. It will be canceled, because user quits JabRef", citationKey);
+            LOGGER.info("There was a summarization task for {}. It will be canceled, because user quits JabRef.", citationKey);
         }
 
         showToUser(false);
@@ -142,7 +142,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
         Optional<Document> document = FileToDocument.fromFile(path.get());
 
         if (document.isEmpty()) {
-            LOGGER.warn("Generated empty document from a linked file {}. It will be skipped when generating a summary", linkedFile.getLink());
+            LOGGER.warn("Could not extract text from a linked file {}. It will be skipped when generating a summary.", linkedFile.getLink());
             return Optional.empty();
         }
 

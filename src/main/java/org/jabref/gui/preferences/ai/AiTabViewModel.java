@@ -50,6 +50,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<AiPreferences.EmbeddingModel> selectedEmbeddingModel = new SimpleObjectProperty<>();
 
     private final StringProperty apiBaseUrl = new SimpleStringProperty();
+    private final BooleanProperty disableApiBaseUrl = new SimpleBooleanProperty(); // {@link HuggingFaceChatModel} doesn't support setting API base URL
 
     private final StringProperty instruction = new SimpleStringProperty();
     private final DoubleProperty temperature = new SimpleDoubleProperty();
@@ -88,28 +89,32 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         );
 
         this.selectedAiProvider.addListener((observable, oldValue, newValue) -> {
-            List<String> models = AiPreferences.CHAT_MODELS.get(newValue);
+            List<String> models = AiDefaultPreferences.CHAT_MODELS.get(newValue);
             chatModelsList.setAll(models);
             if (!models.isEmpty()) {
                 selectedChatModel.setValue(chatModelsList.getFirst());
             }
 
-            apiBaseUrl.set(AiPreferences.PROVIDERS_API_URLS.get(newValue));
+            apiBaseUrl.set(AiDefaultPreferences.PROVIDERS_API_URLS.get(newValue));
             apiToken.set("");
         });
 
         this.selectedChatModel.addListener((observable, oldValue, newValue) -> {
-            Map<String, Integer> modelContextWindows = AiPreferences.CONTEXT_WINDOW_SIZES.get(selectedAiProvider.get());
+            Map<String, Integer> modelContextWindows = AiDefaultPreferences.CONTEXT_WINDOW_SIZES.get(selectedAiProvider.get());
 
             if (modelContextWindows == null) {
-                contextWindowSize.set(0);
+                contextWindowSize.set(AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
                 return;
             }
 
             Integer value = modelContextWindows.get(newValue);
 
-            contextWindowSize.set(value == null ? 0 : value);
+            contextWindowSize.set(value == null ? AiDefaultPreferences.CONTEXT_WINDOW_SIZE : value);
         });
+
+        this.selectedAiProvider.addListener((observable, oldValue, newValue) ->
+            disableApiBaseUrl.set(newValue == AiPreferences.AiProvider.HUGGING_FACE)
+        );
 
         this.apiTokenValidator = new FunctionBasedValidator<>(
                 apiToken,
@@ -194,30 +199,26 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         aiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
 
-        if (customizeExpertSettings.get()) {
-            aiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
-            aiPreferences.setApiBaseUrl(apiBaseUrl.get());
-            aiPreferences.setInstruction(instruction.get());
-            aiPreferences.setTemperature(temperature.get());
-            aiPreferences.setContextWindowSize(contextWindowSize.get());
-            aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
-            aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
-            aiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());
-            aiPreferences.setRagMinScore(ragMinScore.get());
-        } else {
-            resetExpertSettings();
-        }
+        aiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
+        aiPreferences.setApiBaseUrl(apiBaseUrl.get());
+        aiPreferences.setInstruction(instruction.get());
+        aiPreferences.setTemperature(temperature.get());
+        aiPreferences.setContextWindowSize(contextWindowSize.get());
+        aiPreferences.setDocumentSplitterChunkSize(documentSplitterChunkSize.get());
+        aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
+        aiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());
+        aiPreferences.setRagMinScore(ragMinScore.get());
     }
 
     public void resetExpertSettings() {
-        String resetApiBaseUrl = AiPreferences.PROVIDERS_API_URLS.get(selectedAiProvider.get());
+        String resetApiBaseUrl = AiDefaultPreferences.PROVIDERS_API_URLS.get(selectedAiProvider.get());
         aiPreferences.setApiBaseUrl(resetApiBaseUrl);
         apiBaseUrl.setValue(resetApiBaseUrl);
 
         aiPreferences.setInstruction(AiDefaultPreferences.SYSTEM_MESSAGE);
         instruction.set(AiDefaultPreferences.SYSTEM_MESSAGE);
 
-        int resetContextWindowSize = AiPreferences.CONTEXT_WINDOW_SIZES.getOrDefault(selectedAiProvider.get(), Map.of()).getOrDefault(selectedChatModel.get(), 0);
+        int resetContextWindowSize = AiDefaultPreferences.CONTEXT_WINDOW_SIZES.getOrDefault(selectedAiProvider.get(), Map.of()).getOrDefault(selectedChatModel.get(), 0);
         aiPreferences.setContextWindowSize(resetContextWindowSize);
         contextWindowSize.set(resetContextWindowSize);
 
@@ -307,10 +308,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return customizeExpertSettings;
     }
 
-    public boolean getCustomizeExpertSettings() {
-        return customizeExpertSettings.get();
-    }
-
     public ReadOnlyListProperty<AiPreferences.EmbeddingModel> embeddingModelsProperty() {
         return embeddingModelsList;
     }
@@ -321,6 +318,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty apiBaseUrlProperty() {
         return apiBaseUrl;
+    }
+
+    public BooleanProperty disableApiBaseUrlProperty() {
+        return disableApiBaseUrl;
     }
 
     public StringProperty instructionProperty() {

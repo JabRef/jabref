@@ -16,7 +16,7 @@
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
                 <CheckBox fx:id="enableAi"
-                          mnemonicParsing="false" text="%Enable AI functionality (summary generation and chatting) in JabRef" />
+                          mnemonicParsing="false" VBox.vgrow="ALWAYS" text="%Enable AI functionality (summary generation and chatting) in JabRef" />
                 <Button fx:id="enableAiHelp" prefWidth="20.0" />
             </children>
         </HBox>
@@ -33,6 +33,7 @@
             <children>
                 <Label alignment="BASELINE_CENTER" text="%Chat model" />
                 <ComboBox fx:id="chatModelComboBox" editable="true" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                <Button fx:id="chatModelHelp" prefWidth="20.0" />
             </children>
         </HBox>
 

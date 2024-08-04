@@ -463,7 +463,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
-    private static final String AI_ENABLE = "aiEnable";
+    private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_PROVIDER = "aiProvider";
     private static final String AI_CHAT_MODEL = "aiChatModel";
     private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
@@ -881,15 +881,15 @@ public class JabRefPreferences implements PreferencesService {
         setLanguageDependentDefaultValues();
 
         // region:AI
-        defaults.put(AI_ENABLE, AiDefaultPreferences.ENABLE_CHAT);
+        defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);
         defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
         defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL);
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
         defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());
-        defaults.put(AI_API_BASE_URL, AiPreferences.PROVIDERS_API_URLS.get(AiDefaultPreferences.PROVIDER));
+        defaults.put(AI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiDefaultPreferences.PROVIDER));
         defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
         defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
-        defaults.put(AI_CONTEXT_WINDOW_SIZE, AiPreferences.CONTEXT_WINDOW_SIZES.get(AiDefaultPreferences.PROVIDER).get(AiDefaultPreferences.CHAT_MODEL));
+        defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.CONTEXT_WINDOW_SIZES.get(AiDefaultPreferences.PROVIDER).get(AiDefaultPreferences.CHAT_MODEL));
         defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
@@ -2767,7 +2767,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         aiPreferences = new AiPreferences(
-                getBoolean(AI_ENABLE),
+                getBoolean(AI_ENABLED),
                 AiPreferences.AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_CHAT_MODEL),
                 getAiApiTokenFromKeyring().orElse(""),
@@ -2782,7 +2782,7 @@ public class JabRefPreferences implements PreferencesService {
                 getInt(AI_RAG_MAX_RESULTS_COUNT),
                 getDouble(AI_RAG_MIN_SCORE));
 
-        EasyBind.listen(aiPreferences.enableAiProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLE, newValue));
+        EasyBind.listen(aiPreferences.enableAiProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLED, newValue));
 
         EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_PROVIDER, newValue.name()));
         EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue));

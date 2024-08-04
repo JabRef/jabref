@@ -49,6 +49,7 @@ public enum HelpFile {
     PUSH_TO_APPLICATION("cite/pushtoapplications"),
     AI_ENABLE("ai"),
     AI_PROVIDER("ai#what-is-an-ai-provider"),
+    AI_CHAT_MODEL("ai#chat-model"),
     AI_API_TOKEN("ai#what-is-an-api-key"),
     AI_API_BASE_URL("ai#api-base-url"),
     AI_EMBEDDING_MODEL("ai#embedding-model"),

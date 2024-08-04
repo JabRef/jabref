@@ -45,6 +45,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     @FXML private Button enableAiHelp;
     @FXML private Button aiProviderHelp;
+    @FXML private Button chatModelHelp;
     @FXML private Button apiTokenHelp;
     @FXML private Button apiBaseUrlHelp;
     @FXML private Button embeddingModelHelp;
@@ -96,7 +97,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         embeddingModelComboBox.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         apiBaseUrlTextField.textProperty().bindBidirectional(viewModel.apiBaseUrlProperty());
-        apiBaseUrlTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
+        viewModel.disableExpertSettingsProperty().addListener((observable, oldValue, newValue) ->
+            apiBaseUrlTextField.setDisable(newValue || viewModel.disableApiBaseUrlProperty().get())
+        );
+
+        viewModel.disableApiBaseUrlProperty().addListener((observable, oldValue, newValue) ->
+            apiBaseUrlTextField.setDisable(newValue || viewModel.disableExpertSettingsProperty().get())
+        );
 
         instructionTextArea.textProperty().bindBidirectional(viewModel.instructionProperty());
         instructionTextArea.disableProperty().bind(viewModel.disableExpertSettingsProperty());
@@ -183,6 +191,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_ENABLE, dialogService, preferencesService.getFilePreferences()), enableAiHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_PROVIDER, dialogService, preferencesService.getFilePreferences()), aiProviderHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_CHAT_MODEL, dialogService, preferencesService.getFilePreferences()), chatModelHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_API_TOKEN, dialogService, preferencesService.getFilePreferences()), apiTokenHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EMBEDDING_MODEL, dialogService, preferencesService.getFilePreferences()), embeddingModelHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_API_BASE_URL, dialogService, preferencesService.getFilePreferences()), apiBaseUrlHelp);

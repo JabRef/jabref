@@ -60,7 +60,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
                 ingestLinkedFile(linkedFile);
             }
         } catch (InterruptedException e) {
-            LOGGER.info("There is a embeddings generation task for {}. It will be cancelled, because user quits JabRef", citationKey);
+            LOGGER.info("There is a embeddings generation task for {}. It will be cancelled, because user quits JabRef.", citationKey);
         }
 
         showToUser(false);

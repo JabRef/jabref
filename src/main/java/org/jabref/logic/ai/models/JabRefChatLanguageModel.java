@@ -114,11 +114,11 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
 
         if (langchainChatModel.isEmpty()) {
             if (!aiPreferences.getEnableAi()) {
-                throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)"));
+                throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)."));
             } else if (aiPreferences.getApiToken().isEmpty()) {
-                throw new RuntimeException(Localization.lang("In order to use AI chat, set OpenAI API key inside JabRef preferences (AI tab)"));
+                throw new RuntimeException(Localization.lang("In order to use AI chat, set OpenAI API key inside JabRef preferences (AI tab)."));
             } else {
-                throw new RuntimeException(Localization.lang("Unable to chat with AI"));
+                throw new RuntimeException(Localization.lang("Unable to chat with AI."));
             }
         }
 
