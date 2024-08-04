@@ -13,3 +13,7 @@
   url = https://github.com/citation-style-language/locales.git
   ignore = all
   shallow = true
+[submodule "jabref"]
+    path = jabref
+    url = https://github.com/JabRef/user-documentation.git
+    shallow = true
