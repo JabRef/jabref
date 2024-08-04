@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.ListIterator;
 import java.util.function.Predicate;
 
+import javafx.collections.ObservableListBase;
 import javafx.collections.transformation.FilteredList;
 
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -36,12 +37,12 @@ public class FilteredListProxy {
                 throw new IndexOutOfBoundsException();
             }
 
-            invoke(filteredList, "beginChange");
+            invoke(filteredList, ObservableListBase.class, "beginChange");
 
-            invoke(filteredList, "ensureSize", filteredList.getSource().size());
+            invoke(filteredList, FilteredList.class, "ensureSize", filteredList.getSource().size());
 
             @SuppressWarnings("unchecked")
-            Predicate<BibEntryTableViewModel> predicateImpl = (Predicate<BibEntryTableViewModel>) invoke(filteredList, "getPredicateImpl");
+            Predicate<BibEntryTableViewModel> predicateImpl = (Predicate<BibEntryTableViewModel>) invoke(filteredList, FilteredList.class, "getPredicateImpl");
             ListIterator<? extends BibEntryTableViewModel> it = filteredList.getSource().listIterator(sourceFrom);
 
             Field filteredField = getField("filtered");
@@ -60,16 +61,16 @@ public class FilteredListProxy {
                  * 3. not passed before and now -> nextAdd
                  * 4. not passed before and not now -> do nothing */
                 if (passedBefore && passedNow) {
-                    invoke(filteredList, "nextUpdate", pos);
+                    invoke(filteredList, ObservableListBase.class, "nextUpdate", pos);
                 } else if (passedBefore) {
-                    invoke(filteredList, "nextRemove", pos, el);
+                    invoke(filteredList, ObservableListBase.class, "nextRemove", pos, el);
                     System.arraycopy(filtered, pos + 1, filtered, pos, size - pos - 1);
                     --size;
                 } else if (passedNow) {
                     int insertionPoint = ~pos;
                     System.arraycopy(filtered, insertionPoint, filtered, insertionPoint + 1, size - insertionPoint);
                     filtered[insertionPoint] = i;
-                    invoke(filteredList, "nextAdd", insertionPoint, insertionPoint + 1);
+                    invoke(filteredList, ObservableListBase.class, "nextAdd", insertionPoint, insertionPoint + 1);
                     ++size;
                 }
             }
@@ -78,7 +79,7 @@ public class FilteredListProxy {
             filteredField.set(filteredList, filtered);
             sizeField.set(filteredList, size);
 
-            invoke(filteredList, "endChange");
+            invoke(filteredList, ObservableListBase.class, "endChange");
         } catch (ReflectiveOperationException e) {
             LOGGER.warn("Could not refilter list", e);
         }
@@ -87,13 +88,17 @@ public class FilteredListProxy {
     /**
      * We directly invoke the specified method on the given filteredList
      */
-    private static Object invoke(FilteredList<?> filtertedList, String methodName, Object... params) throws ReflectiveOperationException {
+    private static Object invoke(FilteredList<?> filtertedList, Class<?> clazz, String methodName, Object... params) throws ReflectiveOperationException {
         // Determine the parameter types for the method lookup
         Class<?>[] paramTypes = new Class[params.length];
         for (int i = 0; i < params.length; i++) {
             paramTypes[i] = params[i].getClass();
+            if (paramTypes[i] == Integer.class) {
+                // quick hack, because int is converted to Object when calling this method.
+                paramTypes[i] = int.class;
+            }
         }
-        Method method = FilteredList.class.getDeclaredMethod(methodName, paramTypes);
+        Method method = clazz.getDeclaredMethod(methodName, paramTypes);
         method.setAccessible(true);
         return method.invoke(filtertedList, params);
     }
