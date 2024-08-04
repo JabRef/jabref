@@ -15,40 +15,32 @@ public class CSLReferenceMark {
     private final XTextContent textContent;
     private String citationKey;
     private String citationNumber;
+    private String uniqueId;
 
     public CSLReferenceMark(XNamed named, String name) {
         this.name = name;
         this.textContent = UnoRuntime.queryInterface(XTextContent.class, named);
 
-        // Format: JABREF_{citationKey} RND{citationNumber}
+        // Format: JABREF_{citationKey} CID_{citationNumber} {uniqueId}
         String[] parts = name.split(" ");
 
-        if (parts.length >= 2 && parts[0].startsWith("JABREF_") && parts[1].startsWith("RND")) {
+        if (parts.length >= 3 && parts[0].startsWith("JABREF_") && parts[1].startsWith("CID_")) {
             this.citationKey = parts[0].substring(7);
-            this.citationNumber = parts[1].substring(3);
+            this.citationNumber = parts[1].substring(4);
+            this.uniqueId = parts[2];
+            System.out.println(citationKey);
+            System.out.println(citationNumber);
+            System.out.println(uniqueId);
         }
     }
 
     public void insertReferenceIntoOO(XTextDocument doc, XTextCursor cursor, OOText ooText) throws Exception {
-        // Create a text range for the start position
         XTextRange startRange = cursor.getStart();
-
-        // Insert the text content at the cursor position
         OOTextIntoOO.write(doc, cursor, ooText);
-
-        // Create a text range for the end position
         XTextRange endRange = cursor.getEnd();
-
-        // Move the cursor back to the start position
         cursor.gotoRange(startRange, false);
-
-        // Select the text by moving to the end position
         cursor.gotoRange(endRange, true);
-
-        // Attach the reference mark to the selected range
         textContent.attach(cursor);
-
-        // Move the cursor to the end of the inserted text
         cursor.gotoRange(endRange, false);
     }
 
@@ -62,5 +54,13 @@ public class CSLReferenceMark {
 
     public String getCitationKey() {
         return citationKey;
+    }
+
+    public String getCitationNumber() {
+        return citationNumber;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
     }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,47 +55,26 @@ public class CSLReferenceMarkManager {
         }
     }
 
-    /**
-     * Extracts the citation key from a reference mark name.
-     *
-     * @param name The name of the reference mark
-     * @return The extracted citation key, or an empty string if no key could be extracted
-     */
     private String extractCitationKey(String name) {
-        // Check if the name starts with one of the known prefixes
         for (String prefix : CSLCitationOOAdapter.PREFIXES) {
             if (name.startsWith(prefix)) {
-                // Remove the prefix
                 String withoutPrefix = name.substring(prefix.length());
-
-                // Split the remaining string by space
                 String[] parts = withoutPrefix.split("\\s+");
-
                 if (parts.length > 0) {
-                    // The first part should be the citation key
                     String key = parts[0];
-
-                    // Remove any non-alphanumeric characters from the start and end
                     key = key.replaceAll("^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$", "");
-
-                    // If we have a non-empty key, return it
                     if (!key.isEmpty()) {
                         return key;
                     }
                 }
-
-                // If we couldn't extract a key after removing the prefix,
-                // no need to check other prefixes
                 break;
             }
         }
-
-        // If no key could be extracted, return an empty string
         return "";
     }
 
     private void updateCitationInfo(String name) {
-        Pattern pattern = Pattern.compile("JABREF_(.+) RND(\\d+)"); // Format: JABREF_{citationKey} RND{citationNumber}
+        Pattern pattern = Pattern.compile("JABREF_(.+) CID_(\\d+) (.+)"); // Updated pattern
         Matcher matcher = pattern.matcher(name);
         if (matcher.find()) {
             String citationKey = matcher.group(1);
@@ -121,8 +101,9 @@ public class CSLReferenceMarkManager {
     public CSLReferenceMark createReferenceMark(BibEntry entry) throws Exception {
         String citationKey = entry.getCitationKey().orElse("");
         int citationNumber = getCitationNumber(citationKey);
+        String uniqueId = UUID.randomUUID().toString().substring(0, 8); // Generate a unique ID
 
-        String name = CSLCitationOOAdapter.PREFIXES[0] + citationKey + " RND" + citationNumber;
+        String name = CSLCitationOOAdapter.PREFIXES[0] + citationKey + " CID_" + citationNumber + " " + uniqueId;
         Object mark = factory.createInstance("com.sun.star.text.ReferenceMark");
         XNamed named = UnoRuntime.queryInterface(XNamed.class, mark);
         named.setName(name);

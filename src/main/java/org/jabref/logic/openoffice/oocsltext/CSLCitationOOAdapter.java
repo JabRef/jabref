@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice.oocsltext;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +44,7 @@ public class CSLCitationOOAdapter {
         isNumericStyle = selectedStyle.isNumericStyle();
 
         // Sort entries based on their order of appearance in the document
-        // entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
+        entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
         for (BibEntry entry: entries) {
             String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, bibDatabaseContext, bibEntryTypesManager).getFirst();
             writeCitation(document, cursor, entry, citation);
