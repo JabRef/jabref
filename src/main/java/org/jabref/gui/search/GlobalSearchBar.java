@@ -267,13 +267,10 @@ public class GlobalSearchBar extends HBox {
             updateSearchQuery();
         });
 
-        filterModeButton.setSelected(searchPreferences.isFilteringMode());
+        filterModeButton.setSelected(searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FILTER);
         filterModeButton.setTooltip(new Tooltip(Localization.lang("Filter search results")));
         initSearchModifierButton(filterModeButton);
-        filterModeButton.setOnAction(event -> {
-            searchPreferences.setSearchFlag(SearchRules.SearchFlags.FILTERING_SEARCH, filterModeButton.isSelected());
-            updateSearchQuery();
-        });
+        filterModeButton.setOnAction(event -> searchPreferences.setSearchDisplayMode(filterModeButton.isSelected() ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT));
 
         openGlobalSearchButton.disableProperty().bindBidirectional(globalSearchActive);
         openGlobalSearchButton.setTooltip(new Tooltip(Localization.lang("Search across libraries in a new window")));
@@ -284,8 +281,6 @@ public class GlobalSearchBar extends HBox {
             regularExpressionButton.setSelected(searchPreferences.isRegularExpression());
             caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
             fulltextButton.setSelected(searchPreferences.isFulltext());
-            keepSearchString.setSelected(searchPreferences.shouldKeepSearchString());
-            filterModeButton.setSelected(searchPreferences.isFilteringMode());
         });
     }
 
