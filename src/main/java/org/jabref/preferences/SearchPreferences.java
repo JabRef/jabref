@@ -23,6 +23,7 @@ public class SearchPreferences {
     private final DoubleProperty searchWindowHeight;
     private final DoubleProperty searchWindowWidth;
     private final DoubleProperty searchWindowDividerPosition;
+    private final BooleanProperty keepSearchSting;
     private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
 
     public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
@@ -41,23 +42,22 @@ public class SearchPreferences {
         if (isFulltext) {
             searchFlags.add(SearchFlags.FULLTEXT);
         }
-        if (isKeepSearchString) {
-            searchFlags.add(SearchFlags.KEEP_SEARCH_STRING);
-        }
 
+        this.keepSearchSting = new SimpleBooleanProperty(isKeepSearchString);
         this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.setSearchWindowHeight(searchWindowHeight);
         this.setSearchWindowWidth(searchWindowWidth);
     }
 
     @VisibleForTesting
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepWindowOnTop) {
+    public SearchPreferences(EnumSet<SearchFlags> searchFlags) {
         this.searchFlags = FXCollections.observableSet(searchFlags);
-        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
+        this.keepWindowOnTop = new SimpleBooleanProperty(false);
         this.searchWindowHeight = new SimpleDoubleProperty(0);
         this.searchWindowWidth = new SimpleDoubleProperty(0);
         this.searchWindowDividerPosition = new SimpleDoubleProperty(0);
-        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
+        this.searchDisplayMode = new SimpleObjectProperty<>();
+        this.keepSearchSting = new SimpleBooleanProperty(false);
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
@@ -93,7 +93,7 @@ public class SearchPreferences {
     }
 
     public boolean shouldKeepSearchString() {
-        return searchFlags.contains(SearchFlags.KEEP_SEARCH_STRING);
+        return keepSearchSting.get();
     }
 
     public boolean shouldKeepWindowOnTop() {
@@ -140,6 +140,10 @@ public class SearchPreferences {
         return this.searchDisplayMode;
     }
 
+    public BooleanProperty keepSearchStingProperty() {
+        return keepSearchSting;
+    }
+
     public void setSearchWindowHeight(double height) {
         this.searchWindowHeight.set(height);
     }
@@ -154,5 +158,9 @@ public class SearchPreferences {
 
     public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
         this.searchDisplayMode.set(searchDisplayMode);
+    }
+
+    public void setKeepSearchString(boolean keepSearchString) {
+        this.keepSearchSting.set(keepSearchString);
     }
 }

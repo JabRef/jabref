@@ -2751,9 +2751,9 @@ public class JabRefPreferences implements PreferencesService {
             putBoolean(SEARCH_CASE_SENSITIVE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE));
             putBoolean(SEARCH_REG_EXP, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION));
             putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT));
-            putBoolean(SEARCH_KEEP_SEARCH_STRING, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.KEEP_SEARCH_STRING));
         });
         EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
+        EasyBind.listen(searchPreferences.keepSearchStingProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
         EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
         EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));

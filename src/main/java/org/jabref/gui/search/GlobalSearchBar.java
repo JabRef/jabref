@@ -262,10 +262,7 @@ public class GlobalSearchBar extends HBox {
         keepSearchString.setSelected(searchPreferences.shouldKeepSearchString());
         keepSearchString.setTooltip(new Tooltip(Localization.lang("Keep search string across libraries")));
         initSearchModifierButton(keepSearchString);
-        keepSearchString.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            searchPreferences.setSearchFlag(SearchRules.SearchFlags.KEEP_SEARCH_STRING, newVal);
-            updateSearchQuery();
-        });
+        keepSearchString.selectedProperty().addListener((obs, oldVal, newVal) -> searchPreferences.setKeepSearchString(newVal));
 
         filterModeButton.setSelected(searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FILTER);
         filterModeButton.setTooltip(new Tooltip(Localization.lang("Filter search results")));
