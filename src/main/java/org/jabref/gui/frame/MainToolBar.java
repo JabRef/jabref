@@ -218,7 +218,7 @@ public class MainToolBar extends ToolBar {
         indicator.setOnMouseClicked(event -> {
             TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
             EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
-            taskProgressView.setRetainTasks(true);
+            taskProgressView.setRetainTasks(false);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
             if (progressViewPopOver == null) {
