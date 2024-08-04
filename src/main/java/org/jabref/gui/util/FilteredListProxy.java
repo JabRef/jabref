@@ -87,7 +87,7 @@ public class FilteredListProxy {
     /**
      * We directly invoke the specified method on the given filteredList
      */
-    private static Object invoke(FilteredList<?> filtertedList, Class<?> clazz, String methodName, Object... params) throws ReflectiveOperationException {
+    private static Object invoke(FilteredList<?> filteredList, Class<?> clazz, String methodName, Object... params) throws ReflectiveOperationException {
         // Determine the parameter types for the method lookup
         Class<?>[] paramTypes = new Class[params.length];
         for (int i = 0; i < params.length; i++) {
@@ -99,7 +99,7 @@ public class FilteredListProxy {
         }
         Method method = clazz.getDeclaredMethod(methodName, paramTypes);
         method.setAccessible(true);
-        return method.invoke(filtertedList, params);
+        return method.invoke(filteredList, params);
     }
 
     /**
