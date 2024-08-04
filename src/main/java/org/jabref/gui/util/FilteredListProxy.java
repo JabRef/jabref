@@ -31,17 +31,16 @@ public class FilteredListProxy {
 
     public static void refilterListReflection(FilteredList<BibEntryTableViewModel> filteredList, int sourceFrom, int sourceTo) {
         try {
-
             if (sourceFrom < 0 || sourceTo > filteredList.getSource().size() || sourceFrom > sourceTo) {
                 throw new IndexOutOfBoundsException();
             }
 
             invoke(filteredList, "beginChange");
-
             invoke(filteredList, "ensureSize", filteredList.getSource().size());
 
             @SuppressWarnings("unchecked")
             Predicate<BibEntryTableViewModel> predicateImpl = (Predicate<BibEntryTableViewModel>) invoke(filteredList, "getPredicateImpl");
+            
             ListIterator<? extends BibEntryTableViewModel> it = filteredList.getSource().listIterator(sourceFrom);
 
             Field filteredField = getField("filtered");
@@ -64,13 +63,13 @@ public class FilteredListProxy {
                 } else if (passedBefore) {
                     invoke(filteredList, "nextRemove", pos, el);
                     System.arraycopy(filtered, pos + 1, filtered, pos, size - pos - 1);
-                    --size;
+                    size++;
                 } else if (passedNow) {
                     int insertionPoint = ~pos;
                     System.arraycopy(filtered, insertionPoint, filtered, insertionPoint + 1, size - insertionPoint);
                     filtered[insertionPoint] = i;
                     invoke(filteredList, "nextAdd", insertionPoint, insertionPoint + 1);
-                    ++size;
+                    size--;
                 }
             }
 
