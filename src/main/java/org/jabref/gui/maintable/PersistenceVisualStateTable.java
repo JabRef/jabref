@@ -69,7 +69,7 @@ public class PersistenceVisualStateTable {
         return columns.stream()
                       .filter(col -> col instanceof MainTableColumn<?>)
                       .map(column -> ((MainTableColumn<?>) column).getModel())
-                      .filter(model -> !model.getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
+                      .filter(model -> !model.getType().equals(MainTableColumnModel.Type.MATCH_CATEGORY))
                       .collect(Collectors.toList());
     }
 }

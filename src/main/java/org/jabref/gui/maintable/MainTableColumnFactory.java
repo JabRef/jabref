@@ -31,7 +31,7 @@ import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
-import org.jabref.gui.search.SearchRank;
+import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -134,7 +134,7 @@ public class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
-        columns.add(createSearchRankColumn(new MainTableColumnModel(MainTableColumnModel.Type.SEARCH_RANK)));
+        columns.add(createMatchCategoryColumn(new MainTableColumnModel(MainTableColumnModel.Type.MATCH_CATEGORY)));
         columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
         return columns;
     }
@@ -145,14 +145,14 @@ public class MainTableColumnFactory {
         column.setMaxWidth(width);
     }
 
-    private TableColumn<BibEntryTableViewModel, SearchRank> createSearchRankColumn(MainTableColumnModel columnModel) {
-        TableColumn<BibEntryTableViewModel, SearchRank> column = new MainTableColumn<>(columnModel);
-        Node header = new Text(Localization.lang("Search rank"));
+    private TableColumn<BibEntryTableViewModel, MatchCategory> createMatchCategoryColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, MatchCategory> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Match category"));
         header.getStyleClass().add("mainTable-header");
-        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SEARCH_RANK.getDisplayName()));
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.MATCH_CATEGORY.getDisplayName()));
         column.setGraphic(header);
-        column.setCellValueFactory(cellData -> cellData.getValue().searchRank());
-        new ValueTableCellFactory<BibEntryTableViewModel, SearchRank>().withText(String::valueOf).install(column);
+        column.setCellValueFactory(cellData -> cellData.getValue().matchCategory());
+        new ValueTableCellFactory<BibEntryTableViewModel, MatchCategory>().withText(String::valueOf).install(column);
         column.setSortable(true);
         column.setSortType(TableColumn.SortType.ASCENDING);
         column.setVisible(false);

@@ -15,7 +15,7 @@ import javafx.collections.transformation.SortedList;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.search.SearchDisplayMode;
-import org.jabref.gui.search.SearchRank;
+import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.CustomFilteredList;
@@ -86,7 +86,7 @@ public class MainTableDataModel {
         selectedGroupsSubscription = EasyBind.listen(selectedGroupsProperty, (observable, oldValue, newValue) -> updateGroupMatches(newValue));
         groupViewModeSubscription = EasyBind.listen(preferencesService.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(selectedGroupsProperty.get()));
 
-        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_SEARCH_AND_GROUPS).get())));
+        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS).get())));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
@@ -101,7 +101,7 @@ public class MainTableDataModel {
     private static void updateEntrySearchMatch(Optional<SearchQuery> query, BibEntryTableViewModel entry, boolean isFloatingMode) {
         boolean isMatched = query.map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
         entry.isMatchedBySearch().set(isMatched);
-        entry.updateSearchRank();
+        entry.updateMatchCategory();
         setEntrySearchVisibility(entry, isMatched, isFloatingMode);
     }
 
@@ -133,7 +133,7 @@ public class MainTableDataModel {
         boolean isMatched = groupsMatcher.map(matcher -> matcher.isMatch(entry.getEntry()) ^ isInvertMode)
                                          .orElse(true);
         entry.isMatchedByGroup().set(isMatched);
-        entry.updateSearchRank();
+        entry.updateMatchCategory();
         if (isMatched) {
             entry.isVisibleByGroup().set(true);
         } else {

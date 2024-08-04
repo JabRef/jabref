@@ -67,7 +67,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         // Populate the menu with currently used fields
         for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
-            if (((MainTableColumn<?>) column).getModel().getType() == MainTableColumnModel.Type.SEARCH_RANK) {
+            if (((MainTableColumn<?>) column).getModel().getType() == MainTableColumnModel.Type.MATCH_CATEGORY) {
                 continue;
             }
             // Append only if the column has not already been added (a common column)

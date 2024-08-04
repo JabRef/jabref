@@ -21,7 +21,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 
-import org.jabref.gui.search.SearchRank;
+import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.uithreadaware.UiThreadBinding;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -52,7 +52,7 @@ public class BibEntryTableViewModel {
     private final BooleanProperty isVisibleBySearch = new SimpleBooleanProperty(true);
     private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(true);
     private final BooleanProperty isVisibleByGroup = new SimpleBooleanProperty(true);
-    private final ObjectProperty<SearchRank> searchRank = new SimpleObjectProperty<>(SearchRank.MATCHING_SEARCH_AND_GROUPS);
+    private final ObjectProperty<MatchCategory> matchCategory = new SimpleObjectProperty<>(MatchCategory.MATCHING_SEARCH_AND_GROUPS);
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -175,25 +175,25 @@ public class BibEntryTableViewModel {
         return isVisibleByGroup;
     }
 
-    public ObjectProperty<SearchRank> searchRank() {
-        return searchRank;
+    public ObjectProperty<MatchCategory> matchCategory() {
+        return matchCategory;
     }
 
     public boolean isVisible() {
         return isVisibleBySearch.get() && isVisibleByGroup.get();
     }
 
-    public void updateSearchRank() {
-        SearchRank rank = SearchRank.NOT_MATCHING_SEARCH_AND_GROUPS;
+    public void updateMatchCategory() {
+        MatchCategory category = MatchCategory.NOT_MATCHING_SEARCH_AND_GROUPS;
 
         if (isMatchedBySearch.get() && isMatchedByGroup.get()) {
-            rank = SearchRank.MATCHING_SEARCH_AND_GROUPS;
+            category = MatchCategory.MATCHING_SEARCH_AND_GROUPS;
         } else if (isMatchedBySearch.get()) {
-            rank = SearchRank.MATCHING_SEARCH_NOT_GROUPS;
+            category = MatchCategory.MATCHING_SEARCH_NOT_GROUPS;
         } else if (isMatchedByGroup.get()) {
-            rank = SearchRank.MATCHING_GROUPS_NOT_SEARCH;
+            category = MatchCategory.MATCHING_GROUPS_NOT_SEARCH;
         }
 
-        searchRank.set(rank);
+        matchCategory.set(category);
     }
 }

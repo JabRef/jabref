@@ -39,7 +39,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
-import org.jabref.gui.search.SearchRank;
+import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
@@ -155,10 +155,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
-                .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_SEARCH_AND_GROUPS))
-                .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_SEARCH_NOT_GROUPS))
-                .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.searchRank().isEqualTo(SearchRank.MATCHING_GROUPS_NOT_SEARCH))
-                .withPseudoClass(NOT_MATCHING_SEARCH_AND_GROUPS, entry -> entry.searchRank().isEqualTo(SearchRank.NOT_MATCHING_SEARCH_AND_GROUPS))
+                .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS))
+                .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_NOT_GROUPS))
+                .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_GROUPS_NOT_SEARCH))
+                .withPseudoClass(NOT_MATCHING_SEARCH_AND_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.NOT_MATCHING_SEARCH_AND_GROUPS))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -168,7 +168,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.getSortOrder().clear();
 
-        // force search rank column to be the first sort order, (search_rank column is always the first column)
+        // force match category column to be the first sort order, (match_category column is always the first column)
         this.getSortOrder().addFirst(getColumns().getFirst());
         this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
                 if (!this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
@@ -208,7 +208,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             if (this.getSortOrder().size() <= 1) {
                 return;
             }
-            // skip search rank column
+            // skip match category column
             this.jumpToSearchKey(getSortOrder().get(1), key);
         });
 
@@ -291,15 +291,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         libraryTab.delete(StandardActions.CUT);
     }
 
-    private void scrollToNextRank() {
+    private void scrollToNextMatchCategory() {
         BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
         if (selectedEntry == null) {
             return;
         }
 
-        SearchRank currentRank = selectedEntry.searchRank().get();
+        MatchCategory currentMatchCategory = selectedEntry.matchCategory().get();
         for (int i = getSelectionModel().getSelectedIndex(); i < getItems().size(); i++) {
-            if (!getItems().get(i).searchRank().get().equals(currentRank)) {
+            if (!getItems().get(i).matchCategory().get().equals(currentMatchCategory)) {
                 getSelectionModel().clearSelection();
                 getSelectionModel().select(i);
                 scrollTo(i);
@@ -308,18 +308,18 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
     }
 
-    private void scrollToPreviousRank() {
+    private void scrollToPreviousMatchCategory() {
         BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
         if (selectedEntry == null) {
             return;
         }
 
-        SearchRank currentRank = selectedEntry.searchRank().get();
+        MatchCategory currentMatchCategory = selectedEntry.matchCategory().get();
         for (int i = getSelectionModel().getSelectedIndex(); i >= 0; i--) {
-            if (!getItems().get(i).searchRank().get().equals(currentRank)) {
-                SearchRank targetRank = getItems().get(i).searchRank().get();
-                // found the previous rank, scroll to the first entry of that rank
-                while ((i >= 0) && getItems().get(i).searchRank().get().equals(targetRank)) {
+            if (!getItems().get(i).matchCategory().get().equals(currentMatchCategory)) {
+                MatchCategory targetMatchCategory = getItems().get(i).matchCategory().get();
+                // found the previous category, scroll to the first entry of that category
+                while ((i >= 0) && getItems().get(i).matchCategory().get().equals(targetMatchCategory)) {
                     i--;
                 }
                 getSelectionModel().clearSelection();
@@ -372,12 +372,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         deleteAction.execute();
                         event.consume();
                         break;
-                    case SCROLL_TO_NEXT_RANK:
-                        scrollToNextRank();
+                    case SCROLL_TO_NEXT_MATCH_CATEGORY:
+                        scrollToNextMatchCategory();
                         event.consume();
                         break;
-                    case SCROLL_TO_PREVIOUS_RANK:
-                         scrollToPreviousRank();
+                    case SCROLL_TO_PREVIOUS_MATCH_CATEGORY:
+                         scrollToPreviousMatchCategory();
                         event.consume();
                         break;
                     default:
