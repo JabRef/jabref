@@ -17,7 +17,7 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%JabRef uses AI providers to enable 'chatting' with PDF files. AI provider is an external service. To enable JabRef chatting with PDF files, the content of the PDF files need to be shared with the currently selected AI provider.">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%JabRef uses AI providers to enable AI functionality (chatting with attached files and summarization). AI provider is an external service. To enable processing of attached files, their contents need to be shared with the currently selected AI provider.">
                <font>
                   <Font size="14.0" />
                </font>
@@ -27,49 +27,64 @@
                   <Font size="14.0" />
                </font>
             </Text>
-            <HBox alignment="BASELINE_LEFT" spacing="5.0">
+            <HBox alignment="BASELINE_LEFT">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the OpenAI as AI provider, the privacy policy of OpenAI applies. You find it at">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <Hyperlink onAction="#onPrivacyHyperlinkClick" text="https://openai.com/policies/privacy-policy">
+                  <Hyperlink onAction="#onPrivacyHyperlinkClick" style="-fx-padding: 0.166667em 0.25em 0.166667em 0.25em;" text="https://openai.com/policies/privacy-policy">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Hyperlink>
+                  <Text layoutX="10.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text=".">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
                </children>
             </HBox>
-            <HBox alignment="BASELINE_LEFT" spacing="5.0">
+            <HBox alignment="BASELINE_LEFT">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the Mistral AI as AI provider, the privacy policy of Mistral AI applies. You find it at">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <Hyperlink onAction="#onPrivacyHyperlinkClick" text="https://mistral.ai/terms/#privacy-policy">
+                  <Hyperlink onAction="#onPrivacyHyperlinkClick" style="-fx-padding: 0.166667em 0.25em 0.166667em 0.25em;" text="https://mistral.ai/terms/#privacy-policy">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Hyperlink>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text=".">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
                </children>
             </HBox>
-            <HBox alignment="BASELINE_LEFT" layoutX="20.0" layoutY="112.0" spacing="5.0">
+            <HBox alignment="BASELINE_LEFT" layoutX="20.0" layoutY="112.0">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the Hugging Face as AI provider, the privacy policy of Hugging Face applies. You find it at">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <Hyperlink onAction="#onPrivacyHyperlinkClick" text="https://huggingface.co/privacy">
+                  <Hyperlink onAction="#onPrivacyHyperlinkClick" style="-fx-padding: 0.166667em 0.25em 0.166667em 0.25em;" text="https://huggingface.co/privacy">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Hyperlink>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text=".">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
                </children>
             </HBox>
-            <Text layoutX="20.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%Additionally, we use Deep Java Library embedding models for both chatting and summarization. The embedding model will be downloaded in background from Deep Java Library servers.">
+            <Text layoutX="20.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%Additionally, we use Deep Java Library embedding models for both chatting and summarization. The embedding model will be downloaded in background from Deep Java Library servers anonymously">
                <font>
                   <Font size="14.0" />
                </font>
