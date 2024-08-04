@@ -24,7 +24,7 @@ public class ApiKeyMissingComponent extends BorderPane {
     }
 
     @FXML
-    private void onHereHyperlinkClick() {
+    private void onHyperlinkClick() {
         new ShowPreferencesAction(libraryTabContainer, AiTab.class, dialogService).execute();
     }
 }
