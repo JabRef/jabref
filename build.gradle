@@ -89,7 +89,9 @@ application {
         '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref',
         '--add-opens=javafx.graphics/javafx.scene=org.jabref',
         '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
-        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref'
+        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref',
+
+        '--add-opens=javafx.base/javafx.collections.transformation=org.jabref'
     ]
 }
 
@@ -491,6 +493,7 @@ run {
         addOpens = [
                 'javafx.controls/javafx.scene.control' : 'org.jabref',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
+                'javafx.base/javafx.collections.transformation' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
                 'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
 
