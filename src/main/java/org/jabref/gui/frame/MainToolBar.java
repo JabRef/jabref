@@ -45,6 +45,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 
@@ -63,6 +64,7 @@ public class MainToolBar extends ToolBar {
 
     private PopOver entryFromIdPopOver;
     private PopOver progressViewPopOver;
+    private Subscription taskProgressSubscription;
 
     public MainToolBar(LibraryTabContainer tabContainer,
                        PushToApplicationCommand pushToApplicationCommand,
@@ -218,10 +220,11 @@ public class MainToolBar extends ToolBar {
         indicator.setOnMouseClicked(event -> {
             if ((progressViewPopOver != null) && (progressViewPopOver.isShowing())) {
                 progressViewPopOver.hide();
+                taskProgressSubscription.unsubscribe();
             }
 
             TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-            EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
+            taskProgressSubscription = EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
             taskProgressView.setRetainTasks(false);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
