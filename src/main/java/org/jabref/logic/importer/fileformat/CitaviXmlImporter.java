@@ -24,13 +24,9 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -49,11 +45,8 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
-import org.apache.commons.io.ByteOrderMark;
-import org.apache.commons.io.input.BOMInputStream;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -424,8 +417,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
             }
 
             return mapper.readValue(xmlStreamReader, Object.class);
-        } catch(Exception e) {
-            LOGGER.debug("could not read document");
+        } catch (Exception e) {
+            LOGGER.debug("could not read document", e);
             return ParserResult.fromError(e);
         }
     }
