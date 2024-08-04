@@ -134,7 +134,7 @@ public class ImportHandler {
                                 addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                             } else {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
-                                addResultToList(file, false, Localization.lang("No metadata was found. An empty entry was created with file link"));
+                                addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
@@ -146,7 +146,7 @@ public class ImportHandler {
                             addResultToList(file, true, Localization.lang("Bib entry was successfully imported"));
                         } else {
                             entriesToAdd.add(createEmptyEntryWithLink(file));
-                            addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link"));
+                            addResultToList(file, false, Localization.lang("No BibTeX data was found. An empty entry was created with file link."));
                         }
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
