@@ -30,10 +30,11 @@ import org.slf4j.LoggerFactory;
 public abstract class NewLibraryFromPdfAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfAction .class);
 
+    protected final PreferencesService preferencesService;
+
     private final LibraryTabContainer libraryTabContainer;
     private final StateManager stateManager;
     private final DialogService dialogService;
-    protected final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
 
     public NewLibraryFromPdfAction(
