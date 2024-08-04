@@ -445,11 +445,32 @@ public class CitaviXmlImporter extends Importer implements Parser {
         Path newFile = Files.createTempFile("citavicontent", ".xml");
         newFile.toFile().deleteOnExit();
 
-        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(filePath))) {
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath.toFile()))) {
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
                 Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);
                 zipEntry = zis.getNextEntry();
+            }
+        }
+
+        InputStream stream = Files.newInputStream(newFile, StandardOpenOption.READ);
+
+        // check and delete the utf-8 BOM bytes
+        InputStream newStream = checkForUtf8BOMAndDiscardIfAny(stream);
+
+        // clean up the temp file
+        Files.delete(newFile);
+
+        return new BufferedReader(new InputStreamReader(newStream, StandardCharsets.UTF_8));
+    }
+
+    private static InputStream checkForUtf8BOMAndDiscardIfAny(InputStream inputStream) throws IOException {
+        PushbackInputStream pushbackInputStream = new PushbackInputStream(new BufferedInputStream(inputStream), 3);
+        byte[] bom = new byte[3];
+        if (pushbackInputStream.read(bom) != -1) {
+            if (!((bom[0] == (byte) 0xEF) && (bom[1] == (byte) 0xBB) && (bom[2] == (byte) 0xBF))) {
+                pushbackInputStream.unread(bom);
+>>>>>>> Correct closing of stream
             }
         }
 
