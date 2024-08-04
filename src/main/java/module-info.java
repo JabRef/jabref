@@ -148,6 +148,8 @@ open module org.jabref {
     requires jvm.openai;
     requires langchain4j;
     requires langchain4j.core;
+    requires langchain4j.hugging.face;
+    requires langchain4j.mistral.ai;
     requires langchain4j.open.ai;
     // endregion
 
