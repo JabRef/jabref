@@ -99,8 +99,6 @@ public final class CustomFilteredList<E> extends TransformationList<E, E> {
 
     /**
      * Returns the number of elements in this list.
-     *
-     * @return the number of elements in this list
      */
     @Override
     public int size() {
