@@ -445,7 +445,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         Path newFile = Files.createTempFile("citavicontent", ".xml");
         newFile.toFile().deleteOnExit();
 
-        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath.toFile()))) {
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(filePath))) {
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
                 Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);
