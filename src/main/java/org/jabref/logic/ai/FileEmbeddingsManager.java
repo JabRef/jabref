@@ -4,10 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyListProperty;
 
 import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.embeddings.LowLevelIngestor;

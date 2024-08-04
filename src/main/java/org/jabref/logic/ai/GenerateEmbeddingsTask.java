@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
@@ -20,10 +19,8 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
 import dev.langchain4j.data.document.Document;
-import org.apache.lucene.util.ThreadInterruptedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Int;
 
 public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsTask.class);

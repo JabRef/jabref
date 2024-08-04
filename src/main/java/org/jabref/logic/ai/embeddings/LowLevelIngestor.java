@@ -2,7 +2,6 @@ package org.jabref.logic.ai.embeddings;
 
 import java.util.List;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
@@ -15,7 +14,6 @@ import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
-import org.apache.lucene.util.ThreadInterruptedException;
 
 public class LowLevelIngestor {
     private final AiPreferences aiPreferences;

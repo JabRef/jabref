@@ -8,8 +8,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javafx.beans.property.ReadOnlyBooleanProperty;
-
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.embeddings.FileToDocument;
@@ -22,7 +20,6 @@ import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
 import org.slf4j.Logger;
