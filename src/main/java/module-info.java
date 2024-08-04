@@ -160,7 +160,7 @@ open module org.jabref {
 
     requires transitive org.jspecify;
 
-    // region: other libraries
+    // region: other libraries (alphabetically)
     requires dd.plist;
     requires mslinks;
     requires org.antlr.antlr4.runtime;
