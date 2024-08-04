@@ -20,9 +20,7 @@ import javafx.collections.transformation.TransformationList;
  * <li>Offers access to the {@link #refilter()} method, to re-evaluation of the filter predicate over the entire list.</li>
  * <li>Adds the {@link #refilter(int, int)} method to re-evaluate the filter predicate over a specific range of elements.</li>
  * </ol>
- *
  */
-
 public final class CustomFilteredList<E> extends TransformationList<E, E> {
     private int[] filtered;
     private int size;
