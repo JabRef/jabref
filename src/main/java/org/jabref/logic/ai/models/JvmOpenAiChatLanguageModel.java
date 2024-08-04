@@ -40,21 +40,12 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
     @Override
     public Response<AiMessage> generate(List<ChatMessage> list) {
         List<io.github.stefanbratanov.jvm.openai.ChatMessage> messages =
-                list.stream().map(chatMessage -> {
-                    // Do not inline this variable. Java compiler will argue that we return Record & ChatMessage.
-                    io.github.stefanbratanov.jvm.openai.ChatMessage result = switch (chatMessage) {
-                        case AiMessage aiMessage ->
-                                io.github.stefanbratanov.jvm.openai.ChatMessage.assistantMessage(aiMessage.text());
-                        case SystemMessage systemMessage ->
-                                io.github.stefanbratanov.jvm.openai.ChatMessage.systemMessage(systemMessage.text());
-                        case ToolExecutionResultMessage toolExecutionResultMessage ->
-                                io.github.stefanbratanov.jvm.openai.ChatMessage.toolMessage(toolExecutionResultMessage.text(), toolExecutionResultMessage.id());
-                        case UserMessage userMessage ->
-                                io.github.stefanbratanov.jvm.openai.ChatMessage.userMessage(userMessage.singleText());
-                        default ->
-                                throw new IllegalStateException("unknown conversion of chat message from langchain4j to jvm-openai");
-                    };
-                    return result;
+                list.stream().map(chatMessage -> (io.github.stefanbratanov.jvm.openai.ChatMessage) switch (chatMessage) {
+                    case AiMessage aiMessage -> io.github.stefanbratanov.jvm.openai.ChatMessage.assistantMessage(aiMessage.text());
+                    case SystemMessage systemMessage -> io.github.stefanbratanov.jvm.openai.ChatMessage.systemMessage(systemMessage.text());
+                    case ToolExecutionResultMessage toolExecutionResultMessage -> io.github.stefanbratanov.jvm.openai.ChatMessage.toolMessage(toolExecutionResultMessage.text(), toolExecutionResultMessage.id());
+                    case UserMessage userMessage -> io.github.stefanbratanov.jvm.openai.ChatMessage.userMessage(userMessage.singleText());
+                    default -> throw new IllegalStateException("unknown conversion of chat message from langchain4j to jvm-openai");
                 }).toList();
 
         CreateChatCompletionRequest request = CreateChatCompletionRequest
