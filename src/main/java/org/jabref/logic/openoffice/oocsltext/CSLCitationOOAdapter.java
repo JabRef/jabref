@@ -27,12 +27,12 @@ public class CSLCitationOOAdapter {
 
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
     private final XTextDocument document;
-    private MarkManager markManager;
+    private CSLReferenceMarkManager markManager;
     private boolean isNumericStyle = false;
 
     public CSLCitationOOAdapter(XTextDocument doc) throws Exception {
         this.document = doc;
-        this.markManager = new MarkManager(doc);
+        this.markManager = new CSLReferenceMarkManager(doc);
     }
 
     public void readExistingMarks() throws Exception {
@@ -88,7 +88,7 @@ public class CSLCitationOOAdapter {
 
         // Insert reference marks for each entry after the citation
         for (BibEntry entry : entries) {
-            ReferenceMark mark = markManager.createReferenceMark(entry, "InTextReferenceMark");
+            CSLReferenceMark mark = markManager.createReferenceMark(entry, "InTextReferenceMark");
             OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
             mark.insertReferenceIntoOO(doc, cursor, emptyOOText);
         }
@@ -130,7 +130,7 @@ public class CSLCitationOOAdapter {
         String citationKey = entry.getCitationKey().orElse("");
         int currentNumber = markManager.getCitationNumber(citationKey);
 
-        ReferenceMark mark = markManager.createReferenceMark(entry, "ReferenceMark");
+        CSLReferenceMark mark = markManager.createReferenceMark(entry, "CSLReferenceMark");
         String formattedCitation;
         if (isNumericStyle) {
             formattedCitation = updateSingleCitation(transformHtml(citation), currentNumber);
