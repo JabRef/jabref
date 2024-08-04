@@ -14,6 +14,7 @@ import javafx.collections.transformation.SortedList;
 
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.search.SearchRank;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.CustomFilteredList;

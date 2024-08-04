@@ -1,4 +1,4 @@
-package org.jabref.gui.maintable;
+package org.jabref.gui.search;
 
 public enum SearchRank {
     MATCHING_SEARCH_AND_GROUPS,
