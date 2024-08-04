@@ -131,12 +131,14 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void highlightSearchPattern() {
-        if (searchHighlightPattern.isPresent() && (codeArea != null)) {
+        if (codeArea != null) {
             codeArea.setStyleClass(0, codeArea.getLength(), "text");
-            Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
-            while (matcher.find()) {
-                for (int i = 0; i <= matcher.groupCount(); i++) {
-                    codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
+            if (searchHighlightPattern.isPresent()) {
+                Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
+                while (matcher.find()) {
+                    for (int i = 0; i <= matcher.groupCount(); i++) {
+                        codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
+                    }
                 }
             }
         }

@@ -10,12 +10,12 @@ import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.PageInfo;
 import org.jabref.model.openoffice.util.OOListUtil;
 
-class OOBibStyleGetNumCitationMarker {
+class JStyleGetNumCitationMarker {
 
     // The number encoding "this entry is unresolved"
     public final static int UNRESOLVED_ENTRY_NUMBER = 0;
 
-    private OOBibStyleGetNumCitationMarker() {
+    private JStyleGetNumCitationMarker() {
     }
 
     /**
@@ -45,7 +45,7 @@ class OOBibStyleGetNumCitationMarker {
      *       "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
      *       "${number}" stands for the formatted number.
      */
-    public static OOText getNumCitationMarkerForBibliography(OOBibStyle style,
+    public static OOText getNumCitationMarkerForBibliography(JStyle style,
                                                              CitationMarkerNumericBibEntry entry) {
         // prefer BRACKET_BEFORE_IN_LIST and BRACKET_AFTER_IN_LIST
         String bracketBefore = style.getBracketBeforeInListWithFallBack();
@@ -56,7 +56,7 @@ class OOBibStyleGetNumCitationMarker {
         final Optional<Integer> current = entry.getNumber();
         stringBuilder.append(current.isPresent()
                   ? String.valueOf(current.get())
-                  : (OOBibStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey()));
+                  : (JStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey()));
         stringBuilder.append(bracketAfter);
         stringBuilder.append(style.getCitationGroupMarkupAfter());
         return OOText.fromString(stringBuilder.toString());
@@ -86,7 +86,7 @@ class OOBibStyleGetNumCitationMarker {
      *
      */
     private static void emitBlock(List<CitationMarkerNumericEntry> block,
-                                  OOBibStyle style,
+                                  JStyle style,
                                   int minGroupingCount,
                                   StringBuilder stringBuilder) {
 
@@ -100,7 +100,7 @@ class OOBibStyleGetNumCitationMarker {
             CitationMarkerNumericEntry entry = block.getFirst();
             final Optional<Integer> num = entry.getNumber();
             stringBuilder.append(num.isEmpty()
-                                 ? (OOBibStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey())
+                                 ? (JStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey())
                                  : String.valueOf(num.get()));
             // Emit pageInfo
             Optional<OOText> pageInfo = entry.getPageInfo();
@@ -181,7 +181,7 @@ class OOBibStyleGetNumCitationMarker {
      * @return The text for the citation.
      *
      */
-    public static OOText getNumCitationMarker2(OOBibStyle style,
+    public static OOText getNumCitationMarker2(JStyle style,
                                                List<CitationMarkerNumericEntry> entries,
                                                int minGroupingCount) {
 
@@ -193,7 +193,7 @@ class OOBibStyleGetNumCitationMarker {
 
         // Sort a copy of entries
         List<CitationMarkerNumericEntry> sorted = OOListUtil.map(entries, e -> e);
-        sorted.sort(OOBibStyleGetNumCitationMarker::compareCitationMarkerNumericEntry);
+        sorted.sort(JStyleGetNumCitationMarker::compareCitationMarkerNumericEntry);
 
         // "["
         StringBuilder stringBuilder = new StringBuilder(bracketBefore);

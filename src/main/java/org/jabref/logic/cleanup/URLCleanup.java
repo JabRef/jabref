@@ -23,20 +23,20 @@ public class URLCleanup implements CleanupJob {
      * In order to be functional, we made the necessary adjustments regarding Java
      * features (mainly doubled backslashes).
      */
-    public static final String URL_REGEX = "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.]"
+    private static final String URL_REGEX = "(?i)\\b((?:https?://|www\\d{0,3}[.]|[a-z0-9.\\-]+[.]"
             + "[a-z]{2,4}/)(?:[^\\s()<>\\\\]+|\\(([^\\s()<>\\\\]+|(\\([^\\s()"
             + "<>\\\\]+\\)))*\\))+(?:\\(([^\\s()<>\\\\]+|(\\([^\\s()<>\\\\]+\\"
             + ")))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
+    public static final Pattern URL_PATTERN = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);
 
-    public static final String DATE_TERMS_REGEX = "accessed on|visited on|retrieved on|viewed on";
+    private static final String DATE_TERMS_REGEX = "accessed on|visited on|retrieved on|viewed on";
 
     private static final Field NOTE_FIELD = StandardField.NOTE;
     private static final Field URL_FIELD = StandardField.URL;
     private static final Field URLDATE_FIELD = StandardField.URLDATE;
 
-    final Pattern urlPattern = Pattern.compile(URL_REGEX, Pattern.CASE_INSENSITIVE);
-    final Pattern dateTermsPattern = Pattern.compile(DATE_TERMS_REGEX, Pattern.CASE_INSENSITIVE);
-    final Pattern datePattern = Pattern.compile(Date.DATE_REGEX, Pattern.CASE_INSENSITIVE);
+    private static final Pattern DATE_TERMS_PATTERN = Pattern.compile(DATE_TERMS_REGEX, Pattern.CASE_INSENSITIVE);
+    private static final Pattern DATE_PATTERN = Pattern.compile(Date.DATE_REGEX, Pattern.CASE_INSENSITIVE);
     private final NormalizeDateFormatter formatter = new NormalizeDateFormatter();
 
     @Override
@@ -45,9 +45,9 @@ public class URLCleanup implements CleanupJob {
 
         String noteFieldValue = entry.getField(NOTE_FIELD).orElse("");
 
-        final Matcher urlMatcher = urlPattern.matcher(noteFieldValue);
-        final Matcher dateTermsMatcher = dateTermsPattern.matcher(noteFieldValue);
-        final Matcher dateMatcher = datePattern.matcher(noteFieldValue);
+        final Matcher urlMatcher = URL_PATTERN.matcher(noteFieldValue);
+        final Matcher dateTermsMatcher = DATE_TERMS_PATTERN.matcher(noteFieldValue);
+        final Matcher dateMatcher = DATE_PATTERN.matcher(noteFieldValue);
 
         if (urlMatcher.find()) {
             String url = urlMatcher.group();

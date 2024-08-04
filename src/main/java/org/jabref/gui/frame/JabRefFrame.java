@@ -266,7 +266,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         event.consume();
                         break;
                     case SEARCH:
-                        globalSearchBar.focus();
+                        globalSearchBar.requestFocus();
+                        break;
+                    case OPEN_GLOBAL_SEARCH_DIALOG:
+                        globalSearchBar.openGlobalSearchDialog();
                         break;
                     case NEW_ARTICLE:
                         new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Article, dialogService, prefs, stateManager).execute();

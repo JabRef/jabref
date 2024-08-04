@@ -70,9 +70,9 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
-        List<BibEntry> collect;
+        List<BibEntry> result;
         try {
-            collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+            result = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
                             .map(String::trim)
                             .filter(str -> !str.isBlank())
                             .map(Unchecked.function(this::parseUsingGrobid))
@@ -82,7 +82,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
             // This "undoes" Unchecked.function(this::parseUsingGrobid))
             throw (FetcherException) e.getCause();
         }
-        return collect;
+        return result;
     }
 
     /**

@@ -3,6 +3,7 @@ package org.jabref.gui.search;
 import java.util.EnumSet;
 import java.util.List;
 
+import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
@@ -44,6 +45,7 @@ public class GlobalSearchBarTest {
     public void onStart(Stage stage) {
         SearchPreferences searchPreferences = mock(SearchPreferences.class);
         when(searchPreferences.getSearchFlags()).thenReturn(EnumSet.noneOf(SearchRules.SearchFlags.class));
+        when(searchPreferences.getObservableSearchFlags()).thenReturn(FXCollections.observableSet());
         PreferencesService prefs = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         when(prefs.getSearchPreferences()).thenReturn(searchPreferences);
 
