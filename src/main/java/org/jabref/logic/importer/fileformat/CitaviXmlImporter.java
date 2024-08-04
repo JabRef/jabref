@@ -132,7 +132,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
             if (mapperRoot(reader) instanceof CitaviExchangeData data) {
                 List<BibEntry> bibEntries = parseDataList(data);
-
                 return new ParserResult(bibEntries);
             } else {
                 return ParserResult.fromErrorMessage("File does not start with xml tag.");
