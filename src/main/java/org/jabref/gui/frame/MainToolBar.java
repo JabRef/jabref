@@ -224,7 +224,7 @@ public class MainToolBar extends ToolBar {
             }
 
             TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-            taskProgressSubscription = EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
+            taskProgressSubscription = EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getRunningBackgroundTasks());
             taskProgressView.setRetainTasks(false);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
