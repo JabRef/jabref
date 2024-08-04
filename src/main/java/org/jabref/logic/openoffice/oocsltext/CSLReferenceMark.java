@@ -10,14 +10,14 @@ import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.uno.UnoRuntime;
 
-public class ReferenceMark {
+public class CSLReferenceMark {
     private final XTextDocument document;
     private final XNamed named;
     private final String name;
     private XTextContent textContent;
     private String citationKey;
 
-    public ReferenceMark(XTextDocument document, XNamed named, String name) {
+    public CSLReferenceMark(XTextDocument document, XNamed named, String name) {
         this.document = document;
         this.named = named;
         this.name = name;

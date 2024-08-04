@@ -15,16 +15,16 @@ import com.sun.star.text.XReferenceMarksSupplier;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.UnoRuntime;
 
-public class MarkManager {
-    private final HashMap<String, ReferenceMark> marksByName;
-    private final ArrayList<ReferenceMark> marksByID;
-    private final IdentityHashMap<ReferenceMark, Integer> idsByMark;
+public class CSLReferenceMarkManager {
+    private final HashMap<String, CSLReferenceMark> marksByName;
+    private final ArrayList<CSLReferenceMark> marksByID;
+    private final IdentityHashMap<CSLReferenceMark, Integer> idsByMark;
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
     private HashMap<String, Integer> citationKeyToNumber;
     private int highestCitationNumber = 0;
 
-    public MarkManager(XTextDocument document) throws Exception {
+    public CSLReferenceMarkManager(XTextDocument document) throws Exception {
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
         this.marksByName = new HashMap<>();
@@ -39,7 +39,7 @@ public class MarkManager {
         for (String name : marks.getElementNames()) {
             if (name.startsWith(CSLCitationOOAdapter.PREFIXES[0])) {
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
-                ReferenceMark mark = new ReferenceMark(document, named, name);
+                CSLReferenceMark mark = new CSLReferenceMark(document, named, name);
                 addMark(mark);
                 updateCitationInfo(name);
             }
@@ -57,7 +57,7 @@ public class MarkManager {
         }
     }
 
-    public void addMark(ReferenceMark mark) {
+    public void addMark(CSLReferenceMark mark) {
         marksByName.put(mark.getName(), mark);
         idsByMark.put(mark, marksByID.size());
         marksByID.add(mark);
@@ -71,16 +71,16 @@ public class MarkManager {
         });
     }
 
-    public ReferenceMark createReferenceMark(BibEntry entry, String fieldType) throws Exception {
+    public CSLReferenceMark createReferenceMark(BibEntry entry, String fieldType) throws Exception {
         String citationKey = entry.getCitationKey().orElse("");
         int citationNumber = getCitationNumber(citationKey);
 
         String name = CSLCitationOOAdapter.PREFIXES[0] + citationKey + " RND" + citationNumber;
-        Object mark = factory.createInstance("com.sun.star.text.ReferenceMark");
+        Object mark = factory.createInstance("com.sun.star.text.CSLReferenceMark");
         XNamed named = UnoRuntime.queryInterface(XNamed.class, mark);
         named.setName(name);
 
-        ReferenceMark referenceMark = new ReferenceMark(document, named, name);
+        CSLReferenceMark referenceMark = new CSLReferenceMark(document, named, name);
         addMark(referenceMark);
 
         return referenceMark;
