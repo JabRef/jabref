@@ -81,8 +81,8 @@ open module org.jabref {
     requires com.google.gson;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
-    requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.dataformat.xml;
+    requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.module.jaxb;
     // needs to be loaded here as it's otherwise not found at runtime
     requires org.glassfish.jaxb.runtime;
