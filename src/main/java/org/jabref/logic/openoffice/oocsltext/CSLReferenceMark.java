@@ -24,7 +24,7 @@ public class CSLReferenceMark {
         this.textContent = UnoRuntime.queryInterface(XTextContent.class, named);
         String[] parts = name.split(" ");
         if (parts.length >= 2) {
-            this.citationKey = parts[1];
+            this.citationKey = parts[1]; // Format: JABREF_{citationKey} RND{citationNumber}
         }
     }
 

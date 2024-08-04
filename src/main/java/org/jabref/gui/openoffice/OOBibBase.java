@@ -612,8 +612,10 @@ public class OOBibBase {
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
+
                 CSLCitationOOAdapter adapter = new CSLCitationOOAdapter(doc);
                 adapter.readExistingMarks();
+
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     adapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else {
@@ -621,6 +623,7 @@ public class OOBibBase {
                 }
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
+
                 EditInsert.insertCitationGroup(doc,
                         frontend.get(),
                         cursor.get(),
