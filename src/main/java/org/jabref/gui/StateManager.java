@@ -186,10 +186,6 @@ public class StateManager {
         return focusOwner.get();
     }
 
-    public ObservableList<Task<?>> getBackgroundTasks() {
-        return EasyBind.map(backgroundTasks, Pair::getValue);
-    }
-
     public ObservableList<Task<?>> getRunningBackgroundTasks() {
         FilteredList<Pair<BackgroundTask<?>, Task<?>>> pairs = new FilteredList<>(backgroundTasks, task -> task.getValue().isRunning());
         return EasyBind.map(pairs, Pair::getValue);
