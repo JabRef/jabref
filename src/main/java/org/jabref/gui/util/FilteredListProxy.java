@@ -103,7 +103,7 @@ public class FilteredListProxy {
     }
 
     /**
-     * Get the class field (we need it for read and write später)
+     * Get the class field (we need it for read and write later)
      */
     private static Field getField(String fieldName) throws ReflectiveOperationException {
         Field field = FilteredList.class.getDeclaredField(fieldName);
