@@ -109,10 +109,6 @@ public final class CustomFilteredList<E> extends TransformationList<E, E> {
 
     /**
      * Returns the element at the specified position in this list.
-     *
-     * @param  index index of the element to return
-     * @return the element at the specified position in this list
-     * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     @Override
     public E get(int index) {
