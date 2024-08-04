@@ -400,8 +400,9 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private void initMapper() throws Exception {
         // Lazy init because this is expensive
-        mapper = new XmlMapper();
-        mapper.registerModule(new JaxbAnnotationModule());
+        if (mapper == null) {
+            mapper = XmlMapper.xmlBuilder().addModule(new JaxbAnnotationModule()).build();
+        }
     }
 
     private Object mapperRoot(BufferedReader reader) throws XMLStreamException {
