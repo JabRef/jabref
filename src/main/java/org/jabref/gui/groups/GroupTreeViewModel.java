@@ -275,8 +275,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         // we need to check the old name for duplicates. If the new group name occurs more than once, it won't matter
                         groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(oldGroupName)).size();
                     }
-                    boolean removePreviousAssignments = groupsWithSameName < 2;
                     // We found more than 2 groups, so we cannot simply remove old assignment
+                    boolean removePreviousAssignments = groupsWithSameName < 2;
 
                     oldGroup.getGroupNode().setGroup(
                             group,
