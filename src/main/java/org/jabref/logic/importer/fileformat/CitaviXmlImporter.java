@@ -1,11 +1,9 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PushbackInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,6 +51,8 @@ import org.jabref.model.strings.StringUtil;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -449,6 +449,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private BufferedReader getReaderFromZip(Path filePath) throws IOException {
         Path newFile = Files.createTempFile("citavicontent", ".xml");
+        newFile.toFile().deleteOnExit();
 
         try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(filePath))) {
             ZipEntry zipEntry = zis.getNextEntry();
@@ -458,23 +459,14 @@ public class CitaviXmlImporter extends Importer implements Parser {
             }
         }
 
-        InputStream stream = Files.newInputStream(newFile, StandardOpenOption.READ);
-        InputStream newStream = checkForUtf8BOMAndDiscardIfAny(stream);
-
-        Files.delete(newFile);
-
-        return new BufferedReader(new InputStreamReader(newStream, StandardCharsets.UTF_8));
-    }
-
-    private static InputStream checkForUtf8BOMAndDiscardIfAny(InputStream inputStream) throws IOException {
-        PushbackInputStream pushbackInputStream = new PushbackInputStream(new BufferedInputStream(inputStream), 3);
-        byte[] bom = new byte[3];
-        if (pushbackInputStream.read(bom) != -1) {
-            if (!((bom[0] == (byte) 0xEF) && (bom[1] == (byte) 0xBB) && (bom[2] == (byte) 0xBF))) {
-                pushbackInputStream.unread(bom);
-            }
-        }
-        return pushbackInputStream;
+        // Citavi XML files sometimes contains BOM markers. We just discard them.
+        // Solution inspired by https://stackoverflow.com/a/37445972/873282
+        return new BufferedReader(
+                new InputStreamReader(
+                        new BOMInputStream(
+                                Files.newInputStream(newFile, StandardOpenOption.READ),
+                                false,
+                                ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE)));
     }
 
     private String clean(String input) {
