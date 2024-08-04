@@ -449,18 +449,15 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private BufferedReader getReaderFromZip(Path filePath) throws IOException {
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath.toFile()));
-        ZipEntry zipEntry = zis.getNextEntry();
-
         Path newFile = Files.createTempFile("citavicontent", ".xml");
 
-        while (zipEntry != null) {
-            Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);
-
-            zipEntry = zis.getNextEntry();
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath.toFile()))) {
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);
+                zipEntry = zis.getNextEntry();
+            }
         }
-
-        zis.closeEntry();
 
         InputStream stream = Files.newInputStream(newFile, StandardOpenOption.READ);
 
