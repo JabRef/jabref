@@ -617,9 +617,9 @@ public class OOBibBase {
                 adapter.readExistingMarks();
 
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                    adapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    adapter.insertInText(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else {
-                    adapter.insertBibliography(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    adapter.insertBibliography(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 }
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
@@ -960,7 +960,7 @@ public class OOBibBase {
                     BibDatabaseContext bibDatabaseContext = Injector.instantiateModelOrService(BibDatabaseContext.class);
                     BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
 
-                    adapter.insertBibliography(doc, bibliographyCursor, citationStyle, citedEntries, bibDatabaseContext, bibEntryTypesManager);
+                    adapter.insertBibliography(bibliographyCursor, citationStyle, citedEntries, bibDatabaseContext, bibEntryTypesManager);
                 } finally {
                     UnoUndo.leaveUndoContext(doc);
                     fcursor.get().restore(doc);

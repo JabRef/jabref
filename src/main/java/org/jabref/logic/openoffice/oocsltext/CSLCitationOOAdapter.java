@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice.oocsltext;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -23,11 +22,10 @@ import org.apache.commons.text.StringEscapeUtils;
 public class CSLCitationOOAdapter {
 
     public static final String[] PREFIXES = {"JABREF_", "CSL_"};
-    public static final int REFMARK_ADD_CHARS = 8;
 
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
     private final XTextDocument document;
-    private CSLReferenceMarkManager markManager;
+    private final CSLReferenceMarkManager markManager;
     private boolean isNumericStyle = false;
 
     public CSLCitationOOAdapter(XTextDocument doc) throws Exception {
@@ -39,7 +37,7 @@ public class CSLCitationOOAdapter {
         markManager.readExistingMarks();
     }
 
-    public void insertBibliography(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws Exception {
 
         String style = selectedStyle.getSource();
@@ -53,11 +51,11 @@ public class CSLCitationOOAdapter {
         for (int i = 0; i < citations.size(); i++) {
             BibEntry entry = entries.get(i);
             String citation = citations.get(i);
-            writeCitation(doc, cursor, entry, citation);
+            writeCitation(document, cursor, entry, citation);
         }
     }
 
-    public void insertInText(XTextDocument doc, XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+    public void insertInText(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws Exception {
 
         String style = selectedStyle.getSource();
@@ -67,7 +65,6 @@ public class CSLCitationOOAdapter {
         String inTextCitation = CitationStyleGenerator.generateInText(entries, style, format, bibDatabaseContext, bibEntryTypesManager).getText();
 
         String formattedCitation = transformHtml(inTextCitation);
-        System.out.println(formattedCitation);
 
         if (isNumericStyle) {
             formattedCitation = updateMultipleCitations(formattedCitation, entries);
@@ -76,7 +73,7 @@ public class CSLCitationOOAdapter {
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
         // Insert the citation text with multiple reference marks
-        insertMultipleReferenceMarks(doc, cursor, entries, ooText);
+        insertMultipleReferenceMarks(document, cursor, entries, ooText);
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
@@ -95,16 +92,6 @@ public class CSLCitationOOAdapter {
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
-    }
-
-    private List<String> splitCitation(String citation) {
-        List<String> parts = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\\[\\d+\\]|\\([^)]+\\)|[^,;]+");
-        Matcher matcher = pattern.matcher(citation);
-        while (matcher.find()) {
-            parts.add(matcher.group());
-        }
-        return parts;
     }
 
     private String updateMultipleCitations(String citation, List<BibEntry> entries) {

@@ -22,10 +22,9 @@ public class CSLReferenceMarkManager {
     private final IdentityHashMap<CSLReferenceMark, Integer> idsByMark;
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
-    private HashMap<String, Integer> citationKeyToNumber;
+    private final HashMap<String, Integer> citationKeyToNumber;
     private int highestCitationNumber = 0;
-    private Map<String, Integer> citationOrder = new HashMap<>();
-    private int citationCounter = 0;
+    private final Map<String, Integer> citationOrder = new HashMap<>();
 
     public CSLReferenceMarkManager(XTextDocument document) throws Exception {
         this.document = document;
@@ -41,7 +40,7 @@ public class CSLReferenceMarkManager {
         XNameAccess marks = supplier.getReferenceMarks();
 
         citationOrder.clear();
-        citationCounter = 0;
+        int citationCounter = 0;
 
         for (String name : marks.getElementNames()) {
             String citationKey = extractCitationKey(name);
@@ -49,7 +48,7 @@ public class CSLReferenceMarkManager {
                 citationOrder.putIfAbsent(citationKey, ++citationCounter);
 
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
-                CSLReferenceMark mark = new CSLReferenceMark(document, named, name);
+                CSLReferenceMark mark = new CSLReferenceMark(named, name);
                 addMark(mark);
             }
         }
@@ -128,7 +127,7 @@ public class CSLReferenceMarkManager {
         XNamed named = UnoRuntime.queryInterface(XNamed.class, mark);
         named.setName(name);
 
-        CSLReferenceMark referenceMark = new CSLReferenceMark(document, named, name);
+        CSLReferenceMark referenceMark = new CSLReferenceMark(named, name);
         addMark(referenceMark);
 
         return referenceMark;

@@ -11,20 +11,16 @@ import com.sun.star.text.XTextRange;
 import com.sun.star.uno.UnoRuntime;
 
 public class CSLReferenceMark {
-    private final XTextDocument document;
-    private final XNamed named;
     private final String name;
-    private XTextContent textContent;
+    private final XTextContent textContent;
     private String citationKey;
 
-    public CSLReferenceMark(XTextDocument document, XNamed named, String name) {
-        this.document = document;
-        this.named = named;
+    public CSLReferenceMark(XNamed named, String name) {
         this.name = name;
         this.textContent = UnoRuntime.queryInterface(XTextContent.class, named);
         String[] parts = name.split(" ");
         if (parts.length >= 2) {
-            this.citationKey = parts[1]; // Format: JABREF_{citationKey} RND{citationNumber}
+            this.citationKey = parts[0]; // Format: JABREF_{citationKey} RND{citationNumber}
         }
     }
 
@@ -38,7 +34,7 @@ public class CSLReferenceMark {
         XTextRange start = cursor.getStart();
         XTextRange end = cursor.getEnd();
         cursor.gotoRange(start, false);
-        cursor.gotoRange(end, true);
+       // cursor.gotoRange(end, true);
 
         // Attach the reference mark to this range
         textContent.attach(cursor);
