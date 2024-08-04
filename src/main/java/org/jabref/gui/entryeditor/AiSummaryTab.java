@@ -199,7 +199,7 @@ public class AiSummaryTab extends EntryEditorTab {
         setContent(
                 ErrorStateComponent.withSpinner(
                         Localization.lang("Please wait"),
-                        Localization.lang("The attached files are currently being processed by AI. Once completed, you will be able to see the summary.")
+                        Localization.lang("The attached files are currently being processed by %0. Once completed, you will be able to see the summary.", aiService.getPreferences().getAiProvider().getLabel())
                 )
         );
     }
