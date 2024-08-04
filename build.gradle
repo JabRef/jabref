@@ -90,7 +90,10 @@ application {
         '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref',
         '--add-opens=javafx.graphics/javafx.scene=org.jabref',
         '--add-opens=javafx.controls/javafx.scene.control=org.jabref',
-        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref'
+        '--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref',
+
+        '--add-opens=javafx.base/javafx.collections=org.jabref',
+        '--add-opens=javafx.base/javafx.collections.transformation=org.jabref'
     ]
 }
 
@@ -522,7 +525,10 @@ run {
                 'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
 
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
-                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls'
+                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls',
+
+                'javafx.base/javafx.collections' : 'org.jabref',
+                'javafx.base/javafx.collections.transformation' : 'org.jabref'
         ]
 
         addModules = [
