@@ -47,6 +47,8 @@ import org.jabref.model.strings.StringUtil;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -454,8 +456,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
         }
 
         InputStream stream = Files.newInputStream(newFile, StandardOpenOption.READ);
+
+        // check and delete the utf-8 BOM bytes
         InputStream newStream = checkForUtf8BOMAndDiscardIfAny(stream);
 
+        // clean up the temp files
         Files.delete(newFile);
 
         return new BufferedReader(new InputStreamReader(newStream, StandardCharsets.UTF_8));
@@ -467,7 +472,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
         if (pushbackInputStream.read(bom) != -1) {
             if (!((bom[0] == (byte) 0xEF) && (bom[1] == (byte) 0xBB) && (bom[2] == (byte) 0xBF))) {
                 pushbackInputStream.unread(bom);
->>>>>>> Correct closing of stream
             }
         }
 
