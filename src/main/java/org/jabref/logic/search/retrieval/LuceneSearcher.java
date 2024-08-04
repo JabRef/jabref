@@ -48,8 +48,8 @@ public final class LuceneSearcher {
     public SearchResults search(SearchQuery searchQuery, IndexSearcher indexSearcher) {
         this.searchQuery = Objects.requireNonNull(searchQuery);
         try {
-            LOGGER.debug("Searching for entries matching query: {}", searchQuery.getQuery());
-            topDocs = indexSearcher.search(searchQuery.getQuery(), Integer.MAX_VALUE);
+            LOGGER.debug("Searching for entries matching query: {}", searchQuery.getParsedQuery());
+            topDocs = indexSearcher.search(searchQuery.getParsedQuery(), Integer.MAX_VALUE);
             storedFields = indexSearcher.storedFields();
             LOGGER.debug("Found {} matches", topDocs.totalHits.value);
             return getSearchResults();
@@ -72,7 +72,7 @@ public final class LuceneSearcher {
         }
 
         long startTime = System.currentTimeMillis();
-        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(searchQuery.getQuery()));
+        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(searchQuery.getParsedQuery()));
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
             float score = scoreDoc.score;
             Document document = storedFields.document(scoreDoc.doc);

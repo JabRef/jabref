@@ -28,7 +28,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchFieldConstants;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.FilePreferences;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.document.Document;
@@ -53,7 +53,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferences;
+    private final FilePreferences filePreferences;
     private final String libraryName;
     private final Directory indexDirectory;
     private final IndexWriter indexWriter;
@@ -62,15 +62,15 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     private Map<String, Long> indexedFiles;
     private IndexSearcher indexSearcher;
 
-    public DefaultLinkedFilesIndexer(BibDatabaseContext databaseContext, TaskExecutor executor, PreferencesService preferences) throws IOException {
+    public DefaultLinkedFilesIndexer(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences filePreferences) throws IOException {
         this.databaseContext = databaseContext;
         this.taskExecutor = executor;
-        this.preferences = preferences;
+        this.filePreferences = filePreferences;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "untitled");
         this.indexedFiles = new ConcurrentHashMap<>();
 
         indexDirectoryPath = databaseContext.getFulltextIndexPath();
-        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.ANALYZER);
+        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.Standard_ANALYZER);
         if (indexDirectoryPath.getFileName().toString().equals("unsaved")) {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             indexDirectoryPath = indexDirectoryPath.resolveSibling("unsaved" + NUMBER_OF_UNSAVED_LIBRARIES++);
@@ -289,7 +289,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             LOGGER.debug("Linked file {} is not a local PDF file. The file will not be indexed.", linkedFile.getLink());
             return null;
         }
-        Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences());
+        Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
             LOGGER.debug("Could not resolve path of linked file {}. The file will not be indexed.", linkedFile.getLink());
             return null;

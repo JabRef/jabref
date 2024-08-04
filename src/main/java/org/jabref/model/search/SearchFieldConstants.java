@@ -1,8 +1,6 @@
 package org.jabref.model.search;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
@@ -20,10 +18,9 @@ public enum SearchFieldConstants {
     PAGE_NUMBER("pageNumber"),
     MODIFIED("modified");
 
-    public static final Analyzer ANALYZER = new StandardAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+    public static final Analyzer Standard_ANALYZER = new StandardAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+    public static final Analyzer NGram_ANALYZER = new NGramAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
     public static final List<String> PDF_FIELDS = List.of(PATH.toString(), CONTENT.toString(), ANNOTATIONS.toString());
-    public static final Set<String> SEARCHABLE_BIB_FIELDS = new HashSet<>(List.of(ENTRY_ID.toString(), ENTRY_TYPE.toString()));
-
     private final String field;
 
     SearchFieldConstants(String field) {

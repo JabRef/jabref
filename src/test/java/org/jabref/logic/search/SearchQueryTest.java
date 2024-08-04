@@ -49,7 +49,7 @@ public class SearchQueryTest {
 
     @Test
     public void nullWhenQueryBlank() {
-        assertNull(new SearchQuery("", EnumSet.noneOf(SearchFlags.class)).getQuery());
+        assertNull(new SearchQuery("", EnumSet.noneOf(SearchFlags.class)).getParsedQuery());
     }
 
 //    @Test

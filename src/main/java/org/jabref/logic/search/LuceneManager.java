@@ -55,7 +55,7 @@ public class LuceneManager {
 
     private void initializeIndexers() {
         try {
-            bibFieldsIndexer = new BibFieldsIndexer(databaseContext, taskExecutor, preferences);
+            bibFieldsIndexer = new BibFieldsIndexer(databaseContext, taskExecutor);
         } catch (IOException e) {
             LOGGER.error("Error initializing bib fields index", e);
         }
@@ -69,7 +69,7 @@ public class LuceneManager {
 
     private void initializeLinkedFilesIndexer() {
         try {
-            linkedFilesIndexer = new DefaultLinkedFilesIndexer(databaseContext, taskExecutor, preferences);
+            linkedFilesIndexer = new DefaultLinkedFilesIndexer(databaseContext, taskExecutor, preferences.getFilePreferences());
         } catch (IOException e) {
             LOGGER.debug("Error initializing linked files index - using read only index");
             linkedFilesIndexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
@@ -155,13 +155,13 @@ public class LuceneManager {
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT) && shouldIndexLinkedFiles.get()) {
             try {
                 MultiReader reader = new MultiReader(bibFieldsIndexer.getIndexSearcher().getIndexReader(), linkedFilesIndexer.getIndexSearcher().getIndexReader());
-                LOGGER.debug("Using MultiReader for searching");
+                LOGGER.debug("Using index searcher for bib fields and linked files");
                 return new IndexSearcher(reader);
             } catch (IOException e) {
                 LOGGER.error("Error getting index searcher", e);
             }
         }
-        LOGGER.debug("Using single index searcher for searching");
+        LOGGER.debug("Using index searcher for bib fields only");
         return bibFieldsIndexer.getIndexSearcher();
     }
 
