@@ -58,7 +58,7 @@ public class SearchQuery implements SearchMatcher {
     }
 
     private final String query;
-    private EnumSet<SearchRules.SearchFlags> searchFlags;
+    private final EnumSet<SearchRules.SearchFlags> searchFlags;
     private final SearchRule rule;
 
     public SearchQuery(String query, EnumSet<SearchRules.SearchFlags> searchFlags) {

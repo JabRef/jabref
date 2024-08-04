@@ -293,6 +293,8 @@ public class IconTheme {
         CASE_SENSITIVE(MaterialDesignA.ALPHABETICAL),
         REG_EX(MaterialDesignR.REGEX),
         FULLTEXT(MaterialDesignF.FILE_EYE),
+        FILTER(MaterialDesignF.FILTER),
+        INVERT(MaterialDesignI.INVERT_COLORS),
         CONSOLE(MaterialDesignC.CONSOLE),
         FORUM(MaterialDesignF.FORUM),
         FACEBOOK(MaterialDesignF.FACEBOOK),
