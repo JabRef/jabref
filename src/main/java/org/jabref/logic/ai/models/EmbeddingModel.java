@@ -71,9 +71,14 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
     }
 
     public void startRebuildingTask() {
+        if (!aiPreferences.getEnableAi()) {
+            return;
+        }
+
         predictorProperty.set(Optional.empty());
 
-        BackgroundTask.wrap(this::rebuild)
+        BackgroundTask<Void> task = BackgroundTask
+                .wrap(this::rebuild)
                 .onSuccess(v -> {
                     errorWhileBuildingModel = "";
                     eventBus.post(new EmbeddingModelBuiltEvent());
@@ -82,8 +87,10 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
                     LOGGER.error("An error occurred while building the embedding model", e);
                     dialogService.notify(Localization.lang("An error occurred while building the embedding model"));
                     errorWhileBuildingModel = e.getMessage();
-                })
-                .executeWith(taskExecutor);
+                });
+        task.titleProperty().set(Localization.lang("Downloading embedding model"));
+        task.showToUser(true);
+        task.executeWith(taskExecutor);
     }
 
     public boolean isPresent() {
