@@ -30,18 +30,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.
+ * Tries to import BibTeX data trying multiple PDF content importers and merging the results.
+ * See {@Link org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter#metadataImporters} for the list of importers used.
+ *
+ * After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
  */
 public class PdfMergeMetadataImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
 
-    private final List<Importer> metadataImporters;
     private final ImportFormatPreferences importFormatPreferences;
+    private final List<Importer> metadataImporters;
 
     public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
-        this.metadataImporters = new ArrayList<>();
+
+        this.metadataImporters = new ArrayList<>(5);
         this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
@@ -59,14 +63,14 @@ public class PdfMergeMetadataImporter extends Importer {
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException("PdfMergeMetadataImporter does not support importDatabase(BufferedReader reader)."
+        throw new UnsupportedOperationException("PdfMergeMetadataImporter does not support importDatabase(BufferedReader reader). "
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
-        throw new UnsupportedOperationException("PdfMergeMetadataImporter does not support importDatabase(String data)."
+        throw new UnsupportedOperationException("PdfMergeMetadataImporter does not support importDatabase(String data). "
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
@@ -84,7 +88,7 @@ public class PdfMergeMetadataImporter extends Importer {
         if (candidates.isEmpty()) {
             return new ParserResult();
         }
-        List<BibEntry> fetchedCandidates = new ArrayList<>();
+        List<BibEntry> fetchedCandidates = new ArrayList<>(2);
         for (BibEntry candidate : candidates) {
             if (candidate.hasField(StandardField.DOI)) {
                 try {
