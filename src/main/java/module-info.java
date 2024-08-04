@@ -6,18 +6,28 @@ open module org.jabref {
     requires java.sql;
     requires java.sql.rowset;
 
-    // JavaFX
+    // region JavaFX
     requires javafx.base;
     requires javafx.graphics;
     requires javafx.controls;
     requires javafx.web;
     requires javafx.fxml;
+
     requires afterburner.fx;
+    provides com.airhacks.afterburner.views.ResourceLocator
+            with org.jabref.gui.util.JabRefResourceLocator;
+
     requires com.dlsc.gemsfx;
     uses com.dlsc.gemsfx.TagsField;
+
+    requires com.tobiasdiez.easybind;
+
     requires de.saxsys.mvvmfx;
-    requires reactfx;
+    requires de.saxsys.mvvmfx.validation;
+
+    requires org.controlsfx.controls;
     requires org.fxmisc.flowless;
+    requires org.fxmisc.richtext;
 
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
@@ -30,12 +40,8 @@ open module org.jabref {
     provides org.kordamp.ikonli.IkonProvider
             with org.jabref.gui.icon.JabrefIconProvider;
 
-    requires org.controlsfx.controls;
-    requires org.fxmisc.richtext;
-    requires com.tobiasdiez.easybind;
-
-    provides com.airhacks.afterburner.views.ResourceLocator
-            with org.jabref.gui.util.JabRefResourceLocator;
+    requires reactfx;
+    // endregion
 
     // region: Logging
     requires org.slf4j;
@@ -155,7 +161,6 @@ open module org.jabref {
     requires transitive org.jspecify;
 
     // region: other libraries
-    requires de.saxsys.mvvmfx.validation;
     requires dd.plist;
     requires mslinks;
     requires org.antlr.antlr4.runtime;
