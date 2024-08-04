@@ -968,12 +968,4 @@ public class OOBibBase {
             }
         }
     }
-
-    private CSLCitationOOAdapter getOrCreateCSLCitationOOAdapter(XTextDocument doc) throws Exception {
-        if (cslCitationOOAdapter == null) {
-            cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
-        }
-        cslCitationOOAdapter.readExistingMarks();
-        return cslCitationOOAdapter;
-    }
 }

@@ -119,7 +119,7 @@ public class CSLReferenceMarkManager {
         });
     }
 
-    public CSLReferenceMark createReferenceMark(BibEntry entry, String fieldType) throws Exception {
+    public CSLReferenceMark createReferenceMark(BibEntry entry) throws Exception {
         String citationKey = entry.getCitationKey().orElse("");
         int citationNumber = getCitationNumber(citationKey);
 

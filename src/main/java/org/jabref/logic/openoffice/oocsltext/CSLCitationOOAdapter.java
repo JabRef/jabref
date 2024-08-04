@@ -88,7 +88,7 @@ public class CSLCitationOOAdapter {
 
         // Insert reference marks for each entry after the citation
         for (BibEntry entry : entries) {
-            CSLReferenceMark mark = markManager.createReferenceMark(entry, "InTextReferenceMark");
+            CSLReferenceMark mark = markManager.createReferenceMark(entry);
             OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
             mark.insertReferenceIntoOO(doc, cursor, emptyOOText);
         }
@@ -130,7 +130,7 @@ public class CSLCitationOOAdapter {
         String citationKey = entry.getCitationKey().orElse("");
         int currentNumber = markManager.getCitationNumber(citationKey);
 
-        CSLReferenceMark mark = markManager.createReferenceMark(entry, "CSLReferenceMark");
+        CSLReferenceMark mark = markManager.createReferenceMark(entry);
         String formattedCitation;
         if (isNumericStyle) {
             formattedCitation = updateSingleCitation(transformHtml(citation), currentNumber);
