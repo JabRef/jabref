@@ -7,9 +7,11 @@ More information about this topic from the translator side is provided at [Trans
 
 All labeled UI elements, descriptions and messages shown to the user should be localized, i.e., should be displayed in the chosen language.
 
-JabRef uses ResourceBundles ([see Oracle Tutorial](https://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html)) to store `key=value` pairs for each String to be localized.
+[JabRef uses ResourceBundles](https://github.com/JabRef/jabref/blob/4b41108107fb92cc0a8acfcb834ccbb0b6e79ae5/src/main/resources/l10n/JabRef_en.properties) ([see Oracle Tutorial](https://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html)) to store `key=value` pairs for each String to be localized.
 
-To show an localized String the following `org.jabref.logic.l10n.Localization` has to be used. The Class currently provides three methods to obtain translated strings:
+## Localization in Java code
+
+To show a localized String the following `org.jabref.logic.l10n.Localization` has to be used. The Class currently provides three methods to obtain translated strings:
 
 ```java
     public static String lang(String key);
@@ -25,6 +27,19 @@ The actual usage might look like:
     Localization.lang("Get me a translated String");
     Localization.lang("Using %0 or more %1 is also possible", "one", "parameter");
     Localization.menuTitle("Used for Menus only");
+```
+
+## Localization in FXML
+
+To write a localized string in FXML file, prepend it with `%`, like in this code:
+
+```xml
+<HBox alignment="CENTER_LEFT">
+    <Label styleClass="space-after" text="%Want to help?" wrapText="true"/>
+    <Hyperlink onAction="#openDonation" text="%Make a donation"/>
+    <Label styleClass="space" text="%or" wrapText="true"/>
+    <Hyperlink onAction="#openGithub" text="%get involved"/>
+</HBox>
 ```
 
 ## General hints
