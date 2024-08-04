@@ -52,7 +52,7 @@
             </children>
         </VBox>
 
-      <CheckBox fx:id="customizeExpertSettingsCheckbox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%Customize expert settings settings" />
+      <CheckBox fx:id="customizeExpertSettingsCheckbox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="%Customize expert settings" />
 
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
