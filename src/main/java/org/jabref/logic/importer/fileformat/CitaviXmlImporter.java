@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -451,7 +450,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private BufferedReader getReaderFromZip(Path filePath) throws IOException {
         Path newFile = Files.createTempFile("citavicontent", ".xml");
 
-        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath.toFile()))) {
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(filePath))) {
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
                 Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);
