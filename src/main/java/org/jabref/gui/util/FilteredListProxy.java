@@ -32,7 +32,6 @@ public class FilteredListProxy {
 
     public static void refilterListReflection(FilteredList<BibEntryTableViewModel> filteredList, int sourceFrom, int sourceTo) {
         try {
-
             if (sourceFrom < 0 || sourceTo > filteredList.getSource().size() || sourceFrom > sourceTo) {
                 throw new IndexOutOfBoundsException();
             }
@@ -65,13 +64,13 @@ public class FilteredListProxy {
                 } else if (passedBefore) {
                     invoke(filteredList, ObservableListBase.class, "nextRemove", pos, el);
                     System.arraycopy(filtered, pos + 1, filtered, pos, size - pos - 1);
-                    --size;
+                    size--;
                 } else if (passedNow) {
                     int insertionPoint = ~pos;
                     System.arraycopy(filtered, insertionPoint, filtered, insertionPoint + 1, size - insertionPoint);
                     filtered[insertionPoint] = i;
                     invoke(filteredList, ObservableListBase.class, "nextAdd", insertionPoint, insertionPoint + 1);
-                    ++size;
+                    size++;
                 }
             }
 
