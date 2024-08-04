@@ -26,13 +26,9 @@ public class SearchPreferences {
     private final BooleanProperty keepSearchSting;
     private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean isKeepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
-        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
-        this.searchWindowHeight = new SimpleDoubleProperty(searchWindowHeight);
-        this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
-        this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
+        this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition);
 
-        searchFlags = FXCollections.observableSet(EnumSet.noneOf(SearchFlags.class));
         if (isCaseSensitive) {
             searchFlags.add(SearchFlags.CASE_SENSITIVE);
         }
@@ -42,22 +38,18 @@ public class SearchPreferences {
         if (isFulltext) {
             searchFlags.add(SearchFlags.FULLTEXT);
         }
-
-        this.keepSearchSting = new SimpleBooleanProperty(isKeepSearchString);
-        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
-        this.setSearchWindowHeight(searchWindowHeight);
-        this.setSearchWindowWidth(searchWindowWidth);
     }
 
     @VisibleForTesting
-    public SearchPreferences(EnumSet<SearchFlags> searchFlags) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet<SearchFlags> searchFlags, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
+        this.searchDisplayMode = new SimpleObjectProperty<>(searchDisplayMode);
         this.searchFlags = FXCollections.observableSet(searchFlags);
-        this.keepWindowOnTop = new SimpleBooleanProperty(false);
-        this.searchWindowHeight = new SimpleDoubleProperty(0);
-        this.searchWindowWidth = new SimpleDoubleProperty(0);
-        this.searchWindowDividerPosition = new SimpleDoubleProperty(0);
-        this.searchDisplayMode = new SimpleObjectProperty<>();
-        this.keepSearchSting = new SimpleBooleanProperty(false);
+
+        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);
+        this.searchWindowHeight = new SimpleDoubleProperty(searchWindowHeight);
+        this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);
+        this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);
+        this.keepSearchSting = new SimpleBooleanProperty(keepSearchString);
     }
 
     public EnumSet<SearchFlags> getSearchFlags() {
