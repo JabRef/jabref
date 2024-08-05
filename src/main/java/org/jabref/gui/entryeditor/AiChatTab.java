@@ -201,6 +201,7 @@ public class AiChatTab extends EntryEditorTab {
 
         if (!entriesUnderIngestion.contains(entry)) {
             entriesUnderIngestion.add(entry);
+
             new GenerateEmbeddingsTask(entry.getCitationKey().get(), entry.getFiles(), aiService.getEmbeddingsManager(), bibDatabaseContext, filePreferences)
                     .onSuccess(res -> handleFocus())
                     .onFailure(this::showErrorWhileIngesting)
@@ -209,8 +210,12 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void showErrorWhileIngesting(Exception e) {
+        LOGGER.error("Got an error while generating embeddings for entry {}", currentEntry.getCitationKey(), e);
+
         setContent(ErrorStateComponent.withTextArea(Localization.lang("Unable to chat"), Localization.lang("Got error while processing the file:"), e.getMessage()));
+
         entriesUnderIngestion.remove(currentEntry);
+
         currentEntry.getFiles().stream().map(LinkedFile::getLink).forEach(link -> aiService.getEmbeddingsManager().removeDocument(link));
     }
 

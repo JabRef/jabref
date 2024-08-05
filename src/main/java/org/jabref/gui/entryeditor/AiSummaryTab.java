@@ -182,6 +182,8 @@ public class AiSummaryTab extends EntryEditorTab {
     }
 
     private void showErrorWhileSummarizing(Exception e) {
+        LOGGER.error("Got an error while generating a summary for entry {}", currentEntry.getCitationKey(), e);
+
         setContent(
                 ErrorStateComponent.withTextAreaAndButton(
                         Localization.lang("Unable to chat"),
