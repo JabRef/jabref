@@ -29,7 +29,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     @FXML private ComboBox<AiPreferences.AiProvider> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
-    @FXML private CustomPasswordField apiTokenTextField;
+    @FXML private CustomPasswordField apiKeyTextField;
 
     @FXML private CheckBox customizeExpertSettingsCheckbox;
 
@@ -83,8 +83,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         chatModelComboBox.valueProperty().bindBidirectional(viewModel.selectedChatModelProperty());
         chatModelComboBox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
-        apiTokenTextField.textProperty().bindBidirectional(viewModel.apiTokenProperty());
-        apiTokenTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+        apiKeyTextField.textProperty().bindBidirectional(viewModel.apiTokenProperty());
+        apiKeyTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
         customizeExpertSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeExpertSettingsProperty());
         customizeExpertSettingsCheckbox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
@@ -176,7 +176,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         ragMinScoreTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         Platform.runLater(() -> {
-            visualizer.initVisualization(viewModel.getApiTokenValidationStatus(), apiTokenTextField);
+            visualizer.initVisualization(viewModel.getApiTokenValidationStatus(), apiKeyTextField);
             visualizer.initVisualization(viewModel.getChatModelValidationStatus(), chatModelComboBox);
             visualizer.initVisualization(viewModel.getApiBaseUrlValidationStatus(), apiBaseUrlTextField);
             visualizer.initVisualization(viewModel.getSystemMessageValidationStatus(), instructionTextArea);

@@ -39,8 +39,8 @@
 
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
-                <Label alignment="BASELINE_CENTER" text="%API token" />
-                <CustomPasswordField fx:id="apiTokenTextField" HBox.hgrow="ALWAYS" />
+                <Label alignment="BASELINE_CENTER" text="%API key" />
+                <CustomPasswordField fx:id="apiKeyTextField" HBox.hgrow="ALWAYS" />
                 <Button fx:id="apiTokenHelp" prefWidth="20.0" />
             </children>
         </HBox>
