@@ -1,0 +1,48 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+NAME = "jabref-windows-sandbox"
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "gusztavvargadr/windows-10"
+  config.vm.box_url = "https://app.vagrantup.com/gusztavvargadr/boxes/windows-10"
+  config.vm.hostname = NAME
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = NAME
+
+    vb.memory = 6000
+    vb.cpus = 2
+
+    vb.customize ['modifyvm', :id, '--clipboard-mode', 'bidirectional']
+    vb.gui = true
+  end
+
+  config.vm.provision "shell", privileged: "true", powershell_elevated_interactive: "true", inline: <<-SHELL
+    # Source: https://github.com/microsoft/winget-cli/discussions/4065#discussioncomment-8355261
+    Install-PackageProvider -Name NuGet -Force
+    # Microsoft.WinGet.Client is the official Microsoft winget PowerShell distribution. "WingetTools" is not.
+    Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery
+    # This installs winget-cli
+    Repair-WinGetPackageManager
+
+    # winget install EclipseAdoptium.Temurin.21.JDK --accept-source-agreements  # Adoptium has issues with AWT headless
+    winget install --id=Azul.Zulu.21.JDK -e --accept-source-agreements
+    winget install -e --id Git.Git --accept-source-agreements
+
+    winget install -e --id Mozilla.Firefox --accept-source-agreements
+    winget install --id=TheDocumentFoundation.LibreOffice -e --accept-source-agreements
+  SHELL
+
+  config.vm.provision "shell", reboot: true
+
+  config.vm.provision "shell", privileged: "false", inline: <<-SHELL
+    cd \\users\\vagrant
+    git clone --recurse-submodules https://github.com/JabRef/jabref.git
+    # cd jabref
+    # .\\gradlew jar
+  SHELL
+
+  # Used to set the Vagrant machine name
+  config.vm.define NAME do |t|
+  end
+end
