@@ -649,15 +649,27 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .table-row-cell:matching-search-and-groups {
-    -fx-background-color: white;
+    -fx-background-color: #FFFFFFFF;
+}
+
+.table-row-cell:matching-search-and-groups:odd {
+    -fx-background-color: #F5F5F5FF;
 }
 
 .table-row-cell:matching-search-not-groups {
-    -fx-background-color: rgba(180, 180, 180, 0.86);
+    -fx-background-color: #B4B4B4DB;
+}
+
+.table-row-cell:matching-search-not-groups:odd {
+    -fx-background-color: #AAAAAADB;
 }
 
 .table-row-cell:matching-groups-not-search {
-    -fx-background-color: rgba(140, 140, 140, 0.86);
+    -fx-background-color: #8C8C8CDB;
+}
+
+.table-row-cell:matching-groups-not-search:odd {
+    -fx-background-color: #828282DB;
 }
 
 .table-row-cell:not-matching-search-and-groups {
