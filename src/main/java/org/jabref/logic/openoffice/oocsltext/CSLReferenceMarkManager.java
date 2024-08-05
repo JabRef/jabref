@@ -92,10 +92,7 @@ public class CSLReferenceMarkManager {
     }
 
     public int getCitationNumber(String citationKey) {
-        return citationKeyToNumber.computeIfAbsent(citationKey, k -> {
-            highestCitationNumber++;
-            return highestCitationNumber;
-        });
+        return citationKeyToNumber.computeIfAbsent(citationKey, k -> ++highestCitationNumber);
     }
 
     public CSLReferenceMark createReferenceMark(BibEntry entry) throws Exception {
