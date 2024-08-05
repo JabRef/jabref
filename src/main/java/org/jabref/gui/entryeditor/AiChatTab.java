@@ -123,7 +123,7 @@ public class AiChatTab extends EntryEditorTab {
     private void showErrorNotIngested() {
         setContent(
                 ErrorStateComponent.withSpinner(
-                        Localization.lang("Please wait"),
+                        Localization.lang("Processing..."),
                         Localization.lang("The embeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")
                 )
         );

@@ -95,9 +95,12 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
     }
 
     private void summarizeAll() throws InterruptedException {
+        // Rationale for RuntimeException here:
+        // It follows the same idiom as in langchain4j. See {@link JabRefChatLanguageModel.generate}, this method
+        // is used internally in the summarization, and it also throws RuntimeExceptions.
+
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-            LOGGER.error("No summary can be generated for entry as the database doesn't have path");
-            return;
+            throw new RuntimeException(Localization.lang("No summary can be generated for entry '%0' as the database doesn't have path", citationKey));
         }
 
         addMoreWork(1); // For generating final summary.
@@ -113,9 +116,8 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
         }
 
         if (linkedFilesSummary.isEmpty()) {
-            LOGGER.error("No summary can be generated for entry");
             doneOneWork(); // Skipped generation of final summary.
-            return;
+            throw new RuntimeException(Localization.lang("No summary can be generated for entry '%0'. Could not find attached linked files.", citationKey));
         }
 
         String finalSummary;
