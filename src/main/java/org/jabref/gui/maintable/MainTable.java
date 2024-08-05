@@ -39,6 +39,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
@@ -66,12 +67,17 @@ import org.slf4j.LoggerFactory;
 public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
+    private static final PseudoClass MATCHING_SEARCH_AND_GROUPS = PseudoClass.getPseudoClass("matching-search-and-groups");
+    private static final PseudoClass MATCHING_SEARCH_NOT_GROUPS = PseudoClass.getPseudoClass("matching-search-not-groups");
+    private static final PseudoClass MATCHING_GROUPS_NOT_SEARCH = PseudoClass.getPseudoClass("matching-groups-not-search");
+    private static final PseudoClass NOT_MATCHING_SEARCH_AND_GROUPS = PseudoClass.getPseudoClass("not-matching-search-and-groups");
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
+
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
     private final ClipBoardManager clipBoardManager;
@@ -88,6 +94,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      PreferencesService preferencesService,
                      DialogService dialogService,
                      StateManager stateManager,
+                     KeyBindingRepository keyBindingRepository,
                      ClipBoardManager clipBoardManager,
                      BibEntryTypesManager entryTypesManager,
                      TaskExecutor taskExecutor,
@@ -119,16 +126,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.setOnDragOver(this::handleOnDragOverTableView);
         this.setOnDragDropped(this::handleOnDragDroppedTableView);
 
-        this.getColumns().addAll(
-                new MainTableColumnFactory(
-                        database,
-                        preferencesService,
-                        preferencesService.getMainTableColumnPreferences(),
-                        undoManager,
-                        dialogService,
-                        stateManager,
-                        taskExecutor).createColumns());
+        MainTableColumnFactory mainTableColumnFactory = new MainTableColumnFactory(
+                database,
+                preferencesService,
+                preferencesService.getMainTableColumnPreferences(),
+                undoManager,
+                dialogService,
+                stateManager,
+                taskExecutor);
 
+        this.getColumns().addAll(mainTableColumnFactory.createColumns());
         this.getColumns().removeIf(LibraryColumn.class::isInstance);
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
@@ -138,7 +145,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     }
                 })
                 .withContextMenu(entry -> RightClickMenu.create(entry,
-                        preferencesService.getKeyBindingRepository(),
+                        keyBindingRepository,
                         libraryTab,
                         dialogService,
                         stateManager,
@@ -148,10 +155,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         taskExecutor,
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         entryTypesManager))
-                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-search-and-groups"), entry -> entry.matchedBySearchProperty().and(entry.matchedByGroupProperty()))
-                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-search-not-groups"), entry -> entry.matchedBySearchProperty().and(entry.matchedByGroupProperty().not()))
-                .withPseudoClass(PseudoClass.getPseudoClass("entry-matching-groups-not-search"), entry -> entry.matchedByGroupProperty().and(entry.matchedBySearchProperty().not()))
-                .withPseudoClass(PseudoClass.getPseudoClass("entry-not-matching-search-and-groups"), entry -> entry.matchedBySearchProperty().not().and(entry.matchedByGroupProperty().not()))
+                .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS))
+                .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_NOT_GROUPS))
+                .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_GROUPS_NOT_SEARCH))
+                .withPseudoClass(NOT_MATCHING_SEARCH_AND_GROUPS, entry -> entry.matchCategory().isEqualTo(MatchCategory.NOT_MATCHING_SEARCH_AND_GROUPS))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -161,13 +168,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.getSortOrder().clear();
 
-        this.getColumns().stream().map(column -> (MainTableColumn<?>) column)
-            .filter(column -> column.getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK))
-            .findFirst().ifPresent(searchRankColumn -> this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
-                if (!this.getSortOrder().contains(searchRankColumn)) {
-                    this.getSortOrder().addFirst(searchRankColumn);
+        // force match category column to be the first sort order, (match_category column is always the first column)
+        this.getSortOrder().addFirst(getColumns().getFirst());
+        this.getSortOrder().addListener((ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>) change -> {
+                if (!this.getSortOrder().getFirst().equals(getColumns().getFirst())) {
+                    this.getSortOrder().addFirst(getColumns().getFirst());
                 }
-            }));
+            });
 
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
@@ -195,28 +202,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Store visual state
         new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
 
-        setupKeyBindings(preferencesService.getKeyBindingRepository());
+        setupKeyBindings(keyBindingRepository);
 
         this.setOnKeyTyped(key -> {
-            if (this.getSortOrder().isEmpty()) {
+            if (this.getSortOrder().size() <= 1) {
                 return;
             }
-            this.jumpToSearchKey(getSortOrder().getFirst(), key);
+            // skip match category column
+            this.jumpToSearchKey(getSortOrder().get(1), key);
         });
 
         database.getDatabase().registerListener(this);
 
-        MainTableColumnFactory rightClickMenuFactory = new MainTableColumnFactory(
-                database,
-                preferencesService,
-                preferencesService.getMainTableColumnPreferences(),
-                undoManager,
-                dialogService,
-                stateManager,
-                taskExecutor);
-
         // Enable the header right-click menu.
-        new MainTableHeaderContextMenu(this, rightClickMenuFactory, tabContainer, dialogService).show(true);
+        new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
     }
 
     /**
@@ -250,8 +249,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                     .startsWith(columnSearchTerm))
             .findFirst()
             .ifPresent(item -> {
-                this.scrollTo(item);
-                this.clearAndSelect(item.getEntry());
+                getSelectionModel().clearSelection();
+                getSelectionModel().select(item);
+                scrollTo(item);
             });
     }
 
@@ -289,6 +289,45 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public void cut() {
         copy();
         libraryTab.delete(StandardActions.CUT);
+    }
+
+    private void scrollToNextMatchCategory() {
+        BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
+        if (selectedEntry == null) {
+            return;
+        }
+
+        MatchCategory currentMatchCategory = selectedEntry.matchCategory().get();
+        for (int i = getSelectionModel().getSelectedIndex(); i < getItems().size(); i++) {
+            if (!getItems().get(i).matchCategory().get().equals(currentMatchCategory)) {
+                getSelectionModel().clearSelection();
+                getSelectionModel().select(i);
+                scrollTo(i);
+                return;
+            }
+        }
+    }
+
+    private void scrollToPreviousMatchCategory() {
+        BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
+        if (selectedEntry == null) {
+            return;
+        }
+
+        MatchCategory currentMatchCategory = selectedEntry.matchCategory().get();
+        for (int i = getSelectionModel().getSelectedIndex(); i >= 0; i--) {
+            if (!getItems().get(i).matchCategory().get().equals(currentMatchCategory)) {
+                MatchCategory targetMatchCategory = getItems().get(i).matchCategory().get();
+                // found the previous category, scroll to the first entry of that category
+                while ((i >= 0) && getItems().get(i).matchCategory().get().equals(targetMatchCategory)) {
+                    i--;
+                }
+                getSelectionModel().clearSelection();
+                getSelectionModel().select(i + 1);
+                scrollTo(i + 1);
+                return;
+            }
+        }
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
@@ -331,6 +370,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         break;
                     case DELETE_ENTRY:
                         deleteAction.execute();
+                        event.consume();
+                        break;
+                    case SCROLL_TO_NEXT_MATCH_CATEGORY:
+                        scrollToNextMatchCategory();
+                        event.consume();
+                        break;
+                    case SCROLL_TO_PREVIOUS_MATCH_CATEGORY:
+                         scrollToPreviousMatchCategory();
                         event.consume();
                         break;
                     default:
@@ -456,11 +503,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         }
                         case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
-                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getLuceneManager());
+                            importHandler.getLinker().moveFilesToFileDirRenameAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                         case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
-                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getLuceneManager());
+                            importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files, libraryTab.getIndexingTaskManager());
                         }
                     }
                 }

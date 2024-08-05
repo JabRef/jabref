@@ -31,6 +31,8 @@ import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
+import org.jabref.gui.search.MatchCategory;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -88,9 +90,6 @@ public class MainTableColumnFactory {
             case SCORE:
                 returnColumn = createScoreColumn(column);
                 break;
-            case SEARCH_RANK:
-                returnColumn = createSearchRankColumn(column);
-                break;
             case INDEX:
                 returnColumn = createIndexColumn(column);
                 break;
@@ -138,6 +137,7 @@ public class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
+        columns.add(createMatchCategoryColumn(new MainTableColumnModel(MainTableColumnModel.Type.MATCH_CATEGORY)));
         columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
         return columns;
     }
@@ -148,9 +148,20 @@ public class MainTableColumnFactory {
         column.setMaxWidth(width);
     }
 
-    /**
-     * Creates a column with the search score
-     */
+    private TableColumn<BibEntryTableViewModel, MatchCategory> createMatchCategoryColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, MatchCategory> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Match category"));
+        header.getStyleClass().add("mainTable-header");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.MATCH_CATEGORY.getDisplayName()));
+        column.setGraphic(header);
+        column.setCellValueFactory(cellData -> cellData.getValue().matchCategory());
+        new ValueTableCellFactory<BibEntryTableViewModel, MatchCategory>().withText(String::valueOf).install(column);
+        column.setSortable(true);
+        column.setSortType(TableColumn.SortType.ASCENDING);
+        column.setVisible(false);
+        return column;
+    }
+
     private TableColumn<BibEntryTableViewModel, Float> createScoreColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, Float> column = new MainTableColumn<>(columnModel);
         Node header = new Text(Localization.lang("Score"));
@@ -162,20 +173,7 @@ public class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, Float>().withText(String::valueOf).install(column);
         column.setSortable(true);
         column.setReorderable(false);
-        column.visibleProperty().bind(stateManager.activeSearchQueryProperty().isPresent());
-        return column;
-    }
-
-    private TableColumn<BibEntryTableViewModel, Integer> createSearchRankColumn(MainTableColumnModel columnModel) {
-        TableColumn<BibEntryTableViewModel, Integer> column = new MainTableColumn<>(columnModel);
-        Node header = new Text(Localization.lang("Search rank"));
-        header.getStyleClass().add("mainTable-header");
-        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SEARCH_RANK.getDisplayName()));
-        column.setGraphic(header);
-        column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getSearchRank()));
-        new ValueTableCellFactory<BibEntryTableViewModel, Integer>().withText(String::valueOf).install(column);
-        column.setSortable(true);
-//        column.setVisible(false);
+        column.visibleProperty().bind(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).isPresent());
         return column;
     }
 

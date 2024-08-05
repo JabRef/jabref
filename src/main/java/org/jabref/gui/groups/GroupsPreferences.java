@@ -12,6 +12,8 @@ import javafx.collections.FXCollections;
 
 import org.jabref.model.groups.GroupHierarchyType;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class GroupsPreferences {
 
     private final SetProperty<GroupViewMode> groupViewMode;
@@ -40,6 +42,17 @@ public class GroupsPreferences {
         if (viewModeInvert) {
             this.groupViewMode.add(GroupViewMode.INVERT);
         }
+    }
+
+    @VisibleForTesting
+    public GroupsPreferences(EnumSet<GroupViewMode> groupViewMode,
+                             boolean shouldAutoAssignGroup,
+                             boolean shouldDisplayGroupCount,
+                             GroupHierarchyType defaultHierarchicalContext) {
+        this.groupViewMode = new SimpleSetProperty<>(FXCollections.observableSet(groupViewMode));
+        this.shouldAutoAssignGroup = new SimpleBooleanProperty(shouldAutoAssignGroup);
+        this.shouldDisplayGroupCount = new SimpleBooleanProperty(shouldDisplayGroupCount);
+        this.defaultHierarchicalContext = new SimpleObjectProperty<>(defaultHierarchicalContext);
     }
 
     public EnumSet<GroupViewMode> getGroupViewMode() {

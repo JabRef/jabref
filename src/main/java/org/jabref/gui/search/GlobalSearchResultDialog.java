@@ -1,7 +1,5 @@
 package org.jabref.gui.search;
 
-import java.util.Optional;
-
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -70,7 +68,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
 
-        SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager);
+        SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager, taskExecutor);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, taskExecutor);
 
         resultsTable.getColumns().removeIf(SpecialFieldColumn.class::isInstance);
@@ -96,7 +94,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
                                    .findFirst()
                                    .ifPresent(libraryTabContainer::showLibraryTab);
 
-                stateManager.activeSearchQueryProperty().set(Optional.empty());
+                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).get());
                 stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
                 stage.close();
             }

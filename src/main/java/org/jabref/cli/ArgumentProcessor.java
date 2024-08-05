@@ -239,22 +239,22 @@ public class ArgumentProcessor {
             automaticallySetFileLinks(loaded);
         }
 
-        if ((cli.isWriteXMPtoPdf() && cli.isEmbeddBibfileInPdf()) || (cli.isWriteMetadatatoPdf() && (cli.isWriteXMPtoPdf() || cli.isEmbeddBibfileInPdf()))) {
-            System.err.println("Give only one of [writeXMPtoPdf, embeddBibfileInPdf, writeMetadatatoPdf]");
+        if ((cli.isWriteXmpToPdf() && cli.isEmbedBibFileInPdf()) || (cli.isWriteMetadataToPdf() && (cli.isWriteXmpToPdf() || cli.isEmbedBibFileInPdf()))) {
+            System.err.println("Give only one of [writeXmpToPdf, embedBibFileInPdf, writeMetadataToPdf]");
         }
 
-        if (cli.isWriteMetadatatoPdf() || cli.isWriteXMPtoPdf() || cli.isEmbeddBibfileInPdf()) {
+        if (cli.isWriteMetadataToPdf() || cli.isWriteXmpToPdf() || cli.isEmbedBibFileInPdf()) {
             if (!loaded.isEmpty()) {
                 writeMetadataToPdf(loaded,
-                        cli.getWriteMetadatatoPdf(),
+                        cli.getWriteMetadataToPdf(),
                         preferencesService.getXmpPreferences(),
                         preferencesService.getFilePreferences(),
                         preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
                         Injector.instantiateModelOrService(BibEntryTypesManager.class),
                         preferencesService.getFieldPreferences(),
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
-                        cli.isWriteXMPtoPdf() || cli.isWriteMetadatatoPdf(),
-                        cli.isEmbeddBibfileInPdf() || cli.isWriteMetadatatoPdf());
+                        cli.isWriteXmpToPdf() || cli.isWriteMetadataToPdf(),
+                        cli.isEmbedBibFileInPdf() || cli.isWriteMetadataToPdf());
             }
         }
 
@@ -379,7 +379,7 @@ public class ArgumentProcessor {
                 if (embeddedBibFilePdfExporter.exportToAllFilesOfEntry(databaseContext, filePreferences, entry, List.of(entry), abbreviationRepository)) {
                     System.out.printf("Successfully embedded metadata on at least one linked file of %s%n", citeKey);
                 } else {
-                    System.out.printf("Cannot embedd metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey);
+                    System.out.printf("Cannot embed metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey);
                 }
             }
         } catch (Exception e) {

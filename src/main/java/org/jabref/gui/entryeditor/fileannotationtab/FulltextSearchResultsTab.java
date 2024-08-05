@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import javafx.collections.MapChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
@@ -35,7 +34,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResult;
-import org.jabref.model.search.SearchResults;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -53,6 +51,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
     private final TextFlow content;
+    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private BibEntry entry;
     private DocumentViewerView documentViewerView;
 
@@ -60,13 +59,15 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                                     PreferencesService preferencesService,
                                     DialogService dialogService,
                                     BibDatabaseContext databaseContext,
-                                    TaskExecutor taskExecutor) {
+                                    TaskExecutor taskExecutor,
+                                    OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
+        this.searchQueryProperty = searchQueryProperty;
 
         content = new TextFlow();
         ScrollPane scrollPane = new ScrollPane(content);
@@ -74,16 +75,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         content.setPadding(new Insets(10));
         setContent(scrollPane);
         setText(Localization.lang("Search results"));
-        this.stateManager.getSearchResults().addListener((MapChangeListener<String, SearchResults>) change -> bindToEntry(entry));
+        searchQueryProperty.addListener((observable, oldValue, newValue) -> bindToEntry(entry));
     }
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        OptionalObjectProperty<SearchQuery> activeSearchQueryProperty = stateManager.activeSearchQueryProperty();
-        return activeSearchQueryProperty.isPresent().get() &&
-                activeSearchQueryProperty.get().isPresent() &&
-                activeSearchQueryProperty.get().get().getSearchFlags().contains(SearchFlags.FULLTEXT) &&
-                !activeSearchQueryProperty.get().get().toString().isEmpty();
+        return searchQueryProperty.get().map(query ->
+                !query.getParsedQuery().toString().isEmpty() && query.getSearchFlags().contains(SearchFlags.FULLTEXT)
+        ).orElse(false);
     }
 
     @Override
