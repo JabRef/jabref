@@ -194,7 +194,7 @@ public class LibraryTab extends Tab {
         }
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, taskExecutor, selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, taskExecutor, getLuceneManager(), selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -333,7 +333,7 @@ public class LibraryTab extends Tab {
         setLuceneManager();
         this.tableModel.unbind();
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, taskExecutor, selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, taskExecutor, getLuceneManager(), selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -571,6 +571,7 @@ public class LibraryTab extends Tab {
                 preferencesService,
                 dialogService,
                 stateManager,
+                preferencesService.getKeyBindingRepository(),
                 clipBoardManager,
                 entryTypesManager,
                 taskExecutor,

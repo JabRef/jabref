@@ -12,7 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import org.jabref.gui.search.SearchDisplayMode;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -26,12 +26,9 @@ public class SearchPreferences {
     private final BooleanProperty keepSearchSting;
     private final ObjectProperty<SearchDisplayMode> searchDisplayMode;
 
-    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isCaseSensitive, boolean isRegularExpression, boolean isFulltext, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
+    public SearchPreferences(SearchDisplayMode searchDisplayMode, boolean isRegularExpression, boolean isFulltext, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {
         this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition);
 
-        if (isCaseSensitive) {
-            searchFlags.add(SearchFlags.CASE_SENSITIVE);
-        }
         if (isRegularExpression) {
             searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
         }
@@ -62,10 +59,6 @@ public class SearchPreferences {
 
     public ObservableSet<SearchFlags> getObservableSearchFlags() {
         return searchFlags;
-    }
-
-    public boolean isCaseSensitive() {
-        return searchFlags.contains(SearchFlags.CASE_SENSITIVE);
     }
 
     public void setSearchFlag(SearchFlags flag, boolean value) {

@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.collections.ListChangeListener;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -59,17 +58,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                                       .filter(c -> c.getModel().getType() == MainTableColumnModel.Type.SCORE)
                                       .findFirst().orElse(null);
 
-        // always sort by score first. If no search is ongoing, it will be equal for all columns.
-        ListChangeListener<? super TableColumn<BibEntryTableViewModel, ?>> scoreSortOderPrioritizer = new ListChangeListener<TableColumn<BibEntryTableViewModel, ?>>() {
-            @Override
-            public void onChanged(Change<? extends TableColumn<BibEntryTableViewModel, ?>> c) {
-                getSortOrder().removeListener(this);
-                getSortOrder().removeAll(scoreColumn);
-                getSortOrder().addFirst(scoreColumn);
-                getSortOrder().addListener(this);
-            }
-        };
-
         this.getSortOrder().clear();
         preferencesService.getSearchDialogColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
@@ -77,11 +65,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
                     .filter(column -> column.getModel().equals(columnModel))
                     .findFirst()
                     .ifPresent(column -> this.getSortOrder().add(column)));
-        // insert score sort order
-        if (scoreColumn != null) {
-            this.getSortOrder().addFirst(scoreColumn);
-            this.getSortOrder().addListener(scoreSortOderPrioritizer);
-        }
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
@@ -91,7 +74,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         this.setItems(model.getEntriesFilteredAndSorted());
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
-        this.sort();
 
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 

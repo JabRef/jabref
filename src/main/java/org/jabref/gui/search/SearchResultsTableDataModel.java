@@ -18,9 +18,9 @@ import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FilteredListProxy;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -67,7 +67,8 @@ public class SearchResultsTableDataModel {
     }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return query.map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
+        /* query.map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);*/
+        return true;
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {

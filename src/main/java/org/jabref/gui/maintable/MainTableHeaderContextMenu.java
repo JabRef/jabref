@@ -71,9 +71,6 @@ public class MainTableHeaderContextMenu extends ContextMenu {
                 continue;
             }
             // Append only if the column has not already been added (a common column)
-            if (((MainTableColumn<?>) column).getModel().getType().equals(MainTableColumnModel.Type.SEARCH_RANK)) {
-                continue;
-            }
             RightClickMenuItem itemToAdd = createMenuItem(column, true);
             this.getItems().add(itemToAdd);
 
