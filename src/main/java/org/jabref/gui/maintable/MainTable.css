@@ -55,10 +55,10 @@
 .table-row-cell:matching-search-and-groups:hover > .table-cell > .ikonli-font-icon {
     -fx-text-fill: -jr-match-1-text-color-hover;
 }
-.table-row-cell:matching-search-and-groups:odd {
-    -fx-background-color: -jr-match-1-odd;
+.table-row-cell:matching-search-and-groups:even {
+    -fx-background-color: -jr-match-1-even;
 }
-.table-row-cell:matching-search-and-groups:odd:hover {
+.table-row-cell:matching-search-and-groups:even:hover {
     -fx-background-color: -jr-match-1-hover;
 }
 
@@ -80,10 +80,10 @@
 .table-row-cell:matching-search-not-groups:hover > .table-cell > .ikonli-font-icon {
     -fx-text-fill: -jr-match-2-text-color-hover;
 }
-.table-row-cell:matching-search-not-groups:odd {
-    -fx-background-color: -jr-match-2-odd;
+.table-row-cell:matching-search-not-groups:even {
+    -fx-background-color: -jr-match-2-even;
 }
-.table-row-cell:matching-search-not-groups:odd:hover {
+.table-row-cell:matching-search-not-groups:even:hover {
     -fx-background-color: -jr-match-2-hover;
 }
 
@@ -105,10 +105,10 @@
 .table-row-cell:matching-groups-not-search:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-match-3-text-color-hover;
 }
-.table-row-cell:matching-groups-not-search:odd {
-    -fx-background-color: -jr-match-3-odd;
+.table-row-cell:matching-groups-not-search:even {
+    -fx-background-color: -jr-match-3-even;
 }
-.table-row-cell:matching-groups-not-search:odd:hover {
+.table-row-cell:matching-groups-not-search:even:hover {
     -fx-background-color: -jr-hover;
 }
 
@@ -130,10 +130,10 @@
 .table-row-cell:not-matching-search-and-groups:hover > .table-cell > .ikonli-font-icon {
     -fx-icon-color: -jr-match-4-text-color-hover;
 }
-.table-row-cell:not-matching-search-and-groups:odd {
-    -fx-background-color: -jr-match-4-odd;
+.table-row-cell:not-matching-search-and-groups:even {
+    -fx-background-color: -jr-match-4-even;
 }
-.table-row-cell:not-matching-search-and-groups:odd:hover {
+.table-row-cell:not-matching-search-and-groups:even:hover {
     -fx-background-color: -jr-match-4-hover;
 }
 
