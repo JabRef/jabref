@@ -260,7 +260,7 @@
     /* region: maintable base colors **/
 
     -jr-match-1: -jr-white;
-    -jr-match-1-even: derive(-jr-white, -5%);
+    -jr-match-2-even: derive(-jr-match-1, 5%);
     -jr-match-1-text-color: -fx-mid-text-color;
     -jr-match-1-hover: -jr-hover;
     -jr-match-1-text-color-hover: -fx-mid-text-color;
