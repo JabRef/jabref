@@ -257,28 +257,28 @@
     /* Consistent size for headers of tab-pane and side-panels*/
     -jr-header-height: 3em;
 
-    /* region: maintable base colors **/
+    /* region: maintable base colors; based on a Blueberry (#4d648D) diea **/
 
     -jr-match-1: -jr-white;
-    -jr-match-2-even: derive(-jr-match-1, 5%);
+    -jr-match-1-even: -jr-base;
     -jr-match-1-text-color: -fx-mid-text-color;
     -jr-match-1-hover: -jr-hover;
     -jr-match-1-text-color-hover: -fx-mid-text-color;
 
-    -jr-match-2: -jr-blue-gray-1;
-    -jr-match-2-even: -jr-blue-gray-1-darker;
+    -jr-match-2: #d0e1f9ec; /* Periwinkle */
+    -jr-match-2-even: derive(-jr-match-2, 10%);
     -jr-match-2-text-color: -fx-mid-text-color;
     -jr-match-2-hover: -jr-hover;
     -jr-match-2-text-color-hover: -fx-mid-text-color;
 
-    -jr-match-3: -jr-blue-gray-3;
-    -jr-match-3-even: -jr-blue-gray-3-darker;
+    -jr-match-3: #283655; /* Indigo Ink */
+    -jr-match-3-even: derive(-jr-match-3, 10%);
     -jr-match-3-text-color: -jr-gray-1;
     -jr-match-3-hover: -jr-hover;
     -jr-match-3-text-color-hover: -fx-mid-text-color;
 
-    -jr-match-4: -jr-blue-gray-4;
-    -jr-match-4-even: -jr-blue-gray-4-darker;
+    -jr-match-4: #1e1F26; /* Midnight Blue */
+    -jr-match-4-even: derive(-jr-match-4, 10%);
     -jr-match-4-text-color: -jr-gray-1;
     -jr-match-4-hover: -jr-hover;
     -jr-match-4-text-color-hover: -fx-mid-text-color;
