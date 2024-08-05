@@ -231,7 +231,7 @@ public class AiChatTab extends EntryEditorTab {
             LOGGER.warn("AI chat is constructed, but the entry citation key is empty. Cannot store chat history");
             return new InMemoryAiChatHistory();
         } else {
-            return aiService.getChatHistoryManager().getChatHistory(databasePath.get(), entry.getCitationKey().get());
+            return aiService.getChatHistoryManager().getChatHistory(bibDatabaseContext, entry.getCitationKey().get());
         }
     }
 

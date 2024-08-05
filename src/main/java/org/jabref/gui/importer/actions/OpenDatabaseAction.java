@@ -54,7 +54,9 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Warning for migrating the Review into the Comment field
             new MergeReviewIntoCommentAction(),
             // Check for new custom entry types loaded from the BIB file:
-            new CheckForNewEntryTypesAction());
+            new CheckForNewEntryTypesAction(),
+            // AI chat history links BibEntry with citation key. When citation key is changed, chat history should be transferred from old citation key to new citation key
+            new ListenForCitationKeyChangeForChatHistoryAction());
 
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;

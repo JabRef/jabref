@@ -2,14 +2,25 @@ package org.jabref.logic.ai.chathistory;
 
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
+import org.jabref.gui.StateManager;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
+
+import com.airhacks.afterburner.injection.Injector;
+import com.google.common.eventbus.Subscribe;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageType;
 import dev.langchain4j.data.message.UserMessage;
+import jakarta.inject.Inject;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +36,8 @@ import org.slf4j.LoggerFactory;
  */
 public class BibDatabaseChatHistoryManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseChatHistoryManager.class);
+
+    private final StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
 
     private record ChatHistoryRecord(ChatMessageType type, String content) implements Serializable {
         public ChatMessage toLangchainMessage() {
@@ -45,15 +58,20 @@ public class BibDatabaseChatHistoryManager {
         this.mvStore = mvStore;
     }
 
-    private Map<Integer, ChatHistoryRecord> getMap(Path bibDatabasePath, String citationKey) {
-        return mvStore.openMap("chathistory-" + bibDatabasePath + "-" + citationKey);
+    private Map<Integer, ChatHistoryRecord> getMap(BibDatabaseContext bibDatabaseContext, String citationKey) {
+        if (bibDatabaseContext.getDatabasePath().isPresent()) {
+            return mvStore.openMap("chathistory-" + bibDatabaseContext.getDatabasePath().get() + "-" + citationKey);
+        } else {
+            LOGGER.warn("Tried to call BibDatabaseChatHistoryManager.getMap with no database path present. Will use a Java HashMap instead of MVMap from MVStore.");
+            return new HashMap<>();
+        }
     }
 
-    public AiChatHistory getChatHistory(Path bibDatabasePath, String citationKey) {
+    public AiChatHistory getChatHistory(BibDatabaseContext bibDatabaseContext, String citationKey) {
         return new AiChatHistory() {
             @Override
             public List<ChatMessage> getMessages() {
-                Map<Integer, ChatHistoryRecord> messages = getMap(bibDatabasePath, citationKey);
+                Map<Integer, ChatHistoryRecord> messages = getMap(bibDatabaseContext, citationKey);
                 return IntStream.range(0, messages.size())
                                 .mapToObj(key -> messages.get(key).toLangchainMessage())
                                 .toList();
@@ -61,7 +79,7 @@ public class BibDatabaseChatHistoryManager {
 
             @Override
             public void add(ChatMessage chatMessage) {
-                Map<Integer, ChatHistoryRecord> map = getMap(bibDatabasePath, citationKey);
+                Map<Integer, ChatHistoryRecord> map = getMap(bibDatabaseContext, citationKey);
 
                 // We count 0-based, thus "size()" is the next number
                 // 0 entries -> 0 is the first new id
@@ -84,8 +102,28 @@ public class BibDatabaseChatHistoryManager {
 
             @Override
             public void clear() {
-                getMap(bibDatabasePath, citationKey).clear();
+                getMap(bibDatabaseContext, citationKey).clear();
             }
         };
+    }
+
+    @Subscribe
+    private void fieldChangedEventListener(FieldChangedEvent event) {
+        // TODO: This methods doesn't take into account if the new citation key is valid.
+
+        if (event.getField() != InternalField.KEY_FIELD) {
+            return;
+        }
+
+        Optional<BibDatabaseContext> bibDatabaseContext = stateManager.getOpenDatabases().stream().filter(dbContext -> dbContext.getDatabase().getEntries().contains(event.getBibEntry())).findFirst();
+
+        if (bibDatabaseContext.isEmpty()) {
+            LOGGER.error("Could not listen to field change event because no database context was found. BibEntry: {}", event.getBibEntry());
+            return;
+        }
+
+        Map<Integer, ChatHistoryRecord> oldMap = getMap(bibDatabaseContext.get(), event.getOldValue());
+        getMap(bibDatabaseContext.get(), event.getNewValue()).putAll(oldMap);
+        oldMap.clear();
     }
 }
