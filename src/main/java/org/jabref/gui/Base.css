@@ -34,9 +34,13 @@
 
     /* Some blueish greys - currently not used */
     -jr-blue-gray-1: #c8d6e5;
+    -jr-blue-gray-1-darker: derive(-jr-blue-gray-1, -5%);
     -jr-blue-gray-2: #8395a7;
+    -jr-blue-gray-2-darker: derive(-jr-blue-gray-2, -5%);
     -jr-blue-gray-3: #576574;
+    -jr-blue-gray-3-darker: derive(-jr-blue-gray-3, -5%);
     -jr-blue-gray-4: #222f3e;
+    -jr-blue-gray-4-darker: derive(-jr-blue-gray-4, -5%);
 
     /* Highlights */
     -jr-blue: #0abde3;
@@ -252,6 +256,34 @@
 
     /* Consistent size for headers of tab-pane and side-panels*/
     -jr-header-height: 3em;
+
+    /* region: maintable base colors **/
+
+    -jr-match-1: -jr-white;
+    -jr-match-1-odd: derive(-jr-white, -5%);
+    -jr-match-1-text-color: -fx-mid-text-color;
+    -jr-match-1-hover: -jr-hover;
+    -jr-match-1-text-color-hover: -fx-mid-text-color;
+
+    -jr-match-2: -jr-blue-gray-1;
+    -jr-match-2-odd: -jr-blue-gray-1-darker;
+    -jr-match-2-text-color: -fx-mid-text-color;
+    -jr-match-2-hover: -jr-hover;
+    -jr-match-2-text-color-hover: -fx-mid-text-color;
+
+    -jr-match-3: -jr-blue-gray-3;
+    -jr-match-3-odd: -jr-blue-gray-3-darker;
+    -jr-match-3-text-color: -jr-gray-1;
+    -jr-match-3-hover: -jr-hover;
+    -jr-match-3-text-color-hover: -fx-mid-text-color;
+
+    -jr-match-4: -jr-blue-gray-4;
+    -jr-match-4-odd: -jr-blue-gray-4-darker;
+    -jr-match-4-text-color: -jr-gray-1;
+    -jr-match-4-hover: -jr-hover;
+    -jr-match-4-text-color-hover: -fx-mid-text-color;
+
+    /* endregion */
 }
 
 .unchanged {
@@ -269,7 +301,6 @@
 .deletion {
     -rtfx-background-color: rgba(255, 107, 107, 0.55);
 }
-
 
 #frame {
     -fx-background-color: -jr-background-alt;
@@ -646,34 +677,6 @@ TextFlow > .tooltip-text-monospaced {
 .split-pane > .split-pane-divider {
     -fx-background-color: -jr-sidepane-background;
     -fx-padding: 0 .5 0 .5;
-}
-
-.table-row-cell:matching-search-and-groups {
-    -fx-background-color: #FFFFFFFF;
-}
-
-.table-row-cell:matching-search-and-groups:odd {
-    -fx-background-color: #F5F5F5FF;
-}
-
-.table-row-cell:matching-search-not-groups {
-    -fx-background-color: #B4B4B4DB;
-}
-
-.table-row-cell:matching-search-not-groups:odd {
-    -fx-background-color: #AAAAAADB;
-}
-
-.table-row-cell:matching-groups-not-search {
-    -fx-background-color: #8C8C8CDB;
-}
-
-.table-row-cell:matching-groups-not-search:odd {
-    -fx-background-color: #828282DB;
-}
-
-.table-row-cell:not-matching-search-and-groups {
-    -fx-opacity: 60%;
 }
 
 .table-row-cell:hover,
@@ -1174,12 +1177,11 @@ We want to have a look that matches our icons in the tool-bar */
 
 .table-cell,
 .tree-table-cell,
-.table-cell .glyph-icon,
 .tree-table-cell .glyph-icon {
-    -fx-padding: 0.5em 1em 0.5em 1em;
     -fx-cell-size: 4.0em;
-    -fx-text-fill: -fx-text-background-color;
+    -fx-padding: 0.5em 1em 0.5em 1em;
     -fx-fill: -fx-text-background-color;
+    -fx-text-fill: -fx-text-background-color;
 }
 
 /* Drag and drop colored indicator */
