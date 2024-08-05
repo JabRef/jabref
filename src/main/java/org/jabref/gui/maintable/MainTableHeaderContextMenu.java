@@ -67,6 +67,9 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         // Populate the menu with currently used fields
         for (TableColumn<BibEntryTableViewModel, ?> column : mainTable.getColumns()) {
+            if (((MainTableColumn<?>) column).getModel().getType() == MainTableColumnModel.Type.MATCH_CATEGORY) {
+                continue;
+            }
             // Append only if the column has not already been added (a common column)
             RightClickMenuItem itemToAdd = createMenuItem(column, true);
             this.getItems().add(itemToAdd);
@@ -150,8 +153,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      * Determines if a list of TableColumns contains the searched column.
      */
     private boolean isColumnInList(MainTableColumn<?> searchColumn, List<TableColumn<BibEntryTableViewModel, ?>> tableColumns) {
-        for (TableColumn<BibEntryTableViewModel, ?> column:
-        tableColumns) {
+        for (TableColumn<BibEntryTableViewModel, ?> column: tableColumns) {
             MainTableColumnModel model = ((MainTableColumn<?>) column).getModel();
             if (model.equals(searchColumn.getModel())) {
                 return true;

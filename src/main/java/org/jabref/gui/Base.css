@@ -653,6 +653,22 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0 .5 0 .5;
 }
 
+.table-row-cell:matching-search-and-groups {
+    -fx-background-color: white;
+}
+
+.table-row-cell:matching-search-not-groups {
+    -fx-background-color: rgba(180, 180, 180, 0.86);
+}
+
+.table-row-cell:matching-groups-not-search {
+    -fx-background-color: rgba(140, 140, 140, 0.86);
+}
+
+.table-row-cell:not-matching-search-and-groups {
+    -fx-opacity: 60%;
+}
+
 .table-row-cell:hover,
 .tree-table-row-cell:hover {
     -fx-background-color: -jr-hover;
