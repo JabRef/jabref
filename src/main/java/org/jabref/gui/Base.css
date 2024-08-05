@@ -677,13 +677,13 @@ TextFlow > .tooltip-text-monospaced {
 }
 
 .table-row-cell:hover,
+.table-row-cell:hover:odd,
 .tree-table-row-cell:hover {
     -fx-background-color: -jr-hover;
     -fx-text-fill: -fx-focused-text-base-color;
     -fx-fill: -fx-focused-text-base-color;
 }
 
-.table-row-cell:hover,
 .tree-table-row-cell:selected > .tree-table-cell > .glyph-icon {
     -fx-fill: white;
     -fx-text-fill: white;
