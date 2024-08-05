@@ -12,6 +12,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
@@ -55,7 +56,7 @@ public class SciteTab extends EntryEditorTab {
         column.setHalignment(HPos.CENTER);
 
         sciteResultsPane.getColumnConstraints().setAll(column);
-        sciteResultsPane.setId("scitePane");
+        sciteResultsPane.setId("citationsPane");
         setContent(sciteResultsPane);
 
         EasyBind.subscribe(viewModel.statusProperty(), status -> {
@@ -85,6 +86,7 @@ public class SciteTab extends EntryEditorTab {
         Label titleLabel = new Label(Localization.lang("Error"));
         titleLabel.getStyleClass().add("scite-error-label");
         Text errorMessageText = new Text(viewModel.searchErrorProperty().get());
+        errorMessageText.getStyleClass().add("scite-message-content");
         VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
         errorMessageBox.getStyleClass().add("scite-error-box");
         return errorMessageBox;
@@ -101,7 +103,7 @@ public class SciteTab extends EntryEditorTab {
                 tallModel.unclassified(),
                 tallModel.citingPublications()
         ));
-
+        message.getStyleClass().add("scite-message-content");
         String url = SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
         VBox messageBox = getMessageBox(url, titleLabel, message);
         messageBox.getStyleClass().add("scite-message-box");
