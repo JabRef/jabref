@@ -68,8 +68,8 @@ public class AiChatTab extends EntryEditorTab {
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));
 
-        aiService.getEmbeddingsManager().registerListener(new FileIngestedListener());
-        aiService.getEmbeddingModel().registerListener(new EmbeddingModelBuiltListener());
+        aiService.getEmbeddingsManager().registerListener(this);
+        aiService.getEmbeddingModel().registerListener(this);
     }
 
     @Override
@@ -240,17 +240,18 @@ public class AiChatTab extends EntryEditorTab {
         }
     }
 
-    private class FileIngestedListener {
-        @Subscribe
-        public void listen(FullyIngestedDocumentsTracker.DocumentIngestedEvent event) {
-             UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
-        }
+    @Subscribe
+    public void listen(FullyIngestedDocumentsTracker.DocumentIngestedEvent event) {
+        UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
     }
 
-    private class EmbeddingModelBuiltListener {
-        @Subscribe
-        public void listen(EmbeddingModel.EmbeddingModelBuiltEvent event) {
-            UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
-        }
+    @Subscribe
+    public void listen(EmbeddingModel.EmbeddingModelBuiltEvent event) {
+        UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
+    }
+
+    @Subscribe
+    public void listen(EmbeddingModel.EmbeddingModelBuildingErrorEvent event) {
+        UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
     }
 }

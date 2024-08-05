@@ -52,6 +52,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
     private final EventBus eventBus = new EventBus();
 
     public static class EmbeddingModelBuiltEvent { }
+    public static class EmbeddingModelBuildingErrorEvent { }
 
     // Empty if there is no error.
     private String errorWhileBuildingModel = "";
@@ -87,6 +88,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
                     LOGGER.error("An error occurred while building the embedding model", e);
                     dialogService.notify(Localization.lang("An error occurred while building the embedding model"));
                     errorWhileBuildingModel = e.getMessage();
+                    eventBus.post(new EmbeddingModelBuildingErrorEvent());
                 });
         task.titleProperty().set(Localization.lang("Downloading embedding model"));
         task.showToUser(true);
