@@ -175,7 +175,7 @@ public class AiChatTab extends EntryEditorTab {
     public void showBuildingEmbeddingModel() {
         setContent(
                 ErrorStateComponent.withSpinner(
-                        Localization.lang("Please wait"),
+                        Localization.lang("Downloading..."),
                         Localization.lang("Downloading embedding model... Afterwards, you will be able to chat with your files.")
                 )
         );
