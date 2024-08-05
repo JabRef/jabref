@@ -257,7 +257,7 @@
     /* Consistent size for headers of tab-pane and side-panels*/
     -jr-header-height: 3em;
 
-    /* region: maintable base colors; based on a Blueberry (#4d648D) diea **/
+    /* region: maintable base colors **/
 
     -jr-match-1: -jr-white;
     -jr-match-1-even: -jr-base;
