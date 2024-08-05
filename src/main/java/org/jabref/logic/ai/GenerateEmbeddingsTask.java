@@ -104,6 +104,5 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
     private void updateProgress() {
         updateProgress(workDone.get(), workMax.get());
-        updateMessage(Localization.lang("%0% work done for embeddings generation", Math.round((float) workDone.get() / (float) workMax.get() * 100)));
     }
 }

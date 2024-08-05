@@ -216,7 +216,6 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
     private void updateProgress() {
         updateProgress(workDone, workMax);
-        updateMessage(Localization.lang("%0% work done for summarization", Math.round((float) workDone / (float) workMax * 100)));
     }
 
     private void addMoreWork(int moreWork) {
