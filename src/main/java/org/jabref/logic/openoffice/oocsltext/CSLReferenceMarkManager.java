@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
+import org.jabref.logic.openoffice.ReferenceMark;
 import org.jabref.model.entry.BibEntry;
 
 import com.sun.star.container.XNameAccess;
@@ -16,8 +15,13 @@ import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XReferenceMarksSupplier;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.UnoRuntime;
+import io.github.thibaultmeyer.cuid.CUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CSLReferenceMarkManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CSLReferenceMarkManager.class);
+
     private final HashMap<String, CSLReferenceMark> marksByName;
     private final ArrayList<CSLReferenceMark> marksByID;
     private final IdentityHashMap<CSLReferenceMark, Integer> idsByMark;
@@ -44,43 +48,24 @@ public class CSLReferenceMarkManager {
         int citationCounter = 0;
 
         for (String name : marks.getElementNames()) {
-            String citationKey = extractCitationKey(name);
-            if (!citationKey.isEmpty()) {
-                citationOrder.putIfAbsent(citationKey, ++citationCounter);
-
+            Optional<ReferenceMark> referenceMark = ReferenceMark.of(name);
+            if (!referenceMark.isEmpty()) {
+                citationOrder.putIfAbsent(referenceMark.map(ReferenceMark::getCitationKey).get(), ++citationCounter);
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
-                CSLReferenceMark mark = new CSLReferenceMark(named, name);
+                CSLReferenceMark mark = new CSLReferenceMark(named, referenceMark.get());
                 addMark(mark);
             }
         }
     }
 
-    private String extractCitationKey(String name) {
-        for (String prefix : CSLCitationOOAdapter.PREFIXES) {
-            if (name.startsWith(prefix)) {
-                String withoutPrefix = name.substring(prefix.length());
-                String[] parts = withoutPrefix.split("\\s+");
-                if (parts.length > 0) {
-                    String key = parts[0];
-                    key = key.replaceAll("^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$", "");
-                    if (!key.isEmpty()) {
-                        return key;
-                    }
-                }
-                break;
-            }
-        }
-        return "";
-    }
-
     private void updateCitationInfo(String name) {
-        Pattern pattern = Pattern.compile("JABREF_(.+) CID_(\\d+) (.+)"); // Updated pattern
-        Matcher matcher = pattern.matcher(name);
-        if (matcher.find()) {
-            String citationKey = matcher.group(1);
-            int citationNumber = Integer.parseInt(matcher.group(2));
-            citationKeyToNumber.put(citationKey, citationNumber);
+        Optional<ReferenceMark> referenceMark = ReferenceMark.of(name);
+        if (referenceMark.isPresent()) {
+            int citationNumber = referenceMark.get().getCitationNumber();
+            citationKeyToNumber.put(referenceMark.get().getCitationKey(), citationNumber);
             highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
+        } else {
+            LOGGER.warn("Could not parse ReferenceMark name: {}", name);
         }
     }
 
@@ -92,25 +77,14 @@ public class CSLReferenceMarkManager {
     }
 
     public int getCitationNumber(String citationKey) {
-        return citationKeyToNumber.computeIfAbsent(citationKey, k -> {
-            highestCitationNumber++;
-            return highestCitationNumber;
-        });
+        return citationKeyToNumber.computeIfAbsent(citationKey, k -> ++highestCitationNumber);
     }
 
     public CSLReferenceMark createReferenceMark(BibEntry entry) throws Exception {
-        String citationKey = entry.getCitationKey().orElse("");
+        String citationKey = entry.getCitationKey().orElse(CUID.randomCUID2(8).toString());
         int citationNumber = getCitationNumber(citationKey);
-        String uniqueId = UUID.randomUUID().toString().substring(0, 8); // Generate a unique ID
-
-        String name = CSLCitationOOAdapter.PREFIXES[0] + citationKey + " CID_" + citationNumber + " " + uniqueId;
-        Object mark = factory.createInstance("com.sun.star.text.ReferenceMark");
-        XNamed named = UnoRuntime.queryInterface(XNamed.class, mark);
-        named.setName(name);
-
-        CSLReferenceMark referenceMark = new CSLReferenceMark(named, name);
+        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKey, citationNumber, factory);
         addMark(referenceMark);
-
         return referenceMark;
     }
 
