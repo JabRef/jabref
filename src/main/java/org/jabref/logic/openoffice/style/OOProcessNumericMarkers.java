@@ -22,7 +22,7 @@ class OOProcessNumericMarkers {
      * Numbering is according to first appearance.
      * Assumes global order and local order are already applied.
      */
-    static void produceCitationMarkers(CitationGroups citationGroups, OOBibStyle style) {
+    static void produceCitationMarkers(CitationGroups citationGroups, JStyle style) {
         assert style.isNumberEntries();
 
         if (style.isSortByPosition()) {

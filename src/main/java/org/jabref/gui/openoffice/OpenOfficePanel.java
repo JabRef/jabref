@@ -49,8 +49,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
-import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -100,8 +100,7 @@ public class OpenOfficePanel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private OOBibBase ooBase;
-    private OOBibStyle jStyle;
-    private StyleSelectDialogViewModel.StyleType currentStyleType;
+    private OOStyle currentStyle;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            PreferencesService preferencesService,
@@ -165,21 +164,27 @@ public class OpenOfficePanel {
      * Return true if failed. In this case the dialog is already shown.
      */
     private boolean getOrUpdateTheStyle(String title) {
+        currentStyle = loader.getUsedStyleUnified();
         final boolean FAIL = true;
         final boolean PASS = false;
 
-        if (jStyle == null) {
-            jStyle = loader.getUsedStyle();
+        if (currentStyle == null) {
+            currentStyle = loader.getUsedStyleUnified();
         } else {
-            try {
-                jStyle.ensureUpToDate();
-            } catch (IOException ex) {
-                LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
-                String msg = Localization.lang("Unable to reload style file")
-                        + "'" + jStyle.getPath() + "'"
-                        + "\n" + ex.getMessage();
-                new OOError(title, msg, ex).showErrorDialog(dialogService);
-                return FAIL;
+            if (currentStyle instanceof JStyle jStyle) {
+                try {
+                    jStyle.ensureUpToDate();
+                } catch (IOException ex) {
+                    LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
+                    String msg = Localization.lang("Unable to reload style file")
+                            + "'" + jStyle.getPath() + "'"
+                            + "\n" + ex.getMessage();
+                    new OOError(title, msg, ex).showErrorDialog(dialogService);
+                    return FAIL;
+                }
+            } else {
+                // CSL Styles don't need to be updated
+                return PASS;
             }
         }
         return PASS;
@@ -197,18 +202,16 @@ public class OpenOfficePanel {
             StyleSelectDialogView styleDialog = new StyleSelectDialogView(loader);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
-                             jStyle = selectedStyle;
-                             currentStyleType = styleDialog.getSelectedStyleType();
-                             try {
-                                 jStyle.ensureUpToDate();
-                             } catch (IOException e) {
-                                 LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), e);
-                             }
-                             if (currentStyleType == StyleSelectDialogViewModel.StyleType.JSTYLE) {
+                             currentStyle = selectedStyle;
+                             if (currentStyle instanceof JStyle jStyle) {
+                                 try {
+                                     jStyle.ensureUpToDate();
+                                 } catch (IOException e) {
+                                     LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), e);
+                                 }
                                  dialogService.notify(Localization.lang("Currently selected JStyle: '%0'", jStyle.getName()));
-                             } else {
-                                 CitationStyle cslStyle = CSLCitationOOAdapter.getSelectedStyle();
-                                 dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getTitle()));
+                             } else if (currentStyle instanceof CitationStyle cslStyle) {
+                                 dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
                              }
                          });
         });
@@ -234,16 +237,16 @@ public class OpenOfficePanel {
                 return;
             }
             List<BibDatabase> databases = getBaseList();
-            ooBase.guiActionUpdateDocument(databases, jStyle);
+            ooBase.guiActionUpdateDocument(databases, currentStyle);
         });
 
         merge.setMaxWidth(Double.MAX_VALUE);
         merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
-        merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), jStyle));
+        merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), currentStyle));
 
         unmerge.setMaxWidth(Double.MAX_VALUE);
         unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
-        unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), jStyle));
+        unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), currentStyle));
 
         ContextMenu settingsMenu = createSettingsPopup();
         settingsB.setMaxWidth(Double.MAX_VALUE);
@@ -417,25 +420,30 @@ public class OpenOfficePanel {
         connectTask.setOnFailed(value -> {
             Throwable ex = connectTask.getException();
             LOGGER.error("autodetect failed", ex);
-            if (ex instanceof UnsatisfiedLinkError) {
-                LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
+            switch (ex) {
+                case UnsatisfiedLinkError unsatisfiedLinkError -> {
+                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
 
-                dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
-                        + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
-            } else if (ex instanceof IOException) {
-                LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
+                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to connect. One possible reason is that JabRef "
+                            + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
+                }
+                case IOException ioException -> {
+                    LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", ex);
 
-                dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
-                        Localization.lang("Could not connect to running OpenOffice/LibreOffice.")
-                                + "\n"
-                                + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
-                                + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
-                        ex);
-            } else if (ex instanceof BootstrapException bootstrapEx) {
-               LOGGER.error("Exception boostrap cause", bootstrapEx.getTargetException());
-               dialogService.showErrorDialogAndWait("Bootstrap error", bootstrapEx.getTargetException());
-            } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex);
+                    dialogService.showErrorDialogAndWait(Localization.lang("Could not connect to running OpenOffice/LibreOffice."),
+                            Localization.lang("Could not connect to running OpenOffice/LibreOffice.")
+                                    + "\n"
+                                    + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
+                                    + Localization.lang("If connecting manually, please verify program and library paths.") + "\n" + "\n" + Localization.lang("Error message:"),
+                            ex);
+                }
+                case BootstrapException bootstrapEx -> {
+                    LOGGER.error("Exception boostrap cause", bootstrapEx.getTargetException());
+                    dialogService.showErrorDialogAndWait("Bootstrap error", bootstrapEx.getTargetException());
+                }
+                case null,
+                     default ->
+                        dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), ex);
             }
         });
 
@@ -522,11 +530,11 @@ public class OpenOfficePanel {
 
         ooBase.guiActionInsertEntry(entries,
                 bibDatabaseContext,
-                jStyle,
+                entryTypesManager,
+                currentStyle,
                 citationType,
                 pageInfo,
-                syncOptions,
-                currentStyleType);
+                syncOptions);
     }
 
     /**

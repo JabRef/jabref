@@ -1,8 +1,12 @@
 package org.jabref.gui.util;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import javafx.beans.value.ObservableValue;
+import javafx.css.PseudoClass;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
@@ -37,6 +41,7 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
     private TriConsumer<TableRow<S>, S, ? super DragEvent> toOnDragOver;
     private TriConsumer<TableRow<S>, S, ? super MouseDragEvent> toOnMouseDragEntered;
     private Callback<S, String> toTooltip;
+    private final Map<PseudoClass, Callback<S, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
 
     public ViewModelTableRowFactory<S> withOnMouseClickedEvent(BiConsumer<S, ? super MouseEvent> onMouseClickedEvent) {
         this.onMouseClickedEvent = onMouseClickedEvent;
@@ -104,9 +109,26 @@ public class ViewModelTableRowFactory<S> implements Callback<TableView<S>, Table
         return this;
     }
 
+    public ViewModelTableRowFactory<S> withPseudoClass(PseudoClass pseudoClass, Callback<S, ObservableValue<Boolean>> toCondition) {
+        this.pseudoClasses.putIfAbsent(pseudoClass, toCondition);
+        return this;
+    }
+
     @Override
     public TableRow<S> call(TableView<S> tableView) {
-        TableRow<S> row = new TableRow<>();
+        TableRow<S> row = new TableRow<>() {
+            @Override
+            protected void updateItem(S item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || getItem() == null) {
+                    pseudoClasses.forEach((pseudoClass, toCondition) -> pseudoClassStateChanged(pseudoClass, false));
+                } else {
+                    pseudoClasses.forEach((pseudoClass, toCondition) ->
+                            pseudoClassStateChanged(pseudoClass, toCondition.call(getItem()).getValue()));
+                }
+            }
+        };
 
         if (toTooltip != null) {
             String tooltipText = toTooltip.call(row.getItem());
