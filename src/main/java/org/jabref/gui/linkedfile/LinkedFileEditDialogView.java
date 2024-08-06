@@ -19,7 +19,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-public class LinkedFileDialogView extends BaseDialog<LinkedFile> {
+public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
 
     private static final ButtonType ADD_BUTTON = new ButtonType(Localization.lang("Add"), ButtonType.OK.getButtonData());
     private static final ButtonType EDIT_BUTTON = ButtonType.APPLY;
@@ -33,13 +33,13 @@ public class LinkedFileDialogView extends BaseDialog<LinkedFile> {
     @Inject private StateManager stateManager;
     @Inject private PreferencesService preferences;
 
-    private LinkedFilesEditDialogViewModel viewModel;
+    private LinkedFileEditDialogViewModel viewModel;
     private final LinkedFile linkedFile;
 
     /**
      * Constructor for adding a new LinkedFile.
      */
-    public LinkedFileDialogView() {
+    public LinkedFileEditDialogView() {
         this(new LinkedFile("", "", ""));
         initializeDialog(Localization.lang("Add file link"), ADD_BUTTON);
     }
@@ -49,7 +49,7 @@ public class LinkedFileDialogView extends BaseDialog<LinkedFile> {
      *
      * @param linkedFile The linked file to be edited.
      */
-    public LinkedFileDialogView(LinkedFile linkedFile) {
+    public LinkedFileEditDialogView(LinkedFile linkedFile) {
         this.linkedFile = linkedFile;
         initializeDialog(Localization.lang("Edit file link"), EDIT_BUTTON);
     }
@@ -80,7 +80,7 @@ public class LinkedFileDialogView extends BaseDialog<LinkedFile> {
 
     @FXML
     private void initialize() {
-        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences.getFilePreferences());
+        viewModel = new LinkedFileEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences.getFilePreferences());
 
         fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
         new ViewModelListCellFactory<ExternalFileType>()

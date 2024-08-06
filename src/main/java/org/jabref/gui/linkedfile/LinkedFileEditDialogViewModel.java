@@ -29,7 +29,7 @@ import org.jabref.preferences.FilePreferences;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
-public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
+public class LinkedFileEditDialogViewModel extends AbstractViewModel {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
     private final StringProperty link = new SimpleStringProperty("");
@@ -42,10 +42,10 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
 
-    public LinkedFilesEditDialogViewModel(LinkedFile linkedFile,
-                                          BibDatabaseContext database,
-                                          DialogService dialogService,
-                                          FilePreferences filePreferences) {
+    public LinkedFileEditDialogViewModel(LinkedFile linkedFile,
+                                         BibDatabaseContext database,
+                                         DialogService dialogService,
+                                         FilePreferences filePreferences) {
         this.database = database;
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;

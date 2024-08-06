@@ -44,7 +44,7 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.GrobidOptInDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
-import org.jabref.gui.linkedfile.LinkedFileDialogView;
+import org.jabref.gui.linkedfile.LinkedFileEditDialogView;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -286,7 +286,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void addNewFile() {
-        LinkedFileDialogView controller = new LinkedFileDialogView();
+        LinkedFileEditDialogView controller = new LinkedFileEditDialogView();
         dialogService.showCustomDialogAndWait(controller).ifPresent(newLinkedFile -> {
             viewModel.addNewManualFile(newLinkedFile);
         });
