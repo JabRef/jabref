@@ -262,7 +262,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public boolean validateExpertSettings() {
         List<Validator> validators = List.of(
-                chatModelValidator,
                 apiBaseUrlValidator,
                 instructionValidator,
                 temperatureValidator,
