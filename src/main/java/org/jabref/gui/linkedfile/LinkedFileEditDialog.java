@@ -13,6 +13,7 @@ import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
 
@@ -40,7 +41,7 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
      * Constructor for adding a new LinkedFile.
      */
     public LinkedFileEditDialog() {
-        this.linkedFile = new LinkedFile("", "", "");
+        this.linkedFile = new LinkedFile("", "", StandardFileType.PDF);
         initializeDialog(Localization.lang("Add file link"), ADD_BUTTON);
     }
 
