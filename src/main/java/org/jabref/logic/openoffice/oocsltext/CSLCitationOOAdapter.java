@@ -47,6 +47,7 @@ public class CSLCitationOOAdapter {
         entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
         for (BibEntry entry: entries) {
             String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, bibDatabaseContext, bibEntryTypesManager).getFirst();
+            System.out.println(citation);
             writeCitation(document, cursor, entry, citation);
         }
         // List<String> citations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, bibEntryTypesManager);
@@ -196,6 +197,9 @@ public class CSLCitationOOAdapter {
 
         // Replace span tags with inline styles for italic
         html = html.replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
+
+        // Replace span tags with inline styles for underline
+       // html = html.replaceAll("<span style=\"font-style: ?italic;?\">(.*?)</span>", "<i>$1</i>");
 
         html = html.replaceAll("<span style=\"font-variant: ?small-caps;?\">(.*?)</span>", "<smallcaps>$1</smallcaps>");
 
