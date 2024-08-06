@@ -12,7 +12,7 @@
 <?import org.jabref.gui.icon.JabRefIconView?>
 <DialogPane minHeight="140.0" minWidth="550.0"
             xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.jabref.gui.linkedfile.LinkedFileEditDialogView">
+            fx:controller="org.jabref.gui.linkedfile.LinkedFileEditDialog">
     <content>
         <GridPane vgap="4" hgap="4">
             <columnConstraints>
@@ -21,6 +21,7 @@
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
             </columnConstraints>
             <rowConstraints>
+                <RowConstraints/>
                 <RowConstraints/>
                 <RowConstraints/>
                 <RowConstraints/>
