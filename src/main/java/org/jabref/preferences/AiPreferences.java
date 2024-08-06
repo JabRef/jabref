@@ -514,13 +514,17 @@ public class AiPreferences {
     }
 
     public String getSelectedApiBaseUrl() {
-        return switch (aiProvider.get()) {
-            case OPEN_AI ->
-                    openAiApiBaseUrl.get();
-            case MISTRAL_AI ->
-                    mistralAiApiBaseUrl.get();
-            case HUGGING_FACE ->
-                    huggingFaceApiBaseUrl.get();
-        };
+        if (customizeExpertSettings.get()) {
+            return switch (aiProvider.get()) {
+                case OPEN_AI ->
+                        openAiApiBaseUrl.get();
+                case MISTRAL_AI ->
+                        mistralAiApiBaseUrl.get();
+                case HUGGING_FACE ->
+                        huggingFaceApiBaseUrl.get();
+            };
+        } else {
+            return AiDefaultPreferences.PROVIDERS_API_URLS.get(aiProvider.get());
+        }
     }
 }
