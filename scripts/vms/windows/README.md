@@ -1,32 +1,38 @@
 # Windows VM
 
-The initial setup of [WinGet](https://learn.microsoft.com/en-us/windows/package-manager/) might take long.
+A Windows-based VM to test JabRef.
+As user, you need to ensure to have the proper Windows license to use this VM.
 
-In case Vagrant reports "Waiting for machine to reboot..." and nothing happens, one has to "power off" the machine, execute `vagrant destory`, and then run `vagrant up` again.
+In case you have many CPU cores, you can adapt `vb.cpus` in `Vagrantfile` to a higher number.
 
 One has to install the [JabRef Browser Extension](https://addons.mozilla.org/en-US/firefox/addon/jabref/) manually.
 
 ## Troubleshooting
 
-> Repair-WinGetPackageManager : API rate limit exceeded for 194.35.188.229. (But here's the good news: Authenticated
-> requests get a higher rate limit. Check out the documentation for more details.)
->
-> `CategoryInfo          : NotSpecified: (:) [Repair-WinGetPackageManager], RateLimitExceededException`
+### "Waiting for machine to reboot..."
 
-This is a GitHub API rate limit. Either try again at a later point in time or modify `Vagrantfile` to include some GitHub API token (Based on <https://stackoverflow.com/q/33655700/873282>).
+In case Vagrant reports "Waiting for machine to reboot..." and nothing happens, one has to "power off" the machine, execute `vagrant destory`, and then run `vagrant up` again.
 
----
+### `fatal: early EOF`
 
-Slow downloading
-
+```console
+jabref-windows-sandbox: Cloning into 'jabref'...
+jabref-windows-sandbox: error: RPC failed; curl 92 HTTP/2 stream 5 was not closed cleanly: CANCEL (err 8)
+jabref-windows-sandbox: error: 6846 bytes of body are still expected
+jabref-windows-sandbox: fetch-pack: unexpected disconnect while reading sideband packet
+jabref-windows-sandbox: fatal: early EOF
+jabref-windows-sandbox: fatal: fetch-pack: invalid index-pack output
 ```
- Writing web request
-    Writing request stream... (Number of bytes written: 32768)
- ```
 
- This downloads winget-cli from GitHub. It seems that are GitHub rate limiters in place.
+The `git clone` command did not work.
 
- One can try to execute `Install-Module -Name WingetTools` and then `Install-WinGet` manually. This downloads an older winget-cli version.
+Login, open `cmd` and then execute following commands:
+
+```cmd
+git clone --recurse-submodules https://github.com/JabRef/jabref.git
+cd jabref
+gradlew run
+```
 
 ## Background
 
@@ -34,6 +40,8 @@ Slow downloading
 
 The most use image seems to be the [Windows 10 image by `gusztavvargadr`](https://portal.cloud.hashicorp.com/vagrant/discover/gusztavvargadr/windows-10).
 List of all images at <https://portal.cloud.hashicorp.com/vagrant/discover/gusztavvargadr>.
+
+[Chocolatey](https://chocolatey.org/) is used instead of [winget-cli](https://learn.microsoft.com/en-us/windows/package-manager/), because Chocolatey installation does not hit GitHub's rate limits during unattended installation.
 
 ## Atlernatives
 

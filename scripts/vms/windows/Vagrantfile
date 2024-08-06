@@ -18,19 +18,14 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision "shell", privileged: "true", powershell_elevated_interactive: "true", inline: <<-SHELL
-    # Source: https://github.com/microsoft/winget-cli/discussions/4065#discussioncomment-8355261
-    Install-PackageProvider -Name NuGet -Force
-    # Microsoft.WinGet.Client is the official Microsoft winget PowerShell distribution. "WingetTools" is not.
-    Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery
-    # This installs winget-cli
-    Repair-WinGetPackageManager
+    # Install chocolatey
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    choco feature enable -n=allowGlobalConfirmation
 
-    # winget install EclipseAdoptium.Temurin.21.JDK --accept-source-agreements  # Adoptium has issues with AWT headless
-    winget install --id=Azul.Zulu.21.JDK -e --accept-source-agreements
-    winget install -e --id Git.Git --accept-source-agreements
-
-    winget install -e --id Mozilla.Firefox --accept-source-agreements
-    winget install --id=TheDocumentFoundation.LibreOffice -e --accept-source-agreements
+    choco install libericajdk
+    choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal /WindowsTerminalProfile"
+    choco install firefox
+    choco install libreoffice-fresh
   SHELL
 
   config.vm.provision "shell", reboot: true
