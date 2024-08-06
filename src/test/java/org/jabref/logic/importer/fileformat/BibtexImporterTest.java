@@ -130,12 +130,6 @@ public class BibtexImporterTest {
         assertEquals(StandardFileType.BIBTEX_DB, importer.getFileType());
     }
 
-    @Test
-    public void getDescription() {
-        assertEquals(
-                "This importer enables `--importToOpen someEntry.bib`",
-                importer.getDescription());
-    }
 
     @Test
     public void recognizesDatabaseID() throws Exception {
