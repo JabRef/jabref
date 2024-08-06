@@ -31,14 +31,16 @@ public class AiChatLogic {
     private final AiService aiService;
     private final AiChatHistory aiChatHistory;
     private final Filter embeddingsFilter;
+    private final String citationKey;
 
     private ChatMemory chatMemory;
     private Chain<String, String> chain;
 
-    public AiChatLogic(AiService aiService, AiChatHistory aiChatHistory, Filter embeddingsFilter) {
+    public AiChatLogic(AiService aiService, AiChatHistory aiChatHistory, Filter embeddingsFilter, String citationKey) {
         this.aiService = aiService;
         this.aiChatHistory = aiChatHistory;
         this.embeddingsFilter = embeddingsFilter;
+        this.citationKey = citationKey;
 
         setupListeningToPreferencesChanges();
         rebuildFull(aiChatHistory.getMessages());
@@ -53,7 +55,12 @@ public class AiChatLogic {
                         .map(LinkedFile::getLink)
                         .toList()
                 );
-        return new AiChatLogic(aiService, aiChatHistory, filter);
+
+        if (entry.getCitationKey().isEmpty()) {
+            LOGGER.error("AiChatLogic should not be derived from BibEntry with no citation key");
+        }
+
+        return new AiChatLogic(aiService, aiChatHistory, filter, entry.getCitationKey().orElse("<UNKNOWN>"));
     }
 
     private void setupListeningToPreferencesChanges() {
@@ -119,13 +126,16 @@ public class AiChatLogic {
     public AiMessage execute(UserMessage message) {
         // Message will be automatically added to ChatMemory through ConversationalRetrievalChain.
 
-        LOGGER.info("Sending message to AI provider for answering: {}", message.singleText());
+        LOGGER.info("Sending message to AI provider ({}) for answering in entry {}: {}",
+                AiDefaultPreferences.PROVIDERS_API_URLS.get(aiService.getPreferences().getAiProvider()),
+                citationKey,
+                message.singleText());
 
         aiChatHistory.add(message);
         AiMessage result = new AiMessage(chain.execute(message.singleText()));
         aiChatHistory.add(result);
 
-        LOGGER.info("Message was answered by the AI provider: {}", result.text());
+        LOGGER.info("Message was answered by the AI provider for entry {}: {}", citationKey, result.text());
 
         return result;
     }

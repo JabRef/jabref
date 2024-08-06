@@ -140,44 +140,44 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
     }
 
     private Optional<String> generateSummary(LinkedFile linkedFile) throws InterruptedException {
-        LOGGER.info("Generating summary for file {}", linkedFile.getLink());
+        LOGGER.info("Generating summary for file \"{}\" of entry {}", linkedFile.getLink(), citationKey);
 
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
 
         if (path.isEmpty()) {
-            LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
-            LOGGER.info("Unable to generate summary for file {}, because it was not found", linkedFile.getLink());
+            LOGGER.error("Could not find path for a linked file \"{}\" of entry {}", linkedFile.getLink(), citationKey);
+            LOGGER.info("Unable to generate summary for file \"{}\" of entry {}, because it was not found", linkedFile.getLink(), citationKey);
             return Optional.empty();
         }
 
         Optional<Document> document = FileToDocument.fromFile(path.get());
 
         if (document.isEmpty()) {
-            LOGGER.warn("Could not extract text from a linked file {}. It will be skipped when generating a summary.", linkedFile.getLink());
-            LOGGER.info("Unable to generate summary for file {}, because it was not found", linkedFile.getLink());
+            LOGGER.warn("Could not extract text from a linked file \"{}\" of entry {}. It will be skipped when generating a summary.", linkedFile.getLink(), citationKey);
+            LOGGER.info("Unable to generate summary for file \"{}\" of entry {}, because it was not found", linkedFile.getLink(), citationKey);
             return Optional.empty();
         }
 
-        String linkedFileSummary = summarizeOneDocument(document.get().text());
+        String linkedFileSummary = summarizeOneDocument(path.get().toString(), document.get().text());
 
-        LOGGER.info("Summary for file {} was generated successfully", linkedFile.getLink());
+        LOGGER.info("Summary for file \"{}\" of entry {} was generated successfully", linkedFile.getLink(), citationKey);
         return Optional.of(linkedFileSummary);
     }
 
-    public String summarizeOneDocument(String document) throws InterruptedException {
+    public String summarizeOneDocument(String filePath, String document) throws InterruptedException {
         addMoreWork(1); // For the combination of summary chunks.
 
         DocumentSplitter documentSplitter = DocumentSplitters.recursive(aiService.getPreferences().getContextWindowSize() - MAX_OVERLAP_SIZE_IN_CHARS * 2 - estimateTokenCount(CHUNK_PROMPT_TEMPLATE), MAX_OVERLAP_SIZE_IN_CHARS);
 
         List<String> chunkSummaries = documentSplitter.split(new Document(document)).stream().map(TextSegment::text).toList();
 
-        LOGGER.info("The file was split into {} chunks", chunkSummaries.size());
+        LOGGER.info("The file \"{}\" of entry {} was split into {} chunk(s)", filePath, citationKey, chunkSummaries.size());
 
         int passes = 0;
 
         do {
             passes++;
-            LOGGER.info("Summarizing chunks ({} pass)", passes);
+            LOGGER.info("Summarizing chunks for file \"{}\" of entry {} ({} pass)", filePath, citationKey, passes);
 
             addMoreWork(chunkSummaries.size());
 
@@ -190,9 +190,9 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
                 Prompt prompt = CHUNK_PROMPT_TEMPLATE.apply(Collections.singletonMap("document", chunkSummary));
 
-                LOGGER.info("Sending request to AI provider to summarize a chunk");
+                LOGGER.info("Sending request to AI provider to summarize a chunk from file \"{}\" of entry {}", filePath, citationKey);
                 String chunk = aiService.getChatLanguageModel().generate(prompt.toString());
-                LOGGER.info("Chunk summarized by the AI provider");
+                LOGGER.info("Chunk summary for file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 
                 list.add(chunk);
                 doneOneWork();
@@ -203,7 +203,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
         if (chunkSummaries.size() == 1) {
             doneOneWork(); // No need to call LLM for combination of summary chunks.
-            LOGGER.info("Summary of the file was generated successfully");
+            LOGGER.info("Summary of the file \"{}\" of entry {} was generated successfully", filePath, citationKey);
             return chunkSummaries.getFirst();
         }
 
@@ -213,16 +213,16 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
             throw new InterruptedException();
         }
 
-        LOGGER.info("Sending request to AI provider to combine summary chunks");
+        LOGGER.info("Sending request to AI provider to combine summary chunks for file \"{}\" of entry {}", filePath, citationKey);
         String result = aiService.getChatLanguageModel().generate(prompt.toString());
-        LOGGER.info("Summary of the file was generated successfully");
+        LOGGER.info("Summary of the file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 
         doneOneWork();
         return result;
     }
 
     public String summarizeSeveralDocuments(Stream<String> documents) throws InterruptedException {
-        return summarizeOneDocument(documents.collect(Collectors.joining("\n\n")));
+        return summarizeOneDocument(citationKey, documents.collect(Collectors.joining("\n\n")));
     }
 
     private static int estimateTokenCount(List<String> chunkSummaries) {
