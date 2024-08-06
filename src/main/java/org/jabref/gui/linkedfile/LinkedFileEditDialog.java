@@ -9,7 +9,6 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -87,10 +86,6 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
         link.textProperty().bindBidirectional(viewModel.linkProperty());
         fileType.valueProperty().bindBidirectional(viewModel.selectedExternalFileTypeProperty());
         sourceUrl.textProperty().bindBidirectional(viewModel.sourceUrlProperty());
-
-        if (fileType.getValue() == null) {
-            fileType.setValue(StandardExternalFileType.PDF);
-        }
     }
 
     @FXML

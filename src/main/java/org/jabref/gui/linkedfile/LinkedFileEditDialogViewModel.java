@@ -18,7 +18,6 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.util.io.FileUtil;
@@ -92,13 +91,6 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
         });
     }
 
-    private void setDefaultFileType() {
-        ExternalFileType pdfFileType = StandardExternalFileType.PDF;
-        if (allExternalFileTypes.get().contains(pdfFileType)) {
-            selectedExternalFileType.setValue(pdfFileType);
-        }
-    }
-
     public void setValues(LinkedFile linkedFile) {
         description.set(linkedFile.getDescription());
         sourceUrl.set(linkedFile.getSourceUrl());
@@ -108,8 +100,6 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
         } else {
             link.setValue(relativize(Path.of(linkedFile.getLink())));
         }
-
-        setDefaultFileType();
 
         // See what is a reasonable selection for the type combobox:
         Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, filePreferences);
