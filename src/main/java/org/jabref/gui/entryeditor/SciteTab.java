@@ -25,6 +25,9 @@ import org.jabref.preferences.PreferencesService;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.HyperlinkLabel;
 
+/**
+ * @implNote This tab is called <code>SciteTab</code>, because it uses the service <code>**scite** aI</code>.
+ */
 public class SciteTab extends EntryEditorTab {
 
     public static final String NAME = "Citation information";
