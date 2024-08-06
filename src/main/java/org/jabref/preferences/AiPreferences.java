@@ -1,5 +1,6 @@
 package org.jabref.preferences;
 
+import java.util.Map;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -238,7 +239,7 @@ public class AiPreferences {
         if (getCustomizeExpertSettings()) {
             return contextWindowSize.get();
         } else {
-            return AiDefaultPreferences.CONTEXT_WINDOW_SIZE;
+            return AiDefaultPreferences.CONTEXT_WINDOW_SIZES.getOrDefault(getAiProvider(), Map.of()).getOrDefault(getChatModel(), AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
         }
     }
 
