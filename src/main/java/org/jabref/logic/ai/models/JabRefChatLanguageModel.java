@@ -56,7 +56,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
      * and using {@link org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager}, where messages are stored in {@link MVStore}.
      */
     private void rebuild() {
-        if (!aiPreferences.getEnableAi() || aiPreferences.getApiToken().isEmpty()) {
+        if (!aiPreferences.getEnableAi() || aiPreferences.getSelectedApiToken().isEmpty()) {
             langchainChatModel = Optional.empty();
             return;
         }
@@ -69,10 +69,10 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
             case MISTRAL_AI -> {
                 langchainChatModel = Optional.of(MistralAiChatModel
                         .builder()
-                        .apiKey(aiPreferences.getApiToken())
-                        .modelName(aiPreferences.getChatModel())
+                        .apiKey(aiPreferences.getSelectedApiToken())
+                        .modelName(aiPreferences.getSelectedChatModel())
                         .temperature(aiPreferences.getTemperature())
-                        .baseUrl(aiPreferences.getApiBaseUrl())
+                        .baseUrl(aiPreferences.getSelectedApiBaseUrl())
                         .logRequests(true)
                         .logResponses(true)
                         .build()
@@ -83,8 +83,8 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
                 // NOTE: {@link HuggingFaceChatModel} doesn't support API base url :(
                 langchainChatModel = Optional.of(HuggingFaceChatModel
                         .builder()
-                        .accessToken(aiPreferences.getApiToken())
-                        .modelId(aiPreferences.getChatModel())
+                        .accessToken(aiPreferences.getSelectedApiToken())
+                        .modelId(aiPreferences.getSelectedChatModel())
                         .temperature(aiPreferences.getTemperature())
                         .timeout(Duration.ofMinutes(2))
                         .build()
@@ -96,9 +96,10 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
     private void setupListeningToPreferencesChanges() {
         aiPreferences.enableAiProperty().addListener(obs -> rebuild());
         aiPreferences.aiProviderProperty().addListener(obs -> rebuild());
-        aiPreferences.chatModelProperty().addListener(obs -> rebuild());
-        aiPreferences.apiTokenProperty().addListener(obs -> rebuild());
-        aiPreferences.apiBaseUrlProperty().addListener(obs -> rebuild());
+        aiPreferences.listenToChatModels(this::rebuild);
+        aiPreferences.listenToApiTokens(this::rebuild);
+        aiPreferences.listenToApiBaseUrls(this::rebuild);
+        aiPreferences.listenToChatModels(this::rebuild);
         aiPreferences.temperatureProperty().addListener(obs -> rebuild());
     }
 
@@ -115,7 +116,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         if (langchainChatModel.isEmpty()) {
             if (!aiPreferences.getEnableAi()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)."));
-            } else if (aiPreferences.getApiToken().isEmpty()) {
+            } else if (aiPreferences.getSelectedApiToken().isEmpty()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, set OpenAI API key inside JabRef preferences (AI tab)."));
             } else {
                 throw new RuntimeException(Localization.lang("Unable to chat with AI."));

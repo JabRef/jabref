@@ -29,9 +29,9 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
         this.aiPreferences = aiPreferences;
 
         OpenAI openAI = OpenAI
-                .newBuilder(aiPreferences.getApiToken())
+                .newBuilder(aiPreferences.getSelectedApiToken())
                 .httpClient(httpClient)
-                .baseUrl(aiPreferences.getApiBaseUrl())
+                .baseUrl(aiPreferences.getSelectedApiBaseUrl())
                 .build();
 
         this.chatClient = openAI.chatClient();
@@ -50,7 +50,7 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
 
         CreateChatCompletionRequest request = CreateChatCompletionRequest
                 .newBuilder()
-                .model(aiPreferences.getChatModel())
+                .model(aiPreferences.getSelectedChatModel())
                 .temperature(aiPreferences.getTemperature())
                 .n(1)
                 .messages(messages)

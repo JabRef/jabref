@@ -467,10 +467,14 @@ public class JabRefPreferences implements PreferencesService {
 
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_PROVIDER = "aiProvider";
-    private static final String AI_CHAT_MODEL = "aiChatModel";
+    private static final String AI_OPEN_AI_CHAT_MODEL = "aiOpenAiChatModel";
+    private static final String AI_MISTRAL_AI_CHAT_MODEL = "aiMistralAiChatModel";
+    private static final String AI_HUGGING_FACE_CHAT_MODEL = "aiHuggingFaceChatModel";
     private static final String AI_CUSTOMIZE_SETTINGS = "aiCustomizeSettings";
     private static final String AI_EMBEDDING_MODEL = "aiEmbeddingModel";
-    private static final String AI_API_BASE_URL = "aiApiBaseUrl";
+    private static final String AI_OPEN_AI_API_BASE_URL = "aiOpenAiApiBaseUrl";
+    private static final String AI_MISTRAL_AI_API_BASE_URL = "aiMistralAiApiBaseUrl";
+    private static final String AI_HUGGING_FACE_API_BASE_URL = "aiHuggingFaceApiBaseUrl";
     private static final String AI_SYSTEM_MESSAGE = "aiSystemMessage";
     private static final String AI_TEMPERATURE = "aiTemperature";
     private static final String AI_CONTEXT_WINDOW_SIZE = "aiMessageWindowSize";
@@ -887,13 +891,17 @@ public class JabRefPreferences implements PreferencesService {
         // region:AI
         defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);
         defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
-        defaults.put(AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODEL);
+        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiPreferences.AiProvider.OPEN_AI));
+        defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiPreferences.AiProvider.MISTRAL_AI));
+        defaults.put(AI_HUGGING_FACE_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiPreferences.AiProvider.HUGGING_FACE));
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
         defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());
-        defaults.put(AI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiDefaultPreferences.PROVIDER));
+        defaults.put(AI_OPEN_AI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiPreferences.AiProvider.OPEN_AI));
+        defaults.put(AI_MISTRAL_AI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiPreferences.AiProvider.MISTRAL_AI));
+        defaults.put(AI_HUGGING_FACE_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiPreferences.AiProvider.HUGGING_FACE));
         defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
         defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
-        defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.CONTEXT_WINDOW_SIZES.get(AiDefaultPreferences.PROVIDER).get(AiDefaultPreferences.CHAT_MODEL));
+        defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.CONTEXT_WINDOW_SIZES.get(AiDefaultPreferences.PROVIDER).get(AiDefaultPreferences.CHAT_MODELS.get(AiDefaultPreferences.PROVIDER)));
         defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);
         defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);
         defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);
@@ -2779,10 +2787,16 @@ public class JabRefPreferences implements PreferencesService {
         aiPreferences = new AiPreferences(
                 getBoolean(AI_ENABLED),
                 AiPreferences.AiProvider.valueOf(get(AI_PROVIDER)),
-                get(AI_CHAT_MODEL),
-                getAiApiTokenFromKeyring().orElse(""),
+                get(AI_OPEN_AI_CHAT_MODEL),
+                get(AI_MISTRAL_AI_CHAT_MODEL),
+                get(AI_HUGGING_FACE_CHAT_MODEL),
+                getApiKeyForAiProvider(AiPreferences.AiProvider.OPEN_AI).orElse(""),
+                getApiKeyForAiProvider(AiPreferences.AiProvider.MISTRAL_AI).orElse(""),
+                getApiKeyForAiProvider(AiPreferences.AiProvider.HUGGING_FACE).orElse(""),
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
-                get(AI_API_BASE_URL),
+                get(AI_OPEN_AI_API_BASE_URL),
+                get(AI_MISTRAL_AI_API_BASE_URL),
+                get(AI_HUGGING_FACE_API_BASE_URL),
                 AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 get(AI_SYSTEM_MESSAGE),
                 getDouble(AI_TEMPERATURE),
@@ -2795,12 +2809,21 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(aiPreferences.enableAiProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLED, newValue));
 
         EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_PROVIDER, newValue.name()));
-        EasyBind.listen(aiPreferences.chatModelProperty(), (obs, oldValue, newValue) -> put(AI_CHAT_MODEL, newValue));
-        EasyBind.listen(aiPreferences.apiTokenProperty(), (obs, oldValue, newValue) -> storeAiApiTokenInKeyring(newValue));
+
+        EasyBind.listen(aiPreferences.openAiChatModelProperty(), (obs, oldValue, newValue) -> put(AI_OPEN_AI_CHAT_MODEL, newValue));
+        EasyBind.listen(aiPreferences.mistralAiChatModelProperty(), (obs, oldValue, newValue) -> put(AI_MISTRAL_AI_CHAT_MODEL, newValue));
+        EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (obs, oldValue, newValue) -> put(AI_HUGGING_FACE_CHAT_MODEL, newValue));
+
+        EasyBind.listen(aiPreferences.openAiApiTokenProperty(), (obs, oldValue, newValue) -> storeAiApiTokenInKeyring(AiPreferences.AiProvider.OPEN_AI, newValue));
+        EasyBind.listen(aiPreferences.mistralAiApiTokenProperty(), (obs, oldValue, newValue) -> storeAiApiTokenInKeyring(AiPreferences.AiProvider.MISTRAL_AI, newValue));
+        EasyBind.listen(aiPreferences.huggingFaceApiTokenProperty(), (obs, oldValue, newValue) -> storeAiApiTokenInKeyring(AiPreferences.AiProvider.HUGGING_FACE, newValue));
 
         EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
-        EasyBind.listen(aiPreferences.apiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.openAiApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_OPEN_AI_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.mistralAiApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_MISTRAL_AI_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.huggingFaceApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_HUGGING_FACE_API_BASE_URL, newValue));
+
         EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
         EasyBind.listen(aiPreferences.instructionProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
         EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, (double) newValue));
@@ -2813,9 +2836,25 @@ public class JabRefPreferences implements PreferencesService {
         return aiPreferences;
     }
 
-    private Optional<String> getAiApiTokenFromKeyring() {
+    private String determineSelectedChatModel(AiPreferences aiPreferences) {
+        return switch (aiPreferences.getAiProvider()) {
+            case OPEN_AI -> AI_OPEN_AI_CHAT_MODEL;
+            case MISTRAL_AI -> AI_MISTRAL_AI_CHAT_MODEL;
+            case HUGGING_FACE -> AI_HUGGING_FACE_CHAT_MODEL;
+        };
+    }
+
+    private String determineSelectedApiBaseUrl(AiPreferences aiPreferences) {
+        return switch (aiPreferences.getAiProvider()) {
+            case OPEN_AI -> AI_OPEN_AI_API_BASE_URL;
+            case MISTRAL_AI -> AI_MISTRAL_AI_API_BASE_URL;
+            case HUGGING_FACE -> AI_HUGGING_FACE_API_BASE_URL;
+        };
+    }
+
+    public Optional<String> getApiKeyForAiProvider(AiPreferences.AiProvider aiProvider) {
         try (final Keyring keyring = Keyring.create()) {
-            String rawPassword = keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT);
+            String rawPassword = keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
             Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
             return Optional.of(password.decrypt());
         } catch (Exception e) {
@@ -2824,11 +2863,11 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private void storeAiApiTokenInKeyring(String newToken) {
+    private void storeAiApiTokenInKeyring(AiPreferences.AiProvider aiProvider, String newToken) {
         try (final Keyring keyring = Keyring.create()) {
             Password password = new Password(newToken, getInternalPreferences().getUserAndHost());
             String rawPassword = password.encrypt();
-            keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT, rawPassword);
+            keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name(), rawPassword);
         } catch (Exception e) {
             LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token", e);
         }

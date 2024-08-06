@@ -1,6 +1,5 @@
 package org.jabref.preferences;
 
-import java.util.Map;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -58,12 +57,21 @@ public class AiPreferences {
     private final BooleanProperty enableAi;
 
     private final ObjectProperty<AiProvider> aiProvider;
-    private final StringProperty chatModel;
-    private final StringProperty apiToken;
+
+    private final StringProperty openAiChatModel;
+    private final StringProperty mistralAiChatModel;
+    private final StringProperty huggingFaceChatModel;
+
+    private final StringProperty openAiApiToken;
+    private final StringProperty mistralAiApiToken;
+    private final StringProperty huggingFaceApiToken;
 
     private final BooleanProperty customizeExpertSettings;
 
-    private final StringProperty apiBaseUrl;
+    private final StringProperty openAiApiBaseUrl;
+    private final StringProperty mistralAiApiBaseUrl;
+    private final StringProperty huggingFaceApiBaseUrl;
+
     private final ObjectProperty<EmbeddingModel> embeddingModel;
     private final StringProperty instruction;
     private final DoubleProperty temperature;
@@ -75,10 +83,16 @@ public class AiPreferences {
 
     public AiPreferences(boolean enableAi,
                          AiProvider aiProvider,
-                         String chatModel,
-                         String apiToken,
+                         String openAiChatModel,
+                         String mistralAiChatModel,
+                         String huggingFaceChatModel,
+                         String openAiApiToken,
+                         String mistralAiApiToken,
+                         String huggingFaceApiToken,
                          boolean customizeExpertSettings,
-                         String apiBaseUrl,
+                         String openAiApiBaseUrl,
+                         String mistralAiApiBaseUrl,
+                         String huggingFaceApiBaseUrl,
                          EmbeddingModel embeddingModel,
                          String instruction,
                          double temperature,
@@ -91,12 +105,21 @@ public class AiPreferences {
         this.enableAi = new SimpleBooleanProperty(enableAi);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
-        this.chatModel = new SimpleStringProperty(chatModel);
-        this.apiToken = new SimpleStringProperty(apiToken);
+
+        this.openAiChatModel = new SimpleStringProperty(openAiChatModel);
+        this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
+        this.huggingFaceChatModel = new SimpleStringProperty(huggingFaceChatModel);
+
+        this.openAiApiToken = new SimpleStringProperty(openAiApiToken);
+        this.mistralAiApiToken = new SimpleStringProperty(mistralAiApiToken);
+        this.huggingFaceApiToken = new SimpleStringProperty(huggingFaceApiToken);
 
         this.customizeExpertSettings = new SimpleBooleanProperty(customizeExpertSettings);
 
-        this.apiBaseUrl = new SimpleStringProperty(apiBaseUrl);
+        this.openAiApiBaseUrl = new SimpleStringProperty(openAiApiBaseUrl);
+        this.mistralAiApiBaseUrl = new SimpleStringProperty(mistralAiApiBaseUrl);
+        this.huggingFaceApiBaseUrl = new SimpleStringProperty(huggingFaceApiBaseUrl);
+
         this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
         this.instruction = new SimpleStringProperty(instruction);
         this.temperature = new SimpleDoubleProperty(temperature);
@@ -131,28 +154,76 @@ public class AiPreferences {
         this.aiProvider.set(aiProvider);
     }
 
-    public StringProperty chatModelProperty() {
-        return chatModel;
+    public StringProperty openAiChatModelProperty() {
+        return openAiChatModel;
     }
 
-    public String getChatModel() {
-        return chatModel.get();
+    public String getOpenAiChatModel() {
+        return openAiChatModel.get();
     }
 
-    public void setChatModel(String chatModel) {
-        this.chatModel.set(chatModel);
+    public void setOpenAiChatModel(String openAiChatModel) {
+        this.openAiChatModel.set(openAiChatModel);
     }
 
-    public StringProperty apiTokenProperty() {
-        return apiToken;
+    public StringProperty mistralAiChatModelProperty() {
+        return mistralAiChatModel;
     }
 
-    public String getApiToken() {
-        return apiToken.get();
+    public String getMistralAiChatModel() {
+        return mistralAiChatModel.get();
     }
 
-    public void setApiToken(String apiToken) {
-        this.apiToken.set(apiToken);
+    public void setMistralAiChatModel(String mistralAiChatModel) {
+        this.mistralAiChatModel.set(mistralAiChatModel);
+    }
+
+    public StringProperty huggingFaceChatModelProperty() {
+        return huggingFaceChatModel;
+    }
+
+    public String getHuggingFaceChatModel() {
+        return huggingFaceChatModel.get();
+    }
+
+    public void setHuggingFaceChatModel(String huggingFaceChatModel) {
+        this.huggingFaceChatModel.set(huggingFaceChatModel);
+    }
+
+    public StringProperty openAiApiTokenProperty() {
+        return openAiApiToken;
+    }
+
+    public String getOpenAiApiToken() {
+        return openAiApiToken.get();
+    }
+
+    public void setOpenAiApiToken(String openAiApiToken) {
+        this.openAiApiToken.set(openAiApiToken);
+    }
+
+    public StringProperty mistralAiApiTokenProperty() {
+        return mistralAiApiToken;
+    }
+
+    public String getMistralAiApiToken() {
+        return mistralAiApiToken.get();
+    }
+
+    public void setMistralAiApiToken(String mistralAiApiToken) {
+        this.mistralAiApiToken.set(mistralAiApiToken);
+    }
+
+    public StringProperty huggingFaceApiTokenProperty() {
+        return huggingFaceApiToken;
+    }
+
+    public String getHuggingFaceApiToken() {
+        return huggingFaceApiToken.get();
+    }
+
+    public void setHuggingFaceApiToken(String huggingFaceAiApiToken) {
+        this.huggingFaceApiToken.set(huggingFaceAiApiToken);
     }
 
     public BooleanProperty customizeExpertSettingsProperty() {
@@ -179,24 +250,44 @@ public class AiPreferences {
         }
     }
 
-    public void setApiBaseUrl(String apiBaseUrl) {
-        this.apiBaseUrl.set(apiBaseUrl);
-    }
-
-    public StringProperty apiBaseUrlProperty() {
-        return apiBaseUrl;
-    }
-
-    public String getApiBaseUrl() {
-        if (getCustomizeExpertSettings()) {
-            return apiBaseUrl.get();
-        } else {
-            return AiDefaultPreferences.PROVIDERS_API_URLS.get(getAiProvider());
-        }
-    }
-
     public void setEmbeddingModel(EmbeddingModel embeddingModel) {
         this.embeddingModel.set(embeddingModel);
+    }
+
+    public StringProperty openAiApiBaseUrlProperty() {
+        return openAiApiBaseUrl;
+    }
+
+    public String getOpenAiApiBaseUrl() {
+        return openAiApiBaseUrl.get();
+    }
+
+    public void setOpenAiApiBaseUrl(String openAiApiBaseUrl) {
+        this.openAiApiBaseUrl.set(openAiApiBaseUrl);
+    }
+
+    public StringProperty mistralAiApiBaseUrlProperty() {
+        return mistralAiApiBaseUrl;
+    }
+
+    public String getMistralAiApiBaseUrl() {
+        return mistralAiApiBaseUrl.get();
+    }
+
+    public void setMistralAiApiBaseUrl(String mistralAiApiBaseUrl) {
+        this.mistralAiApiBaseUrl.set(mistralAiApiBaseUrl);
+    }
+
+    public StringProperty huggingFaceApiBaseUrlProperty() {
+        return huggingFaceApiBaseUrl;
+    }
+
+    public String getHuggingFaceApiBaseUrl() {
+        return huggingFaceApiBaseUrl.get();
+    }
+
+    public void setHuggingFaceApiBaseUrl(String huggingFaceApiBaseUrl) {
+        this.huggingFaceApiBaseUrl.set(huggingFaceApiBaseUrl);
     }
 
     public StringProperty instructionProperty() {
@@ -239,7 +330,11 @@ public class AiPreferences {
         if (getCustomizeExpertSettings()) {
             return contextWindowSize.get();
         } else {
-            return AiDefaultPreferences.CONTEXT_WINDOW_SIZES.getOrDefault(getAiProvider(), Map.of()).getOrDefault(getChatModel(), AiDefaultPreferences.CONTEXT_WINDOW_SIZE);
+            return switch (aiProvider.get()) {
+                case OPEN_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.OPEN_AI, openAiChatModel.get());
+                case MISTRAL_AI -> AiDefaultPreferences.getContextWindowSize(AiProvider.MISTRAL_AI, mistralAiChatModel.get());
+                case HUGGING_FACE -> AiDefaultPreferences.getContextWindowSize(AiProvider.HUGGING_FACE, huggingFaceChatModel.get());
+            };
         }
     }
 
@@ -334,5 +429,98 @@ public class AiPreferences {
                 runnable.run();
             }
         });
+    }
+
+    public void listenToChatModels(Runnable runnable) {
+        openAiChatModel.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+
+        mistralAiChatModel.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+
+        huggingFaceChatModel.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+    }
+
+    public void listenToApiTokens(Runnable runnable) {
+        openAiApiToken.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+
+        mistralAiApiToken.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+
+        huggingFaceApiToken.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+    }
+
+    public void listenToApiBaseUrls(Runnable runnable) {
+        openAiApiBaseUrl.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+
+        mistralAiApiBaseUrl.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+
+        huggingFaceApiBaseUrl.addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue)) {
+                runnable.run();
+            }
+        });
+    }
+
+    public String getSelectedChatModel() {
+        return switch (aiProvider.get()) {
+            case OPEN_AI ->
+                    openAiChatModel.get();
+            case MISTRAL_AI ->
+                    mistralAiChatModel.get();
+            case HUGGING_FACE ->
+                    huggingFaceChatModel.get();
+        };
+    }
+
+    public String getSelectedApiToken() {
+        return switch (aiProvider.get()) {
+            case OPEN_AI ->
+                    openAiApiToken.get();
+            case MISTRAL_AI ->
+                    mistralAiApiToken.get();
+            case HUGGING_FACE ->
+                    huggingFaceApiToken.get();
+        };
+    }
+
+    public String getSelectedApiBaseUrl() {
+        return switch (aiProvider.get()) {
+            case OPEN_AI ->
+                    openAiApiBaseUrl.get();
+            case MISTRAL_AI ->
+                    mistralAiApiBaseUrl.get();
+            case HUGGING_FACE ->
+                    huggingFaceApiBaseUrl.get();
+        };
     }
 }

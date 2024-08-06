@@ -82,7 +82,7 @@ public class AiSummaryTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (!aiService.getPreferences().getEnableAi()) {
             showPrivacyNotice(entry);
-        } else if (aiService.getPreferences().getApiToken().isEmpty()) {
+        } else if (aiService.getPreferences().getSelectedApiToken().isEmpty()) {
             showApiKeyMissing();
         } else if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             showErrorNoDatabasePath();

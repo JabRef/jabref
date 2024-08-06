@@ -7,6 +7,7 @@
 <?import org.controlsfx.control.textfield.*?>
 
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import javafx.geometry.Insets?>
 <fx:root spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.ai.AiTab">
     <children>
         <Label styleClass="titleHeader" text="%AI" />
@@ -35,6 +36,9 @@
                 <ComboBox fx:id="chatModelComboBox" editable="true" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                 <Button fx:id="chatModelHelp" prefWidth="20.0" />
             </children>
+            <padding>
+                <Insets left="20.0"/>
+            </padding>
         </HBox>
 
         <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -43,6 +47,9 @@
                 <CustomPasswordField fx:id="apiKeyTextField" HBox.hgrow="ALWAYS" />
                 <Button fx:id="apiTokenHelp" prefWidth="20.0" />
             </children>
+            <padding>
+                <Insets left="20.0"/>
+            </padding>
         </HBox>
 
         <Label styleClass="sectionHeader" text="%Expert settings" />
