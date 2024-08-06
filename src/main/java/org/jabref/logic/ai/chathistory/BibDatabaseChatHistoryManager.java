@@ -58,20 +58,15 @@ public class BibDatabaseChatHistoryManager {
         this.mvStore = mvStore;
     }
 
-    private Map<Integer, ChatHistoryRecord> getMap(BibDatabaseContext bibDatabaseContext, String citationKey) {
-        if (bibDatabaseContext.getDatabasePath().isPresent()) {
-            return mvStore.openMap("chathistory-" + bibDatabaseContext.getDatabasePath().get() + "-" + citationKey);
-        } else {
-            LOGGER.warn("Tried to call BibDatabaseChatHistoryManager.getMap with no database path present. Will use a Java HashMap instead of MVMap from MVStore.");
-            return new HashMap<>();
-        }
+    private Map<Integer, ChatHistoryRecord> getMap(Path bibDatabasePath, String citationKey) {
+        return mvStore.openMap("chathistory-" + bibDatabasePath + "-" + citationKey);
     }
 
-    public AiChatHistory getChatHistory(BibDatabaseContext bibDatabaseContext, String citationKey) {
+    public AiChatHistory getChatHistory(Path bibDatabasePath, String citationKey) {
         return new AiChatHistory() {
             @Override
             public List<ChatMessage> getMessages() {
-                Map<Integer, ChatHistoryRecord> messages = getMap(bibDatabaseContext, citationKey);
+                Map<Integer, ChatHistoryRecord> messages = getMap(bibDatabasePath, citationKey);
                 return IntStream.range(0, messages.size())
                                 .mapToObj(key -> messages.get(key).toLangchainMessage())
                                 .toList();
@@ -79,7 +74,7 @@ public class BibDatabaseChatHistoryManager {
 
             @Override
             public void add(ChatMessage chatMessage) {
-                Map<Integer, ChatHistoryRecord> map = getMap(bibDatabaseContext, citationKey);
+                Map<Integer, ChatHistoryRecord> map = getMap(bibDatabasePath, citationKey);
 
                 // We count 0-based, thus "size()" is the next number
                 // 0 entries -> 0 is the first new id
@@ -102,7 +97,7 @@ public class BibDatabaseChatHistoryManager {
 
             @Override
             public void clear() {
-                getMap(bibDatabaseContext, citationKey).clear();
+                getMap(bibDatabasePath, citationKey).clear();
             }
         };
     }
@@ -122,8 +117,15 @@ public class BibDatabaseChatHistoryManager {
             return;
         }
 
-        Map<Integer, ChatHistoryRecord> oldMap = getMap(bibDatabaseContext.get(), event.getOldValue());
-        getMap(bibDatabaseContext.get(), event.getNewValue()).putAll(oldMap);
+        Optional<Path> bibDatabasePath = bibDatabaseContext.get().getDatabasePath();
+
+        if (bibDatabasePath.isEmpty()) {
+            LOGGER.error("Could not listen to field change event because no database path was found. BibEntry: {}", event.getBibEntry());
+            return;
+        }
+
+        Map<Integer, ChatHistoryRecord> oldMap = getMap(bibDatabasePath.get(), event.getOldValue());
+        getMap(bibDatabasePath.get(), event.getNewValue()).putAll(oldMap);
         oldMap.clear();
     }
 }

@@ -189,7 +189,7 @@ public class AiSummaryTab extends EntryEditorTab {
                         Localization.lang("Unable to chat"),
                         Localization.lang("Got error while processing the file:"),
                         e.getMessage(),
-                        Localization.lang("Try to regenerate"),
+                        Localization.lang("Regenerate"),
                         () -> bindToEntry(currentEntry)
                 )
         );

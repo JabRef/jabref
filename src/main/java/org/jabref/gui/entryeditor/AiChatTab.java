@@ -166,7 +166,7 @@ public class AiChatTab extends EntryEditorTab {
                         Localization.lang("Unable to chat"),
                         Localization.lang("An error occurred while building the embedding model"),
                         aiService.getEmbeddingModel().getErrorWhileBuildingModel(),
-                        Localization.lang("Try to rebuild again"),
+                        Localization.lang("Rebuild"),
                         () -> aiService.getEmbeddingModel().startRebuildingTask()
                 )
         );
@@ -236,7 +236,7 @@ public class AiChatTab extends EntryEditorTab {
             LOGGER.warn("AI chat is constructed, but the entry citation key is empty. Cannot store chat history");
             return new InMemoryAiChatHistory();
         } else {
-            return aiService.getChatHistoryManager().getChatHistory(bibDatabaseContext, entry.getCitationKey().get());
+            return aiService.getChatHistoryManager().getChatHistory(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
         }
     }
 
