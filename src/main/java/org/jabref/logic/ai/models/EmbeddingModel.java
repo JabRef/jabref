@@ -52,6 +52,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
     private final EventBus eventBus = new EventBus();
 
     public static class EmbeddingModelBuiltEvent { }
+
     public static class EmbeddingModelBuildingErrorEvent { }
 
     // Empty if there is no error.
@@ -142,6 +143,12 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
     }
 
     private void setupListeningToPreferencesChanges() {
+        aiPreferences.enableAiProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue && predictorProperty.get().isEmpty()) {
+                startRebuildingTask();
+            }
+        });
+
         aiPreferences.embeddingModelProperty().addListener(obs -> startRebuildingTask());
     }
 

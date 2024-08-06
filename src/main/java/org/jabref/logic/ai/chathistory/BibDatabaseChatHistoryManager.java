@@ -2,7 +2,6 @@ package org.jabref.logic.ai.chathistory;
 
 import java.io.Serializable;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,7 +11,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
@@ -20,7 +18,6 @@ import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.ChatMessageType;
 import dev.langchain4j.data.message.UserMessage;
-import jakarta.inject.Inject;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
