@@ -287,7 +287,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @FXML
     private void addNewFile() {
         dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).ifPresent(newLinkedFile -> {
-            viewModel.addNewManualFile(newLinkedFile);
+            viewModel.addNewLinkedFile(newLinkedFile);
         });
     }
 
