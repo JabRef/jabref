@@ -37,6 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We fixed an issue where the "Check for updates" preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11515](https://github.com/JabRef/jabref/pull/11515)
+- We fixed an issue where JabRef put file paths as absolute path when an entry was created using drag and drop of a PDF file. [#11173](https://github.com/JabRef/jabref/issues/11173)
 - We fixed an issue that online and offline mode for new library creation were handled incorrectly. [#11565](https://github.com/JabRef/jabref/pull/11565)
 - We fixed an issue with colors in the search bar when dark theme is enabled. [#11569](https://github.com/JabRef/jabref/issues/11569)
 - We fixed an issue where a new unsaved library was not marked with an asterisk. [#11519](https://github.com/JabRef/jabref/pull/11519)
@@ -44,7 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
-
+- We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
 
 
 

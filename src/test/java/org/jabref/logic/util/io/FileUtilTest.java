@@ -12,22 +12,33 @@ import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.OS;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @AllowedToUseLogic("uses OS from logic package")
 class FileUtilTest {
+
+    @TempDir
+    static Path bibTempDir;
+
     private final Path nonExistingTestPath = Path.of("nonExistingTestPath");
     private Path existingTestFile;
     private Path otherExistingTestFile;
@@ -334,7 +345,6 @@ class FileUtilTest {
     @Test
     void isBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
-
         assertTrue(FileUtil.isBibFile(bibFile));
     }
 
@@ -345,7 +355,7 @@ class FileUtilTest {
     }
 
     @Test
-    void findinPath() {
+    void findInPath() {
         Optional<Path> resultPath1 = FileUtil.findSingleFileRecursively("existingTestFile.txt", rootDir);
         assertEquals(resultPath1.get().toString(), existingTestFile.toString());
     }
@@ -419,6 +429,41 @@ class FileUtilTest {
         } else {
             assertTrue(FileUtil.detectBadFileName(fileName));
         }
+    }
+
+    /**
+     * @implNote Tests inspired by {@link org.jabref.model.database.BibDatabaseContextTest#getFileDirectoriesWithRelativeMetadata}
+     */
+    public static Stream<Arguments> relativize() {
+        Path bibPath = bibTempDir.resolve("bibliography.bib");
+        Path filesPath = bibTempDir.resolve("files").resolve("pdfs");
+
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(bibPath);
+        database.getMetaData().setDefaultFileDirectory(filesPath.toString());
+
+        FilePreferences fileDirPrefs = mock(FilePreferences.class);
+        when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+
+        Path testPdf = filesPath.resolve("test.pdf");
+        BibEntry source1 = new BibEntry().withFiles(List.of(new LinkedFile(testPdf)));
+        BibEntry target1 = new BibEntry().withFiles(List.of(new LinkedFile(filesPath.relativize(testPdf))));
+
+        testPdf = bibPath.resolve("test.pdf");
+        BibEntry source2 = new BibEntry().withFiles(List.of(new LinkedFile(testPdf)));
+        BibEntry target2 = new BibEntry().withFiles(List.of(new LinkedFile(bibTempDir.relativize(testPdf))));
+
+        return Stream.of(
+                Arguments.of(List.of(target1), List.of(source1), database, fileDirPrefs),
+                Arguments.of(List.of(target2), List.of(source2), database, fileDirPrefs)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    public void relativize(List<BibEntry> expected, List<BibEntry> entries, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+        List<BibEntry> actual = FileUtil.relativize(entries, databaseContext, filePreferences);
+        assertEquals(expected, actual);
     }
 
     @ParameterizedTest
