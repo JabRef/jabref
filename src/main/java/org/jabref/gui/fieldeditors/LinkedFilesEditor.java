@@ -287,15 +287,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @FXML
     private void addNewFile() {
         LinkedFileDialogView controller = new LinkedFileDialogView();
-
-        // Show the dialog using DialogService
-        LinkedFile newLinkedFile = dialogService.showCustomDialogAndWait(controller).orElse(null);
-
-        // Handle the result if the user clicked OK or Add
-        if (newLinkedFile != null) {
-            // Add the new file to your list or handle it as needed
+        dialogService.showCustomDialogAndWait(controller).ifPresent(newLinkedFile -> {
             viewModel.addNewManualFile(newLinkedFile);
-        }
+        });
     }
 
     @FXML
