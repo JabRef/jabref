@@ -24,13 +24,12 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.core.json.JSONObject;
-import org.tinylog.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SciteTabViewModel extends AbstractViewModel {
 
-    /**
-     * Status enum for Scite tab
-     */
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SciteTabViewModel.class);
+
     public enum SciteStatus {
         IN_PROGRESS,
         FOUND,
@@ -99,21 +98,22 @@ public class SciteTabViewModel extends AbstractViewModel {
     public SciteTallyModel fetchTallies(DOI doi) throws FetcherException {
         try {
             URL url = new URI(BASE_URL + "tallies/" + doi.getDOI()).toURL();
+            LOGGER.debug("Fetching tallies from {}", url);
             URLDownload download = new URLDownload(url);
             String response = download.asString();
-            Logger.debug("Response {}", response);
+            LOGGER.debug("Response {}", response);
             JSONObject tallies = new JSONObject(response);
             if (tallies.has("detail")) {
                 String message = tallies.getString("detail");
                 throw new FetcherException(message);
             } else if (!tallies.has("total")) {
-                throw new FetcherException("Unexpected result data!");
+                throw new FetcherException("Unexpected result data.");
             }
             return SciteTallyModel.fromJSONObject(tallies);
         } catch (MalformedURLException | URISyntaxException ex) {
-            throw new FetcherException("Malformed url for DOs", ex);
+            throw new FetcherException("Malformed URL for DOI", ex);
         } catch (IOException ioex) {
-            throw new FetcherException("Failed to retrieve tallies for DOI - IO Exception", ioex);
+            throw new FetcherException("Failed to retrieve tallies for DOI - I/O Exception", ioex);
         }
     }
 
