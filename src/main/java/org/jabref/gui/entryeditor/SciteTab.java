@@ -87,7 +87,6 @@ public class SciteTab extends EntryEditorTab {
     private VBox getErrorPane() {
         Label titleLabel = new Label(Localization.lang("Error"));
         titleLabel.setId("scite-error-label");
-        titleLabel.getStyleClass().add("scite-error-label");
         Text errorMessageText = new Text(viewModel.searchErrorProperty().get());
         VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
         errorMessageBox.getStyleClass().add("scite-error-box");
