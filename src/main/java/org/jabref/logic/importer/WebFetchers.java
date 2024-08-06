@@ -178,7 +178,7 @@ public class WebFetchers {
         set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
 
-        // Uses the PDFs - adn then uses the parsed Dpi. Makes it 10% a web fetcher.
+        // Uses the PDFs - and then uses the parsed DOI. Makes it 10% a web fetcher.
         // We list it here, because otherwise, it would be much more effort (other UI button, ...)
         set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));
 
