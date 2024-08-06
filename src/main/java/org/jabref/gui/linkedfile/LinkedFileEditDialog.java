@@ -40,7 +40,7 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
      * Constructor for adding a new LinkedFile.
      */
     public LinkedFileEditDialog() {
-        this(new LinkedFile("", "", ""));
+        this.linkedFile = new LinkedFile("", "", "");
         initializeDialog(Localization.lang("Add file link"), ADD_BUTTON);
     }
 
