@@ -19,7 +19,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
+public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
 
     private static final ButtonType ADD_BUTTON = new ButtonType(Localization.lang("Add"), ButtonType.OK.getButtonData());
     private static final ButtonType EDIT_BUTTON = ButtonType.APPLY;
@@ -39,7 +39,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
     /**
      * Constructor for adding a new LinkedFile.
      */
-    public LinkedFileEditDialogView() {
+    public LinkedFileEditDialog() {
         this(new LinkedFile("", "", ""));
         initializeDialog(Localization.lang("Add file link"), ADD_BUTTON);
     }
@@ -49,7 +49,7 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
      *
      * @param linkedFile The linked file to be edited.
      */
-    public LinkedFileEditDialogView(LinkedFile linkedFile) {
+    public LinkedFileEditDialog(LinkedFile linkedFile) {
         this.linkedFile = linkedFile;
         initializeDialog(Localization.lang("Edit file link"), EDIT_BUTTON);
     }
