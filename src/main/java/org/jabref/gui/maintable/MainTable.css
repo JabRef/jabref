@@ -63,7 +63,9 @@
 .table-row-cell:matching-search-and-groups:odd {
     -fx-background-color: -jr-match-1-even;
 }
-.table-row-cell:matching-search-and-groups:odd:focused {
+.table-row-cell:matching-search-and-groups:odd:focused,
+.table-row-cell:matching-search-and-groups:odd:focused:hover,
+.table-row-cell:matching-search-and-groups:focused:hover {
     -fx-background-color: -jr-selected;
 }
 .table-row-cell:matching-search-and-groups:odd:hover {
@@ -94,7 +96,9 @@
 .table-row-cell:matching-search-not-groups:odd {
     -fx-background-color: -jr-match-2-even;
 }
-.table-row-cell:matching-search-not-groups:odd:focused {
+.table-row-cell:matching-search-not-groups:odd:focused,
+.table-row-cell:matching-search-not-groups:odd:focused:hover,
+.table-row-cell:matching-search-not-groups:focused:hover {
     -fx-background-color: -jr-selected;
 }
 .table-row-cell:matching-search-not-groups:odd:hover {
@@ -125,7 +129,9 @@
 .table-row-cell:matching-groups-not-search:odd {
     -fx-background-color: -jr-match-3-even;
 }
-.table-row-cell:matching-groups-not-search:odd:focused {
+.table-row-cell:matching-groups-not-search:odd:focused,
+.table-row-cell:matching-groups-not-search:odd:focused:hover,
+.table-row-cell:matching-groups-not-search:focused:hover {
     -fx-background-color: -jr-selected;
 }
 .table-row-cell:matching-groups-not-search:odd:hover {
@@ -156,7 +162,9 @@
 .table-row-cell:not-matching-search-and-groups:odd {
     -fx-background-color: -jr-match-4-even;
 }
-.table-row-cell:not-matching-search-and-groups:odd:focused {
+.table-row-cell:not-matching-search-and-groups:odd:focused,
+.table-row-cell:not-matching-search-and-groups:odd:focused:hover,
+.table-row-cell:not-matching-search-and-groups:focused:hover {
     -fx-background-color: -jr-selected;
 }
 .table-row-cell:not-matching-search-and-groups:odd:hover {
