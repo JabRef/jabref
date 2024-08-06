@@ -133,7 +133,8 @@
     -fx-background-color: -fx-control-inner-background;
 }
 
-#citationsPane .scite-message-content{
+#citationsPane *,
+#scitePane * {
     -fx-fill: -fx-text-background-color;
 }
 
@@ -154,11 +155,13 @@
 .scite-error-box {
     -fx-padding: 30 0 0 30;
 }
+
 .scite-message-box {
     -fx-padding: 30 0 0 30;
 }
-.scite-error-label {
+
+#scite-error-label {
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-accent;
+    -fx-text-fill: -jr-error;
 }
