@@ -126,10 +126,9 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void sGetExtensions() {
+    public void getExtensions() {
         assertEquals(StandardFileType.BIBTEX_DB, importer.getFileType());
     }
-
 
     @Test
     public void recognizesDatabaseID() throws Exception {

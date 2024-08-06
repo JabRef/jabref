@@ -35,6 +35,10 @@ import static org.mockito.Mockito.when;
 
 @AllowedToUseLogic("uses OS from logic package")
 class FileUtilTest {
+
+    @TempDir
+    static Path bibTempDir;
+
     private final Path nonExistingTestPath = Path.of("nonExistingTestPath");
     private Path existingTestFile;
     private Path otherExistingTestFile;
@@ -426,9 +430,6 @@ class FileUtilTest {
             assertTrue(FileUtil.detectBadFileName(fileName));
         }
     }
-
-    @TempDir
-    static Path bibTempDir;
 
     /**
      * @implNote Tests inspired by {@link org.jabref.model.database.BibDatabaseContextTest#getFileDirectoriesWithRelativeMetadata}
