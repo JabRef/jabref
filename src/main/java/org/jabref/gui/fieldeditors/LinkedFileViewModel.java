@@ -29,7 +29,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
-import org.jabref.gui.linkedfile.LinkedFileDialogController;
+import org.jabref.gui.linkedfile.LinkedFileDialogView;
 import org.jabref.gui.mergeentries.MultiMergeEntriesView;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -375,7 +375,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void edit() {
-        Optional<LinkedFile> editedFile = dialogService.showCustomDialogAndWait(new LinkedFileDialogController(this.linkedFile));
+        Optional<LinkedFile> editedFile = dialogService.showCustomDialogAndWait(new LinkedFileDialogView(this.linkedFile));
         editedFile.ifPresent(file -> {
             this.linkedFile.setLink(file.getLink());
             this.linkedFile.setDescription(file.getDescription());

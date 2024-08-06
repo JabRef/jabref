@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -18,7 +19,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-public class LinkedFileDialogController extends BaseDialog<LinkedFile> {
+public class LinkedFileDialogView extends BaseDialog<LinkedFile> {
 
     private static final ButtonType ADD_BUTTON = new ButtonType(Localization.lang("Add"), ButtonType.OK.getButtonData());
     private static final ButtonType EDIT_BUTTON = ButtonType.APPLY;
@@ -38,7 +39,7 @@ public class LinkedFileDialogController extends BaseDialog<LinkedFile> {
     /**
      * Constructor for adding a new LinkedFile.
      */
-    public LinkedFileDialogController() {
+    public LinkedFileDialogView() {
         this(new LinkedFile("", "", ""));
         initializeDialog(Localization.lang("Add file link"), ADD_BUTTON);
     }
@@ -48,7 +49,7 @@ public class LinkedFileDialogController extends BaseDialog<LinkedFile> {
      *
      * @param linkedFile The linked file to be edited.
      */
-    public LinkedFileDialogController(LinkedFile linkedFile) {
+    public LinkedFileDialogView(LinkedFile linkedFile) {
         this.linkedFile = linkedFile;
         initializeDialog(Localization.lang("Edit file link"), EDIT_BUTTON);
     }
@@ -66,7 +67,7 @@ public class LinkedFileDialogController extends BaseDialog<LinkedFile> {
 
         this.setTitle(title);
         this.setResizable(false);
-        this.getDialogPane().getButtonTypes().setAll(primaryButtonType, ButtonType.CANCEL);
+        this.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, primaryButtonType);
 
         this.setResultConverter(button -> {
             if (button == primaryButtonType) {
@@ -91,6 +92,10 @@ public class LinkedFileDialogController extends BaseDialog<LinkedFile> {
         link.textProperty().bindBidirectional(viewModel.linkProperty());
         fileType.valueProperty().bindBidirectional(viewModel.selectedExternalFileTypeProperty());
         sourceUrl.textProperty().bindBidirectional(viewModel.sourceUrlProperty());
+
+        if (fileType.getValue() == null) {
+            fileType.setValue(StandardExternalFileType.PDF);
+        }
     }
 
     @FXML
