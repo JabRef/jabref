@@ -134,7 +134,7 @@
 }
 
 #citationsPane *,
-#scitePane * {
+#scitePane Label, #scitePane Text {
     -fx-fill: -fx-text-background-color;
 }
 
@@ -163,5 +163,9 @@
 #scite-error-label {
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
+    -fx-text-fill: -jr-error;
+}
+
+#scitePane .scite-error-label {
     -fx-text-fill: -jr-error;
 }
