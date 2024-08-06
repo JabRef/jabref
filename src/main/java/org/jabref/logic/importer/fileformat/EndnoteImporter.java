@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -52,7 +53,7 @@ public class EndnoteImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Importer for the Refer/Endnote format. Modified to use article number for pages if pages are missing.";
+        return Localization.lang("Importer for the Refer/Endnote format. Modified to use article number for pages if pages are missing.");
     }
 
     @Override

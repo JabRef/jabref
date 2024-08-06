@@ -592,6 +592,6 @@ public class PdfContentImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.";
+        return Localization.lang("This importer parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.");
     }
 }
