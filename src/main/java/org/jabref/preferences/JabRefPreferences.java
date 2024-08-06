@@ -2790,9 +2790,9 @@ public class JabRefPreferences implements PreferencesService {
                 get(AI_OPEN_AI_CHAT_MODEL),
                 get(AI_MISTRAL_AI_CHAT_MODEL),
                 get(AI_HUGGING_FACE_CHAT_MODEL),
-                getApiKeyForAiProvider(AiPreferences.AiProvider.OPEN_AI).orElse(""),
-                getApiKeyForAiProvider(AiPreferences.AiProvider.MISTRAL_AI).orElse(""),
-                getApiKeyForAiProvider(AiPreferences.AiProvider.HUGGING_FACE).orElse(""),
+                getBoolean(AI_ENABLED) ? getApiKeyForAiProvider(AiPreferences.AiProvider.OPEN_AI) : "",
+                getBoolean(AI_ENABLED) ? getApiKeyForAiProvider(AiPreferences.AiProvider.MISTRAL_AI) : "",
+                getBoolean(AI_ENABLED) ? getApiKeyForAiProvider(AiPreferences.AiProvider.HUGGING_FACE) : "",
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_OPEN_AI_API_BASE_URL),
                 get(AI_MISTRAL_AI_API_BASE_URL),
@@ -2814,9 +2814,23 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(aiPreferences.mistralAiChatModelProperty(), (obs, oldValue, newValue) -> put(AI_MISTRAL_AI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (obs, oldValue, newValue) -> put(AI_HUGGING_FACE_CHAT_MODEL, newValue));
 
-        EasyBind.listen(aiPreferences.openAiApiTokenProperty(), (obs, oldValue, newValue) -> storeAiApiTokenInKeyring(AiPreferences.AiProvider.OPEN_AI, newValue));
-        EasyBind.listen(aiPreferences.mistralAiApiTokenProperty(), (obs, oldValue, newValue) -> storeAiApiTokenInKeyring(AiPreferences.AiProvider.MISTRAL_AI, newValue));
-        EasyBind.listen(aiPreferences.huggingFaceApiTokenProperty(), (obs, oldValue, newValue) -> storeAiApiTokenInKeyring(AiPreferences.AiProvider.HUGGING_FACE, newValue));
+        EasyBind.listen(aiPreferences.openAiApiTokenProperty(), (obs, oldValue, newValue) -> {
+            if (getBoolean(AI_ENABLED)) {
+                storeAiApiTokenInKeyring(AiPreferences.AiProvider.OPEN_AI, newValue);
+            }
+        });
+
+        EasyBind.listen(aiPreferences.mistralAiApiTokenProperty(), (obs, oldValue, newValue) -> {
+            if (getBoolean(AI_ENABLED)) {
+                storeAiApiTokenInKeyring(AiPreferences.AiProvider.MISTRAL_AI, newValue);
+            }
+        });
+
+        EasyBind.listen(aiPreferences.huggingFaceApiTokenProperty(), (obs, oldValue, newValue) -> {
+            if (getBoolean(AI_ENABLED)) {
+                storeAiApiTokenInKeyring(AiPreferences.AiProvider.HUGGING_FACE, newValue);
+            }
+        });
 
         EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
@@ -2836,30 +2850,14 @@ public class JabRefPreferences implements PreferencesService {
         return aiPreferences;
     }
 
-    private String determineSelectedChatModel(AiPreferences aiPreferences) {
-        return switch (aiPreferences.getAiProvider()) {
-            case OPEN_AI -> AI_OPEN_AI_CHAT_MODEL;
-            case MISTRAL_AI -> AI_MISTRAL_AI_CHAT_MODEL;
-            case HUGGING_FACE -> AI_HUGGING_FACE_CHAT_MODEL;
-        };
-    }
-
-    private String determineSelectedApiBaseUrl(AiPreferences aiPreferences) {
-        return switch (aiPreferences.getAiProvider()) {
-            case OPEN_AI -> AI_OPEN_AI_API_BASE_URL;
-            case MISTRAL_AI -> AI_MISTRAL_AI_API_BASE_URL;
-            case HUGGING_FACE -> AI_HUGGING_FACE_API_BASE_URL;
-        };
-    }
-
-    public Optional<String> getApiKeyForAiProvider(AiPreferences.AiProvider aiProvider) {
+    public String getApiKeyForAiProvider(AiPreferences.AiProvider aiProvider) {
         try (final Keyring keyring = Keyring.create()) {
             String rawPassword = keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
             Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
-            return Optional.of(password.decrypt());
+            return password.decrypt();
         } catch (Exception e) {
             LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token", e);
-            return Optional.empty();
+            return "";
         }
     }
 

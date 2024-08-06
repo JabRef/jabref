@@ -2,7 +2,6 @@ package org.jabref.preferences;
 
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -153,5 +152,5 @@ public interface PreferencesService {
 
     AiPreferences getAiPreferences();
 
-    Optional<String> getApiKeyForAiProvider(AiPreferences.AiProvider provider);
+    String getApiKeyForAiProvider(AiPreferences.AiProvider provider);
 }

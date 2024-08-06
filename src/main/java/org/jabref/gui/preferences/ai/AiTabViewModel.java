@@ -95,6 +95,28 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.enableAi.addListener((observable, oldValue, newValue) -> {
             disableBasicSettings.set(!newValue);
             disableExpertSettings.set(!newValue || !customizeExpertSettings.get());
+
+            if (newValue) {
+                openAiApiToken.set(preferencesService.getApiKeyForAiProvider(AiPreferences.AiProvider.OPEN_AI));
+                mistralAiApiToken.set(preferencesService.getApiKeyForAiProvider(AiPreferences.AiProvider.MISTRAL_AI));
+                huggingFaceApiToken.set(preferencesService.getApiKeyForAiProvider(AiPreferences.AiProvider.HUGGING_FACE));
+
+                if (selectedAiProvider.get() != null) {
+                    switch (selectedAiProvider.get()) {
+                        case OPEN_AI -> {
+                            currentApiToken.set(openAiApiToken.get());
+                        }
+
+                        case MISTRAL_AI -> {
+                            currentApiToken.set(mistralAiApiToken.get());
+                        }
+
+                        case HUGGING_FACE -> {
+                            currentApiToken.set(huggingFaceApiToken.get());
+                        }
+                    }
+                }
+            }
         });
 
         this.customizeExpertSettings.addListener((observableValue, oldValue, newValue) ->
