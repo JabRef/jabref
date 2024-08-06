@@ -54,6 +54,8 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
     @Override
     protected Void call() throws Exception {
+        LOGGER.info("Starting embeddings generation task for entry {}", citationKey);
+
         try {
             // forEach() method would look better here, but we need to catch the {@link InterruptedException}.
             for (LinkedFile linkedFile : linkedFiles) {
@@ -65,14 +67,19 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
         showToUser(false);
 
+        LOGGER.info("Finished embeddings generation task for entry {}", citationKey);
+
         return null;
     }
 
     private void ingestLinkedFile(LinkedFile linkedFile) throws InterruptedException {
+        LOGGER.info("Generating embeddings for file {}", linkedFile.getLink());
+
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
 
         if (path.isEmpty()) {
             LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
+            LOGGER.info("Unable to generate embeddings for file {}, because it was not found", linkedFile.getLink());
             return;
         }
 
@@ -84,12 +91,16 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
             Optional<Long> ingestedModificationTimeInSeconds = fileEmbeddingsManager.getIngestedDocumentModificationTimeInSeconds(linkedFile.getLink());
 
             if (ingestedModificationTimeInSeconds.isPresent() && currentModificationTimeInSeconds <= ingestedModificationTimeInSeconds.get()) {
+                LOGGER.info("No need to generate embeddings for file {}, because it was already generated", linkedFile.getLink());
                 return;
             }
 
             Optional<Document> document = FileToDocument.fromFile(path.get());
             if (document.isPresent()) {
                 fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), currentModificationTimeInSeconds, workDone, workMax);
+                LOGGER.info("Embeddings for file {} were generated successfully", linkedFile.getLink());
+            } else {
+                LOGGER.info("Unable to generate embeddings for file {}, because JabRef was unable to extract text from the file", linkedFile.getLink());
             }
         } catch (IOException e) {
             LOGGER.error("Couldn't retrieve attributes of a linked file: {}", linkedFile.getLink(), e);
@@ -98,6 +109,9 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
             Optional<Document> document = FileToDocument.fromFile(path.get());
             if (document.isPresent()) {
                 fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), 0, workDone, workMax);
+                LOGGER.info("Embeddings for file {} were generated successfully, but the JabRef couldn't check if the file was changed", linkedFile.getLink());
+            } else {
+                LOGGER.info("Unable to generate embeddings for file {}, because JabRef was unable to extract text from the file", linkedFile.getLink());
             }
         }
     }

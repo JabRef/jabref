@@ -119,9 +119,13 @@ public class AiChatLogic {
     public AiMessage execute(UserMessage message) {
         // Message will be automatically added to ChatMemory through ConversationalRetrievalChain.
 
+        LOGGER.info("Sending message to AI provider for answering: {}", message.singleText());
+
         aiChatHistory.add(message);
         AiMessage result = new AiMessage(chain.execute(message.singleText()));
         aiChatHistory.add(result);
+
+        LOGGER.info("Message was answered by the AI provider: {}", result.text());
 
         return result;
     }

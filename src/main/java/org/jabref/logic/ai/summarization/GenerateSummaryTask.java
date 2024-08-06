@@ -83,6 +83,8 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
     @Override
     protected Void call() throws Exception {
+        LOGGER.info("Starting summarization task for entry {}", citationKey);
+
         try {
             summarizeAll();
         } catch (InterruptedException e) {
@@ -90,6 +92,8 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
         }
 
         showToUser(false);
+
+        LOGGER.info("Finished summarization task for entry {}", citationKey);
 
         return null;
     }
@@ -120,6 +124,8 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
             throw new RuntimeException(Localization.lang("No summary can be generated for entry '%0'. Could not find attached linked files.", citationKey));
         }
 
+        LOGGER.info("All summaries for attached files of entry {} are generated. Generating final summary.", citationKey);
+
         String finalSummary;
 
         if (linkedFilesSummary.size() == 1) {
@@ -134,10 +140,13 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
     }
 
     private Optional<String> generateSummary(LinkedFile linkedFile) throws InterruptedException {
+        LOGGER.info("Generating summary for file {}", linkedFile.getLink());
+
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
 
         if (path.isEmpty()) {
             LOGGER.error("Could not find path for a linked file: {}", linkedFile.getLink());
+            LOGGER.info("Unable to generate summary for file {}, because it was not found", linkedFile.getLink());
             return Optional.empty();
         }
 
@@ -145,11 +154,13 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
         if (document.isEmpty()) {
             LOGGER.warn("Could not extract text from a linked file {}. It will be skipped when generating a summary.", linkedFile.getLink());
+            LOGGER.info("Unable to generate summary for file {}, because it was not found", linkedFile.getLink());
             return Optional.empty();
         }
 
         String linkedFileSummary = summarizeOneDocument(document.get().text());
 
+        LOGGER.info("Summary for file {} was generated successfully", linkedFile.getLink());
         return Optional.of(linkedFileSummary);
     }
 
@@ -160,7 +171,14 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
         List<String> chunkSummaries = documentSplitter.split(new Document(document)).stream().map(TextSegment::text).toList();
 
+        LOGGER.info("The file was split into {} chunks", chunkSummaries.size());
+
+        int passes = 0;
+
         do {
+            passes++;
+            LOGGER.info("Summarizing chunks ({} pass)", passes);
+
             addMoreWork(chunkSummaries.size());
 
             List<String> list = new ArrayList<>();
@@ -172,7 +190,10 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
                 Prompt prompt = CHUNK_PROMPT_TEMPLATE.apply(Collections.singletonMap("document", chunkSummary));
 
+                LOGGER.info("Sending request to AI provider to summarize a chunk");
                 String chunk = aiService.getChatLanguageModel().generate(prompt.toString());
+                LOGGER.info("Chunk summarized by the AI provider");
+
                 list.add(chunk);
                 doneOneWork();
             }
@@ -182,6 +203,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
         if (chunkSummaries.size() == 1) {
             doneOneWork(); // No need to call LLM for combination of summary chunks.
+            LOGGER.info("Summary of the file was generated successfully");
             return chunkSummaries.getFirst();
         }
 
@@ -191,7 +213,10 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
             throw new InterruptedException();
         }
 
+        LOGGER.info("Sending request to AI provider to combine summary chunks");
         String result = aiService.getChatLanguageModel().generate(prompt.toString());
+        LOGGER.info("Summary of the file was generated successfully");
+
         doneOneWork();
         return result;
     }

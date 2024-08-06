@@ -81,6 +81,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
         BackgroundTask<Void> task = BackgroundTask
                 .wrap(this::rebuild)
                 .onSuccess(v -> {
+                    LOGGER.info("Embedding model was successfully downloaded");
                     errorWhileBuildingModel = "";
                     eventBus.post(new EmbeddingModelBuiltEvent());
                 })
@@ -90,7 +91,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
                     errorWhileBuildingModel = e.getMessage();
                     eventBus.post(new EmbeddingModelBuildingErrorEvent());
                 });
-        task.titleProperty().set(Localization.lang("Downloading embedding model"));
+        task.titleProperty().set(Localization.lang("Downloading embedding model..."));
         task.showToUser(true);
         task.executeWith(taskExecutor);
     }
@@ -112,6 +113,8 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
             predictorProperty.set(Optional.empty());
             return;
         }
+
+        LOGGER.info("Downloading embedding model...");
 
         String modelUrl = DJL_AI_DJL_HUGGINGFACE_PYTORCH_SENTENCE_TRANSFORMERS + aiPreferences.getEmbeddingModel().getLabel();
 
