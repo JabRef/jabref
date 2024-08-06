@@ -93,7 +93,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Prepare merged jars and modules dir (macOS)
@@ -153,6 +153,8 @@ jobs:
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
           --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
       - name: Build pkg (macOS)
         if: (matrix.os == 'macos-13') && (steps.checksecrets.outputs.secretspresent == 'YES')
@@ -192,6 +194,8 @@ jobs:
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
           --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-13') && (steps.checksecrets.outputs.secretspresent == 'YES')
