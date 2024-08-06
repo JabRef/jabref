@@ -55,12 +55,6 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
         initializeDialog(Localization.lang("Edit file link"), EDIT_BUTTON);
     }
 
-    /**
-     * Initializes the dialog with the given title and button type.
-     *
-     * @param title The title of the dialog.
-     * @param primaryButtonType The primary button type for the dialog.
-     */
     private void initializeDialog(String title, ButtonType primaryButtonType) {
         ViewLoader.view(this)
                   .load()
