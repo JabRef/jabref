@@ -25,6 +25,8 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
+    private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
+
     @FXML private CheckBox enableAi;
 
     @FXML private ComboBox<AiPreferences.AiProvider> aiProviderComboBox;
@@ -82,6 +84,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         chatModelComboBox.setItems(viewModel.chatModelsProperty());
         chatModelComboBox.valueProperty().bindBidirectional(viewModel.selectedChatModelProperty());
         chatModelComboBox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+
+        this.aiProviderComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == AiPreferences.AiProvider.HUGGING_FACE) {
+                chatModelComboBox.setPromptText(HUGGING_FACE_CHAT_MODEL_PROMPT);
+            }
+        });
 
         apiKeyTextField.textProperty().bindBidirectional(viewModel.apiTokenProperty());
         apiKeyTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
