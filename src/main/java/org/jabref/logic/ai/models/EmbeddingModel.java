@@ -82,7 +82,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
         BackgroundTask<Void> task = BackgroundTask
                 .wrap(this::rebuild)
                 .onSuccess(v -> {
-                    LOGGER.info("Embedding model was successfully downloaded");
+                    LOGGER.info("Embedding model was successfully updated");
                     errorWhileBuildingModel = "";
                     eventBus.post(new EmbeddingModelBuiltEvent());
                 })
