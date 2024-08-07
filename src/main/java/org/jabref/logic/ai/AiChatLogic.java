@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jabref.logic.ai.chathistory.AiChatHistory;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.CanonicalBibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.AiPreferences;
 
@@ -115,9 +116,12 @@ public class AiChatLogic {
     }
 
     private void setSystemMessage(String systemMessage) {
-        String realSystemMessage = systemMessage + "\n\n" + "Here is the paper you are analyzing: " + entry.toString();
+        String newSystemMessage = augmentSystemMessage(systemMessage);
+        chatMemory.add(new SystemMessage(newSystemMessage));
+    }
 
-        chatMemory.add(new SystemMessage(realSystemMessage));
+    private String augmentSystemMessage(String oldSystemMessage) {
+        return oldSystemMessage + "\n\n" + "Here is the paper you are analyzing: " + CanonicalBibEntry.getCanonicalRepresentation(entry);
     }
 
     public AiMessage execute(UserMessage message) {

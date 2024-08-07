@@ -2784,15 +2784,17 @@ public class JabRefPreferences implements PreferencesService {
             return aiPreferences;
         }
 
+        boolean aiEnabled = getBoolean(AI_ENABLED);
+
         aiPreferences = new AiPreferences(
-                getBoolean(AI_ENABLED),
+                aiEnabled,
                 AiPreferences.AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_OPEN_AI_CHAT_MODEL),
                 get(AI_MISTRAL_AI_CHAT_MODEL),
                 get(AI_HUGGING_FACE_CHAT_MODEL),
-                getBoolean(AI_ENABLED) ? getApiKeyForAiProvider(AiPreferences.AiProvider.OPEN_AI) : "",
-                getBoolean(AI_ENABLED) ? getApiKeyForAiProvider(AiPreferences.AiProvider.MISTRAL_AI) : "",
-                getBoolean(AI_ENABLED) ? getApiKeyForAiProvider(AiPreferences.AiProvider.HUGGING_FACE) : "",
+                aiEnabled ? getApiKeyForAiProvider(AiPreferences.AiProvider.OPEN_AI) : "",
+                aiEnabled ? getApiKeyForAiProvider(AiPreferences.AiProvider.MISTRAL_AI) : "",
+                aiEnabled ? getApiKeyForAiProvider(AiPreferences.AiProvider.HUGGING_FACE) : "",
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_OPEN_AI_API_BASE_URL),
                 get(AI_MISTRAL_AI_API_BASE_URL),
@@ -2815,19 +2817,19 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (obs, oldValue, newValue) -> put(AI_HUGGING_FACE_CHAT_MODEL, newValue));
 
         EasyBind.listen(aiPreferences.openAiApiTokenProperty(), (obs, oldValue, newValue) -> {
-            if (getBoolean(AI_ENABLED)) {
+            if (aiPreferences.getEnableAi()) {
                 storeAiApiTokenInKeyring(AiPreferences.AiProvider.OPEN_AI, newValue);
             }
         });
 
         EasyBind.listen(aiPreferences.mistralAiApiTokenProperty(), (obs, oldValue, newValue) -> {
-            if (getBoolean(AI_ENABLED)) {
+            if (aiPreferences.getEnableAi()) {
                 storeAiApiTokenInKeyring(AiPreferences.AiProvider.MISTRAL_AI, newValue);
             }
         });
 
         EasyBind.listen(aiPreferences.huggingFaceApiTokenProperty(), (obs, oldValue, newValue) -> {
-            if (getBoolean(AI_ENABLED)) {
+            if (aiPreferences.getEnableAi()) {
                 storeAiApiTokenInKeyring(AiPreferences.AiProvider.HUGGING_FACE, newValue);
             }
         });
@@ -2840,12 +2842,12 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
         EasyBind.listen(aiPreferences.instructionProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
-        EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, (double) newValue));
+        EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, newValue.doubleValue()));
         EasyBind.listen(aiPreferences.contextWindowSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_CONTEXT_WINDOW_SIZE, newValue));
         EasyBind.listen(aiPreferences.documentSplitterChunkSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, newValue));
         EasyBind.listen(aiPreferences.documentSplitterOverlapSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, newValue));
         EasyBind.listen(aiPreferences.ragMaxResultsCountProperty(), (obs, oldValue, newValue) -> putInt(AI_RAG_MAX_RESULTS_COUNT, newValue));
-        EasyBind.listen(aiPreferences.ragMinScoreProperty(), (obs, oldValue, newValue) -> putDouble(AI_RAG_MIN_SCORE, (Double) newValue));
+        EasyBind.listen(aiPreferences.ragMinScoreProperty(), (obs, oldValue, newValue) -> putDouble(AI_RAG_MIN_SCORE, newValue.doubleValue()));
 
         return aiPreferences;
     }
