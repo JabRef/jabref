@@ -298,21 +298,21 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         aiPreferences.setAiProvider(selectedAiProvider.get());
 
-        aiPreferences.setOpenAiChatModel(openAiChatModel.get());
-        aiPreferences.setMistralAiChatModel(mistralAiChatModel.get());
-        aiPreferences.setHuggingFaceChatModel(huggingFaceChatModel.get());
+        aiPreferences.setOpenAiChatModel(openAiChatModel.get() == null ? "" : openAiChatModel.get());
+        aiPreferences.setMistralAiChatModel(mistralAiChatModel.get() == null ? "" : mistralAiChatModel.get());
+        aiPreferences.setHuggingFaceChatModel(huggingFaceChatModel.get() == null ? "" : huggingFaceChatModel.get());
 
-        aiPreferences.setOpenAiApiToken(openAiApiToken.get());
-        aiPreferences.setMistralAiApiToken(mistralAiApiToken.get());
-        aiPreferences.setHuggingFaceApiToken(huggingFaceApiToken.get());
+        aiPreferences.setOpenAiApiToken(openAiApiToken.get() == null ? "" : openAiApiToken.get());
+        aiPreferences.setMistralAiApiToken(mistralAiApiToken.get() == null ? "" : mistralAiApiToken.get());
+        aiPreferences.setHuggingFaceApiToken(huggingFaceApiToken.get() == null ? "" : huggingFaceApiToken.get());
 
         aiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
 
         aiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
 
-        aiPreferences.setOpenAiApiBaseUrl(openAiApiBaseUrl.get());
-        aiPreferences.setMistralAiApiBaseUrl(mistralAiApiBaseUrl.get());
-        aiPreferences.setHuggingFaceApiBaseUrl(huggingFaceApiBaseUrl.get());
+        aiPreferences.setOpenAiApiBaseUrl(openAiApiBaseUrl.get() == null ? "" : openAiApiBaseUrl.get());
+        aiPreferences.setMistralAiApiBaseUrl(mistralAiApiBaseUrl.get() == null ? "" : mistralAiApiBaseUrl.get());
+        aiPreferences.setHuggingFaceApiBaseUrl(huggingFaceApiBaseUrl.get() == null ? "" : huggingFaceApiBaseUrl.get());
 
         aiPreferences.setInstruction(instruction.get());
         aiPreferences.setTemperature(temperature.get());

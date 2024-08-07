@@ -65,7 +65,7 @@
         <HBox alignment="CENTER_LEFT" spacing="10.0">
             <children>
                 <Label alignment="BASELINE_CENTER" text="%API base URL (used only for LLM)" />
-                <TextField fx:id="apiBaseUrlTextField" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="apiBaseUrlTextField" disable="true" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
                 <Button fx:id="apiBaseUrlHelp" prefWidth="20.0" />
             </children>
         </HBox>
