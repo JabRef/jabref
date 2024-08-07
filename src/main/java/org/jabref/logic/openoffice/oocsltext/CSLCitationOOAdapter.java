@@ -85,13 +85,25 @@ public class CSLCitationOOAdapter {
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
         // Insert the citation text with multiple reference marks
-        insertMultipleReferenceMarks(document, cursor, entries, ooText);
+        insertMultipleReferenceMarks(cursor, entries, ooText);
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
     }
 
-    private void insertMultipleReferenceMarks(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception {
+    public void insertEmpty(XTextCursor cursor, List<BibEntry> entries)
+            throws Exception {
+        for (BibEntry entry : entries) {
+            CSLReferenceMark mark = markManager.createReferenceMark(entry);
+            OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
+            mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false, true);
+        }
+
+        // Move the cursor to the end of the inserted text - although no need as we don't insert any text, but a good practice
+        cursor.collapseToEnd();
+    }
+
+    private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception {
         // Check if there's already a space before the cursor
         boolean spaceExists = false;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
@@ -111,16 +123,16 @@ public class CSLCitationOOAdapter {
 
         if (entries.size() == 1) {
             CSLReferenceMark mark = markManager.createReferenceMark(entries.getFirst());
-            mark.insertReferenceIntoOO(doc, cursor, ooText, !spaceExists, true, true);
+            mark.insertReferenceIntoOO(document, cursor, ooText, !spaceExists, true, true);
         } else {
             if (!spaceExists) {
                 cursor.getText().insertString(cursor, " ", false);
             }
-            OOTextIntoOO.write(doc, cursor, ooText);
+            OOTextIntoOO.write(document, cursor, ooText);
             for (BibEntry entry : entries) {
                 CSLReferenceMark mark = markManager.createReferenceMark(entry);
                 OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-                mark.insertReferenceIntoOO(doc, cursor, emptyOOText, false, false, true);
+                mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false, true);
             }
             cursor.getText().insertString(cursor, " ", false);
         }
