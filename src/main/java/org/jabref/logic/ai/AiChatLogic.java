@@ -31,16 +31,16 @@ public class AiChatLogic {
     private final AiService aiService;
     private final AiChatHistory aiChatHistory;
     private final Filter embeddingsFilter;
-    private final String citationKey;
+    private final BibEntry entry;
 
     private ChatMemory chatMemory;
     private Chain<String, String> chain;
 
-    public AiChatLogic(AiService aiService, AiChatHistory aiChatHistory, Filter embeddingsFilter, String citationKey) {
+    public AiChatLogic(AiService aiService, AiChatHistory aiChatHistory, Filter embeddingsFilter, BibEntry entry) {
         this.aiService = aiService;
         this.aiChatHistory = aiChatHistory;
         this.embeddingsFilter = embeddingsFilter;
-        this.citationKey = citationKey;
+        this.entry = entry;
 
         setupListeningToPreferencesChanges();
         rebuildFull(aiChatHistory.getMessages());
@@ -60,7 +60,7 @@ public class AiChatLogic {
             LOGGER.error("AiChatLogic should not be derived from BibEntry with no citation key");
         }
 
-        return new AiChatLogic(aiService, aiChatHistory, filter, entry.getCitationKey().orElse("<UNKNOWN>"));
+        return new AiChatLogic(aiService, aiChatHistory, filter, entry);
     }
 
     private void setupListeningToPreferencesChanges() {
@@ -115,12 +115,9 @@ public class AiChatLogic {
     }
 
     private void setSystemMessage(String systemMessage) {
-        if (systemMessage.isEmpty()) {
-            LOGGER.warn("An empty system message is passed to AiChat");
-            return;
-        }
+        String realSystemMessage = systemMessage + "\n\n" + "Here is the paper you are analyzing: " + entry.toString();
 
-        chatMemory.add(new SystemMessage(systemMessage));
+        chatMemory.add(new SystemMessage(realSystemMessage));
     }
 
     public AiMessage execute(UserMessage message) {
@@ -128,14 +125,14 @@ public class AiChatLogic {
 
         LOGGER.info("Sending message to AI provider ({}) for answering in entry {}: {}",
                 AiDefaultPreferences.PROVIDERS_API_URLS.get(aiService.getPreferences().getAiProvider()),
-                citationKey,
+                entry.getCitationKey().orElse("<no citation key>"),
                 message.singleText());
 
         aiChatHistory.add(message);
         AiMessage result = new AiMessage(chain.execute(message.singleText()));
         aiChatHistory.add(result);
 
-        LOGGER.info("Message was answered by the AI provider for entry {}: {}", citationKey, result.text());
+        LOGGER.info("Message was answered by the AI provider for entry {}: {}", entry.getCitationKey().orElse("<no citation key>"), result.text());
 
         return result;
     }

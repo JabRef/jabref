@@ -19,8 +19,12 @@ import io.github.stefanbratanov.jvm.openai.ChatCompletion;
 import io.github.stefanbratanov.jvm.openai.CreateChatCompletionRequest;
 import io.github.stefanbratanov.jvm.openai.OpenAI;
 import io.github.stefanbratanov.jvm.openai.Usage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JvmOpenAiChatLanguageModel.class);
+
     private final AiPreferences aiPreferences;
 
     private final ChatClient chatClient;
@@ -39,6 +43,8 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
 
     @Override
     public Response<AiMessage> generate(List<ChatMessage> list) {
+        LOGGER.debug("Generating response from jvm-openai chat model with {} messages: {}", list.size(), list);
+
         List<io.github.stefanbratanov.jvm.openai.ChatMessage> messages =
                 list.stream().map(chatMessage -> (io.github.stefanbratanov.jvm.openai.ChatMessage) switch (chatMessage) {
                     case AiMessage aiMessage -> io.github.stefanbratanov.jvm.openai.ChatMessage.assistantMessage(aiMessage.text());
