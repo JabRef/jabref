@@ -144,7 +144,7 @@ public class OpenOfficePanel {
         selectDocument.setMaxWidth(Double.MAX_VALUE);
 
         update = new Button();
-        update.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
+        update.setGraphic(IconTheme.JabRefIcons.ADD_OR_MAKE_BIBLIOGRAPHY.getGraphicNode());
         update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
         update.setMaxWidth(Double.MAX_VALUE);
 
@@ -230,7 +230,7 @@ public class OpenOfficePanel {
         pushEntriesAdvanced.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_INTEXT, true));
         pushEntriesAdvanced.setMaxWidth(Double.MAX_VALUE);
 
-        update.setTooltip(new Tooltip(Localization.lang("Make/Update bibliography")));
+        update.setTooltip(new Tooltip(Localization.lang("Make/Sync bibliography")));
 
         update.setOnAction(event -> {
             String title = Localization.lang("Could not update bibliography");
