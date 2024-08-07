@@ -13,14 +13,14 @@ This folder contains directories making use of [Vagrant](https://www.vagrantup.c
 
 ### Setup VM
 
-1. `cd` into `ubuntu`
+1. `cd` into `{vmdir}`, e..g, `cd ubuntu`
 2. Start the vm `vagrant up`
-3. Store ssh configuration: `vagrant ssh-config > default`
+3. Linux machines: Store ssh configuration: `vagrant ssh-config > default`
 
 ### Use VM
 
 You can use the UI offered by the VirtualBox client.
-You can also do `ssh -Y -F vagrant-ssh default` to SSH into the machine.
+On Linux, you can also do `ssh -Y -F vagrant-ssh default` to SSH into the machine.
 
 If asked for a password, this is `vagrant`.
 
@@ -31,8 +31,12 @@ Then, everything is removed.
 
 ## Available VMs
 
-- `ubuntu`: Ubuntu with JabRef snap and libreoffice-connection pre-installed. One has to install the [JabRef Browser Extension](https://addons.mozilla.org/en-US/firefox/addon/jabref/) manually.
-- `fedora`: Fedora 39 with KDE plasma and JDK. During the build, the JabRef sources will be fetched and an initial build will be triggered. Login and then type `startx`. Now KDE Plasma should start. Open Konsole. Then `cd jabref`. Then `./gradlew run`.
+| VM                                              | JabRef  | Browser | LibreOffice |
+|-------------------------------------------------|---------|---------|-------------|
+| [`fedora`](fedora/)                             | source  | --      | --          |
+| [`Linux Mint (Cinnamon)`](linux-mint-cinnamon/) | source  | Firefox | yes         |
+| [`ubuntu`](ubuntu/)                             | snap    | Firefox | yes         |
+| [`windows`](windows/)                           | source  | Edge    | --          |
 
 ## Troubleshooting
 

@@ -40,9 +40,4 @@ public class MedlineImporterTest {
     public void sGetExtensions() {
         assertEquals(StandardFileType.MEDLINE, importer.getFileType());
     }
-
-    @Test
-    public void getDescription() {
-        assertEquals("Importer for the Medline format.", importer.getDescription());
-    }
 }

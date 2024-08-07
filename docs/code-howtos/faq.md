@@ -19,7 +19,7 @@ Following is a list of common errors encountered by developers which lead to fai
       Read more about the background and format of localization in JabRef [here](https://devdocs.jabref.org/code-howtos/localization.html).
 
 * `org.jabref.logic.l10n.LocalizationConsistencyTest` `findObsoleteLocalizationKeys` <span style="color:red">FAILED</span>
-  * <span style="color:green">Fix</span>: There are localization keys [localization properties file](https://github.com/JabRef/jabref/blob/main/src/main/resources/l10n/JabRef_en.properties) that are not used in the code, probably due to the removal of existing code. Navigate to the unused key-value pairs in the file and remove them. You can always click on the details of the failing test to pinpoint which keys are unused.
+  * <span style="color:green">Fix</span>: There are localization keys in the [localization properties file](https://github.com/JabRef/jabref/blob/main/src/main/resources/l10n/JabRef_en.properties) that are not used in the code, probably due to the removal of existing code. Navigate to the unused key-value pairs in the file and remove them. You can always click on the details of the failing test to pinpoint which keys are unused.
     Read more about the background and format of localization in JabRef [here](https://devdocs.jabref.org/code-howtos/localization.html).
 
 * `org.jabref.logic.citationstyle.CitationStyle` `discoverCitationStyles` <span style="color:red">ERROR: Could not find any citation style. Tried with /ieee.csl.</span>

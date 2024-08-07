@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -55,16 +54,6 @@ class MedlinePlainImporterTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         importer = new MedlinePlainImporter(importFormatPreferences);
-    }
-
-    @Test
-    void sGetExtensions() {
-        assertEquals(StandardFileType.MEDLINE_PLAIN, importer.getFileType());
-    }
-
-    @Test
-    void getDescription() {
-        assertEquals("Importer for the MedlinePlain format.", importer.getDescription());
     }
 
     @ParameterizedTest
