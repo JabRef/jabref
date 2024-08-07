@@ -46,7 +46,7 @@ public class CSLCitationOOAdapter {
 
         // Sort entries based on their order of appearance in the document
         entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
-        for (BibEntry entry: entries) {
+        for (BibEntry entry : entries) {
             String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, bibDatabaseContext, bibEntryTypesManager).getFirst();
             System.out.println(citation);
             writeCitation(document, cursor, entry, citation);
