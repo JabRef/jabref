@@ -88,6 +88,13 @@ public class LinkedFile implements Serializable {
         this(description, Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType), Objects.requireNonNull(sourceUrl));
     }
 
+    /**
+     * Constructs a new LinkedFile with an empty file type and an empty description
+     */
+    public LinkedFile(Path link) {
+        this("", Objects.requireNonNull(link), "");
+    }
+
     public StringProperty descriptionProperty() {
         return description;
     }

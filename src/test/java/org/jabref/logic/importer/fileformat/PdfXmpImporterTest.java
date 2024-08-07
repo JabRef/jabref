@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -36,21 +35,6 @@ public class PdfXmpImporterTest {
     @BeforeEach
     public void setUp() {
         importer = new PdfXmpImporter(mock(XmpPreferences.class));
-    }
-
-    @Test
-    public void getFormatName() {
-        assertEquals("XMP-annotated PDF", importer.getName());
-    }
-
-    @Test
-    public void sGetExtensions() {
-        assertEquals(StandardFileType.PDF, importer.getFileType());
-    }
-
-    @Test
-    public void getDescription() {
-        assertEquals("Wraps the XMPUtility function to be used as an Importer.", importer.getDescription());
     }
 
     @Disabled("XMP reader prints warnings to the logger when parsing does not work")

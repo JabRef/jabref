@@ -37,6 +37,7 @@ import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems.KnowledgeItem;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.Persons.Person;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -108,7 +109,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public String getDescription() {
-        return "Importer for the Citavi XML format.";
+        return Localization.lang("Importer for the Citavi XML format.");
     }
 
     @Override

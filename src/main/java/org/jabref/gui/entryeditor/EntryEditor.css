@@ -126,7 +126,6 @@
     -fx-fill: #7800A9 ;
     -fx-font-size: 1.2em;
     -fx-font-weight: bolder;
-
 }
 
 #citationsPane {
@@ -134,7 +133,8 @@
     -fx-background-color: -fx-control-inner-background;
 }
 
-#citationsPane * {
+#citationsPane *,
+#scitePane Label, #scitePane Text {
     -fx-fill: -fx-text-background-color;
 }
 
@@ -155,12 +155,13 @@
 .scite-error-box {
     -fx-padding: 30 0 0 30;
 }
+
 .scite-message-box {
     -fx-padding: 30 0 0 30;
 }
 
-.scite-error-label {
+#scite-error-label {
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
-    -fx-text-fill: -fx-accent;
+    -fx-text-fill: -jr-error;
 }

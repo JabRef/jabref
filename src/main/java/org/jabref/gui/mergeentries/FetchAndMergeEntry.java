@@ -40,8 +40,8 @@ import org.slf4j.LoggerFactory;
  */
 public class FetchAndMergeEntry {
 
-    // A list of all field which are supported
     public static List<Field> SUPPORTED_FIELDS = Arrays.asList(StandardField.DOI, StandardField.EPRINT, StandardField.ISBN);
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FetchAndMergeEntry.class);
     private final DialogService dialogService;
     private final UndoManager undoManager;
