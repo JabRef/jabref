@@ -55,6 +55,8 @@ public class AiPreferences {
         }
     }
 
+    private final PreferencesService preferencesService;
+
     private final BooleanProperty enableAi;
 
     private final ObjectProperty<AiProvider> aiProvider;
@@ -82,7 +84,8 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableAi,
+    public AiPreferences(PreferencesService preferencesService,
+                         boolean enableAi,
                          AiProvider aiProvider,
                          String openAiChatModel,
                          String mistralAiChatModel,
@@ -103,6 +106,8 @@ public class AiPreferences {
                          int ragMaxResultsCount,
                          double ragMinScore
     ) {
+        this.preferencesService = preferencesService;
+
         this.enableAi = new SimpleBooleanProperty(enableAi);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
@@ -504,13 +509,27 @@ public class AiPreferences {
     }
 
     public String getSelectedApiToken() {
+        if (!enableAi.get()) {
+            return "";
+        }
+
+        retrieveTokens();
+        return getTokens();
+    }
+
+    private void retrieveTokens() {
+        switch (aiProvider.get()) {
+            case OPEN_AI -> openAiApiToken.set(preferencesService.getApiKeyForAiProvider(AiProvider.OPEN_AI));
+            case MISTRAL_AI -> mistralAiApiToken.set(preferencesService.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
+            case HUGGING_FACE -> huggingFaceApiToken.set(preferencesService.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
+        }
+    }
+
+    private String getTokens() {
         return switch (aiProvider.get()) {
-            case OPEN_AI ->
-                    openAiApiToken.get();
-            case MISTRAL_AI ->
-                    mistralAiApiToken.get();
-            case HUGGING_FACE ->
-                    huggingFaceApiToken.get();
+            case OPEN_AI -> openAiApiToken.get();
+            case MISTRAL_AI -> mistralAiApiToken.get();
+            case HUGGING_FACE -> huggingFaceApiToken.get();
         };
     }
 

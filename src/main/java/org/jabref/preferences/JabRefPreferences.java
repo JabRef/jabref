@@ -2787,14 +2787,15 @@ public class JabRefPreferences implements PreferencesService {
         boolean aiEnabled = getBoolean(AI_ENABLED);
 
         aiPreferences = new AiPreferences(
+                this,
                 aiEnabled,
                 AiPreferences.AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_OPEN_AI_CHAT_MODEL),
                 get(AI_MISTRAL_AI_CHAT_MODEL),
                 get(AI_HUGGING_FACE_CHAT_MODEL),
-                aiEnabled ? getApiKeyForAiProvider(AiPreferences.AiProvider.OPEN_AI) : "",
-                aiEnabled ? getApiKeyForAiProvider(AiPreferences.AiProvider.MISTRAL_AI) : "",
-                aiEnabled ? getApiKeyForAiProvider(AiPreferences.AiProvider.HUGGING_FACE) : "",
+                "",
+                "",
+                "",
                 getBoolean(AI_CUSTOMIZE_SETTINGS),
                 get(AI_OPEN_AI_API_BASE_URL),
                 get(AI_MISTRAL_AI_API_BASE_URL),
