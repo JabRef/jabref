@@ -36,7 +36,7 @@ Then, everything is removed.
 | [`fedora`](fedora/)                             | source  | --      | --          |
 | [`Linux Mint (Cinnamon)`](linux-mint-cinnamon/) | source  | Firefox | yes         |
 | [`ubuntu`](ubuntu/)                             | snap    | Firefox | yes         |
-| [`windows`](windows/)                           | source  | Firefox | yes         |
+| [`windows`](windows/)                           | source  | Edge    | --          |
 
 ## Troubleshooting
 
