@@ -92,12 +92,29 @@ public class CSLCitationOOAdapter {
     }
 
     private void insertMultipleReferenceMarks(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception {
-        // Insert reference marks for each entry after the citation
+        // Check if there's already a space before the cursor
+        boolean spaceExists = false;
+        XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
+
+        // Check if we're at the start of the document or if there's a space before
+        if (!checkCursor.goLeft((short) 1, true)) {
+            // We're at the start of the document
+            spaceExists = true;
+        } else {
+            spaceExists = checkCursor.getString().equals(" ");
+            // If not a space, check if it's a paragraph break
+            if (!spaceExists) {
+                spaceExists = checkCursor.getString().matches("\\R");
+            }
+        }
+
         if (entries.size() == 1) {
             CSLReferenceMark mark = markManager.createReferenceMark(entries.getFirst());
-            mark.insertReferenceIntoOO(doc, cursor, ooText, true, true, true);
+            mark.insertReferenceIntoOO(doc, cursor, ooText, !spaceExists, true, true);
         } else {
-            cursor.getText().insertString(cursor, " ", false);
+            if (!spaceExists) {
+                cursor.getText().insertString(cursor, " ", false);
+            }
             OOTextIntoOO.write(doc, cursor, ooText);
             for (BibEntry entry : entries) {
                 CSLReferenceMark mark = markManager.createReferenceMark(entry);
