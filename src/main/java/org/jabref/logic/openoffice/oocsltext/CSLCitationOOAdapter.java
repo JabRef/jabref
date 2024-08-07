@@ -84,14 +84,19 @@ public class CSLCitationOOAdapter {
     }
 
     private void insertMultipleReferenceMarks(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception {
-        // Insert the entire citation text as-is
-        OOTextIntoOO.write(doc, cursor, ooText);
-
         // Insert reference marks for each entry after the citation
-        for (BibEntry entry : entries) {
-            CSLReferenceMark mark = markManager.createReferenceMark(entry);
-            OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-            mark.insertReferenceIntoOO(doc, cursor, emptyOOText);
+        if (entries.size() == 1) {
+            CSLReferenceMark mark = markManager.createReferenceMark(entries.getFirst());
+            mark.insertReferenceIntoOO(doc, cursor, ooText, true, true, true);
+        } else {
+            cursor.getText().insertString(cursor, " ", false);
+            OOTextIntoOO.write(doc, cursor, ooText);
+            for (BibEntry entry : entries) {
+                CSLReferenceMark mark = markManager.createReferenceMark(entry);
+                OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
+                mark.insertReferenceIntoOO(doc, cursor, emptyOOText, false, false, true);
+            }
+            cursor.getText().insertString(cursor, " ", false);
         }
 
         // Move the cursor to the end of the inserted text
@@ -131,7 +136,7 @@ public class CSLCitationOOAdapter {
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
         // Insert the citation text wrapped in a reference mark
-        mark.insertReferenceIntoOO(doc, cursor, ooText);
+        mark.insertReferenceIntoOO(doc, cursor, ooText, false, false, true);
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
