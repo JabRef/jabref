@@ -1,6 +1,8 @@
 package org.jabref.logic.ai.summarization;
 
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,6 +67,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
     private int workDone = 0;
     private int workMax = 0;
+    private Instant oneWorkTimeStart = Instant.now();
 
     public GenerateSummaryTask(BibDatabaseContext bibDatabaseContext,
                                String citationKey,
@@ -77,7 +80,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
         this.aiService = aiService;
         this.filePreferences = filePreferences;
 
-        titleProperty().set(Localization.lang("Generating summary for %0...", citationKey));
+        titleProperty().set(Localization.lang("Waiting summary for %0...", citationKey));
         showToUser(true);
     }
 
@@ -242,6 +245,22 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
     }
 
     private void updateProgress() {
+        Instant oneWorkTimeEnd = Instant.now();
+        Duration duration = Duration.between(oneWorkTimeStart, oneWorkTimeEnd);
+        oneWorkTimeStart = oneWorkTimeEnd;
+
+        Duration eta = duration.multipliedBy(workMax - workDone);
+
+        updateProgress(workDone, workMax);
+
+        if (eta.getSeconds() < 60) {
+            updateMessage(Localization.lang("Estimated time left: %0 seconds", eta.getSeconds()));
+        } else if (eta.getSeconds() % 60 == 0) {
+            updateMessage(Localization.lang("Estimated time left: %0 minutes", eta.getSeconds() / 60));
+        } else {
+            updateMessage(Localization.lang("Estimated time left: %0 minutes, %1 seconds", eta.getSeconds() / 60, eta.getSeconds() % 60));
+        }
+
         updateProgress(workDone, workMax);
     }
 

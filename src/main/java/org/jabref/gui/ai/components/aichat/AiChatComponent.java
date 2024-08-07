@@ -20,6 +20,7 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.ExpandingTextArea;
+import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
 
     private final AiChatLogic aiChatLogic;
+    private final String citationKey;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
@@ -38,8 +40,9 @@ public class AiChatComponent extends VBox {
     @FXML private Button submitButton;
     @FXML private StackPane stackPane;
 
-    public AiChatComponent(AiChatLogic aiChatLogic, DialogService dialogService, TaskExecutor taskExecutor) {
+    public AiChatComponent(AiChatLogic aiChatLogic, String citationKey, DialogService dialogService, TaskExecutor taskExecutor) {
         this.aiChatLogic = aiChatLogic;
+        this.citationKey = citationKey;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
@@ -82,23 +85,29 @@ public class AiChatComponent extends VBox {
             addMessage(userMessage);
             setLoading(true);
 
-            BackgroundTask.wrap(() -> aiChatLogic.execute(userMessage))
-                          .onSuccess(aiMessage -> {
-                              setLoading(false);
-                              addMessage(aiMessage);
-                              requestUserPromptTextFieldFocus();
-                          })
-                          .onFailure(e -> {
-                              LOGGER.error("Got an error while sending a message to AI", e);
-                              setLoading(false);
+            BackgroundTask<AiMessage> task =
+                    BackgroundTask
+                            .wrap(() -> aiChatLogic.execute(userMessage))
+                            .showToUser(true)
+                            .onSuccess(aiMessage -> {
+                                setLoading(false);
+                                addMessage(aiMessage);
+                                requestUserPromptTextFieldFocus();
+                            })
+                            .onFailure(e -> {
+                                LOGGER.error("Got an error while sending a message to AI", e);
+                                setLoading(false);
 
-                              if (e.getMessage().equals("401 - null") || e.getMessage().equals("404 - null")) {
-                                  addError(Localization.lang("API base URL setting appears to be incorrect. Please check it in AI expert settings."));
-                              } else {
-                                  addError(e.getMessage());
-                              }
-                          })
-                          .executeWith(taskExecutor);
+                                if (e.getMessage().equals("401 - null") || e.getMessage().equals("404 - null")) {
+                                    addError(Localization.lang("API base URL setting appears to be incorrect. Please check it in AI expert settings."));
+                                } else {
+                                    addError(e.getMessage());
+                                }
+                            });
+
+            task.titleProperty().set(Localization.lang("Waiting for AI reply for %0...", citationKey));
+
+            task.executeWith(taskExecutor);
         }
     }
 

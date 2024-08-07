@@ -220,9 +220,14 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void bindToCorrectEntry(BibEntry entry) {
+        assert entry.getCitationKey().isPresent();
+
         AiChatHistory aiChatHistory = getAiChatHistory(aiService, entry, bibDatabaseContext);
+
         AiChatLogic aiChatLogic = AiChatLogic.forBibEntry(aiService, aiChatHistory, entry);
-        Node content = new AiChatComponent(aiChatLogic, dialogService, taskExecutor);
+
+        Node content = new AiChatComponent(aiChatLogic, entry.getCitationKey().get(), dialogService, taskExecutor);
+
         setContent(content);
     }
 
@@ -236,7 +241,7 @@ public class AiChatTab extends EntryEditorTab {
             LOGGER.warn("AI chat is constructed, but the entry citation key is empty. Cannot store chat history");
             return new InMemoryAiChatHistory();
         } else {
-            return aiService.getChatHistoryManager().getChatHistory(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
+            return aiService.getChatHistoryManager().getChatHistory(databasePath.get(), entry.getCitationKey().get());
         }
     }
 

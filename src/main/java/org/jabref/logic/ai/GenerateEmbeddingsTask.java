@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +35,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
     private final IntegerProperty workDone = new SimpleIntegerProperty(0);
     private final IntegerProperty workMax = new SimpleIntegerProperty(0);
+    private Instant oneWorkTimeStart = Instant.now();
 
     public GenerateEmbeddingsTask(String citationKey,
                                   List<LinkedFile> linkedFiles,
@@ -121,6 +124,20 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     }
 
     private void updateProgress() {
+        Instant oneWorkTimeEnd = Instant.now();
+        Duration duration = Duration.between(oneWorkTimeStart, oneWorkTimeEnd);
+        oneWorkTimeStart = oneWorkTimeEnd;
+
+        Duration eta = duration.multipliedBy(workMax.get() - workDone.get());
+
         updateProgress(workDone.get(), workMax.get());
+
+        if (eta.getSeconds() < 60) {
+            updateMessage(Localization.lang("Estimated time left: %0 seconds", eta.getSeconds()));
+        } else if (eta.getSeconds() % 60 == 0) {
+            updateMessage(Localization.lang("Estimated time left: %0 minutes", eta.getSeconds() / 60));
+        } else {
+            updateMessage(Localization.lang("Estimated time left: %0 minutes, %1 seconds", eta.getSeconds() / 60, eta.getSeconds() % 60));
+        }
     }
 }
