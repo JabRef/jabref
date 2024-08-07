@@ -31,11 +31,12 @@ Then, everything is removed.
 
 ## Available VMs
 
-| VM                    | JabRef | Browser | LibreOffice |
-|-----------------------|--------|---------|-------------|
-| [`fedora`](fedora/)   | source | --      | --          |
-| [`ubuntu`](ubuntu/)   | snap   | Firefox | yes         |
-| [`windows`](windows/) | source | Firefox | yes         |
+| VM                                              | JabRef  | Browser | LibreOffice |
+|-------------------------------------------------|---------|---------|-------------|
+| [`fedora`](fedora/)                             | source  | --      | --          |
+| [`Linux Mint (Cinnamon)`](linux-mint-cinnamon/) | source  | Firefox | yes         |
+| [`ubuntu`](ubuntu/)                             | snap    | Firefox | yes         |
+| [`windows`](windows/)                           | source  | Edge    | --          |
 
 ## Troubleshooting
 

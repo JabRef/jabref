@@ -268,20 +268,20 @@
 
     /* region: maintable base colors **/
 
-    -jr-match-1: -jr-row-odd-background;
+    -jr-match-1-odd: -jr-row-odd-background;
     -jr-match-1-even: -jr-row-even-background;
     -jr-match-1-text-color: -fx-mid-text-color;
 
-    -jr-match-2: derive(-jr-theme, 100%);
-    -jr-match-2-even: derive(-jr-match-2, 10%);
+    -jr-match-2-odd: derive(-jr-theme, 100%);
+    -jr-match-2-even: derive(-jr-match-2-odd, 10%);
     -jr-match-2-text-color: -fx-mid-text-color;
 
-    -jr-match-3: derive(-jr-theme, 50%);
-    -jr-match-3-even: derive(-jr-match-3, 10%);
+    -jr-match-3-odd: derive(-jr-theme, 50%);
+    -jr-match-3-even: derive(-jr-match-3-odd, 10%);
     -jr-match-3-text-color: derive(-jr-accent, 30%);
 
-    -jr-match-4: -jr-theme;
-    -jr-match-4-even: derive(-jr-match-4, 10%);
+    -jr-match-4-odd: -jr-theme;
+    -jr-match-4-even: derive(-jr-match-4-odd, 10%);
     -jr-match-4-text-color: -jr-accent;
 
     -jr-maintable-focused-hover-text: -jr-white;
