@@ -32,6 +32,7 @@ import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.search.MatchCategory;
+import org.jabref.gui.search.SearchType;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -52,7 +53,6 @@ import org.slf4j.LoggerFactory;
 public class MainTableColumnFactory {
 
     public static final String STYLE_ICON_COLUMN = "column-icon";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
     private final PreferencesService preferencesService;
@@ -87,6 +87,9 @@ public class MainTableColumnFactory {
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
+            case SCORE:
+                returnColumn = createScoreColumn(column);
+                break;
             case INDEX:
                 returnColumn = createIndexColumn(column);
                 break;
@@ -156,6 +159,21 @@ public class MainTableColumnFactory {
         column.setSortable(true);
         column.setSortType(TableColumn.SortType.ASCENDING);
         column.setVisible(false);
+        return column;
+    }
+
+    private TableColumn<BibEntryTableViewModel, Float> createScoreColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, Float> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Score"));
+        header.getStyleClass().add("mainTable-header");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SCORE.getDisplayName()));
+        column.setGraphic(header);
+        column.setStyle("-fx-alignment: CENTER-RIGHT;");
+        column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().searchScoreProperty().getValue()));
+        new ValueTableCellFactory<BibEntryTableViewModel, Float>().withText(String::valueOf).install(column);
+        column.setSortable(true);
+        column.setReorderable(false);
+        column.visibleProperty().bind(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).isPresent());
         return column;
     }
 

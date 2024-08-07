@@ -124,7 +124,7 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -287,7 +287,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
-    public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String SEARCH_FULLTEXT = "fulltextSearch";
     public static final String SEARCH_KEEP_SEARCH_STRING = "keepSearchString";
@@ -541,7 +540,6 @@ public class JabRefPreferences implements PreferencesService {
         // will never be translated.
         Localization.setLanguage(getLanguage());
 
-        defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
         defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);
@@ -655,8 +653,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
 
-        defaults.put(COLUMN_NAMES, "groups;group_icons;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
-        defaults.put(COLUMN_WIDTHS, "28;40;28;28;75;300;470;60;130;50;50;50");
+        defaults.put(COLUMN_NAMES, "search_score;groups;group_icons;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
+        defaults.put(COLUMN_WIDTHS, "50;28;40;28;28;75;300;470;60;130;50;50;50");
 
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
@@ -2738,7 +2736,6 @@ public class JabRefPreferences implements PreferencesService {
 
         searchPreferences = new SearchPreferences(
                 getBoolean(SEARCH_DISPLAY_MODE) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,
-                getBoolean(SEARCH_CASE_SENSITIVE),
                 getBoolean(SEARCH_REG_EXP),
                 getBoolean(SEARCH_FULLTEXT),
                 getBoolean(SEARCH_KEEP_SEARCH_STRING),
@@ -2747,10 +2744,9 @@ public class JabRefPreferences implements PreferencesService {
                 getDouble(SEARCH_WINDOW_WIDTH),
                 getDouble(SEARCH_WINDOW_DIVIDER_POS));
 
-        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchRules.SearchFlags>) c -> {
-            putBoolean(SEARCH_CASE_SENSITIVE, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.CASE_SENSITIVE));
-            putBoolean(SEARCH_REG_EXP, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.REGULAR_EXPRESSION));
-            putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT));
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) c -> {
+            putBoolean(SEARCH_REG_EXP, searchPreferences.getObservableSearchFlags().contains(SearchFlags.REGULAR_EXPRESSION));
+            putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT));
         });
         EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
         EasyBind.listen(searchPreferences.keepSearchStingProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));

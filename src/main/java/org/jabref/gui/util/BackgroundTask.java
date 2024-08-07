@@ -130,6 +130,11 @@ public abstract class BackgroundTask<V> {
         return title;
     }
 
+    public BackgroundTask<V> setTitle(String title) {
+        this.title.set(title);
+        return this;
+    }
+
     public double getWorkDonePercentage() {
         return workDonePercentage.get();
     }
@@ -159,8 +164,9 @@ public abstract class BackgroundTask<V> {
         return willBeRecoveredAutomatically.get();
     }
 
-    public void willBeRecoveredAutomatically(boolean willBeRecoveredAutomatically) {
+    public BackgroundTask<V> willBeRecoveredAutomatically(boolean willBeRecoveredAutomatically) {
         this.willBeRecoveredAutomatically.set(willBeRecoveredAutomatically);
+        return this;
     }
 
     /**
@@ -203,7 +209,7 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
-    public Future<?> executeWith(TaskExecutor taskExecutor) {
+    public Future<V> executeWith(TaskExecutor taskExecutor) {
         return taskExecutor.execute(this);
     }
 
@@ -277,7 +283,7 @@ public abstract class BackgroundTask<V> {
         progress.setValue(newProgress);
     }
 
-    protected void updateProgress(double workDone, double max) {
+    public void updateProgress(double workDone, double max) {
         updateProgress(new BackgroundProgress(workDone, max));
     }
 

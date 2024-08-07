@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.search.MatchCategory;
@@ -22,10 +23,12 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FilteredListProxy;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.SearchResults;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
@@ -35,6 +38,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 
 public class MainTableDataModel {
+
     private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
@@ -43,6 +47,8 @@ public class MainTableDataModel {
     private final SearchPreferences searchPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
+    private final StateManager stateManager;
+    private final LuceneManager luceneManager;
     private final TaskExecutor taskExecutor;
     private final Subscription searchQuerySubscription;
     private final Subscription searchDisplayModeSubscription;
@@ -53,6 +59,8 @@ public class MainTableDataModel {
     public MainTableDataModel(BibDatabaseContext context,
                               PreferencesService preferencesService,
                               TaskExecutor taskExecutor,
+                              StateManager stateManager,
+                              LuceneManager luceneManager,
                               ListProperty<GroupTreeNode> selectedGroupsProperty,
                               OptionalObjectProperty<SearchQuery> searchQueryProperty,
                               IntegerProperty resultSizeProperty) {
@@ -60,6 +68,8 @@ public class MainTableDataModel {
         this.searchPreferences = preferencesService.getSearchPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
         this.taskExecutor = taskExecutor;
+        this.stateManager = stateManager;
+        this.luceneManager = luceneManager;
         this.bibDatabaseContext = context;
         this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
 
@@ -74,7 +84,7 @@ public class MainTableDataModel {
                 if (change.wasAdded() || change.wasUpdated()) {
                     BackgroundTask.wrap(() -> {
                         for (BibEntryTableViewModel entry : change.getList().subList(change.getFrom(), change.getTo())) {
-                            updateEntrySearchMatch(searchQueryProperty.get(), entry, searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT);
+                            // updateEntrySearchMatch(searchQueryProperty.get(), entry, searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT);
                             updateEntryGroupMatch(entry, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
                         }
                     }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered, change.getFrom(), change.getTo())).executeWith(taskExecutor);
@@ -95,12 +105,25 @@ public class MainTableDataModel {
     private void updateSearchMatches(Optional<SearchQuery> query) {
         BackgroundTask.wrap(() -> {
             boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
-            entriesViewModel.forEach(entry -> updateEntrySearchMatch(query, entry, isFloatingMode));
+            if (query.isPresent()) {
+                SearchResults results = luceneManager.search(query.get());
+                stateManager.getSearchResults().put(bibDatabaseContext.getUid(), results);
+                entriesViewModel.forEach(entry -> {
+                    entry.searchScoreProperty().set(results.getSearchScoreForEntry(entry.getEntry()));
+                    entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));
+                    updateEntrySearchMatch(entry, entry.searchScoreProperty().get() > 0, isFloatingMode);
+                });
+            } else {
+                entriesViewModel.forEach(entry -> {
+                    entry.searchScoreProperty().set(0);
+                    entry.hasFullTextResultsProperty().set(false);
+                    updateEntrySearchMatch(entry, true, isFloatingMode);
+                });
+            }
         }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
     }
 
-    private static void updateEntrySearchMatch(Optional<SearchQuery> query, BibEntryTableViewModel entry, boolean isFloatingMode) {
-        boolean isMatched = query.map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
+    private static void updateEntrySearchMatch(BibEntryTableViewModel entry, boolean isMatched, boolean isFloatingMode) {
         entry.isMatchedBySearch().set(isMatched);
         entry.updateMatchCategory();
         setEntrySearchVisibility(entry, isMatched, isFloatingMode);

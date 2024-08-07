@@ -25,10 +25,11 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.SearchResults;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -60,6 +61,7 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final IntegerProperty searchResultSize = new SimpleIntegerProperty(0);
     private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);
+    private final ObservableMap<String, SearchResults> searchResults = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Pair<BackgroundTask<?>, Task<?>>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.map(Pair::getValue).anyMatch(Task::isRunning));
@@ -175,6 +177,21 @@ public class StateManager {
 
     public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
         lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);
+    }
+
+    public ObservableMap<String, SearchResults> getSearchResults() {
+        return searchResults;
+    }
+
+    public Optional<SearchResults> getSearchResults(BibDatabaseContext databaseContext) {
+        return Optional.ofNullable(searchResults.get(databaseContext.getUid()));
+    }
+
+    public int getSearchResultsCount() {
+        return activeDatabase.get()
+                             .flatMap(this::getSearchResults)
+                             .map(SearchResults::getNumberOfResults)
+                             .orElse(0);
     }
 
     public List<String> collectAllDatabasePaths() {

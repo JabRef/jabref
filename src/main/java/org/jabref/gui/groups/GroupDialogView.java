@@ -44,8 +44,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -89,7 +88,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private CheckBox keywordGroupRegex;
 
     @FXML private TextField searchGroupSearchTerm;
-    @FXML private CheckBox searchGroupCaseSensitive;
     @FXML private CheckBox searchGroupRegex;
 
     @FXML private RadioButton autoGroupKeywordsOption;
@@ -207,23 +205,13 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         keywordGroupRegex.selectedProperty().bindBidirectional(viewModel.keywordGroupRegexProperty());
 
         searchGroupSearchTerm.textProperty().bindBidirectional(viewModel.searchGroupSearchTermProperty());
-        searchGroupCaseSensitive.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.CASE_SENSITIVE));
-        searchGroupCaseSensitive.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            EnumSet<SearchFlags> searchFlags = viewModel.searchFlagsProperty().get();
-            if (newValue) {
-                searchFlags.add(SearchRules.SearchFlags.CASE_SENSITIVE);
-            } else {
-                searchFlags.remove(SearchRules.SearchFlags.CASE_SENSITIVE);
-            }
-            viewModel.searchFlagsProperty().set(searchFlags);
-        });
         searchGroupRegex.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.REGULAR_EXPRESSION));
         searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> {
             EnumSet<SearchFlags> searchFlags = viewModel.searchFlagsProperty().get();
             if (newValue) {
-                searchFlags.add(SearchRules.SearchFlags.REGULAR_EXPRESSION);
+                searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
             } else {
-                searchFlags.remove(SearchRules.SearchFlags.REGULAR_EXPRESSION);
+                searchFlags.remove(SearchFlags.REGULAR_EXPRESSION);
             }
             viewModel.searchFlagsProperty().set(searchFlags);
         });

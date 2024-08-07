@@ -20,7 +20,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.ExportPreferences;
@@ -51,7 +51,7 @@ class ArgumentProcessorTest {
         when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferencesService.getSearchPreferences()).thenReturn(new SearchPreferences(
                 SearchDisplayMode.FILTER,
-                EnumSet.noneOf(SearchRules.SearchFlags.class),
+                EnumSet.noneOf(SearchFlags.class),
                 false,
                 false,
                 0,

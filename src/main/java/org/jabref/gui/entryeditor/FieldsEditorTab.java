@@ -36,7 +36,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -62,9 +62,9 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final StateManager stateManager;
-    private final IndexingTaskManager indexingTaskManager;
     private PreviewPanel previewPanel;
     private final UndoManager undoManager;
+    private final LuceneManager luceneManager;
     private Collection<Field> fields = new ArrayList<>();
     private Subscription dividerPositionSubscription;
 
@@ -80,7 +80,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                            ThemeManager themeManager,
                            TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository,
-                           IndexingTaskManager indexingTaskManager) {
+                           LuceneManager luceneManager) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
@@ -93,7 +93,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.stateManager = stateManager;
-        this.indexingTaskManager = indexingTaskManager;
+        this.luceneManager = luceneManager;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -263,8 +263,8 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                     preferences,
                     stateManager,
                     themeManager,
-                    indexingTaskManager,
-                    taskExecutor);
+                    taskExecutor,
+                    luceneManager);
             EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
                 if (show) {
                     container.getItems().remove(previewPanel);

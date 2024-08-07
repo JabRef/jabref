@@ -102,10 +102,9 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         if (this == o) {
             return true;
         }
-        if (!(o instanceof WordKeywordGroup)) {
+        if (!(o instanceof WordKeywordGroup other)) {
             return false;
         }
-        WordKeywordGroup other = (WordKeywordGroup) o;
         return Objects.equals(getName(), other.getName())
                 && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
                 && Objects.equals(searchField, other.searchField)
