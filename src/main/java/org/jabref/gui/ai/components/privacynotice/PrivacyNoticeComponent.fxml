@@ -17,12 +17,12 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%JabRef uses AI providers to enable AI functionality (chatting with attached files and summarization). AI provider is an external service. To enable processing of attached files, their contents need to be shared with the currently selected AI provider.">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). AI provider is an external service. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider.">
                <font>
                   <Font size="14.0" />
                </font>
             </Text>
-            <Text layoutX="20.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%As soon as you ask a question, the text content of all PDFs attached to the entry are send to external service.">
+            <Text layoutX="20.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%As soon as you ask a question, the text content of all PDFs attached to the entry are sent to external service.">
                <font>
                   <Font size="14.0" />
                </font>

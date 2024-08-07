@@ -124,7 +124,7 @@ public class AiChatTab extends EntryEditorTab {
         setContent(
                 ErrorStateComponent.withSpinner(
                         Localization.lang("Processing..."),
-                        Localization.lang("The embeddings of the file are currently being generated. Please wait, and at the end you will be able to chat.")
+                        Localization.lang("The embeddings of the file(s) are currently being generated. Please wait, and at the end you will be able to chat.")
                 )
         );
     }
@@ -142,7 +142,7 @@ public class AiChatTab extends EntryEditorTab {
         setContent(
                 new ErrorStateComponent(
                         Localization.lang("Unable to chat"),
-                        Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")
+                        Localization.lang("Please attach at least one PDF file to enable chatting with PDF file(s).")
                 )
         );
     }
@@ -176,7 +176,7 @@ public class AiChatTab extends EntryEditorTab {
         setContent(
                 ErrorStateComponent.withSpinner(
                         Localization.lang("Downloading..."),
-                        Localization.lang("Downloading embedding model... Afterwards, you will be able to chat with your files.")
+                        Localization.lang("Downloading embedding model... Afterward, you will be able to chat with your files.")
                 )
         );
     }
