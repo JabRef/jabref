@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
@@ -68,9 +71,7 @@ public class CSLCitationOOAdapter {
 //        }
     }
 
-    public void insertInText(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws Exception {
-
+    public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager) throws Exception {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
 
@@ -84,37 +85,66 @@ public class CSLCitationOOAdapter {
         }
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-
-        // Insert the citation text with multiple reference marks
         insertMultipleReferenceMarks(document, cursor, entries, ooText);
-
-        // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
     }
 
+    /**
+     * Inserts the in-text citation for a group of entries.
+     * Comparable to LaTeX's \citet command.
+     *
+     * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager)} method.insertInText method
+     */
+    public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+            throws Exception {
+        String style = selectedStyle.getSource();
+        isNumericStyle = selectedStyle.isNumericStyle();
+
+        Iterator<BibEntry> iterator = entries.iterator();
+        while (iterator.hasNext()) {
+            BibEntry currentEntry = iterator.next();
+            String inTextCitation = CitationStyleGenerator.generateInText(List.of(currentEntry), style, format, bibDatabaseContext, bibEntryTypesManager).getText();
+            String formattedCitation = transformHtml(inTextCitation);
+            if (isNumericStyle) {
+                formattedCitation = updateMultipleCitations(formattedCitation, List.of(currentEntry));
+            }
+            String prefix = currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
+                                        .map(authors -> AuthorList.parse(authors))
+                                        .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al.") + " ")
+                                        .orElse("");
+            String finalText = prefix + formattedCitation;
+            if (iterator.hasNext()) {
+                finalText += ",";
+                // The next space is inserted somehow magically by other routines. Therefore, we do not add a space here.
+            }
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
+            insertMultipleReferenceMarks(document, cursor, List.of(currentEntry), ooText);
+            cursor.collapseToEnd();
+        }
+    }
+
     private void insertMultipleReferenceMarks(XTextDocument doc, XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception {
-        // Check if there's already a space before the cursor
-        boolean spaceExists = false;
+        boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
 
         // Check if we're at the start of the document - if yes we set the flag and don't insert a space
         if (!checkCursor.goLeft((short) 1, true)) {
             // We're at the start of the document
-            spaceExists = true;
+            preceedingSpaceExists = true;
         } else {
-            // If not at the start of document, check if there's a space before
-            spaceExists = checkCursor.getString().equals(" ");
+            // If not at the start of document, check if there is a space before
+            preceedingSpaceExists = checkCursor.getString().equals(" ");
             // If not a space, check if it's a paragraph break
-            if (!spaceExists) {
-                spaceExists = checkCursor.getString().matches("\\R");
+            if (!preceedingSpaceExists) {
+                preceedingSpaceExists = checkCursor.getString().matches("\\R");
             }
         }
 
         if (entries.size() == 1) {
             CSLReferenceMark mark = markManager.createReferenceMark(entries.getFirst());
-            mark.insertReferenceIntoOO(doc, cursor, ooText, !spaceExists, true, true);
+            mark.insertReferenceIntoOO(doc, cursor, ooText, !preceedingSpaceExists, false, true);
         } else {
-            if (!spaceExists) {
+            if (!preceedingSpaceExists) {
                 cursor.getText().insertString(cursor, " ", false);
             }
             OOTextIntoOO.write(doc, cursor, ooText);
@@ -123,13 +153,15 @@ public class CSLCitationOOAdapter {
                 OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
                 mark.insertReferenceIntoOO(doc, cursor, emptyOOText, false, false, true);
             }
-            cursor.getText().insertString(cursor, " ", false);
         }
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
     }
 
+    /**
+     * Transforms the numbers in the citation to globally-unique numbers
+     */
     private String updateMultipleCitations(String citation, List<BibEntry> entries) {
         Pattern pattern = Pattern.compile("(\\D*)(\\d+)(\\D*)");
         Matcher matcher = pattern.matcher(citation);
