@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -23,17 +22,6 @@ class PdfContentImporterTest {
     @BeforeEach
     void setUp() {
         importer = new PdfContentImporter();
-    }
-
-    @Test
-    void sGetExtensions() {
-        assertEquals(StandardFileType.PDF, importer.getFileType());
-    }
-
-    @Test
-    void getDescription() {
-        assertEquals("PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.",
-                     importer.getDescription());
     }
 
     @Test

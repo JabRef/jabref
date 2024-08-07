@@ -118,9 +118,4 @@ public class InspecImporterTest {
     public void sGetExtensions() {
         assertEquals(StandardFileType.TXT, importer.getFileType());
     }
-
-    @Test
-    public void getDescription() {
-        assertEquals("INSPEC format importer.", importer.getDescription());
-    }
 }

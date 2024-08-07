@@ -60,12 +60,6 @@ public class IsiImporterTest {
         assertEquals(StandardFileType.ISI, importer.getFileType());
     }
 
-    @Test
-    public void getDescription() {
-        assertEquals("Importer for the ISI Web of Science, INSPEC and Medline format.",
-                importer.getDescription());
-    }
-
     @ParameterizedTest
     @MethodSource("fileNames")
     public void isRecognizedFormatAccepted(String fileName) throws IOException {

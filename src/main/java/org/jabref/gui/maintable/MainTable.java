@@ -56,6 +56,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -84,6 +85,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final BibEntryTypesManager entryTypesManager;
     private final TaskExecutor taskExecutor;
     private final UndoManager undoManager;
+    private final FilePreferences filePreferences;
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
@@ -110,6 +112,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
         this.undoManager = libraryTab.getUndoManager();
+        this.filePreferences = preferencesService.getFilePreferences();
+
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
         importHandler = new ImportHandler(
@@ -492,8 +496,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // Center -> link files to entry
             // Depending on the pressed modifier, move/copy/link files to drop target
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
-                case TOP, BOTTOM ->
-                        importHandler.importFilesInBackground(files).executeWith(taskExecutor);
+                case TOP, BOTTOM -> importHandler.importFilesInBackground(files, database, filePreferences).executeWith(taskExecutor);
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {
@@ -524,9 +527,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         boolean success = false;
 
         if (event.getDragboard().hasFiles()) {
-            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-            importHandler.importFilesInBackground(files).executeWith(taskExecutor);
-
+            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).toList();
+            importHandler.importFilesInBackground(files, this.database, filePreferences).executeWith(taskExecutor);
             success = true;
         }
 

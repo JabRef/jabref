@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Last updated: 2023-08-24
+Last updated: 2024-08-06
 
 Your privacy is a fundamental right JabRef e.V. respects and supports.
 By using JabRef and its related online services, you choose to share some of your personal information.
@@ -58,6 +58,7 @@ These third-party services are the following:
 | [IACR](https://www.iacr.org/)                                                                                                | <https://www.iacr.org/privacy.html> |
 | [IEEEXplore](https://ieeexplore.ieee.org/Xplore/home.jsp)                                                                    | <https://www.ieee.org/security-privacy.html> |
 | [INSPIRE](https://inspirehep.net/)                                                                                           | <https://cern.service-now.com/service-portal?id=privacy_policy&se=INSPIRE-Online&notice=main> |
+| [ISIDORE](https://isidore.science/)                                                                                          | <https://isidore.science/credit> |
 | [JSTOR](https://www.jstor.org/)                                                                                              | <https://www.ithaka.org/privacypolicy/> |
 | [Library of Congress](https://lccn.loc.gov/)                                                                                 | <https://www.loc.gov/legal/> |
 | [National Library of Medicine](https://www.ncbi.nlm.nih.gov/)                                                                | <https://www.nlm.nih.gov/web_policies.html> |
@@ -73,9 +74,8 @@ These third-party services are the following:
 | [The SAO/NASA Astrophysics Data System](https://ui.adsabs.harvard.edu/)                                                      | <https://ui.adsabs.harvard.edu/help/privacy/> |
 | [Unpaywall](https://unpaywall.org/)                                                                                          | <https://unpaywall.org/legal/privacy> |
 | [zbMATH Open](https://www.zbmath.org)                                                                                        | <https://zbmath.org/privacy-policy/> |
-| [ISIDORE](https://isidore.science/)                                                                                          | <https://isidore.science/credit> |
 
-[1]: *Note: The Mr. DLib service is used for the related articles tab in the entry editor and collects also your language, your browser and operating system (by default*disabled*).*
+[1]: *Note: The Mr. DLib service is used for the related articles tab in the entry editor and collects also your language, your browser and operating system (*disabled* by default).*
 
 ## JabRef Browser Extension
 
