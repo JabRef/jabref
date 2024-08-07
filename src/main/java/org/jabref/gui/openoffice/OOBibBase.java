@@ -938,7 +938,7 @@ public class OOBibBase {
                     BibDatabase bibDatabase = new BibDatabase(citedEntries);
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
 
-                    CSLUpdateBibliography.rebuildCSLBibliography(doc, adapter, citedEntries, citationStyle, Injector.instantiateModelOrService(BibDatabaseContext.class), Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                    CSLUpdateBibliography.rebuildCSLBibliography(doc, adapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
 //                    // Create a new cursor at the end of the document for bibliography insertion
 //                    XTextCursor bibliographyCursor = doc.getText().createTextCursor();

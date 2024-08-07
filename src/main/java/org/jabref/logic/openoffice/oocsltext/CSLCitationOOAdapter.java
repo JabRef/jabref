@@ -49,6 +49,14 @@ public class CSLCitationOOAdapter {
             String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, bibDatabaseContext, bibEntryTypesManager).getFirst();
             System.out.println(citation);
             writeCitation(document, cursor, entry, citation);
+
+            if (isNumericStyle) {
+                // Select the paragraph break
+                cursor.goLeft((short) 1, true);
+
+                // Delete the selected content (paragraph break)
+                cursor.setString("");
+            }
         }
         // List<String> citations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, bibEntryTypesManager);
 
