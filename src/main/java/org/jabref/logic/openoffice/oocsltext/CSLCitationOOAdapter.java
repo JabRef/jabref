@@ -96,11 +96,12 @@ public class CSLCitationOOAdapter {
         boolean spaceExists = false;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
 
-        // Check if we're at the start of the document or if there's a space before
+        // Check if we're at the start of the document - if yes we set the flag and don't insert a space
         if (!checkCursor.goLeft((short) 1, true)) {
             // We're at the start of the document
             spaceExists = true;
         } else {
+            // If not at the start of document, check if there's a space before
             spaceExists = checkCursor.getString().equals(" ");
             // If not a space, check if it's a paragraph break
             if (!spaceExists) {
