@@ -8,7 +8,8 @@ nav_order: 12
 
 ## Ensure that JDK 21 is available to IntelliJ
 
-Ensure you have a Java 21 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.
+Ensure you have a Java 21 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.<br>
+**Note:** In some MacBooks, `Project Structure` can be found at the "IntelliJ" button of the app menu instead of at "File".
 
 {% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 21 is missing." %}
 ![Plattform Settings - SDKs](intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
@@ -193,3 +194,5 @@ A right-click on "BibEntryTests" enables the debugger to start.
 {% figure caption:"Run window for the BibEntry test case" %}
 ![Run window for the BibEntry test case](guidelines-intellij-tests-are-green.png)
 {% endfigure %}
+
+<!-- markdownlint-disable-file MD033 -->

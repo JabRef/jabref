@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -38,8 +39,7 @@ public class BiblioscapeImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Imports a Biblioscape Tag File.\n" +
-                "Several Biblioscape field types are ignored. Others are only included in the BibTeX field \"comment\".";
+        return Localization.lang("Imports a Biblioscape Tag File.\nSeveral Biblioscape field types are ignored. Others are only included in the BibTeX field \"comment\".");
     }
 
     @Override

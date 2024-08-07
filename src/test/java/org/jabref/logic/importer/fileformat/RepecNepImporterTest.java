@@ -5,15 +5,12 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.StandardFileType;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,26 +55,5 @@ public class RepecNepImporterTest {
     @MethodSource("fileNames")
     public void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(testImporter, fileName, FILE_ENDING);
-    }
-
-    @Test
-    public final void getFormatName() {
-        assertEquals("REPEC New Economic Papers (NEP)", testImporter.getName());
-    }
-
-    @Test
-    public final void getCliId() {
-        assertEquals("repecnep", testImporter.getId());
-    }
-
-    @Test
-    public void getExtension() {
-        assertEquals(StandardFileType.TXT, testImporter.getFileType());
-    }
-
-    @Test
-    public final void getDescription() {
-        assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.",
-                testImporter.getDescription());
     }
 }

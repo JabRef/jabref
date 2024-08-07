@@ -1,4 +1,3 @@
-
 .root {
     -jr-row-odd-background: -fx-control-inner-background-alt;
     -jr-row-even-background: -fx-control-inner-background;
@@ -14,13 +13,17 @@
     work nicely with this base color
     */
 
-    /* This theme is the original JabRef dark blue color */
+    /* original JabRef dark blue color */
     -jr-theme: #50618F;
+
     -jr-accent: #a3b7e6;
     -jr-transparent-accent: rgba(163, 183, 230, 0.16);
-    -jr-selected: -jr-accent;
     -jr-checked: -jr-theme;
+
+    -jr-selected: -jr-accent;
+
     -jr-hover: #0002;
+    -jr-hover-text: -fx-focused-text-base-color;
 
     /* The base gray. Most gray-tones in the application are derived from this color. */
     -jr-base: #ebebeb;
@@ -259,29 +262,23 @@
 
     /* region: maintable base colors **/
 
-    -jr-match-1: -jr-white;
-    -jr-match-1-even: -jr-base;
+    -jr-match-1-odd: -jr-row-odd-background;
+    -jr-match-1-even: -jr-row-even-background;
     -jr-match-1-text-color: -fx-mid-text-color;
-    -jr-match-1-hover: -jr-hover;
-    -jr-match-1-text-color-hover: -fx-mid-text-color;
 
-    -jr-match-2: derive(-jr-theme, 100%);
-    -jr-match-2-even: derive(-jr-match-2, 10%);
+    -jr-match-2-odd: derive(-jr-theme, 100%);
+    -jr-match-2-even: derive(-jr-match-2-odd, 10%);
     -jr-match-2-text-color: -fx-mid-text-color;
-    -jr-match-2-hover: -jr-hover;
-    -jr-match-2-text-color-hover: -fx-mid-text-color;
 
-    -jr-match-3: derive(-jr-theme, 50%);
-    -jr-match-3-even: derive(-jr-match-3, 10%);
+    -jr-match-3-odd: derive(-jr-theme, 50%);
+    -jr-match-3-even: derive(-jr-match-3-odd, 10%);
     -jr-match-3-text-color: derive(-jr-accent, 30%);
-    -jr-match-3-hover: -jr-hover;
-    -jr-match-3-text-color-hover: -fx-mid-text-color;
 
-    -jr-match-4: -jr-theme;
-    -jr-match-4-even: derive(-jr-match-4, 10%);
+    -jr-match-4-odd: -jr-theme;
+    -jr-match-4-even: derive(-jr-match-4-odd, 10%);
     -jr-match-4-text-color: -jr-accent;
-    -jr-match-4-hover: -jr-hover;
-    -jr-match-4-text-color-hover: -fx-mid-text-color;
+
+    -jr-maintable-focused-hover-text: -jr-white;
 
     /* endregion */
 }
@@ -683,8 +680,8 @@ TextFlow > .tooltip-text-monospaced {
 .table-row-cell:hover:even,
 .tree-table-row-cell:hover {
     -fx-background-color: -jr-hover;
-    -fx-text-fill: -fx-focused-text-base-color;
-    -fx-fill: -fx-focused-text-base-color;
+    -fx-fill: -jr-hover-text;
+    -fx-text-fill: -jr-hover-text;
 }
 
 .tree-table-row-cell:selected > .tree-table-cell > .glyph-icon {
@@ -752,7 +749,9 @@ TextFlow > .tooltip-text-monospaced {
     -fx-table-cell-border-color: transparent;
 }
 
-/* Selected when control is not focused */
+/* Selected when control is not focused
+ * In the context of the MainTable: an element is focused at a double click. A single click "just" selects it.
+ */
 .list-cell:filled:selected,
 .tree-cell:filled:selected,
 .table-row-cell:filled:selected,

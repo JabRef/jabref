@@ -96,7 +96,7 @@ public class BibliographyFromPdfImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Reads the references from the 'References' section of a PDF file.";
+        return Localization.lang("Reads the references from the 'References' section of a PDF file.");
     }
 
     @Override

@@ -12,13 +12,17 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
+public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
+
+    private static final ButtonType ADD_BUTTON = new ButtonType(Localization.lang("Add"), ButtonType.OK.getButtonData());
+    private static final ButtonType EDIT_BUTTON = ButtonType.APPLY;
 
     @FXML private TextField link;
     @FXML private TextField description;
@@ -27,26 +31,40 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
 
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
-
     @Inject private PreferencesService preferences;
 
-    private LinkedFilesEditDialogViewModel viewModel;
-
+    private LinkedFileEditDialogViewModel viewModel;
     private final LinkedFile linkedFile;
 
-    public LinkedFileEditDialogView(LinkedFile linkedFile) {
-        this.linkedFile = linkedFile;
+    /**
+     * Constructor for adding a new LinkedFile.
+     */
+    public LinkedFileEditDialog() {
+        this.linkedFile = new LinkedFile("", "", StandardFileType.PDF);
+        initializeDialog(Localization.lang("Add file link"), ADD_BUTTON);
+    }
 
+    /**
+     * Constructor for editing an existing LinkedFile.
+     *
+     * @param linkedFile The linked file to be edited.
+     */
+    public LinkedFileEditDialog(LinkedFile linkedFile) {
+        this.linkedFile = linkedFile;
+        initializeDialog(Localization.lang("Edit file link"), EDIT_BUTTON);
+    }
+
+    private void initializeDialog(String title, ButtonType primaryButtonType) {
         ViewLoader.view(this)
                   .load()
                   .setAsContent(this.getDialogPane());
 
-        this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
+        this.setTitle(title);
         this.setResizable(false);
-        this.setTitle(Localization.lang("Edit file link"));
+        this.getDialogPane().getButtonTypes().setAll(ButtonType.CANCEL, primaryButtonType);
 
         this.setResultConverter(button -> {
-            if (button == ButtonType.APPLY) {
+            if (button == primaryButtonType) {
                 return viewModel.getNewLinkedFile();
             } else {
                 return null;
@@ -56,7 +74,8 @@ public class LinkedFileEditDialogView extends BaseDialog<LinkedFile> {
 
     @FXML
     private void initialize() {
-        viewModel = new LinkedFilesEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences.getFilePreferences());
+        viewModel = new LinkedFileEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences.getFilePreferences());
+
         fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
         new ViewModelListCellFactory<ExternalFileType>()
                 .withIcon(ExternalFileType::getIcon)
