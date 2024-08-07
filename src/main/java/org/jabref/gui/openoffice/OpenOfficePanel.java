@@ -214,6 +214,7 @@ public class OpenOfficePanel {
                              } else if (currentStyle instanceof CitationStyle cslStyle) {
                                  dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
                              }
+                             updateButtonAvailability();
                          });
         });
 
@@ -390,12 +391,13 @@ public class OpenOfficePanel {
         pushEntriesAdvanced.setDisable(!canCite);
 
         boolean canRefreshDocument = isConnectedToDocument && hasStyle;
+        boolean cslStyleSelected = preferencesService.getOpenOfficePreferences().getCurrentStyle() instanceof CitationStyle;
         update.setDisable(!canRefreshDocument);
-        merge.setDisable(!canRefreshDocument);
-        unmerge.setDisable(!canRefreshDocument);
-        manageCitations.setDisable(!canRefreshDocument);
+        merge.setDisable(!canRefreshDocument || cslStyleSelected);
+        unmerge.setDisable(!canRefreshDocument || cslStyleSelected);
+        manageCitations.setDisable(!canRefreshDocument || cslStyleSelected);
 
-        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase));
+        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
     }
 
     private void connect() {
