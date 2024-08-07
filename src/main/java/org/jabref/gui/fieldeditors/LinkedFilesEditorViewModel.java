@@ -174,15 +174,19 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         }
     }
 
-    private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
-        LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getFilePreferences());
+    public void addNewLinkedFile(LinkedFile linkedFile) {
         files.add(new LinkedFileViewModel(
-                newLinkedFile,
+                linkedFile,
                 entry,
                 databaseContext,
                 taskExecutor,
                 dialogService,
                 preferences));
+    }
+
+    private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
+        LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getFilePreferences());
+        addNewLinkedFile(newLinkedFile);
     }
 
     @Override

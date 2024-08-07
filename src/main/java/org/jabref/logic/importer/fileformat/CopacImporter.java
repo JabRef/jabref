@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -43,7 +44,7 @@ public class CopacImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Importer for COPAC format.";
+        return Localization.lang("Importer for COPAC format.");
     }
 
     @Override

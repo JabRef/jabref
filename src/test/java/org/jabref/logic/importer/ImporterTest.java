@@ -20,7 +20,6 @@ import org.jabref.logic.importer.fileformat.PdfContentImporter;
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
-import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -102,16 +101,15 @@ public class ImporterTest {
     }
 
     public static Stream<Importer> instancesToTest() {
-        // all classes implementing {@link Importer}
-        // sorted alphabetically
-
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-        // @formatter:off
         return Stream.of(
+                // all classes implementing {@link Importer}
+                // sorted alphabetically
                 new BiblioscapeImporter(),
                 new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()),
+                new CitaviXmlImporter(),
                 new CopacImporter(),
                 new EndnoteImporter(),
                 new InspecImporter(),
@@ -124,10 +122,7 @@ public class ImporterTest {
                 new PdfContentImporter(),
                 new PdfXmpImporter(xmpPreferences),
                 new RepecNepImporter(importFormatPreferences),
-                new RisImporter(),
-                new SilverPlatterImporter(),
-                new CitaviXmlImporter()
+                new RisImporter()
         );
-        // @formatter:on
     }
 }
