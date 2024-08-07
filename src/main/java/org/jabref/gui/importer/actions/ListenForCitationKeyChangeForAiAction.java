@@ -7,7 +7,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 
-public class ListenForCitationKeyChangeForChatHistoryAction implements GUIPostOpenAction {
+public class ListenForCitationKeyChangeForAiAction implements GUIPostOpenAction {
     private final AiService aiService = Injector.instantiateModelOrService(AiService.class);
 
     @Override
@@ -17,7 +17,7 @@ public class ListenForCitationKeyChangeForChatHistoryAction implements GUIPostOp
 
     @Override
     public void performAction(ParserResult pr, DialogService dialogService, PreferencesService preferencesService) {
-        // pr.getDatabase().getEntries().forEach(entry -> entry.registerListener(aiService.getChatHistoryManager()));
         pr.getDatabase().registerListener(aiService.getChatHistoryManager());
+        pr.getDatabase().registerListener(aiService.getSummariesStorage());
     }
 }
