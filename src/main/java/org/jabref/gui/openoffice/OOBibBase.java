@@ -613,14 +613,12 @@ public class OOBibBase {
 
                 CSLCitationOOAdapter adapter = new CSLCitationOOAdapter(doc);
                 adapter.readExistingMarks();
-
                 if (citationType == CitationType.AUTHORYEAR_PAR) {
                     // "Cite" button
-                    adapter.insertInText(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    adapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                    // TODO: "Cite in-text button" - For olly
-                    // Below was what we did initially, no utility, hence button non-functional till replaced by todo changes
-                    // adapter.insertBibliography(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    // "Cite in-text" button
+                    adapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.INVISIBLE_CIT) {
                     // "Insert empty citation"
                     adapter.insertEmpty(cursor.get(), entries);

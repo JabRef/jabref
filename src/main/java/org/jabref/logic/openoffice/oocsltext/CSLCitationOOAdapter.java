@@ -1,16 +1,20 @@
 package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
@@ -45,7 +49,7 @@ public class CSLCitationOOAdapter {
 
         // Sort entries based on their order of appearance in the document
         entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
-        for (BibEntry entry: entries) {
+        for (BibEntry entry : entries) {
             String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, bibDatabaseContext, bibEntryTypesManager).getFirst();
             System.out.println(citation);
             writeCitation(document, cursor, entry, citation);
@@ -67,9 +71,7 @@ public class CSLCitationOOAdapter {
 //        }
     }
 
-    public void insertInText(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws Exception {
-
+    public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager) throws Exception {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
 
@@ -83,12 +85,42 @@ public class CSLCitationOOAdapter {
         }
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-
-        // Insert the citation text with multiple reference marks
         insertMultipleReferenceMarks(cursor, entries, ooText);
-
-        // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
+    }
+
+    /**
+     * Inserts the in-text citation for a group of entries.
+     * Comparable to LaTeX's \citet command.
+     *
+     * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager)} method.insertInText method
+     */
+    public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+            throws Exception {
+        String style = selectedStyle.getSource();
+        isNumericStyle = selectedStyle.isNumericStyle();
+
+        Iterator<BibEntry> iterator = entries.iterator();
+        while (iterator.hasNext()) {
+            BibEntry currentEntry = iterator.next();
+            String inTextCitation = CitationStyleGenerator.generateInText(List.of(currentEntry), style, format, bibDatabaseContext, bibEntryTypesManager).getText();
+            String formattedCitation = transformHtml(inTextCitation);
+            if (isNumericStyle) {
+                formattedCitation = updateMultipleCitations(formattedCitation, List.of(currentEntry));
+            }
+            String prefix = currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
+                                        .map(authors -> AuthorList.parse(authors))
+                                        .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al.") + " ")
+                                        .orElse("");
+            String finalText = prefix + formattedCitation;
+            if (iterator.hasNext()) {
+                finalText += ",";
+                // The next space is inserted somehow magically by other routines. Therefore, we do not add a space here.
+            }
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
+            insertMultipleReferenceMarks(cursor, List.of(currentEntry), ooText);
+            cursor.collapseToEnd();
+        }
     }
 
     public void insertEmpty(XTextCursor cursor, List<BibEntry> entries)
@@ -104,28 +136,27 @@ public class CSLCitationOOAdapter {
     }
 
     private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception {
-        // Check if there's already a space before the cursor
-        boolean spaceExists = false;
+        boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
 
         // Check if we're at the start of the document - if yes we set the flag and don't insert a space
         if (!checkCursor.goLeft((short) 1, true)) {
             // We're at the start of the document
-            spaceExists = true;
+            preceedingSpaceExists = true;
         } else {
-            // If not at the start of document, check if there's a space before
-            spaceExists = checkCursor.getString().equals(" ");
+            // If not at the start of document, check if there is a space before
+            preceedingSpaceExists = checkCursor.getString().equals(" ");
             // If not a space, check if it's a paragraph break
-            if (!spaceExists) {
-                spaceExists = checkCursor.getString().matches("\\R");
+            if (!preceedingSpaceExists) {
+                preceedingSpaceExists = checkCursor.getString().matches("\\R");
             }
         }
 
         if (entries.size() == 1) {
             CSLReferenceMark mark = markManager.createReferenceMark(entries.getFirst());
-            mark.insertReferenceIntoOO(document, cursor, ooText, !spaceExists, true, true);
+            mark.insertReferenceIntoOO(document, cursor, ooText, !preceedingSpaceExists, false, true);
         } else {
-            if (!spaceExists) {
+            if (!preceedingSpaceExists) {
                 cursor.getText().insertString(cursor, " ", false);
             }
             OOTextIntoOO.write(document, cursor, ooText);
@@ -134,27 +165,28 @@ public class CSLCitationOOAdapter {
                 OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
                 mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false, true);
             }
-            cursor.getText().insertString(cursor, " ", false);
         }
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
     }
 
+    /**
+     * Transforms the numbers in the citation to globally-unique numbers
+     */
     private String updateMultipleCitations(String citation, List<BibEntry> entries) {
         Pattern pattern = Pattern.compile("(\\D*)(\\d+)(\\D*)");
         Matcher matcher = pattern.matcher(citation);
         StringBuilder sb = new StringBuilder();
-        int entryIndex = 0;
+        Iterator<BibEntry> iterator = entries.iterator();
 
-        while (matcher.find() && entryIndex < entries.size()) {
+        while (matcher.find() && iterator.hasNext()) {
             String prefix = matcher.group(1);
             String suffix = matcher.group(3);
 
-            int currentNumber = markManager.getCitationNumber(entries.get(entryIndex).getCitationKey().orElse(""));
+            int currentNumber = markManager.getCitationNumber(iterator.next().getCitationKey().orElse(""));
 
             matcher.appendReplacement(sb, Matcher.quoteReplacement(prefix + currentNumber + suffix));
-            entryIndex++;
         }
         matcher.appendTail(sb);
         return sb.toString();
