@@ -96,10 +96,10 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
     private void setupListeningToPreferencesChanges() {
         aiPreferences.enableAiProperty().addListener(obs -> rebuild());
         aiPreferences.aiProviderProperty().addListener(obs -> rebuild());
+        aiPreferences.customizeExpertSettingsProperty().addListener(obs -> rebuild());
         aiPreferences.listenToChatModels(this::rebuild);
         aiPreferences.listenToApiTokens(this::rebuild);
         aiPreferences.listenToApiBaseUrls(this::rebuild);
-        aiPreferences.listenToChatModels(this::rebuild);
         aiPreferences.temperatureProperty().addListener(obs -> rebuild());
     }
 

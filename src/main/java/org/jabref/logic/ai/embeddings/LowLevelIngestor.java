@@ -48,6 +48,7 @@ public class LowLevelIngestor {
     }
 
     private void setupListeningToPreferencesChanges() {
+        aiPreferences.customizeExpertSettingsProperty().addListener(obs -> rebuild());
         aiPreferences.onEmbeddingsParametersChange(this::rebuild);
     }
 

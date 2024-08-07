@@ -149,6 +149,12 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
             }
         });
 
+        aiPreferences.customizeExpertSettingsProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue && predictorProperty.get().isEmpty()) {
+                startRebuildingTask();
+            }
+        });
+
         aiPreferences.embeddingModelProperty().addListener(obs -> startRebuildingTask());
     }
 
