@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -133,16 +134,15 @@ public class CSLCitationOOAdapter {
         Pattern pattern = Pattern.compile("(\\D*)(\\d+)(\\D*)");
         Matcher matcher = pattern.matcher(citation);
         StringBuilder sb = new StringBuilder();
-        int entryIndex = 0;
+        Iterator<BibEntry> iterator = entries.iterator();
 
-        while (matcher.find() && entryIndex < entries.size()) {
+        while (matcher.find() && iterator.hasNext()) {
             String prefix = matcher.group(1);
             String suffix = matcher.group(3);
 
-            int currentNumber = markManager.getCitationNumber(entries.get(entryIndex).getCitationKey().orElse(""));
+            int currentNumber = markManager.getCitationNumber(iterator.next().getCitationKey().orElse(""));
 
             matcher.appendReplacement(sb, Matcher.quoteReplacement(prefix + currentNumber + suffix));
-            entryIndex++;
         }
         matcher.appendTail(sb);
         return sb.toString();
