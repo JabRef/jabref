@@ -95,7 +95,7 @@ public class AiSummaryTab extends EntryEditorTab {
             // will check this. But with this call the linter is happy for the next expression in else if.
             tryToGenerateCitationKeyThenBind(entry);
         } else {
-            Optional<String> summary = aiService.getSummariesStorage().get(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
+            Optional<SummariesStorage.SummarizationRecord> summary = aiService.getSummariesStorage().get(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
             if (summary.isEmpty()) {
                 startGeneratingSummary(entry);
             } else {
@@ -206,7 +206,7 @@ public class AiSummaryTab extends EntryEditorTab {
         );
     }
 
-    private void bindToCorrectEntry(String summary) {
+    private void bindToCorrectEntry(SummariesStorage.SummarizationRecord summary) {
         entriesUnderSummarization.remove(currentEntry);
 
         SummaryComponent summaryComponent = new SummaryComponent(summary, () -> {

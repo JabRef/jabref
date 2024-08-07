@@ -9,6 +9,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
@@ -17,6 +18,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.AiPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.ExpandingTextArea;
@@ -29,6 +31,7 @@ import org.slf4j.LoggerFactory;
 public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
 
+    private final AiPreferences aiPreferences;
     private final AiChatLogic aiChatLogic;
     private final String citationKey;
     private final DialogService dialogService;
@@ -39,8 +42,10 @@ public class AiChatComponent extends VBox {
     @FXML private ExpandingTextArea userPromptTextArea;
     @FXML private Button submitButton;
     @FXML private StackPane stackPane;
+    @FXML private Text noticeText;
 
-    public AiChatComponent(AiChatLogic aiChatLogic, String citationKey, DialogService dialogService, TaskExecutor taskExecutor) {
+    public AiChatComponent(AiPreferences aiPreferences, AiChatLogic aiChatLogic, String citationKey, DialogService dialogService, TaskExecutor taskExecutor) {
+        this.aiPreferences = aiPreferences;
         this.aiChatLogic = aiChatLogic;
         this.citationKey = citationKey;
         this.dialogService = dialogService;
@@ -70,6 +75,12 @@ public class AiChatComponent extends VBox {
         });
 
         chatVBox.getChildren().addAll(aiChatLogic.getChatHistory().getMessages().stream().map(ChatMessageComponent::new).toList());
+
+        String newNotice = noticeText
+                .getText()
+                .replaceAll("%0", aiPreferences.getAiProvider().getLabel() + " " + aiPreferences.getSelectedChatModel());
+
+        noticeText.setText(newNotice);
 
         Platform.runLater(() -> userPromptTextArea.requestFocus());
     }

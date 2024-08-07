@@ -3,6 +3,7 @@ package org.jabref.logic.ai.summarization;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -139,7 +140,14 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
         doneOneWork();
 
-        aiService.getSummariesStorage().set(bibDatabaseContext.getDatabasePath().get(), citationKey, finalSummary);
+        SummariesStorage.SummarizationRecord summaryRecord = new SummariesStorage.SummarizationRecord(
+                LocalDateTime.now(),
+                aiService.getPreferences().getAiProvider(),
+                aiService.getPreferences().getSelectedChatModel(),
+                finalSummary
+        );
+
+        aiService.getSummariesStorage().set(bibDatabaseContext.getDatabasePath().get(), citationKey, summaryRecord);
     }
 
     private Optional<String> generateSummary(LinkedFile linkedFile) throws InterruptedException {

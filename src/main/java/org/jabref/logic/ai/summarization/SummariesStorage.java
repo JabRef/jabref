@@ -1,18 +1,21 @@
 package org.jabref.logic.ai.summarization;
 
+import java.io.Serializable;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.gui.StateManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.preferences.AiPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
-import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +23,17 @@ import org.slf4j.LoggerFactory;
 public class SummariesStorage {
     private final static Logger LOGGER = LoggerFactory.getLogger(SummariesStorage.class);
 
+    private final AiPreferences aiPreferences;
     private final MVStore mvStore;
 
     private final EventBus eventBus = new EventBus();
 
     @Inject private StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
 
-    public SummariesStorage(MVStore mvStore) {
+    public record SummarizationRecord(LocalDateTime timestamp, AiPreferences.AiProvider aiProvider, String model, String content) implements Serializable { }
+
+    public SummariesStorage(AiPreferences aiPreferences, MVStore mvStore) {
+        this.aiPreferences = aiPreferences;
         this.mvStore = mvStore;
     }
 
@@ -36,16 +43,16 @@ public class SummariesStorage {
 
     public static class SummarySetEvent { }
 
-    private MVMap<String, String> getMap(Path bibDatabasePath) {
+    private Map<String, SummarizationRecord> getMap(Path bibDatabasePath) {
         return mvStore.openMap("summarizationRecords-" + bibDatabasePath.toString());
     }
 
-    public void set(Path bibDatabasePath, String citationKey, String contents) {
-        getMap(bibDatabasePath).put(citationKey, contents);
+    public void set(Path bibDatabasePath, String citationKey, SummarizationRecord summary) {
+        getMap(bibDatabasePath).put(citationKey, summary);
         eventBus.post(new SummarySetEvent());
     }
 
-    public Optional<String> get(Path bibDatabasePath, String citationKey) {
+    public Optional<SummarizationRecord> get(Path bibDatabasePath, String citationKey) {
         return Optional.ofNullable(getMap(bibDatabasePath).get(citationKey));
     }
 
@@ -75,7 +82,7 @@ public class SummariesStorage {
             return;
         }
 
-        Optional<String> oldSummary = get(bibDatabasePath.get(), event.getOldValue());
+        Optional<SummarizationRecord> oldSummary = get(bibDatabasePath.get(), event.getOldValue());
 
         if (oldSummary.isEmpty()) {
             LOGGER.info("Old summary not found for {}", event.getNewValue());

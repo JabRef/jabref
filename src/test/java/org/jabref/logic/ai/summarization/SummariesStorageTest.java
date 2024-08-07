@@ -1,13 +1,18 @@
 package org.jabref.logic.ai.summarization;
 
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Optional;
+
+import org.jabref.preferences.AiPreferences;
 
 import org.h2.mvstore.MVStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,7 +28,7 @@ class SummariesStorageTest {
     void setUp() {
         mvStore = MVStore.open(tempDir.resolve("test.mv").toString());
         bibPath = tempDir.resolve("test.bib");
-        summariesStorage = new SummariesStorage(mvStore);
+        summariesStorage = new SummariesStorage(Mockito.mock(AiPreferences.class),  mvStore);
     }
 
     private void reopen() {
@@ -38,14 +43,14 @@ class SummariesStorageTest {
 
     @Test
     void set() {
-        summariesStorage.set(bibPath, "citationKey", "contents");
+        summariesStorage.set(bibPath, "citationKey", new SummariesStorage.SummarizationRecord(LocalDateTime.now(), AiPreferences.AiProvider.OPEN_AI, "model", "contents"));
         reopen();
-        assertEquals(Optional.of("contents"), summariesStorage.get(bibPath, "citationKey"));
+        assertEquals(Optional.of("contents"), summariesStorage.get(bibPath, "citationKey").map(SummariesStorage.SummarizationRecord::content));
     }
 
     @Test
     void clear() {
-        summariesStorage.set(bibPath, "citationKey", "contents");
+        summariesStorage.set(bibPath, "citationKey", new SummariesStorage.SummarizationRecord(LocalDateTime.now(), AiPreferences.AiProvider.OPEN_AI, "model", "contents"));
         reopen();
         summariesStorage.clear(bibPath, "citationKey");
         reopen();

@@ -226,7 +226,7 @@ public class AiChatTab extends EntryEditorTab {
 
         AiChatLogic aiChatLogic = AiChatLogic.forBibEntry(aiService, aiChatHistory, entry);
 
-        Node content = new AiChatComponent(aiChatLogic, entry.getCitationKey().get(), dialogService, taskExecutor);
+        Node content = new AiChatComponent(aiService.getPreferences(), aiChatLogic, entry.getCitationKey().get(), dialogService, taskExecutor);
 
         setContent(content);
     }

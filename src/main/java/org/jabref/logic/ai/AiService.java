@@ -77,7 +77,7 @@ public class AiService implements AutoCloseable {
         this.bibDatabaseChatHistoryManager = new BibDatabaseChatHistoryManager(mvStore);
         this.embeddingModel = new EmbeddingModel(aiPreferences, dialogService, taskExecutor);
         this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, shutdownSignal, embeddingModel, mvStore);
-        this.summariesStorage = new SummariesStorage(mvStore);
+        this.summariesStorage = new SummariesStorage(aiPreferences, mvStore);
     }
 
     @Override
