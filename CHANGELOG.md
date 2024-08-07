@@ -116,6 +116,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where DatabaseChangeDetailsView was not scrollable when reviewing external metadata changes [#11220](https://github.com/JabRef/jabref/issues/11220)
 - We fixed undo/redo for text fields. [#11420](https://github.com/JabRef/jabref/issues/11420)
 - We fixed an issue where clicking on a page number in the search results tab opens a wrong file in the document viewer. [#11432](https://github.com/JabRef/jabref/pull/11432)
+- We fixed an issue where we display warning message for moving attached open files. [#10121](https://github.com/JabRef/jabref/issues/10121)
+
 
 ### Removed
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.gui.DialogService;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
@@ -17,10 +18,13 @@ public class CleanupWorker {
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
 
-    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
+    private final DialogService dialogService;
+
+    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, DialogService dialogService) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
+        this.dialogService = dialogService;
     }
 
     public List<FieldChange> cleanup(CleanupPreferences preset, BibEntry entry) {
@@ -78,7 +82,7 @@ public class CleanupWorker {
             case CONVERT_TIMESTAMP_TO_MODIFICATIONDATE ->
                     new TimeStampToModificationDate(timestampPreferences);
             case MOVE_PDF ->
-                    new MoveFilesCleanup(databaseContext, filePreferences);
+                    new MoveFilesCleanup(databaseContext, filePreferences, dialogService);
             case FIX_FILE_LINKS ->
                     new FileLinksCleanup();
             case CLEAN_UP_ISSN ->
