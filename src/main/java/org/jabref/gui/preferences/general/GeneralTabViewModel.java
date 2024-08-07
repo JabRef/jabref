@@ -66,7 +66,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty themeSyncOsProperty = new SimpleBooleanProperty();
 
-    private final StringProperty customPathToThemeProperty = new SimpleStringProperty();
+    // init with empty string to avoid npe in accessing
+    private final StringProperty customPathToThemeProperty = new SimpleStringProperty("");
 
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
@@ -334,10 +335,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     }
 
     public void importCSSFile() {
+
+        String fileDir = customPathToThemeProperty.getValue().isEmpty() ? preferences.getInternalPreferences().getLastPreferencesExportPath().toString()
+                : customPathToThemeProperty.getValue();
+
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSS)
                 .withDefaultExtension(StandardFileType.CSS)
-                .withInitialDirectory(preferences.getInternalPreferences().getLastPreferencesExportPath()).build();
+                .withInitialDirectory(fileDir).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file ->
                 customPathToThemeProperty.setValue(file.toAbsolutePath().toString()));
