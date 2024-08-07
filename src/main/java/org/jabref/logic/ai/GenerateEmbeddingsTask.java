@@ -133,7 +133,11 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         updateProgress(workDone.get(), workMax.get());
 
         if (eta.getSeconds() < 60) {
-            updateMessage(Localization.lang("Estimated time left: %0 seconds", eta.getSeconds()));
+            if (eta.getSeconds() == 0) {
+                updateMessage(Localization.lang("Estimated time left: %0 seconds", 3));
+            } else {
+                updateMessage(Localization.lang("Estimated time left: %0 seconds", eta.getSeconds()));
+            }
         } else if (eta.getSeconds() % 60 == 0) {
             updateMessage(Localization.lang("Estimated time left: %0 minutes", eta.getSeconds() / 60));
         } else {
