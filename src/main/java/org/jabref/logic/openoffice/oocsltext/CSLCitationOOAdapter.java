@@ -73,7 +73,7 @@ public class CSLCitationOOAdapter {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
 
-        // Generate a single in-text citation for all entries
+        // Generate a single in-text citation for a group of entries
         String inTextCitation = CitationStyleGenerator.generateInText(entries, style, format, bibDatabaseContext, bibEntryTypesManager).getText();
 
         String formattedCitation = transformHtml(inTextCitation);

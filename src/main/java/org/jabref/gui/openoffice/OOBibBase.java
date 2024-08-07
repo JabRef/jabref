@@ -615,9 +615,12 @@ public class OOBibBase {
                 adapter.readExistingMarks();
 
                 if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                    adapter.insertInText(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    // TODO: "Cite in-text button" - For olly
+                    // Below was what we did initially, no utility, hence button non-functional till replaced by todo changes
+                    // adapter.insertBibliography(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else {
-                    adapter.insertBibliography(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    // "Cite" button
+                    adapter.insertInText(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 }
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
