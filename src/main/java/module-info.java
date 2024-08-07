@@ -6,18 +6,28 @@ open module org.jabref {
     requires java.sql;
     requires java.sql.rowset;
 
-    // JavaFX
+    // region JavaFX
     requires javafx.base;
     requires javafx.graphics;
     requires javafx.controls;
     requires javafx.web;
     requires javafx.fxml;
+
     requires afterburner.fx;
+    provides com.airhacks.afterburner.views.ResourceLocator
+            with org.jabref.gui.util.JabRefResourceLocator;
+
     requires com.dlsc.gemsfx;
     uses com.dlsc.gemsfx.TagsField;
+
+    requires com.tobiasdiez.easybind;
+
     requires de.saxsys.mvvmfx;
-    requires reactfx;
+    requires de.saxsys.mvvmfx.validation;
+
+    requires org.controlsfx.controls;
     requires org.fxmisc.flowless;
+    requires org.fxmisc.richtext;
 
     requires org.kordamp.ikonli.core;
     requires org.kordamp.ikonli.javafx;
@@ -30,20 +40,17 @@ open module org.jabref {
     provides org.kordamp.ikonli.IkonProvider
             with org.jabref.gui.icon.JabrefIconProvider;
 
-    requires org.controlsfx.controls;
-    requires org.fxmisc.richtext;
-    requires com.tobiasdiez.easybind;
+    requires reactfx;
+    // endregion
 
-    provides com.airhacks.afterburner.views.ResourceLocator
-            with org.jabref.gui.util.JabRefResourceLocator;
-
-    // Logging
+    // region: Logging
     requires org.slf4j;
     requires jul.to.slf4j;
     requires org.apache.logging.log4j.to.slf4j;
     requires org.tinylog.api;
     requires org.tinylog.api.slf4j;
     requires org.tinylog.impl;
+    // endregion
 
     provides org.tinylog.writers.Writer
     with org.jabref.gui.logging.GuiWriter;
@@ -55,16 +62,18 @@ open module org.jabref {
     // YAML
     requires org.yaml.snakeyaml;
 
-    // Annotations (@PostConstruct)
+    // region: Annotations (@PostConstruct)
     requires jakarta.annotation;
     requires jakarta.inject;
+    // endregion
 
-    // http server and client exchange
+    // region: http server and client exchange
     requires java.net.http;
     requires jakarta.ws.rs;
     requires org.glassfish.grizzly;
+    // endregion
 
-    // data mapping
+    // region: data mapping
     requires jakarta.xml.bind;
     requires jdk.xml.dom;
     requires com.google.gson;
@@ -73,22 +82,26 @@ open module org.jabref {
     requires com.fasterxml.jackson.datatype.jsr310;
     // needs to be loaded here as it's otherwise not found at runtime
     requires org.glassfish.jaxb.runtime;
+    // endregion
 
     // dependency injection using HK2
     requires org.glassfish.hk2.api;
 
-    // http clients
+    // region: http clients
     requires unirest.java.core;
     requires unirest.modules.gson;
+    requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
+    // endregion
 
-    // SQL databases
+    // region: SQL databases
     requires ojdbc10;
     requires org.postgresql.jdbc;
     requires org.mariadb.jdbc;
     uses org.mariadb.jdbc.credential.CredentialPlugin;
+    // endregion
 
-    // Apache Commons and other (similar) helper libraries
+    // region: Apache Commons and other (similar) helper libraries
     requires com.google.common;
     requires io.github.javadiffutils;
     requires java.string.similarity;
@@ -98,9 +111,13 @@ open module org.jabref {
     requires org.apache.commons.lang3;
     requires org.apache.commons.text;
     requires org.apache.commons.logging;
+    // endregion
 
+    // region: latex2unicode
     requires com.github.tomtung.latex2unicode;
     requires fastparse;
+    requires scala.library;
+    // endregion
 
     requires jbibtex;
     requires citeproc.java;
@@ -123,15 +140,15 @@ open module org.jabref {
 
     requires org.jooq.jool;
 
-    // fulltext search
+    // region: fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
     uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
-
     requires org.apache.lucene.queryparser;
     uses org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.highlighter;
+    // endregion
 
     requires net.harawata.appdirs;
     requires com.sun.jna;
@@ -143,11 +160,10 @@ open module org.jabref {
 
     requires transitive org.jspecify;
 
-    // other libraries
-    requires org.antlr.antlr4.runtime;
-    requires org.libreoffice.uno;
-    requires de.saxsys.mvvmfx.validation;
+    // region: other libraries (alphabetically)
     requires dd.plist;
     requires mslinks;
-    requires org.apache.httpcomponents.core5.httpcore5;
+    requires org.antlr.antlr4.runtime;
+    requires org.libreoffice.uno;
+    // endregion
 }

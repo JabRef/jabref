@@ -173,7 +173,7 @@ public class Version {
         Optional<Version> newerVersion = Optional.empty();
         for (Version version : availableVersions) {
             if (this.shouldBeUpdatedTo(version)
-                    && (!newerVersion.isPresent() || version.isNewerThan(newerVersion.get()))) {
+                    && (newerVersion.isEmpty() || version.isNewerThan(newerVersion.get()))) {
                 newerVersion = Optional.of(version);
             }
         }

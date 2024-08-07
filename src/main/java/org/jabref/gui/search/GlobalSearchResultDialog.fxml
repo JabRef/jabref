@@ -6,7 +6,6 @@
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.VBox?>
-<?import org.jabref.gui.icon.JabRefIconView?>
 <?import javafx.scene.layout.HBox?>
 <DialogPane xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.jabref.gui.search.GlobalSearchResultDialog"
@@ -15,9 +14,6 @@
         <VBox>
             <HBox fx:id="searchBarContainer" spacing="10" alignment="CENTER_RIGHT">
                 <ToggleButton fx:id="keepOnTop" styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0">
-                    <graphic>
-                        <JabRefIconView glyph="KEEP_ON_TOP"/>
-                    </graphic>
                     <tooltip>
                         <Tooltip text="%Keep dialog always on top"/>
                     </tooltip>

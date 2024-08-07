@@ -174,10 +174,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         }
     }
 
-    private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
-        LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getFilePreferences());
+    public void addNewLinkedFile(LinkedFile linkedFile) {
         files.add(new LinkedFileViewModel(
-                newLinkedFile,
+                linkedFile,
                 entry,
                 databaseContext,
                 taskExecutor,
@@ -185,14 +184,25 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 preferences));
     }
 
+    private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
+        LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getFilePreferences());
+        addNewLinkedFile(newLinkedFile);
+    }
+
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);
 
         if ((entry != null) && preferences.getEntryEditorPreferences().autoLinkFilesEnabled()) {
+            LOGGER.debug("Auto-linking files for entry {}", entry);
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask
                     .wrap(() -> findAssociatedNotLinkedFiles(entry))
-                    .onSuccess(files::addAll);
+                    .onSuccess(list -> {
+                        if (!list.isEmpty()) {
+                            LOGGER.debug("Found non-associated files:", list);
+                            files.addAll(list);
+                        }
+                    });
             taskExecutor.execute(findAssociatedNotLinkedFiles);
         }
     }
@@ -224,6 +234,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
             dialogService.showErrorDialogAndWait("Error accessing the file system", e);
         }
 
+        LOGGER.trace("Found {} associated files for entry {}", result.size(), entry.getCitationKey());
         return result;
     }
 

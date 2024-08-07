@@ -11,6 +11,66 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
+- We added Tools > New library based on references in PDF file... to create a new library based on the references section in a PDF file. [#11522](https://github.com/JabRef/jabref/pull/11522)
+- When converting the references section of a paper (PDF file), more than the last page is treated. [#11522](https://github.com/JabRef/jabref/pull/11522)
+- Added the functionality to invoke offline reference parsing explicitly. [#11565](https://github.com/JabRef/jabref/pull/11565)
+- The dialog for [adding an entry using reference text](https://docs.jabref.org/collect/newentryfromplaintext) is now filled with the clipboard contents as default. [#11565](https://github.com/JabRef/jabref/pull/11565)
+- Added minimal support for [biblatex data annotation](https://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsection.3.7) fields in `.layout` files. [#11505](https://github.com/JabRef/jabref/issues/11505)
+- Added saving of selected options in the [Lookup -> Search for unlinked local files dialog](https://docs.jabref.org/collect/findunlinkedfiles#link-the-pdfs-to-your-bib-library). [#11439](https://github.com/JabRef/jabref/issues/11439)
+- We fixed ans issue where text in Dark mode inside "Citation information" was not readable [#11512](https://github.com/JabRef/jabref/issues/11512)
+- We enabled creating a new file link manually. [#11017](https://github.com/JabRef/jabref/issues/11017)
+- We added a toggle button to invert the selected groups. [#9073](https://github.com/JabRef/jabref/issues/9073)
+- We reintroduced the floating search in the main table. [#4237](https://github.com/JabRef/jabref/issues/4237)
+- We fixed an issue where the selection of an entry in the table lost after searching for a group. [#3176](https://github.com/JabRef/jabref/issues/3176)
+
+### Changed
+
+- The Pubmed/Medline Plain importer now imports the PMID field as well [#11488](https://github.com/JabRef/jabref/issues/11488)
+- The 'Check for updates' menu bar button is now always enabled. [#11485](https://github.com/JabRef/jabref/pull/11485)
+- JabRef respects the [configuration for storing files relative to the .bib file](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files) in more cases. [#11492](https://github.com/JabRef/jabref/pull/11492)
+- JabRef does not show finished background tasks in the status bar popup. [#11574](https://github.com/JabRef/jabref/pull/11574)
+- We enhanced the indexing speed. [#11502](https://github.com/JabRef/jabref/pull/11502)
+- ⚠️ Renamed command line parameters `embeddBibfileInPdf` to `embedBibFileInPdf`, `writeMetadatatoPdf` to `writeMetadataToPdf`, and `writeXMPtoPdf` to `writeXmpToPdf`. [#11575](https://github.com/JabRef/jabref/pull/11575)
+
+### Fixed
+
+- We fixed an issue where the "Check for updates" preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
+- We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11515](https://github.com/JabRef/jabref/pull/11515)
+- We fixed an issue where JabRef put file paths as absolute path when an entry was created using drag and drop of a PDF file. [#11173](https://github.com/JabRef/jabref/issues/11173)
+- We fixed an issue that online and offline mode for new library creation were handled incorrectly. [#11565](https://github.com/JabRef/jabref/pull/11565)
+- We fixed an issue with colors in the search bar when dark theme is enabled. [#11569](https://github.com/JabRef/jabref/issues/11569)
+- We fixed an issue where a new unsaved library was not marked with an asterisk. [#11519](https://github.com/JabRef/jabref/pull/11519)
+- We fixed an issue where JabRef starts without window decorations. [#11440](https://github.com/JabRef/jabref/pull/11440)
+
+### Removed
+
+- We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
+
+
+
+
+
+
+
+
+## [5.15] – 2024-07-10
+
+### Added
+
+- We made new groups automatically to focus upon creation. [#11449](https://github.com/JabRef/jabref/issues/11449)
+
+### Fixed
+
+- We fixed an issue where JabRef was no longer built for Intel based macs (x86) [#11468](https://github.com/JabRef/jabref/issues/11468)
+- We fixed usage when using running on Snapcraft. [#11465](https://github.com/JabRef/jabref/issues/11465)
+- We fixed detection for `soffice.exe` on Windows. [#11478](https://github.com/JabRef/jabref/pull/11478)
+- We fixed an issue where saving preferences when importing preferences on first run in a snap did not work [forum#4399](https://discourse.jabref.org/t/how-to-report-problems-in-the-distributed-version-5-14-ensuring-that-one-can-no-longer-work-with-jabref/4399/5)
+
+## [5.14] – 2024-07-08
+
+### Added
+
 - We added support for offline extracting references from PDFs following the IEEE format. [#11156](https://github.com/JabRef/jabref/pull/11156)
 - We added a new keyboard shortcut  <kbd>ctrl</kbd> + <kbd>,</kbd> to open the preferences. [#11154](https://github.com/JabRef/jabref/pull/11154)
 - We added value selection (such as for month) for content selectors in custom entry types. [#11109](https://github.com/JabRef/jabref/issues/11109)
@@ -53,14 +113,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the Pubmed/Medline Plain importer would not respect the user defined keyword separator [#11413](https://github.com/JabRef/jabref/issues/11413)
 - We fixed an issue where the value of "Override default font settings" was not applied on startup [#11344](https://github.com/JabRef/jabref/issues/11344)
 - We fixed an issue where DatabaseChangeDetailsView was not scrollable when reviewing external metadata changes [#11220](https://github.com/JabRef/jabref/issues/11220)
+- We fixed undo/redo for text fields. [#11420](https://github.com/JabRef/jabref/issues/11420)
 - We fixed an issue where clicking on a page number in the search results tab opens a wrong file in the document viewer. [#11432](https://github.com/JabRef/jabref/pull/11432)
 
 ### Removed
 
-
-
-
-
+- We removed the misleading message "Doing a cleanup for X entries" when opening the Cleanup entries dialog [#11463](https://github.com/JabRef/jabref/pull/11463)
 
 ## [5.13] – 2024-04-01
 
@@ -1342,7 +1400,9 @@ The changelog of JabRef 4.x is available at the [v4.3.1 tag](https://github.com/
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.13...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.15...HEAD
+[5.15]: https://github.com/JabRef/jabref/compare/v5.14...v5.15
+[5.14]: https://github.com/JabRef/jabref/compare/v5.13...v5.14
 [5.13]: https://github.com/JabRef/jabref/compare/v5.12...v5.13
 [5.12]: https://github.com/JabRef/jabref/compare/v5.11...v5.12
 [5.11]: https://github.com/JabRef/jabref/compare/v5.10...v5.11

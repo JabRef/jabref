@@ -85,9 +85,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         // Set-up bindings
         filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
-
-        // Init
-        refresh();
     }
 
     private void refresh() {
@@ -178,7 +175,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     groupDialogHeader));
 
             newGroup.ifPresent(group -> {
-                parent.addSubgroup(group);
+                GroupTreeNode newSubgroup = parent.addSubgroup(group);
+                selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
 
                 // TODO: Add undo
                 // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
@@ -186,7 +184,6 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 // TODO: Expand parent to make new group visible
                 // parent.expand();
-
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
             });
@@ -278,11 +275,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         // we need to check the old name for duplicates. If the new group name occurs more than once, it won't matter
                         groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(oldGroupName)).size();
                     }
-                    boolean removePreviousAssignments = true;
                     // We found more than 2 groups, so we cannot simply remove old assignment
-                    if (groupsWithSameName >= 2) {
-                        removePreviousAssignments = false;
-                    }
+                    boolean removePreviousAssignments = groupsWithSameName < 2;
 
                     oldGroup.getGroupNode().setGroup(
                             group,

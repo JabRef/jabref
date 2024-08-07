@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import javax.swing.undo.UndoManager;
 
@@ -43,9 +44,11 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.UnlinkedFilesDialogPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -102,6 +105,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             if (button == ButtonType.CANCEL) {
                 viewModel.cancelTasks();
             }
+            saveConfiguration();
             return null;
         });
 
@@ -158,21 +162,21 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                 .install(fileTypeCombo);
         fileTypeCombo.setItems(viewModel.getFileFilters());
         fileTypeCombo.valueProperty().bindBidirectional(viewModel.selectedExtensionProperty());
-        fileTypeCombo.getSelectionModel().selectFirst();
+
         new ViewModelListCellFactory<DateRange>()
             .withText(DateRange::getDateRange)
             .install(fileDateCombo);
         fileDateCombo.setItems(viewModel.getDateFilters());
         fileDateCombo.valueProperty().bindBidirectional(viewModel.selectedDateProperty());
-        fileDateCombo.getSelectionModel().selectFirst();
+
         new ViewModelListCellFactory<ExternalFileSorter>()
                 .withText(ExternalFileSorter::getSorter)
                 .install(fileSortCombo);
         fileSortCombo.setItems(viewModel.getSorters());
         fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
-        fileSortCombo.getSelectionModel().selectFirst();
 
         directoryPathField.setText(bibDatabaseContext.getFirstExistingFileDir(preferencesService.getFilePreferences()).map(Path::toString).orElse(""));
+        loadSavedConfiguration();
     }
 
     private void initUnlinkedFilesList() {
@@ -225,6 +229,25 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
         scanButton.setDefaultButton(true);
         scanButton.disableProperty().bind(viewModel.taskActiveProperty().or(viewModel.directoryPathValidationStatus().validProperty().not()));
+    }
+
+    private void loadSavedConfiguration() {
+        UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences = preferencesService.getUnlinkedFilesDialogPreferences();
+
+        FileExtensionViewModel selectedExtension = fileTypeCombo.getItems()
+                                                                .stream()
+                                                                .filter(item -> Objects.equals(item.getName(), unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedExtension()))
+                                                                .findFirst()
+                                                                .orElseGet(() -> new FileExtensionViewModel(StandardFileType.ANY_FILE, preferencesService.getFilePreferences()));
+        fileTypeCombo.getSelectionModel().select(selectedExtension);
+        fileDateCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedDateRange());
+        fileSortCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedSort());
+    }
+
+    public void saveConfiguration() {
+        preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedExtension(fileTypeCombo.getValue().getName());
+        preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedDateRange(fileDateCombo.getValue());
+        preferencesService.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(fileSortCombo.getValue());
     }
 
     @FXML

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -15,7 +16,11 @@ import javax.swing.undo.UndoManager;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
@@ -51,10 +56,13 @@ import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.RedoAction;
+import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleCache;
@@ -85,6 +93,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -146,8 +155,9 @@ public class LibraryTab extends Tab {
     @SuppressWarnings({"FieldCanBeLocal"})
     private Subscription dividerPositionSubscription;
 
-    // the query the user searches when this BasePanel is active
-    private Optional<SearchQuery> currentSearchQuery = Optional.empty();
+    private ListProperty<GroupTreeNode> selectedGroupsProperty;
+    private final OptionalObjectProperty<SearchQuery> searchQueryProperty = OptionalObjectProperty.empty();
+    private final IntegerProperty resultSize = new SimpleIntegerProperty(0);
 
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
@@ -159,15 +169,15 @@ public class LibraryTab extends Tab {
     private final DirectoryMonitorManager directoryMonitorManager;
 
     private LibraryTab(BibDatabaseContext bibDatabaseContext,
-                      LibraryTabContainer tabContainer,
-                      DialogService dialogService,
-                      PreferencesService preferencesService,
-                      StateManager stateManager,
-                      FileUpdateMonitor fileUpdateMonitor,
-                      BibEntryTypesManager entryTypesManager,
-                      CountingUndoManager undoManager,
-                      ClipBoardManager clipBoardManager,
-                      TaskExecutor taskExecutor) {
+                       LibraryTabContainer tabContainer,
+                       DialogService dialogService,
+                       PreferencesService preferencesService,
+                       StateManager stateManager,
+                       FileUpdateMonitor fileUpdateMonitor,
+                       BibEntryTypesManager entryTypesManager,
+                       CountingUndoManager undoManager,
+                       ClipBoardManager clipBoardManager,
+                       TaskExecutor taskExecutor) {
         this.tabContainer = Objects.requireNonNull(tabContainer);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.undoManager = undoManager;
@@ -184,7 +194,8 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
+        this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, taskExecutor, selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -202,7 +213,7 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
-        this.entryEditor = new EntryEditor(this);
+        this.entryEditor = createEntryEditor();
 
         // set LibraryTab ID for drag'n'drop
         // ID content doesn't matter, we only need different tabs to have different ID
@@ -216,6 +227,14 @@ public class LibraryTab extends Tab {
 
         setOnCloseRequest(this::onCloseRequest);
         setOnClosed(this::onClosed);
+    }
+
+    private EntryEditor createEntryEditor() {
+        Supplier<LibraryTab> tabSupplier = () -> this;
+        return new EntryEditor(this,
+                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
+                new UndoAction(tabSupplier, dialogService, stateManager),
+                new RedoAction(tabSupplier, dialogService, stateManager));
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -307,7 +326,10 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, stateManager);
+        this.tableModel.unbind();
+        this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, taskExecutor, selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
+
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
@@ -324,7 +346,7 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
-        this.entryEditor = new EntryEditor(this);
+        this.entryEditor = createEntryEditor();
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
@@ -404,13 +426,8 @@ public class LibraryTab extends Tab {
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
+                tabTitle.append('*');
                 tabTitle.append(Localization.lang("untitled"));
-                if (bibDatabaseContext.getDatabase().hasEntries()) {
-                    // if the database is not empty and no file is assigned,
-                    // the database came from an import and has to be treated somehow
-                    // -> mark as changed
-                    tabTitle.append('*');
-                }
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
@@ -697,7 +714,6 @@ public class LibraryTab extends Tab {
     /**
      * Put an asterisk behind the filename to indicate the database has changed.
      */
-
     public synchronized void markChangedOrUnChanged() {
         if (undoManager.hasChanged()) {
             this.changedProperty.setValue(true);
@@ -870,6 +886,9 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when shutting down backup manager", e);
         }
 
+        if (tableModel != null) {
+            tableModel.unbind();
+        }
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }
@@ -911,19 +930,16 @@ public class LibraryTab extends Tab {
         return mainTable;
     }
 
-    public Optional<SearchQuery> getCurrentSearchQuery() {
-        return currentSearchQuery;
+    public ListProperty<GroupTreeNode> selectedGroupsProperty() {
+        return selectedGroupsProperty;
     }
 
-    /**
-     * Set the query the user currently searches while this basepanel is active
-     */
-    public void setCurrentSearchQuery(Optional<SearchQuery> currentSearchQuery) {
-        this.currentSearchQuery = currentSearchQuery;
+    public OptionalObjectProperty<SearchQuery> searchQueryProperty() {
+        return searchQueryProperty;
     }
 
-    public CitationStyleCache getCitationStyleCache() {
-        return citationStyleCache;
+    public IntegerProperty resultSizeProperty() {
+        return resultSize;
     }
 
     public FileAnnotationCache getAnnotationCache() {

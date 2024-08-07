@@ -24,7 +24,7 @@ class CitationStyleTest {
     void defaultCitation() {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
         context.setMode(BibDatabaseMode.BIBLATEX);
-        String citation = CitationStyleGenerator.generateCitation(TestEntry.getTestEntry(), CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager());
+        String citation = CitationStyleGenerator.generateCitation(List.of(TestEntry.getTestEntry()), CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager()).getFirst();
 
         // if the default citation style changes this has to be modified
         String expected = """
