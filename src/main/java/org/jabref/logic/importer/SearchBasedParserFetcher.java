@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -32,7 +33,19 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  *     We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching {@link IdBasedFetcher}), complete entry {@link EntryBasedFetcher}, and search-based fetcher (this class).
  * </p>
  */
+
 public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetcher {
+
+    /**
+     * Pattern to redact API keys from error messages.
+     */
+   Pattern API_KEY_PATTERN = Pattern.compile("(?i)(key|api[-_]?key)=[^&]*");
+    /**
+     * A constant string used to replace or mask sensitive information , such as API keys;
+     */
+   String REDACTED_STRING = "[REDACTED]";
+
+
 
     /**
      * This method is used to send queries with advanced URL parameters.
@@ -59,9 +72,11 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
         } catch (IOException e) {
-            throw new FetcherException("A network error occurred while fetching from " + urlForQuery, e);
+            // Regular expression to redact API keys from the error message
+            throw new FetcherException(API_KEY_PATTERN.matcher(("A network error occurred while fetching from " + urlForQuery)).replaceAll(REDACTED_STRING), e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred while fetching from " + urlForQuery, e);
+            // Regular expression to redact API keys from the error message
+            throw new FetcherException(API_KEY_PATTERN.matcher(("An internal parser error occurred while fetching from " + urlForQuery)).replaceAll(REDACTED_STRING), e);
         }
     }
 
