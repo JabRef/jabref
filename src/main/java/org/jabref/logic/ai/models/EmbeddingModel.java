@@ -92,7 +92,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
                     errorWhileBuildingModel = e.getMessage();
                     eventBus.post(new EmbeddingModelBuildingErrorEvent());
                 });
-        task.titleProperty().set(Localization.lang("Downloading embedding model..."));
+        task.titleProperty().set(Localization.lang("Updating local embedding model..."));
         task.showToUser(true);
         task.executeWith(taskExecutor);
     }
