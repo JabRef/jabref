@@ -7,6 +7,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -39,6 +40,7 @@ public class AiChatComponent extends VBox {
 
     @FXML private ScrollPane scrollPane;
     @FXML private VBox chatVBox;
+    @FXML private HBox promptHBox;
     @FXML private ExpandingTextArea userPromptTextArea;
     @FXML private Button submitButton;
     @FXML private StackPane stackPane;
@@ -114,12 +116,49 @@ public class AiChatComponent extends VBox {
                                 } else {
                                     addError(e.getMessage());
                                 }
+
+                                switchToErrorState(userPrompt);
                             });
 
             task.titleProperty().set(Localization.lang("Waiting for AI reply for %0...", citationKey));
 
             task.executeWith(taskExecutor);
         }
+    }
+
+    private void switchToErrorState(String userMessage) {
+        promptHBox.getChildren().clear();
+
+        Button retryButton = new Button(Localization.lang("Retry"));
+
+        retryButton.setOnAction(event -> {
+            userPromptTextArea.setText(userMessage);
+
+            chatVBox.getChildren().removeLast();
+            chatVBox.getChildren().removeLast();
+
+            switchToNormalState();
+
+            onSendMessage();
+        });
+
+        Button cancelButton = new Button(Localization.lang("Cancel"));
+
+        cancelButton.setOnAction(event -> {
+            chatVBox.getChildren().removeLast();
+            chatVBox.getChildren().removeLast();
+
+            switchToNormalState();
+        });
+
+        promptHBox.getChildren().add(retryButton);
+        promptHBox.getChildren().add(cancelButton);
+    }
+
+    private void switchToNormalState() {
+        promptHBox.getChildren().clear();
+        promptHBox.getChildren().add(userPromptTextArea);
+        promptHBox.getChildren().add(submitButton);
     }
 
     private void setLoading(boolean loading) {
