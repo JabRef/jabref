@@ -25,7 +25,6 @@ import org.apache.commons.text.StringEscapeUtils;
 
 public class CSLCitationOOAdapter {
 
-    public static final String[] PREFIXES = {"JABREF_", "CSL_"};
 
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
     private final XTextDocument document;

@@ -4,15 +4,10 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
-
 import io.github.thibaultmeyer.cuid.CUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * See {@link CSLCitationOOAdapter#PREFIXES} for the prefix(es) used to identify reference marks.
- */
 public class ReferenceMark {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMark.class);
 
