@@ -25,6 +25,7 @@ import org.apache.commons.text.StringEscapeUtils;
 
 public class CSLCitationOOAdapter {
 
+    private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.).*?, (\\d{4}.*)");
 
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
     private final XTextDocument document;
@@ -99,6 +100,8 @@ public class CSLCitationOOAdapter {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
 
+        boolean twoEntries = entries.size() == 2;
+
         Iterator<BibEntry> iterator = entries.iterator();
         while (iterator.hasNext()) {
             BibEntry currentEntry = iterator.next();
@@ -106,6 +109,8 @@ public class CSLCitationOOAdapter {
             String formattedCitation = transformHtml(inTextCitation);
             if (isNumericStyle) {
                 formattedCitation = updateMultipleCitations(formattedCitation, List.of(currentEntry));
+            } else {
+                formattedCitation = extractYear(formattedCitation);
             }
             String prefix = currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
                                         .map(authors -> AuthorList.parse(authors))
@@ -120,6 +125,14 @@ public class CSLCitationOOAdapter {
             insertMultipleReferenceMarks(cursor, List.of(currentEntry), ooText);
             cursor.collapseToEnd();
         }
+    }
+
+    private String extractYear(String formattedCitation) {
+        Matcher matcher = YEAR_IN_CITATION_PATTERN.matcher(formattedCitation);
+        if (matcher.find()) {
+            return matcher.group(1) + matcher.group(2);
+        }
+        return formattedCitation;
     }
 
     public void insertEmpty(XTextCursor cursor, List<BibEntry> entries)
