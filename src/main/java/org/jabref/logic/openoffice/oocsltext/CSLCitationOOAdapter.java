@@ -26,6 +26,10 @@ import org.apache.commons.text.StringEscapeUtils;
 public class CSLCitationOOAdapter {
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.).*?, (\\d{4}.*)");
+    public static final String[] PREFIXES = {"JABREF_", "CSL_"};
+    // TODO: These are static final fields right now, should add the functionality to let user select these and store them in preferences.
+    public static final String BIBLIOGRAPHY_TITLE = "References";
+    public static final String BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = "Heading 2";
 
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
     private final XTextDocument document;
@@ -43,17 +47,32 @@ public class CSLCitationOOAdapter {
 
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws Exception {
+//        XTextCursor bibliographyCursor = document.getText().createTextCursor();
+//        bibliographyCursor.gotoEnd(false);
+//        XTextRange titleRange = bibliographyCursor.getStart();
+//        titleRange.setString(BIBLIOGRAPHY_TITLE);
+//        XPropertySet titleProps = UnoRuntime.queryInterface(XPropertySet.class, titleRange);
+//        titleProps.setPropertyValue("ParaStyleName", BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
+//
+//        // Clear formatting after the title
+//        bibliographyCursor.gotoEnd(false);
+//        bibliographyCursor.goRight((short) 1, false);  // Move to the start of the next paragraph
+//        XPropertySet paragraphProps = UnoRuntime.queryInterface(XPropertySet.class, bibliographyCursor);
+//        paragraphProps.setPropertyValue("ParaStyleName", "Default Paragraph Style");  // Or use your default style name
+        OOText title = OOFormat.paragraph(OOText.fromString(BIBLIOGRAPHY_TITLE), BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
+        OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
+        OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), "Body Text");
+        OOTextIntoOO.write(document, cursor, ooBreak);
 
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
 
         // Sort entries based on their order of appearance in the document
         entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
+
         for (BibEntry entry : entries) {
             String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, bibDatabaseContext, bibEntryTypesManager).getFirst();
-            System.out.println(citation);
             writeCitation(document, cursor, entry, citation);
-
             if (isNumericStyle) {
                 // Select the paragraph break
                 cursor.goLeft((short) 1, true);
@@ -62,13 +81,9 @@ public class CSLCitationOOAdapter {
                 cursor.setString("");
             }
         }
-        // List<String> citations = CitationStyleGenerator.generateCitation(entries, style, format, bibDatabaseContext, bibEntryTypesManager);
+        // OOText bibBody = OOFormat.paragraph(OOText.fromString(bibliography.toString()));
 
-//        for (int i = 0; i < citations.size(); i++) {
-//            BibEntry entry = entries.get(i);
-//            String citation = citations.get(i);
-//            writeCitation(document, cursor, entry, citation);
-//        }
+        // Numeric styles had newlines
     }
 
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager) throws Exception {
