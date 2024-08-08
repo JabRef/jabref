@@ -416,8 +416,7 @@ processResources {
 
 tasks.register('generateSource') {
     dependsOn("generateBstGrammarSource",
-            "generateSearchGrammarSource",
-            "generateCitaviSource")
+            "generateSearchGrammarSource")
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
@@ -459,15 +458,6 @@ tasks.register("generateJournalListMV", JavaExec) {
 
 jar.dependsOn("generateJournalListMV")
 compileTestJava.dependsOn("generateJournalListMV")
-
-tasks.register('generateCitaviSource', XjcTask) {
-    group = 'JabRef'
-    description = "Generates java files for the citavi importer."
-
-    schemaFile = "src/main/resources/xjc/citavi/citavi.xsd"
-    outputDirectory = "src-gen/main/java/"
-    javaPackage = "org.jabref.logic.importer.fileformat.citavi"
-}
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
