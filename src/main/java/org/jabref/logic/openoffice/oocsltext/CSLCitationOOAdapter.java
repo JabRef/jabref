@@ -16,7 +16,6 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
@@ -83,10 +82,10 @@ public class CSLCitationOOAdapter {
 //        refParaProps.setPropertyValue("ParaStyleName", "Body Text");
         // Always creating at the end of the document.
         // Alternatively, we could receive a cursor.
-        XTextCursor textCursor = document.getText().createTextCursor();
-        textCursor.gotoEnd(false);
-        DocumentAnnotation annotation = new DocumentAnnotation(document, "CSL_bibliography", textCursor, false);
-        UnoTextSection.create(annotation);
+//        XTextCursor textCursor = document.getText().createTextCursor();
+//        textCursor.gotoEnd(false);
+//        DocumentAnnotation annotation = new DocumentAnnotation(document, "CSL_bibliography", textCursor, false);
+//        UnoTextSection.create(annotation);
 
         // antalk2's derivative
         OOText title = OOFormat.paragraph(OOText.fromString(BIBLIOGRAPHY_TITLE), BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
@@ -103,6 +102,7 @@ public class CSLCitationOOAdapter {
             String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, bibDatabaseContext, bibEntryTypesManager).getFirst();
             String citationKey = entry.getCitationKey().orElse("");
             int currentNumber = markManager.getCitationNumber(citationKey);
+            System.out.println(citation);
 
             String formattedCitation;
             if (isNumericStyle) {
@@ -122,12 +122,12 @@ public class CSLCitationOOAdapter {
             }
         }
         // remove the initial empty paragraph from the section.
-        XTextRange sectionRange = getBibliographyRange(document).orElseThrow(IllegalStateException::new);
-        XTextCursor initialParagraph = document.getText().createTextCursorByRange(sectionRange);
-        initialParagraph.collapseToStart();
-        initialParagraph.goRight((short) 1, true);
-        initialParagraph.setString("");
-        // TODO: Chris help
+//        XTextRange sectionRange = getBibliographyRange(document).orElseThrow(IllegalStateException::new);
+//        XTextCursor initialParagraph = document.getText().createTextCursorByRange(sectionRange);
+//        initialParagraph.collapseToStart();
+//        initialParagraph.goRight((short) 1, true);
+//        initialParagraph.setString("");
+//        // TODO: Chris help - newlines!!
     }
 
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager) throws Exception {
