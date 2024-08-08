@@ -722,6 +722,8 @@ public class BibEntry implements Cloneable {
      * to a) enable debugging the internal representation and b) save time at this method.
      * <p>
      * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
+     * <p>
+     * Alternative for some more readable output: {@link #getAuthorTitleYear(int)}
      */
     @Override
     public String toString() {

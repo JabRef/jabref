@@ -121,6 +121,7 @@ public class OpenOfficePanel {
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
+        this.currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
 
         ActionFactory factory = new ActionFactory();
 
@@ -143,7 +144,7 @@ public class OpenOfficePanel {
         selectDocument.setMaxWidth(Double.MAX_VALUE);
 
         update = new Button();
-        update.setGraphic(IconTheme.JabRefIcons.REFRESH.getGraphicNode());
+        update.setGraphic(IconTheme.JabRefIcons.ADD_OR_MAKE_BIBLIOGRAPHY.getGraphicNode());
         update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
         update.setMaxWidth(Double.MAX_VALUE);
 
@@ -213,6 +214,7 @@ public class OpenOfficePanel {
                              } else if (currentStyle instanceof CitationStyle cslStyle) {
                                  dialogService.notify(Localization.lang("Currently selected CSL Style: '%0'", cslStyle.getName()));
                              }
+                             updateButtonAvailability();
                          });
         });
 
@@ -229,7 +231,7 @@ public class OpenOfficePanel {
         pushEntriesAdvanced.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_INTEXT, true));
         pushEntriesAdvanced.setMaxWidth(Double.MAX_VALUE);
 
-        update.setTooltip(new Tooltip(Localization.lang("Ensure that the bibliography is up-to-date")));
+        update.setTooltip(new Tooltip(Localization.lang("Make/Sync bibliography")));
 
         update.setOnAction(event -> {
             String title = Localization.lang("Could not update bibliography");
@@ -384,17 +386,19 @@ public class OpenOfficePanel {
         pushEntries.setDisable(!(isConnectedToDocument && hasStyle && hasDatabase));
 
         boolean canCite = isConnectedToDocument && hasStyle && hasSelectedBibEntry;
+        boolean cslStyleSelected = preferencesService.getOpenOfficePreferences().getCurrentStyle() instanceof CitationStyle;
         pushEntriesInt.setDisable(!canCite);
         pushEntriesEmpty.setDisable(!canCite);
-        pushEntriesAdvanced.setDisable(!canCite);
+        pushEntriesAdvanced.setDisable(!canCite || cslStyleSelected);
 
         boolean canRefreshDocument = isConnectedToDocument && hasStyle;
-        update.setDisable(!canRefreshDocument);
-        merge.setDisable(!canRefreshDocument);
-        unmerge.setDisable(!canRefreshDocument);
-        manageCitations.setDisable(!canRefreshDocument);
 
-        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase));
+        update.setDisable(!canRefreshDocument);
+        merge.setDisable(!canRefreshDocument || cslStyleSelected);
+        unmerge.setDisable(!canRefreshDocument || cslStyleSelected);
+        manageCitations.setDisable(!canRefreshDocument || cslStyleSelected);
+
+        exportCitations.setDisable(!(isConnectedToDocument && hasDatabase) || cslStyleSelected);
     }
 
     private void connect() {

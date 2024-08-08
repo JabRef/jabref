@@ -1,6 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +23,7 @@ import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
+import org.jabref.logic.openoffice.oocsltext.CSLUpdateBibliography;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
@@ -44,6 +44,7 @@ import org.jabref.model.openoffice.uno.UnoUndo;
 import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyVetoException;
@@ -59,7 +60,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for manipulating the Bibliography of the currently started document in OpenOffice.
  */
-class OOBibBase {
+public class OOBibBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBase.class);
 
@@ -73,7 +74,7 @@ class OOBibBase {
 
     private final OOBibBaseConnect connection;
 
-    private final CSLCitationOOAdapter cslCitationOOAdapter;
+    private CSLCitationOOAdapter cslCitationOOAdapter;
 
     public OOBibBase(Path loPath, DialogService dialogService)
             throws
@@ -85,8 +86,15 @@ class OOBibBase {
 
         this.refreshBibliographyDuringSyncWhenCiting = false;
         this.alwaysAddCitedOnPages = false;
+    }
 
-        cslCitationOOAdapter = new CSLCitationOOAdapter();
+    private void initializeCitationAdapter(XTextDocument doc) {
+        try {
+            this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
+            this.cslCitationOOAdapter.readExistingMarks();
+        } catch (Exception e) {
+            LOGGER.error("Error initializing CSLCitationOOAdapter", e);
+        }
     }
 
     public void guiActionSelectDocument(boolean autoSelectForSingle) {
@@ -100,13 +108,14 @@ class OOBibBase {
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (WrappedTargetException
-                | IndexOutOfBoundsException
-                | NoSuchElementException ex) {
+                 | IndexOutOfBoundsException
+                 | NoSuchElementException ex) {
             LOGGER.warn("Problem connecting", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         }
 
         if (this.isConnectedToDocument()) {
+            initializeCitationAdapter(this.getXTextDocument().get());
             dialogService.notify(Localization.lang("Connected to document") + ": "
                     + this.getCurrentDocumentTitle().orElse(""));
         }
@@ -591,16 +600,26 @@ class OOBibBase {
         }
 
         try {
+
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
-                if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                    cslCitationOOAdapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-                } else {
-                    cslCitationOOAdapter.insertBibliography(doc, cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+
+                CSLCitationOOAdapter adapter = new CSLCitationOOAdapter(doc);
+                adapter.readExistingMarks();
+                if (citationType == CitationType.AUTHORYEAR_PAR) {
+                    // "Cite" button
+                    adapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
+                    // "Cite in-text" button
+                    adapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                } else if (citationType == CitationType.INVISIBLE_CIT) {
+                    // "Insert empty citation"
+                    adapter.insertEmpty(cursor.get(), entries);
                 }
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
+
                 EditInsert.insertCitationGroup(doc,
                         frontend.get(),
                         cursor.get(),
@@ -618,12 +637,7 @@ class OOBibBase {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-        } catch (CreationException
-                 | WrappedTargetException
-                 | IOException
-                 | PropertyVetoException
-                 | IllegalTypeException
-                 | NotRemoveableException ex) {
+        } catch (Exception ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } finally {
@@ -817,9 +831,8 @@ class OOBibBase {
      * @param style     Style.
      */
     public void guiActionUpdateDocument(List<BibDatabase> databases, OOStyle style) {
+        final String errorTitle = Localization.lang("Unable to synchronize bibliography");
         if (style instanceof JStyle jStyle) {
-            final String errorTitle = Localization.lang("Unable to synchronize bibliography");
-
             try {
 
                 OOResult<XTextDocument, OOError> odoc = getXTextDocument();
@@ -872,9 +885,90 @@ class OOBibBase {
             } catch (DisposedException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } catch (CreationException
-                     | WrappedTargetException
-                     | com.sun.star.lang.IllegalArgumentException ex) {
+                    | WrappedTargetException
+                    | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not update bibliography", ex);
+                OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
+            }
+        } else if (style instanceof CitationStyle citationStyle) {
+            try {
+                OOResult<XTextDocument, OOError> odoc = getXTextDocument();
+                if (testDialog(errorTitle, odoc.asVoidResult())) {
+                    return;
+                }
+
+                XTextDocument doc = odoc.get();
+
+                OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
+
+                if (testDialog(errorTitle,
+                        fcursor.asVoidResult(),
+                        checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    return;
+                }
+
+                try {
+                    UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
+
+                    CSLCitationOOAdapter adapter = new CSLCitationOOAdapter(doc);
+                    adapter.readExistingMarks();
+
+                    // Collect only cited entries from all databases
+                    List<BibEntry> citedEntries = new ArrayList<>();
+                    for (BibDatabase database : databases) {
+                        for (BibEntry entry : database.getEntries()) {
+                            if (adapter.isCitedEntry(entry)) {
+                                citedEntries.add(entry);
+                            }
+                        }
+                    }
+
+                    // If no entries are cited, show a message and return
+                    if (citedEntries.isEmpty()) {
+                        dialogService.showInformationDialogAndWait(
+                                Localization.lang("Bibliography"),
+                                Localization.lang("No cited entries found in the document.")
+                        );
+                        return;
+                    }
+
+                    // A separate database and database
+                    BibDatabase bibDatabase = new BibDatabase(citedEntries);
+                    BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+
+                    CSLUpdateBibliography.rebuildCSLBibliography(doc, adapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+
+//                    // Create a new cursor at the end of the document for bibliography insertion
+//                    XTextCursor bibliographyCursor = doc.getText().createTextCursor();
+//                    bibliographyCursor.gotoEnd(false);
+//
+//                    // Insert bibliography title
+//                    String bibliographyTitle = Localization.lang("\nReferences");
+//                    bibliographyCursor.setString("\n");
+//
+//                    // Apply formatting to the title (here, we make it bold and larger)
+//                    XTextRange titleRange = bibliographyCursor.getStart();
+//                    titleRange.setString(bibliographyTitle);
+//                    XPropertySet titleProps = UnoRuntime.queryInterface(XPropertySet.class, titleRange);
+//                    titleProps.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
+//                    titleProps.setPropertyValue("CharHeight", 16f);
+//
+//                    // Move cursor to prevent reference mark bleed-out (current implementation) TODO: Remove once bleed-out is fixed
+//                    bibliographyCursor.goRight((short) 1, false);
+//
+//                    // Insert bibliography entries
+//                    // BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(databases.getFirst());
+//                    // TODO: Ask Chris if injecting database context is a good idea
+//                    BibDatabaseContext bibDatabaseContext = Injector.instantiateModelOrService(BibDatabaseContext.class);
+//                    BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
+//
+//                    adapter.insertBibliography(bibliographyCursor, citationStyle, citedEntries, bibDatabaseContext, bibEntryTypesManager);
+                } finally {
+                    UnoUndo.leaveUndoContext(doc);
+                    fcursor.get().restore(doc);
+                }
+            } catch (Exception ex) {
+                LOGGER.warn("Could not create bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         }
