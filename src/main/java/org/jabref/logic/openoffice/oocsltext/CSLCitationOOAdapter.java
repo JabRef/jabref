@@ -3,6 +3,7 @@ package org.jabref.logic.openoffice.oocsltext;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,16 +16,17 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+import org.jabref.model.openoffice.uno.NoDocumentException;
+import org.jabref.model.openoffice.uno.UnoTextSection;
 
-import com.sun.star.beans.XPropertySet;
-import com.sun.star.text.ControlCharacter;
+import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
-import com.sun.star.uno.UnoRuntime;
 import org.apache.commons.text.StringEscapeUtils;
 
 public class CSLCitationOOAdapter {
@@ -49,45 +51,68 @@ public class CSLCitationOOAdapter {
         markManager.readExistingMarks();
     }
 
+    public static Optional<XTextRange> getBibliographyRange(XTextDocument doc)
+            throws
+            NoDocumentException,
+            WrappedTargetException {
+        return UnoTextSection.getAnchor(doc, "CSL_bibliography");
+    }
+
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws Exception {
-        XTextCursor bibliographyCursor = document.getText().createTextCursor();
-        bibliographyCursor.gotoEnd(false);
-        // My approach:
-        // Insert the bibliography title
-        XTextRange titleRange = bibliographyCursor.getStart();
-        titleRange.setString(BIBLIOGRAPHY_TITLE);
-
-        // Set the paragraph style for the title
-        XPropertySet titleProps = UnoRuntime.queryInterface(XPropertySet.class, titleRange);
-        titleProps.setPropertyValue("ParaStyleName", BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
-
-        // Move the cursor to the end of the title
-        bibliographyCursor.gotoEnd(false);
-
-        // Insert a paragraph break after the title
-        bibliographyCursor.getText().insertControlCharacter(bibliographyCursor, ControlCharacter.PARAGRAPH_BREAK, false);
-
-        // Create a new paragraph for references and set its style
-        XTextRange refParagraph = bibliographyCursor.getStart();
-        XPropertySet refParaProps = UnoRuntime.queryInterface(XPropertySet.class, refParagraph);
-        refParaProps.setPropertyValue("ParaStyleName", "Body Text");
+//        XTextCursor bibliographyCursor = document.getText().createTextCursor();
+//        bibliographyCursor.gotoEnd(false);
+//        // My approach:
+//        // Insert the bibliography title
+//        XTextRange titleRange = bibliographyCursor.getStart();
+//        titleRange.setString(BIBLIOGRAPHY_TITLE);
+//
+//        // Set the paragraph style for the title
+//        XPropertySet titleProps = UnoRuntime.queryInterface(XPropertySet.class, titleRange);
+//        titleProps.setPropertyValue("ParaStyleName", BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
+//
+//        // Move the cursor to the end of the title
+//        bibliographyCursor.gotoEnd(false);
+//
+//        // Insert a paragraph break after the title
+//        bibliographyCursor.getText().insertControlCharacter(bibliographyCursor, ControlCharacter.PARAGRAPH_BREAK, false);
+//
+//        // Create a new paragraph for references and set its style
+//        XTextRange refParagraph = bibliographyCursor.getStart();
+//        XPropertySet refParaProps = UnoRuntime.queryInterface(XPropertySet.class, refParagraph);
+//        refParaProps.setPropertyValue("ParaStyleName", "Body Text");
+        // Always creating at the end of the document.
+        // Alternatively, we could receive a cursor.
+        XTextCursor textCursor = document.getText().createTextCursor();
+        textCursor.gotoEnd(false);
+        DocumentAnnotation annotation = new DocumentAnnotation(document, "CSL_bibliography", textCursor, false);
+        UnoTextSection.create(annotation);
 
         // antalk2's derivative
-//        OOText title = OOFormat.paragraph(OOText.fromString(BIBLIOGRAPHY_TITLE), BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
-//        OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
-//        OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), "Body Text");
-//        OOTextIntoOO.write(document, cursor, ooBreak);
+        OOText title = OOFormat.paragraph(OOText.fromString(BIBLIOGRAPHY_TITLE), BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
+        OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
+        OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), "Body Text");
+        OOTextIntoOO.write(document, cursor, ooBreak);
 
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
 
         // Sort entries based on their order of appearance in the document
         entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
-
         for (BibEntry entry : entries) {
             String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, bibDatabaseContext, bibEntryTypesManager).getFirst();
-            writeCitation(document, cursor, entry, citation);
+            String citationKey = entry.getCitationKey().orElse("");
+            int currentNumber = markManager.getCitationNumber(citationKey);
+
+            String formattedCitation;
+            if (isNumericStyle) {
+                formattedCitation = updateSingleCitation(transformHtml(citation), currentNumber);
+            } else {
+                formattedCitation = transformHtml(citation);
+            }
+            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+
+            OOTextIntoOO.write(document, cursor, ooText);
             if (isNumericStyle) {
                 // Select the paragraph break
                 cursor.goLeft((short) 1, true);
@@ -96,6 +121,13 @@ public class CSLCitationOOAdapter {
                 cursor.setString("");
             }
         }
+        // remove the initial empty paragraph from the section.
+        XTextRange sectionRange = getBibliographyRange(document).orElseThrow(IllegalStateException::new);
+        XTextCursor initialParagraph = document.getText().createTextCursorByRange(sectionRange);
+        initialParagraph.collapseToStart();
+        initialParagraph.goRight((short) 1, true);
+        initialParagraph.setString("");
+        // TODO: Chris help
     }
 
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager) throws Exception {
