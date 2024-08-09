@@ -484,7 +484,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
     private static final String KEYRING_AI_SERVICE = "org.jabref.ai";
-    private static final String KEYRING_AI_SERVICE_ACCOUNT = "apitoken";
+    private static final String KEYRING_AI_SERVICE_ACCOUNT = "apiKey";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
@@ -2817,21 +2817,21 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(aiPreferences.mistralAiChatModelProperty(), (obs, oldValue, newValue) -> put(AI_MISTRAL_AI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (obs, oldValue, newValue) -> put(AI_HUGGING_FACE_CHAT_MODEL, newValue));
 
-        EasyBind.listen(aiPreferences.openAiApiTokenProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(aiPreferences.openAiApiKeyProperty(), (obs, oldValue, newValue) -> {
             if (aiPreferences.getEnableAi()) {
-                storeAiApiTokenInKeyring(AiPreferences.AiProvider.OPEN_AI, newValue);
+                storeAiApiKeyInKeyring(AiPreferences.AiProvider.OPEN_AI, newValue);
             }
         });
 
-        EasyBind.listen(aiPreferences.mistralAiApiTokenProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(aiPreferences.mistralAiApiKeyProperty(), (obs, oldValue, newValue) -> {
             if (aiPreferences.getEnableAi()) {
-                storeAiApiTokenInKeyring(AiPreferences.AiProvider.MISTRAL_AI, newValue);
+                storeAiApiKeyInKeyring(AiPreferences.AiProvider.MISTRAL_AI, newValue);
             }
         });
 
-        EasyBind.listen(aiPreferences.huggingFaceApiTokenProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(aiPreferences.huggingFaceApiKeyProperty(), (obs, oldValue, newValue) -> {
             if (aiPreferences.getEnableAi()) {
-                storeAiApiTokenInKeyring(AiPreferences.AiProvider.HUGGING_FACE, newValue);
+                storeAiApiKeyInKeyring(AiPreferences.AiProvider.HUGGING_FACE, newValue);
             }
         });
 
@@ -2859,18 +2859,18 @@ public class JabRefPreferences implements PreferencesService {
             Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
             return password.decrypt();
         } catch (Exception e) {
-            LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token", e);
+            LOGGER.warn("JabRef could not open keyring for retrieving {} API token", aiProvider.getLabel(), e);
             return "";
         }
     }
 
-    private void storeAiApiTokenInKeyring(AiPreferences.AiProvider aiProvider, String newToken) {
+    private void storeAiApiKeyInKeyring(AiPreferences.AiProvider aiProvider, String newKey) {
         try (final Keyring keyring = Keyring.create()) {
-            Password password = new Password(newToken, getInternalPreferences().getUserAndHost());
+            Password password = new Password(newKey, getInternalPreferences().getUserAndHost());
             String rawPassword = password.encrypt();
             keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name(), rawPassword);
         } catch (Exception e) {
-            LOGGER.warn("JabRef could not open keyring for retrieving OpenAI API token", e);
+            LOGGER.warn("JabRef could not open keyring for storing {} API token", aiProvider.getLabel(), e);
         }
     }
 

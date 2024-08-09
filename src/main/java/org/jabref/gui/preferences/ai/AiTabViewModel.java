@@ -46,11 +46,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final StringProperty mistralAiChatModel = new SimpleStringProperty();
     private final StringProperty huggingFaceChatModel = new SimpleStringProperty();
 
-    private final StringProperty currentApiToken = new SimpleStringProperty();
+    private final StringProperty currentApiKey = new SimpleStringProperty();
 
-    private final StringProperty openAiApiToken = new SimpleStringProperty();
-    private final StringProperty mistralAiApiToken = new SimpleStringProperty();
-    private final StringProperty huggingFaceApiToken = new SimpleStringProperty();
+    private final StringProperty openAiApiKey = new SimpleStringProperty();
+    private final StringProperty mistralAiApiKey = new SimpleStringProperty();
+    private final StringProperty huggingFaceApiKey = new SimpleStringProperty();
 
     private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
 
@@ -78,7 +78,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final AiPreferences aiPreferences;
 
-    private final Validator apiTokenValidator;
+    private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
     private final Validator apiBaseUrlValidator;
     private final Validator instructionValidator;
@@ -97,22 +97,22 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             disableExpertSettings.set(!newValue || !customizeExpertSettings.get());
 
             if (newValue) {
-                openAiApiToken.set(preferencesService.getApiKeyForAiProvider(AiPreferences.AiProvider.OPEN_AI));
-                mistralAiApiToken.set(preferencesService.getApiKeyForAiProvider(AiPreferences.AiProvider.MISTRAL_AI));
-                huggingFaceApiToken.set(preferencesService.getApiKeyForAiProvider(AiPreferences.AiProvider.HUGGING_FACE));
+                openAiApiKey.set(preferencesService.getApiKeyForAiProvider(AiPreferences.AiProvider.OPEN_AI));
+                mistralAiApiKey.set(preferencesService.getApiKeyForAiProvider(AiPreferences.AiProvider.MISTRAL_AI));
+                huggingFaceApiKey.set(preferencesService.getApiKeyForAiProvider(AiPreferences.AiProvider.HUGGING_FACE));
 
                 if (selectedAiProvider.get() != null) {
                     switch (selectedAiProvider.get()) {
                         case OPEN_AI -> {
-                            currentApiToken.set(openAiApiToken.get());
+                            currentApiKey.set(openAiApiKey.get());
                         }
 
                         case MISTRAL_AI -> {
-                            currentApiToken.set(mistralAiApiToken.get());
+                            currentApiKey.set(mistralAiApiKey.get());
                         }
 
                         case HUGGING_FACE -> {
-                            currentApiToken.set(huggingFaceApiToken.get());
+                            currentApiKey.set(huggingFaceApiKey.get());
                         }
                     }
                 }
@@ -138,18 +138,18 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 switch (oldValue) {
                     case OPEN_AI -> {
                         openAiChatModel.set(oldChatModel);
-                        openAiApiToken.set(currentApiToken.get());
+                        openAiApiKey.set(currentApiKey.get());
                         openAiApiBaseUrl.set(currentApiBaseUrl.get());
                     }
 
                     case MISTRAL_AI -> {
                         mistralAiChatModel.set(oldChatModel);
-                        mistralAiApiToken.set(currentApiToken.get());
+                        mistralAiApiKey.set(currentApiKey.get());
                         mistralAiApiBaseUrl.set(currentApiBaseUrl.get()); }
 
                     case HUGGING_FACE -> {
                         huggingFaceChatModel.set(oldChatModel);
-                        huggingFaceApiToken.set(currentApiToken.get());
+                        huggingFaceApiKey.set(currentApiKey.get());
                         huggingFaceApiBaseUrl.set(currentApiBaseUrl.get());
                     }
                 }
@@ -158,19 +158,19 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             switch (newValue) {
                 case OPEN_AI -> {
                     currentChatModel.set(openAiChatModel.get());
-                    currentApiToken.set(openAiApiToken.get());
+                    currentApiKey.set(openAiApiKey.get());
                     currentApiBaseUrl.set(openAiApiBaseUrl.get());
                 }
 
                 case MISTRAL_AI -> {
                     currentChatModel.set(mistralAiChatModel.get());
-                    currentApiToken.set(mistralAiApiToken.get());
+                    currentApiKey.set(mistralAiApiKey.get());
                     currentApiBaseUrl.set(mistralAiApiBaseUrl.get());
                 }
 
                 case HUGGING_FACE -> {
                     currentChatModel.set(huggingFaceChatModel.get());
-                    currentApiToken.set(huggingFaceApiToken.get());
+                    currentApiKey.set(huggingFaceApiKey.get());
                     currentApiBaseUrl.set(huggingFaceApiBaseUrl.get());
                 }
             }
@@ -193,11 +193,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             contextWindowSize.set(modelContextWindows.getOrDefault(newValue, AiDefaultPreferences.CONTEXT_WINDOW_SIZE));
         });
 
-        this.currentApiToken.addListener((observable, oldValue, newValue) -> {
+        this.currentApiKey.addListener((observable, oldValue, newValue) -> {
             switch (selectedAiProvider.get()) {
-                case OPEN_AI -> openAiApiToken.set(newValue);
-                case MISTRAL_AI -> mistralAiApiToken.set(newValue);
-                case HUGGING_FACE -> huggingFaceApiToken.set(newValue);
+                case OPEN_AI -> openAiApiKey.set(newValue);
+                case MISTRAL_AI -> mistralAiApiKey.set(newValue);
+                case HUGGING_FACE -> huggingFaceApiKey.set(newValue);
             }
         });
 
@@ -209,10 +209,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        this.apiTokenValidator = new FunctionBasedValidator<>(
-                currentApiToken,
+        this.apiKeyValidator = new FunctionBasedValidator<>(
+                currentApiKey,
                 token -> !StringUtil.isBlank(token),
-                ValidationMessage.error(Localization.lang("An OpenAI token has to be provided")));
+                ValidationMessage.error(Localization.lang("An API key has to be provided")));
 
         this.chatModelValidator = new FunctionBasedValidator<>(
                 currentChatModel,
@@ -269,9 +269,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         mistralAiChatModel.setValue(aiPreferences.getMistralAiChatModel());
         huggingFaceChatModel.setValue(aiPreferences.getHuggingFaceChatModel());
 
-        openAiApiToken.setValue(aiPreferences.getOpenAiApiToken());
-        mistralAiApiToken.setValue(aiPreferences.getMistralAiApiToken());
-        huggingFaceApiToken.setValue(aiPreferences.getHuggingFaceApiToken());
+        openAiApiKey.setValue(aiPreferences.getOpenAiApiKey());
+        mistralAiApiKey.setValue(aiPreferences.getMistralAiApiKey());
+        huggingFaceApiKey.setValue(aiPreferences.getHuggingFaceApiKey());
 
         customizeExpertSettings.setValue(aiPreferences.getCustomizeExpertSettings());
 
@@ -302,9 +302,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setMistralAiChatModel(mistralAiChatModel.get() == null ? "" : mistralAiChatModel.get());
         aiPreferences.setHuggingFaceChatModel(huggingFaceChatModel.get() == null ? "" : huggingFaceChatModel.get());
 
-        aiPreferences.setOpenAiApiToken(openAiApiToken.get() == null ? "" : openAiApiToken.get());
-        aiPreferences.setMistralAiApiToken(mistralAiApiToken.get() == null ? "" : mistralAiApiToken.get());
-        aiPreferences.setHuggingFaceApiToken(huggingFaceApiToken.get() == null ? "" : huggingFaceApiToken.get());
+        aiPreferences.setOpenAiApiKey(openAiApiKey.get() == null ? "" : openAiApiKey.get());
+        aiPreferences.setMistralAiApiKey(mistralAiApiKey.get() == null ? "" : mistralAiApiKey.get());
+        aiPreferences.setHuggingFaceApiKey(huggingFaceApiKey.get() == null ? "" : huggingFaceApiKey.get());
 
         aiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
 
@@ -355,7 +355,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public boolean validateBasicSettings() {
         List<Validator> validators = List.of(
                 chatModelValidator,
-                apiTokenValidator
+                apiKeyValidator
         );
 
         return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
@@ -400,8 +400,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return currentChatModel;
     }
 
-    public StringProperty apiTokenProperty() {
-        return currentApiToken;
+    public StringProperty apiKeyProperty() {
+        return currentApiKey;
     }
 
     public BooleanProperty customizeExpertSettingsProperty() {
@@ -461,7 +461,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     }
 
     public ValidationStatus getApiTokenValidationStatus() {
-        return apiTokenValidator.getValidationStatus();
+        return apiKeyValidator.getValidationStatus();
     }
 
     public ValidationStatus getChatModelValidationStatus() {

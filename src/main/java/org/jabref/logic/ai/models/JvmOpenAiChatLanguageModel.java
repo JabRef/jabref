@@ -33,7 +33,7 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
         this.aiPreferences = aiPreferences;
 
         OpenAI openAI = OpenAI
-                .newBuilder(aiPreferences.getSelectedApiToken())
+                .newBuilder(aiPreferences.getSelectedApiKey())
                 .httpClient(httpClient)
                 .baseUrl(aiPreferences.getSelectedApiBaseUrl())
                 .build();

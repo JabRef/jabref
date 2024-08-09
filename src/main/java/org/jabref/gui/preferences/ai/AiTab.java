@@ -91,7 +91,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             }
         });
 
-        apiKeyTextField.textProperty().bindBidirectional(viewModel.apiTokenProperty());
+        apiKeyTextField.textProperty().bindBidirectional(viewModel.apiKeyProperty());
         apiKeyTextField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
         customizeExpertSettingsCheckbox.selectedProperty().bindBidirectional(viewModel.customizeExpertSettingsProperty());

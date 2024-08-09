@@ -65,9 +65,9 @@ public class AiPreferences {
     private final StringProperty mistralAiChatModel;
     private final StringProperty huggingFaceChatModel;
 
-    private final StringProperty openAiApiToken;
-    private final StringProperty mistralAiApiToken;
-    private final StringProperty huggingFaceApiToken;
+    private final StringProperty openAiApiKey;
+    private final StringProperty mistralAiApiKey;
+    private final StringProperty huggingFaceApiKey;
 
     private final BooleanProperty customizeExpertSettings;
 
@@ -90,9 +90,9 @@ public class AiPreferences {
                          String openAiChatModel,
                          String mistralAiChatModel,
                          String huggingFaceChatModel,
-                         String openAiApiToken,
-                         String mistralAiApiToken,
-                         String huggingFaceApiToken,
+                         String openAiApiKey,
+                         String mistralAiApiKey,
+                         String huggingFaceApiKey,
                          boolean customizeExpertSettings,
                          String openAiApiBaseUrl,
                          String mistralAiApiBaseUrl,
@@ -116,9 +116,9 @@ public class AiPreferences {
         this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
         this.huggingFaceChatModel = new SimpleStringProperty(huggingFaceChatModel);
 
-        this.openAiApiToken = new SimpleStringProperty(openAiApiToken);
-        this.mistralAiApiToken = new SimpleStringProperty(mistralAiApiToken);
-        this.huggingFaceApiToken = new SimpleStringProperty(huggingFaceApiToken);
+        this.openAiApiKey = new SimpleStringProperty(openAiApiKey);
+        this.mistralAiApiKey = new SimpleStringProperty(mistralAiApiKey);
+        this.huggingFaceApiKey = new SimpleStringProperty(huggingFaceApiKey);
 
         this.customizeExpertSettings = new SimpleBooleanProperty(customizeExpertSettings);
 
@@ -196,40 +196,40 @@ public class AiPreferences {
         this.huggingFaceChatModel.set(huggingFaceChatModel);
     }
 
-    public StringProperty openAiApiTokenProperty() {
-        return openAiApiToken;
+    public StringProperty openAiApiKeyProperty() {
+        return openAiApiKey;
     }
 
-    public String getOpenAiApiToken() {
-        return openAiApiToken.get();
+    public String getOpenAiApiKey() {
+        return openAiApiKey.get();
     }
 
-    public void setOpenAiApiToken(String openAiApiToken) {
-        this.openAiApiToken.set(openAiApiToken);
+    public void setOpenAiApiKey(String openAiApiKey) {
+        this.openAiApiKey.set(openAiApiKey);
     }
 
-    public StringProperty mistralAiApiTokenProperty() {
-        return mistralAiApiToken;
+    public StringProperty mistralAiApiKeyProperty() {
+        return mistralAiApiKey;
     }
 
-    public String getMistralAiApiToken() {
-        return mistralAiApiToken.get();
+    public String getMistralAiApiKey() {
+        return mistralAiApiKey.get();
     }
 
-    public void setMistralAiApiToken(String mistralAiApiToken) {
-        this.mistralAiApiToken.set(mistralAiApiToken);
+    public void setMistralAiApiKey(String mistralAiApiKey) {
+        this.mistralAiApiKey.set(mistralAiApiKey);
     }
 
-    public StringProperty huggingFaceApiTokenProperty() {
-        return huggingFaceApiToken;
+    public StringProperty huggingFaceApiKeyProperty() {
+        return huggingFaceApiKey;
     }
 
-    public String getHuggingFaceApiToken() {
-        return huggingFaceApiToken.get();
+    public String getHuggingFaceApiKey() {
+        return huggingFaceApiKey.get();
     }
 
-    public void setHuggingFaceApiToken(String huggingFaceAiApiToken) {
-        this.huggingFaceApiToken.set(huggingFaceAiApiToken);
+    public void setHuggingFaceApiKey(String huggingFaceAiApiToken) {
+        this.huggingFaceApiKey.set(huggingFaceAiApiToken);
     }
 
     public BooleanProperty customizeExpertSettingsProperty() {
@@ -458,19 +458,19 @@ public class AiPreferences {
     }
 
     public void listenToApiTokens(Runnable runnable) {
-        openAiApiToken.addListener((observableValue, oldValue, newValue) -> {
+        openAiApiKey.addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.equals(oldValue)) {
                 runnable.run();
             }
         });
 
-        mistralAiApiToken.addListener((observableValue, oldValue, newValue) -> {
+        mistralAiApiKey.addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.equals(oldValue)) {
                 runnable.run();
             }
         });
 
-        huggingFaceApiToken.addListener((observableValue, oldValue, newValue) -> {
+        huggingFaceApiKey.addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.equals(oldValue)) {
                 runnable.run();
             }
@@ -508,28 +508,28 @@ public class AiPreferences {
         };
     }
 
-    public String getSelectedApiToken() {
+    public String getSelectedApiKey() {
         if (!enableAi.get()) {
             return "";
         }
 
-        retrieveTokens();
-        return getTokens();
+        retrieveKeys();
+        return getKeys();
     }
 
-    private void retrieveTokens() {
+    private void retrieveKeys() {
         switch (aiProvider.get()) {
-            case OPEN_AI -> openAiApiToken.set(preferencesService.getApiKeyForAiProvider(AiProvider.OPEN_AI));
-            case MISTRAL_AI -> mistralAiApiToken.set(preferencesService.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
-            case HUGGING_FACE -> huggingFaceApiToken.set(preferencesService.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
+            case OPEN_AI -> openAiApiKey.set(preferencesService.getApiKeyForAiProvider(AiProvider.OPEN_AI));
+            case MISTRAL_AI -> mistralAiApiKey.set(preferencesService.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
+            case HUGGING_FACE -> huggingFaceApiKey.set(preferencesService.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
         }
     }
 
-    private String getTokens() {
+    private String getKeys() {
         return switch (aiProvider.get()) {
-            case OPEN_AI -> openAiApiToken.get();
-            case MISTRAL_AI -> mistralAiApiToken.get();
-            case HUGGING_FACE -> huggingFaceApiToken.get();
+            case OPEN_AI -> openAiApiKey.get();
+            case MISTRAL_AI -> mistralAiApiKey.get();
+            case HUGGING_FACE -> huggingFaceApiKey.get();
         };
     }
 
