@@ -283,7 +283,7 @@ public class CSLCitationOOAdapter {
         cursor.collapseToEnd();
     }
 
-    private String updateSingleCitation(String citation, int currentNumber) {
+    public static String updateSingleCitation(String citation, int currentNumber) {
         Pattern pattern = Pattern.compile("(\\[|\\()?(\\d+)(\\]|\\))?(\\.)?\\s*");
         Matcher matcher = pattern.matcher(citation);
         StringBuilder sb = new StringBuilder();
@@ -294,18 +294,13 @@ public class CSLCitationOOAdapter {
                 String prefix = matcher.group(1) != null ? matcher.group(1) : "";
                 String suffix = matcher.group(3) != null ? matcher.group(3) : "";
                 String dot = matcher.group(4) != null ? "." : "";
+                String space = matcher.group().endsWith(" ") ? " " : "";
 
-                String replacement;
-                if (prefix.isEmpty() && suffix.isEmpty()) {
-                    replacement = currentNumber + dot + " ";
-                } else {
-                    replacement = prefix + currentNumber + suffix + dot + " ";
-                }
+                String replacement = prefix + currentNumber + suffix + dot + space;
 
                 matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
                 numberReplaced = true;
             } else {
-                // If we've already replaced the number, keep any subsequent numbers as they are
                 matcher.appendReplacement(sb, matcher.group());
             }
         }
