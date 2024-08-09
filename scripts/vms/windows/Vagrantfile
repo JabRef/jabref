@@ -24,8 +24,12 @@ Vagrant.configure("2") do |config|
 
     choco install libericajdk
     choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal /WindowsTerminalProfile"
-    choco install firefox
-    choco install libreoffice-fresh
+
+    # Required by AI functionaltiy
+    choco choco install vcredist140
+
+    # choco install firefox
+    # choco install libreoffice-fresh
   SHELL
 
   config.vm.provision "shell", reboot: true
