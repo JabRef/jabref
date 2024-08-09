@@ -18,6 +18,7 @@ import org.jabref.gui.ai.components.errormessage.ErrorMessageComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChatLogic;
+import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.AiPreferences;
 
@@ -76,7 +77,18 @@ public class AiChatComponent extends VBox {
             }
         });
 
-        chatVBox.getChildren().addAll(aiChatLogic.getChatHistory().getMessages().stream().map(ChatMessageComponent::new).toList());
+        chatVBox
+                .getChildren()
+                .addAll(aiChatLogic.getChatHistory()
+                                   .getMessages()
+                                   .stream()
+                                   .map(chatMessage ->
+                                           chatMessage instanceof ErrorMessage
+                                                   ? new ErrorMessageComponent(((ErrorMessage) chatMessage).getText())
+                                                   : new ChatMessageComponent(chatMessage)
+                                   )
+                                   .toList()
+                );
 
         String newNotice = noticeText
                 .getText()
@@ -179,6 +191,8 @@ public class AiChatComponent extends VBox {
     }
 
     private void addError(String message) {
+        aiChatLogic.getChatHistory().add(new ErrorMessage(message));
+
         ErrorMessageComponent component = new ErrorMessageComponent(message);
         chatVBox.getChildren().add(component);
     }

@@ -3,6 +3,7 @@ package org.jabref.logic.ai;
 import java.util.List;
 
 import org.jabref.logic.ai.chathistory.AiChatHistory;
+import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.CanonicalBibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -84,7 +85,7 @@ public class AiChatLogic {
                 .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenizer())
                 .build();
 
-        chatMessages.forEach(chatMemory::add);
+        chatMessages.stream().filter(chatMessage -> !(chatMessage instanceof ErrorMessage)).forEach(chatMemory::add);
 
         setSystemMessage(aiPreferences.getInstruction());
     }

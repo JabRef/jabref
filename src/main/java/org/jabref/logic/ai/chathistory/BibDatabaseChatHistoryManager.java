@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.jabref.gui.StateManager;
+import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;
@@ -36,14 +38,16 @@ public class BibDatabaseChatHistoryManager {
 
     private final StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
 
-    private record ChatHistoryRecord(ChatMessageType type, String content) implements Serializable {
+    private record ChatHistoryRecord(String className, String content) implements Serializable {
         public ChatMessage toLangchainMessage() {
-            if (type == ChatMessageType.AI) {
+            if (className.equals(AiMessage.class.getName())) {
                 return new AiMessage(content);
-            } else if (type == ChatMessageType.USER) {
+            } else if (className.equals(UserMessage.class.getName())) {
                 return new UserMessage(content);
+            } else if (className.equals(ErrorMessage.class.getName())) {
+                return new ErrorMessage(content);
             } else {
-                LOGGER.warn("BibDatabaseChatHistoryManager supports only AI and user messages, but retrieved message has other type: {}. Will treat as an AI message", type);
+                LOGGER.warn("BibDatabaseChatHistoryManager supports only AI and user messages, but retrieved message has other type: {}. Will treat as an AI message", className);
                 return new AiMessage(content);
             }
         }
@@ -80,16 +84,20 @@ public class BibDatabaseChatHistoryManager {
 
                 String content;
 
-                if (chatMessage instanceof AiMessage aiMessage) {
-                    content = aiMessage.text();
-                } else if (chatMessage instanceof UserMessage userMessage) {
-                    content = userMessage.singleText();
-                } else {
-                    LOGGER.warn("BibDatabaseChatHistoryFile supports only AI and user messages, but added message has other type: {}", chatMessage.type().name());
-                    return;
+                switch (chatMessage) {
+                    case AiMessage aiMessage ->
+                            content = aiMessage.text();
+                    case UserMessage userMessage ->
+                            content = userMessage.singleText();
+                    case ErrorMessage errorMessage ->
+                            content = errorMessage.getText();
+                    default -> {
+                        LOGGER.warn("BibDatabaseChatHistoryFile supports only AI, user. and error messages, but added message has other type: {}", chatMessage.type().name());
+                        return;
+                    }
                 }
 
-                map.put(id, new ChatHistoryRecord(chatMessage.type(), content));
+                map.put(id, new ChatHistoryRecord(chatMessage.getClass().getName(), content));
             }
 
             @Override
