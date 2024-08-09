@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -35,18 +36,30 @@ public class ChatMessageComponent extends HBox {
 
     @FXML
     private void initialize() {
-        if (chatMessage instanceof UserMessage userMessage) {
-            setColor("-jr-ai-message-user", "-jr-ai-message-user-border");
-            setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-            sourceLabel.setText(Localization.lang("User"));
-            contentTextArea.setText(userMessage.singleText());
-        } else if (chatMessage instanceof AiMessage aiMessage) {
-            setColor("-jr-ai-message-ai", "-jr-ai-message-ai-border");
-            setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
-            sourceLabel.setText(Localization.lang("AI"));
-            contentTextArea.setText(aiMessage.text());
-        } else {
-            LOGGER.warn("ChatMessageComponent supports only user or AI messages, but other type was passed: {}", chatMessage.type().name());
+        switch (chatMessage) {
+            case UserMessage userMessage -> {
+                setColor("-jr-ai-message-user", "-jr-ai-message-user-border");
+                setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+                sourceLabel.setText(Localization.lang("User"));
+                contentTextArea.setText(userMessage.singleText());
+            }
+
+            case AiMessage aiMessage -> {
+                setColor("-jr-ai-message-ai", "-jr-ai-message-ai-border");
+                setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+                sourceLabel.setText(Localization.lang("AI"));
+                contentTextArea.setText(aiMessage.text());
+            }
+
+            case ErrorMessage errorMessage -> {
+                setColor("-jr-ai-message-error", "-jr-ai-message-error-border");
+                setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+                sourceLabel.setText(Localization.lang("Error"));
+                contentTextArea.setText(errorMessage.getText());
+            }
+
+            default ->
+                LOGGER.warn("ChatMessageComponent supports only user or AI messages, but other type was passed: {}", chatMessage.type().name());
         }
     }
 

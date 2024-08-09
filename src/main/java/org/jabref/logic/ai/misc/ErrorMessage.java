@@ -26,6 +26,7 @@ public class ErrorMessage implements ChatMessage {
     }
 
     @Override
+    @Deprecated
     public String text() {
         return text;
     }

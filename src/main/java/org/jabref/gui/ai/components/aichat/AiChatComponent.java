@@ -14,7 +14,6 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
-import org.jabref.gui.ai.components.errormessage.ErrorMessageComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChatLogic;
@@ -82,11 +81,7 @@ public class AiChatComponent extends VBox {
                 .addAll(aiChatLogic.getChatHistory()
                                    .getMessages()
                                    .stream()
-                                   .map(chatMessage ->
-                                           chatMessage instanceof ErrorMessage
-                                                   ? new ErrorMessageComponent(((ErrorMessage) chatMessage).getText())
-                                                   : new ChatMessageComponent(chatMessage)
-                                   )
+                                   .map(ChatMessageComponent::new)
                                    .toList()
                 );
 
@@ -192,9 +187,7 @@ public class AiChatComponent extends VBox {
 
     private void addError(String message) {
         aiChatLogic.getChatHistory().add(new ErrorMessage(message));
-
-        ErrorMessageComponent component = new ErrorMessageComponent(message);
-        chatVBox.getChildren().add(component);
+        chatVBox.getChildren().add(new ChatMessageComponent(new ErrorMessage(message)));
     }
 
     private void requestUserPromptTextFieldFocus() {
