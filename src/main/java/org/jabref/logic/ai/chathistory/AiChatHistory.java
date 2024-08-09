@@ -9,5 +9,7 @@ public interface AiChatHistory {
 
     void add(ChatMessage chatMessage);
 
+    void remove(ChatMessage chatMessage);
+
     void clear();
 }

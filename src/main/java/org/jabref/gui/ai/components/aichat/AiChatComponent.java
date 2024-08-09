@@ -81,7 +81,7 @@ public class AiChatComponent extends VBox {
                 .addAll(aiChatLogic.getChatHistory()
                                    .getMessages()
                                    .stream()
-                                   .map(ChatMessageComponent::new)
+                                   .map(message -> new ChatMessageComponent(message, this::deleteMessage))
                                    .toList()
                 );
 
@@ -181,13 +181,22 @@ public class AiChatComponent extends VBox {
     }
 
     private void addMessage(ChatMessage chatMessage) {
-        ChatMessageComponent component = new ChatMessageComponent(chatMessage);
+        ChatMessageComponent component = new ChatMessageComponent(chatMessage, this::deleteMessage);
+        // chatMessage will be added to chat history in {@link AiChatLogic}.
         chatVBox.getChildren().add(component);
     }
 
     private void addError(String message) {
-        aiChatLogic.getChatHistory().add(new ErrorMessage(message));
-        chatVBox.getChildren().add(new ChatMessageComponent(new ErrorMessage(message)));
+        ErrorMessage errorMessage = new ErrorMessage(message);
+
+        addMessage(errorMessage);
+        aiChatLogic.getChatHistory().add(errorMessage);
+    }
+
+    private void deleteMessage(ChatMessageComponent chatMessageComponent) {
+        aiChatLogic.getChatHistory().remove(chatMessageComponent.getChatMessage());
+
+        chatVBox.getChildren().remove(chatMessageComponent);
     }
 
     private void requestUserPromptTextFieldFocus() {

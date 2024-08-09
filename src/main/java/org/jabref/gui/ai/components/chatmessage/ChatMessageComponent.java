@@ -1,5 +1,7 @@
 package org.jabref.gui.ai.components.chatmessage;
 
+import java.util.function.Consumer;
+
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Label;
@@ -21,17 +23,24 @@ public class ChatMessageComponent extends HBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatMessageComponent.class);
 
     private final ChatMessage chatMessage;
+    private final Consumer<ChatMessageComponent> onDeleteCallback;
 
     @FXML private VBox vBox;
     @FXML private Label sourceLabel;
     @FXML private ExpandingTextArea contentTextArea;
+    @FXML private HBox buttonsHBox;
 
-    public ChatMessageComponent(ChatMessage chatMessage) {
+    public ChatMessageComponent(ChatMessage chatMessage, Consumer<ChatMessageComponent> onDeleteCallback) {
         this.chatMessage = chatMessage;
+        this.onDeleteCallback = onDeleteCallback;
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
+    }
+
+    public ChatMessage getChatMessage() {
+        return chatMessage;
     }
 
     @FXML
@@ -63,7 +72,12 @@ public class ChatMessageComponent extends HBox {
         }
     }
 
-    public void setColor(String fillColor, String borderColor) {
+    @FXML
+    private void onDeleteClick() {
+        onDeleteCallback.accept(this);
+    }
+
+    private void setColor(String fillColor, String borderColor) {
         vBox.setStyle("-fx-background-color: " + fillColor + "; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-color: " + borderColor + "; -fx-border-width: 3;");
     }
 }

@@ -82,22 +82,29 @@ public class BibDatabaseChatHistoryManager {
                 // 1 entry -> 0 is assigned, 1 is the next number, which is also the size
                 int id = map.keySet().size();
 
-                String content;
-
-                switch (chatMessage) {
-                    case AiMessage aiMessage ->
-                            content = aiMessage.text();
-                    case UserMessage userMessage ->
-                            content = userMessage.singleText();
-                    case ErrorMessage errorMessage ->
-                            content = errorMessage.getText();
-                    default -> {
-                        LOGGER.warn("BibDatabaseChatHistoryFile supports only AI, user. and error messages, but added message has other type: {}", chatMessage.type().name());
-                        return;
-                    }
-                }
+                String content = getContentFromLangchainMessage(chatMessage);
 
                 map.put(id, new ChatHistoryRecord(chatMessage.getClass().getName(), content));
+            }
+
+            @Override
+            public void remove(ChatMessage chatMessage) {
+                Map<Integer, ChatHistoryRecord> map = getMap(bibDatabasePath, citationKey);
+
+                String content = getContentFromLangchainMessage(chatMessage);
+
+                Optional<Integer> id = map
+                        .entrySet()
+                        .stream()
+                        .filter(entry -> entry.getValue().className.equals(chatMessage.getClass().getName()) && entry.getValue().content.equals(content))
+                        .map(Map.Entry::getKey)
+                        .findFirst();
+
+                if (id.isPresent()) {
+                    map.remove(id.get());
+                } else {
+                    LOGGER.error("Attempted to delete a message that does not exist in the chat history: {}", chatMessage);
+                }
             }
 
             @Override
@@ -105,6 +112,25 @@ public class BibDatabaseChatHistoryManager {
                 getMap(bibDatabasePath, citationKey).clear();
             }
         };
+    }
+
+    private static String getContentFromLangchainMessage(ChatMessage chatMessage) {
+        String content;
+
+        switch (chatMessage) {
+            case AiMessage aiMessage ->
+                    content = aiMessage.text();
+            case UserMessage userMessage ->
+                    content = userMessage.singleText();
+            case ErrorMessage errorMessage ->
+                    content = errorMessage.getText();
+            default -> {
+                LOGGER.warn("BibDatabaseChatHistoryManager supports only AI, user. and error messages, but added message has other type: {}", chatMessage.type().name());
+                return "";
+            }
+        }
+
+        return content;
     }
 
     @Subscribe

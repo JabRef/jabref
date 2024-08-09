@@ -19,6 +19,11 @@ public class InMemoryAiChatHistory implements AiChatHistory {
     }
 
     @Override
+    public void remove(ChatMessage chatMessage) {
+        chatMessages.remove(chatMessage);
+    }
+
+    @Override
     public void clear() {
         chatMessages.clear();
     }

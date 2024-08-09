@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
+<?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.chatmessage.ChatMessageComponent">
     <children>
         <VBox fx:id="vBox" spacing="10.0">
@@ -19,6 +20,18 @@
                     </font>
                 </Label>
                 <ExpandingTextArea fx:id="contentTextArea" editable="false" nodeOrientation="LEFT_TO_RIGHT" text="Content" />
+            <HBox fx:id="buttonsHBox" alignment="BASELINE_RIGHT">
+               <children>
+                   <Button onAction="#onDeleteClick" styleClass="icon-button,narrow" textAlignment="CENTER">
+                       <graphic>
+                           <JabRefIconView glyph="DELETE_ENTRY"/>
+                       </graphic>
+                       <tooltip>
+                           <Tooltip text="%Delete message from chat history" />
+                       </tooltip>
+                   </Button>
+               </children>
+            </HBox>
             </children>
       </VBox>
     </children>
