@@ -19,7 +19,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChatLogic;
 import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.ExpandingTextArea;

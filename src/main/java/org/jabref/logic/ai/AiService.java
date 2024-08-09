@@ -13,10 +13,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager;
-import org.jabref.logic.ai.models.EmbeddingModel;
+import org.jabref.logic.ai.models.JabRefEmbeddingModel;
 import org.jabref.logic.ai.models.JabRefChatLanguageModel;
 import org.jabref.logic.ai.summarization.SummariesStorage;
-import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.h2.mvstore.MVStore;
@@ -50,7 +50,7 @@ public class AiService implements AutoCloseable {
     private final JabRefChatLanguageModel jabRefChatLanguageModel;
     private final BibDatabaseChatHistoryManager bibDatabaseChatHistoryManager;
 
-    private final EmbeddingModel embeddingModel;
+    private final JabRefEmbeddingModel jabRefEmbeddingModel;
     private final FileEmbeddingsManager fileEmbeddingsManager;
 
     private final SummariesStorage summariesStorage;
@@ -75,8 +75,8 @@ public class AiService implements AutoCloseable {
 
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
         this.bibDatabaseChatHistoryManager = new BibDatabaseChatHistoryManager(mvStore);
-        this.embeddingModel = new EmbeddingModel(aiPreferences, dialogService, taskExecutor);
-        this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, shutdownSignal, embeddingModel, mvStore);
+        this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, dialogService, taskExecutor);
+        this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, shutdownSignal, jabRefEmbeddingModel, mvStore);
         this.summariesStorage = new SummariesStorage(aiPreferences, mvStore);
     }
 
@@ -86,7 +86,7 @@ public class AiService implements AutoCloseable {
 
         this.cachedThreadPool.shutdownNow();
         this.jabRefChatLanguageModel.close();
-        this.embeddingModel.close();
+        this.jabRefEmbeddingModel.close();
         this.mvStore.close();
     }
 
@@ -102,8 +102,8 @@ public class AiService implements AutoCloseable {
         return jabRefChatLanguageModel;
     }
 
-    public EmbeddingModel getEmbeddingModel() {
-        return embeddingModel;
+    public JabRefEmbeddingModel getEmbeddingModel() {
+        return jabRefEmbeddingModel;
     }
 
     public BibDatabaseChatHistoryManager getChatHistoryManager() {

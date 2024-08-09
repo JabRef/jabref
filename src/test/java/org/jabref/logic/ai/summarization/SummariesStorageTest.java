@@ -4,14 +4,13 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import org.h2.mvstore.MVStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

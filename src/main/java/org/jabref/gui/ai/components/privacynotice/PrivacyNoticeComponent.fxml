@@ -11,24 +11,24 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%Privacy notice">
+            <Text text="%Privacy notice">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
             </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). AI provider is an external service. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider.">
+            <Text text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). AI provider is an external service. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider.">
                <font>
                   <Font size="14.0" />
                </font>
             </Text>
-            <Text layoutX="20.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%As soon as you ask a question, the text content of all PDFs attached to the entry are sent to external service.">
+            <Text text="%As soon as you ask a question, the text content of all PDFs attached to the entry are sent to external service.">
                <font>
                   <Font size="14.0" />
                </font>
             </Text>
             <TextFlow fx:id="openAiPrivacyTextFlow">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the OpenAI as AI provider, the privacy policy of OpenAI applies. You find it at %0.">
+                  <Text text="%If you have chosen the OpenAI as AI provider, the privacy policy of OpenAI applies. You find it at %0.">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -37,7 +37,7 @@
             </TextFlow>
             <TextFlow fx:id="mistralAiPrivacyTextFlow">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the Mistral AI as AI provider, the privacy policy of Mistral AI applies. You find it at %0.">
+                  <Text text="%If you have chosen the Mistral AI as AI provider, the privacy policy of Mistral AI applies. You find it at %0.">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -46,18 +46,25 @@
             </TextFlow>
             <TextFlow fx:id="huggingFacePrivacyTextFlow">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%If you have chosen the Hugging Face as AI provider, the privacy policy of Hugging Face applies. You find it at %0.">
+                  <Text text="%If you have chosen the Hugging Face as AI provider, the privacy policy of Hugging Face applies. You find it at %0.">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
                </children>
             </TextFlow>
-            <Text layoutX="20.0" layoutY="98.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%Additionally, we use Deep Java Library embedding models for both chatting and summarization. The embedding model will be downloaded in background from Deep Java Library servers anonymously.">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Text>
+             <TextFlow>
+                <Text fx:id="embeddingModelText" text="%Additionally, we use Deep Java Library (DJL) embedding models for both chatting and summarization. The embedding model will be downloaded in background (size %0) from Deep Java Library servers anonymously.">
+                   <font>
+                      <Font size="14.0" />
+                   </font>
+                </Text>
+                 <Hyperlink onAction="#onDjlPrivacyPolicyClick" text="%Here you can find details about the Privacy Policy of DJL.">
+                     <font>
+                         <Font size="14.0" />
+                     </font>
+                 </Hyperlink>
+             </TextFlow>
             <Button mnemonicParsing="false" onAction="#onIAgreeButtonClick" text="%I agree">
                <font>
                   <Font size="14.0" />

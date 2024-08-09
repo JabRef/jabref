@@ -33,6 +33,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.preferences.ai.AiPreferences;
 
 import org.jvnet.hk2.annotations.Contract;
 

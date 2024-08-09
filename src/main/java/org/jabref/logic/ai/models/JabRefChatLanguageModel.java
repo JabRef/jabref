@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.message.AiMessage;

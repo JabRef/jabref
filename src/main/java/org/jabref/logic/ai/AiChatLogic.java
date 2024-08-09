@@ -7,7 +7,7 @@ import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.CanonicalBibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.chain.Chain;
 import dev.langchain4j.chain.ConversationalRetrievalChain;

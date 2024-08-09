@@ -10,9 +10,9 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.embeddings.LowLevelIngestor;
 import org.jabref.logic.ai.embeddings.MVStoreEmbeddingStore;
-import org.jabref.logic.ai.models.EmbeddingModel;
+import org.jabref.logic.ai.models.JabRefEmbeddingModel;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.segment.TextSegment;
@@ -42,13 +42,13 @@ public class FileEmbeddingsManager {
     private final FullyIngestedDocumentsTracker fullyIngestedDocumentsTracker;
     private final LowLevelIngestor lowLevelIngestor;
 
-    public FileEmbeddingsManager(AiPreferences aiPreferences, ReadOnlyBooleanProperty shutdownProperty, EmbeddingModel embeddingModel, MVStore mvStore) {
+    public FileEmbeddingsManager(AiPreferences aiPreferences, ReadOnlyBooleanProperty shutdownProperty, JabRefEmbeddingModel jabRefEmbeddingModel, MVStore mvStore) {
         this.aiPreferences = aiPreferences;
         this.shutdownProperty = shutdownProperty;
 
         this.embeddingStore = new MVStoreEmbeddingStore(mvStore);
         this.fullyIngestedDocumentsTracker = new FullyIngestedDocumentsTracker(mvStore);
-        this.lowLevelIngestor = new LowLevelIngestor(aiPreferences, embeddingStore, embeddingModel);
+        this.lowLevelIngestor = new LowLevelIngestor(aiPreferences, embeddingStore, jabRefEmbeddingModel);
 
         setupListeningToPreferencesChanges();
     }

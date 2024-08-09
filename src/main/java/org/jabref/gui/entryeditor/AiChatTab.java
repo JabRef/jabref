@@ -22,7 +22,7 @@ import org.jabref.logic.ai.GenerateEmbeddingsTask;
 import org.jabref.logic.ai.chathistory.AiChatHistory;
 import org.jabref.logic.ai.chathistory.InMemoryAiChatHistory;
 import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
-import org.jabref.logic.ai.models.EmbeddingModel;
+import org.jabref.logic.ai.models.JabRefEmbeddingModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
@@ -251,12 +251,12 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     @Subscribe
-    public void listen(EmbeddingModel.EmbeddingModelBuiltEvent event) {
+    public void listen(JabRefEmbeddingModel.EmbeddingModelBuiltEvent event) {
         UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
     }
 
     @Subscribe
-    public void listen(EmbeddingModel.EmbeddingModelBuildingErrorEvent event) {
+    public void listen(JabRefEmbeddingModel.EmbeddingModelBuildingErrorEvent event) {
         UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
     }
 }

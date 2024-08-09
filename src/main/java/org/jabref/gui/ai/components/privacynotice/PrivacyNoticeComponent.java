@@ -5,13 +5,12 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.ai.AiPreferences;
 import org.jabref.preferences.FilePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -24,6 +23,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
     @FXML private TextFlow openAiPrivacyTextFlow;
     @FXML private TextFlow mistralAiPrivacyTextFlow;
     @FXML private TextFlow huggingFacePrivacyTextFlow;
+    @FXML private Text embeddingModelText;
 
     private final DialogService dialogService;
 
@@ -49,6 +49,9 @@ public class PrivacyNoticeComponent extends ScrollPane {
         initPrivacyHyperlink(openAiPrivacyTextFlow, "https://openai.com/policies/privacy-policy/");
         initPrivacyHyperlink(mistralAiPrivacyTextFlow, "https://mistral.ai/terms/#privacy-policy");
         initPrivacyHyperlink(huggingFacePrivacyTextFlow, "https://huggingface.co/privacy");
+
+        String newEmbeddingModelText = embeddingModelText.getText().replaceAll("%0", aiPreferences.getEmbeddingModel().sizeInfo());
+        embeddingModelText.setText(newEmbeddingModelText);
     }
 
     private void initPrivacyHyperlink(TextFlow textFlow, String link) {
@@ -67,12 +70,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
         Hyperlink hyperlink = new Hyperlink(link);
         hyperlink.setFont(text.getFont());
         hyperlink.setOnAction(event -> {
-            try {
-                JabRefDesktop.openBrowser(link, filePreferences);
-            } catch (IOException e) {
-                LOGGER.error("Error opening the browser to AI provider's privacy policy page.", e);
-                dialogService.showErrorDialogAndWait(e);
-            }
+            openBrowser(link);
         });
 
         textFlow.getChildren().add(hyperlink);
@@ -86,5 +84,19 @@ public class PrivacyNoticeComponent extends ScrollPane {
     private void onIAgreeButtonClick() {
         aiPreferences.setEnableAi(true);
         onIAgreeButtonClickCallback.run();
+    }
+
+    @FXML
+    private void onDjlPrivacyPolicyClick() {
+        openBrowser("https://github.com/deepjavalibrary/djl/discussions/3370#discussioncomment-10233632");
+    }
+
+    private void openBrowser(String link) {
+        try {
+            JabRefDesktop.openBrowser(link, filePreferences);
+        } catch (IOException e) {
+            LOGGER.error("Error opening the browser to AI provider's privacy policy page.", e);
+            dialogService.showErrorDialogAndWait(e);
+        }
     }
 }

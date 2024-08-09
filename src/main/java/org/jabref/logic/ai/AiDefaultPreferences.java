@@ -3,7 +3,8 @@ package org.jabref.logic.ai;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.preferences.ai.EmbeddingModel;
 
 public class AiDefaultPreferences {
     public static final Map<AiPreferences.AiProvider, List<String>> AVAILABLE_CHAT_MODELS = Map.of(
@@ -48,7 +49,7 @@ public class AiDefaultPreferences {
 
     public static final boolean CUSTOMIZE_SETTINGS = false;
 
-    public static final AiPreferences.EmbeddingModel EMBEDDING_MODEL = AiPreferences.EmbeddingModel.ALL_MINILM_L6_V2;
+    public static final EmbeddingModel EMBEDDING_MODEL = EmbeddingModel.SENTENCE_TRANSFORMERS_ALL_MINILM_L12_V2;
     public static final String SYSTEM_MESSAGE = "You are an AI assistant that analyses research papers.";
     public static final double TEMPERATURE = 0.7;
     public static final int DOCUMENT_SPLITTER_CHUNK_SIZE = 300;

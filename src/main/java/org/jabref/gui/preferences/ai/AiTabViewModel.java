@@ -22,8 +22,9 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.ai.AiPreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.ai.EmbeddingModel;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -54,9 +55,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
 
-    private final ListProperty<AiPreferences.EmbeddingModel> embeddingModelsList =
-            new SimpleListProperty<>(FXCollections.observableArrayList(AiPreferences.EmbeddingModel.values()));
-    private final ObjectProperty<AiPreferences.EmbeddingModel> selectedEmbeddingModel = new SimpleObjectProperty<>();
+    private final ListProperty<EmbeddingModel> embeddingModelsList =
+            new SimpleListProperty<>(FXCollections.observableArrayList(EmbeddingModel.values()));
+    private final ObjectProperty<EmbeddingModel> selectedEmbeddingModel = new SimpleObjectProperty<>();
 
     private final StringProperty currentApiBaseUrl = new SimpleStringProperty();
     private final BooleanProperty disableApiBaseUrl = new SimpleBooleanProperty(true); // {@link HuggingFaceChatModel} doesn't support setting API base URL
@@ -408,11 +409,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return customizeExpertSettings;
     }
 
-    public ReadOnlyListProperty<AiPreferences.EmbeddingModel> embeddingModelsProperty() {
+    public ReadOnlyListProperty<EmbeddingModel> embeddingModelsProperty() {
         return embeddingModelsList;
     }
 
-    public ObjectProperty<AiPreferences.EmbeddingModel> selectedEmbeddingModelProperty() {
+    public ObjectProperty<EmbeddingModel> selectedEmbeddingModelProperty() {
         return selectedEmbeddingModel;
     }
 

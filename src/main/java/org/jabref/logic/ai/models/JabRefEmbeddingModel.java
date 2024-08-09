@@ -13,7 +13,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.AiPreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import ai.djl.MalformedModelException;
 import ai.djl.huggingface.translator.TextEmbeddingTranslatorFactory;
@@ -33,10 +33,10 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This class listens to preferences changes.
  */
-public class EmbeddingModel implements dev.langchain4j.model.embedding.EmbeddingModel, AutoCloseable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddingModel.class);
+public class JabRefEmbeddingModel implements dev.langchain4j.model.embedding.EmbeddingModel, AutoCloseable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefEmbeddingModel.class);
 
-    private static final String DJL_AI_DJL_HUGGINGFACE_PYTORCH_SENTENCE_TRANSFORMERS = "djl://ai.djl.huggingface.pytorch/sentence-transformers/";
+    private static final String DJL_EMBEDDING_MODEL_URL_PREFIX = "djl://ai.djl.huggingface.pytorch/";
 
     private final AiPreferences aiPreferences;
     private final DialogService dialogService;
@@ -58,7 +58,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
     // Empty if there is no error.
     private String errorWhileBuildingModel = "";
 
-    public EmbeddingModel(AiPreferences aiPreferences, DialogService dialogService, TaskExecutor taskExecutor) {
+    public JabRefEmbeddingModel(AiPreferences aiPreferences, DialogService dialogService, TaskExecutor taskExecutor) {
         this.aiPreferences = aiPreferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -117,7 +117,7 @@ public class EmbeddingModel implements dev.langchain4j.model.embedding.Embedding
 
         LOGGER.info("Downloading embedding model...");
 
-        String modelUrl = DJL_AI_DJL_HUGGINGFACE_PYTORCH_SENTENCE_TRANSFORMERS + aiPreferences.getEmbeddingModel().getLabel();
+        String modelUrl = DJL_EMBEDDING_MODEL_URL_PREFIX + aiPreferences.getEmbeddingModel().getName();
 
         Criteria<String, float[]> criteria =
                 Criteria.builder()

@@ -127,6 +127,8 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.preferences.ai.EmbeddingModel;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
@@ -2797,7 +2799,7 @@ public class JabRefPreferences implements PreferencesService {
                 get(AI_OPEN_AI_API_BASE_URL),
                 get(AI_MISTRAL_AI_API_BASE_URL),
                 get(AI_HUGGING_FACE_API_BASE_URL),
-                AiPreferences.EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
+                EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),
                 get(AI_SYSTEM_MESSAGE),
                 getDouble(AI_TEMPERATURE),
                 getInt(AI_CONTEXT_WINDOW_SIZE),

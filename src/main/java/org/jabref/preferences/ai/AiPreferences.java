@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.preferences.ai;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.ai.AiDefaultPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class AiPreferences {
     public enum AiProvider implements Serializable {
@@ -30,24 +31,6 @@ public class AiPreferences {
 
         public String getLabel() {
             return label;
-        }
-
-        public String toString() {
-            return label;
-        }
-    }
-
-    public enum EmbeddingModel {
-        ALL_MINILM_L6_V2("all-MiniLM-L6-v2");
-
-        private final String label;
-
-        EmbeddingModel(String label) {
-            this.label = label;
-        }
-
-        public String getLabel() {
-             return label;
         }
 
         public String toString() {
