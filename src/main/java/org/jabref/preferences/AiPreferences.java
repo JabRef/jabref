@@ -90,9 +90,6 @@ public class AiPreferences {
                          String openAiChatModel,
                          String mistralAiChatModel,
                          String huggingFaceChatModel,
-                         String openAiApiKey,
-                         String mistralAiApiKey,
-                         String huggingFaceApiKey,
                          boolean customizeExpertSettings,
                          String openAiApiBaseUrl,
                          String mistralAiApiBaseUrl,
@@ -116,9 +113,9 @@ public class AiPreferences {
         this.mistralAiChatModel = new SimpleStringProperty(mistralAiChatModel);
         this.huggingFaceChatModel = new SimpleStringProperty(huggingFaceChatModel);
 
-        this.openAiApiKey = new SimpleStringProperty(openAiApiKey);
-        this.mistralAiApiKey = new SimpleStringProperty(mistralAiApiKey);
-        this.huggingFaceApiKey = new SimpleStringProperty(huggingFaceApiKey);
+        this.openAiApiKey = new SimpleStringProperty("");
+        this.mistralAiApiKey = new SimpleStringProperty("");
+        this.huggingFaceApiKey = new SimpleStringProperty("");
 
         this.customizeExpertSettings = new SimpleBooleanProperty(customizeExpertSettings);
 
@@ -519,9 +516,23 @@ public class AiPreferences {
 
     private void retrieveKeys() {
         switch (aiProvider.get()) {
-            case OPEN_AI -> openAiApiKey.set(preferencesService.getApiKeyForAiProvider(AiProvider.OPEN_AI));
-            case MISTRAL_AI -> mistralAiApiKey.set(preferencesService.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
-            case HUGGING_FACE -> huggingFaceApiKey.set(preferencesService.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
+            case OPEN_AI -> {
+                if (openAiApiKey.get().isEmpty()) {
+                    openAiApiKey.set(preferencesService.getApiKeyForAiProvider(AiProvider.OPEN_AI));
+                }
+            }
+
+            case MISTRAL_AI -> {
+                if (mistralAiApiKey.get().isEmpty()) {
+                    mistralAiApiKey.set(preferencesService.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
+                }
+            }
+
+            case HUGGING_FACE -> {
+                if (huggingFaceApiKey.get().isEmpty()) {
+                    huggingFaceApiKey.set(preferencesService.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
+                }
+            }
         }
     }
 
