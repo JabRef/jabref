@@ -40,6 +40,8 @@ public class EntryEditorPreferences {
     private final MapProperty<String, Set<Field>> defaultEntryEditorTabList;
     private final BooleanProperty shouldOpenOnNewEntry;
     private final BooleanProperty shouldShowRecommendationsTab;
+    private final BooleanProperty shouldShowAiSummaryTab;
+    private final BooleanProperty shouldShowAiChatTab;
     private final BooleanProperty shouldShowLatexCitationsTab;
     private final BooleanProperty showSourceTabByDefault;
     private final BooleanProperty enableValidation;
@@ -55,6 +57,8 @@ public class EntryEditorPreferences {
                                   Map<String, Set<Field>> defaultEntryEditorTabList,
                                   boolean shouldOpenOnNewEntry,
                                   boolean shouldShowRecommendationsTab,
+                                  boolean shouldShowAiSummaryTab,
+                                  boolean shouldShowAiChatTab,
                                   boolean shouldShowLatexCitationsTab,
                                   boolean showSourceTabByDefault,
                                   boolean enableValidation,
@@ -70,6 +74,8 @@ public class EntryEditorPreferences {
         this.defaultEntryEditorTabList = new SimpleMapProperty<>(FXCollections.observableMap(defaultEntryEditorTabList));
         this.shouldOpenOnNewEntry = new SimpleBooleanProperty(shouldOpenOnNewEntry);
         this.shouldShowRecommendationsTab = new SimpleBooleanProperty(shouldShowRecommendationsTab);
+        this.shouldShowAiSummaryTab = new SimpleBooleanProperty(shouldShowAiSummaryTab);
+        this.shouldShowAiChatTab = new SimpleBooleanProperty(shouldShowAiChatTab);
         this.shouldShowLatexCitationsTab = new SimpleBooleanProperty(shouldShowLatexCitationsTab);
         this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
         this.enableValidation = new SimpleBooleanProperty(enableValidation);
@@ -120,6 +126,30 @@ public class EntryEditorPreferences {
 
     public void setShouldShowRecommendationsTab(boolean shouldShowRecommendationsTab) {
         this.shouldShowRecommendationsTab.set(shouldShowRecommendationsTab);
+    }
+
+    public boolean shouldShowAiSummaryTab() {
+        return shouldShowAiSummaryTab.get();
+    }
+
+    public BooleanProperty shouldShowAiSummaryTabProperty() {
+        return shouldShowAiSummaryTab;
+    }
+
+    public void setShouldShowAiSummaryTab(boolean shouldShowAiSummaryTab) {
+        this.shouldShowAiSummaryTab.set(shouldShowAiSummaryTab);
+    }
+
+    public boolean shouldShowAiChatTab() {
+        return shouldShowAiChatTab.get();
+    }
+
+    public BooleanProperty shouldShowAiChatTabProperty() {
+        return shouldShowAiChatTab;
+    }
+
+    public void setShouldShowAiChatTab(boolean shouldShowAiChatTab) {
+        this.shouldShowAiChatTab.set(shouldShowAiChatTab);
     }
 
     public boolean shouldShowLatexCitationsTab() {

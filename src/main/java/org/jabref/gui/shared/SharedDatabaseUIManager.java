@@ -21,6 +21,7 @@ import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
@@ -48,6 +49,7 @@ public class SharedDatabaseUIManager {
     private DatabaseSynchronizer dbmsSynchronizer;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final AiService aiService;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -58,6 +60,7 @@ public class SharedDatabaseUIManager {
     public SharedDatabaseUIManager(LibraryTabContainer tabContainer,
                                    DialogService dialogService,
                                    PreferencesService preferencesService,
+                                   AiService aiService,
                                    StateManager stateManager,
                                    BibEntryTypesManager entryTypesManager,
                                    FileUpdateMonitor fileUpdateMonitor,
@@ -67,6 +70,7 @@ public class SharedDatabaseUIManager {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.aiService = aiService;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -172,6 +176,7 @@ public class SharedDatabaseUIManager {
                 tabContainer,
                 dialogService,
                 preferencesService,
+                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,

@@ -20,6 +20,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -41,6 +42,7 @@ public class SidePaneViewModel extends AbstractViewModel {
 
     public SidePaneViewModel(LibraryTabContainer tabContainer,
                              PreferencesService preferencesService,
+                             AiService aiService,
                              JournalAbbreviationRepository abbreviationRepository,
                              StateManager stateManager,
                              TaskExecutor taskExecutor,
@@ -55,6 +57,7 @@ public class SidePaneViewModel extends AbstractViewModel {
         this.sidePaneContentFactory = new SidePaneContentFactory(
                 tabContainer,
                 preferencesService,
+                aiService,
                 abbreviationRepository,
                 taskExecutor,
                 dialogService,

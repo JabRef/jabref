@@ -337,4 +337,8 @@ public class JabRefDesktop {
     public static Path getFulltextIndexBaseDirectory() {
         return NATIVE_DESKTOP.getFulltextIndexBaseDirectory();
     }
+
+    public static Path getAiFilesDirectory() {
+        return NATIVE_DESKTOP.getAiFilesDirectory();
+    }
 }

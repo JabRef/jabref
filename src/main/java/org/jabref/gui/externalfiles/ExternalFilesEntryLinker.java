@@ -78,7 +78,7 @@ public class ExternalFilesEntryLinker {
     }
 
     public void moveFilesToFileDirRenameAndAddToEntry(BibEntry entry, List<Path> files, IndexingTaskManager indexingTaskManager) {
-        try (AutoCloseable blocker = indexingTaskManager.blockNewTasks()) {
+        try (AutoCloseable indexingTaskManagerBlocker = indexingTaskManager.blockNewTasks()) {
             addFilesToEntry(entry, files);
             moveLinkedFilesToFileDir(entry);
             renameLinkedFilesToPattern(entry);

@@ -359,7 +359,12 @@ public class IconTheme {
         REMOVE_TAGS(MaterialDesignC.CLOSE),
         ACCEPT_LEFT(MaterialDesignS.SUBDIRECTORY_ARROW_LEFT),
         ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
-        MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE);
+        MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE),
+        THUMB_UP(MaterialDesignT.THUMB_UP),
+        THUMB_DOWN(MaterialDesignT.THUMB_DOWN),
+        THUMB_UP_OUTLINE(MaterialDesignT.THUMB_UP_OUTLINE),
+        THUMB_DOWN_OUTLINE(MaterialDesignT.THUMB_DOWN_OUTLINE);
+
         private final JabRefIcon icon;
 
         JabRefIcons(Ikon... icons) {

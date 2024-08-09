@@ -32,6 +32,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
@@ -83,6 +84,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final AiService aiService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -102,6 +104,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
     public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
+                                              AiService aiService,
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -111,6 +114,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
+        this.aiService = aiService;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -192,6 +196,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     tabContainer,
                     dialogService,
                     preferencesService,
+                    aiService,
                     stateManager,
                     entryTypesManager,
                     fileUpdateMonitor,
