@@ -108,7 +108,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
         // is used internally in the summarization, and it also throws RuntimeExceptions.
 
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-            throw new RuntimeException(Localization.lang("No summary can be generated for entry '%0' as the database doesn't have path", citationKey));
+            throw new RuntimeException(Localization.lang("No summary can be generated for entry '%0' as the database does not have path", citationKey));
         }
 
         addMoreWork(1); // For generating final summary.
@@ -188,7 +188,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
         do {
             passes++;
-            LOGGER.info("Summarizing chunks for file \"{}\" of entry {} ({} pass)", filePath, citationKey, passes);
+            LOGGER.info("Summarizing chunk(s) for file \"{}\" of entry {} ({} pass)", filePath, citationKey, passes);
 
             addMoreWork(chunkSummaries.size());
 
@@ -224,7 +224,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
             throw new InterruptedException();
         }
 
-        LOGGER.info("Sending request to AI provider to combine summary chunks for file \"{}\" of entry {}", filePath, citationKey);
+        LOGGER.info("Sending request to AI provider to combine summary chunk(s) for file \"{}\" of entry {}", filePath, citationKey);
         String result = aiService.getChatLanguageModel().generate(prompt.toString());
         LOGGER.info("Summary of the file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 

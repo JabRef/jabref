@@ -10,8 +10,8 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.preferences.ai.AiPreferences;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.slf4j.Logger;
@@ -95,7 +95,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
         try {
             JabRefDesktop.openBrowser(link, filePreferences);
         } catch (IOException e) {
-            LOGGER.error("Error opening the browser to AI provider's privacy policy page.", e);
+            LOGGER.error("Error opening the browser to the Privacy Policy page of the AI provider.", e);
             dialogService.showErrorDialogAndWait(e);
         }
     }

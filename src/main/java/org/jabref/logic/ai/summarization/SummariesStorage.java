@@ -11,6 +11,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.preferences.ai.AiProvider;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.EventBus;
@@ -23,17 +24,15 @@ import org.slf4j.LoggerFactory;
 public class SummariesStorage {
     private final static Logger LOGGER = LoggerFactory.getLogger(SummariesStorage.class);
 
-    private final AiPreferences aiPreferences;
     private final MVStore mvStore;
 
     private final EventBus eventBus = new EventBus();
 
     @Inject private StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
 
-    public record SummarizationRecord(LocalDateTime timestamp, AiPreferences.AiProvider aiProvider, String model, String content) implements Serializable { }
+    public record SummarizationRecord(LocalDateTime timestamp, AiProvider aiProvider, String model, String content) implements Serializable { }
 
     public SummariesStorage(AiPreferences aiPreferences, MVStore mvStore) {
-        this.aiPreferences = aiPreferences;
         this.mvStore = mvStore;
     }
 

@@ -29,8 +29,6 @@ import dev.langchain4j.store.embedding.filter.comparison.IsEqualTo;
 import dev.langchain4j.store.embedding.filter.comparison.IsIn;
 import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static java.util.Comparator.comparingDouble;
 
@@ -42,11 +40,8 @@ import static java.util.Comparator.comparingDouble;
  * <p>
  */
 public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreEmbeddingStore.class);
-
     // `file` field is nullable, because {@link Optional} can't be serialized.
-    private record EmbeddingRecord(@Nullable String file, String content, float[] embeddingVector) implements Serializable {
-    }
+    private record EmbeddingRecord(@Nullable String file, String content, float[] embeddingVector) implements Serializable { }
 
     private final Map<String, EmbeddingRecord> embeddingsMap;
 

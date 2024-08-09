@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.preferences.ai.AiProvider;
 
 import org.h2.mvstore.MVStore;
 import org.junit.jupiter.api.AfterEach;
@@ -42,14 +43,14 @@ class SummariesStorageTest {
 
     @Test
     void set() {
-        summariesStorage.set(bibPath, "citationKey", new SummariesStorage.SummarizationRecord(LocalDateTime.now(), AiPreferences.AiProvider.OPEN_AI, "model", "contents"));
+        summariesStorage.set(bibPath, "citationKey", new SummariesStorage.SummarizationRecord(LocalDateTime.now(), AiProvider.OPEN_AI, "model", "contents"));
         reopen();
         assertEquals(Optional.of("contents"), summariesStorage.get(bibPath, "citationKey").map(SummariesStorage.SummarizationRecord::content));
     }
 
     @Test
     void clear() {
-        summariesStorage.set(bibPath, "citationKey", new SummariesStorage.SummarizationRecord(LocalDateTime.now(), AiPreferences.AiProvider.OPEN_AI, "model", "contents"));
+        summariesStorage.set(bibPath, "citationKey", new SummariesStorage.SummarizationRecord(LocalDateTime.now(), AiProvider.OPEN_AI, "model", "contents"));
         reopen();
         summariesStorage.clear(bibPath, "citationKey");
         reopen();

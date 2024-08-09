@@ -136,7 +136,7 @@ public class AiSummaryTab extends EntryEditorTab {
         setContent(
                 new ErrorStateComponent(
                         Localization.lang("Unable to chat"),
-                        Localization.lang("Please attach at least one PDF file to enable chatting with PDF files.")
+                        Localization.lang("Please attach at least one PDF file to enable chatting with PDF file(s).")
                 )
         );
     }

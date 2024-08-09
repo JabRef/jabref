@@ -1,6 +1,5 @@
 package org.jabref.preferences.ai;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -18,26 +17,6 @@ import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class AiPreferences {
-    public enum AiProvider implements Serializable {
-        OPEN_AI("OpenAI"),
-        MISTRAL_AI("Mistral AI"),
-        HUGGING_FACE("Hugging Face");
-
-        private final String label;
-
-        AiProvider(String label) {
-            this.label = label;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public String toString() {
-            return label;
-        }
-    }
-
     private final PreferencesService preferencesService;
 
     private final BooleanProperty enableAi;

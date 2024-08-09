@@ -16,7 +16,7 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.preferences.ai.AiProvider;
 import org.jabref.preferences.ai.EmbeddingModel;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -30,7 +30,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     @FXML private CheckBox enableAi;
 
-    @FXML private ComboBox<AiPreferences.AiProvider> aiProviderComboBox;
+    @FXML private ComboBox<AiProvider> aiProviderComboBox;
     @FXML private ComboBox<String> chatModelComboBox;
     @FXML private CustomPasswordField apiKeyTextField;
 
@@ -72,8 +72,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         enableAi.selectedProperty().bindBidirectional(viewModel.enableAi());
 
-        new ViewModelListCellFactory<AiPreferences.AiProvider>()
-                .withText(AiPreferences.AiProvider::toString)
+        new ViewModelListCellFactory<AiProvider>()
+                .withText(AiProvider::toString)
                 .install(aiProviderComboBox);
         aiProviderComboBox.setItems(viewModel.aiProvidersProperty());
         aiProviderComboBox.valueProperty().bindBidirectional(viewModel.selectedAiProviderProperty());
@@ -87,7 +87,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         chatModelComboBox.disableProperty().bind(viewModel.disableBasicSettingsProperty());
 
         this.aiProviderComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == AiPreferences.AiProvider.HUGGING_FACE) {
+            if (newValue == AiProvider.HUGGING_FACE) {
                 chatModelComboBox.setPromptText(HUGGING_FACE_CHAT_MODEL_PROMPT);
             }
         });

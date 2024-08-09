@@ -20,7 +20,7 @@ public class FileToDocument {
         if (FileUtil.isPDFFile(path)) {
             return FileToDocument.fromPdfFile(path);
         } else {
-            LOGGER.info("Unsupported file type of file: {}. For now, only PDF files are supported", path);
+            LOGGER.info("Unsupported file type of file: {}. Currently, only PDF files are supported", path);
             return Optional.empty();
         }
     }
@@ -39,7 +39,7 @@ public class FileToDocument {
 
             return FileToDocument.fromString(writer.toString());
         } catch (Exception e) {
-            LOGGER.error("An error occurred while reading a PDF file: {}", path, e);
+            LOGGER.error("An error occurred while reading the PDF file: {}", path, e);
             return Optional.empty();
         }
     }

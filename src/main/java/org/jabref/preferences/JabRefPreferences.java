@@ -128,6 +128,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.preferences.ai.AiProvider;
 import org.jabref.preferences.ai.EmbeddingModel;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -893,14 +894,14 @@ public class JabRefPreferences implements PreferencesService {
         // region:AI
         defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);
         defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());
-        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiPreferences.AiProvider.OPEN_AI));
-        defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiPreferences.AiProvider.MISTRAL_AI));
-        defaults.put(AI_HUGGING_FACE_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiPreferences.AiProvider.HUGGING_FACE));
+        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI));
+        defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI));
+        defaults.put(AI_HUGGING_FACE_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.HUGGING_FACE));
         defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);
         defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());
-        defaults.put(AI_OPEN_AI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiPreferences.AiProvider.OPEN_AI));
-        defaults.put(AI_MISTRAL_AI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiPreferences.AiProvider.MISTRAL_AI));
-        defaults.put(AI_HUGGING_FACE_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiPreferences.AiProvider.HUGGING_FACE));
+        defaults.put(AI_OPEN_AI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.OPEN_AI));
+        defaults.put(AI_MISTRAL_AI_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.MISTRAL_AI));
+        defaults.put(AI_HUGGING_FACE_API_BASE_URL, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.HUGGING_FACE));
         defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);
         defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);
         defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.CONTEXT_WINDOW_SIZES.get(AiDefaultPreferences.PROVIDER).get(AiDefaultPreferences.CHAT_MODELS.get(AiDefaultPreferences.PROVIDER)));
@@ -2791,7 +2792,7 @@ public class JabRefPreferences implements PreferencesService {
         aiPreferences = new AiPreferences(
                 this,
                 aiEnabled,
-                AiPreferences.AiProvider.valueOf(get(AI_PROVIDER)),
+                AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_OPEN_AI_CHAT_MODEL),
                 get(AI_MISTRAL_AI_CHAT_MODEL),
                 get(AI_HUGGING_FACE_CHAT_MODEL),
@@ -2818,19 +2819,19 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(aiPreferences.openAiApiKeyProperty(), (obs, oldValue, newValue) -> {
             if (aiPreferences.getEnableAi()) {
-                storeAiApiKeyInKeyring(AiPreferences.AiProvider.OPEN_AI, newValue);
+                storeAiApiKeyInKeyring(AiProvider.OPEN_AI, newValue);
             }
         });
 
         EasyBind.listen(aiPreferences.mistralAiApiKeyProperty(), (obs, oldValue, newValue) -> {
             if (aiPreferences.getEnableAi()) {
-                storeAiApiKeyInKeyring(AiPreferences.AiProvider.MISTRAL_AI, newValue);
+                storeAiApiKeyInKeyring(AiProvider.MISTRAL_AI, newValue);
             }
         });
 
         EasyBind.listen(aiPreferences.huggingFaceApiKeyProperty(), (obs, oldValue, newValue) -> {
             if (aiPreferences.getEnableAi()) {
-                storeAiApiKeyInKeyring(AiPreferences.AiProvider.HUGGING_FACE, newValue);
+                storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE, newValue);
             }
         });
 
@@ -2852,7 +2853,7 @@ public class JabRefPreferences implements PreferencesService {
         return aiPreferences;
     }
 
-    public String getApiKeyForAiProvider(AiPreferences.AiProvider aiProvider) {
+    public String getApiKeyForAiProvider(AiProvider aiProvider) {
         try (final Keyring keyring = Keyring.create()) {
             String rawPassword = keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
             Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
@@ -2863,7 +2864,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private void storeAiApiKeyInKeyring(AiPreferences.AiProvider aiProvider, String newKey) {
+    private void storeAiApiKeyInKeyring(AiProvider aiProvider, String newKey) {
         try (final Keyring keyring = Keyring.create()) {
             Password password = new Password(newKey, getInternalPreferences().getUserAndHost());
             String rawPassword = password.encrypt();

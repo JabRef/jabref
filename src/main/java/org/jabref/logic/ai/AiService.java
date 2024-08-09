@@ -13,9 +13,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager;
-import org.jabref.logic.ai.models.JabRefEmbeddingModel;
 import org.jabref.logic.ai.models.JabRefChatLanguageModel;
+import org.jabref.logic.ai.models.JabRefEmbeddingModel;
 import org.jabref.logic.ai.summarization.SummariesStorage;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.ai.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -66,8 +67,8 @@ public class AiService implements AutoCloseable {
 
             mvStore = MVStore.open(mvStorePath.toString());
         } catch (Exception e) {
-            LOGGER.error("An error occurred while creating directories for storing chat history. Chat history won't be remembered in next session", e);
-            dialogService.notify("An error occurred while creating directories for storing chat history. Chat history won't be remembered in next session");
+            LOGGER.error("An error occurred while creating directories for AI cache and chat history. Chat history will not be remembered in next session", e);
+            dialogService.notify(Localization.lang("An error occurred while creating directories for AI cache and chat history. Chat history will not be remembered in next session"));
             mvStore = MVStore.open(null);
         }
 
