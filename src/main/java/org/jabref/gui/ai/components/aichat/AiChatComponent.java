@@ -152,9 +152,6 @@ public class AiChatComponent extends VBox {
         Button cancelButton = new Button(Localization.lang("Cancel"));
 
         cancelButton.setOnAction(event -> {
-            chatVBox.getChildren().removeLast();
-            chatVBox.getChildren().removeLast();
-
             switchToNormalState();
         });
 
