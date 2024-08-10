@@ -42,6 +42,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
 
 import kong.unirest.core.Unirest;
@@ -400,10 +401,14 @@ public class URLDownload {
                 String newUrl = connection.getHeaderField("location");
                 // open the new connection again
                 connection = new URLDownload(newUrl).openConnection();
-            } else if (status >= 400) {
+            } else {
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
-                LOGGER.info("HTTP {}, details: {}, {}", status, httpURLConnection.getResponseMessage(), httpURLConnection.getContentLength() > 0 ? httpURLConnection.getContent() : "");
-                throw new IOException(new FetcherClientException("Encountered HTTP %s %s".formatted(status, httpURLConnection.getResponseMessage()), httpResponse));
+                LOGGER.info("HTTP {} {} - body: {}", status, httpURLConnection.getResponseMessage(), httpURLConnection.getContentLength() > 0 ? httpURLConnection.getContent() : "");
+                if ((status >= 400) && (status < 500)) {
+                    throw new IOException(new FetcherClientException(httpResponse));
+                } else if (status >= 500) {
+                    throw new IOException(new FetcherServerException(httpResponse));
+                }
             }
         }
         return connection;
