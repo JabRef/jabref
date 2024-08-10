@@ -844,7 +844,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the initials of all authors' names
      */
-    static String authorsAlpha(AuthorList authorList) {
+    public static String authorsAlpha(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
         int maxAuthors;
         final boolean maxAuthorsExceeded;
