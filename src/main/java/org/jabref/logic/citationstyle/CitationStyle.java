@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -41,7 +40,7 @@ public class CitationStyle implements OOStyle {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyle.class);
     private static final String STYLES_ROOT = "/csl-styles";
     private static final List<CitationStyle> STYLES = new ArrayList<>();
-    private static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
+    private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
     private final String filePath;
     private final String title;
@@ -77,10 +76,10 @@ public class CitationStyle implements OOStyle {
     }
 
     private static Optional<String> getTitle(String filename, String content) {
-        XMLInputFactory factory = XMLInputFactory.newInstance();
-        factory.setProperty(XMLInputFactory.IS_COALESCING, true);
+
+        FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
         try {
-            XMLStreamReader reader = factory.createXMLStreamReader(new StringReader(content));
+            XMLStreamReader reader = FACTORY.createXMLStreamReader(new StringReader(content));
 
             boolean inInfo = false;
             boolean hasBibliography = false;
