@@ -31,13 +31,12 @@ import org.apache.commons.text.StringEscapeUtils;
 
 public class CSLCitationOOAdapter {
 
-    private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
-    public static final String[] PREFIXES = {"JABREF_", "CSL_"};
     // TODO: These are static final fields right now, should add the functionality to let user select these and store them in preferences.
     public static final String BIBLIOGRAPHY_TITLE = "References";
     public static final String BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = "Heading 2";
     private static final int MAX_ALPHA_AUTHORS = 4;
 
+    private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
     private final XTextDocument document;
     private final CSLReferenceMarkManager markManager;
