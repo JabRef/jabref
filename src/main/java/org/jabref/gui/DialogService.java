@@ -20,6 +20,7 @@ import javafx.util.StringConverter;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 
 import org.controlsfx.control.textfield.CustomPasswordField;
@@ -99,6 +100,11 @@ public interface DialogService {
      */
     default void showErrorDialogAndWait(Exception exception) {
         showErrorDialogAndWait(Localization.lang("Unhandled exception occurred."), exception);
+    }
+
+    default void showErrorDialogAndWait(FetcherException exception) {
+        // TODO: Move org.jabref.gui.linkedfile.DownloadLinkedFileAction.onFailure to here
+        //       Include urlDownload.getSource() in FetcherException
     }
 
     /**
