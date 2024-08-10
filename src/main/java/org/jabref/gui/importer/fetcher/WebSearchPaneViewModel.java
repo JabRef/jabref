@@ -16,7 +16,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.CompositeIdFetcher;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -146,13 +145,7 @@ public class WebSearchPaneViewModel {
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
 
-        Callable<ParserResult> parserResultCallable = () -> {
-            try {
-                return new ParserResult(activeFetcher.performSearch(query));
-            } catch (FetcherException e) {
-                return ParserResult.fromError(e);
-            }
-        };
+        Callable<ParserResult> parserResultCallable;
 
         String fetcherName = activeFetcher.getName();
 
@@ -160,6 +153,9 @@ public class WebSearchPaneViewModel {
             CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferencesService.getImportFormatPreferences());
             parserResultCallable = () -> new ParserResult(OptionalUtil.toList(compositeIdFetcher.performSearchById(query)));
             fetcherName = Localization.lang("Identifier-based Web Search");
+        } else {
+            // Execptions are handled below at "task.onFailure(dialogService::showErrorDialogAndWait)"
+            parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
         }
 
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
