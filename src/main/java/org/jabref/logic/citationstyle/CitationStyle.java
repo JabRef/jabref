@@ -107,7 +107,6 @@ public class CitationStyle implements OOStyle {
             }
 
             if (hasBibliography && title != null) {
-                System.out.println("HELLOOOOOO" + title);
                 return Optional.of(title);
             } else {
                 LOGGER.debug("No valid title or bibliography found for file {}", filename);
