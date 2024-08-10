@@ -12,6 +12,7 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -35,6 +36,7 @@ public class CSLCitationOOAdapter {
     // TODO: These are static final fields right now, should add the functionality to let user select these and store them in preferences.
     public static final String BIBLIOGRAPHY_TITLE = "References";
     public static final String BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = "Heading 2";
+    private static final int MAX_ALPHA_AUTHORS = 4;
 
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
     private final XTextDocument document;
@@ -133,9 +135,14 @@ public class CSLCitationOOAdapter {
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager) throws Exception {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
+        boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
 
-        // Generate a single in-text citation for a group of entries
-        String inTextCitation = CitationStyleGenerator.generateInText(entries, style, format, bibDatabaseContext, bibEntryTypesManager).getText();
+        String inTextCitation;
+        if (isAlphanumeric) {
+            inTextCitation = generateAlphanumericCitation(entries, bibDatabaseContext);
+        } else {
+            inTextCitation = CitationStyleGenerator.generateInText(entries, style, format, bibDatabaseContext, bibEntryTypesManager).getText();
+        }
 
         String formattedCitation = transformHtml(inTextCitation);
 
@@ -158,13 +165,25 @@ public class CSLCitationOOAdapter {
             throws Exception {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
-
-        boolean twoEntries = entries.size() == 2;
+        boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
 
         Iterator<BibEntry> iterator = entries.iterator();
         while (iterator.hasNext()) {
             BibEntry currentEntry = iterator.next();
-            String inTextCitation = CitationStyleGenerator.generateInText(List.of(currentEntry), style, format, bibDatabaseContext, bibEntryTypesManager).getText();
+            String inTextCitation;
+            if (isAlphanumeric) {
+                // Generate the alphanumeric citation
+                inTextCitation = generateAlphanumericCitation(List.of(currentEntry), bibDatabaseContext);
+                // Get the author's name
+                String authorName = currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
+                                                .map(authors -> AuthorList.parse(authors))
+                                                .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al."))
+                                                .orElse("");
+                // Combine author name with the citation
+                inTextCitation = authorName + " " + inTextCitation;
+            } else {
+                inTextCitation = CitationStyleGenerator.generateInText(List.of(currentEntry), style, format, bibDatabaseContext, bibEntryTypesManager).getText();
+            }
             String formattedCitation = transformHtml(inTextCitation);
             String finalText;
             if (isNumericStyle) {
@@ -174,12 +193,13 @@ public class CSLCitationOOAdapter {
                                             .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al.") + " ")
                                             .orElse("");
                 finalText = prefix + formattedCitation;
+            } else if (isAlphanumeric) {
+                finalText = formattedCitation;
             } else {
                 finalText = changeToInText(formattedCitation);
             }
             if (iterator.hasNext()) {
                 finalText += ",";
-                // The next space is inserted somehow magically by other routines. Therefore, we do not add a space here.
             }
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
             insertMultipleReferenceMarks(cursor, List.of(currentEntry), ooText);
@@ -354,5 +374,82 @@ public class CSLCitationOOAdapter {
     public boolean isCitedEntry(BibEntry entry) {
         String citationKey = entry.getCitationKey().orElse("");
         return markManager.hasCitationForKey(citationKey);
+    }
+
+    private String generateAlphanumericCitation(List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
+        StringBuilder citation = new StringBuilder("[");
+        for (int i = 0; i < entries.size(); i++) {
+            BibEntry entry = entries.get(i);
+            Optional<String> author = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase());
+            Optional<String> year = entry.getResolvedFieldOrAlias(StandardField.YEAR, bibDatabaseContext.getDatabase());
+
+            if (author.isPresent() && year.isPresent()) {
+                AuthorList authorList = AuthorList.parse(author.get());
+                String alphaKey = authorsAlpha(authorList);
+
+                // Extract last two digits of the year
+                String shortYear = year.get().length() >= 2 ?
+                        year.get().substring(year.get().length() - 2) :
+                        year.get();
+
+                citation.append(alphaKey).append(shortYear);
+            } else {
+                citation.append(entry.getCitationKey().orElse(""));
+            }
+
+            if (i < entries.size() - 1) {
+                citation.append("; ");
+            }
+        }
+        citation.append("]");
+        return citation.toString();
+    }
+
+    private boolean isAlphanumericStyle(CitationStyle style) {
+        return "DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690".equals(style.getTitle());
+    }
+
+    public static String authorsAlpha(AuthorList authorList) {
+        StringBuilder alphaStyle = new StringBuilder();
+        int maxAuthors;
+        final boolean maxAuthorsExceeded;
+        if (authorList.getNumberOfAuthors() <= MAX_ALPHA_AUTHORS) {
+            maxAuthors = authorList.getNumberOfAuthors();
+            maxAuthorsExceeded = false;
+        } else {
+            maxAuthors = MAX_ALPHA_AUTHORS;
+            maxAuthorsExceeded = true;
+        }
+
+        if (authorList.getNumberOfAuthors() == 1) {
+            String[] firstAuthor = authorList.getAuthor(0).getNamePrefixAndFamilyName()
+                                             .replaceAll("\\s+", " ").trim().split(" ");
+            // take first letter of any "prefixes" (e.g. van der Aalst -> vd)
+            for (int j = 0; j < (firstAuthor.length - 1); j++) {
+                alphaStyle.append(firstAuthor[j], 0, 1);
+            }
+            // append last part of last name completely
+            alphaStyle.append(firstAuthor[firstAuthor.length - 1], 0,
+                    Math.min(4, firstAuthor[firstAuthor.length - 1].length()));
+        } else {
+            boolean andOthersPresent = authorList.getAuthor(maxAuthors - 1).equals(Author.OTHERS);
+            if (andOthersPresent) {
+                maxAuthors--;
+            }
+            List<String> vonAndLastNames = authorList.getAuthors().stream()
+                                                     .limit(maxAuthors)
+                                                     .map(Author::getNamePrefixAndFamilyName)
+                                                     .toList();
+            for (String vonAndLast : vonAndLastNames) {
+                // replace all whitespaces by " "
+                // split the lastname at " "
+                String[] nameParts = vonAndLast.replaceAll("\\s+", " ").trim().split(" ");
+                for (String part : nameParts) {
+                    // use first character of each part of lastname
+                    alphaStyle.append(part, 0, 1);
+                }
+            }
+        }
+        return alphaStyle.toString();
     }
 }
