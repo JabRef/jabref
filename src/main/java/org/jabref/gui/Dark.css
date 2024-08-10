@@ -62,19 +62,19 @@
     -js-summary-text-color: derive(-fx-light-text-color, 70%);
     -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
 
-    -jr-match-1: -jr-row-odd-background;
+    -jr-match-1-odd: -jr-row-odd-background;
     -jr-match-1-even: -jr-row-even-background;
     -jr-match-1-text-color: -fx-mid-text-color;
 
-    -jr-match-2: derive(-jr-theme, -60%);
+    -jr-match-2-odd: derive(-jr-theme, -60%);
     -jr-match-2-even: derive(-jr-match-2, 4%);
     -jr-match-2-text-color: -fx-mid-text-color;
 
-    -jr-match-3: derive(-jr-theme, -70%);
+    -jr-match-3-odd: derive(-jr-theme, -70%);
     -jr-match-3-even: derive(-jr-match-3, 4%);
     -jr-match-3-text-color: derive(-jr-accent, 30%);
 
-    -jr-match-4: derive(-jr-black, 10%);
+    -jr-match-4-odd: derive(-jr-black, 10%);
     -jr-match-4-even: -jr-background-alt;
     -jr-match-4-text-color: derive(-jr-match-3-text-color, -15%);
 }
