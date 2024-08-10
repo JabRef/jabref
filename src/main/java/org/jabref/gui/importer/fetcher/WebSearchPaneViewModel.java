@@ -2,7 +2,6 @@ package org.jabref.gui.importer.fetcher;
 
 import java.util.concurrent.Callable;
 
-import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -17,7 +16,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.CompositeIdFetcher;
-import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -152,14 +150,8 @@ public class WebSearchPaneViewModel {
             try {
                 return new ParserResult(activeFetcher.performSearch(query));
             } catch (FetcherException e) {
-                // FetcherException's cause can be both IOException and ParseException
-                if (e.getCause() != null && e.getCause().getCause() instanceof FetcherClientException clientException) {
-                     Platform.runLater(() -> dialogService.showErrorDialogAndWait(e.getMessage(), (clientException.getMessage() + "\n" + clientException.getHttpResponse().responseBody()), clientException));
-                } else {
-                    Platform.runLater(() -> dialogService.showErrorDialogAndWait(e.getMessage(), e.getCause().getMessage(), e));
-                }
+                return ParserResult.fromError(e);
             }
-            return new ParserResult();
         };
 
         String fetcherName = activeFetcher.getName();
