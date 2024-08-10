@@ -163,7 +163,7 @@ public class WebSearchPaneViewModel {
         }
 
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
-                             .withInitialMessage(Localization.lang("Processing %0", query));
+                                                          .withInitialMessage(Localization.lang("Processing \"%0\"...", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
