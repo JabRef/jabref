@@ -76,8 +76,8 @@ public class CitationStyle implements OOStyle {
     }
 
     private static Optional<String> getTitle(String filename, String content) {
-
         FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
+
         try {
             XMLStreamReader reader = FACTORY.createXMLStreamReader(new StringReader(content));
 
