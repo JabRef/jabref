@@ -33,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We enhanced the indexing speed. [#11502](https://github.com/JabRef/jabref/pull/11502)
 - ⚠️ Renamed command line parameters `embeddBibfileInPdf` to `embedBibFileInPdf`, `writeMetadatatoPdf` to `writeMetadataToPdf`, and `writeXMPtoPdf` to `writeXmpToPdf`. [#11575](https://github.com/JabRef/jabref/pull/11575)
 - The browse button for a Custom theme now opens in the directory of the current used CSS file [#11597](https://github.com/JabRef/jabref/pull/11597)
+- We upgraded from DOM to StAX parser for CSL style titles. [11604](https://github.com/JabRef/jabref/pull/11604)
 
 ### Fixed
 
