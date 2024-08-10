@@ -2,6 +2,7 @@ package org.jabref.http.dto;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
@@ -47,7 +48,11 @@ public record SimpleHttpResponse(int statusCode, String responseMessage, String 
      * @throws IOException if an I/O error occurs while reading the response body
      */
     private static String getResponseBody(HttpURLConnection connection) throws IOException {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
+        InputStream errorStream = connection.getErrorStream();
+        if (errorStream == null) {
+            return "";
+        }
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(errorStream))) {
             String inputLine;
             StringBuilder content = new StringBuilder();
             while ((content.length() < MAX_RESPONSE_LENGTH) && (inputLine = in.readLine()) != null) {
