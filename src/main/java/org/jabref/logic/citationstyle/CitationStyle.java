@@ -18,7 +18,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -26,12 +29,6 @@ import org.jabref.logic.util.StandardFileType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Representation of a CitationStyle. Stores its name, the file path and the style itself
@@ -72,28 +69,55 @@ public class CitationStyle implements OOStyle {
             }
 
             return Optional.of(new CitationStyle(filename, title.get(), content));
-        } catch (ParserConfigurationException | SAXException | NullPointerException | IOException e) {
+        } catch (NullPointerException
+                 | IOException e) {
             LOGGER.error("Error while parsing source", e);
             return Optional.empty();
         }
     }
 
-    private static Optional<String> getTitle(String filename, String content) throws SAXException, IOException, ParserConfigurationException {
-        // TODO: Switch to StAX parsing (to speed up - we need only the title)
-        InputSource inputSource = new InputSource(new StringReader(content));
-        Document doc = FACTORY.newDocumentBuilder().parse(inputSource);
+    private static Optional<String> getTitle(String filename, String content) {
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        factory.setProperty(XMLInputFactory.IS_COALESCING, true);
+        try {
+            XMLStreamReader reader = factory.createXMLStreamReader(new StringReader(content));
 
-        // See CSL#canFormatBibliographies, checks if the tag exists
-        NodeList bibs = doc.getElementsByTagName("bibliography");
-        if (bibs.getLength() <= 0) {
-            LOGGER.debug("no bibliography element for file {} ", filename);
+            boolean inInfo = false;
+            boolean hasBibliography = false;
+            String title = null;
+
+            while (reader.hasNext()) {
+                int event = reader.next();
+
+                if (event == XMLStreamConstants.START_ELEMENT) {
+                    String elementName = reader.getLocalName();
+
+                    if ("bibliography".equals(elementName)) {
+                        hasBibliography = true;
+                    } else if ("info".equals(elementName)) {
+                        inInfo = true;
+                    } else if (inInfo && "title".equals(elementName)) {
+                        title = reader.getElementText();
+                    }
+                } else if (event == XMLStreamConstants.END_ELEMENT) {
+                    if ("info".equals(reader.getLocalName())) {
+                        inInfo = false;
+                    }
+                }
+            }
+
+            if (hasBibliography && title != null) {
+                System.out.println("HELLOOOOOO" + title);
+                return Optional.of(title);
+            } else {
+                LOGGER.debug("No valid title or bibliography found for file {}", filename);
+                return Optional.empty();
+            }
+        } catch (
+                XMLStreamException e) {
+            LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage());
             return Optional.empty();
         }
-
-        NodeList nodes = doc.getElementsByTagName("info");
-        NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
-        String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
-        return Optional.of(title);
     }
 
     private static String stripInvalidProlog(String source) {
