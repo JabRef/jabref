@@ -83,7 +83,7 @@ public class CitationStyle implements OOStyle {
 
             boolean inInfo = false;
             boolean hasBibliography = false;
-            String title = null;
+            String title = "";
 
             while (reader.hasNext()) {
                 int event = reader.next();
