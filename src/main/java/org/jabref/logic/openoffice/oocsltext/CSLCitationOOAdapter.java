@@ -30,7 +30,7 @@ import org.apache.commons.text.StringEscapeUtils;
 
 public class CSLCitationOOAdapter {
 
-    private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.).*?, (\\d{4}.*)");
+    private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
     public static final String[] PREFIXES = {"JABREF_", "CSL_"};
     // TODO: These are static final fields right now, should add the functionality to let user select these and store them in preferences.
     public static final String BIBLIOGRAPHY_TITLE = "References";
@@ -166,16 +166,17 @@ public class CSLCitationOOAdapter {
             BibEntry currentEntry = iterator.next();
             String inTextCitation = CitationStyleGenerator.generateInText(List.of(currentEntry), style, format, bibDatabaseContext, bibEntryTypesManager).getText();
             String formattedCitation = transformHtml(inTextCitation);
+            String finalText;
             if (isNumericStyle) {
                 formattedCitation = updateMultipleCitations(formattedCitation, List.of(currentEntry));
+                String prefix = currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
+                                            .map(authors -> AuthorList.parse(authors))
+                                            .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al.") + " ")
+                                            .orElse("");
+                finalText = prefix + formattedCitation;
             } else {
-                formattedCitation = extractYear(formattedCitation);
+                finalText = changeToInText(formattedCitation);
             }
-            String prefix = currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
-                                        .map(authors -> AuthorList.parse(authors))
-                                        .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al.") + " ")
-                                        .orElse("");
-            String finalText = prefix + formattedCitation;
             if (iterator.hasNext()) {
                 finalText += ",";
                 // The next space is inserted somehow magically by other routines. Therefore, we do not add a space here.
@@ -186,10 +187,10 @@ public class CSLCitationOOAdapter {
         }
     }
 
-    private String extractYear(String formattedCitation) {
+    private String changeToInText(String formattedCitation) {
         Matcher matcher = YEAR_IN_CITATION_PATTERN.matcher(formattedCitation);
         if (matcher.find()) {
-            return matcher.group(1) + matcher.group(2);
+            return matcher.group(2) + " " + matcher.group(1) + matcher.group(3);
         }
         return formattedCitation;
     }
