@@ -403,7 +403,7 @@ public class URLDownload {
                 connection = new URLDownload(newUrl).openConnection();
             } else {
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
-                LOGGER.info("HTTP {} {} - body: {}", status, httpURLConnection.getResponseMessage(), httpURLConnection.getContentLength() > 0 ? httpURLConnection.getContent() : "");
+                LOGGER.info("{}", httpResponse);
                 if ((status >= 400) && (status < 500)) {
                     throw new IOException(new FetcherClientException(httpResponse));
                 } else if (status >= 500) {
