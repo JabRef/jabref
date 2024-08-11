@@ -42,6 +42,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneHighlighter;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -73,9 +74,8 @@ public class SourceTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
-    private Optional<Pattern> searchHighlightPattern = Optional.empty();
+    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private CodeArea codeArea;
-
     private BibEntry previousEntry;
 
     private class EditAction extends SimpleCommand {
@@ -118,21 +118,23 @@ public class SourceTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
-
-        searchQueryProperty.addListener((observable, oldValue, newValue) -> {
-            // searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
-            // highlightSearchPattern();
-        });
+        this.searchQueryProperty = searchQueryProperty;
+        searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightSearchPattern());
     }
 
     private void highlightSearchPattern() {
         if (codeArea != null) {
             codeArea.setStyleClass(0, codeArea.getLength(), "text");
-            if (searchHighlightPattern.isPresent()) {
-                Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
-                while (matcher.find()) {
-                    for (int i = 0; i <= matcher.groupCount(); i++) {
-                        codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
+            if (searchQueryProperty.get().isPresent() && searchQueryProperty.get().get().isValid()) {
+                String text = codeArea.getText();
+                Optional<Pattern> searchHighlightPattern = LuceneHighlighter.getHighlightingPattern(text, searchQueryProperty.get().get().getParsedQuery());
+                if (searchHighlightPattern.isPresent()) {
+                    LOGGER.debug("Highlighting pattern: {}", searchHighlightPattern);
+                    Matcher matcher = searchHighlightPattern.get().matcher(text);
+                    while (matcher.find()) {
+                        int start = matcher.start();
+                        int end = matcher.end();
+                        codeArea.setStyleClass(start, end, "search");
                     }
                 }
             }

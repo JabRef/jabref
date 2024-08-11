@@ -46,7 +46,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
         this.taskExecutor = executor;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "unsaved");
 
-        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.NGram_ANALYZER);
+        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.NGram_Analyzer_For_INDEXING);
 
         this.indexDirectory = new ByteBuffersDirectory();
         this.indexWriter = new IndexWriter(indexDirectory, config);

@@ -204,9 +204,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         Optional<SearchQuery> searchQuery = stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get();
         if (searchQuery.isPresent()) {
-            LOGGER.info("Before highlighting {}", myText);
             String highlightedContent = LuceneHighlighter.highlightPreviewViewer(myText, searchQuery.get().getParsedQuery());
-            LOGGER.info("After highlighting {}", highlightedContent);
             previewView.getEngine().loadContent(highlightedContent);
         } else {
             previewView.getEngine().loadContent(myText);

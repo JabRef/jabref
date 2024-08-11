@@ -19,7 +19,8 @@ public enum SearchFieldConstants {
     MODIFIED("modified");
 
     public static final Analyzer Standard_ANALYZER = new StandardAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-    public static final Analyzer NGram_ANALYZER = new NGramAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+    public static final Analyzer NGram_Analyzer_For_INDEXING = new NGramAnalyzer(1, 5, EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+    public static final Analyzer NGram_Analyzer_For_HIGHLIGHING = new NGramAnalyzer(1, Integer.MAX_VALUE, EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
     public static final List<String> PDF_FIELDS = List.of(PATH.toString(), CONTENT.toString(), ANNOTATIONS.toString());
     private final String field;
 
