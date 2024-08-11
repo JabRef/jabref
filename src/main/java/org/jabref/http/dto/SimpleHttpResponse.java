@@ -20,6 +20,15 @@ public record SimpleHttpResponse(int statusCode, String responseMessage, String 
         this(connection.getResponseCode(), connection.getResponseMessage(), getResponseBody(connection));
     }
 
+    @Override
+    public String toString() {
+        return "SimpleHttpResponse{" +
+                "statusCode=" + statusCode +
+                ", responseMessage='" + responseMessage + '\'' +
+                ", responseBody='" + responseBody + '\'' +
+                '}';
+    }
+
     /**
      * Truncates the response body to 1 KB if it exceeds that size.
      * Appends "... (truncated)" to indicate truncation.
