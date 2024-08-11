@@ -94,6 +94,7 @@ public class CSLCitationOOAdapter {
             throws CreationException, IOException, Exception {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
+        System.out.println(isNumericStyle);
         boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
 
         String inTextCitation;

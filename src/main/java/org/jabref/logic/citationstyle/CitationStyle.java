@@ -17,9 +17,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.logic.openoffice.style.OOStyle;
@@ -27,12 +28,6 @@ import org.jabref.logic.util.StandardFileType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Representation of a CitationStyle. Stores its name, the file path and the style itself
@@ -45,7 +40,7 @@ public class CitationStyle implements OOStyle {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyle.class);
     private static final String STYLES_ROOT = "/csl-styles";
     private static final List<CitationStyle> STYLES = new ArrayList<>();
-    private static final DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
+    private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
     private final String filePath;
     private final String title;
@@ -73,28 +68,54 @@ public class CitationStyle implements OOStyle {
             }
 
             return Optional.of(new CitationStyle(filename, title.get(), content));
-        } catch (ParserConfigurationException | SAXException | NullPointerException | IOException e) {
+        } catch (NullPointerException
+                 | IOException e) {
             LOGGER.error("Error while parsing source", e);
             return Optional.empty();
         }
     }
 
-    private static Optional<String> getTitle(String filename, String content) throws SAXException, IOException, ParserConfigurationException {
-        // TODO: Switch to StAX parsing (to speed up - we need only the title)
-        InputSource inputSource = new InputSource(new StringReader(content));
-        Document doc = FACTORY.newDocumentBuilder().parse(inputSource);
+    private static Optional<String> getTitle(String filename, String content) {
+        FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
 
-        // See CSL#canFormatBibliographies, checks if the tag exists
-        NodeList bibs = doc.getElementsByTagName("bibliography");
-        if (bibs.getLength() <= 0) {
-            LOGGER.debug("no bibliography element for file {} ", filename);
+        try {
+            XMLStreamReader reader = FACTORY.createXMLStreamReader(new StringReader(content));
+
+            boolean inInfo = false;
+            boolean hasBibliography = false;
+            String title = "";
+
+            while (reader.hasNext()) {
+                int event = reader.next();
+
+                if (event == XMLStreamConstants.START_ELEMENT) {
+                    String elementName = reader.getLocalName();
+
+                    if ("bibliography".equals(elementName)) {
+                        hasBibliography = true;
+                    } else if ("info".equals(elementName)) {
+                        inInfo = true;
+                    } else if (inInfo && "title".equals(elementName)) {
+                        title = reader.getElementText();
+                    }
+                } else if (event == XMLStreamConstants.END_ELEMENT) {
+                    if ("info".equals(reader.getLocalName())) {
+                        inInfo = false;
+                    }
+                }
+            }
+
+            if (hasBibliography && title != null) {
+                return Optional.of(title);
+            } else {
+                LOGGER.debug("No valid title or bibliography found for file {}", filename);
+                return Optional.empty();
+            }
+        } catch (
+                XMLStreamException e) {
+            LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage());
             return Optional.empty();
         }
-
-        NodeList nodes = doc.getElementsByTagName("info");
-        NodeList titleNode = ((Element) nodes.item(0)).getElementsByTagName("title");
-        String title = ((CharacterData) titleNode.item(0).getFirstChild()).getData();
-        return Optional.of(title);
     }
 
     private static String stripInvalidProlog(String source) {
@@ -124,9 +145,11 @@ public class CitationStyle implements OOStyle {
                 return Optional.empty();
             }
             return createCitationStyleFromSource(inputStream, styleFile);
-        } catch (NoSuchFileException e) {
+        } catch (
+                NoSuchFileException e) {
             LOGGER.error("Could not find file: {}", styleFile, e);
-        } catch (IOException e) {
+        } catch (
+                IOException e) {
             LOGGER.error("Error reading source file", e);
         }
         return Optional.empty();
@@ -165,7 +188,9 @@ public class CitationStyle implements OOStyle {
             STYLES.addAll(discoverCitationStylesInPath(path));
 
             return STYLES;
-        } catch (URISyntaxException | IOException e) {
+        } catch (
+                URISyntaxException |
+                IOException e) {
             LOGGER.error("something went wrong while searching available CitationStyles", e);
             return Collections.emptyList();
         }
@@ -241,22 +266,26 @@ public class CitationStyle implements OOStyle {
 
     public boolean isNumericStyle() {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document doc = builder.parse(new InputSource(new StringReader(source)));
+            XMLStreamReader reader = FACTORY.createXMLStreamReader(new StringReader(source));
 
-            Element styleElement = doc.getDocumentElement();
-            Element infoElement = (Element) styleElement.getElementsByTagName("info").item(0);
-            Element categoryElement = (Element) infoElement.getElementsByTagName("category").item(0);
+            while (reader.hasNext()) {
+                int event = reader.next();
 
-            String citationFormat = categoryElement.getAttribute("citation-format");
-            return "numeric".equals(citationFormat);
-        } catch (IOException
-                 | ParserConfigurationException e) {
+                if (event == XMLStreamConstants.START_ELEMENT) {
+                    String elementName = reader.getLocalName();
+
+                    if ("category".equals(elementName)) {
+                        String citationFormat = reader.getAttributeValue(null, "citation-format");
+                        if (citationFormat != null) {
+                            return "numeric".equals(citationFormat);
+                        }
+                    }
+                }
+            }
+        } catch (XMLStreamException e) {
             LOGGER.error("Error parsing CSL style XML", e);
-            return false;
-        } catch (SAXException e) {
-            throw new RuntimeException(e);
         }
+
+        return false;
     }
 }
