@@ -41,7 +41,6 @@ public class CSLCitationOOAdapter {
     private final CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
     private final XTextDocument document;
     private final CSLReferenceMarkManager markManager;
-    private boolean isNumericStyle = false;
 
     public CSLCitationOOAdapter(XTextDocument doc) {
         this.document = doc;
@@ -61,7 +60,6 @@ public class CSLCitationOOAdapter {
         OOTextIntoOO.write(document, cursor, ooBreak);
 
         String style = selectedStyle.getSource();
-        isNumericStyle = selectedStyle.isNumericStyle();
 
         // Sort entries based on their order of appearance in the document
         entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
@@ -72,7 +70,7 @@ public class CSLCitationOOAdapter {
             System.out.println(citation);
 
             String formattedCitation;
-            if (isNumericStyle) {
+            if (selectedStyle.isNumericStyle()) {
                 formattedCitation = updateSingleCitation(transformHtml(citation), currentNumber);
             } else {
                 formattedCitation = transformHtml(citation);
@@ -80,7 +78,7 @@ public class CSLCitationOOAdapter {
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
             OOTextIntoOO.write(document, cursor, ooText);
-            if (isNumericStyle) {
+            if (selectedStyle.isNumericStyle()) {
                 // Select the paragraph break
                 cursor.goLeft((short) 1, true);
 
@@ -93,8 +91,6 @@ public class CSLCitationOOAdapter {
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws CreationException, IOException, Exception {
         String style = selectedStyle.getSource();
-        isNumericStyle = selectedStyle.isNumericStyle();
-        System.out.println(isNumericStyle);
         boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
 
         String inTextCitation;
@@ -106,7 +102,7 @@ public class CSLCitationOOAdapter {
 
         String formattedCitation = transformHtml(inTextCitation);
 
-        if (isNumericStyle) {
+        if (selectedStyle.isNumericStyle()) {
             formattedCitation = updateMultipleCitations(formattedCitation, entries);
         }
 
@@ -124,7 +120,6 @@ public class CSLCitationOOAdapter {
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws IOException, CreationException, Exception {
         String style = selectedStyle.getSource();
-        isNumericStyle = selectedStyle.isNumericStyle();
         boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
 
         Iterator<BibEntry> iterator = entries.iterator();
@@ -146,7 +141,7 @@ public class CSLCitationOOAdapter {
             }
             String formattedCitation = transformHtml(inTextCitation);
             String finalText;
-            if (isNumericStyle) {
+            if (selectedStyle.isNumericStyle()) {
                 formattedCitation = updateMultipleCitations(formattedCitation, List.of(currentEntry));
                 String prefix = currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
                                             .map(AuthorList::parse)

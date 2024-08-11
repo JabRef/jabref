@@ -59,27 +59,24 @@ public class CitationStyle implements OOStyle {
      */
     private static Optional<CitationStyle> createCitationStyleFromSource(final InputStream source, final String filename) {
         try {
-            // We need the content twice:
-            //   First, for parsing it here for the name
-            //   Second for the CSL library to parse it
             String content = new String(source.readAllBytes());
 
-            Optional<String> title = getTitle(filename, content);
-            if (title.isEmpty()) {
+            Optional<StyleInfo> styleInfo = parseStyleInfo(filename, content);
+            if (styleInfo.isEmpty()) {
                 return Optional.empty();
             }
 
-            boolean isNumericStyle = isNumericStyle(filename, content);
-
-            return Optional.of(new CitationStyle(filename, title.get(), isNumericStyle, content));
-        } catch (NullPointerException
-                 | IOException e) {
+            return Optional.of(new CitationStyle(filename, styleInfo.get().title(), styleInfo.get().isNumericStyle(), content));
+        } catch (NullPointerException | IOException e) {
             LOGGER.error("Error while parsing source", e);
             return Optional.empty();
         }
     }
 
-    private static Optional<String> getTitle(String filename, String content) {
+    public record StyleInfo(String title, boolean isNumericStyle) {
+    }
+
+    private static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
         FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
 
         try {
@@ -87,7 +84,8 @@ public class CitationStyle implements OOStyle {
 
             boolean inInfo = false;
             boolean hasBibliography = false;
-            String title = "";
+            String title = null;
+            boolean isNumericStyle = false;
 
             while (reader.hasNext()) {
                 int event = reader.next();
@@ -95,12 +93,20 @@ public class CitationStyle implements OOStyle {
                 if (event == XMLStreamConstants.START_ELEMENT) {
                     String elementName = reader.getLocalName();
 
-                    if ("bibliography".equals(elementName)) {
-                        hasBibliography = true;
-                    } else if ("info".equals(elementName)) {
-                        inInfo = true;
-                    } else if (inInfo && "title".equals(elementName)) {
-                        title = reader.getElementText();
+                    switch (elementName) {
+                        case "bibliography" -> hasBibliography = true;
+                        case "info" -> inInfo = true;
+                        case "title" -> {
+                            if (inInfo) {
+                                title = reader.getElementText();
+                            }
+                        }
+                        case "category" -> {
+                            String citationFormat = reader.getAttributeValue(null, "citation-format");
+                            if (citationFormat != null) {
+                                isNumericStyle = "numeric".equals(citationFormat);
+                            }
+                        }
                     }
                 } else if (event == XMLStreamConstants.END_ELEMENT) {
                     if ("info".equals(reader.getLocalName())) {
@@ -110,7 +116,7 @@ public class CitationStyle implements OOStyle {
             }
 
             if (hasBibliography && title != null) {
-                return Optional.of(title);
+                return Optional.of(new StyleInfo(title, isNumericStyle));
             } else {
                 LOGGER.debug("No valid title or bibliography found for file {}", filename);
                 return Optional.empty();
@@ -119,34 +125,6 @@ public class CitationStyle implements OOStyle {
             LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage());
             return Optional.empty();
         }
-    }
-
-    private static boolean isNumericStyle(String filename, String content) {
-        FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
-
-        try {
-            XMLStreamReader reader = FACTORY.createXMLStreamReader(new StringReader(content));
-
-            while (reader.hasNext()) {
-                int event = reader.next();
-
-                if (event == XMLStreamConstants.START_ELEMENT) {
-                    String elementName = reader.getLocalName();
-
-                    if ("category".equals(elementName)) {
-                        String citationFormat = reader.getAttributeValue(null, "citation-format");
-                        if (citationFormat != null) {
-                            return "numeric".equals(citationFormat);
-                        }
-                    }
-                }
-            }
-        } catch (XMLStreamException e) {
-            LOGGER.error("Error parsing CSL style XML for file {}: {}", filename, e.getMessage());
-        }
-
-        LOGGER.warn("Cannot determine if {} is a numeric style!", filename);
-        return false;
     }
 
     private static String stripInvalidProlog(String source) {
