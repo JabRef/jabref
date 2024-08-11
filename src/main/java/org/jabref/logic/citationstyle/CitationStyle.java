@@ -44,11 +44,13 @@ public class CitationStyle implements OOStyle {
 
     private final String filePath;
     private final String title;
+    private final boolean isNumericStyle;
     private final String source;
 
-    private CitationStyle(final String filename, final String title, final String source) {
+    private CitationStyle(final String filename, final String title, final boolean isNumericStyle, final String source) {
         this.filePath = Objects.requireNonNull(filename);
         this.title = Objects.requireNonNull(title);
+        this.isNumericStyle = isNumericStyle;
         this.source = Objects.requireNonNull(source);
     }
 
@@ -67,7 +69,9 @@ public class CitationStyle implements OOStyle {
                 return Optional.empty();
             }
 
-            return Optional.of(new CitationStyle(filename, title.get(), content));
+            boolean isNumericStyle = isNumericStyle(filename, content);
+
+            return Optional.of(new CitationStyle(filename, title.get(), isNumericStyle, content));
         } catch (NullPointerException
                  | IOException e) {
             LOGGER.error("Error while parsing source", e);
@@ -117,6 +121,34 @@ public class CitationStyle implements OOStyle {
         }
     }
 
+    private static boolean isNumericStyle(String filename, String content) {
+        FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
+
+        try {
+            XMLStreamReader reader = FACTORY.createXMLStreamReader(new StringReader(content));
+
+            while (reader.hasNext()) {
+                int event = reader.next();
+
+                if (event == XMLStreamConstants.START_ELEMENT) {
+                    String elementName = reader.getLocalName();
+
+                    if ("category".equals(elementName)) {
+                        String citationFormat = reader.getAttributeValue(null, "citation-format");
+                        if (citationFormat != null) {
+                            return "numeric".equals(citationFormat);
+                        }
+                    }
+                }
+            }
+        } catch (XMLStreamException e) {
+            LOGGER.error("Error parsing CSL style XML for file {}: {}", filename, e.getMessage());
+        }
+
+        LOGGER.warn("Cannot determine if {} is a numeric style!", filename);
+        return false;
+    }
+
     private static String stripInvalidProlog(String source) {
         int startIndex = source.indexOf("<");
         if (startIndex > 0) {
@@ -158,7 +190,7 @@ public class CitationStyle implements OOStyle {
      * @return default citation style
      */
     public static CitationStyle getDefault() {
-        return createCitationStyleFromFile(DEFAULT).orElse(new CitationStyle("", "Empty", ""));
+        return createCitationStyleFromFile(DEFAULT).orElse(new CitationStyle("", "Empty", false, ""));
     }
 
     /**
@@ -214,6 +246,10 @@ public class CitationStyle implements OOStyle {
         return title;
     }
 
+    public boolean isNumericStyle() {
+        return isNumericStyle;
+    }
+
     public String getSource() {
         return source;
     }
@@ -258,30 +294,5 @@ public class CitationStyle implements OOStyle {
     @Override
     public String getPath() {
         return getFilePath();
-    }
-
-    public boolean isNumericStyle() {
-        try {
-            XMLStreamReader reader = FACTORY.createXMLStreamReader(new StringReader(source));
-
-            while (reader.hasNext()) {
-                int event = reader.next();
-
-                if (event == XMLStreamConstants.START_ELEMENT) {
-                    String elementName = reader.getLocalName();
-
-                    if ("category".equals(elementName)) {
-                        String citationFormat = reader.getAttributeValue(null, "citation-format");
-                        if (citationFormat != null) {
-                            return "numeric".equals(citationFormat);
-                        }
-                    }
-                }
-            }
-        } catch (XMLStreamException e) {
-            LOGGER.error("Error parsing CSL style XML", e);
-        }
-
-        return false;
     }
 }
