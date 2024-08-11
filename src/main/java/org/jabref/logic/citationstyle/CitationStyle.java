@@ -67,7 +67,7 @@ public class CitationStyle implements OOStyle {
             }
 
             return Optional.of(new CitationStyle(filename, styleInfo.get().title(), styleInfo.get().isNumericStyle(), content));
-        } catch (NullPointerException | IOException e) {
+        } catch (IOException e) {
             LOGGER.error("Error while parsing source", e);
             return Optional.empty();
         }
