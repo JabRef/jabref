@@ -952,7 +952,7 @@ public class OOBibBase {
             } catch (CreationException
                      | WrappedTargetException
                      | com.sun.star.lang.IllegalArgumentException ex) {
-                LOGGER.warn("Could not create bibliography", ex);
+                LOGGER.warn("Could not update bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         }
