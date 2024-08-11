@@ -228,7 +228,7 @@ public class DOITest {
                 Arguments.of("10.5220/0010404301780189", DOI.findInText("10.5220/0010404301780189").get().getDOI()),
 
                 // findDoiWithSpecialCharactersInText
-                Arguments.of(new DOI("10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2").getDOI(),
+                Arguments.of("10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2"),
                         DOI.findInText("https://doi.org/10.1175/1520-0493(2002)130%3C1913:EDAWPO%3E2.0.CO;2").get().getDOI())
         );
     }
