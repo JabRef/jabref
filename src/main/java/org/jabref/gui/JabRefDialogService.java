@@ -87,6 +87,7 @@ public class JabRefDialogService implements DialogService {
         alert.setResizable(true);
 
         TextArea area = new TextArea(content);
+        area.setWrapText(true);
 
         alert.getDialogPane().setContent(area);
         alert.initOwner(mainWindow);

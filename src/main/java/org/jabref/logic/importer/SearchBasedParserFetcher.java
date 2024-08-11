@@ -6,7 +6,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -37,17 +36,6 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetcher {
 
     /**
-     * Pattern to redact API keys from error messages.
-     */
-   Pattern API_KEY_PATTERN = Pattern.compile("(?i)(key|api[-_]?key)=[^&]*");
-    /**
-     * A constant string used to replace or mask sensitive information , such as API keys;
-     */
-   String REDACTED_STRING = "[REDACTED]";
-
-
-
-    /**
      * This method is used to send queries with advanced URL parameters.
      * This method is necessary as the performSearch method does not support certain URL parameters that are used for
      * fielded search, such as a title, author, or year parameter.
@@ -73,10 +61,10 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
             return fetchedEntries;
         } catch (IOException e) {
             // Regular expression to redact API keys from the error message
-            throw new FetcherException(API_KEY_PATTERN.matcher(("A network error occurred while fetching from " + urlForQuery)).replaceAll(REDACTED_STRING), e);
+            throw new FetcherException(urlForQuery, e);
         } catch (ParseException e) {
             // Regular expression to redact API keys from the error message
-            throw new FetcherException(API_KEY_PATTERN.matcher(("An internal parser error occurred while fetching from " + urlForQuery)).replaceAll(REDACTED_STRING), e);
+            throw new FetcherException(urlForQuery, "An internal parser error occurred while fetching", e);
         }
     }
 

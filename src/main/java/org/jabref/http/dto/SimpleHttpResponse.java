@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 
+import org.jsoup.HttpStatusException;
+
 public record SimpleHttpResponse(int statusCode, String responseMessage, String responseBody) {
     private static final int MAX_RESPONSE_LENGTH = 1024; // 1 KB
 
@@ -16,8 +18,12 @@ public record SimpleHttpResponse(int statusCode, String responseMessage, String 
         this.responseMessage = responseMessage;
     }
 
-    public SimpleHttpResponse(HttpURLConnection connection) throws IOException {
-        this(connection.getResponseCode(), connection.getResponseMessage(), getResponseBody(connection));
+    public SimpleHttpResponse(HttpURLConnection connection) {
+        this(getStatusCode(connection), getResponseMessage(connection), getResponseBodyDefaultEmpty(connection));
+    }
+
+    public SimpleHttpResponse(HttpStatusException e) {
+        this(e.getStatusCode(), "", "");
     }
 
     @Override
@@ -27,6 +33,36 @@ public record SimpleHttpResponse(int statusCode, String responseMessage, String 
                 ", responseMessage='" + responseMessage + '\'' +
                 ", responseBody='" + responseBody + '\'' +
                 '}';
+    }
+
+    private static int getStatusCode(HttpURLConnection connection) {
+        int statusCode;
+        try {
+            statusCode = connection.getResponseCode();
+        } catch (IOException e) {
+            statusCode = -1;
+        }
+        return statusCode;
+    }
+
+    private static String getResponseMessage(HttpURLConnection connection) {
+        String responseMessage;
+        try {
+            responseMessage = connection.getResponseMessage();
+        } catch (IOException e) {
+            responseMessage = "";
+        }
+        return responseMessage;
+    }
+
+    private static String getResponseBodyDefaultEmpty(HttpURLConnection connection) {
+        String responseBody;
+        try {
+            responseBody = getResponseBody(connection);
+        } catch (IOException e) {
+            responseBody = "";
+        }
+        return responseBody;
     }
 
     /**

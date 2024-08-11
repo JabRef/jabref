@@ -96,8 +96,13 @@ public class SciteTabViewModel extends AbstractViewModel {
     }
 
     public SciteTallyModel fetchTallies(DOI doi) throws FetcherException {
+        URL url;
         try {
-            URL url = new URI(BASE_URL + "tallies/" + doi.getDOI()).toURL();
+            url = new URI(BASE_URL + "tallies/" + doi.getDOI()).toURL();
+        } catch (MalformedURLException | URISyntaxException ex) {
+            throw new FetcherException("Malformed URL for DOI", ex);
+        }
+        try {
             LOGGER.debug("Fetching tallies from {}", url);
             URLDownload download = new URLDownload(url);
             String response = download.asString();
@@ -110,10 +115,8 @@ public class SciteTabViewModel extends AbstractViewModel {
                 throw new FetcherException("Unexpected result data.");
             }
             return SciteTallyModel.fromJSONObject(tallies);
-        } catch (MalformedURLException | URISyntaxException ex) {
-            throw new FetcherException("Malformed URL for DOI", ex);
         } catch (IOException ioex) {
-            throw new FetcherException("Failed to retrieve tallies for DOI - I/O Exception", ioex);
+            throw new FetcherException(url, "Failed to retrieve tallies for DOI", ioex);
         }
     }
 

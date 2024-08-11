@@ -64,7 +64,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
         try {
             return BibtexParser.singleFromString(actualEntry, prefs);
         } catch (ParseException e) {
-            throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
+            throw FetcherException.ofUrl(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
         }
     }
 
@@ -108,7 +108,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
             URLDownload download = new URLDownload(url);
             return download.asString();
         } catch (IOException e) {
-            throw new FetcherException(Localization.lang("Could not retrieve entry data from '%0'.", url), e);
+            throw FetcherException.ofUrl(url, Localization.lang("Could not retrieve entry data from '%0'.", url), e);
         }
     }
 

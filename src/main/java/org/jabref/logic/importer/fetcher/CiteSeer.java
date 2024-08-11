@@ -67,7 +67,7 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
                 LOGGER.debug("No success");
                 // TODO: body needs to be added to the exception, but we currently only have JSON available, but the error is most probably simple text (or HTML)
                 SimpleHttpResponse simpleHttpResponse = new SimpleHttpResponse(httpResponse.getStatus(), httpResponse.getStatusText(), "");
-                throw new FetcherException(simpleHttpResponse);
+                throw new FetcherException(API_URL, simpleHttpResponse);
             }
 
             JsonNode requestResponse = httpResponse.getBody();
@@ -84,7 +84,7 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
             List<BibEntry> fetchedEntries = parser.parseCiteSeerResponse(jsonResponse.orElse(new JSONArray()));
             return fetchedEntries;
         } catch (ParseException ex) {
-            throw new FetcherException("An internal parser error occurred while parsing CiteSeer entries, ", ex);
+            throw new FetcherException("An internal parser error occurred while parsing CiteSeer entries", ex);
         }
     }
 

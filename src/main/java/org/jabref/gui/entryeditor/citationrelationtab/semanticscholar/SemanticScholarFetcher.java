@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -34,8 +35,13 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
     @Override
     public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isPresent()) {
+            URL citationsUrl;
             try {
-                URL citationsUrl = URI.create(getAPIUrl("citations", entry)).toURL();
+                citationsUrl = URI.create(getAPIUrl("citations", entry)).toURL();
+            } catch (MalformedURLException e) {
+                throw new FetcherException("Malformed URL", e);
+            }
+            try {
                 URLDownload urlDownload = new URLDownload(citationsUrl);
 
                 String apiKey = getApiKey();
@@ -49,7 +55,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
                                         .stream().filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
                                         .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry()).toList();
             } catch (IOException e) {
-                throw new FetcherException("Could not fetch", e);
+                throw new FetcherException(citationsUrl, "Could not fetch", e);
             }
         }
         return List.of();
@@ -58,8 +64,13 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
     @Override
     public List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isPresent()) {
+            URL referencesUrl;
             try {
-                URL referencesUrl = URI.create(getAPIUrl("references", entry)).toURL();
+                referencesUrl = URI.create(getAPIUrl("references", entry)).toURL();
+            } catch (MalformedURLException e) {
+                throw new FetcherException("Malformed URL", e);
+            }
+            try {
                 URLDownload urlDownload = new URLDownload(referencesUrl);
                 String apiKey = getApiKey();
                 if (!apiKey.isEmpty()) {
@@ -73,7 +84,7 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
                                          .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
                                          .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
             } catch (IOException e) {
-                throw new FetcherException("Could not fetch", e);
+                throw new FetcherException(referencesUrl, "Could not fetch", e);
             }
         }
         return List.of();

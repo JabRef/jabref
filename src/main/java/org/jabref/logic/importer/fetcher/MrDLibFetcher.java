@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -54,31 +53,31 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getFieldLatexFree(StandardField.TITLE);
-        if (title.isPresent()) {
-            String response = makeServerRequest(title.get());
-            MrDLibImporter importer = new MrDLibImporter();
-            ParserResult parserResult;
-            try {
-                if (importer.isRecognizedFormat(response)) {
-                    parserResult = importer.importDatabase(response);
-                    heading = importer.getRecommendationsHeading();
-                    description = importer.getRecommendationsDescription();
-                    recommendationSetId = importer.getRecommendationSetId();
-                } else {
-                    // For displaying An ErrorMessage
-                    description = DEFAULT_MRDLIB_ERROR_MESSAGE;
-                    BibDatabase errorBibDataBase = new BibDatabase();
-                    parserResult = new ParserResult(errorBibDataBase);
-                }
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
-                throw new FetcherException("JSON Parser IOException.");
-            }
-            return parserResult.getDatabase().getEntries();
-        } else {
+        if (!title.isPresent()) {
             // without a title there is no reason to ask MrDLib
-            return new ArrayList<>(0);
+            return List.of();
         }
+
+        String response = makeServerRequest(title.get());
+        MrDLibImporter importer = new MrDLibImporter();
+        ParserResult parserResult;
+        try {
+            if (importer.isRecognizedFormat(response)) {
+                parserResult = importer.importDatabase(response);
+                heading = importer.getRecommendationsHeading();
+                description = importer.getRecommendationsDescription();
+                recommendationSetId = importer.getRecommendationSetId();
+            } else {
+                // For displaying An ErrorMessage
+                description = DEFAULT_MRDLIB_ERROR_MESSAGE;
+                BibDatabase errorBibDataBase = new BibDatabase();
+                parserResult = new ParserResult(errorBibDataBase);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while fetching", e);
+            throw FetcherException.ofUrl(constructQuery(title.get()), e);
+        }
+        return parserResult.getDatabase().getEntries();
     }
 
     public String getHeading() {
@@ -96,8 +95,9 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      * @return Returns the server response. This is an XML document as a String.
      */
     private String makeServerRequest(String queryByTitle) throws FetcherException {
+        String url = constructQuery(queryByTitle);
         try {
-            URLDownload urlDownload = new URLDownload(constructQuery(queryByTitle));
+            URLDownload urlDownload = new URLDownload(url);
             String response = urlDownload.asString();
 
             // Conversion of < and >
@@ -105,7 +105,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             response = response.replace("&lt;", "<");
             return response;
         } catch (IOException e) {
-            throw new FetcherException("Problem downloading", e);
+            throw FetcherException.ofUrl(url, e);
         }
     }
 
@@ -138,10 +138,10 @@ public class MrDLibFetcher implements EntryBasedFetcher {
 
         try {
             URI uri = builder.build();
-            LOGGER.trace("Request: " + uri.toString());
+            LOGGER.trace("Request: {}", uri.toString());
             return uri.toString();
         } catch (URISyntaxException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Invalid URI", e);
         }
         return "";
     }

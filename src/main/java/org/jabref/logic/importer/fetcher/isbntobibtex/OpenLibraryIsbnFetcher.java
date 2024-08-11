@@ -11,7 +11,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.AuthorListParser;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -53,7 +52,7 @@ public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         this.ensureThatIsbnIsValid(identifier);
         return new URIBuilder(BASE_URL)
                 .setPathSegments("isbn", identifier + ".json")

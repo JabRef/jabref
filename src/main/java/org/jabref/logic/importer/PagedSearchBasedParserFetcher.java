@@ -6,7 +6,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
@@ -14,15 +13,6 @@ import org.jabref.model.paging.Page;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher, PagedSearchBasedFetcher, ParserFetcher {
-
-    /**
-     * Pattern to redact API keys from error messages.
-     */
-    Pattern API_KEY_PATTERN = Pattern.compile("(?i)(api|key|api[-_]?key)=[^&]*");
-    /**
-     * A constant string used to replace or mask sensitive information , such as API keys;
-     */
-    String REDACTED_STRING = "[REDACTED]";
 
     @Override
     default Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
@@ -42,9 +32,9 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
         } catch (IOException e) {
-            throw new FetcherException(API_KEY_PATTERN.matcher(("A network error occurred while fetching from " + urlForQuery)).replaceAll(REDACTED_STRING), e);
+            throw new FetcherException(urlForQuery, "A network error occurred", e);
         } catch (ParseException e) {
-            throw new FetcherException(API_KEY_PATTERN.matcher(("An internal parser error occurred while fetching from " + urlForQuery)).replaceAll(REDACTED_STRING), e);
+            throw new FetcherException(urlForQuery, "An internal parser error occurred", e);
         }
     }
 
@@ -54,10 +44,10 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
      * @param luceneQuery the search query
      * @param pageNumber  the number of the page indexed from 0
      */
-    URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException;
 
     @Override
-    default URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    default URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         return getURLForQuery(luceneQuery, 0);
     }
 

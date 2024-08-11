@@ -88,7 +88,7 @@ public class AstrophysicsDataSystem
      * @return URL which points to a search request for given query
      */
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         builder.addParameter("fl", "bibcode");
@@ -129,7 +129,7 @@ public class AstrophysicsDataSystem
      * @return URL which points to a search URL for given identifier
      */
     @Override
-    public URL getUrlForIdentifier(String identifier) throws FetcherException, URISyntaxException, MalformedURLException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         String query = "doi:\"" + identifier + "\" OR " + "bibcode:\"" + identifier + "\"";
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
@@ -178,14 +178,15 @@ public class AstrophysicsDataSystem
             return Collections.emptyList();
         }
 
+        URL urlForEntry = null;
         try {
-            List<String> bibcodes = fetchBibcodes(getURLForEntry(entry));
-            return performSearchByIds(bibcodes);
-        } catch (URISyntaxException e) {
+            urlForEntry = getURLForEntry(entry);
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
         }
+
+        List<String> bibcodes = fetchBibcodes(urlForEntry);
+        return performSearchByIds(bibcodes);
     }
 
     /**
@@ -204,7 +205,7 @@ public class AstrophysicsDataSystem
             }
             return bibcodes;
         } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
+            throw new FetcherException(url, "A network error occurred", e);
         } catch (JSONException e) {
             return Collections.emptyList();
         }
@@ -216,24 +217,25 @@ public class AstrophysicsDataSystem
             return Optional.empty();
         }
 
+        URL urlForIdentifier;
         try {
-            List<String> bibcodes = fetchBibcodes(getUrlForIdentifier(identifier));
-            List<BibEntry> fetchedEntries = performSearchByIds(bibcodes);
-
-            if (fetchedEntries.isEmpty()) {
-                return Optional.empty();
-            }
-            if (fetchedEntries.size() > 1) {
-                LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
-                        + ". We will use the first entry.");
-            }
-            BibEntry entry = fetchedEntries.getFirst();
-            return Optional.of(entry);
-        } catch (URISyntaxException e) {
+            urlForIdentifier = getUrlForIdentifier(identifier);
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
         }
+
+        List<String> bibcodes = fetchBibcodes(urlForIdentifier);
+        List<BibEntry> fetchedEntries = performSearchByIds(bibcodes);
+
+        if (fetchedEntries.isEmpty()) {
+            return Optional.empty();
+        }
+        if (fetchedEntries.size() > 1) {
+            LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
+                    + ". We will use the first entry.");
+        }
+        BibEntry entry = fetchedEntries.getFirst();
+        return Optional.of(entry);
     }
 
     /**
@@ -245,9 +247,17 @@ public class AstrophysicsDataSystem
         if (ids.isEmpty()) {
             return Collections.emptyList();
         }
+
+        URL urLforExport;
+        try {
+            urLforExport = getURLforExport();
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        }
+
         try {
             String postData = buildPostData(ids);
-            URLDownload download = new URLDownload(getURLforExport());
+            URLDownload download = new URLDownload(urLforExport);
             download.addHeader("Authorization", "Bearer " + importerPreferences.getApiKey(getName()).orElse(API_KEY));
             download.addHeader("ContentType", "application/json");
             download.setPostData(postData);
@@ -266,12 +276,10 @@ public class AstrophysicsDataSystem
             } catch (JSONException e) {
                 return Collections.emptyList();
             }
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
+            throw new FetcherException(urLforExport, "A network error occurred", e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred", e);
+            throw new FetcherException(urLforExport, "An internal parser error occurred", e);
         }
     }
 
@@ -280,10 +288,8 @@ public class AstrophysicsDataSystem
         URL urlForQuery;
         try {
             urlForQuery = getURLForQuery(luceneQuery);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
         }
         List<String> bibCodes = fetchBibcodes(urlForQuery);
         return performSearchByIds(bibCodes);
@@ -294,10 +300,8 @@ public class AstrophysicsDataSystem
         URL urlForQuery;
         try {
             urlForQuery = getURLForQuery(luceneQuery, pageNumber);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
         }
         // This is currently just interpreting the complex query as a default string query
         List<String> bibCodes = fetchBibcodes(urlForQuery);

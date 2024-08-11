@@ -364,13 +364,14 @@ public class URLDownload {
     }
 
     /**
-     * Open a connection to this object's URL (with specified settings). If accessing an HTTP URL, don't forget
-     * to close the resulting connection after usage.
+     * Open a connection to this object's URL (with specified settings).
+     * <p>
+     * If accessing an HTTP URL, remeber to close the resulting connection after usage.
      *
      * @return an open connection
      */
     public URLConnection openConnection() throws IOException {
-        URLConnection connection = this.source.openConnection();
+        URLConnection connection = getUrlConnection();
         connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
@@ -383,17 +384,18 @@ public class URLDownload {
         }
 
         if (connection instanceof HttpURLConnection httpURLConnection) {
-            // this does network i/o: GET + read returned headers
             int status;
             try {
+                // this does network i/o: GET + read returned headers
                 status = httpURLConnection.getResponseCode();
             } catch (IOException e) {
                 LOGGER.error("Error getting response code", e);
                 // TODO: Convert e to FetcherClientException
+                //       Same TODO as in org.jabref.logic.importer.EntryBasedParserFetcher.performSearch.
+                //       Maybe do this in org.jabref.logic.importer.FetcherException.getLocalizedMessage
                 throw e;
             }
 
-            // normally, 3xx is redirect
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
                     || (status == HttpURLConnection.HTTP_MOVED_PERM)
                     || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
@@ -405,10 +407,25 @@ public class URLDownload {
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
                 LOGGER.info("{}", httpResponse);
                 if ((status >= 400) && (status < 500)) {
-                    throw new IOException(new FetcherClientException(httpResponse));
+                    throw new IOException(new FetcherClientException(this.source, httpResponse));
                 } else if (status >= 500) {
-                    throw new IOException(new FetcherServerException(httpResponse));
+                    throw new IOException(new FetcherServerException(this.source, httpResponse));
                 }
+            }
+        }
+        return connection;
+    }
+
+    private URLConnection getUrlConnection() throws IOException {
+        URLConnection connection = this.source.openConnection();
+        connection.setConnectTimeout((int) connectTimeout.toMillis());
+        for (Entry<String, String> entry : this.parameters.entrySet()) {
+            connection.setRequestProperty(entry.getKey(), entry.getValue());
+        }
+        if (!this.postData.isEmpty()) {
+            connection.setDoOutput(true);
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+                wr.writeBytes(this.postData);
             }
         }
         return connection;

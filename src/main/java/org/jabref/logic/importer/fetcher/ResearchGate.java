@@ -169,26 +169,29 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         return Optional.of(link);
     }
 
-    /**
-     * Constructs a URL based on the query, size and page number.
-     * <p>
-     * Extract the numerical internal ID and add it to the URL to receive a link to a {@link BibEntry}
-     *
-     * @param luceneQuery the search query.
-     * @return A URL that lets us download a .bib file
-     * @throws URISyntaxException from {@link URIBuilder}'s build() method
-     * @throws IOException        from {@link Connection}'s get() method
-     */
-    private Document getPage(QueryNode luceneQuery) throws URISyntaxException, IOException {
-        String query = new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("");
-        URIBuilder source = new URIBuilder(SEARCH);
-        source.addParameter("type", "publication");
-        source.addParameter("query", query);
-        return Jsoup.connect(source.build().toString())
+    private Document getPage(String url) throws IOException {
+        return Jsoup.connect(url)
                     .userAgent(URLDownload.USER_AGENT)
                     .referrer("www.google.com")
                     .ignoreHttpErrors(true)
                     .get();
+    }
+
+    /**
+     * Constructs a URL based on the query, size and page number.
+     * Extract the numerical internal ID and add it to the URL to receive a link to a {@link BibEntry}
+     * <p>
+     *
+     * @param luceneQuery the search query.
+     * @return A URL that lets us download a .bib file
+     */
+    private static String getUrlForQuery(QueryNode luceneQuery) throws URISyntaxException {
+        String query = new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("");
+        URIBuilder source = new URIBuilder(SEARCH);
+        source.addParameter("type", "publication");
+        source.addParameter("query", query);
+        String url = source.build().toString();
+        return url;
     }
 
     @Override
@@ -206,13 +209,21 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
     @Override
     public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         Document html;
+
+        String url;
         try {
-            html = getPage(luceneQuery);
+            url = getUrlForQuery(luceneQuery);
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Invalid URL", e);
+        }
+
+        try {
+            html = getPage(url);
             // ResearchGate's server blocks when too many request are made
             if (!html.getElementsByClass("nova-legacy-v-publication-item__title").hasText()) {
-                throw new FetcherException("ResearchGate server unavailable");
+                throw FetcherException.ofUrl(url, "ResearchGate server unavailable");
             }
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new FetcherException("URL is not correct", e);
         }
 
@@ -234,7 +245,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
                 entry = parser.parseSingleEntry(bib);
                 entry.ifPresent(list::add);
             } catch (ParseException e) {
-                LOGGER.debug("Entry is not convertible to Bibtex", e);
+                LOGGER.debug("Entry is not convertible to BibTeX", e);
             }
         }
         return list;
@@ -245,7 +256,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
             URL url = new URL(urlString);
             return new BufferedReader(new InputStreamReader(url.openStream()));
         } catch (IOException e) {
-            LOGGER.debug("Wrong URL:", e);
+            LOGGER.debug("Wrong URL", e);
         }
         return null;
     }

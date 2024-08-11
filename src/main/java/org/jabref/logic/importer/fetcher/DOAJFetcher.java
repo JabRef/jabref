@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
@@ -185,7 +184,7 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         DOAJFetcher.addPath(uriBuilder, new DefaultLuceneQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         // Number of results

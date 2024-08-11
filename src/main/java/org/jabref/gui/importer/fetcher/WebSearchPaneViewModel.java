@@ -154,7 +154,7 @@ public class WebSearchPaneViewModel {
             parserResultCallable = () -> new ParserResult(OptionalUtil.toList(compositeIdFetcher.performSearchById(query)));
             fetcherName = Localization.lang("Identifier-based Web Search");
         } else {
-            // Execptions are handled below at "task.onFailure(dialogService::showErrorDialogAndWait)"
+            // Exceptions are handled below at "task.onFailure(dialogService::showErrorDialogAndWait)"
             parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
         }
 

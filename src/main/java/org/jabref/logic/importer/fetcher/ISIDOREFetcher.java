@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -76,15 +75,13 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
                 Element entryElement = document.getDocumentElement();
 
                 if (entryElement == null) {
-                    return Collections.emptyList();
+                    return List.of();
                 }
 
                 return parseXMl(entryElement);
             } catch (FetcherException e) {
                 Unchecked.throwChecked(e);
-            } catch (ParserConfigurationException |
-                     IOException |
-                     SAXException e) {
+            } catch (ParserConfigurationException | IOException | SAXException e) {
                 Unchecked.throwChecked(new FetcherException("Issue with parsing link", e));
             }
             return null;
@@ -99,7 +96,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         ISIDOREQueryTransformer queryTransformer = new ISIDOREQueryTransformer();
         String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);

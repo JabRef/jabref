@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -258,7 +257,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         // transformer is stored globally, because we need to filter out the bib entries by the year manually
         // the transformer stores the min and max year
         transformer = new IEEEQueryTransformer();

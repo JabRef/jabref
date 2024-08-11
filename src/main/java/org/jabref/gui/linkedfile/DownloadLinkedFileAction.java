@@ -29,10 +29,8 @@ import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.fieldeditors.URLUtil;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
-import org.jabref.logic.importer.FetcherClientException;
-import org.jabref.logic.importer.FetcherServerException;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProgressInputStream;
 import org.jabref.logic.net.URLDownload;
@@ -200,28 +198,11 @@ public class DownloadLinkedFileAction extends SimpleCommand {
 
     private void onFailure(URLDownload urlDownload, Exception ex) {
         LOGGER.error("Error downloading from URL: {}", urlDownload, ex);
-        String fetcherExceptionMessage = ex.getLocalizedMessage();
-        String failedTitle = Localization.lang("Failed to download from URL");
-        if (ex instanceof FetcherClientException fetcherException) {
-            Optional<SimpleHttpResponse> httpResponse = fetcherException.getHttpResponse();
-            if (httpResponse.isPresent()) {
-                int statusCode = httpResponse.get().statusCode();
-                if (statusCode == 401) {
-                    dialogService.showInformationDialogAndWait(failedTitle, Localization.lang("401 Unauthorized: Access Denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.\nURL: %0\nDetails: %1", urlDownload.getSource(), fetcherExceptionMessage));
-                } else if (statusCode == 403) {
-                    dialogService.showInformationDialogAndWait(failedTitle, Localization.lang("403 Forbidden: Access Denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.\nURL: %0\nDetails: %1", urlDownload.getSource(), fetcherExceptionMessage));
-                } else if (statusCode == 404) {
-                    dialogService.showInformationDialogAndWait(failedTitle, Localization.lang("404 Not Found Error: The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.\nURL: %0\nDetails: %1", urlDownload.getSource(), fetcherExceptionMessage));
-                } else {
-                    dialogService.showErrorDialogAndWait(failedTitle, Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.\nURL: %0\nDetails: %1", urlDownload.getSource(), fetcherExceptionMessage));
-                }
-            } else {
-                dialogService.showErrorDialogAndWait(failedTitle, Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.\nURL: %0\nDetails: %1", urlDownload.getSource(), fetcherExceptionMessage));
-            }
-        } else if (ex instanceof FetcherServerException) {
-            dialogService.showInformationDialogAndWait(failedTitle,
-                    Localization.lang("Error downloading from URL. Cause is likely the server side.\nPlease try again later or contact the server administrator.\nURL: %0\nDetails: %1", urlDownload.getSource(), fetcherExceptionMessage));
+        if (ex instanceof FetcherException fetcherException) {
+            dialogService.showErrorDialogAndWait(fetcherException);
         } else {
+            String fetcherExceptionMessage = ex.getLocalizedMessage();
+            String failedTitle = Localization.lang("Failed to download from URL");
             dialogService.showErrorDialogAndWait(failedTitle, Localization.lang("Please check the URL and try again.\nURL: %0\nDetails: %1", urlDownload.getSource(), fetcherExceptionMessage));
         }
     }

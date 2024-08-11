@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -48,14 +47,14 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
         uriBuilder.addParameter("Query", new JstorQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         return uriBuilder.build().toURL();
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws MalformedURLException {
         String start = "https://www.jstor.org/citation/text/";
         if (identifier.startsWith("http")) {
             identifier = identifier.replace("https://www.jstor.org/stable", "");
@@ -63,16 +62,12 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
         }
         identifier = identifier.replaceAll(URL_QUERY_REGEX, "");
 
-        try {
-            if (identifier.contains("/")) {
-                // if identifier links to a entry with a valid doi
-                return new URL(start + identifier);
-            }
-            // else use default doi start.
-            return new URL(start + "10.2307/" + identifier);
-        } catch (IOException e) {
-            throw new FetcherException("could not construct url for jstor", e);
+        if (identifier.contains("/")) {
+            // if identifier links to a entry with a valid doi
+            return new URL(start + identifier);
         }
+        // else use default doi start.
+        return new URL(start + "10.2307/" + identifier);
     }
 
     @Override

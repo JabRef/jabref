@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -197,7 +196,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(getBaseURL().toURI());
         BiodiversityLibraryTransformer transformer = new BiodiversityLibraryTransformer();
         uriBuilder.addParameter("op", "PublicationSearch");
