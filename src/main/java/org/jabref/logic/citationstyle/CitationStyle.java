@@ -251,10 +251,12 @@ public class CitationStyle implements OOStyle {
 
             String citationFormat = categoryElement.getAttribute("citation-format");
             return "numeric".equals(citationFormat);
-        } catch (
-                Exception e) {
-            org.tinylog.Logger.error("Error parsing CSL style XML", e);
+        } catch (IOException
+                 | ParserConfigurationException e) {
+            LOGGER.error("Error parsing CSL style XML", e);
             return false;
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
         }
     }
 }
