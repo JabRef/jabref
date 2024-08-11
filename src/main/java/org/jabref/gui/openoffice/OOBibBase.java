@@ -1,5 +1,6 @@
 package org.jabref.gui.openoffice;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +55,7 @@ import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,16 +90,12 @@ public class OOBibBase {
         this.alwaysAddCitedOnPages = false;
     }
 
-    private void initializeCitationAdapter(XTextDocument doc) {
-        try {
+    private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
             this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
             this.cslCitationOOAdapter.readExistingMarks();
-        } catch (Exception e) {
-            LOGGER.error("Error initializing CSLCitationOOAdapter", e);
-        }
     }
 
-    public void guiActionSelectDocument(boolean autoSelectForSingle) {
+    public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {
         final String errorTitle = Localization.lang("Problem connecting");
 
         try {
@@ -637,9 +635,16 @@ public class OOBibBase {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-        } catch (Exception ex) {
+        } catch (CreationException
+                 | WrappedTargetException
+                 | IOException
+                 | PropertyVetoException
+                 | IllegalTypeException
+                 | NotRemoveableException ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             UnoUndo.leaveUndoContext(doc);
         }
@@ -937,36 +942,16 @@ public class OOBibBase {
 
                     CSLUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
-//                    // Create a new cursor at the end of the document for bibliography insertion
-//                    XTextCursor bibliographyCursor = doc.getText().createTextCursor();
-//                    bibliographyCursor.gotoEnd(false);
-//
-//                    // Insert bibliography title
-//                    String bibliographyTitle = Localization.lang("\nReferences");
-//                    bibliographyCursor.setString("\n");
-//
-//                    // Apply formatting to the title (here, we make it bold and larger)
-//                    XTextRange titleRange = bibliographyCursor.getStart();
-//                    titleRange.setString(bibliographyTitle);
-//                    XPropertySet titleProps = UnoRuntime.queryInterface(XPropertySet.class, titleRange);
-//                    titleProps.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
-//                    titleProps.setPropertyValue("CharHeight", 16f);
-//
-//                    // Move cursor to prevent reference mark bleed-out (current implementation) TODO: Remove once bleed-out is fixed
-//                    bibliographyCursor.goRight((short) 1, false);
-//
-//                    // Insert bibliography entries
-//                    // BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(databases.getFirst());
-//                    // TODO: Ask Chris if injecting database context is a good idea
-//                    BibDatabaseContext bibDatabaseContext = Injector.instantiateModelOrService(BibDatabaseContext.class);
-//                    BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-//
-//                    adapter.insertBibliography(bibliographyCursor, citationStyle, citedEntries, bibDatabaseContext, bibEntryTypesManager);
+                } catch (NoDocumentException
+                         | NoSuchElementException e) {
+                    throw new RuntimeException(e);
                 } finally {
                     UnoUndo.leaveUndoContext(doc);
                     fcursor.get().restore(doc);
                 }
-            } catch (Exception ex) {
+            } catch (CreationException
+                     | WrappedTargetException
+                     | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not create bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }

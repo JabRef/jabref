@@ -62,6 +62,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.sun.star.comp.helper.BootstrapException;
+import com.sun.star.container.NoSuchElementException;
+import com.sun.star.lang.WrappedTargetException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,7 +198,14 @@ public class OpenOfficePanel {
         manualConnect.setOnAction(e -> connectManually());
 
         selectDocument.setTooltip(new Tooltip(Localization.lang("Select which open Writer document to work on")));
-        selectDocument.setOnAction(e -> ooBase.guiActionSelectDocument(false));
+        selectDocument.setOnAction(e -> {
+            try {
+                ooBase.guiActionSelectDocument(false);
+            } catch (WrappedTargetException
+                     | NoSuchElementException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event -> {
@@ -404,7 +413,7 @@ public class OpenOfficePanel {
     private void connect() {
         Task<OOBibBase> connectTask = new Task<>() {
             @Override
-            protected OOBibBase call() throws Exception {
+            protected OOBibBase call() throws BootstrapException, CreationException {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
                 Path path = Path.of(preferencesService.getOpenOfficePreferences().getExecutablePath());
@@ -415,7 +424,12 @@ public class OpenOfficePanel {
         connectTask.setOnSucceeded(value -> {
             ooBase = connectTask.getValue();
 
-            ooBase.guiActionSelectDocument(true);
+            try {
+                ooBase.guiActionSelectDocument(true);
+            } catch (WrappedTargetException
+                     | NoSuchElementException e) {
+                throw new RuntimeException(e);
+            }
 
             // Enable actions that depend on a connection
             updateButtonAvailability();

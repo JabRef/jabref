@@ -8,6 +8,7 @@ import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.UnoReferenceMark;
 
 import com.sun.star.container.XNamed;
+import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextCursor;
@@ -49,7 +50,8 @@ public class CSLReferenceMark {
         return new CSLReferenceMark(named, name, citationKey, citationNumber, uniqueId);
     }
 
-    public void insertReferenceIntoOO(XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter, boolean withoutBrackets) throws Exception, CreationException {
+    public void insertReferenceIntoOO(XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter, boolean withoutBrackets)
+            throws CreationException, WrappedTargetException {
         // Ensure the cursor is at the end of its range
         position.collapseToEnd();
 

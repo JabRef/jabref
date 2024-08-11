@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice.oocsltext;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -20,13 +21,13 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
-import org.jabref.model.openoffice.uno.NoDocumentException;
-import org.jabref.model.openoffice.uno.UnoTextSection;
+import org.jabref.model.openoffice.uno.CreationException;
 
+import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
-import com.sun.star.text.XTextRange;
+import com.sun.star.uno.Exception;
 import org.apache.commons.text.StringEscapeUtils;
 
 public class CSLCitationOOAdapter {
@@ -42,53 +43,18 @@ public class CSLCitationOOAdapter {
     private final CSLReferenceMarkManager markManager;
     private boolean isNumericStyle = false;
 
-    public CSLCitationOOAdapter(XTextDocument doc) throws Exception {
+    public CSLCitationOOAdapter(XTextDocument doc) {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
     }
 
-    public void readExistingMarks() throws Exception {
+    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         markManager.readExistingMarks();
     }
 
-    public static Optional<XTextRange> getBibliographyRange(XTextDocument doc)
-            throws
-            NoDocumentException,
-            WrappedTargetException {
-        return UnoTextSection.getAnchor(doc, "CSL_bibliography");
-    }
-
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws Exception {
-//        XTextCursor bibliographyCursor = document.getText().createTextCursor();
-//        bibliographyCursor.gotoEnd(false);
-//        // My approach:
-//        // Insert the bibliography title
-//        XTextRange titleRange = bibliographyCursor.getStart();
-//        titleRange.setString(BIBLIOGRAPHY_TITLE);
-//
-//        // Set the paragraph style for the title
-//        XPropertySet titleProps = UnoRuntime.queryInterface(XPropertySet.class, titleRange);
-//        titleProps.setPropertyValue("ParaStyleName", BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
-//
-//        // Move the cursor to the end of the title
-//        bibliographyCursor.gotoEnd(false);
-//
-//        // Insert a paragraph break after the title
-//        bibliographyCursor.getText().insertControlCharacter(bibliographyCursor, ControlCharacter.PARAGRAPH_BREAK, false);
-//
-//        // Create a new paragraph for references and set its style
-//        XTextRange refParagraph = bibliographyCursor.getStart();
-//        XPropertySet refParaProps = UnoRuntime.queryInterface(XPropertySet.class, refParagraph);
-//        refParaProps.setPropertyValue("ParaStyleName", "Body Text");
-        // Always creating at the end of the document.
-        // Alternatively, we could receive a cursor.
-//        XTextCursor textCursor = document.getText().createTextCursor();
-//        textCursor.gotoEnd(false);
-//        DocumentAnnotation annotation = new DocumentAnnotation(document, "CSL_bibliography", textCursor, false);
-//        UnoTextSection.create(annotation);
+            throws WrappedTargetException, CreationException {
 
-        // antalk2's derivative
         OOText title = OOFormat.paragraph(OOText.fromString(BIBLIOGRAPHY_TITLE), BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
         OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), "Body Text");
@@ -122,16 +88,10 @@ public class CSLCitationOOAdapter {
                 cursor.setString("");
             }
         }
-        // remove the initial empty paragraph from the section.
-//        XTextRange sectionRange = getBibliographyRange(document).orElseThrow(IllegalStateException::new);
-//        XTextCursor initialParagraph = document.getText().createTextCursorByRange(sectionRange);
-//        initialParagraph.collapseToStart();
-//        initialParagraph.goRight((short) 1, true);
-//        initialParagraph.setString("");
-//        // TODO: Chris help - newlines!!
     }
 
-    public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager) throws Exception {
+    public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
+            throws CreationException, IOException, Exception {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
         boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
@@ -161,7 +121,7 @@ public class CSLCitationOOAdapter {
      * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager)} method.insertInText method
      */
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws Exception {
+            throws IOException, CreationException, Exception {
         String style = selectedStyle.getSource();
         isNumericStyle = selectedStyle.isNumericStyle();
         boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
@@ -175,7 +135,7 @@ public class CSLCitationOOAdapter {
                 inTextCitation = generateAlphanumericCitation(List.of(currentEntry), bibDatabaseContext);
                 // Get the author's name
                 String authorName = currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
-                                                .map(authors -> AuthorList.parse(authors))
+                                                .map(AuthorList::parse)
                                                 .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al."))
                                                 .orElse("");
                 // Combine author name with the citation
@@ -188,7 +148,7 @@ public class CSLCitationOOAdapter {
             if (isNumericStyle) {
                 formattedCitation = updateMultipleCitations(formattedCitation, List.of(currentEntry));
                 String prefix = currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
-                                            .map(authors -> AuthorList.parse(authors))
+                                            .map(AuthorList::parse)
                                             .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al.") + " ")
                                             .orElse("");
                 finalText = prefix + formattedCitation;
@@ -215,7 +175,7 @@ public class CSLCitationOOAdapter {
     }
 
     public void insertEmpty(XTextCursor cursor, List<BibEntry> entries)
-            throws Exception {
+            throws CreationException, Exception {
         for (BibEntry entry : entries) {
             CSLReferenceMark mark = markManager.createReferenceMark(entry);
             OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
@@ -226,7 +186,8 @@ public class CSLCitationOOAdapter {
         cursor.collapseToEnd();
     }
 
-    private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception {
+    private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText)
+            throws CreationException, Exception {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
 
@@ -281,26 +242,6 @@ public class CSLCitationOOAdapter {
         }
         matcher.appendTail(sb);
         return sb.toString();
-    }
-
-    private void writeCitation(XTextDocument doc, XTextCursor cursor, BibEntry entry, String citation) throws Exception {
-        String citationKey = entry.getCitationKey().orElse("");
-        int currentNumber = markManager.getCitationNumber(citationKey);
-
-        CSLReferenceMark mark = markManager.createReferenceMark(entry);
-        String formattedCitation;
-        if (isNumericStyle) {
-            formattedCitation = updateSingleCitation(transformHtml(citation), currentNumber);
-        } else {
-            formattedCitation = transformHtml(citation);
-        }
-        OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-
-        // Insert the citation text wrapped in a reference mark
-        mark.insertReferenceIntoOO(doc, cursor, ooText, false, false, true);
-
-        // Move the cursor to the end of the inserted text
-        cursor.collapseToEnd();
     }
 
     public static String updateSingleCitation(String citation, int currentNumber) {
@@ -410,15 +351,7 @@ public class CSLCitationOOAdapter {
 
     public static String authorsAlpha(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
-        int maxAuthors;
-        final boolean maxAuthorsExceeded;
-        if (authorList.getNumberOfAuthors() <= MAX_ALPHA_AUTHORS) {
-            maxAuthors = authorList.getNumberOfAuthors();
-            maxAuthorsExceeded = false;
-        } else {
-            maxAuthors = MAX_ALPHA_AUTHORS;
-            maxAuthorsExceeded = true;
-        }
+        int maxAuthors = Math.min(authorList.getNumberOfAuthors(), MAX_ALPHA_AUTHORS);
 
         if (authorList.getNumberOfAuthors() == 1) {
             String[] firstAuthor = authorList.getAuthor(0).getNamePrefixAndFamilyName()

@@ -9,11 +9,14 @@ import java.util.Optional;
 import org.jabref.logic.openoffice.ReferenceMark;
 import org.jabref.model.entry.BibEntry;
 
+import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
+import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XReferenceMarksSupplier;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import io.github.thibaultmeyer.cuid.CUID;
 import org.slf4j.Logger;
@@ -40,7 +43,7 @@ public class CSLReferenceMarkManager {
         this.citationKeyToNumber = new HashMap<>();
     }
 
-    public void readExistingMarks() throws Exception {
+    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
 
