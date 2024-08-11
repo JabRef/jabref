@@ -111,8 +111,7 @@ public class CitationStyle implements OOStyle {
                 LOGGER.debug("No valid title or bibliography found for file {}", filename);
                 return Optional.empty();
             }
-        } catch (
-                XMLStreamException e) {
+        } catch (XMLStreamException e) {
             LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage());
             return Optional.empty();
         }
@@ -145,11 +144,9 @@ public class CitationStyle implements OOStyle {
                 return Optional.empty();
             }
             return createCitationStyleFromSource(inputStream, styleFile);
-        } catch (
-                NoSuchFileException e) {
+        } catch (NoSuchFileException e) {
             LOGGER.error("Could not find file: {}", styleFile, e);
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             LOGGER.error("Error reading source file", e);
         }
         return Optional.empty();
@@ -188,9 +185,8 @@ public class CitationStyle implements OOStyle {
             STYLES.addAll(discoverCitationStylesInPath(path));
 
             return STYLES;
-        } catch (
-                URISyntaxException |
-                IOException e) {
+        } catch (URISyntaxException
+                 | IOException e) {
             LOGGER.error("something went wrong while searching available CitationStyles", e);
             return Collections.emptyList();
         }
