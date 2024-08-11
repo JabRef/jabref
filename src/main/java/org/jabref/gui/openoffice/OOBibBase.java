@@ -897,6 +897,9 @@ public class OOBibBase {
             }
         } else if (style instanceof CitationStyle citationStyle) {
             try {
+
+                CSLUpdateBibliography cslUpdateBibliography = new CSLUpdateBibliography();
+
                 OOResult<XTextDocument, OOError> odoc = getXTextDocument();
                 if (testDialog(errorTitle, odoc.asVoidResult())) {
                     return;
@@ -940,7 +943,7 @@ public class OOBibBase {
                     BibDatabase bibDatabase = new BibDatabase(citedEntries);
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
 
-                    CSLUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                    cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
                 } catch (NoDocumentException
                          | NoSuchElementException e) {

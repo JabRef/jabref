@@ -23,10 +23,7 @@ public class CSLUpdateBibliography {
     private static final String CSL_BIB_SECTION_NAME = "CSL_bibliography";
     private static final Logger LOGGER = Logger.getLogger(CSLUpdateBibliography.class.getName());
 
-    private CSLUpdateBibliography() {
-    }
-
-    public static Optional<XTextRange> getBibliographyRange(XTextDocument doc)
+    public Optional<XTextRange> getBibliographyRange(XTextDocument doc)
             throws NoDocumentException, WrappedTargetException {
         LOGGER.info("Attempting to get bibliography range");
         Optional<XTextRange> range = UnoTextSection.getAnchor(doc, CSL_BIB_SECTION_NAME);
@@ -37,7 +34,7 @@ public class CSLUpdateBibliography {
     /**
      * Rebuilds the bibliography using CSL.
      */
-    public static void rebuildCSLBibliography(XTextDocument doc,
+    public void rebuildCSLBibliography(XTextDocument doc,
                                               CSLCitationOOAdapter cslAdapter,
                                               List<BibEntry> entries,
                                               CitationStyle citationStyle,
@@ -60,7 +57,7 @@ public class CSLUpdateBibliography {
         LOGGER.info("Finished rebuilding CSL bibliography");
     }
 
-    private static void createCSLBibTextSection(XTextDocument doc)
+    private void createCSLBibTextSection(XTextDocument doc)
             throws CreationException {
         LOGGER.info("Creating new CSL bibliography section");
         XTextCursor textCursor = doc.getText().createTextCursor();
@@ -70,7 +67,7 @@ public class CSLUpdateBibliography {
         LOGGER.info("CSL bibliography section created");
     }
 
-    private static void clearCSLBibTextSectionContent(XTextDocument doc)
+    private void clearCSLBibTextSectionContent(XTextDocument doc)
             throws NoDocumentException, WrappedTargetException {
         LOGGER.info("Clearing CSL bibliography section content");
         Optional<XTextRange> sectionRange = getBibliographyRange(doc);
@@ -83,7 +80,7 @@ public class CSLUpdateBibliography {
         }
     }
 
-    private static void populateCSLBibTextSection(XTextDocument doc,
+    private void populateCSLBibTextSection(XTextDocument doc,
                                                   CSLCitationOOAdapter cslAdapter,
                                                   List<BibEntry> entries,
                                                   CitationStyle citationStyle,
