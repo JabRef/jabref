@@ -892,7 +892,7 @@ public class OOBibBase {
             } catch (CreationException
                     | WrappedTargetException
                     | com.sun.star.lang.IllegalArgumentException ex) {
-                LOGGER.warn("Could not update bibliography", ex);
+                LOGGER.warn("Could not update JStyle bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         } else if (style instanceof CitationStyle citationStyle) {
@@ -952,7 +952,7 @@ public class OOBibBase {
             } catch (CreationException
                      | WrappedTargetException
                      | com.sun.star.lang.IllegalArgumentException ex) {
-                LOGGER.warn("Could not update bibliography", ex);
+                LOGGER.warn("Could not update CSL bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         }
