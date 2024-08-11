@@ -605,17 +605,17 @@ public class OOBibBase {
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
 
-                CSLCitationOOAdapter adapter = new CSLCitationOOAdapter(doc);
-                adapter.readExistingMarks();
+                initializeCitationAdapter(doc);
+
                 if (citationType == CitationType.AUTHORYEAR_PAR) {
                     // "Cite" button
-                    adapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    this.cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     // "Cite in-text" button
-                    adapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                    this.cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.INVISIBLE_CIT) {
                     // "Insert empty citation"
-                    adapter.insertEmpty(cursor.get(), entries);
+                    this.cslCitationOOAdapter.insertEmpty(cursor.get(), entries);
                 }
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
@@ -910,14 +910,13 @@ public class OOBibBase {
                 try {
                     UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
 
-                    CSLCitationOOAdapter adapter = new CSLCitationOOAdapter(doc);
-                    adapter.readExistingMarks();
+                    initializeCitationAdapter(doc);
 
                     // Collect only cited entries from all databases
                     List<BibEntry> citedEntries = new ArrayList<>();
                     for (BibDatabase database : databases) {
                         for (BibEntry entry : database.getEntries()) {
-                            if (adapter.isCitedEntry(entry)) {
+                            if (cslCitationOOAdapter.isCitedEntry(entry)) {
                                 citedEntries.add(entry);
                             }
                         }
@@ -936,7 +935,7 @@ public class OOBibBase {
                     BibDatabase bibDatabase = new BibDatabase(citedEntries);
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
 
-                    CSLUpdateBibliography.rebuildCSLBibliography(doc, adapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                    CSLUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
 
 //                    // Create a new cursor at the end of the document for bibliography insertion
 //                    XTextCursor bibliographyCursor = doc.getText().createTextCursor();
