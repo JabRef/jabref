@@ -104,18 +104,6 @@ public class CSLUpdateBibliography {
         cslAdapter.insertBibliography(cursor, citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
         LOGGER.info("Bibliography inserted using CSLCitationOOAdapter");
 
-        // Remove the initial empty paragraph from the section
-//        sectionRange = getBibliographyRange(doc);
-//        if (sectionRange.isPresent()) {
-//            XTextCursor initialParagraph = doc.getText().createTextCursorByRange(sectionRange.get());
-//            initialParagraph.collapseToStart();
-//            initialParagraph.goRight((short) 1, true);
-//            initialParagraph.setString("");
-//            LOGGER.info("Initial empty paragraph removed from bibliography section");
-//        } else {
-//            LOGGER.warning("Failed to remove initial empty paragraph: bibliography section not found");
-//        }
-
         cursor.collapseToEnd();
         LOGGER.info("CSL bibliography section population completed");
     }
