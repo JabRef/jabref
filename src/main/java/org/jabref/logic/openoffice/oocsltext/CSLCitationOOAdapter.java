@@ -321,7 +321,7 @@ public class CSLCitationOOAdapter {
 
             if (author.isPresent() && year.isPresent()) {
                 AuthorList authorList = AuthorList.parse(author.get());
-                String alphaKey = authorsAlpha(authorList);
+                String alphaKey = authorRepresentationExtractor(authorList);
 
                 // Extract last two digits of the year
                 String shortYear = year.get().length() >= 2 ?
@@ -345,7 +345,13 @@ public class CSLCitationOOAdapter {
         return "DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690".equals(style.getTitle());
     }
 
-    public static String authorsAlpha(AuthorList authorList) {
+    /**
+     * Adapted from {@link BracketedPattern#authorsAlpha(AuthorList) authorsAlpha}
+     *
+     * @param authorList - list of authors to generate alphabetic representation for.
+     * @return first four letters of the author (in case of a single author), first letter of each author till 4 authors, in case of multiple authors.
+     */
+    public static String authorRepresentationExtractor(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
         int maxAuthors = Math.min(authorList.getNumberOfAuthors(), MAX_ALPHA_AUTHORS);
 
