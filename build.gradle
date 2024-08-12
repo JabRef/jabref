@@ -200,6 +200,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.17.2'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.2'
     implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.17.2'
+    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-jakarta-xmlbind-annotations', version: '2.13.0'
 
 
     implementation 'com.fasterxml:aalto-xml:1.3.3'
