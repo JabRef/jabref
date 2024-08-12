@@ -2858,6 +2858,9 @@ public class JabRefPreferences implements PreferencesService {
             String rawPassword = keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
             Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
             return password.decrypt();
+        } catch (PasswordAccessException e) {
+            LOGGER.debug("No API key stored for provider {}. Returning an empty string", aiProvider.getLabel());
+            return "";
         } catch (Exception e) {
             LOGGER.warn("JabRef could not open keyring for retrieving {} API token", aiProvider.getLabel(), e);
             return "";
@@ -2866,9 +2869,18 @@ public class JabRefPreferences implements PreferencesService {
 
     private void storeAiApiKeyInKeyring(AiProvider aiProvider, String newKey) {
         try (final Keyring keyring = Keyring.create()) {
-            Password password = new Password(newKey, getInternalPreferences().getUserAndHost());
-            String rawPassword = password.encrypt();
-            keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name(), rawPassword);
+            if (StringUtil.isNullOrEmpty(newKey)) {
+                try {
+                    keyring.deletePassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
+                } catch (PasswordAccessException ex) {
+                    LOGGER.debug("API key for provider {} not stored in keyring. JabRef won't store an empty key", aiProvider.getLabel());
+                }
+            } else {
+                Password password = new Password(newKey, getInternalPreferences().getUserAndHost());
+                String rawPassword = password.encrypt();
+
+                keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name(), rawPassword);
+            }
         } catch (Exception e) {
             LOGGER.warn("JabRef could not open keyring for storing {} API token", aiProvider.getLabel(), e);
         }
