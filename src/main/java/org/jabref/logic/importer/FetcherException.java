@@ -1,5 +1,6 @@
 package org.jabref.logic.importer;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -9,7 +10,11 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FetcherException extends JabRefException {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FetcherException.class);
 
     Pattern API_KEY_PATTERN = Pattern.compile("(?i)(api|key|api[-_]?key)=[^&]*");
 
@@ -63,7 +68,13 @@ public class FetcherException extends JabRefException {
         // TODO: Convert IOException e to FetcherClientException
         //       Same TODO as in org.jabref.logic.importer.EntryBasedParserFetcher.performSearch.
         //       Maybe do this in org.jabref.logic.importer.FetcherException.getLocalizedMessage
+
+        // Idea (from org.jabref.logic.importer.fetcher.GoogleScholar.performSearchPaged)
+        // if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
         super(errorMessage, cause);
+        if (LOGGER.isDebugEnabled() && (cause instanceof IOException)) {
+            LOGGER.debug("I/O exception", cause);
+        }
         httpResponse = null;
         url = null;
     }
