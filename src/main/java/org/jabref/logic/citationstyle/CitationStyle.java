@@ -44,11 +44,13 @@ public class CitationStyle implements OOStyle {
 
     private final String filePath;
     private final String title;
+    private final boolean isNumericStyle;
     private final String source;
 
-    private CitationStyle(final String filename, final String title, final String source) {
+    private CitationStyle(final String filename, final String title, final boolean isNumericStyle, final String source) {
         this.filePath = Objects.requireNonNull(filename);
         this.title = Objects.requireNonNull(title);
+        this.isNumericStyle = isNumericStyle;
         this.source = Objects.requireNonNull(source);
     }
 
@@ -57,25 +59,24 @@ public class CitationStyle implements OOStyle {
      */
     private static Optional<CitationStyle> createCitationStyleFromSource(final InputStream source, final String filename) {
         try {
-            // We need the content twice:
-            //   First, for parsing it here for the name
-            //   Second for the CSL library to parse it
             String content = new String(source.readAllBytes());
 
-            Optional<String> title = getTitle(filename, content);
-            if (title.isEmpty()) {
+            Optional<StyleInfo> styleInfo = parseStyleInfo(filename, content);
+            if (styleInfo.isEmpty()) {
                 return Optional.empty();
             }
 
-            return Optional.of(new CitationStyle(filename, title.get(), content));
-        } catch (NullPointerException
-                 | IOException e) {
+            return Optional.of(new CitationStyle(filename, styleInfo.get().title(), styleInfo.get().isNumericStyle(), content));
+        } catch (IOException e) {
             LOGGER.error("Error while parsing source", e);
             return Optional.empty();
         }
     }
 
-    private static Optional<String> getTitle(String filename, String content) {
+    public record StyleInfo(String title, boolean isNumericStyle) {
+    }
+
+    private static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
         FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
 
         try {
@@ -84,6 +85,7 @@ public class CitationStyle implements OOStyle {
             boolean inInfo = false;
             boolean hasBibliography = false;
             String title = "";
+            boolean isNumericStyle = false;
 
             while (reader.hasNext()) {
                 int event = reader.next();
@@ -91,12 +93,20 @@ public class CitationStyle implements OOStyle {
                 if (event == XMLStreamConstants.START_ELEMENT) {
                     String elementName = reader.getLocalName();
 
-                    if ("bibliography".equals(elementName)) {
-                        hasBibliography = true;
-                    } else if ("info".equals(elementName)) {
-                        inInfo = true;
-                    } else if (inInfo && "title".equals(elementName)) {
-                        title = reader.getElementText();
+                    switch (elementName) {
+                        case "bibliography" -> hasBibliography = true;
+                        case "info" -> inInfo = true;
+                        case "title" -> {
+                            if (inInfo) {
+                                title = reader.getElementText();
+                            }
+                        }
+                        case "category" -> {
+                            String citationFormat = reader.getAttributeValue(null, "citation-format");
+                            if (citationFormat != null) {
+                                isNumericStyle = "numeric".equals(citationFormat);
+                            }
+                        }
                     }
                 } else if (event == XMLStreamConstants.END_ELEMENT) {
                     if ("info".equals(reader.getLocalName())) {
@@ -106,13 +116,12 @@ public class CitationStyle implements OOStyle {
             }
 
             if (hasBibliography && title != null) {
-                return Optional.of(title);
+                return Optional.of(new StyleInfo(title, isNumericStyle));
             } else {
                 LOGGER.debug("No valid title or bibliography found for file {}", filename);
                 return Optional.empty();
             }
-        } catch (
-                XMLStreamException e) {
+        } catch (XMLStreamException e) {
             LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage());
             return Optional.empty();
         }
@@ -159,7 +168,7 @@ public class CitationStyle implements OOStyle {
      * @return default citation style
      */
     public static CitationStyle getDefault() {
-        return createCitationStyleFromFile(DEFAULT).orElse(new CitationStyle("", "Empty", ""));
+        return createCitationStyleFromFile(DEFAULT).orElse(new CitationStyle("", "Empty", false, ""));
     }
 
     /**
@@ -186,7 +195,8 @@ public class CitationStyle implements OOStyle {
             STYLES.addAll(discoverCitationStylesInPath(path));
 
             return STYLES;
-        } catch (URISyntaxException | IOException e) {
+        } catch (URISyntaxException
+                 | IOException e) {
             LOGGER.error("something went wrong while searching available CitationStyles", e);
             return Collections.emptyList();
         }
@@ -212,6 +222,10 @@ public class CitationStyle implements OOStyle {
 
     public String getTitle() {
         return title;
+    }
+
+    public boolean isNumericStyle() {
+        return isNumericStyle;
     }
 
     public String getSource() {

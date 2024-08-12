@@ -18,7 +18,7 @@ import com.sun.star.text.XTextRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class NamedRangeReferenceMark implements NamedRange {
+public class NamedRangeReferenceMark implements NamedRange {
 
     private static final String ZERO_WIDTH_SPACE = "\u200b";
 
@@ -58,7 +58,7 @@ class NamedRangeReferenceMark implements NamedRange {
      * @param numSpaces Number of spaces to insert.
      * @return a new cursor, covering the just-inserted spaces.
      */
-    private static XTextCursor safeInsertSpacesBetweenReferenceMarks(XTextRange position, int numSpaces) {
+    public static XTextCursor safeInsertSpacesBetweenReferenceMarks(XTextRange position, int numSpaces) {
         // Start with an empty cursor at position.getStart();
         XText text = position.getText();
         XTextCursor cursor = text.createTextCursorByRange(position.getStart());
