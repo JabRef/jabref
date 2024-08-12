@@ -66,7 +66,7 @@ public class ReferenceMark {
         return citationKey;
     }
 
-    public Integer getCitationNumber() {
+    public int getCitationNumber() {
         return citationNumber;
     }
 
