@@ -265,8 +265,8 @@
     -jr-ai-message-user-border: -jr-theme;
     -jr-ai-message-ai: -jr-accent;
     -jr-ai-message-ai-border: -jr-theme;
-    -jr-ai-message-error: -jr-error;
-    -jr-ai-message-error-border: #982B1C;
+    -jr-ai-message-error: derive(-jr-error, 40%);
+    -jr-ai-message-error-border: derive(-jr-error, 20%);
 
     /* region: maintable base colors **/
 
