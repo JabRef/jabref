@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -9,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.google.common.annotations.VisibleForTesting;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
@@ -79,7 +80,8 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
         return uriBuilder.build().toURL();
     }
 
-    public URL getPartMetadataURL(String identifier) throws URISyntaxException, MalformedURLException {
+    @VisibleForTesting
+    URL getPartMetadataURL(String identifier) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(getBaseURL().toURI());
         uriBuilder.addParameter("op", "GetPartMetadata");
         uriBuilder.addParameter("pages", "f");
@@ -89,17 +91,22 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
         return uriBuilder.build().toURL();
     }
 
-    public JSONObject getDetails(URL url) throws IOException {
+    public JSONObject getDetails(URL url) throws FetcherException {
         URLDownload download = new URLDownload(url);
         String response = download.asString();
         Logger.debug("Response {}", response);
         return new JSONObject(response).getJSONArray("Result").getJSONObject(0);
     }
 
-    public BibEntry parseBibJSONtoBibtex(JSONObject item, BibEntry entry) throws IOException, URISyntaxException {
+    public BibEntry parseBibJSONtoBibtex(JSONObject item, BibEntry entry) throws FetcherException {
         if (item.has("BHLType")) {
             if ("Part".equals(item.getString("BHLType"))) {
-                URL url = getPartMetadataURL(item.getString("PartID"));
+                URL url;
+                try {
+                    url = getPartMetadataURL(item.getString("PartID"));
+                } catch (URISyntaxException | MalformedURLException e) {
+                    throw new FetcherException("Malformed URL", e);
+                }
                 JSONObject itemsDetails = getDetails(url);
                 entry.setField(StandardField.LANGUAGE, itemsDetails.optString("Language", ""));
 
@@ -112,7 +119,12 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
             }
 
             if ("Item".equals(item.getString("BHLType"))) {
-                URL url = getItemMetadataURL(item.getString("ItemID"));
+                URL url = null;
+                try {
+                    url = getItemMetadataURL(item.getString("ItemID"));
+                } catch (URISyntaxException | MalformedURLException e) {
+                    throw new FetcherException("Malformed URL", e);
+                }
                 JSONObject itemsDetails = getDetails(url);
                 entry.setField(StandardField.EDITOR, itemsDetails.optString("Sponsor", ""));
                 entry.setField(StandardField.PUBLISHER, itemsDetails.optString("HoldingInstitution", ""));
@@ -185,7 +197,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
                 BibEntry entry = jsonResultToBibEntry(item);
                 try {
                     entry = parseBibJSONtoBibtex(item, entry);
-                } catch (JSONException | IOException | URISyntaxException exception) {
+                } catch (JSONException | FetcherException exception) {
                     throw new ParseException("Error when parsing entry", exception);
                 }
                 entries.add(entry);

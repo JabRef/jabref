@@ -116,7 +116,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
         throw new FetcherException("Could not find a pdf");
     }
 
-    Optional<String> getURLByString(String query) throws IOException, NullPointerException {
+    Optional<String> getURLByString(String query) throws IOException, FetcherException {
         URIBuilder source;
         String link;
         try {

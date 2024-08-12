@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -204,9 +203,8 @@ public class AstrophysicsDataSystem
                 bibcodes.add(codes.getJSONObject(i).getString("bibcode"));
             }
             return bibcodes;
-        } catch (IOException e) {
-            throw new FetcherException(url, "A network error occurred", e);
         } catch (JSONException e) {
+            LOGGER.error("Error while parsing JSON", e);
             return Collections.emptyList();
         }
     }
@@ -231,8 +229,7 @@ public class AstrophysicsDataSystem
             return Optional.empty();
         }
         if (fetchedEntries.size() > 1) {
-            LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
-                    + ". We will use the first entry.");
+            LOGGER.info("Fetcher {} found more than one result for identifier {}. We will use the first entry.", getName(), identifier);
         }
         BibEntry entry = fetchedEntries.getFirst();
         return Optional.of(entry);
@@ -274,10 +271,9 @@ public class AstrophysicsDataSystem
 
                 return fetchedEntries;
             } catch (JSONException e) {
+                LOGGER.error("Error while parsing JSON", e);
                 return Collections.emptyList();
             }
-        } catch (IOException e) {
-            throw new FetcherException(urLforExport, "A network error occurred", e);
         } catch (ParseException e) {
             throw new FetcherException(urLforExport, "An internal parser error occurred", e);
         }

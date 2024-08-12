@@ -2,7 +2,6 @@ package org.jabref.logic.net;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +41,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.io.FileUtil;
 
@@ -241,7 +241,7 @@ public class URLDownload {
      *
      * @return the downloaded string
      */
-    public String asString() throws IOException {
+    public String asString() throws FetcherException {
         return asString(StandardCharsets.UTF_8, this.openConnection());
     }
 
@@ -251,7 +251,7 @@ public class URLDownload {
      * @param encoding the desired String encoding
      * @return the downloaded string
      */
-    public String asString(Charset encoding) throws IOException {
+    public String asString(Charset encoding) throws FetcherException {
         return asString(encoding, this.openConnection());
     }
 
@@ -261,7 +261,7 @@ public class URLDownload {
      * @param existingConnection an existing connection
      * @return the downloaded string
      */
-    public static String asString(URLConnection existingConnection) throws IOException {
+    public static String asString(URLConnection existingConnection) throws FetcherException {
         return asString(StandardCharsets.UTF_8, existingConnection);
     }
 
@@ -272,16 +272,17 @@ public class URLDownload {
      * @param connection an existing connection
      * @return the downloaded string
      */
-    public static String asString(Charset encoding, URLConnection connection) throws IOException {
-
+    public static String asString(Charset encoding, URLConnection connection) throws FetcherException {
         try (InputStream input = new BufferedInputStream(connection.getInputStream());
              Writer output = new StringWriter()) {
             copy(input, output, encoding);
             return output.toString();
+        } catch (IOException e) {
+            throw new FetcherException("Error downloading", e);
         }
     }
 
-    public List<HttpCookie> getCookieFromUrl() throws IOException {
+    public List<HttpCookie> getCookieFromUrl() throws FetcherException {
         CookieManager cookieManager = new CookieManager();
         CookieHandler.setDefault(cookieManager);
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
@@ -302,27 +303,41 @@ public class URLDownload {
      *
      * @param destination the destination file path.
      */
-    public void toFile(Path destination) throws IOException {
+    public void toFile(Path destination) throws FetcherException {
         try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream())) {
             Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             LOGGER.warn("Could not copy input", e);
-            throw e;
+            throw new FetcherException("Could not copy input", e);
         }
     }
 
     /**
      * Takes the web resource as the source for a monitored input stream.
      */
-    public ProgressInputStream asInputStream() throws IOException {
+    public ProgressInputStream asInputStream() throws FetcherException {
         HttpURLConnection urlConnection = (HttpURLConnection) this.openConnection();
 
-        if ((urlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) || (urlConnection.getResponseCode() == HttpURLConnection.HTTP_BAD_REQUEST)) {
-            LOGGER.error("Response message {} returned for url {}", urlConnection.getResponseMessage(), urlConnection.getURL());
-            return new ProgressInputStream(new ByteArrayInputStream(new byte[0]), 0);
+        int responseCode;
+        try {
+            responseCode = urlConnection.getResponseCode();
+        } catch (IOException e) {
+            throw new FetcherException("Error getting response code", e);
+        }
+        LOGGER.debug("Response code: {}", responseCode); // We could check for != 200, != 204
+        if (responseCode >= 300) {
+            SimpleHttpResponse simpleHttpResponse = new SimpleHttpResponse(urlConnection);
+            LOGGER.error("Failed to read from url: {}", simpleHttpResponse);
+            throw FetcherException.of(this.source, simpleHttpResponse);
         }
         long fileSize = urlConnection.getContentLengthLong();
-        return new ProgressInputStream(new BufferedInputStream(urlConnection.getInputStream()), fileSize);
+        InputStream inputStream;
+        try {
+            inputStream = urlConnection.getInputStream();
+        } catch (IOException e) {
+            throw new FetcherException("Error getting input stream", e);
+        }
+        return new ProgressInputStream(new BufferedInputStream(inputStream), fileSize);
     }
 
     /**
@@ -330,7 +345,7 @@ public class URLDownload {
      *
      * @return the path of the temporary file.
      */
-    public Path toTemporaryFile() throws IOException {
+    public Path toTemporaryFile() throws FetcherException {
         // Determine file name and extension from source url
         String sourcePath = source.getPath();
 
@@ -340,7 +355,12 @@ public class URLDownload {
         String extension = "." + FileUtil.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
-        Path file = Files.createTempFile(fileName, extension);
+        Path file = null;
+        try {
+            file = Files.createTempFile(fileName, extension);
+        } catch (IOException e) {
+            throw new FetcherException("Could not create temporary file", e);
+        }
         file.toFile().deleteOnExit();
         toFile(file);
 
@@ -370,8 +390,13 @@ public class URLDownload {
      *
      * @return an open connection
      */
-    public URLConnection openConnection() throws IOException {
-        URLConnection connection = getUrlConnection();
+    public URLConnection openConnection() throws FetcherException {
+        URLConnection connection;
+        try {
+            connection = getUrlConnection();
+        } catch (IOException e) {
+            throw new FetcherException("Error opening connection", e);
+        }
         connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
@@ -380,6 +405,8 @@ public class URLDownload {
             connection.setDoOutput(true);
             try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
                 wr.writeBytes(this.postData);
+            } catch (IOException e) {
+                throw new FetcherException("Could not write output", e);
             }
         }
 
@@ -390,10 +417,7 @@ public class URLDownload {
                 status = httpURLConnection.getResponseCode();
             } catch (IOException e) {
                 LOGGER.error("Error getting response code", e);
-                // TODO: Convert e to FetcherClientException
-                //       Same TODO as in org.jabref.logic.importer.EntryBasedParserFetcher.performSearch.
-                //       Maybe do this in org.jabref.logic.importer.FetcherException.getLocalizedMessage
-                throw e;
+                throw new FetcherException("Error getting response code", e);
             }
 
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
@@ -402,14 +426,18 @@ public class URLDownload {
                 // get redirect url from "location" header field
                 String newUrl = connection.getHeaderField("location");
                 // open the new connection again
-                connection = new URLDownload(newUrl).openConnection();
+                try {
+                    connection = new URLDownload(newUrl).openConnection();
+                } catch (MalformedURLException e) {
+                    throw new FetcherException("Could not open URL Download", e);
+                }
             } else {
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
                 LOGGER.info("{}", httpResponse);
                 if ((status >= 400) && (status < 500)) {
-                    throw new IOException(new FetcherClientException(this.source, httpResponse));
+                    throw new FetcherClientException(this.source, httpResponse);
                 } else if (status >= 500) {
-                    throw new IOException(new FetcherServerException(this.source, httpResponse));
+                    throw new FetcherServerException(this.source, httpResponse);
                 }
             }
         }

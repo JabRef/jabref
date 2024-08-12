@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -81,7 +82,8 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
             if (text.startsWith("@")) {
                 return parser.parseEntries(text);
             }
-            // input stream contains html
+            // otherwise: input stream contains html
+
             List<BibEntry> entries;
             try {
                 Document doc = Jsoup.parse(inputStream, null, HOST);
@@ -95,7 +97,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
                     stringBuilder.append(data);
                 }
                 entries = new ArrayList<>(parser.parseEntries(stringBuilder.toString()));
-            } catch (IOException e) {
+            } catch (IOException | FetcherException e) {
                 throw new ParseException("Could not download data from jstor.org", e);
             }
             return entries;
@@ -108,7 +110,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws FetcherException, IOException {
         if (entry.getField(StandardField.URL).isEmpty()) {
             return Optional.empty();
         }

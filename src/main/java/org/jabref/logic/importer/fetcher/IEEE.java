@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -15,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -134,7 +134,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
         String stampString = "";
@@ -161,7 +161,12 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
             Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
                 // Download the HTML page from IEEE
-                URLDownload urlDownload = new URLDownload(doi.get().getExternalURI().get().toURL());
+                URLDownload urlDownload = null;
+                try {
+                    urlDownload = new URLDownload(doi.get().getExternalURI().get().toURL());
+                } catch (MalformedURLException e) {
+                    throw new FetcherException("Malformed URL", e);
+                }
                 // We don't need to modify the cookies, but we need support for them
                 urlDownload.getCookieFromUrl();
 
@@ -181,7 +186,12 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         }
 
         // Download the HTML page containing a frame with the PDF
-        URLDownload urlDownload = new URLDownload(BASE_URL + stampString);
+        URLDownload urlDownload;
+        try {
+            urlDownload = new URLDownload(BASE_URL + stampString);
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Malformed URL", e);
+        }
         // We don't need to modify the cookies, but we need support for them
         urlDownload.getCookieFromUrl();
 
@@ -191,7 +201,13 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, Cus
         if (matcher.find()) {
             // The PDF was found
             LOGGER.debug("Full text document found on IEEE Xplore");
-            return Optional.of(new URL(matcher.group(1)));
+            URL value;
+            try {
+                value = new URL(matcher.group(1));
+            } catch (MalformedURLException e) {
+                throw new FetcherException("Malformed URL", e);
+            }
+            return Optional.of(value);
         }
         return Optional.empty();
     }

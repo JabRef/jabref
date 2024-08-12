@@ -95,7 +95,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 LOGGER.trace("Thread %s, searching for DOI '%s', waited %.2fs because of API rate limiter".formatted(
                         Thread.currentThread().threadId(), identifier, waitingTime));
             }
-        } catch (IOException e) {
+        } catch (FetcherException | MalformedURLException e) {
             LOGGER.warn("Could not limit DOI API access rate", e);
         }
     }
@@ -141,16 +141,9 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
             String bibtexString;
             URLConnection openConnection;
-            try {
-                openConnection = download.openConnection();
-                bibtexString = URLDownload.asString(openConnection).trim();
-            } catch (IOException e) {
-                // an IOException with a nested FetcherException will be thrown when you encounter a 400x or 500x http status code
-                if (e.getCause() instanceof FetcherException fe) {
-                    throw fe;
-                }
-                throw e;
-            }
+
+            openConnection = download.openConnection();
+            bibtexString = URLDownload.asString(openConnection).trim();
 
             // BibTeX entry
             fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
@@ -222,7 +215,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
      *
      * @param doi the DOI to be searched
      */
-    public Optional<String> getAgency(DOI doi) throws IOException {
+    public Optional<String> getAgency(DOI doi) throws FetcherException, MalformedURLException {
         Optional<String> agency = Optional.empty();
         try {
             URLDownload download = getUrlDownload(new URL(DOI.AGENCY_RESOLVER + "/" + doi.getDOI()));

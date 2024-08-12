@@ -117,11 +117,11 @@ public interface DialogService {
         if (httpResponse.isPresent()) {
             int statusCode = httpResponse.get().statusCode();
             if (statusCode == 401) {
-                this.showInformationDialogAndWait(failedTitle, Localization.lang("401 Unauthorized: Access Denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.") + "\n\n" + localizedMessage);
+                this.showInformationDialogAndWait(failedTitle, Localization.lang("Access denied. You are not authorized to access this resource. Please check your credentials and try again. If you believe you should have access, please contact the administrator for assistance.") + "\n\n" + localizedMessage);
             } else if (statusCode == 403) {
-                this.showInformationDialogAndWait(failedTitle, Localization.lang("403 Forbidden: Access Denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.") + "\n\n" + localizedMessage);
+                this.showInformationDialogAndWait(failedTitle, Localization.lang("Access denied. You do not have permission to access this resource. Please contact the administrator for assistance or try a different action.") + "\n\n" + localizedMessage);
             } else if (statusCode == 404) {
-                this.showInformationDialogAndWait(failedTitle, Localization.lang("404 Not Found Error: The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.") + "\n\n" + localizedMessage);
+                this.showInformationDialogAndWait(failedTitle, Localization.lang("The requested resource could not be found. It seems that the file you are trying to download is not available or has been moved. Please verify the URL and try again. If you believe this is an error, please contact the administrator for further assistance.") + "\n\n" + localizedMessage);
             } else {
                 this.showErrorDialogAndWait(failedTitle, Localization.lang("Something is wrong on JabRef side. Please check the URL and try again.") + "\n\n" + localizedMessage);
             }

@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -112,7 +111,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
             List<BibEntry> results = getParser().parseEntries(download.asInputStream());
             results.forEach(this::doPostCleanup);
             return results;
-        } catch (IOException | ParseException e) {
+        } catch (ParseException e) {
             throw new FetcherException(url, e);
         }
     }
