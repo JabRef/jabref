@@ -29,7 +29,7 @@ public class FetcherException extends JabRefException {
         this.httpResponse = httpResponse;
     }
 
-    public FetcherException(URL url, SimpleHttpResponse httpResponse) {
+    protected FetcherException(URL url, SimpleHttpResponse httpResponse) {
         this(url.toString(), httpResponse);
     }
 
@@ -72,14 +72,6 @@ public class FetcherException extends JabRefException {
         url = null;
     }
 
-    public static FetcherException of(URL url, SimpleHttpResponse simpleHttpResponse) {
-        if (simpleHttpResponse.statusCode() >= 500) {
-            return new FetcherServerException(url, simpleHttpResponse);
-        } else {
-            return new FetcherClientException(url, simpleHttpResponse);
-        }
-    }
-
     @Override
     public String getLocalizedMessage() {
         // TODO: This should be moved to a separate class converting "any" exception object to a localized message
@@ -114,5 +106,13 @@ public class FetcherException extends JabRefException {
 
     public Optional<String> getUrl() {
         return Optional.ofNullable(url);
+    }
+
+    public static FetcherException of(URL url, SimpleHttpResponse simpleHttpResponse) {
+        if (simpleHttpResponse.statusCode() >= 500) {
+            return new FetcherServerException(url, simpleHttpResponse);
+        } else {
+            return new FetcherClientException(url, simpleHttpResponse);
+        }
     }
 }
