@@ -1,6 +1,7 @@
 package org.jabref.model.search;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -16,9 +17,49 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.QueryTermExtractor;
 import org.apache.lucene.search.highlight.WeightedTerm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SearchQuery {
 
+    /**
+     * The mode of escaping special characters in regular expressions
+     */
+    private enum EscapeMode {
+        /**
+         * using \Q and \E marks
+         */
+        JAVA {
+            @Override
+            String format(String regex) {
+                return Pattern.quote(regex);
+            }
+        },
+        /**
+         * escaping all javascript regex special characters separately
+         */
+        JAVASCRIPT {
+            @Override
+            String format(String regex) {
+                return JAVASCRIPT_ESCAPED_CHARS_PATTERN.matcher(regex).replaceAll("\\\\$0");
+            }
+        };
+
+        /**
+         * Regex pattern for escaping special characters in javascript regular expressions
+         */
+        private static final Pattern JAVASCRIPT_ESCAPED_CHARS_PATTERN = Pattern.compile("[.*+?^${}()|\\[\\]\\\\/]");
+
+        /**
+         * Attempt to escape all regex special characters.
+         *
+         * @param regex a string containing a regex expression
+         * @return a regex with all special characters escaped
+         */
+        abstract String format(String regex);
+    }
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(SearchQuery.class);
     protected final String query;
     protected Query parsedQuery;
     protected String parseError;
@@ -88,20 +129,50 @@ public class SearchQuery {
         return searchFlags;
     }
 
-    public Optional<Pattern> getPatternForWords() {
-        List<String> words = getSearchWords();
-        if ((words == null) || words.isEmpty() || words.getFirst().isEmpty()) {
-            return Optional.empty();
+    /**
+     * Returns a list of words this query searches for. The returned strings can be a regular expression.
+     */
+    public List<String> getSearchWords() {
+        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
+            return Collections.singletonList(query);
         }
-        // compile the words to a regular expression in the form (w1)|(w2)|(w3)
-        Stream<String> joiner = words.stream();
-        String searchPattern = joiner.collect(Collectors.joining(")|(", "(", ")"));
-        return Optional.of(Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE));
-    }
-
-    private List<String> getSearchWords() {
+        if (!isValid()) {
+            return List.of();
+        }
         return Arrays.stream(QueryTermExtractor.getTerms(parsedQuery))
                      .map(WeightedTerm::getTerm)
                      .toList();
+    }
+
+    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
+    public Optional<Pattern> getPatternForWords() {
+        return joinWordsToPattern(EscapeMode.JAVA);
+    }
+
+    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped for javascript if no regular expression search is enabled
+    public Optional<Pattern> getJavaScriptPatternForWords() {
+        return joinWordsToPattern(EscapeMode.JAVASCRIPT);
+    }
+
+    /**
+     * Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
+     *
+     * @param escapeMode the mode of escaping special characters in wi
+     */
+    private Optional<Pattern> joinWordsToPattern(EscapeMode escapeMode) {
+        List<String> words = getSearchWords();
+
+        if ((words == null) || words.isEmpty() || words.getFirst().isEmpty()) {
+            return Optional.empty();
+        }
+
+        // compile the words to a regular expression in the form (w1)|(w2)|(w3)
+        Stream<String> joiner = words.stream();
+        if (!searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
+            // Reformat string when we are looking for a literal match
+            joiner = joiner.map(escapeMode::format);
+        }
+        String searchPattern = joiner.collect(Collectors.joining(")|(", "(", ")"));
+        return Optional.of(Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE));
     }
 }
