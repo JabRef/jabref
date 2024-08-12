@@ -15,9 +15,23 @@ import org.jabref.logic.l10n.Localization;
 import ai.djl.util.Progress;
 
 public class ProgressCounter implements Progress {
+
+    private record ProgressMessage(int maxTime, String message) { }
+
+    // The list should be sorted by ProgressMessage.maxTime, smaller first.
+    private static final List<ProgressMessage> PROGRESS_MESSAGES = List.of(
+            new ProgressMessage(5, Localization.lang("Estimated time left: 5 seconds.")),
+            new ProgressMessage(15, Localization.lang("Estimated time left: 15 seconds.")),
+            new ProgressMessage(30, Localization.lang("Estimated time left: 30 seconds.")),
+            new ProgressMessage(60, Localization.lang("Estimated time left: approx. 1 minute.")),
+            new ProgressMessage(120, Localization.lang("Estimated time left: approx. 2 minutes.")),
+            new ProgressMessage(Integer.MAX_VALUE, Localization.lang("Estimated time left: more than 2 minutes."))
+    );
+
     private final IntegerProperty workDone = new SimpleIntegerProperty(0);
     private final IntegerProperty workMax = new SimpleIntegerProperty(0);
     private final StringProperty message = new SimpleStringProperty("");
+
     private Instant oneWorkTimeStart = Instant.now();
     private Duration lastEtaCalculation = Duration.ofDays(1);
 
@@ -105,18 +119,6 @@ public class ProgressCounter implements Progress {
         workDone.set((int) progress);
         // Ignoring message, because 1) it's not localized, 2) we supply our own message in updateMessage().
     }
-
-    private record ProgressMessage(int maxTime, String message) { }
-
-    // The list should be sorted by ProgressMessage.maxTime, smaller first.
-    private final List<ProgressMessage> PROGRESS_MESSAGES = List.of(
-            new ProgressMessage(5, Localization.lang("Estimated time left: 5 seconds")),
-            new ProgressMessage(15, Localization.lang("Estimated time left: 15 seconds")),
-            new ProgressMessage(30, Localization.lang("Estimated time left: 30 seconds")),
-            new ProgressMessage(60, Localization.lang("Estimated time left: approx. 1 minute")),
-            new ProgressMessage(120, Localization.lang("Estimated time left: approx. 2 minutes")),
-            new ProgressMessage(Integer.MAX_VALUE, Localization.lang("Estimated time left: more than 2 minutes"))
-    );
 
     private void updateMessage(Duration eta) {
         for (ProgressMessage progressMessage : PROGRESS_MESSAGES) {

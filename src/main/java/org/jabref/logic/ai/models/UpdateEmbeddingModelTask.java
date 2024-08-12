@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
+
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.ProgressCounter;
