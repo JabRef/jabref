@@ -137,10 +137,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             Object mapperObject = mapperRoot(reader);
 
             if (mapperObject instanceof XMLStreamReader data) {
-                while (data.hasNext()){
-                    data.next();
-                    bibEntries.addAll(parseDataList(data));
-                }
+                bibEntries.addAll(parseDataList(data));
             } else {
                 return ParserResult.fromErrorMessage("File does not start with xml tag.");
             }
@@ -164,8 +161,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
                 if (elementName == null) {
                     break;
-                }
-                else {
+                } else {
                     if (elementName.equals("Author")) {
                         this.refIdWithAuthors.put("PersonList", reader.getText());
                         bibEntries.add(new BibEntry(reader.getText()));
@@ -199,16 +195,153 @@ public class CitaviXmlImporter extends Importer implements Parser {
         return bibEntries;
     }
 
-    private static EntryType convertRefNameToType(String refName) {
-        return switch (refName.toLowerCase().trim()) {
-            case "artwork", "generic", "musicalbum", "audioorvideodocument", "movie" -> StandardEntryType.Misc;
-            case "electronic article" -> IEEETranEntryType.Electronic;
-            case "book section" -> StandardEntryType.InBook;
-            case "book", "bookedited", "audiobook" -> StandardEntryType.Book;
-            case "report" -> StandardEntryType.Report;
-            // case "journal article" -> StandardEntryType.Article;
-            default -> StandardEntryType.Article;
-        };
+    private BibEntry parseData(XMLStreamReader reader) {
+        BibEntry entry = new BibEntry();
+        entry.setType(getType(reader));
+
+        try {
+            while (reader.hasNext()) {
+                reader.next();
+                String elementName = reader.getName().getLocalPart();
+
+                if (elementName.equals("Title")) {
+                    Optional.ofNullable(reader.getText())
+                        .ifPresent(value -> entry.setField(StandardField.TITLE,     clean(value)));
+                }
+                if (elementName.equals("Abstract")) {
+                    Optional.ofNullable(reader.getText())
+                        .ifPresent(value -> entry.setField(StandardField.ABSTRACT, clean(value)));
+                }
+                if (elementName.equals("Year")) {
+                    Optional.ofNullable(reader.getText())
+                        .ifPresent(value -> entry.setField(StandardField.YEAR, clean(value)));
+                }
+                if (elementName.equals("doi")) {
+                    Optional.ofNullable(reader.getText())
+                        .ifPresent(value ->         entry.setField(StandardField.DOI, clean(value)));
+                }
+                if (elementName.equals("Isbn")) {
+                    Optional.ofNullable(reader.getText())
+                        .ifPresent(value -> entry.setField(StandardField.ISBN, clean(value)));
+                }
+
+                String pages = clean(getPages(reader));
+                // Cleans also unicode minus signs
+                pages = pagesFormatter.format(pages);
+                entry.setField(StandardField.PAGES, pages);
+
+                if (elementName.equals("Volume")) {
+                    Optional.ofNullable(reader.getText())
+                        .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
+                }
+                if (elementName.equals("Author")) {
+                    Optional.ofNullable(getAuthorName(reader.getText    ()))
+                        .ifPresent(value -> entry.setField(StandardField.AUTHOR, clean(value)));
+                }
+                if (elementName.equals("Editor")) {
+                    Optional.ofNullable(getEditorName(reader.getText    ()))
+                        .ifPresent(value -> entry.setField(StandardField.EDITOR, clean(value)));
+                }
+                if (elementName.equals("Keyword")) {
+                    Optional.ofNullable(getKeywords(reader.getText()))
+                        .ifPresent(value -> entry.setField(StandardField.KEYWORDS, clean(value)));
+                }
+                if (elementName.equals("Publisher")) {
+                    Optional.ofNullable(getPublisher(reader.getText()))
+                        .ifPresent(value -> entry.setField(StandardField.PUBLISHER, clean(value)));
+                }
+            }
+        } catch (XMLStreamException e) {
+            LOGGER.debug("could not parse document", e);
+        }
+        return entry;
+    }
+
+    private EntryType getType(XMLStreamReader reader) {
+        EntryType entryType = StandardEntryType.Article;
+        String elementName = reader.getName().getLocalPart();
+
+        try {
+            while (reader.hasNext()) {
+                reader.next();
+
+                switch (elementName) {
+                    case "artwork", "generic", "musicalbum", "audioorvideodocument", "movie" -> {
+                        entryType = StandardEntryType.Misc;
+                    }
+                    case "electronic article" -> {
+                        entryType = IEEETranEntryType.Electronic;
+                    }
+                    case "book section" -> {
+                        entryType = StandardEntryType.InBook;
+                    }
+                    case "book", "bookedited", "audiobook" -> {
+                        entryType = StandardEntryType.Book;
+                    }
+                    case "report" -> {
+                        entryType = StandardEntryType.Report;
+                    }
+                }
+            }
+        } catch (XMLStreamException e) {
+            LOGGER.debug("could not parse document", e);
+        }
+        return entryType;
+    }
+
+    private String getPages(XMLStreamReader reader) {
+        String startPage = "";
+        String endPage = "";
+        String pages = "";
+
+        try {
+            while (reader.hasNext()) {
+                reader.next();
+                String elementName = reader.getName().getLocalPart();
+
+                if (elementName.equals("startPage")) {
+                    startPage = reader.getText();
+                }
+                if (elementName.equals("endPage")) {
+                    endPage = reader.getText();
+                }
+            }
+
+            pages = startPage + "-" + endPage;
+
+        } catch (XMLStreamException e) {
+            LOGGER.debug("could not parse document", e);
+        }
+        return pages;
+    }
+
+    private String getAuthorName(String data) {
+        if (refAuthors == null) {
+            return null;
+        }
+
+        return this.refIdWithAuthors.get(data);
+    }
+
+    private String getEditorName(String data) {
+        if (refEditors == null) {
+            return null;
+        }
+        return this.refIdWithEditors.get(data);
+    }
+
+    private String getKeywords(String data) {
+        if (refKeywords == null) {
+            return null;
+        }
+        return this.refIdWithKeywords.get(data);
+    }
+
+    private String getPublisher(String data) {
+        if (refPublishers == null) {
+            return null;
+        }
+        return this.refIdWithPublishers.get(data);
     }
 
     String cleanUpText(String text) {
