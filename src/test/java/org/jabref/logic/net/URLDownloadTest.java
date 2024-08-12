@@ -128,11 +128,9 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void test503ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
+    public void test503ErrorThrowsFetcherServerException() throws Exception {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
-
-        Exception exception = assertThrows(IOException.class, urlDownload::asString);
-        assertInstanceOf(FetcherServerException.class, exception.getCause());
+        assertThrows(FetcherServerException.class, urlDownload::asString);
     }
 
     @Test
