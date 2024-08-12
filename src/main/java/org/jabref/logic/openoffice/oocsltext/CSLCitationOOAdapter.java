@@ -343,5 +343,4 @@ public class CSLCitationOOAdapter {
     private boolean isAlphanumericStyle(CitationStyle style) {
         return "DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690".equals(style.getTitle());
     }
-
 }
