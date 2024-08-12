@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -117,9 +116,10 @@ public class FetcherException extends JabRefException {
         // TODO: 5% of the "new-ers" pass a "real" localized message. See org.jabref.logic.importer.fetcher.GoogleScholar.addHitsFromQuery. We should maybe make use of this (and rewrite the whole message handling)
         // TODO: Try to convert IOException to some more meaningful information here (or at org.jabref.gui.DialogService.showErrorDialogAndWait(org.jabref.logic.importer.FetcherException)). See also org.jabref.logic.net.URLDownload.openConnection
         if (httpResponse != null) {
-            return getPrefix() + Localization.lang("URL: %0\nHTTP %1 %2\n%3", getRedactedUrl(), httpResponse.statusCode(), httpResponse.responseMessage(), httpResponse.responseBody());
+            // We decided to not "translate" technical terms (URL, HTTP)
+            return getPrefix() + String.format("URL: %s\nHTTP %d %s\n%s", getRedactedUrl(), httpResponse.statusCode(), httpResponse.responseMessage(), httpResponse.responseBody());
         } else if (url != null) {
-            return getPrefix() + Localization.lang("URL: %0", getRedactedUrl());
+            return getPrefix() + "URL: %s".format(getRedactedUrl());
         } else {
             return super.getLocalizedMessage();
         }
