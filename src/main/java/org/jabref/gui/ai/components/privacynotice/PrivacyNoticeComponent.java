@@ -23,6 +23,9 @@ public class PrivacyNoticeComponent extends ScrollPane {
     @FXML private TextFlow openAiPrivacyTextFlow;
     @FXML private TextFlow mistralAiPrivacyTextFlow;
     @FXML private TextFlow huggingFacePrivacyTextFlow;
+    @FXML private Text text1;
+    @FXML private Text text2;
+    @FXML private Text text3;
     @FXML private Text embeddingModelText;
 
     private final DialogService dialogService;
@@ -52,6 +55,14 @@ public class PrivacyNoticeComponent extends ScrollPane {
 
         String newEmbeddingModelText = embeddingModelText.getText().replaceAll("%0", aiPreferences.getEmbeddingModel().sizeInfo());
         embeddingModelText.setText(newEmbeddingModelText);
+
+        // Because of the https://bugs.openjdk.org/browse/JDK-8090400 bug, the text in the privacy policy cannot be
+        // fully wrapped.
+
+        text1.wrappingWidthProperty().bind(this.widthProperty());
+        text2.wrappingWidthProperty().bind(this.widthProperty());
+        text3.wrappingWidthProperty().bind(this.widthProperty());
+        embeddingModelText.wrappingWidthProperty().bind(this.widthProperty());
     }
 
     private void initPrivacyHyperlink(TextFlow textFlow, String link) {
@@ -65,9 +76,11 @@ public class PrivacyNoticeComponent extends ScrollPane {
             return;
         }
 
+        text.wrappingWidthProperty().bind(this.widthProperty());
         text.setText(stringArray[0]);
 
         Hyperlink hyperlink = new Hyperlink(link);
+        hyperlink.setWrapText(true);
         hyperlink.setFont(text.getFont());
         hyperlink.setOnAction(event -> {
             openBrowser(link);
@@ -77,6 +90,8 @@ public class PrivacyNoticeComponent extends ScrollPane {
 
         Text postText = new Text(stringArray[1]);
         postText.setFont(text.getFont());
+        postText.wrappingWidthProperty().bind(this.widthProperty());
+
         textFlow.getChildren().add(postText);
     }
 
