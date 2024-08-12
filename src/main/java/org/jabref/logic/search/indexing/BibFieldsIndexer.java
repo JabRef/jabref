@@ -2,12 +2,9 @@ package org.jabref.logic.search.indexing;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
@@ -34,16 +31,14 @@ import static org.jabref.model.entry.field.StandardField.GROUPS;
 public class BibFieldsIndexer implements LuceneIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
     private final BibDatabaseContext databaseContext;
-    private final TaskExecutor taskExecutor;
     private final String libraryName;
     private final Directory indexDirectory;
     private final IndexWriter indexWriter;
     private final SearcherManager searcherManager;
     private IndexSearcher indexSearcher;
 
-    public BibFieldsIndexer(BibDatabaseContext databaseContext, TaskExecutor executor) throws IOException {
+    public BibFieldsIndexer(BibDatabaseContext databaseContext) throws IOException {
         this.databaseContext = databaseContext;
-        this.taskExecutor = executor;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "unsaved");
 
         IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.NGram_Analyzer_For_INDEXING);
@@ -54,37 +49,27 @@ public class BibFieldsIndexer implements LuceneIndexer {
     }
 
     @Override
-    public void updateOnStart() {
-        addToIndex(databaseContext.getDatabase().getEntries());
+    public void updateOnStart(BackgroundTask<?> task) {
+        addToIndex(databaseContext.getDatabase().getEntries(), task);
     }
 
     @Override
-    public void addToIndex(Collection<BibEntry> entries) {
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            new BackgroundTask<>() {
-                @Override
-                protected Void call() {
-                    int i = 1;
-                    long startTime = System.currentTimeMillis();
-                    LOGGER.debug("Adding {} entries to index", entries.size());
-                    for (BibEntry entry : entries) {
-                        if (isCanceled()) {
-                            updateMessage(Localization.lang("Indexing canceled: %0 of %1 entries added to the index.", i, entries.size()));
-                            break;
-                        }
-                        addToIndex(entry);
-                        updateProgress(i, entries.size());
-                        updateMessage(Localization.lang("%0 of %1 entries added to the index.", i, entries.size()));
-                        i++;
-                    }
-                    updateMessage(Localization.lang("Indexing completed: %0 entries added to the index.", entries.size()));
-                    LOGGER.debug("Added {} entries to index in {} ms", entries.size(), System.currentTimeMillis() - startTime);
-                    return null;
-                }
-            }.showToUser(entries.size() > 1)
-             .setTitle(Localization.lang("Indexing bib fields for %0", libraryName))
-             .executeWith(taskExecutor);
-        });
+    public void addToIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
+        task.setTitle(Localization.lang("Indexing bib fields for %0", libraryName));
+        int i = 1;
+        long startTime = System.currentTimeMillis();
+        LOGGER.debug("Adding {} entries to index", entries.size());
+        for (BibEntry entry : entries) {
+            if (task.isCanceled()) {
+                LOGGER.debug("Indexing canceled");
+                return;
+            }
+            addToIndex(entry);
+            task.updateProgress(i, entries.size());
+            task.updateMessage(Localization.lang("%0 of %1 entries added to the index.", i, entries.size()));
+            i++;
+        }
+        LOGGER.debug("Added {} entries to index in {} ms", entries.size(), System.currentTimeMillis() - startTime);
     }
 
     private void addToIndex(BibEntry bibEntry) {
@@ -113,13 +98,23 @@ public class BibFieldsIndexer implements LuceneIndexer {
     }
 
     @Override
-    public void removeFromIndex(Collection<BibEntry> entries) {
-        entries.forEach(this::removeFromIndex);
+    public void removeFromIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
+        task.setTitle(Localization.lang("Removing entries from index for %0", libraryName));
+        int i = 1;
+        for (BibEntry entry : entries) {
+            if (task.isCanceled()) {
+                LOGGER.debug("Removing entries canceled");
+                return;
+            }
+            removeFromIndex(entry);
+            task.updateProgress(i, entries.size());
+            task.updateMessage(Localization.lang("%0 of %1 entries removed from the index.", i, entries.size()));
+            i++;
+        }
     }
 
     private void removeFromIndex(BibEntry entry) {
         try {
-            LOGGER.debug("Removing entry {} from index", entry.getId());
             indexWriter.deleteDocuments((new Term(SearchFieldConstants.ENTRY_ID.toString(), entry.getId())));
             LOGGER.debug("Entry {} removed from index", entry.getId());
         } catch (IOException e) {
@@ -128,10 +123,10 @@ public class BibFieldsIndexer implements LuceneIndexer {
     }
 
     @Override
-    public void updateEntry(BibEntry entry, String oldValue, String newValue) {
+    public void updateEntry(BibEntry entry, String oldValue, String newValue, BackgroundTask<?> task) {
         LOGGER.debug("Updating entry {} in index", entry.getId());
-        removeFromIndex(List.of(entry));
-        addToIndex(List.of(entry));
+        removeFromIndex(entry);
+        addToIndex(entry);
     }
 
     @Override
@@ -146,16 +141,15 @@ public class BibFieldsIndexer implements LuceneIndexer {
     }
 
     @Override
-    public void rebuildIndex() {
+    public void rebuildIndex(BackgroundTask<?> task) {
         removeAllFromIndex();
-        addToIndex(databaseContext.getDatabase().getEntries());
+        addToIndex(databaseContext.getDatabase().getEntries(), task);
     }
 
     @Override
     public IndexSearcher getIndexSearcher() {
         LOGGER.debug("Getting index searcher for bib fields index");
         try {
-            IndexSearcher oldSearcher = indexSearcher;
             if (indexSearcher != null) {
                 LOGGER.debug("Releasing bib fields index searcher");
                 searcherManager.release(indexSearcher);

@@ -2,22 +2,23 @@ package org.jabref.model.search;
 
 import java.util.Collection;
 
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.search.IndexSearcher;
 
 public interface LuceneIndexer {
-    void updateOnStart();
+    void updateOnStart(BackgroundTask<?> task);
 
-    void addToIndex(Collection<BibEntry> entries);
+    void addToIndex(Collection<BibEntry> entries, BackgroundTask<?> task);
 
-    void removeFromIndex(Collection<BibEntry> entries);
+    void removeFromIndex(Collection<BibEntry> entries, BackgroundTask<?> task);
 
-    void updateEntry(BibEntry entry, String oldValue, String newValue);
+    void updateEntry(BibEntry entry, String oldValue, String newValue, BackgroundTask<?> task);
 
     void removeAllFromIndex();
 
-    void rebuildIndex();
+    void rebuildIndex(BackgroundTask<?> task);
 
     IndexSearcher getIndexSearcher();
 

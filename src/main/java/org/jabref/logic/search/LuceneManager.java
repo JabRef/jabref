@@ -2,7 +2,6 @@ package org.jabref.logic.search;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -11,8 +10,6 @@ import javafx.beans.value.ChangeListener;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.indexing.BibFieldsIndexer;
-import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
-import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -55,7 +52,7 @@ public class LuceneManager {
 
     private void initializeIndexers() {
         try {
-            bibFieldsIndexer = new BibFieldsIndexer(databaseContext, taskExecutor);
+            bibFieldsIndexer = new BibFieldsIndexer(databaseContext);
         } catch (IOException e) {
             LOGGER.error("Error initializing bib fields index", e);
         }
@@ -68,19 +65,19 @@ public class LuceneManager {
     }
 
     private void initializeLinkedFilesIndexer() {
-        try {
-            linkedFilesIndexer = new DefaultLinkedFilesIndexer(databaseContext, taskExecutor, preferences.getFilePreferences());
-        } catch (IOException e) {
-            LOGGER.debug("Error initializing linked files index - using read only index");
-            linkedFilesIndexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
-        }
+//        try {
+//            linkedFilesIndexer = new DefaultLinkedFilesIndexer(databaseContext, taskExecutor, preferences.getFilePreferences());
+//        } catch (IOException e) {
+//            LOGGER.debug("Error initializing linked files index - using read only index");
+//            linkedFilesIndexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
+//        }
     }
 
     private void bindToPreferences(boolean newValue) {
         BackgroundTask.wrap(() -> {
             if (newValue) {
                 initializeLinkedFilesIndexer();
-                linkedFilesIndexer.updateOnStart();
+                // linkedFilesIndexer.updateOnStart();
             } else {
                 linkedFilesIndexer.removeAllFromIndex();
                 linkedFilesIndexer.close();
@@ -90,50 +87,87 @@ public class LuceneManager {
     }
 
     public void updateOnStart() {
-        BackgroundTask.wrap(bibFieldsIndexer::updateOnStart).executeWith(taskExecutor);
+        new BackgroundTask<>() {
+            @Override
+            protected Object call() {
+                bibFieldsIndexer.updateOnStart(this);
+                return null;
+            }
+        }.showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {
-            BackgroundTask.wrap(linkedFilesIndexer::updateOnStart).executeWith(taskExecutor);
+            // BackgroundTask.wrap(linkedFilesIndexer::updateOnStart).executeWith(taskExecutor);
         }
     }
 
     public void addToIndex(Collection<BibEntry> entries) {
-        BackgroundTask.wrap(() -> bibFieldsIndexer.addToIndex(entries)).executeWith(taskExecutor);
+        new BackgroundTask<>() {
+            @Override
+            protected Object call() {
+                bibFieldsIndexer.addToIndex(entries, this);
+                return null;
+            }
+        }.onSuccess(r -> LOGGER.debug("OnSuccess"))
+         .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            BackgroundTask.wrap(() -> linkedFilesIndexer.addToIndex(entries)).executeWith(taskExecutor);
+            // BackgroundTask.wrap(() -> linkedFilesIndexer.addToIndex(entries)).executeWith(taskExecutor);
         }
     }
 
     public void removeFromIndex(Collection<BibEntry> entries) {
-        BackgroundTask.wrap(() -> bibFieldsIndexer.removeFromIndex(entries)).executeWith(taskExecutor);
+        new BackgroundTask<>() {
+            @Override
+            protected Object call() {
+                bibFieldsIndexer.removeFromIndex(entries, this);
+                return null;
+            }
+        }.showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {
-            BackgroundTask.wrap(() -> linkedFilesIndexer.removeFromIndex(entries)).executeWith(taskExecutor);
+            // BackgroundTask.wrap(() -> linkedFilesIndexer.removeFromIndex(entries)).executeWith(taskExecutor);
         }
     }
 
     public void updateEntry(BibEntry entry, String oldValue, String newValue, boolean isLinkedFile) {
-        BackgroundTask.wrap(() -> bibFieldsIndexer.updateEntry(entry, oldValue, newValue)).executeWith(taskExecutor);
+        new BackgroundTask<>() {
+            @Override
+            protected Object call() {
+                bibFieldsIndexer.updateEntry(entry, oldValue, newValue, this);
+                return null;
+            }
+        }.showToUser(true).executeWith(taskExecutor);
 
         if (isLinkedFile && shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            BackgroundTask.wrap(() -> linkedFilesIndexer.updateEntry(entry, oldValue, newValue)).executeWith(taskExecutor);
+            // BackgroundTask.wrap(() -> linkedFilesIndexer.updateEntry(entry, oldValue, newValue)).executeWith(taskExecutor);
         }
     }
 
     public void updateAfterDropFiles(BibEntry entry) {
-        BackgroundTask.wrap(() -> bibFieldsIndexer.updateEntry(entry, "", "")).executeWith(taskExecutor);
+        new BackgroundTask<>() {
+            @Override
+            protected Object call() {
+                bibFieldsIndexer.updateEntry(entry, "", "", this);
+                return null;
+            }
+        }.showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            BackgroundTask.wrap(() -> linkedFilesIndexer.addToIndex(List.of(entry))).executeWith(taskExecutor);
+            // BackgroundTask.wrap(() -> linkedFilesIndexer.addToIndex(List.of(entry))).executeWith(taskExecutor);
         }
     }
 
     public void rebuildIndex() {
-        BackgroundTask.wrap(bibFieldsIndexer::rebuildIndex).executeWith(taskExecutor);
+        new BackgroundTask<>() {
+            @Override
+            protected Object call() {
+                bibFieldsIndexer.rebuildIndex(this);
+                return null;
+            }
+        }.showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {
-            BackgroundTask.wrap(linkedFilesIndexer::rebuildIndex).executeWith(taskExecutor);
+            // BackgroundTask.wrap(linkedFilesIndexer::rebuildIndex).executeWith(taskExecutor);
         }
     }
 

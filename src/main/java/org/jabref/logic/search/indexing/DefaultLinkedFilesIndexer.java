@@ -26,7 +26,6 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 
@@ -46,7 +45,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultLinkedFilesIndexer implements LuceneIndexer {
+public class DefaultLinkedFilesIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLinkedFilesIndexer.class);
     private static final DocumentReader DOCUMENT_READER = new DocumentReader();
     private static int NUMBER_OF_UNSAVED_LIBRARIES = 1;
@@ -81,7 +80,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         this.searcherManager = new SearcherManager(indexWriter, null);
     }
 
-    @Override
+    // @Override
     public void updateOnStart() {
         indexedFiles = getLinkedFilesFromIndex();
         Map<String, Pair<Long, Path>> currentFiles = getLinkedFilesFromEntries(databaseContext.getEntries());
@@ -112,7 +111,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         addToIndex(filesToAdd);
     }
 
-    @Override
+    // @Override
     public void addToIndex(Collection<BibEntry> entries) {
         addToIndex(getLinkedFilesFromEntries(entries));
     }
@@ -147,7 +146,6 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
                     LOGGER.debug("Adding {} files to index", linkedFiles.size());
                     for (Map.Entry<String, Pair<Long, Path>> entry : linkedFiles.entrySet()) {
                         if (isCanceled()) {
-                            updateMessage(Localization.lang("Indexing canceled: %0 of %1 files added to the index.", i, linkedFiles.size()));
                             break;
                         }
                         addToIndex(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
@@ -155,7 +153,6 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
                         updateMessage(Localization.lang("Indexing %0. %1 of %2 files added to the index.", entry.getValue().getValue().getFileName(), i, linkedFiles.size()));
                         i++;
                     }
-                    updateMessage(Localization.lang("Indexing completed: %0 files added to the index.", linkedFiles.size()));
                     return null;
                 }
             }.willBeRecoveredAutomatically(true)
@@ -176,7 +173,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         }
     }
 
-    @Override
+    // @Override
     public void removeFromIndex(Collection<BibEntry> entries) {
         Map<String, Pair<Long, Path>> linkedFiles = getLinkedFilesFromEntries(entries);
         removeUnlinkedFiles(entries, linkedFiles.keySet());
@@ -217,7 +214,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         }
     }
 
-    @Override
+    // @Override
     public void updateEntry(BibEntry entry, String oldValue, String newValue) {
         Set<LinkedFile> oldFiles = new HashSet<>(FileFieldParser.parse(oldValue));
         Set<LinkedFile> newFiles = new HashSet<>(FileFieldParser.parse(newValue));
@@ -231,7 +228,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         addToIndex(toAdd);
     }
 
-    @Override
+    // @Override
     public void removeAllFromIndex() {
         try {
             LOGGER.debug("Removing all linked files from index.");
@@ -243,7 +240,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         }
     }
 
-    @Override
+    // @Override
     public void rebuildIndex() {
         removeAllFromIndex();
         addToIndex(getLinkedFilesFromEntries(databaseContext.getEntries()));
@@ -303,7 +300,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         }
     }
 
-    @Override
+    // @Override
     public IndexSearcher getIndexSearcher() {
         LOGGER.debug("Getting index searcher for linked files index");
         try {
@@ -337,7 +334,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         }
     }
 
-    @Override
+    // @Override
     public void close() {
         HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
