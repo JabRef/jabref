@@ -69,7 +69,7 @@ public class ChatMessageComponent extends HBox {
             }
 
             default ->
-                LOGGER.warn("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.type().name());
+                LOGGER.error("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.type().name());
         }
 
         buttonsHBox.visibleProperty().bind(wrapperVBox.hoverProperty());

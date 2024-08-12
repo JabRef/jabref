@@ -2,6 +2,10 @@ package org.jabref.preferences.ai;
 
 import org.apache.commons.io.FileUtils;
 
+/**
+ * This enumeration was formed by <a href="https://docs.djl.ai/master/docs/load_model.html#list-available-models-using-djl-command-line">listing available embeddings model from Model Zoo of DJL</a>
+ * and by using a script that would rewrite the output in Java syntax + calculate size information by finding the models on Hugging Face.
+ */
 public enum EmbeddingModel {
     SDADAS_ST_POLISH_PARAPHRASE_FROM_MPNET("sdadas/st-polish-paraphrase-from-mpnet", 1001952602L),
     D0RJ_E5_BASE_EN_RU("d0rj/e5-base-en-ru", 1064431460L),

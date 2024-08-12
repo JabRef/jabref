@@ -136,7 +136,7 @@ public class AiChatLogic {
         AiMessage result = new AiMessage(chain.execute(message.singleText()));
         aiChatHistory.add(result);
 
-        LOGGER.info("Message was answered by the AI provider for entry {}: {}", entry.getCitationKey().orElse("<no citation key>"), result.text());
+        LOGGER.debug("Message was answered by the AI provider for entry {}: {}", entry.getCitationKey().orElse("<no citation key>"), result.text());
 
         return result;
     }
