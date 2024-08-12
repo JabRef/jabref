@@ -117,12 +117,11 @@ public class AiChatLogic {
     }
 
     private void setSystemMessage(String systemMessage) {
-        String newSystemMessage = augmentSystemMessage(systemMessage);
-        chatMemory.add(new SystemMessage(newSystemMessage));
+        chatMemory.add(new SystemMessage(augmentSystemMessage(systemMessage)));
     }
 
-    private String augmentSystemMessage(String oldSystemMessage) {
-        return oldSystemMessage + "\n\n" + "Here is the paper you are analyzing: " + CanonicalBibEntry.getCanonicalRepresentation(entry);
+    private String augmentSystemMessage(String systemMessage) {
+        return systemMessage + "\n" + CanonicalBibEntry.getCanonicalRepresentation(entry);
     }
 
     public AiMessage execute(UserMessage message) {

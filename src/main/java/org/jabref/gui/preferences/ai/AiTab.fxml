@@ -45,7 +45,7 @@
             <children>
                 <Label alignment="BASELINE_CENTER" text="%API key" />
                 <CustomPasswordField fx:id="apiKeyTextField" HBox.hgrow="ALWAYS" />
-                <Button fx:id="apiTokenHelp" prefWidth="20.0" />
+                <Button fx:id="apiKeyHelp" prefWidth="20.0" />
             </children>
             <padding>
                 <Insets left="20.0"/>

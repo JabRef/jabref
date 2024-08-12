@@ -28,7 +28,7 @@ class SummariesStorageTest {
     void setUp() {
         mvStore = MVStore.open(tempDir.resolve("test.mv").toString());
         bibPath = tempDir.resolve("test.bib");
-        summariesStorage = new SummariesStorage(Mockito.mock(AiPreferences.class),  mvStore);
+        summariesStorage = new SummariesStorage(Mockito.mock(AiPreferences.class), mvStore);
     }
 
     private void reopen() {
