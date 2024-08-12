@@ -29,8 +29,6 @@ import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
 import org.apache.commons.text.StringEscapeUtils;
 
-import static org.jabref.logic.citationkeypattern.BracketedPattern.authorsAlpha;
-
 public class CSLCitationOOAdapter {
 
     // TODO: These are static final fields right now, should add the functionality to let user select these and store them in preferences.
@@ -322,7 +320,7 @@ public class CSLCitationOOAdapter {
 
             if (author.isPresent() && year.isPresent()) {
                 AuthorList authorList = AuthorList.parse(author.get());
-                String alphaKey = authorsAlpha(authorList);
+                String alphaKey = BracketedPattern.authorsAlpha(authorList);
 
                 // Extract last two digits of the year
                 String shortYear = year.get().length() >= 2 ?
