@@ -431,7 +431,8 @@ public class URLDownload {
                 } catch (MalformedURLException e) {
                     throw new FetcherException("Could not open URL Download", e);
                 }
-            } else {
+            } else if (status >= 400) {
+                // in case of an error, propagate the error message
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
                 LOGGER.info("{}", httpResponse);
                 if ((status >= 400) && (status < 500)) {
