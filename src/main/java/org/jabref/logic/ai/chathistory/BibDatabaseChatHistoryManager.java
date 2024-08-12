@@ -45,7 +45,7 @@ public class BibDatabaseChatHistoryManager {
             } else if (className.equals(ErrorMessage.class.getName())) {
                 return new ErrorMessage(content);
             } else {
-                LOGGER.warn("BibDatabaseChatHistoryManager supports only AI and user messages, but retrieved message has other type: {}. Will treat as an AI message", className);
+                LOGGER.warn("BibDatabaseChatHistoryManager supports only AI and user messages, but retrieved message has other type: {}. Will treat as an AI message.", className);
                 return new AiMessage(content);
             }
         }
