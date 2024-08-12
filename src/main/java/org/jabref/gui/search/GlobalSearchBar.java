@@ -6,8 +6,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.swing.undo.UndoManager;
 
@@ -64,6 +62,7 @@ import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
+import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.AutoCompletePopup;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -88,7 +87,6 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton keepSearchString;
     private final ToggleButton filterModeButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
-    private final Label currentResults = new Label("");
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
     private final UndoManager undoManager;
@@ -120,18 +118,23 @@ public class GlobalSearchBar extends HBox {
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the tabContainer width is too small
+        Label currentResults = new Label("");
         currentResults.setPrefWidth(150);
         currentResults.visibleProperty().bind(stateManager.activeSearchQuery(searchType).isPresent());
-        currentResults.textProperty().bind(Bindings.createStringBinding(() -> {
-            int matched = stateManager.searchResultSize(searchType).get();
-            if (matched == 0) {
-                searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
-                return Localization.lang("No results found.");
-            } else {
-                searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
-                return Localization.lang("Found %0 results.", String.valueOf(matched));
-            }
-        }, stateManager.searchResultSize(searchType)));
+        currentResults.textProperty().bind(EasyBind.combine(stateManager.searchResultSize(searchType), stateManager.activeSearchQuery(searchType),
+                (size, query) -> {
+                    if (query.isPresent() && !query.get().isValid()) {
+                        searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
+                        return Localization.lang("Search failed: illegal search expression");
+                    }
+                    if (size.intValue() == 0) {
+                        searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
+                        return Localization.lang("No results found.");
+                    } else {
+                        searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
+                        return Localization.lang("Found %0 results.", String.valueOf(size));
+                    }
+                }));
 
         searchField.setTooltip(searchFieldTooltip);
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -211,9 +214,6 @@ public class GlobalSearchBar extends HBox {
                 },
                 query -> setSearchTerm(query.orElseGet(() -> new SearchQuery("", EnumSet.noneOf(SearchFlags.class)))));
 
-        // TODO search describer
-        // stateManager.activeSearchQuery(searchType).addListener((obs, oldValue, newValue) ->
-                // newValue.ifPresent(query -> setSearchFieldHintTooltip(SearchDescribers.getSearchDescriberFor(query).getDescription())));
         /*
          * The listener tracks a change on the focus property value.
          * This happens, from active (user types a query) to inactive / focus
@@ -309,38 +309,13 @@ public class GlobalSearchBar extends HBox {
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
-            setSearchFieldHintTooltip(null);
+            setSearchFieldHintTooltip();
             stateManager.activeSearchQuery(searchType).set(Optional.empty());
             return;
         }
 
-        // Invalid regular expression
-        if (regularExpressionButton.isSelected() && !validRegex()) {
-            currentResults.setText(Localization.lang("Invalid regular expression"));
-            return;
-        }
-
         SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
-        if (!searchQuery.isValid()) {
-            informUserAboutInvalidSearchQuery();
-            return;
-        }
         stateManager.activeSearchQuery(searchType).set(Optional.of(searchQuery));
-    }
-
-    private boolean validRegex() {
-        try {
-            Pattern.compile(searchField.getText());
-        } catch (PatternSyntaxException e) {
-            LOGGER.debug(e.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-    private void informUserAboutInvalidSearchQuery() {
-        searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
-        currentResults.setText(Localization.lang("Search failed: illegal search expression"));
     }
 
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
@@ -370,25 +345,19 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    private void setSearchFieldHintTooltip(TextFlow description) {
+    private void setSearchFieldHintTooltip() {
         if (preferencesService.getWorkspacePreferences().shouldShowAdvancedHints()) {
             String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author:Smith AND title:electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 
-            if (description == null) {
-                TextFlow emptyHintTooltip = new TextFlow();
-                emptyHintTooltip.getChildren().setAll(genericDescriptionTexts);
-                searchFieldTooltip.setGraphic(emptyHintTooltip);
-            } else {
-                description.getChildren().add(new Text("\n\n"));
-                description.getChildren().addAll(genericDescriptionTexts);
-                searchFieldTooltip.setGraphic(description);
-            }
+            TextFlow emptyHintTooltip = new TextFlow();
+            emptyHintTooltip.getChildren().setAll(genericDescriptionTexts);
+            searchFieldTooltip.setGraphic(emptyHintTooltip);
         }
     }
 
     public void updateHintVisibility() {
-        setSearchFieldHintTooltip(null);
+        setSearchFieldHintTooltip();
     }
 
     public void setSearchTerm(SearchQuery searchQuery) {

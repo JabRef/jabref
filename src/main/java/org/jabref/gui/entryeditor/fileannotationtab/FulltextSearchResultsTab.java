@@ -80,9 +80,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return searchQueryProperty.get().map(query ->
-                !query.getParsedQuery().toString().isEmpty() && query.getSearchFlags().contains(SearchFlags.FULLTEXT)
-        ).orElse(false);
+        return searchQueryProperty.get().map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT)).orElse(false);
     }
 
     @Override
