@@ -18,7 +18,7 @@ class ReferenceMarkTest {
         ReferenceMark referenceMark = new ReferenceMark(name);
 
         assertEquals(expectedCitationKey, referenceMark.getCitationKey());
-        assertEquals(expectedCitationNumber, referenceMark.getCitationNumber());
+        assertEquals(expectedCitationNumber, String.valueOf(referenceMark.getCitationNumber()));
         assertEquals(expectedUniqueId, referenceMark.getUniqueId());
     }
 
