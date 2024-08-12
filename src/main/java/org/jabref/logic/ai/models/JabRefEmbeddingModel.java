@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
 public class JabRefEmbeddingModel implements dev.langchain4j.model.embedding.EmbeddingModel, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefEmbeddingModel.class);
 
-    private static final String DJL_EMBEDDING_MODEL_URL_PREFIX = "djl://ai.djl.huggingface.pytorch/";
-
     private final AiPreferences aiPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -79,8 +77,7 @@ public class JabRefEmbeddingModel implements dev.langchain4j.model.embedding.Emb
 
         predictorProperty.set(Optional.empty());
 
-        BackgroundTask<Void> task = BackgroundTask
-                .wrap(this::rebuild)
+        new UpdateEmbeddingModelTask(aiPreferences, predictorProperty)
                 .onSuccess(v -> {
                     LOGGER.info("Embedding model was successfully updated");
                     errorWhileBuildingModel = "";
@@ -91,10 +88,8 @@ public class JabRefEmbeddingModel implements dev.langchain4j.model.embedding.Emb
                     dialogService.notify(Localization.lang("An error occurred while building the embedding model"));
                     errorWhileBuildingModel = e.getMessage();
                     eventBus.post(new EmbeddingModelBuildingErrorEvent());
-                });
-        task.titleProperty().set(Localization.lang("Updating local embedding model..."));
-        task.showToUser(true);
-        task.executeWith(taskExecutor);
+                })
+                .executeWith(taskExecutor);
     }
 
     public boolean isPresent() {
@@ -107,39 +102,6 @@ public class JabRefEmbeddingModel implements dev.langchain4j.model.embedding.Emb
 
     public String getErrorWhileBuildingModel() {
         return errorWhileBuildingModel;
-    }
-
-    private void rebuild() {
-        if (!aiPreferences.getEnableAi()) {
-            predictorProperty.set(Optional.empty());
-            return;
-        }
-
-        LOGGER.info("Downloading embedding model...");
-
-        String modelUrl = DJL_EMBEDDING_MODEL_URL_PREFIX + aiPreferences.getEmbeddingModel().getName();
-
-        Criteria<String, float[]> criteria =
-                Criteria.builder()
-                        .setTypes(String.class, float[].class)
-                        .optModelUrls(modelUrl)
-                        .optEngine("PyTorch")
-                        .optTranslatorFactory(new TextEmbeddingTranslatorFactory())
-                        .optProgress(new ProgressBar())
-                        .build();
-
-        try {
-            predictorProperty.set(Optional.of(new DeepJavaEmbeddingModel(criteria)));
-        } catch (ModelNotFoundException e) {
-            predictorProperty.set(Optional.empty());
-            throw new RuntimeException(Localization.lang("Unable to find the embedding model by the URL %0", modelUrl), e);
-        } catch (MalformedModelException e) {
-            predictorProperty.set(Optional.empty());
-            throw new RuntimeException(Localization.lang("The model by URL %0 is malformed", modelUrl), e);
-        } catch (IOException e) {
-            predictorProperty.set(Optional.empty());
-            throw new RuntimeException(Localization.lang("An I/O error occurred while opening the embedding model by URL %0", modelUrl), e);
-        }
     }
 
     private void setupListeningToPreferencesChanges() {
