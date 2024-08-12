@@ -944,7 +944,6 @@ public class OOBibBase {
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
 
                     cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
-
                 } catch (NoDocumentException
                          | NoSuchElementException e) {
                     throw new RuntimeException(e);

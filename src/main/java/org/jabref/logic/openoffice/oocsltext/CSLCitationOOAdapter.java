@@ -66,7 +66,6 @@ public class CSLCitationOOAdapter {
             String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, bibDatabaseContext, bibEntryTypesManager).getFirst();
             String citationKey = entry.getCitationKey().orElse("");
             int currentNumber = markManager.getCitationNumber(citationKey);
-            System.out.println(citation);
 
             String formattedCitation;
             if (selectedStyle.isNumericStyle()) {
