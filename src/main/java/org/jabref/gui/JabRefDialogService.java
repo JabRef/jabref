@@ -211,9 +211,9 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public void showErrorDialogAndWait(Exception exception) {
-        if (exception instanceof FetcherException) {
+        if (exception instanceof FetcherException fetcherException) {
             // Somehow, Java does not route correctly to the other method
-            showErrorDialogAndWait((FetcherException) exception);
+            showErrorDialogAndWait(fetcherException);
         } else {
             showErrorDialogAndWait(Localization.lang("Unhandled exception occurred."), exception);
         }
