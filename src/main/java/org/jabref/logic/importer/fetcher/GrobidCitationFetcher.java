@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -49,17 +50,15 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         try {
             return grobidService.processCitation(plainText, importFormatPreferences, GrobidService.ConsolidateCitations.WITH_METADATA);
         } catch (HttpStatusException e) {
-            String msg = "Connection failure.";
-            LOGGER.debug(msg, e);
-            throw new FetcherException(msg, e.getCause());
+            LOGGER.debug("Could not connect to Grobid", e);
+            throw new FetcherException("{grobid}", new SimpleHttpResponse(e));
         } catch (SocketTimeoutException e) {
             String msg = "Connection timed out.";
             LOGGER.debug(msg, e);
             throw new FetcherException(msg, e.getCause());
         } catch (IOException | ParseException e) {
-            String msg = "Could not process citation. " + e.getMessage();
-            LOGGER.debug(msg, e);
-            return Optional.empty();
+            LOGGER.debug("Could not process citation", e);
+            throw new FetcherException("Could not process citation", e);
         }
     }
 

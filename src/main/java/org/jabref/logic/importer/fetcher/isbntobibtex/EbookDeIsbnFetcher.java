@@ -7,7 +7,6 @@ import java.net.URL;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.model.entry.BibEntry;
@@ -31,7 +30,7 @@ public class EbookDeIsbnFetcher extends AbstractIsbnFetcher {
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         this.ensureThatIsbnIsValid(identifier);
         return new URIBuilder(BASE_URL)
                 .addParameter("isbn", identifier)
