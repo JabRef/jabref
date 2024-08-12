@@ -25,6 +25,7 @@ public class ChatMessageComponent extends HBox {
     private final ChatMessage chatMessage;
     private final Consumer<ChatMessageComponent> onDeleteCallback;
 
+    @FXML private VBox wrapperVBox;
     @FXML private VBox vBox;
     @FXML private Label sourceLabel;
     @FXML private ExpandingTextArea contentTextArea;
@@ -70,6 +71,8 @@ public class ChatMessageComponent extends HBox {
             default ->
                 LOGGER.warn("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.type().name());
         }
+
+        buttonsHBox.visibleProperty().bind(wrapperVBox.hoverProperty());
     }
 
     @FXML
