@@ -90,14 +90,6 @@ public class FetcherException extends JabRefException {
         url = null;
     }
 
-    public static FetcherException ofUrl(String url, Throwable cause) {
-        return new FetcherException(url, cause, null);
-    }
-
-    public static FetcherException ofUrl(String url, String errorMessage) {
-        return new FetcherException(url, errorMessage, null, null);
-    }
-
     public static FetcherException ofUrl(String url, String errorMessage, Throwable cause) {
         return new FetcherException(url, errorMessage, cause, null);
     }

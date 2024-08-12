@@ -64,7 +64,7 @@ public class IacrEprintFetcher implements FulltextFetcher, IdBasedFetcher {
         try {
             return BibtexParser.singleFromString(actualEntry, prefs);
         } catch (ParseException e) {
-            throw FetcherException.ofUrl(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
+            throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
         }
     }
 
