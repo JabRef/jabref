@@ -1,13 +1,7 @@
 package org.jabref.logic.search;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.jabref.model.search.SearchFieldConstants;
 
@@ -52,7 +46,7 @@ public class LuceneHighlighter {
         for (Node node : element.childNodes()) {
             if (node instanceof TextNode textNode) {
                 String originalText = textNode.text();
-                String highlightedText = highlighter.getBestFragment(SearchFieldConstants.NGram_Analyzer_For_HIGHLIGHING, "", originalText);
+                String highlightedText = highlighter.getBestFragment(SearchFieldConstants.Standard_ANALYZER, "", originalText);
                 if (highlightedText != null) {
                     textNode.text("");
                     textNode.after(highlightedText);
@@ -61,34 +55,5 @@ public class LuceneHighlighter {
                 highlightTextNodes((Element) node, highlighter);
             }
         }
-    }
-
-    public static Optional<Pattern> getHighlightingPattern(String content, Query query) {
-        try {
-            Highlighter highlighter = new Highlighter(FORMATTER, new QueryScorer(query));
-            highlighter.setTextFragmenter(FRAGMENTER);
-            String highlightedText = highlighter.getBestFragment(SearchFieldConstants.NGram_Analyzer_For_HIGHLIGHING, null, content);
-            if (highlightedText == null) {
-                return Optional.empty();
-            }
-            LOGGER.debug("Highlighted text: {}", highlightedText);
-            Set<String> matchedTerms = getMatchedTerms(highlightedText);
-            return Optional.of(Pattern.compile(
-                    matchedTerms.stream()
-                                .sorted(Comparator.comparing(String::length))
-                                .collect(Collectors.joining("|")),
-                    Pattern.CASE_INSENSITIVE));
-        } catch (InvalidTokenOffsetsException | IOException e) {
-            return Optional.empty();
-        }
-    }
-
-    private static Set<String> getMatchedTerms(String highlightedText) {
-        Set<String> matchedTerms = new HashSet<>();
-        Matcher matcher = HIGHLIGHTED_TERM_PATTERN.matcher(highlightedText);
-        while (matcher.find()) {
-            matchedTerms.add(matcher.group(1));
-        }
-        return matchedTerms;
     }
 }

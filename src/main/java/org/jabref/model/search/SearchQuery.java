@@ -1,13 +1,21 @@
 package org.jabref.model.search;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.highlight.QueryTermExtractor;
+import org.apache.lucene.search.highlight.WeightedTerm;
 
 public class SearchQuery {
 
@@ -78,5 +86,22 @@ public class SearchQuery {
 
     public EnumSet<SearchFlags> getSearchFlags() {
         return searchFlags;
+    }
+
+    public Optional<Pattern> getPatternForWords() {
+        List<String> words = getSearchWords();
+        if ((words == null) || words.isEmpty() || words.getFirst().isEmpty()) {
+            return Optional.empty();
+        }
+        // compile the words to a regular expression in the form (w1)|(w2)|(w3)
+        Stream<String> joiner = words.stream();
+        String searchPattern = joiner.collect(Collectors.joining(")|(", "(", ")"));
+        return Optional.of(Pattern.compile(searchPattern, Pattern.CASE_INSENSITIVE));
+    }
+
+    private List<String> getSearchWords() {
+        return Arrays.stream(QueryTermExtractor.getTerms(parsedQuery))
+                     .map(WeightedTerm::getTerm)
+                     .toList();
     }
 }
