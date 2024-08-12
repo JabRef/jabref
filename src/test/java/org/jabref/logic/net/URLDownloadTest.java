@@ -1,7 +1,6 @@
 package org.jabref.logic.net;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -134,10 +132,8 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void test429ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
+    public void test429ErrorThrowsFetcherClientException() throws Exception {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
-
-        Exception exception = assertThrows(IOException.class, urlDownload::asString);
-        assertInstanceOf(FetcherClientException.class, exception.getCause());
+        Exception exception = assertThrows(FetcherClientException.class, urlDownload::asString);
     }
 }
