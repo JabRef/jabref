@@ -13,7 +13,6 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -29,6 +28,8 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
 import org.apache.commons.text.StringEscapeUtils;
+
+import static org.jabref.logic.citationkeypattern.BracketedPattern.authorsAlpha;
 
 public class CSLCitationOOAdapter {
 
@@ -321,7 +322,7 @@ public class CSLCitationOOAdapter {
 
             if (author.isPresent() && year.isPresent()) {
                 AuthorList authorList = AuthorList.parse(author.get());
-                String alphaKey = authorRepresentationExtractor(authorList);
+                String alphaKey = authorsAlpha(authorList);
 
                 // Extract last two digits of the year
                 String shortYear = year.get().length() >= 2 ?
@@ -345,45 +346,4 @@ public class CSLCitationOOAdapter {
         return "DIN 1505-2 (alphanumeric, Deutsch) - standard superseded by ISO-690".equals(style.getTitle());
     }
 
-    /**
-     * Adapted from {@link BracketedPattern#authorsAlpha(AuthorList) authorsAlpha}
-     *
-     * @param authorList - list of authors to generate alphabetic representation for.
-     * @return first four letters of the author (in case of a single author), first letter of each author till 4 authors, in case of multiple authors.
-     */
-    public static String authorRepresentationExtractor(AuthorList authorList) {
-        StringBuilder alphaStyle = new StringBuilder();
-        int maxAuthors = Math.min(authorList.getNumberOfAuthors(), MAX_ALPHA_AUTHORS);
-
-        if (authorList.getNumberOfAuthors() == 1) {
-            String[] firstAuthor = authorList.getAuthor(0).getNamePrefixAndFamilyName()
-                                             .replaceAll("\\s+", " ").trim().split(" ");
-            // take first letter of any "prefixes" (e.g. van der Aalst -> vd)
-            for (int j = 0; j < (firstAuthor.length - 1); j++) {
-                alphaStyle.append(firstAuthor[j], 0, 1);
-            }
-            // append last part of last name completely
-            alphaStyle.append(firstAuthor[firstAuthor.length - 1], 0,
-                    Math.min(4, firstAuthor[firstAuthor.length - 1].length()));
-        } else {
-            boolean andOthersPresent = authorList.getAuthor(maxAuthors - 1).equals(Author.OTHERS);
-            if (andOthersPresent) {
-                maxAuthors--;
-            }
-            List<String> vonAndLastNames = authorList.getAuthors().stream()
-                                                     .limit(maxAuthors)
-                                                     .map(Author::getNamePrefixAndFamilyName)
-                                                     .toList();
-            for (String vonAndLast : vonAndLastNames) {
-                // replace all whitespaces by " "
-                // split the lastname at " "
-                String[] nameParts = vonAndLast.replaceAll("\\s+", " ").trim().split(" ");
-                for (String part : nameParts) {
-                    // use first character of each part of lastname
-                    alphaStyle.append(part, 0, 1);
-                }
-            }
-        }
-        return alphaStyle.toString();
-    }
 }
