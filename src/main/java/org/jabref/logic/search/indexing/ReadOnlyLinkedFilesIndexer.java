@@ -3,9 +3,11 @@ package org.jabref.logic.search.indexing;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.search.LuceneIndexer;
 
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
@@ -14,7 +16,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReadOnlyLinkedFilesIndexer {
+public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReadOnlyLinkedFilesIndexer.class);
     private Directory indexDirectory;
     private SearcherManager searcherManager;
@@ -29,31 +31,31 @@ public class ReadOnlyLinkedFilesIndexer {
         }
     }
 
-//    @Override
-    public void updateOnStart() {
+    @Override
+    public void updateOnStart(BackgroundTask<?> task) {
     }
 
-//    @Override
-    public void addToIndex(Collection<BibEntry> entries) {
+    @Override
+    public void addToIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
     }
 
-//    @Override
-    public void removeFromIndex(Collection<BibEntry> entries) {
+    @Override
+    public void removeFromIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
     }
 
-//    @Override
-    public void updateEntry(BibEntry entry, String oldValue, String newValue) {
+    @Override
+    public void updateEntry(BibEntry entry, String oldValue, String newValue, BackgroundTask<?> task) {
     }
 
-//    @Override
+    @Override
     public void removeAllFromIndex() {
     }
 
-//    @Override
-    public void rebuildIndex() {
+    @Override
+    public void rebuildIndex(BackgroundTask<?> task) {
     }
 
-//    @Override
+    @Override
     public IndexSearcher getIndexSearcher() {
         try {
             if (indexSearcher != null) {
@@ -67,7 +69,7 @@ public class ReadOnlyLinkedFilesIndexer {
         return indexSearcher;
     }
 
-//    @Override
+    @Override
     public void close() {
         HeadlessExecutorService.INSTANCE.execute(() -> {
             try {

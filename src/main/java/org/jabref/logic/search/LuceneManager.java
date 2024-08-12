@@ -2,6 +2,7 @@ package org.jabref.logic.search;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -10,6 +11,8 @@ import javafx.beans.value.ChangeListener;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.indexing.BibFieldsIndexer;
+import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
+import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -65,25 +68,29 @@ public class LuceneManager {
     }
 
     private void initializeLinkedFilesIndexer() {
-//        try {
-//            linkedFilesIndexer = new DefaultLinkedFilesIndexer(databaseContext, taskExecutor, preferences.getFilePreferences());
-//        } catch (IOException e) {
-//            LOGGER.debug("Error initializing linked files index - using read only index");
-//            linkedFilesIndexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
-//        }
+        try {
+            linkedFilesIndexer = new DefaultLinkedFilesIndexer(databaseContext, preferences.getFilePreferences());
+        } catch (IOException e) {
+            LOGGER.debug("Error initializing linked files index - using read only index");
+            linkedFilesIndexer = new ReadOnlyLinkedFilesIndexer(databaseContext);
+        }
     }
 
     private void bindToPreferences(boolean newValue) {
-        BackgroundTask.wrap(() -> {
-            if (newValue) {
-                initializeLinkedFilesIndexer();
-                // linkedFilesIndexer.updateOnStart();
-            } else {
-                linkedFilesIndexer.removeAllFromIndex();
-                linkedFilesIndexer.close();
-                linkedFilesIndexer = null;
-            }
-        }).executeWith(taskExecutor);
+        if (newValue) {
+            initializeLinkedFilesIndexer();
+            new BackgroundTask<>() {
+                @Override
+                protected Object call() {
+                    linkedFilesIndexer.updateOnStart(this);
+                    return null;
+                }
+            }.showToUser(true).executeWith(taskExecutor);
+        } else {
+            linkedFilesIndexer.removeAllFromIndex();
+            linkedFilesIndexer.close();
+            linkedFilesIndexer = null;
+        }
     }
 
     public void updateOnStart() {
@@ -95,8 +102,14 @@ public class LuceneManager {
             }
         }.showToUser(true).executeWith(taskExecutor);
 
-        if (shouldIndexLinkedFiles.get()) {
-            // BackgroundTask.wrap(linkedFilesIndexer::updateOnStart).executeWith(taskExecutor);
+        if (shouldIndexLinkedFiles.get() && linkedFilesIndexer != null) {
+            new BackgroundTask<>() {
+                @Override
+                protected Object call() {
+                    linkedFilesIndexer.updateOnStart(this);
+                    return null;
+                }
+            }.showToUser(true).executeWith(taskExecutor);
         }
     }
 
@@ -107,11 +120,16 @@ public class LuceneManager {
                 bibFieldsIndexer.addToIndex(entries, this);
                 return null;
             }
-        }.onSuccess(r -> LOGGER.debug("OnSuccess"))
-         .showToUser(true).executeWith(taskExecutor);
+        }.showToUser(true).executeWith(taskExecutor);
 
-        if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            // BackgroundTask.wrap(() -> linkedFilesIndexer.addToIndex(entries)).executeWith(taskExecutor);
+        if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get() && linkedFilesIndexer != null) {
+            new BackgroundTask<>() {
+                @Override
+                protected Object call() {
+                    linkedFilesIndexer.addToIndex(entries, this);
+                    return null;
+                }
+            }.showToUser(true).executeWith(taskExecutor);
         }
     }
 
@@ -124,8 +142,14 @@ public class LuceneManager {
             }
         }.showToUser(true).executeWith(taskExecutor);
 
-        if (shouldIndexLinkedFiles.get()) {
-            // BackgroundTask.wrap(() -> linkedFilesIndexer.removeFromIndex(entries)).executeWith(taskExecutor);
+        if (shouldIndexLinkedFiles.get() && linkedFilesIndexer != null) {
+            new BackgroundTask<>() {
+                @Override
+                protected Object call() {
+                    linkedFilesIndexer.removeFromIndex(entries, this);
+                    return null;
+                }
+            }.showToUser(true).executeWith(taskExecutor);
         }
     }
 
@@ -138,8 +162,14 @@ public class LuceneManager {
             }
         }.showToUser(true).executeWith(taskExecutor);
 
-        if (isLinkedFile && shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            // BackgroundTask.wrap(() -> linkedFilesIndexer.updateEntry(entry, oldValue, newValue)).executeWith(taskExecutor);
+        if (isLinkedFile && shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get() && linkedFilesIndexer != null) {
+            new BackgroundTask<>() {
+                @Override
+                protected Object call() {
+                    linkedFilesIndexer.updateEntry(entry, oldValue, newValue, this);
+                    return null;
+                }
+            }.showToUser(true).executeWith(taskExecutor);
         }
     }
 
@@ -152,8 +182,14 @@ public class LuceneManager {
             }
         }.showToUser(true).executeWith(taskExecutor);
 
-        if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
-            // BackgroundTask.wrap(() -> linkedFilesIndexer.addToIndex(List.of(entry))).executeWith(taskExecutor);
+        if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get() && linkedFilesIndexer != null) {
+            new BackgroundTask<>() {
+                @Override
+                protected Object call() {
+                    linkedFilesIndexer.addToIndex(List.of(entry), this);
+                    return null;
+                }
+            }.showToUser(true).executeWith(taskExecutor);
         }
     }
 
@@ -166,8 +202,14 @@ public class LuceneManager {
             }
         }.showToUser(true).executeWith(taskExecutor);
 
-        if (shouldIndexLinkedFiles.get()) {
-            // BackgroundTask.wrap(linkedFilesIndexer::rebuildIndex).executeWith(taskExecutor);
+        if (shouldIndexLinkedFiles.get() && linkedFilesIndexer != null) {
+            new BackgroundTask<>() {
+                @Override
+                protected Object call() {
+                    linkedFilesIndexer.rebuildIndex(this);
+                    return null;
+                }
+            }.showToUser(true).executeWith(taskExecutor);
         }
     }
 

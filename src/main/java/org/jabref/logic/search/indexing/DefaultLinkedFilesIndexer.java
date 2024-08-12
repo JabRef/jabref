@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
 import javafx.util.Pair;
 
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -26,6 +24,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 
@@ -45,13 +44,12 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultLinkedFilesIndexer {
+public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLinkedFilesIndexer.class);
     private static final DocumentReader DOCUMENT_READER = new DocumentReader();
     private static int NUMBER_OF_UNSAVED_LIBRARIES = 1;
 
     private final BibDatabaseContext databaseContext;
-    private final TaskExecutor taskExecutor;
     private final FilePreferences filePreferences;
     private final String libraryName;
     private final Directory indexDirectory;
@@ -61,9 +59,8 @@ public class DefaultLinkedFilesIndexer {
     private Map<String, Long> indexedFiles;
     private IndexSearcher indexSearcher;
 
-    public DefaultLinkedFilesIndexer(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences filePreferences) throws IOException {
+    public DefaultLinkedFilesIndexer(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
         this.databaseContext = databaseContext;
-        this.taskExecutor = executor;
         this.filePreferences = filePreferences;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "untitled");
         this.indexedFiles = new ConcurrentHashMap<>();
@@ -80,8 +77,8 @@ public class DefaultLinkedFilesIndexer {
         this.searcherManager = new SearcherManager(indexWriter, null);
     }
 
-    // @Override
-    public void updateOnStart() {
+    @Override
+    public void updateOnStart(BackgroundTask<?> task) {
         indexedFiles = getLinkedFilesFromIndex();
         Map<String, Pair<Long, Path>> currentFiles = getLinkedFilesFromEntries(databaseContext.getEntries());
 
@@ -102,21 +99,20 @@ public class DefaultLinkedFilesIndexer {
         Map<String, Pair<Long, Path>> filesToAdd = new HashMap<>();
         for (Map.Entry<String, Pair<Long, Path>> entry : currentFiles.entrySet()) {
             String fileLink = entry.getKey();
-            long modification = entry.getValue().getKey();
             if (!indexedFiles.containsKey(fileLink)) {
                 LOGGER.debug("File {} has been added to the library. Will be added to the index.", fileLink);
                 filesToAdd.put(fileLink, entry.getValue());
             }
         }
-        addToIndex(filesToAdd);
+        addToIndex(filesToAdd, task);
     }
 
-    // @Override
-    public void addToIndex(Collection<BibEntry> entries) {
-        addToIndex(getLinkedFilesFromEntries(entries));
+    @Override
+    public void addToIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
+        addToIndex(getLinkedFilesFromEntries(entries), task);
     }
 
-    private void addToIndex(Set<LinkedFile> linkedFiles) {
+    private void addToIndex(Set<LinkedFile> linkedFiles, BackgroundTask<?> task) {
         Map<String, Pair<Long, Path>> filesToAdd = new HashMap<>();
         for (LinkedFile linkedFile : linkedFiles) {
             Pair<Long, Path> fileInfo = getLinkedFileInfo(linkedFile);
@@ -124,10 +120,10 @@ public class DefaultLinkedFilesIndexer {
                 filesToAdd.put(linkedFile.getLink(), fileInfo);
             }
         }
-        addToIndex(filesToAdd);
+        addToIndex(filesToAdd, task);
     }
 
-    private void addToIndex(Map<String, Pair<Long, Path>> linkedFiles) {
+    private void addToIndex(Map<String, Pair<Long, Path>> linkedFiles, BackgroundTask<?> task) {
         for (String fileLink : linkedFiles.keySet()) {
             if (indexedFiles.containsKey(fileLink)) {
                 LOGGER.debug("File {} is already indexed.", fileLink);
@@ -138,28 +134,21 @@ public class DefaultLinkedFilesIndexer {
             return;
         }
 
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            new BackgroundTask<>() {
-                @Override
-                protected Void call() {
-                    int i = 1;
-                    LOGGER.debug("Adding {} files to index", linkedFiles.size());
-                    for (Map.Entry<String, Pair<Long, Path>> entry : linkedFiles.entrySet()) {
-                        if (isCanceled()) {
-                            break;
-                        }
-                        addToIndex(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
-                        updateProgress(i, linkedFiles.size());
-                        updateMessage(Localization.lang("Indexing %0. %1 of %2 files added to the index.", entry.getValue().getValue().getFileName(), i, linkedFiles.size()));
-                        i++;
-                    }
-                    return null;
-                }
-            }.willBeRecoveredAutomatically(true)
-             .showToUser(true)
-             .setTitle(Localization.lang("Indexing pdf files for %0", libraryName))
-             .executeWith(taskExecutor);
-        });
+        task.willBeRecoveredAutomatically(true);
+        task.setTitle(Localization.lang("Indexing pdf files for %0", libraryName));
+        LOGGER.debug("Adding {} files to index", linkedFiles.size());
+        int i = 1;
+        for (Map.Entry<String, Pair<Long, Path>> entry : linkedFiles.entrySet()) {
+            if (task.isCanceled()) {
+                LOGGER.debug("Adding files to index canceled");
+                return;
+            }
+            addToIndex(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
+            task.updateProgress(i, linkedFiles.size());
+            task.updateMessage(Localization.lang("Indexing %0. %1 of %2 files added to the index.", entry.getValue().getValue().getFileName(), i, linkedFiles.size()));
+            i++;
+        }
+        LOGGER.debug("Added {} files to index", linkedFiles.size());
     }
 
     private void addToIndex(String fileLink, long modifiedTime, Path resolvedPath) {
@@ -173,8 +162,8 @@ public class DefaultLinkedFilesIndexer {
         }
     }
 
-    // @Override
-    public void removeFromIndex(Collection<BibEntry> entries) {
+    @Override
+    public void removeFromIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
         Map<String, Pair<Long, Path>> linkedFiles = getLinkedFilesFromEntries(entries);
         removeUnlinkedFiles(entries, linkedFiles.keySet());
     }
@@ -201,21 +190,19 @@ public class DefaultLinkedFilesIndexer {
     }
 
     private void removeFromIndex(Set<String> links) {
-        links.forEach(this::removeFromIndex);
-    }
-
-    private void removeFromIndex(String fileLink) {
-        try {
-            LOGGER.debug("Removing file {} from index.", fileLink);
-            indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH.toString(), fileLink));
-            indexedFiles.remove(fileLink);
-        } catch (IOException e) {
-            LOGGER.warn("Could not remove linked file {} from index.", fileLink, e);
+        for (String fileLink : links) {
+            try {
+                LOGGER.debug("Removing file {} from index.", fileLink);
+                indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH.toString(), fileLink));
+                indexedFiles.remove(fileLink);
+            } catch (IOException e) {
+                LOGGER.warn("Could not remove linked file {} from index.", fileLink, e);
+            }
         }
     }
 
-    // @Override
-    public void updateEntry(BibEntry entry, String oldValue, String newValue) {
+    @Override
+    public void updateEntry(BibEntry entry, String oldValue, String newValue, BackgroundTask<?> task) {
         Set<LinkedFile> oldFiles = new HashSet<>(FileFieldParser.parse(oldValue));
         Set<LinkedFile> newFiles = new HashSet<>(FileFieldParser.parse(newValue));
 
@@ -225,10 +212,10 @@ public class DefaultLinkedFilesIndexer {
 
         Set<LinkedFile> toAdd = new HashSet<>(newFiles);
         toAdd.removeAll(oldFiles);
-        addToIndex(toAdd);
+        addToIndex(toAdd, task);
     }
 
-    // @Override
+    @Override
     public void removeAllFromIndex() {
         try {
             LOGGER.debug("Removing all linked files from index.");
@@ -240,10 +227,10 @@ public class DefaultLinkedFilesIndexer {
         }
     }
 
-    // @Override
-    public void rebuildIndex() {
+    @Override
+    public void rebuildIndex(BackgroundTask<?> task) {
         removeAllFromIndex();
-        addToIndex(getLinkedFilesFromEntries(databaseContext.getEntries()));
+        addToIndex(getLinkedFilesFromEntries(databaseContext.getEntries()), task);
     }
 
     private Map<String, Long> getLinkedFilesFromIndex() {
@@ -300,7 +287,7 @@ public class DefaultLinkedFilesIndexer {
         }
     }
 
-    // @Override
+    @Override
     public IndexSearcher getIndexSearcher() {
         LOGGER.debug("Getting index searcher for linked files index");
         try {
@@ -334,7 +321,7 @@ public class DefaultLinkedFilesIndexer {
         }
     }
 
-    // @Override
+    @Override
     public void close() {
         HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
