@@ -79,9 +79,9 @@ public class FetcherException extends JabRefException {
         // TODO: Try to convert IOException to some more meaningful information here (or at org.jabref.gui.DialogService.showErrorDialogAndWait(org.jabref.logic.importer.FetcherException)). See also org.jabref.logic.net.URLDownload.openConnection
         if (httpResponse != null) {
             // We decided to not "translate" technical terms (URL, HTTP)
-            return getPrefix() + String.format("URL: %s\nHTTP %d %s\n%s", getRedactedUrl(), httpResponse.statusCode(), httpResponse.responseMessage(), httpResponse.responseBody());
+            return getPrefix() + "URL: %s\nHTTP %d %s\n%s".formatted(getRedactedUrl(), httpResponse.statusCode(), httpResponse.responseMessage(), httpResponse.responseBody());
         } else if (url != null) {
-            return getPrefix() + "URL: %s".format(getRedactedUrl());
+            return getPrefix() + "URL: %s".formatted(getRedactedUrl());
         } else {
             return super.getLocalizedMessage();
         }
