@@ -15,6 +15,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.embeddings.FileToDocument;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.ProgressCounter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
@@ -66,9 +67,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
     private final AiService aiService;
     private final FilePreferences filePreferences;
 
-    private int workDone = 0;
-    private int workMax = 0;
-    private Instant oneWorkTimeStart = Instant.now();
+    private final ProgressCounter progressCounter = new ProgressCounter();
 
     public GenerateSummaryTask(BibDatabaseContext bibDatabaseContext,
                                String citationKey,
@@ -83,6 +82,8 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
         titleProperty().set(Localization.lang("Waiting summary for %0...", citationKey));
         showToUser(true);
+
+        progressCounter.listenToAllProperties(this::updateProgress);
     }
 
     @Override
@@ -253,36 +254,17 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
     }
 
     private void updateProgress() {
-        Instant oneWorkTimeEnd = Instant.now();
-        Duration duration = Duration.between(oneWorkTimeStart, oneWorkTimeEnd);
-        oneWorkTimeStart = oneWorkTimeEnd;
-
-        Duration eta = duration.multipliedBy(workMax - workDone);
-
-        updateProgress(workDone, workMax);
-
-        if (eta.getSeconds() < 60) {
-            if (eta.getSeconds() == 0) {
-                updateMessage(Localization.lang("Estimated time left: %0 seconds", 3));
-            } else {
-                updateMessage(Localization.lang("Estimated time left: %0 seconds", eta.getSeconds()));
-            }
-        } else if (eta.getSeconds() % 60 == 0) {
-            updateMessage(Localization.lang("Estimated time left: %0 minutes", eta.getSeconds() / 60));
-        } else {
-            updateMessage(Localization.lang("Estimated time left: %0 minutes, %1 seconds", eta.getSeconds() / 60, eta.getSeconds() % 60));
-        }
-
-        updateProgress(workDone, workMax);
+        updateProgress(progressCounter.getWorkDone(), progressCounter.getWorkMax());
+        updateMessage(progressCounter.getMessage());
     }
 
     private void addMoreWork(int moreWork) {
-        workMax += moreWork;
+        progressCounter.increaseWorkMax(moreWork);
         updateProgress();
     }
 
     private void doneOneWork() {
-        workDone += 1;
+        progressCounter.increaseWorkDone(1);
         updateProgress();
     }
 }

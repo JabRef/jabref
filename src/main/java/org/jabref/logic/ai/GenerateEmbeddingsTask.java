@@ -16,6 +16,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.ai.embeddings.FileToDocument;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.ProgressCounter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
@@ -33,9 +34,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     private final BibDatabaseContext bibDatabaseContext;
     private final FilePreferences filePreferences;
 
-    private final IntegerProperty workDone = new SimpleIntegerProperty(0);
-    private final IntegerProperty workMax = new SimpleIntegerProperty(0);
-    private Instant oneWorkTimeStart = Instant.now();
+    private final ProgressCounter progressCounter = new ProgressCounter();
 
     public GenerateEmbeddingsTask(String citationKey,
                                   List<LinkedFile> linkedFiles,
@@ -51,8 +50,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         titleProperty().set(Localization.lang("Generating embeddings for for %0", citationKey));
         showToUser(true);
 
-        workDone.addListener(obs -> updateProgress());
-        workMax.addListener(obs -> updateProgress());
+        progressCounter.listenToAllProperties(this::updateProgress);
     }
 
     @Override
@@ -103,7 +101,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
             Optional<Document> document = FileToDocument.fromFile(path.get());
             if (document.isPresent()) {
-                fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), currentModificationTimeInSeconds, workDone, workMax);
+                fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), currentModificationTimeInSeconds, progressCounter.workDoneProperty(), progressCounter.workMaxProperty());
                 LOGGER.info("Embeddings for file \"{}\" were generated successfully, while processing entry {}", linkedFile.getLink(), citationKey);
             } else {
                 LOGGER.error("Unable to generate embeddings for file \"{}\", because JabRef was unable to extract text from the file, while processing entry {}", linkedFile.getLink(), citationKey);
@@ -115,7 +113,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
             Optional<Document> document = FileToDocument.fromFile(path.get());
             if (document.isPresent()) {
-                fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), 0, workDone, workMax);
+                fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), 0, progressCounter.workDoneProperty(), progressCounter.workMaxProperty());
                 LOGGER.info("Embeddings for file \"{}\" were generated successfully while processing entry {}, but the JabRef couldn't check if the file was changed", linkedFile.getLink(), citationKey);
             } else {
                 LOGGER.info("Unable to generate embeddings for file \"{}\" while processing entry {}, because JabRef was unable to extract text from the file", linkedFile.getLink(), citationKey);
@@ -124,24 +122,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     }
 
     private void updateProgress() {
-        Instant oneWorkTimeEnd = Instant.now();
-        Duration duration = Duration.between(oneWorkTimeStart, oneWorkTimeEnd);
-        oneWorkTimeStart = oneWorkTimeEnd;
-
-        Duration eta = duration.multipliedBy(workMax.get() - workDone.get());
-
-        updateProgress(workDone.get(), workMax.get());
-
-        if (eta.getSeconds() < 60) {
-            if (eta.getSeconds() == 0) {
-                updateMessage(Localization.lang("Estimated time left: %0 seconds", 3));
-            } else {
-                updateMessage(Localization.lang("Estimated time left: %0 seconds", eta.getSeconds()));
-            }
-        } else if (eta.getSeconds() % 60 == 0) {
-            updateMessage(Localization.lang("Estimated time left: %0 minutes", eta.getSeconds() / 60));
-        } else {
-            updateMessage(Localization.lang("Estimated time left: %0 minutes, %1 seconds", eta.getSeconds() / 60, eta.getSeconds() % 60));
-        }
+        updateProgress(progressCounter.getWorkDone(), progressCounter.getWorkMax());
+        updateMessage(progressCounter.getMessage());
     }
 }
