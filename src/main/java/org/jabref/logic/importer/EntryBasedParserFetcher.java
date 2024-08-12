@@ -12,6 +12,8 @@ import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
 
+import org.slf4j.LoggerFactory;
+
 /**
  * Provides a convenient interface for entry-based fetcher, which follow the usual three-step procedure:
  * 1. Open a URL based on the entry
@@ -36,16 +38,16 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetche
     default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
-        URL UrlForEntry;
+        URL urlForEntry;
         try {
-            if ((UrlForEntry = getURLForEntry(entry)) == null) {
+            if ((urlForEntry = getURLForEntry(entry)) == null) {
                 return Collections.emptyList();
             }
         } catch (MalformedURLException | URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         }
 
-        try (InputStream stream = new BufferedInputStream(UrlForEntry.openStream())) {
+        try (InputStream stream = new BufferedInputStream(urlForEntry.openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup
@@ -54,9 +56,11 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetche
             return fetchedEntries;
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
-            throw new FetcherException("A network error occurred", e);
+            //       Same TODO as in org.jabref.logic.net.URLDownload.openConnection. Code should be reused.
+            LoggerFactory.getLogger(EntryBasedParserFetcher.class).error("Could not fetch from URL {}", urlForEntry, e);
+            throw new FetcherException(urlForEntry, "A network error occurred", e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred", e);
+            throw new FetcherException(urlForEntry, "An internal parser error occurred", e);
         }
     }
 }

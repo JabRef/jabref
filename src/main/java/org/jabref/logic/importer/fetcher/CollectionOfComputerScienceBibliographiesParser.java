@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -38,7 +39,7 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
                     .collect(Collectors.joining());
 
             return bibtexParser.parseEntries(bibtexDataString);
-        } catch (IOException e) {
+        } catch (IOException | FetcherException e) {
             throw new ParseException(e);
         }
     }
@@ -51,7 +52,7 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
         }
     }
 
-    private List<String> parseBibtexStringsFromLinks(List<String> links) throws IOException {
+    private List<String> parseBibtexStringsFromLinks(List<String> links) throws IOException, FetcherException {
         List<String> bibtexStringsFromAllLinks = new ArrayList<>();
         for (String link : links) {
             try (InputStream inputStream = new URLDownload(link).asInputStream()) {

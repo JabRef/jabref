@@ -1,9 +1,10 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -54,31 +55,38 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getFieldLatexFree(StandardField.TITLE);
-        if (title.isPresent()) {
-            String response = makeServerRequest(title.get());
-            MrDLibImporter importer = new MrDLibImporter();
-            ParserResult parserResult;
-            try {
-                if (importer.isRecognizedFormat(response)) {
-                    parserResult = importer.importDatabase(response);
-                    heading = importer.getRecommendationsHeading();
-                    description = importer.getRecommendationsDescription();
-                    recommendationSetId = importer.getRecommendationSetId();
-                } else {
-                    // For displaying An ErrorMessage
-                    description = DEFAULT_MRDLIB_ERROR_MESSAGE;
-                    BibDatabase errorBibDataBase = new BibDatabase();
-                    parserResult = new ParserResult(errorBibDataBase);
-                }
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
-                throw new FetcherException("JSON Parser IOException.");
-            }
-            return parserResult.getDatabase().getEntries();
-        } else {
+        if (!title.isPresent()) {
             // without a title there is no reason to ask MrDLib
-            return new ArrayList<>(0);
+            return List.of();
         }
+
+        URL url;
+        try {
+            url = constructQuery(title.get());
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Invalid URL", e);
+        }
+
+        String response = makeServerRequest(url);
+        MrDLibImporter importer = new MrDLibImporter();
+        ParserResult parserResult;
+        try {
+            if (importer.isRecognizedFormat(response)) {
+                parserResult = importer.importDatabase(response);
+                heading = importer.getRecommendationsHeading();
+                description = importer.getRecommendationsDescription();
+                recommendationSetId = importer.getRecommendationSetId();
+            } else {
+                // For displaying An ErrorMessage
+                description = DEFAULT_MRDLIB_ERROR_MESSAGE;
+                BibDatabase errorBibDataBase = new BibDatabase();
+                parserResult = new ParserResult(errorBibDataBase);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while fetching", e);
+            throw new FetcherException(url, e);
+        }
+        return parserResult.getDatabase().getEntries();
     }
 
     public String getHeading() {
@@ -92,30 +100,25 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     /**
      * Contact the server with the title of the selected item
      *
-     * @param queryByTitle the query holds the title of the selected entry. Used to make a query to the MDL Server
      * @return Returns the server response. This is an XML document as a String.
      */
-    private String makeServerRequest(String queryByTitle) throws FetcherException {
-        try {
-            URLDownload urlDownload = new URLDownload(constructQuery(queryByTitle));
-            String response = urlDownload.asString();
+    private String makeServerRequest(URL url) throws FetcherException {
+        URLDownload urlDownload = new URLDownload(url);
+        String response = urlDownload.asString();
 
-            // Conversion of < and >
-            response = response.replace("&gt;", ">");
-            response = response.replace("&lt;", "<");
-            return response;
-        } catch (IOException e) {
-            throw new FetcherException("Problem downloading", e);
-        }
+        // Conversion of < and >
+        response = response.replace("&gt;", ">");
+        response = response.replace("&lt;", "<");
+        return response;
     }
 
     /**
      * Constructs the query based on title of the BibEntry. Adds statistical stuff to the url.
      *
-     * @param queryWithTitle the title of the bib entry.
+     * @param queryWithTitle the query holds the title of the selected entry. Used to make a query to the MDL Server
      * @return the string used to make the query at mdl server
      */
-    private String constructQuery(String queryWithTitle) {
+    private URL constructQuery(String queryWithTitle) throws URISyntaxException, MalformedURLException {
         // The encoding does not work for / so we convert them by our own
         queryWithTitle = queryWithTitle.replace("/", " ");
         URIBuilder builder = new URIBuilder();
@@ -136,13 +139,8 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             builder.addParameter("timezone", Calendar.getInstance().getTimeZone().getID());
         }
 
-        try {
-            URI uri = builder.build();
-            LOGGER.trace("Request: " + uri.toString());
-            return uri.toString();
-        } catch (URISyntaxException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return "";
+        URI uri = builder.build();
+        LOGGER.trace("Request: {}", uri.toString());
+        return uri.toURL();
     }
 }
