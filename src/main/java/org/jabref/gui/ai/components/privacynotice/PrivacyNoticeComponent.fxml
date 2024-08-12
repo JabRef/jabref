@@ -59,7 +59,7 @@
                       <Font size="14.0" />
                    </font>
                 </Text>
-                 <Hyperlink onAction="#onDjlPrivacyPolicyClick" text="%Here you can find details about the Privacy Policy of DJL.">
+                 <Hyperlink onAction="#onDjlPrivacyPolicyClick" style="-fx-padding: 0.166667em 0.25em 0.166667em 0.25em;" text="%You find information about the privacy policy here">
                      <font>
                          <Font size="14.0" />
                      </font>
