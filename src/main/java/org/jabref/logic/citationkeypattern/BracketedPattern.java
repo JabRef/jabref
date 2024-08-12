@@ -846,15 +846,7 @@ public class BracketedPattern {
      */
     static String authorsAlpha(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
-        int maxAuthors;
-        final boolean maxAuthorsExceeded;
-        if (authorList.getNumberOfAuthors() <= MAX_ALPHA_AUTHORS) {
-            maxAuthors = authorList.getNumberOfAuthors();
-            maxAuthorsExceeded = false;
-        } else {
-            maxAuthors = MAX_ALPHA_AUTHORS - 1;
-            maxAuthorsExceeded = true;
-        }
+        int maxAuthors = Math.min(authorList.getNumberOfAuthors(), MAX_ALPHA_AUTHORS);
 
         if (authorList.getNumberOfAuthors() == 1) {
             String[] firstAuthor = authorList.getAuthor(0).getNamePrefixAndFamilyName()
@@ -865,7 +857,7 @@ public class BracketedPattern {
             }
             // append last part of last name completely
             alphaStyle.append(firstAuthor[firstAuthor.length - 1], 0,
-                    Math.min(3, firstAuthor[firstAuthor.length - 1].length()));
+                    Math.min(4, firstAuthor[firstAuthor.length - 1].length()));
         } else {
             boolean andOthersPresent = authorList.getAuthor(maxAuthors - 1).equals(Author.OTHERS);
             if (andOthersPresent) {
@@ -874,7 +866,7 @@ public class BracketedPattern {
             List<String> vonAndLastNames = authorList.getAuthors().stream()
                                                      .limit(maxAuthors)
                                                      .map(Author::getNamePrefixAndFamilyName)
-                                                     .collect(Collectors.toList());
+                                                     .toList();
             for (String vonAndLast : vonAndLastNames) {
                 // replace all whitespaces by " "
                 // split the lastname at " "
@@ -883,9 +875,6 @@ public class BracketedPattern {
                     // use first character of each part of lastname
                     alphaStyle.append(part, 0, 1);
                 }
-            }
-            if (andOthersPresent || maxAuthorsExceeded) {
-                alphaStyle.append("+");
             }
         }
         return alphaStyle.toString();
