@@ -45,24 +45,6 @@ public class FetcherException extends JabRefException {
         this.url = url.toString();
     }
 
-    /**
-     * @param dummy Required to distinguish of {@link FetcherException#FetcherException(String, Throwable)}, which is for a FetcherException with an error message
-     */
-    private FetcherException(String url, Throwable cause, Object dummy) {
-        super(cause);
-        httpResponse = null;
-        this.url = url;
-    }
-
-    /**
-     * @param dummy Required to distinguish of {@link FetcherException#FetcherException(String, String, Throwable)}, which is for a localized FetcherException
-     */
-    private FetcherException(String url, String errorMessage, Throwable cause, Object dummy) {
-        super(errorMessage, cause);
-        httpResponse = null;
-        this.url = url;
-    }
-
     public FetcherException(String errorMessage, Throwable cause) {
         // TODO: Convert IOException e to FetcherClientException
         //       Same TODO as in org.jabref.logic.importer.EntryBasedParserFetcher.performSearch.
@@ -88,10 +70,6 @@ public class FetcherException extends JabRefException {
         super(errorMessage, localizedMessage, cause);
         httpResponse = null;
         url = null;
-    }
-
-    public static FetcherException ofUrl(String url, String errorMessage, Throwable cause) {
-        return new FetcherException(url, errorMessage, cause, null);
     }
 
     public static FetcherException of(URL url, SimpleHttpResponse simpleHttpResponse) {
