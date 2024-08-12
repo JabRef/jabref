@@ -397,18 +397,6 @@ public class URLDownload {
         } catch (IOException e) {
             throw new FetcherException("Error opening connection", e);
         }
-        connection.setConnectTimeout((int) connectTimeout.toMillis());
-        for (Entry<String, String> entry : this.parameters.entrySet()) {
-            connection.setRequestProperty(entry.getKey(), entry.getValue());
-        }
-        if (!this.postData.isEmpty()) {
-            connection.setDoOutput(true);
-            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
-                wr.writeBytes(this.postData);
-            } catch (IOException e) {
-                throw new FetcherException("Could not write output", e);
-            }
-        }
 
         if (connection instanceof HttpURLConnection httpURLConnection) {
             int status;
