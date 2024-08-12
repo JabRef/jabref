@@ -49,7 +49,7 @@ These third-party services are the following:
 | [Collection of Computer Science Bibliographies](https://en.wikipedia.org/wiki/Collection_of_Computer_Science_Bibliographies) | **currently unavailable**, offline  |
 | [CrossRef](https://www.crossref.org/)                                                                                        | <https://www.crossref.org/operations-and-sustainability/privacy/> |
 | [dblp](https://dblp.uni-trier.de/)                                                                                           | <https://dblp.uni-trier.de/db/about/privacy.html> |
-| [DJL](https://djl.ai/)                                                                                            | <https://github.com/deepjavalibrary/djl/discussions/3370#discussioncomment-10233632> |
+| [DJL (Deep Java Library)](https://djl.ai/)                                                                                   | <https://github.com/deepjavalibrary/djl/discussions/3370#discussioncomment-10233632> |
 | [Directory of Open Access Books](https://www.doabooks.org/)                                                                  | <https://www.doabooks.org/en/resources/accessibility> |
 | [Digitala Vetenskapliga Arkivet](https://www.diva-portal.org/)                                                               | <https://www.uu.se/en/about-uu/data-protection-policy/> |
 | [DOI Foundation](https://www.doi.org/)                                                                                       | <https://www.doi.org/privacy-policy/> |
