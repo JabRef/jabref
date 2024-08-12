@@ -67,7 +67,7 @@ public class AiService implements AutoCloseable {
 
             mvStore = MVStore.open(mvStorePath.toString());
         } catch (Exception e) {
-            LOGGER.error("An error occurred while creating directories for AI cache and chat history. Chat history will not be remembered in next session", e);
+            LOGGER.error("An error occurred while creating directories for AI cache and chat history. Chat history will not be remembered in next session.", e);
             dialogService.notify(Localization.lang("An error occurred while creating directories for AI cache and chat history. Chat history will not be remembered in next session"));
             mvStore = MVStore.open(null);
         }
