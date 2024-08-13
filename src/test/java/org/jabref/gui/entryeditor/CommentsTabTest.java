@@ -15,6 +15,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -78,7 +79,7 @@ class CommentsTabTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
         when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
@@ -99,7 +100,8 @@ class CommentsTabTest {
                 stateManager,
                 themeManager,
                 taskExecutor,
-                journalAbbreviationRepository
+                journalAbbreviationRepository,
+                mock(LuceneManager.class)
         );
     }
 

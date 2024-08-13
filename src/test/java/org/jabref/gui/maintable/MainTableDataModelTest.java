@@ -12,7 +12,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
-import org.jabref.gui.StateManager;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -34,7 +33,7 @@ class MainTableDataModelTest {
         NameDisplayPreferences nameDisplayPreferences = new NameDisplayPreferences(NameDisplayPreferences.DisplayStyle.AS_IS, NameDisplayPreferences.AbbreviationStyle.FULL);
         SimpleObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
         ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
-                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter, new StateManager()));
+                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
         FilteredList<BibEntryTableViewModel> entriesFiltered = new FilteredList<>(entriesViewModel);
         IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));
@@ -49,18 +48,18 @@ class MainTableDataModelTest {
         BibEntry bibEntryAuthorT = new BibEntry().withField(StandardField.AUTHOR, "T");
         entries.add(bibEntryAuthorT);
 
-        List<BibEntry> result = entriesFilteredAndSorted.stream().map(entry -> entry.getEntry()).toList();
+        List<BibEntry> result = entriesFilteredAndSorted.stream().map(BibEntryTableViewModel::getEntry).toList();
         assertEquals(List.of(bibEntryAuthorT), result);
 
         BibEntry bibEntryNothingToZ = new BibEntry();
         entries.add(bibEntryNothingToZ);
-        result = entriesFilteredAndSorted.stream().map(entry -> entry.getEntry()).toList();
+        result = entriesFilteredAndSorted.stream().map(BibEntryTableViewModel::getEntry).toList();
         assertEquals(List.of(bibEntryNothingToZ, bibEntryAuthorT), result);
 
         changed[0] = false;
         bibEntryNothingToZ.setField(StandardField.AUTHOR, "Z");
         assertTrue(changed[0]);
-        result = entriesFilteredAndSorted.stream().map(entry -> entry.getEntry()).toList();
+        result = entriesFilteredAndSorted.stream().map(BibEntryTableViewModel::getEntry).toList();
         assertEquals(List.of(bibEntryAuthorT, bibEntryNothingToZ), result);
     }
 }

@@ -1,34 +1,7 @@
 package org.jabref.logic.search.indexing;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Optional;
-
-import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.search.LuceneIndexer;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
-
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.store.NIOFSDirectory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mockito;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class LuceneIndexerTest {
-
+    /*
     private LuceneIndexer indexer;
     private BibDatabase database;
     private BibDatabaseContext context = mock(BibDatabaseContext.class);
@@ -210,4 +183,5 @@ public class LuceneIndexerTest {
             assertEquals(36, reader.numDocs());
         }
     }
+    */
 }

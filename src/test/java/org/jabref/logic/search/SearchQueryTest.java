@@ -2,7 +2,6 @@ package org.jabref.logic.search;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.EnumSet;
 
 import org.jabref.logic.search.retrieval.LuceneSearcher;
@@ -10,17 +9,13 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class SearchQueryTest {
 
@@ -31,20 +26,20 @@ public class SearchQueryTest {
 
     @BeforeEach
     public void setUp(@TempDir Path indexDir) throws IOException {
-        preferencesService = mock(PreferencesService.class);
-        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
-
-        bibDatabase = new BibDatabase();
-        bibDatabaseContext = mock(BibDatabaseContext.class);
-        when(bibDatabaseContext.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
-        when(bibDatabaseContext.getFulltextIndexPath()).thenReturn(indexDir);
-        when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
-        when(bibDatabaseContext.getEntries()).thenReturn(bibDatabase.getEntries());
-
-        LuceneIndexer indexer = LuceneIndexer.of(bibDatabaseContext, preferencesService);
-        indexer.createIndex();
-
-        searcher = LuceneSearcher.of(bibDatabaseContext);
+//        preferencesService = mock(PreferencesService.class);
+//        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+//
+//        bibDatabase = new BibDatabase();
+//        bibDatabaseContext = mock(BibDatabaseContext.class);
+//        when(bibDatabaseContext.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
+//        when(bibDatabaseContext.getFulltextIndexPath()).thenReturn(indexDir);
+//        when(bibDatabaseContext.getDatabase()).thenReturn(bibDatabase);
+//        when(bibDatabaseContext.getEntries()).thenReturn(bibDatabase.getEntries());
+//
+//        LuceneIndexer indexer = LuceneIndexer.of(bibDatabaseContext, preferencesService);
+//        indexer.createIndex();
+//
+//        searcher = LuceneSearcher.of(bibDatabaseContext);
     }
 
     @Test

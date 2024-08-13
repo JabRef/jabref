@@ -53,6 +53,7 @@ public final class DocumentReader {
             }
         } catch (IOException e) {
             LOGGER.warn("Could not read {}", resolvedPdfPath.toAbsolutePath(), e);
+            return pages;
         }
         if (pages.isEmpty()) {
             Document newDocument = new Document();
