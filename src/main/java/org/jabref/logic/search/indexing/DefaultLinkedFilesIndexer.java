@@ -135,7 +135,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         }
 
         task.willBeRecoveredAutomatically(true);
-        task.setTitle(Localization.lang("Indexing pdf files for %0", libraryName));
+        task.setTitle(Localization.lang("Indexing PDF files for %0", libraryName));
         LOGGER.debug("Adding {} files to index", linkedFiles.size());
         int i = 1;
         for (Map.Entry<String, Pair<Long, Path>> entry : linkedFiles.entrySet()) {
