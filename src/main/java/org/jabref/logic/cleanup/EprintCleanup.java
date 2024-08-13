@@ -20,7 +20,7 @@ public class EprintCleanup implements CleanupJob {
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
 
-        for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE)) {
+        for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE, StandardField.EID)) {
             Optional<ArXivIdentifier> arXivIdentifier = entry.getField(field).flatMap(ArXivIdentifier::parse);
 
             if (arXivIdentifier.isPresent()) {
@@ -45,6 +45,8 @@ public class EprintCleanup implements CleanupJob {
                 }
             }
         }
+        entry.clearField(StandardField.VERSION).ifPresent(changes::add);
+        entry.clearField(StandardField.INSTITUTION).ifPresent(changes::add);
 
         return changes;
     }
