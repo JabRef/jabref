@@ -23,6 +23,7 @@ import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.ai.AiApiKeyProvider;
 import org.jabref.preferences.ai.AiPreferences;
 import org.jabref.preferences.ai.AiProvider;
 import org.jabref.preferences.ai.EmbeddingModel;
@@ -79,6 +80,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty disableExpertSettings = new SimpleBooleanProperty(true);
 
     private final AiPreferences aiPreferences;
+    private final AiApiKeyProvider aiApiKeyProvider;
 
     private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
@@ -91,8 +93,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator ragMaxResultsCountValidator;
     private final Validator ragMinScoreValidator;
 
-    public AiTabViewModel(PreferencesService preferencesService) {
+    public AiTabViewModel(PreferencesService preferencesService, AiApiKeyProvider aiApiKeyProvider) {
         this.aiPreferences = preferencesService.getAiPreferences();
+        this.aiApiKeyProvider = aiApiKeyProvider;
 
         this.enableAi.addListener((observable, oldValue, newValue) -> {
             disableBasicSettings.set(!newValue);
@@ -271,9 +274,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         mistralAiChatModel.setValue(aiPreferences.getMistralAiChatModel());
         huggingFaceChatModel.setValue(aiPreferences.getHuggingFaceChatModel());
 
-        openAiApiKey.setValue(aiPreferences.getOpenAiApiKey());
-        mistralAiApiKey.setValue(aiPreferences.getMistralAiApiKey());
-        huggingFaceApiKey.setValue(aiPreferences.getHuggingFaceApiKey());
+        openAiApiKey.setValue(aiApiKeyProvider.getApiKeyForAiProvider(AiProvider.OPEN_AI));
+        mistralAiApiKey.setValue(aiApiKeyProvider.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
+        huggingFaceApiKey.setValue(aiApiKeyProvider.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
 
         customizeExpertSettings.setValue(aiPreferences.getCustomizeExpertSettings());
 
@@ -304,9 +307,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setMistralAiChatModel(mistralAiChatModel.get() == null ? "" : mistralAiChatModel.get());
         aiPreferences.setHuggingFaceChatModel(huggingFaceChatModel.get() == null ? "" : huggingFaceChatModel.get());
 
-        aiPreferences.setOpenAiApiKey(openAiApiKey.get() == null ? "" : openAiApiKey.get());
-        aiPreferences.setMistralAiApiKey(mistralAiApiKey.get() == null ? "" : mistralAiApiKey.get());
-        aiPreferences.setHuggingFaceApiKey(huggingFaceApiKey.get() == null ? "" : huggingFaceApiKey.get());
+        aiApiKeyProvider.storeAiApiKeyInKeyring(AiProvider.OPEN_AI, openAiApiKey.get() == null ? "" : openAiApiKey.get());
+        aiApiKeyProvider.storeAiApiKeyInKeyring(AiProvider.MISTRAL_AI, mistralAiApiKey.get() == null ? "" : openAiApiKey.get());
+        aiApiKeyProvider.storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE, huggingFaceApiKey.get() == null ? "" : openAiApiKey.get());
 
         aiPreferences.setCustomizeExpertSettings(customizeExpertSettings.get());
 

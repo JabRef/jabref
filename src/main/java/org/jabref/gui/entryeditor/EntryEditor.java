@@ -63,6 +63,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.ai.AiApiKeyProvider;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -110,6 +111,7 @@ public class EntryEditor extends BorderPane {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
+    @Inject private AiApiKeyProvider aiApiKeyProvider;
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
@@ -312,8 +314,8 @@ public class EntryEditor extends BorderPane {
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor, libraryTab.searchQueryProperty()));
-        tabs.add(new AiSummaryTab(libraryTab.getLibraryTabContainer(), dialogService, preferencesService, aiService, libraryTab.getBibDatabaseContext(), taskExecutor));
-        tabs.add(new AiChatTab(libraryTab.getLibraryTabContainer(), dialogService, preferencesService, aiService, libraryTab.getBibDatabaseContext(), taskExecutor));
+        tabs.add(new AiSummaryTab(libraryTab.getLibraryTabContainer(), dialogService, preferencesService, aiApiKeyProvider, aiService, libraryTab.getBibDatabaseContext(), taskExecutor));
+        tabs.add(new AiChatTab(libraryTab.getLibraryTabContainer(), dialogService, preferencesService, aiApiKeyProvider, aiService, libraryTab.getBibDatabaseContext(), taskExecutor));
 
         return tabs;
     }

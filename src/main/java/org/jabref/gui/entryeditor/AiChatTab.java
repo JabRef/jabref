@@ -31,6 +31,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.ai.AiApiKeyProvider;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -47,19 +48,24 @@ public class AiChatTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
+    private final AiApiKeyProvider aiApiKeyProvider;
 
     private final List<BibEntry> entriesUnderIngestion = new ArrayList<>();
 
     public AiChatTab(LibraryTabContainer libraryTabContainer,
                      DialogService dialogService,
                      PreferencesService preferencesService,
+                     AiApiKeyProvider aiApiKeyProvider,
                      AiService aiService,
                      BibDatabaseContext bibDatabaseContext,
                      TaskExecutor taskExecutor) {
         this.libraryTabContainer = libraryTabContainer;
         this.dialogService = dialogService;
+
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.aiApiKeyProvider = aiApiKeyProvider;
+
         this.aiService = aiService;
         this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
@@ -84,11 +90,14 @@ public class AiChatTab extends EntryEditorTab {
         }
     }
 
+    /**
+     * @implNote Method similar to {@link AiSummaryTab#bindToEntry(BibEntry)}
+     */
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (!aiService.getPreferences().getEnableAi()) {
             showPrivacyNotice(entry);
-        } else if (aiService.getPreferences().getSelectedApiKey().isEmpty()) {
+        } else if (aiApiKeyProvider.getApiKeyForAiProvider(aiService.getPreferences().getAiProvider()).isEmpty()) {
             showApiKeyMissing();
         } else if (entry.getFiles().isEmpty()) {
             showErrorNoFiles();

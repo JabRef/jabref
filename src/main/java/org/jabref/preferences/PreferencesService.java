@@ -40,7 +40,6 @@ import org.jvnet.hk2.annotations.Contract;
 
 @Contract
 public interface PreferencesService {
-
     void clear() throws BackingStoreException;
 
     void deleteKey(String key) throws IllegalArgumentException;

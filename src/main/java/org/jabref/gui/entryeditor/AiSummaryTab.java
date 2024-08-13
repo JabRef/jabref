@@ -26,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.ai.AiApiKeyProvider;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -41,20 +42,23 @@ public class AiSummaryTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
     private final CitationKeyGenerator citationKeyGenerator;
+    private final AiApiKeyProvider aiApiKeyProvider;
     private final AiService aiService;
 
     private final List<BibEntry> entriesUnderSummarization = new ArrayList<>();
 
     public AiSummaryTab(LibraryTabContainer libraryTabContainer,
-                     DialogService dialogService,
-                     PreferencesService preferencesService,
-                     AiService aiService,
-                     BibDatabaseContext bibDatabaseContext,
-                     TaskExecutor taskExecutor) {
+                        DialogService dialogService,
+                        PreferencesService preferencesService,
+                        AiApiKeyProvider aiApiKeyProvider,
+                        AiService aiService,
+                        BibDatabaseContext bibDatabaseContext,
+                        TaskExecutor taskExecutor) {
         this.libraryTabContainer = libraryTabContainer;
         this.dialogService = dialogService;
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.aiApiKeyProvider = aiApiKeyProvider;
         this.aiService = aiService;
         this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
@@ -78,11 +82,14 @@ public class AiSummaryTab extends EntryEditorTab {
         }
     }
 
+    /**
+     * @implNote Method similar to {@link AiChatTab#bindToEntry(BibEntry)}
+     */
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (!aiService.getPreferences().getEnableAi()) {
             showPrivacyNotice(entry);
-        } else if (aiService.getPreferences().getSelectedApiKey().isEmpty()) {
+        } else if (aiApiKeyProvider.getApiKeyForAiProvider(aiService.getPreferences().getAiProvider()).isEmpty()) {
             showApiKeyMissing();
         } else if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             showErrorNoDatabasePath();

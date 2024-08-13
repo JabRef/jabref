@@ -127,6 +127,7 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.ai.AiApiKeyProvider;
 import org.jabref.preferences.ai.AiPreferences;
 import org.jabref.preferences.ai.AiProvider;
 import org.jabref.preferences.ai.EmbeddingModel;
@@ -154,7 +155,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Service
-public class JabRefPreferences implements PreferencesService {
+public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
 
     // Push to application preferences
     public static final String PUSH_EMACS_PATH = "emacsPath";
@@ -2817,24 +2818,6 @@ public class JabRefPreferences implements PreferencesService {
         EasyBind.listen(aiPreferences.mistralAiChatModelProperty(), (obs, oldValue, newValue) -> put(AI_MISTRAL_AI_CHAT_MODEL, newValue));
         EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (obs, oldValue, newValue) -> put(AI_HUGGING_FACE_CHAT_MODEL, newValue));
 
-        EasyBind.listen(aiPreferences.openAiApiKeyProperty(), (obs, oldValue, newValue) -> {
-            if (aiPreferences.getEnableAi()) {
-                storeAiApiKeyInKeyring(AiProvider.OPEN_AI, newValue);
-            }
-        });
-
-        EasyBind.listen(aiPreferences.mistralAiApiKeyProperty(), (obs, oldValue, newValue) -> {
-            if (aiPreferences.getEnableAi()) {
-                storeAiApiKeyInKeyring(AiProvider.MISTRAL_AI, newValue);
-            }
-        });
-
-        EasyBind.listen(aiPreferences.huggingFaceApiKeyProperty(), (obs, oldValue, newValue) -> {
-            if (aiPreferences.getEnableAi()) {
-                storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE, newValue);
-            }
-        });
-
         EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
         EasyBind.listen(aiPreferences.openAiApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_OPEN_AI_API_BASE_URL, newValue));
@@ -2867,7 +2850,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private void storeAiApiKeyInKeyring(AiProvider aiProvider, String newKey) {
+    public void storeAiApiKeyInKeyring(AiProvider aiProvider, String newKey) {
         try (final Keyring keyring = Keyring.create()) {
             if (StringUtil.isNullOrEmpty(newKey)) {
                 try {
