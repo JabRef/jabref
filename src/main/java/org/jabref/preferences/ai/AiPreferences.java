@@ -42,6 +42,8 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
+    private Runnable apiKeyChangeListener;
+
     public AiPreferences(PreferencesService preferencesService,
                          boolean enableAi,
                          AiProvider aiProvider,
@@ -416,5 +418,16 @@ public class AiPreferences {
         } else {
             return AiDefaultPreferences.PROVIDERS_API_URLS.get(aiProvider.get());
         }
+    }
+
+    public void setApiKeyChangeListener(Runnable apiKeyChangeListener) {
+        this.apiKeyChangeListener = apiKeyChangeListener;
+    }
+
+    /**
+     * Notify that the API key has been updated.
+     */
+    public void apiKeyUpdated() {
+        apiKeyChangeListener.run();
     }
 }
