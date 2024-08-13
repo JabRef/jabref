@@ -12,12 +12,10 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -34,11 +32,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.entry.Author;
-import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.Keyword;
-import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
@@ -61,28 +55,19 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final NormalizePagesFormatter pagesFormatter = new NormalizePagesFormatter();
 
-    private final Map<String, Author> knownPersons = new HashMap<>();
-    private final Map<String, Keyword> knownKeywords = new HashMap<>();
-    private final Map<String, String> knownPublishers = new HashMap<>();
     private final XMLInputFactory xmlInputFactory;
-    private Map<String, String> refIdWithAuthors = new HashMap<>();
-    private Map<String, String> refIdWithEditors = new HashMap<>();
-    private Map<String, String> refIdWithKeywords = new HashMap<>();
-    private Map<String, String> refIdWithPublishers = new HashMap<>();
-
-    private List<Author> persons;
-    private List<Keyword> keywords;
-    private List<String> publishers;
-
-    private String refAuthors;
-    private String refEditors;
-    private String refKeywords;
-    private String refPublishers;
+    private List<String> refIdWithAuthors = new ArrayList<String>();
+    private List<String> refIdWithEditors = new ArrayList<String>();
+    private List<String> refIdWithKeywords = new ArrayList<String>();
+    private List<String> refIdWithPublishers = new ArrayList<String>();
 
     private XmlMapper mapper;
 
     public CitaviXmlImporter() {
         xmlInputFactory = XMLInputFactory.newFactory();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
     }
 
     @Override
@@ -128,7 +113,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
-        List<BibEntry> bibEntries = null;
+        List<BibEntry> bibEntries = new ArrayList<BibEntry>();
 
         try (BufferedReader reader = getReaderFromZip(filePath)) {
             Object mapperObject = mapperRoot(reader);
@@ -147,42 +132,25 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private List<BibEntry> parseDataList(XMLStreamReader reader) {
-        List<BibEntry> bibEntries = null;
-        String lastName = "";
-        String foreName = "";
+        List<BibEntry> bibEntries = new ArrayList<BibEntry>();
 
         try {
             while (reader.hasNext()) {
                 reader.next();
                 String elementName = reader.getName().getLocalPart();
 
-                if (elementName == null) {
-                    break;
-                } else {
-                    if (elementName.equals("Author")) {
-                        this.refIdWithAuthors.put("PersonList", reader.getText());
-                        bibEntries.add(new BibEntry(reader.getText()));
-                    }
-                    if (elementName.equals("LastName")) {
-                        reader.next();
-                        lastName = reader.getText();
-                    }
-                    if (elementName.equals("ForeName")){
-                        reader.next();
-                        foreName = reader.getText();
-                        persons.add(new Author(lastName, "", "", foreName, ""));
-                    }
-                    if (elementName.equals("PublisherLocation"))       {
-                        this.refIdWithEditors.put("", reader.getText());
-                    }
-                    if (elementName.equals("Keyword")) {
-                        this.refIdWithKeywords.put("KeywordList", reader.getText());
-                        keywords.add(new Keyword(reader.getText()));
-                    }
-                    if (elementName.equals("PublisherName")) {
-                        this.refIdWithPublishers.put("PublisherList", reader.getText());
-                        publishers.add(reader.getText());
-                    }
+                if (elementName.equals("Author")) {
+                    this.refIdWithAuthors.add(reader.getText());
+                    bibEntries.add(new BibEntry(reader.getText()));
+                }
+                if (elementName.equals("PublisherLocation")) {
+                    this.refIdWithEditors.add(reader.getText());
+                }
+                if (elementName.equals("Keyword")) {
+                    this.refIdWithKeywords.add(reader.getText());
+                }
+                if (elementName.equals("PublisherName")) {
+                    this.refIdWithPublishers.add(reader.getText());
                 }
             }
         } catch (XMLStreamException e) {
@@ -202,50 +170,40 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 String elementName = reader.getName().getLocalPart();
 
                 if (elementName.equals("Title")) {
-                    Optional.ofNullable(reader.getText())
-                        .ifPresent(value -> entry.setField(StandardField.TITLE,     clean(value)));
+                    entry.setField(StandardField.TITLE,     reader.getText());
                 }
                 if (elementName.equals("Abstract")) {
-                    Optional.ofNullable(reader.getText())
-                        .ifPresent(value -> entry.setField(StandardField.ABSTRACT, clean(value)));
+                    entry.setField(StandardField.ABSTRACT, reader.getText());
                 }
                 if (elementName.equals("Year")) {
-                    Optional.ofNullable(reader.getText())
-                        .ifPresent(value -> entry.setField(StandardField.YEAR, clean(value)));
+                    entry.setField(StandardField.YEAR, reader.getText());
                 }
                 if (elementName.equals("doi")) {
-                    Optional.ofNullable(reader.getText())
-                        .ifPresent(value ->         entry.setField(StandardField.DOI, clean(value)));
+                    entry.setField(StandardField.DOI, reader.getText());
                 }
                 if (elementName.equals("Isbn")) {
-                    Optional.ofNullable(reader.getText())
-                        .ifPresent(value -> entry.setField(StandardField.ISBN, clean(value)));
+                    entry.setField(StandardField.ISBN, reader.getText());
                 }
 
-                String pages = clean(getPages(reader));
+                String pages = getPages(reader);
                 // Cleans also unicode minus signs
                 pages = pagesFormatter.format(pages);
                 entry.setField(StandardField.PAGES, pages);
 
                 if (elementName.equals("Volume")) {
-                    Optional.ofNullable(reader.getText())
-                        .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
+                    entry.setField(StandardField.VOLUME, reader.getText());
                 }
                 if (elementName.equals("Author")) {
-                    Optional.ofNullable(getAuthorName(reader.getText    ()))
-                        .ifPresent(value -> entry.setField(StandardField.AUTHOR, clean(value)));
+                    entry.setField(StandardField.AUTHOR, getAuthorName(reader.getText()));
                 }
                 if (elementName.equals("Editor")) {
-                    Optional.ofNullable(getEditorName(reader.getText    ()))
-                        .ifPresent(value -> entry.setField(StandardField.EDITOR, clean(value)));
+                    entry.setField(StandardField.EDITOR, getEditorName(reader.getText()));
                 }
                 if (elementName.equals("Keyword")) {
-                    Optional.ofNullable(getKeywords(reader.getText()))
-                        .ifPresent(value -> entry.setField(StandardField.KEYWORDS, clean(value)));
+                    entry.setField(StandardField.KEYWORDS, getKeywords(reader.getText()));
                 }
                 if (elementName.equals("Publisher")) {
-                    Optional.ofNullable(getPublisher(reader.getText()))
-                        .ifPresent(value -> entry.setField(StandardField.PUBLISHER, clean(value)));
+                    entry.setField(StandardField.PUBLISHER, getPublisher(reader.getText()));
                 }
             }
         } catch (XMLStreamException e) {
@@ -313,32 +271,32 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getAuthorName(String data) {
-        if (refAuthors == null) {
+        if (refIdWithAuthors.isEmpty()) {
             return null;
         }
 
-        return this.refIdWithAuthors.get(data);
+        return this.refIdWithAuthors.get(refIdWithAuthors.indexOf(data));
     }
 
     private String getEditorName(String data) {
-        if (refEditors == null) {
+        if (refIdWithEditors.isEmpty()) {
             return null;
         }
-        return this.refIdWithEditors.get(data);
+        return this.refIdWithEditors.get(refIdWithEditors.indexOf(data));
     }
 
     private String getKeywords(String data) {
-        if (refKeywords == null) {
+        if (refIdWithKeywords.isEmpty()) {
             return null;
         }
-        return this.refIdWithKeywords.get(data);
+        return this.refIdWithKeywords.get(refIdWithKeywords.indexOf(data));
     }
 
     private String getPublisher(String data) {
-        if (refPublishers == null) {
+        if (refIdWithPublishers.isEmpty()) {
             return null;
         }
-        return this.refIdWithPublishers.get(data);
+        return this.refIdWithPublishers.get(refIdWithPublishers.indexOf(data));
     }
 
     String cleanUpText(String text) {
