@@ -94,12 +94,13 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
     }
 
     private void setupListeningToPreferencesChanges() {
-        aiPreferences.enableAiProperty().addListener(obs -> rebuild());
-        aiPreferences.aiProviderProperty().addListener(obs -> rebuild());
-        aiPreferences.customizeExpertSettingsProperty().addListener(obs -> rebuild());
-        aiPreferences.listenToChatModels(this::rebuild);
-        aiPreferences.listenToApiBaseUrls(this::rebuild);
-        aiPreferences.temperatureProperty().addListener(obs -> rebuild());
+        // Setting "langchainChatModel" to "Optional.empty()" will trigger a rebuild on the next usage
+        aiPreferences.enableAiProperty().addListener(obs -> langchainChatModel = Optional.empty());
+        aiPreferences.aiProviderProperty().addListener(obs -> langchainChatModel = Optional.empty());
+        aiPreferences.customizeExpertSettingsProperty().addListener(obs -> langchainChatModel = Optional.empty());
+        aiPreferences.listenToChatModels(() -> langchainChatModel = Optional.empty());
+        aiPreferences.listenToApiBaseUrls(() -> langchainChatModel = Optional.empty());
+        aiPreferences.temperatureProperty().addListener(obs -> langchainChatModel = Optional.empty());
     }
 
     @Override
@@ -118,7 +119,10 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
             } else if (apiKeyProvider.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, set OpenAI API key inside JabRef preferences (AI tab)."));
             } else {
-                throw new RuntimeException(Localization.lang("Unable to chat with AI."));
+                rebuild();
+                if (langchainChatModel.isEmpty()) {
+                    throw new RuntimeException(Localization.lang("Unable to chat with AI."));
+                }
             }
         }
 
