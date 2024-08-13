@@ -1,0 +1,3606 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CitaviExchangeData Version="5.4.0.2" FilePath="C:\Users\zumstein\Desktop\citavi-projekt\citavi-single.ctv5" Changeset="177">
+  <ProjectSettings>
+    <AutoSave>true</AutoSave>
+    <AttachmentsFolderPath></AttachmentsFolderPath>
+    <CacheId>7e60b160-8057-41b1-a8b2-5de485d35353</CacheId>
+    <ColorScheme>Yellow</ColorScheme>
+    <CustomFields>
+      <CustomFieldSettings>
+        <CompareType>Text</CompareType>
+        <DefaultValue />
+        <DropDownStyle>None</DropDownStyle>
+        <PropertyName>CoverPath</PropertyName>
+      </CustomFieldSettings>
+      <CustomFieldSettings>
+        <CompareType>Text</CompareType>
+        <DefaultValue />
+        <DropDownStyle>None</DropDownStyle>
+        <PropertyName>CustomField1</PropertyName>
+      </CustomFieldSettings>
+      <CustomFieldSettings>
+        <CompareType>Text</CompareType>
+        <DefaultValue />
+        <DropDownStyle>None</DropDownStyle>
+        <PropertyName>CustomField2</PropertyName>
+      </CustomFieldSettings>
+      <CustomFieldSettings>
+        <CompareType>Text</CompareType>
+        <DefaultValue />
+        <DropDownStyle>None</DropDownStyle>
+        <PropertyName>CustomField3</PropertyName>
+      </CustomFieldSettings>
+      <CustomFieldSettings>
+        <CompareType>Text</CompareType>
+        <DefaultValue />
+        <DropDownStyle>None</DropDownStyle>
+        <PropertyName>CustomField4</PropertyName>
+      </CustomFieldSettings>
+      <CustomFieldSettings>
+        <CompareType>Text</CompareType>
+        <DefaultValue />
+        <DropDownStyle>None</DropDownStyle>
+        <PropertyName>CustomField5</PropertyName>
+      </CustomFieldSettings>
+      <CustomFieldSettings>
+        <CompareType>Text</CompareType>
+        <DefaultValue />
+        <DropDownStyle>None</DropDownStyle>
+        <PropertyName>CustomField6</PropertyName>
+      </CustomFieldSettings>
+      <CustomFieldSettings>
+        <CompareType>Text</CompareType>
+        <DefaultValue />
+        <DropDownStyle>None</DropDownStyle>
+        <PropertyName>CustomField7</PropertyName>
+      </CustomFieldSettings>
+      <CustomFieldSettings>
+        <CompareType>Text</CompareType>
+        <DefaultValue />
+        <DropDownStyle>None</DropDownStyle>
+        <PropertyName>CustomField8</PropertyName>
+      </CustomFieldSettings>
+      <CustomFieldSettings>
+        <CompareType>Text</CompareType>
+        <DefaultValue />
+        <DropDownStyle>None</DropDownStyle>
+        <PropertyName>CustomField9</PropertyName>
+      </CustomFieldSettings>
+    </CustomFields>
+    <Description><![CDATA[This project is a sample and was created to illustrate some features of Citavi.
+2015-03-26]]></Description>
+    <LastChangeTime>26.11.2016 10:52:08</LastChangeTime>
+    <OptimizeForSlowDatabaseAccess>Auto</OptimizeForSlowDatabaseAccess>
+  </ProjectSettings>
+  <ProjectUserSettings>
+    <ActiveCategoryId>58be20c2-1d50-44f1-9825-64fd6976384b</ActiveCategoryId>
+    <LastReferenceId>0781d673-88c9-4c66-8eda-e3a6877cde78</LastReferenceId>
+    <ExpandedCategoryNodes><![CDATA[f3908a35-7af0-462f-a4c9-f5f6c4bb2eac|049de24f-992e-408f-8ed0-4bc058602b8f|cd3ac2ac-88f6-4055-ae74-b5ff11d08c2d]]></ExpandedCategoryNodes>
+    <ShowCategoryClassification>true</ShowCategoryClassification>
+    <SearchMruQueries><![CDATA[tüchtige]]></SearchMruQueries>
+    <SortOrder>
+      <SortProperty>
+        <ReferencePropertyId>AuthorsOrEditorsOrOrganizations</ReferencePropertyId>
+        <SortDirection>Ascending</SortDirection>
+      </SortProperty>
+      <SortProperty>
+        <ReferencePropertyId>YearResolved</ReferencePropertyId>
+        <SortDirection>Ascending</SortDirection>
+      </SortProperty>
+      <SortProperty>
+        <ReferencePropertyId>Title</ReferencePropertyId>
+        <SortDirection>Ascending</SortDirection>
+      </SortProperty>
+      <SortProperty>
+        <ReferencePropertyId>Volume</ReferencePropertyId>
+        <SortDirection>Ascending</SortDirection>
+      </SortProperty>
+      <SortProperty>
+        <ReferencePropertyId>Number</ReferencePropertyId>
+        <SortDirection>Ascending</SortDirection>
+      </SortProperty>
+    </SortOrder>
+    <SortOrderImport>
+      <SortProperty>
+        <ReferencePropertyId>AuthorsOrEditorsOrOrganizations</ReferencePropertyId>
+        <SortDirection>Ascending</SortDirection>
+      </SortProperty>
+      <SortProperty>
+        <ReferencePropertyId>YearResolved</ReferencePropertyId>
+        <SortDirection>Ascending</SortDirection>
+      </SortProperty>
+      <SortProperty>
+        <ReferencePropertyId>Title</ReferencePropertyId>
+        <SortDirection>Ascending</SortDirection>
+      </SortProperty>
+      <SortProperty>
+        <ReferencePropertyId>Volume</ReferencePropertyId>
+        <SortDirection>Ascending</SortDirection>
+      </SortProperty>
+      <SortProperty>
+        <ReferencePropertyId>Number</ReferencePropertyId>
+        <SortDirection>Ascending</SortDirection>
+      </SortProperty>
+    </SortOrderImport>
+  </ProjectUserSettings>
+  <Categories>
+    <Category id="cd3ac2ac-88f6-4055-ae74-b5ff11d08c2d">
+      <Name>Training methods</Name>
+    </Category>
+    <Category id="f3908a35-7af0-462f-a4c9-f5f6c4bb2eac">
+      <Name>Definitions</Name>
+    </Category>
+    <Category id="049de24f-992e-408f-8ed0-4bc058602b8f">
+      <Name>Information literacy specifics</Name>
+    </Category>
+    <Category id="89f4a959-1aea-4357-9ecb-c27efca35c16">
+      <Name>Findings about information literacy</Name>
+    </Category>
+    <Category id="bf16ab31-c042-4d9d-9ba7-0a9b3ce2a15c">
+      <Name>Finding information providers</Name>
+    </Category>
+    <Category id="48dbb991-fbb0-4554-91b9-f95f2c04de94">
+      <Name>Recognizing information needs</Name>
+    </Category>
+    <Category id="032f629c-ad3c-4b45-8ebc-c3a2ba6ffc35">
+      <Name>Evaluating search results</Name>
+    </Category>
+    <Category id="7e254f3e-0178-4e47-8302-fdf8d46875a5">
+      <Name>Information literacy</Name>
+    </Category>
+    <Category id="58be20c2-1d50-44f1-9825-64fd6976384b">
+      <Name>Formulating information needs</Name>
+    </Category>
+    <Category id="eaebe6f2-341b-4d77-b7e5-17cd2d22c53f">
+      <Name>Presenting the problem resolution</Name>
+    </Category>
+    <Category id="5e666d7e-8696-4902-a85c-472edb67830d">
+      <Name>On-site training</Name>
+    </Category>
+    <Category id="ea8cfe7b-78db-4aa8-900a-116d339f2433">
+      <Name>E-Learning</Name>
+    </Category>
+    <Category id="e5bdda7b-2f33-4e4d-a23a-65e02e8f4a05">
+      <Name>Applying results to problem resolution</Name>
+    </Category>
+    <Category id="ed777873-0854-4495-96f2-c31392b99d43">
+      <Name>Saving and organizing search results</Name>
+    </Category>
+    <Category id="02f00b04-a5ab-4192-970c-3ee2fccf68eb">
+      <Name>Using retrieval tools</Name>
+    </Category>
+    <Category id="245d3ae2-013d-4ca4-9a48-f34641829e84">
+      <Name>Media literacy</Name>
+    </Category>
+    <Category id="eb7866df-68b2-44fe-8d70-c4c0b055f419">
+      <Name>Computer literacy</Name>
+    </Category>
+    <Category id="7a085a40-2e4b-4542-8b4f-0856046c4354">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-03-26T14:05:28</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-03-26T14:05:28</ModifiedOn>
+      <Name>Scientific theoretical basics</Name>
+    </Category>
+  </Categories>
+  <CategoryCatgories>
+    <OnetoN>00000000-0000-0000-0000-000000000000;7a085a40-2e4b-4542-8b4f-0856046c4354;f3908a35-7af0-462f-a4c9-f5f6c4bb2eac;89f4a959-1aea-4357-9ecb-c27efca35c16;049de24f-992e-408f-8ed0-4bc058602b8f;cd3ac2ac-88f6-4055-ae74-b5ff11d08c2d</OnetoN>
+    <OnetoN>cd3ac2ac-88f6-4055-ae74-b5ff11d08c2d;5e666d7e-8696-4902-a85c-472edb67830d;ea8cfe7b-78db-4aa8-900a-116d339f2433</OnetoN>
+    <OnetoN>f3908a35-7af0-462f-a4c9-f5f6c4bb2eac;7e254f3e-0178-4e47-8302-fdf8d46875a5;245d3ae2-013d-4ca4-9a48-f34641829e84;eb7866df-68b2-44fe-8d70-c4c0b055f419</OnetoN>
+    <OnetoN>049de24f-992e-408f-8ed0-4bc058602b8f;48dbb991-fbb0-4554-91b9-f95f2c04de94;58be20c2-1d50-44f1-9825-64fd6976384b;bf16ab31-c042-4d9d-9ba7-0a9b3ce2a15c;02f00b04-a5ab-4192-970c-3ee2fccf68eb;032f629c-ad3c-4b45-8ebc-c3a2ba6ffc35;ed777873-0854-4495-96f2-c31392b99d43;e5bdda7b-2f33-4e4d-a23a-65e02e8f4a05;eaebe6f2-341b-4d77-b7e5-17cd2d22c53f</OnetoN>
+  </CategoryCatgories>
+  <Keywords>
+    <Keyword id="5244660d-0421-4f6c-ab64-fb0a8efde59d">
+      <Name>ACRL</Name>
+      <Notes>Acronym: Association of College and Research Libraries (approved IL standard)</Notes>
+      <Protected>true</Protected>
+      <SortFullName>acrl</SortFullName>
+      <UniqueFullName>8728523bd12bc78a05f4886735bb43155346e0e1</UniqueFullName>
+    </Keyword>
+    <Keyword id="55bb7501-91cd-40b5-80a9-feda76a7e27e">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <Name>Adult</Name>
+      <Protected>false</Protected>
+      <SortFullName>adult</SortFullName>
+      <UniqueFullName>805ffb11200d4554f6df4fcb98a8cad130a3fcb0</UniqueFullName>
+    </Keyword>
+    <Keyword id="3761ad3a-13dc-471b-b327-3bbebfec2861">
+      <Name>American Library Association</Name>
+      <Protected>true</Protected>
+      <SortFullName>american library association</SortFullName>
+      <UniqueFullName>450cfee96a44eedc12747d2ac3ed0655f5643d26</UniqueFullName>
+    </Keyword>
+    <Keyword id="88a5cb69-9d24-4a4a-8a2a-0334666015e9">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:14</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:14</ModifiedOn>
+      <Name>Attitude of Health Personnel</Name>
+      <Protected>false</Protected>
+      <SortFullName>attitude of health personnel</SortFullName>
+      <UniqueFullName>338692afa8f9c8fda14f67fbde99518272cebed5</UniqueFullName>
+    </Keyword>
+    <Keyword id="5caa7a9c-cc9b-444b-b7ce-3a3bb9328a3c">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:33:44</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:33:44</ModifiedOn>
+      <Name>Bluetooth technology</Name>
+      <Protected>false</Protected>
+      <SortFullName>bluetooth technology</SortFullName>
+      <UniqueFullName>0f172ec9d854493c039d284de42f086f770074be</UniqueFullName>
+    </Keyword>
+    <Keyword id="27046e49-7a55-4751-8551-24c538fac470">
+      <Name>CARS</Name>
+      <Protected>true</Protected>
+      <SortFullName>cars</SortFullName>
+      <UniqueFullName>557aca462404f6cc8a31af7458fcd9e35aa77725</UniqueFullName>
+    </Keyword>
+    <Keyword id="f920c0af-e561-4757-942f-56cb648734b5">
+      <Name>CAUL</Name>
+      <Notes>Acronym for Council of Australian University Librarians; extended ACRL standards</Notes>
+      <Protected>true</Protected>
+      <SortFullName>caul</SortFullName>
+      <UniqueFullName>6481c7cbbc3169fc7b9326c669f323278648450c</UniqueFullName>
+    </Keyword>
+    <Keyword id="cf37dfbf-7e3c-4753-a8ad-093c2e539168">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T11:32:46</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T11:32:46</ModifiedOn>
+      <Name>Citavi</Name>
+      <Protected>false</Protected>
+      <SortFullName>citavi</SortFullName>
+      <UniqueFullName>c8b73892194bb58edbdc8b2ae2edfa8d000ae7e7</UniqueFullName>
+    </Keyword>
+    <Keyword id="965bdd10-d1a7-4d7a-93eb-657b70a9054f">
+      <Name>computer literacy</Name>
+      <Protected>true</Protected>
+      <SortFullName>computer literacy</SortFullName>
+      <UniqueFullName>a1c00ca47e8de7b25886e70ae429ba3fb06c2fa4</UniqueFullName>
+    </Keyword>
+    <Keyword id="22412e24-e848-46b2-a342-cf8364610e47">
+      <Name>computer-aided learning</Name>
+      <Protected>true</Protected>
+      <SortFullName>computer-aided learning</SortFullName>
+      <UniqueFullName>71c3a13468eb6729b0a5ae8be77dfd34e767ada3</UniqueFullName>
+    </Keyword>
+    <Keyword id="c9a96fbc-d9b9-49d3-9c0a-effb2b682fb3">
+      <Name>continuing education</Name>
+      <Protected>true</Protected>
+      <SortFullName>continuing education</SortFullName>
+      <UniqueFullName>9576706f85e278ccc7cfe9e871886058250082e6</UniqueFullName>
+    </Keyword>
+    <Keyword id="27cf15c1-7e0f-4413-967e-e449c3ffed9f">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:14</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:14</ModifiedOn>
+      <Name>Cooperative Behavior</Name>
+      <Protected>false</Protected>
+      <SortFullName>cooperative behavior</SortFullName>
+      <UniqueFullName>0381708234c238ec98c777175944791d83e5f363</UniqueFullName>
+    </Keyword>
+    <Keyword id="91186e70-b125-4d74-b9f0-9abdcd49368c">
+      <Name>curriculum</Name>
+      <Protected>true</Protected>
+      <SortFullName>curriculum</SortFullName>
+      <UniqueFullName>62691682436eb9d40d36cba3fb77e1fd37c8f443</UniqueFullName>
+    </Keyword>
+    <Keyword id="471b243d-e8fc-4b9f-a0e2-9f7006f78465">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:11:43</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:11:43</ModifiedOn>
+      <Name>curriculum mapping</Name>
+      <Protected>false</Protected>
+      <SortFullName>curriculum mapping</SortFullName>
+      <UniqueFullName>567ea973127fc2a6319a13ecf27d26f637303df8</UniqueFullName>
+    </Keyword>
+    <Keyword id="495cd1ee-c56b-40ff-8c5e-a7715294f1dc">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <Name>Data Collection</Name>
+      <Protected>false</Protected>
+      <SortFullName>data collection</SortFullName>
+      <UniqueFullName>4a605bdb6c41335160fcd6c19e4bef490894b0e1</UniqueFullName>
+    </Keyword>
+    <Keyword id="b93a8a0e-1994-49a6-8a68-458438eeb27c">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:15</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:15</ModifiedOn>
+      <Name>Demography</Name>
+      <Protected>false</Protected>
+      <SortFullName>demography</SortFullName>
+      <UniqueFullName>501cdf16d97f42bf82be9bd5d84761778f90dd03</UniqueFullName>
+    </Keyword>
+    <Keyword id="e4bf21bf-7fa5-4fc1-8084-e7e63d1f7af1">
+      <Name>digital information resources</Name>
+      <Protected>true</Protected>
+      <SortFullName>digital information resources</SortFullName>
+      <UniqueFullName>014b22ccf1a2d69e250cfc306494b52ffaab32d9</UniqueFullName>
+    </Keyword>
+    <Keyword id="52cd0b4a-2ddc-48a4-a60f-c74042de890a">
+      <Name>digital libraries</Name>
+      <Protected>true</Protected>
+      <SortFullName>digital libraries</SortFullName>
+      <UniqueFullName>c4312eb0c60c333825c8cbd532fbb83bb51633ec</UniqueFullName>
+    </Keyword>
+    <Keyword id="bc22ce4f-90e3-4c74-8479-0ab026a10d8f">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <Name>Educational Measurement</Name>
+      <Protected>false</Protected>
+      <SortFullName>educational measurement</SortFullName>
+      <UniqueFullName>cbbdd4941dd2de7fe1202338f643ea91f47245b4</UniqueFullName>
+    </Keyword>
+    <Keyword id="473cf6b6-534d-4249-9373-6f49a79f9186">
+      <Name>E-Learning</Name>
+      <Protected>false</Protected>
+      <SortFullName>e-learning</SortFullName>
+      <UniqueFullName>c358e1103f158fb6a4aa648d07106140e0934209</UniqueFullName>
+    </Keyword>
+    <Keyword id="06ab9653-4505-4dde-b779-67b3058c8b52">
+      <Name>electronic information services</Name>
+      <Protected>true</Protected>
+      <SortFullName>electronic information services</SortFullName>
+      <UniqueFullName>703d1b21ffefe1b80378b5a0b5e3d413ef49d434</UniqueFullName>
+    </Keyword>
+    <Keyword id="10fbd3ac-ce58-4a42-aa8f-3db147961e10">
+      <Name>e-literacy</Name>
+      <Protected>true</Protected>
+      <SortFullName>e-literacy</SortFullName>
+      <UniqueFullName>749a7d5fc1b92219a01f02171dc08ad1c57679bf</UniqueFullName>
+    </Keyword>
+    <Keyword id="7da998f2-ddc6-4711-b95d-da0bfe144345">
+      <Name>e-tutoring</Name>
+      <Protected>true</Protected>
+      <SortFullName>e-tutoring</SortFullName>
+      <UniqueFullName>265a1aee37375a08fc49965af196233e49518bd2</UniqueFullName>
+    </Keyword>
+    <Keyword id="9d43b25b-fde4-4a99-ac9f-ccc0c2fba9ef">
+      <Name>evaluation</Name>
+      <Protected>false</Protected>
+      <SortFullName>evaluation</SortFullName>
+      <UniqueFullName>2bec4382e236ca046e38acd4b1b6dbff2a694480</UniqueFullName>
+    </Keyword>
+    <Keyword id="c6b7f7d9-bd3b-41f6-a537-4bbda13c1310">
+      <Name>historical development</Name>
+      <Protected>true</Protected>
+      <SortFullName>historical development</SortFullName>
+      <UniqueFullName>df599ea52c41f1a7a99e1d3fbc0129e9249cfd84</UniqueFullName>
+    </Keyword>
+    <Keyword id="8256913d-2959-4c5e-873c-1bab0ab84327">
+      <Name>independent learning</Name>
+      <Protected>true</Protected>
+      <SortFullName>independent learning</SortFullName>
+      <UniqueFullName>acfa24a1c040f195a500dab70e792224be8d9402</UniqueFullName>
+    </Keyword>
+    <Keyword id="49b49f7f-42e4-4da2-a25d-edbcba8022bb">
+      <Name>information literacy</Name>
+      <Protected>true</Protected>
+      <SortFullName>information literacy</SortFullName>
+      <UniqueFullName>b0d0b23bd692e1137a46b1ac6575a4d5ef05ec92</UniqueFullName>
+    </Keyword>
+    <Keyword id="332fcd5d-c074-4efc-b229-198ac6c839c2">
+      <Name>information management</Name>
+      <Protected>true</Protected>
+      <SortFullName>information management</SortFullName>
+      <UniqueFullName>e00031bcc65b182028e77dad674c8eec58fc668b</UniqueFullName>
+    </Keyword>
+    <Keyword id="ccf1741f-1d4d-42b4-9c43-6addc486d9e3">
+      <Name>information quality</Name>
+      <Protected>true</Protected>
+      <SortFullName>information quality</SortFullName>
+      <UniqueFullName>97741394ed283c4e8ae90bcc49d76bcb19c20601</UniqueFullName>
+    </Keyword>
+    <Keyword id="4079f54f-57be-4644-acd5-04f5975ad0a6">
+      <Name>information resources</Name>
+      <Protected>true</Protected>
+      <SortFullName>information resources</SortFullName>
+      <UniqueFullName>70ea2deac1c7bb452c7edf70b97168eff66f0d2a</UniqueFullName>
+    </Keyword>
+    <Keyword id="d99e9e2f-0953-4ab0-aa29-cb94ee8154bb">
+      <Name>information retrieval</Name>
+      <Protected>true</Protected>
+      <SortFullName>information retrieval</SortFullName>
+      <UniqueFullName>17498c51a44424a9612b2c33d27c6bf2c3ca1942</UniqueFullName>
+    </Keyword>
+    <Keyword id="ecd00afd-200b-4f55-98f7-c02b330609d3">
+      <Name>information sciences</Name>
+      <Protected>true</Protected>
+      <SortFullName>information sciences</SortFullName>
+      <UniqueFullName>1ed4b21418a22592e2a2dd1a218960fabc958753</UniqueFullName>
+    </Keyword>
+    <Keyword id="1d3b83cd-03f0-4714-ada4-fd903916f6b7">
+      <Name>information search process</Name>
+      <Protected>true</Protected>
+      <SortFullName>information search process</SortFullName>
+      <UniqueFullName>14cc69092f617917e366f15cb980f79baf94aa5f</UniqueFullName>
+    </Keyword>
+    <Keyword id="23c1c8b1-d412-4c2e-90c2-1d83752b9b8f">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:06</ModifiedOn>
+      <Name>Information technology</Name>
+      <Protected>false</Protected>
+      <SortFullName>information technology</SortFullName>
+      <UniqueFullName>efc70e69fb3c882255f68267c20e9cde882166c9</UniqueFullName>
+    </Keyword>
+    <Keyword id="a52109c9-2401-493f-976b-89cee5186a42">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:11:43</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:11:43</ModifiedOn>
+      <Name>institutional assessment</Name>
+      <Protected>false</Protected>
+      <SortFullName>institutional assessment</SortFullName>
+      <UniqueFullName>8db7a5093ad684f47225052f4207b39fb13f3e67</UniqueFullName>
+    </Keyword>
+    <Keyword id="4cc15841-80d0-4739-b4cb-2b56d99141d1">
+      <Name>instruction concepts</Name>
+      <Protected>true</Protected>
+      <SortFullName>instruction concepts</SortFullName>
+      <UniqueFullName>d89d158a6b5c82985a9d93c454a681df6a2cd83a</UniqueFullName>
+    </Keyword>
+    <Keyword id="bc83692b-b90a-45b8-89db-e007c2deca4b">
+      <Name>internet</Name>
+      <Protected>true</Protected>
+      <SortFullName>internet</SortFullName>
+      <UniqueFullName>b0d90560bc2353c73fe332ce8b1e758defef460d</UniqueFullName>
+    </Keyword>
+    <Keyword id="6601a5c3-cc84-4074-9ca4-f01100c35626">
+      <Name>investigation</Name>
+      <Protected>true</Protected>
+      <SortFullName>investigation</SortFullName>
+      <UniqueFullName>a127658b982d304d10f37b1b85c806024fa3849d</UniqueFullName>
+    </Keyword>
+    <Keyword id="b89844fc-295a-4fb7-9299-99130e2239c6">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:15</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:15</ModifiedOn>
+      <Name>Knowledge</Name>
+      <Protected>false</Protected>
+      <SortFullName>knowledge</SortFullName>
+      <UniqueFullName>773644ea7ec4cccaf0feedbcc78b55f3e317d862</UniqueFullName>
+    </Keyword>
+    <Keyword id="09f409af-a7b9-4092-b0ec-5dd594cb6b38">
+      <Name>knowledge management</Name>
+      <Protected>true</Protected>
+      <SortFullName>knowledge management</SortFullName>
+      <UniqueFullName>670c99969a3931b0bf75c912231129bfe9e28d50</UniqueFullName>
+    </Keyword>
+    <Keyword id="db8ff152-4bda-45f3-82c1-aa44f966a05e">
+      <Name>learning</Name>
+      <Protected>true</Protected>
+      <SortFullName>learning</SortFullName>
+      <UniqueFullName>c4880e97a69d355e4ca98f28fb2e31ff35430e24</UniqueFullName>
+    </Keyword>
+    <Keyword id="d55c2f87-3f8e-4e69-8327-17fb7e5df390">
+      <Name>learning success tracking</Name>
+      <Protected>true</Protected>
+      <SortFullName>learning success tracking</SortFullName>
+      <UniqueFullName>bf24e5944377108ebda5f438f9a2803da3bc57f0</UniqueFullName>
+    </Keyword>
+    <Keyword id="9ec3b366-7513-4313-820f-62007346f290">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:11:43</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:11:43</ModifiedOn>
+      <Name>librarians</Name>
+      <Protected>false</Protected>
+      <SortFullName>librarians</SortFullName>
+      <UniqueFullName>32bc7587902e96fbf3b7879cc018b5ee7c7c7fe5</UniqueFullName>
+    </Keyword>
+    <Keyword id="89b931eb-b0bd-46ac-9cf9-968ec39da8e5">
+      <Name>libraries</Name>
+      <Protected>true</Protected>
+      <SortFullName>libraries</SortFullName>
+      <UniqueFullName>88c7e611f005035bd1b45deb95e85f9a6244a84c</UniqueFullName>
+    </Keyword>
+    <Keyword id="a185b37b-ccb2-44a1-a7da-26988d2b7c06">
+      <Name>Library literacy</Name>
+      <Protected>true</Protected>
+      <SortFullName>library literacy</SortFullName>
+      <UniqueFullName>01e5b70ae513a98218ff7052fb674e37d395da3b</UniqueFullName>
+    </Keyword>
+    <Keyword id="32028786-9876-4e11-873c-dbd6bd2d6ab3">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:37:42</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:37:42</ModifiedOn>
+      <Name>long-term evaluation</Name>
+      <Protected>false</Protected>
+      <SortFullName>long-term evaluation</SortFullName>
+      <UniqueFullName>7274a60ad3cb28cbf908d68ac407fa96829d2a31</UniqueFullName>
+    </Keyword>
+    <Keyword id="baf1fdb2-e293-4691-9d40-e9ecd11fc386">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:06</ModifiedOn>
+      <Name>Management</Name>
+      <Protected>false</Protected>
+      <SortFullName>management</SortFullName>
+      <UniqueFullName>962b9e322a798ad361d166a99dd1afc6c4d9844e</UniqueFullName>
+    </Keyword>
+    <Keyword id="3ed7f0fa-56b2-420e-a1fc-c45d6fa94fe2">
+      <Name>media literacy</Name>
+      <Protected>true</Protected>
+      <SortFullName>media literacy</SortFullName>
+      <UniqueFullName>8449f21443063f427be933b7f5c9a92662a82e52</UniqueFullName>
+    </Keyword>
+    <Keyword id="f0bd05f8-b992-4df7-aa0e-6c7924cb037b">
+      <Name>online media</Name>
+      <Protected>true</Protected>
+      <SortFullName>online media</SortFullName>
+      <UniqueFullName>0a6052adab3fa0bad56c91f955ee8a23756cbb39</UniqueFullName>
+    </Keyword>
+    <Keyword id="85283245-38bb-473b-b888-d85af7cfab67">
+      <Name>open access</Name>
+      <Protected>true</Protected>
+      <SortFullName>open access</SortFullName>
+      <UniqueFullName>f6a9ccabafdc5f311e81a3920d7386d6ba7ec0e4</UniqueFullName>
+    </Keyword>
+    <Keyword id="bfc9e7b8-63db-4fb3-b70f-818ec60464ff">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:12</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:12</ModifiedOn>
+      <Name>Organizational Case Studies</Name>
+      <Protected>false</Protected>
+      <SortFullName>organizational case studies</SortFullName>
+      <UniqueFullName>e3f363f594ed0155fc07b4f8866ec4d4e1ffb18d</UniqueFullName>
+    </Keyword>
+    <Keyword id="17f70590-9002-4ad0-9fc1-037f39ab9a78">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:06</ModifiedOn>
+      <Name>Organizational learning</Name>
+      <Protected>false</Protected>
+      <SortFullName>organizational learning</SortFullName>
+      <UniqueFullName>7b2ca1d9e6583fa4f9e8095e3dbab55a381b9615</UniqueFullName>
+    </Keyword>
+    <Keyword id="8b9f54cb-d21d-4728-b3b1-a4ee11f1a72f">
+      <Name>plagiarism</Name>
+      <Protected>true</Protected>
+      <SortFullName>plagiarism</SortFullName>
+      <UniqueFullName>80e396f5935f75829353b0ab3c9fa9d4fa7fe0f8</UniqueFullName>
+    </Keyword>
+    <Keyword id="36f43ee1-946d-4976-9936-4bd494c9939a">
+      <Name>public library</Name>
+      <Protected>true</Protected>
+      <SortFullName>public library</SortFullName>
+      <UniqueFullName>4d293a1a86747744b8da3c6239e31d0e40cc20cb</UniqueFullName>
+    </Keyword>
+    <Keyword id="e1b025dd-98af-4bae-a18c-f66968a26a54">
+      <Name>publication rate</Name>
+      <Protected>true</Protected>
+      <SortFullName>publication rate</SortFullName>
+      <UniqueFullName>8ccde70d3e0c6a1e1da24536049ede766be83379</UniqueFullName>
+    </Keyword>
+    <Keyword id="905a4ce8-7348-40a6-bf18-9c707818b700">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:37:42</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:37:42</ModifiedOn>
+      <Name>quality management</Name>
+      <Protected>false</Protected>
+      <SortFullName>quality management</SortFullName>
+      <UniqueFullName>ba99cf37694f04fdb670b4d94e572b9085a049e0</UniqueFullName>
+    </Keyword>
+    <Keyword id="c90b1fc3-b9f3-42f8-bacb-0432ad6f6ffc">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T11:32:55</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T11:32:55</ModifiedOn>
+      <Name>reference management</Name>
+      <Protected>false</Protected>
+      <SortFullName>reference management</SortFullName>
+      <UniqueFullName>431733b9d4c31aa2daece8cf3ea7f1f443b5d966</UniqueFullName>
+    </Keyword>
+    <Keyword id="5fdf7b2f-d3cb-4ec3-9933-230fe83d9bdc">
+      <Name>research methodology</Name>
+      <Protected>true</Protected>
+      <SortFullName>research methodology</SortFullName>
+      <UniqueFullName>3dcce147027c5542ec505faae86d27b69fb5eb7b</UniqueFullName>
+    </Keyword>
+    <Keyword id="fe1a2229-87b4-4dea-b3ef-c01898e14d08">
+      <Name>standards</Name>
+      <Protected>true</Protected>
+      <SortFullName>standards</SortFullName>
+      <UniqueFullName>92a267b23bee0191ac090705527911492849d4ba</UniqueFullName>
+    </Keyword>
+    <Keyword id="d07a8393-8c9f-4433-837c-7863422df398">
+      <Name>task design</Name>
+      <Protected>true</Protected>
+      <SortFullName>task design</SortFullName>
+      <UniqueFullName>a0b6be9f2cefa8336bf53fc76d41bcb8c2ee5257</UniqueFullName>
+    </Keyword>
+    <Keyword id="9bd355af-1738-43bc-9594-87cfa6f79a28">
+      <Name>teaching</Name>
+      <Protected>true</Protected>
+      <SortFullName>teaching</SortFullName>
+      <UniqueFullName>59f240c422f9948278f985a479ae071790220ea8</UniqueFullName>
+    </Keyword>
+    <Keyword id="b6179c52-0e42-441d-b613-4ee9d9eac686">
+      <Name>training sessions</Name>
+      <Protected>true</Protected>
+      <SortFullName>training sessions</SortFullName>
+      <UniqueFullName>106a1d9e52750dfde79978ee1f723c7e480db1d9</UniqueFullName>
+    </Keyword>
+    <Keyword id="3f437081-57ad-4d4f-b9c5-82ba7d249032">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:12</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:12</ModifiedOn>
+      <Name>Universities</Name>
+      <Protected>false</Protected>
+      <SortFullName>universities</SortFullName>
+      <UniqueFullName>f616f29df3302a78eccf10fb8805390d37f7df01</UniqueFullName>
+    </Keyword>
+    <Keyword id="666be9b8-7860-48a2-a5da-99feff26b4fd">
+      <Name>web based training</Name>
+      <Protected>true</Protected>
+      <SortFullName>web based training</SortFullName>
+      <UniqueFullName>3d5b48df604473c61881bc9cf5a2b3bf7370c7b4</UniqueFullName>
+    </Keyword>
+    <Keyword id="ba5e5a26-0c5b-4779-ad26-00d0407e8463">
+      <Name>workplace literacy</Name>
+      <Protected>true</Protected>
+      <SortFullName>workplace literacy</SortFullName>
+      <UniqueFullName>15842cc344d35a07bd6b0b3a6be3a2e32214d068</UniqueFullName>
+    </Keyword>
+    <Keyword id="9315e036-9cfa-495e-912b-3d9fb279c695">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <Name>Young Adult</Name>
+      <Protected>false</Protected>
+      <SortFullName>young adult</SortFullName>
+      <UniqueFullName>e84255d0684e897ac3104cb2ecce721fb6555fea</UniqueFullName>
+    </Keyword>
+  </Keywords>
+  <Libraries>
+    <Library id="968ec8cb-a62e-46a6-9e8e-992f9719c48d">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:33:44</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:33:44</ModifiedOn>
+      <Abbreviation>UB Kiel</Abbreviation>
+      <Priority>1</Priority>
+      <SortFullName>ub kiel</SortFullName>
+      <UniqueFullName>fda89d877ee775827086359bed5fed7dad490187</UniqueFullName>
+    </Library>
+    <Library id="6d193bab-1e5f-4b1e-959e-009bd00e1068">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:33:44</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:33:44</ModifiedOn>
+      <Abbreviation>MPI ethnol. Forschung</Abbreviation>
+      <Priority>2</Priority>
+      <SortFullName>mpi ethnol. forschung</SortFullName>
+      <UniqueFullName>323be14e47112cd0a604927de163722409e2bb90</UniqueFullName>
+    </Library>
+    <Library id="f44d8ceb-086b-44a6-a1cc-a6dae4458d72">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:33:44</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:33:44</ModifiedOn>
+      <Abbreviation>TIB/UB Hannover</Abbreviation>
+      <Priority>3</Priority>
+      <SortFullName>tib/ub hannover</SortFullName>
+      <UniqueFullName>2973ae1ab40b9ad043fb34ced98f80298fb1429f</UniqueFullName>
+    </Library>
+    <Library id="b8ae43d6-b37f-4500-b5a9-d1b544ee7e9a">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:33:44</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:33:44</ModifiedOn>
+      <Name>Hochschule Hannover</Name>
+      <Priority>4</Priority>
+      <SortFullName>hochschule hannover</SortFullName>
+      <UniqueFullName>c2995717896a222e5c70ec8e18ecdaaee6c5a362</UniqueFullName>
+    </Library>
+  </Libraries>
+  <Periodicals>
+    <Periodical id="8ac5881d-c752-4713-9340-c8d86ddd2c38">
+      <Name>American Behavioral Scientist</Name>
+      <Protected>false</Protected>
+      <SortFullName>american behavioral scientist</SortFullName>
+      <UniqueFullName>65456d071537d6beecf69a9cffe66f75f39ef9f3</UniqueFullName>
+    </Periodical>
+    <Periodical id="150c9a79-547d-45bf-92ad-880ec92c7203">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <ISSN>1472-6920</ISSN>
+      <Name>BMC medical education</Name>
+      <Protected>false</Protected>
+      <SortFullName>bmc medical education</SortFullName>
+      <UniqueFullName>101444c26c9f221fefbc14d9fe90651ea6c434ad</UniqueFullName>
+      <UserAbbreviation1>BMC Med Educ</UserAbbreviation1>
+    </Periodical>
+    <Periodical id="8e0180b9-03a2-4726-8539-eecd1155a5be">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:15</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:15</ModifiedOn>
+      <ISSN>1931-7913</ISSN>
+      <Name>CBE life sciences education</Name>
+      <Protected>false</Protected>
+      <SortFullName>cbe life sciences education</SortFullName>
+      <UniqueFullName>338b478c2f2db403a8a61f09fd1ffb799816dc3d</UniqueFullName>
+      <UserAbbreviation1>CBE Life Sci Educ</UserAbbreviation1>
+    </Periodical>
+    <Periodical id="5c31b3e9-7681-43f4-b260-de19b771e948">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:10</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:10</ModifiedOn>
+      <ISSN>1552-3799</ISSN>
+      <Name>Clinical nursing research</Name>
+      <Protected>false</Protected>
+      <SortFullName>clinical nursing research</SortFullName>
+      <UniqueFullName>64ffb1b4d67d0fdf58f408b887ab458eabc105b2</UniqueFullName>
+      <UserAbbreviation1>Clin Nurs Res</UserAbbreviation1>
+    </Periodical>
+    <Periodical id="081dab63-9a26-4836-b764-37376ffeec62">
+      <Name>Computer IEEE</Name>
+      <Protected>false</Protected>
+      <SortFullName>computer ieee</SortFullName>
+      <UniqueFullName>375a9c2eb7eca0aab392fb0027022d1676ab7dca</UniqueFullName>
+    </Periodical>
+    <Periodical id="20d91d80-8c40-452f-a90f-ceaf61a4cbb5">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:39:34</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:39:34</ModifiedOn>
+      <ISSN>07475632</ISSN>
+      <Name>Computers in Human Behavior</Name>
+      <Protected>false</Protected>
+      <SortFullName>computers in human behavior</SortFullName>
+      <UniqueFullName>6c4a98a6b1233476e7c2b570117144f96425ce1a</UniqueFullName>
+    </Periodical>
+    <Periodical id="7d4b83e9-c2ea-496b-9e4a-6bdc8b8f6354">
+      <Name>Education and Computing</Name>
+      <Protected>true</Protected>
+      <SortFullName>education and computing</SortFullName>
+      <UniqueFullName>c008a3bd25484e7212e128dfc186bc0a1099aeec</UniqueFullName>
+    </Periodical>
+    <Periodical id="2bdc20ef-6aa0-4553-8d77-910f90152996">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:08</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:21</ModifiedOn>
+      <ISSN>1471-1834</ISSN>
+      <Name>Health information and libraries journal</Name>
+      <Protected>false</Protected>
+      <SortFullName>health information and libraries journal</SortFullName>
+      <UniqueFullName>a1556c927168b38d254c277f9399911214dbbff7</UniqueFullName>
+      <UserAbbreviation1>Health Info Libr J</UserAbbreviation1>
+    </Periodical>
+    <Periodical id="27adf367-2c8d-43b7-8081-558c4e9fab71">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-08-08T17:28:19</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-08T17:28:19</ModifiedOn>
+      <ISSN>20103689</ISSN>
+      <Name>International Journal of Information and Education Technology</Name>
+      <Protected>false</Protected>
+      <SortFullName>ijiet (international journal of information and education technology)</SortFullName>
+      <StandardAbbreviation>IJIET</StandardAbbreviation>
+      <UniqueFullName>d89c2c5a15509163b82befdd21a24e043fa59561</UniqueFullName>
+    </Periodical>
+    <Periodical id="64f6d242-55be-4e94-94fd-e4f31ae3e2d3">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <ISSN>2164-0475</ISSN>
+      <Name>Indiana Libraries</Name>
+      <Protected>false</Protected>
+      <SortFullName>indiana libraries</SortFullName>
+      <UniqueFullName>1b51606d9305008c5abcb3ff4da10ad42bedb334</UniqueFullName>
+    </Periodical>
+    <Periodical id="30da292e-e5b3-476a-a41e-4f688df4de74">
+      <ISSN>0306-4573</ISSN>
+      <Name>Information Processing &amp; Management</Name>
+      <Protected>false</Protected>
+      <SortFullName>information processing &amp; management</SortFullName>
+      <UniqueFullName>c3143df31af455039245116e1d8a20dbc6239f40</UniqueFullName>
+    </Periodical>
+    <Periodical id="7687abd2-8e83-4644-a97b-327c7411a652">
+      <Name>Information Research</Name>
+      <Protected>false</Protected>
+      <SortFullName>information research</SortFullName>
+      <UniqueFullName>e5904d2ebaa4684a06ac917132f756df56cf53c9</UniqueFullName>
+    </Periodical>
+    <Periodical id="a3d6e529-25ff-4559-9fa8-dec4659a0ff7">
+      <ISSN>0268-4012</ISSN>
+      <Name>International Journal of Information Management</Name>
+      <Notes>formerly: Social Science Information Studies</Notes>
+      <Protected>true</Protected>
+      <SortFullName>international journal of information management</SortFullName>
+      <UniqueFullName>d945ee14e877e5e3c069f6aada6641223a9f8734</UniqueFullName>
+    </Periodical>
+    <Periodical id="573221b5-4bd1-4ef0-a094-4e5bf815389b">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:22:02</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:26:57</ModifiedOn>
+      <Name>Journal for educational research online</Name>
+      <Protected>true</Protected>
+      <SortFullName>journal for educational research online</SortFullName>
+      <UniqueFullName>95fa73c471c3c0aa846734e9f038e9e20f32d866</UniqueFullName>
+      <UserAbbreviation2>JERO</UserAbbreviation2>
+    </Periodical>
+    <Periodical id="82b0c8c6-3c75-46ed-a73b-14f1bb0371d6">
+      <Name>Journal of Documentation</Name>
+      <Protected>false</Protected>
+      <SortFullName>journal of documentation</SortFullName>
+      <UniqueFullName>a214b2b05d93366b9e2a7523fdd5cdc245bad9ad</UniqueFullName>
+    </Periodical>
+    <Periodical id="d5fa8343-44fc-4948-8a6e-252a233b6ca1">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:04</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:04</ModifiedOn>
+      <Name>Journal of education for business</Name>
+      <Protected>false</Protected>
+      <SortFullName>journal of education for business</SortFullName>
+      <UniqueFullName>f8a7db454be09c701c169e7515f2b358c574052b</UniqueFullName>
+    </Periodical>
+    <Periodical id="e3c3fc1e-8ce5-4270-97ee-56633b9a377c">
+      <Name>Journal of Librarianship and Information Science</Name>
+      <Protected>false</Protected>
+      <SortFullName>journal of librarianship and information science</SortFullName>
+      <UniqueFullName>ed5a23859f1f983bc6fc89546ee306bc2d641101</UniqueFullName>
+    </Periodical>
+    <Periodical id="66f7a6f1-346a-45c6-b081-d2ee76cf48c0">
+      <ISSN>07408188</ISSN>
+      <Name>Library &amp; Information Science Research</Name>
+      <Protected>false</Protected>
+      <SortFullName>library &amp; information science research (library &amp; information science research)</SortFullName>
+      <StandardAbbreviation>Library &amp; Information Science Research</StandardAbbreviation>
+      <UniqueFullName>8f9845bb324654f8078022edca74f32707962045</UniqueFullName>
+    </Periodical>
+    <Periodical id="1dfd3846-2188-49b2-9174-640efda9c8dc">
+      <Name>Library Quarterly</Name>
+      <Protected>false</Protected>
+      <SortFullName>library quarterly</SortFullName>
+      <UniqueFullName>d866aee6dc77ba967e1bed8fed717dea2acb67ad</UniqueFullName>
+    </Periodical>
+    <Periodical id="87a3f75a-4b94-4284-841a-0871a5826739">
+      <ISSN>0024-2535</ISSN>
+      <Name>Library Review</Name>
+      <Protected>true</Protected>
+      <SortFullName>library review</SortFullName>
+      <UniqueFullName>5efafbdddd014a246a0c5d81dc898b74748be411</UniqueFullName>
+    </Periodical>
+    <Periodical id="48c2b27a-9e30-4e81-8ac5-1e40710c4baf">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:11</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:11</ModifiedOn>
+      <ISSN>1512-7680</ISSN>
+      <Name>Materia socio-medica</Name>
+      <Protected>false</Protected>
+      <SortFullName>materia socio-medica</SortFullName>
+      <UniqueFullName>252aefe20404a8c1fe08bc8c209bdaaf8c75de2b</UniqueFullName>
+      <UserAbbreviation1>Mater Sociomed</UserAbbreviation1>
+    </Periodical>
+    <Periodical id="c868e1a8-3bcd-432c-b627-f5e35a26841b">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:08</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:22</ModifiedOn>
+      <ISSN>0260-6917</ISSN>
+      <Name>Nurse education today</Name>
+      <Protected>false</Protected>
+      <SortFullName>nurse education today</SortFullName>
+      <UniqueFullName>65b073469e0103c60497257d12a891e4f48a2475</UniqueFullName>
+      <UserAbbreviation1>Nurse Educ Today</UserAbbreviation1>
+    </Periodical>
+    <Periodical id="c08ac3ac-9803-4fd3-97ca-1c82904a3ae7">
+      <Name>Online Information Review</Name>
+      <Protected>false</Protected>
+      <SortFullName>online information review</SortFullName>
+      <UniqueFullName>86a6f015d667d0668935237c500d6bd49af90925</UniqueFullName>
+    </Periodical>
+    <Periodical id="f5964198-dca4-413e-ae8e-1269730dd97c">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:12:55</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:12:55</ModifiedOn>
+      <ISSN>1094-9054</ISSN>
+      <Name>Reference &amp; User Services Quarterly</Name>
+      <Protected>false</Protected>
+      <SortFullName>reference &amp; user services quarterly</SortFullName>
+      <UniqueFullName>13b1ac1c4d95425eec444fda1f2ceb726a9a49d6</UniqueFullName>
+    </Periodical>
+    <Periodical id="097752a7-84f4-47ac-9001-a33cafe050d3">
+      <Name>Research Strategies</Name>
+      <Protected>false</Protected>
+      <SortFullName>research strategies</SortFullName>
+      <UniqueFullName>208fed1ebb79ee17ec7895f5d103ab45663fc3a9</UniqueFullName>
+    </Periodical>
+    <Periodical id="e36bcf85-8b35-4571-9aae-fe272b9f9c27">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-24T08:30:09</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-24T08:30:09</ModifiedOn>
+      <ISSN>00386073</ISSN>
+      <Name>Soziale Welt</Name>
+      <Protected>false</Protected>
+      <SortFullName>soziale welt</SortFullName>
+      <UniqueFullName>e77a24f72567450ba961f9cc084742e0a8291f2b</UniqueFullName>
+    </Periodical>
+    <Periodical id="43fc029a-8e8e-4463-bd7d-04173349618e">
+      <Name>Studies in Higher Education</Name>
+      <Protected>false</Protected>
+      <SortFullName>studies in higher education</SortFullName>
+      <UniqueFullName>3ce2e15e6ca105b809fc715d829f05bdbc888ab3</UniqueFullName>
+    </Periodical>
+    <Periodical id="e2c62849-f5bb-4f3a-90fb-7401ba71e06f">
+      <ISSN>0264-0473</ISSN>
+      <Name>The Electronic Library</Name>
+      <Protected>true</Protected>
+      <SortFullName>the electronic library</SortFullName>
+      <UniqueFullName>a32cc257bdc1cc2d5df5b0b54102a792b3debcc7</UniqueFullName>
+    </Periodical>
+    <Periodical id="f052b9a8-a546-4445-b0a5-1659b4f20225">
+      <ISSN>0099-1333</ISSN>
+      <Name>The Journal of Academic Librarianship</Name>
+      <Protected>true</Protected>
+      <SortFullName>the journal of academic librarianship</SortFullName>
+      <UniqueFullName>5b96cfd6d4723f8a9b303015692688e524f9390f</UniqueFullName>
+    </Periodical>
+    <Periodical id="33982fde-fab3-4865-a2a0-f61570d8167d">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:24:40</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:24:40</ModifiedOn>
+      <Name>The Language and Literacy Spectrum</Name>
+      <Protected>false</Protected>
+      <SortFullName>the language and literacy spectrum</SortFullName>
+      <UniqueFullName>b93b33cfc42e0fb2f23a4e438e4a1d647ee91bbb</UniqueFullName>
+    </Periodical>
+  </Periodicals>
+  <Persons>
+    <Person id="7aa714c8-9cc1-4bdd-a8c7-5cad6edc83c9">
+      <FirstName>Maria</FirstName>
+      <LastName>Accardi</LastName>
+      <UniqueFullName>cb97355341b027c45c53486cb6e840734627c191</UniqueFullName>
+      <SortFullName>accardi, maria t.</SortFullName>
+      <MiddleName>T.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="140a0a3d-1df3-49ac-8b6c-2f24a99d9665">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2013-09-22T08:28:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2013-09-22T08:28:50</ModifiedOn>
+      <FirstName>Stefano</FirstName>
+      <LastName>Adamo</LastName>
+      <UniqueFullName>5e82ce04cf4ad4fa8a8dbfd9e7dd1c2123447d62</UniqueFullName>
+      <SortFullName>adamo, stefano</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="1ae7caa0-55df-44c6-8509-d970fb52ad49">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:33:44</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:33:44</ModifiedOn>
+      <LastName>Akiba</LastName>
+      <UniqueFullName>5681cb1be736372cbf5673558741e3e4d7a47464</UniqueFullName>
+      <SortFullName>akiba</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="6a5de7e4-e081-422e-a57c-463012737a4b">
+      <FirstName>Barbara</FirstName>
+      <LastName>Allan</LastName>
+      <UniqueFullName>369234edeca9f787ffbe518c0408f70d8211f83b</UniqueFullName>
+      <SortFullName>allan, barbara</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="758ff448-fe22-4982-8a8a-4d03bb133f30">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:53:36</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-09T16:13:54</ModifiedOn>
+      <FirstName>Susan</FirstName>
+      <LastName>Ambrose</LastName>
+      <UniqueFullName>210444619cba8b6da1aa278fde945dc793450111</UniqueFullName>
+      <SortFullName>ambrose, susan a.</SortFullName>
+      <MiddleName>A.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="cefdec8d-682b-4b89-9145-f5607ca49083">
+      <LastName>American Council on Education</LastName>
+      <UniqueFullName>e9a10f46a6a798ab28668830047f6a949b4b08ff</UniqueFullName>
+      <SortFullName>american council on education</SortFullName>
+      <Protected>false</Protected>
+      <Sex>3</Sex>
+    </Person>
+    <Person id="0b910652-ce09-4670-90b3-33ef83cfc47e">
+      <LastName>American Library Association</LastName>
+      <UniqueFullName>450cfee96a44eedc12747d2ac3ed0655f5643d26</UniqueFullName>
+      <SortFullName>american library association</SortFullName>
+      <Protected>false</Protected>
+      <Sex>3</Sex>
+    </Person>
+    <Person id="4b99e7fa-5689-40c4-b9d5-1a52140c22f4">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:41:11</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:41:11</ModifiedOn>
+      <LastName>American Psychological Association</LastName>
+      <UniqueFullName>84624e65a96e61d7761620b89459ca27ebc4b386</UniqueFullName>
+      <SortFullName>american psychological association</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="53a848e3-12eb-41f7-82da-e03298b85383">
+      <FirstName>Susie</FirstName>
+      <LastName>Andretta</LastName>
+      <UniqueFullName>2badbaf9be9a1ac556e8ac598a375a6f6235a2d1</UniqueFullName>
+      <SortFullName>andretta, susie</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="db3b0bfd-53c9-41df-a108-69cdd419b5ae">
+      <FirstName>Chris</FirstName>
+      <LastName>Armstrong</LastName>
+      <UniqueFullName>2945cdea279afed1dc0856df025380f1701718f2</UniqueFullName>
+      <SortFullName>armstrong, chris</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="549a495b-b5e7-4559-ae5c-455d43bd2abf">
+      <FirstName>Terryl</FirstName>
+      <LastName>Asla</LastName>
+      <UniqueFullName>b47aa084afc12c0855eb16cda63de850da2b392a</UniqueFullName>
+      <SortFullName>asla, terryl</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="17726249-6bec-4d03-beaa-3b38edcfc088">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:22:02</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:22:02</ModifiedOn>
+      <FirstName>Kim</FirstName>
+      <LastName>Baker</LastName>
+      <UniqueFullName>f341be2b67990133766471ab9a822e506c27d136</UniqueFullName>
+      <SortFullName>baker, kim</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="930ffa01-0672-4c0f-8b6d-7697252072c9">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-08-08T17:15:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-08T17:15:17</ModifiedOn>
+      <FirstName>Matthias</FirstName>
+      <LastName>Ballod</LastName>
+      <UniqueFullName>991b617cbd2caff16365ac0f9426932f75d756d8</UniqueFullName>
+      <SortFullName>ballod, matthias</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="3b8e65aa-392e-4a61-8ef0-de0776ed3886">
+      <FirstName>Linda</FirstName>
+      <LastName>Banwell</LastName>
+      <UniqueFullName>8469c0a62441dcfe3a043a365f53ac0848f02235</UniqueFullName>
+      <SortFullName>banwell, linda</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="99c6318d-b316-4703-ba45-0d61b8aafb0f">
+      <FirstName>David</FirstName>
+      <LastName>Bawden</LastName>
+      <UniqueFullName>7805ab6da750ffab9ec758408404c5802d89f3c3</UniqueFullName>
+      <SortFullName>bawden, david</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="d8b56477-4c75-4ce5-968b-4a1cfb6c9acd">
+      <LastName>BBC Radio 4</LastName>
+      <UniqueFullName>b98d3d87037c389acbadb602c08523f7215fe224</UniqueFullName>
+      <SortFullName>bbc radio 4</SortFullName>
+      <Protected>false</Protected>
+      <Sex>3</Sex>
+    </Person>
+    <Person id="fe639e14-bd34-48b4-acd0-88f0c411c793">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-24T08:30:09</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-24T08:30:09</ModifiedOn>
+      <FirstName>Rolf</FirstName>
+      <LastName>Becker</LastName>
+      <UniqueFullName>1a06c37f2c0e3e444d52b27e2da15b756c2c1f4d</UniqueFullName>
+      <SortFullName>becker, rolf</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="9b5f7454-fb7b-45d0-b91e-4339ca4e9e73">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-05T14:25:36</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-05T14:25:36</ModifiedOn>
+      <FirstName>Moira</FirstName>
+      <LastName>Bent</LastName>
+      <UniqueFullName>799b2093cf7c5c454a07692c1f9c786d5e19ace9</UniqueFullName>
+      <SortFullName>bent, moira</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="22fc017f-1a7f-437a-8290-f098898ca147">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:09:30</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:09:30</ModifiedOn>
+      <FirstName>John</FirstName>
+      <LastName>Bertot</LastName>
+      <UniqueFullName>303d36cdd1a480693d0427fd8c5c5be692958e0c</UniqueFullName>
+      <SortFullName>bertot, john carlo</SortFullName>
+      <MiddleName>Carlo</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="1ca72d21-5c5e-4a0d-9602-a89d01fcea3f">
+      <FirstName>David</FirstName>
+      <LastName>Bibb</LastName>
+      <UniqueFullName>c05c78c74b38ffb49cd716423413587d70ce008c</UniqueFullName>
+      <SortFullName>bibb, david</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="9502f00a-bfdf-4c69-b789-a2d8b1de2335">
+      <FirstName>Richard</FirstName>
+      <LastName>Black</LastName>
+      <UniqueFullName>9198e8ff4fa0cc24e967d17c2a8aca71d14358a4</UniqueFullName>
+      <SortFullName>black, richard</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="b03590ea-4de0-4161-89c9-00cbc9fb04a8">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:58:46</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T16:58:46</ModifiedOn>
+      <FirstName>Joel</FirstName>
+      <LastName>Bloch</LastName>
+      <UniqueFullName>9182361a51c291f75e612f759231642ca8f2555d</UniqueFullName>
+      <SortFullName>bloch, joel</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="de3d1015-ca2a-4220-a589-25d85ce16642">
+      <FirstName>Patricia</FirstName>
+      <LastName>Breivik</LastName>
+      <UniqueFullName>d538395a227fce9586a52d9f9e1884fb4ff62c37</UniqueFullName>
+      <SortFullName>breivik, patricia</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="662f7a8a-1553-4877-a976-704b51327242">
+      <FirstName>Reegan</FirstName>
+      <LastName>Breu</LastName>
+      <UniqueFullName>880812fede07ce5dd53593b62af568b9b42a32bc</UniqueFullName>
+      <SortFullName>breu, reegan d.</SortFullName>
+      <MiddleName>D.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="26c01bc9-90af-434d-a89a-be08f208c2f2">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:15</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:15</ModifiedOn>
+      <FirstName>Peggy</FirstName>
+      <LastName>Brickman</LastName>
+      <UniqueFullName>1352c1b57f0e578f134fd65d6b4dd969cf10bbcd</UniqueFullName>
+      <SortFullName>brickman, peggy</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="759f58e9-e166-4da7-b011-1cce2b2c941f">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-08-09T16:13:54</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-09T16:13:54</ModifiedOn>
+      <FirstName>Michael</FirstName>
+      <LastName>Bridges</LastName>
+      <UniqueFullName>04298b2cc53695b0f5ed9b3905bea4b68c4a6287</UniqueFullName>
+      <SortFullName>bridges, michael w.</SortFullName>
+      <MiddleName>W.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="1027551d-1f83-4942-bd57-c9c1f4aeacd1">
+      <FirstName>Christine</FirstName>
+      <LastName>Bruce</LastName>
+      <UniqueFullName>f775d8ac419d4386d55cc2aeac216931c3cb428e</UniqueFullName>
+      <SortFullName>bruce, christine susan</SortFullName>
+      <MiddleName>Susan</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="55104e8e-1fac-4a1a-9d2e-e3ea358350d5">
+      <FirstName>Joanna</FirstName>
+      <LastName>Burkhardt</LastName>
+      <UniqueFullName>6cd681dd035ad631e203b2ac1ff8e6b328d65cae</UniqueFullName>
+      <SortFullName>burkhardt, joanna m.</SortFullName>
+      <MiddleName>M.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="5f26fe81-98f5-4f1e-b781-e92780d58733">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:10</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:10</ModifiedOn>
+      <FirstName>Pamela</FirstName>
+      <LastName>Cacchione</LastName>
+      <UniqueFullName>f7941100b6d67c25543bf1e7e3ece9c5b8e2c05c</UniqueFullName>
+      <SortFullName>cacchione, pamela z.</SortFullName>
+      <MiddleName>Z.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="0e191e27-eb51-499d-b03f-d7c796c509af">
+      <FirstName>Linda</FirstName>
+      <LastName>Carder</LastName>
+      <UniqueFullName>f9ca0deba97cb75378bcca6935d1b115924708bd</UniqueFullName>
+      <SortFullName>carder, linda</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="43c09cef-98c5-4701-b7ea-0f6d6ab38385">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <FirstName>Kayo</FirstName>
+      <LastName>Chang</LastName>
+      <UniqueFullName>8e3db47c9920588a30591ac5865e2977c9634a05</UniqueFullName>
+      <SortFullName>chang, kayo</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="826d033a-8d39-4fbd-9754-508b3ad31539">
+      <FirstName>Lisa</FirstName>
+      <LastName>Churchill</LastName>
+      <UniqueFullName>5179a60f833bd3f8b7b440e2b02fe9ebbb7667a6</UniqueFullName>
+      <SortFullName>churchill, lisa</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="f9a27138-1aae-425e-a7c4-586878357991">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:12</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:12</ModifiedOn>
+      <FirstName>Natalie</FirstName>
+      <LastName>Clairoux</LastName>
+      <UniqueFullName>2ad7dd868225b51809cac13ee437607af8e58de5</UniqueFullName>
+      <SortFullName>clairoux, natalie</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="9df5395f-63fe-4a60-8522-22470a51b237">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:12</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:12</ModifiedOn>
+      <FirstName>Monique</FirstName>
+      <LastName>Clar</LastName>
+      <UniqueFullName>b241424ee329f5f6ce3837cbe9c5d25ae8490e3d</UniqueFullName>
+      <SortFullName>clar, monique</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="de820f06-0333-4a64-834e-ec796468a741">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:06:47</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:06:47</ModifiedOn>
+      <FirstName>Julie</FirstName>
+      <LastName>Coiro</LastName>
+      <UniqueFullName>e850552a7fad14ae52a3ef0ea3edce1fb7cd65f4</UniqueFullName>
+      <SortFullName>coiro, julie</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="45a4f906-d32b-4203-9bf2-a5c79d73de80">
+      <FirstName>Natasha</FirstName>
+      <LastName>Cooper</LastName>
+      <UniqueFullName>7aafece6e86a25d5220997dad7a2b9937a532923</UniqueFullName>
+      <SortFullName>cooper, natasha</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="8697ebb3-04a5-44a1-98ce-1a38bbc7c787">
+      <FirstName>Ana</FirstName>
+      <LastName>Correia</LastName>
+      <UniqueFullName>396578fc455421706ae020e14fc06b62a82c043e</UniqueFullName>
+      <SortFullName>correia, ana maria ramalho</SortFullName>
+      <MiddleName>Maria Ramalho</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="d7068a10-bedc-49fc-b5c9-d96440c556e1">
+      <FirstName>Graham</FirstName>
+      <LastName>Coulson</LastName>
+      <UniqueFullName>b470d2bda2ef09fd3e8f6ddca9d1967334612c0b</UniqueFullName>
+      <SortFullName>coulson, graham</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="688a83c8-1631-43f5-95d6-56b627d2fce2">
+      <FirstName>Christopher</FirstName>
+      <LastName>Cox</LastName>
+      <UniqueFullName>74e00892cc60849ad709fec50802a36e5ff28449</UniqueFullName>
+      <SortFullName>cox, christopher n.</SortFullName>
+      <MiddleName>N.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="056225b7-c562-433a-934d-87e30e8376f0">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:33:44</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:33:44</ModifiedOn>
+      <FirstName>Carles</FirstName>
+      <LastName>Cufí</LastName>
+      <UniqueFullName>2493522f5aa5752a4123c3ef424d8148c9634590</UniqueFullName>
+      <SortFullName>cufí, carles</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="77d8ec4c-3c4b-4034-b40e-2c28449557d8">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:33:44</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:33:44</ModifiedOn>
+      <FirstName>Robert</FirstName>
+      <LastName>Davidson</LastName>
+      <UniqueFullName>faa047f3f2622f252cb4f332cf5dac2bb1b28310</UniqueFullName>
+      <SortFullName>davidson, robert</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="9a64ea56-01e4-4fa6-a7da-0ef9c5cc0da9">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:12</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:12</ModifiedOn>
+      <FirstName>Sylvie</FirstName>
+      <LastName>Desbiens</LastName>
+      <UniqueFullName>be95289d8ec3078c25cce469b7615f8bb2f7563f</UniqueFullName>
+      <SortFullName>desbiens, sylvie</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="fcae465a-b766-4148-9c45-de0e3eba41db">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-08-08T17:28:19</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-08T17:28:19</ModifiedOn>
+      <FirstName>Ding</FirstName>
+      <LastName>Ding</LastName>
+      <UniqueFullName>f99677ddc3b5005540f6a3a883950c4607db2929</UniqueFullName>
+      <SortFullName>ding, ding</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="1d76f000-4eb4-4593-b8db-932420e64154">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:54:46</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-09T16:13:54</ModifiedOn>
+      <FirstName>Michele</FirstName>
+      <LastName>DiPietro</LastName>
+      <UniqueFullName>aab9aaac580b4e339f55722e5ed9fd752566c366</UniqueFullName>
+      <SortFullName>dipietro, michele</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="33464993-8652-49ba-8c84-b79a5320c23e">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:42:28</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:42:28</ModifiedOn>
+      <FirstName>Stephen</FirstName>
+      <LastName>Downes</LastName>
+      <UniqueFullName>93a2cdcd3544f65c558230d37edb23fbf7543113</UniqueFullName>
+      <SortFullName>downes, stephen</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="b8084dca-ea93-4572-aa36-c19f8c5edb0e">
+      <FirstName>Emily</FirstName>
+      <LastName>Drabinski</LastName>
+      <UniqueFullName>8ee0651ab697121e6be0135b79fb3f5a5e8faa8a</UniqueFullName>
+      <SortFullName>drabinski, emily</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="cf6913b9-7c61-40bc-9db2-d757a5d8f173">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:12</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:12</ModifiedOn>
+      <FirstName>Patrice</FirstName>
+      <LastName>Dupont</LastName>
+      <UniqueFullName>ca6f84b72f762ca5232b3f8792d8d1f27d537d56</UniqueFullName>
+      <SortFullName>dupont, patrice</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="14e2d02b-3159-40bd-866f-6022f7fe49f4">
+      <FirstName>Michael</FirstName>
+      <LastName>Eisenberg</LastName>
+      <UniqueFullName>d54125b4aa8cdf22dc39360df0e6f28b3b97ea60</UniqueFullName>
+      <SortFullName>eisenberg, michael b.</SortFullName>
+      <MiddleName>B.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="a258ed15-eb16-4b08-80b0-a02316a93cf2">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:02:58</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:02:58</ModifiedOn>
+      <FirstName>Mark</FirstName>
+      <LastName>Emmons</LastName>
+      <UniqueFullName>7919f66a7e73acabe1f9e5d59d76fa7538c4dbe2</UniqueFullName>
+      <SortFullName>emmons, mark</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="a6634eab-50c3-4616-9176-a7decb5e6b40">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:14</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:14</ModifiedOn>
+      <FirstName>Lynnelle</FirstName>
+      <LastName>Erbacker</LastName>
+      <UniqueFullName>ffab8e8c4c1e04a39729427110a37162a0ab1396</UniqueFullName>
+      <SortFullName>erbacker, lynnelle</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="1535f4f7-17ef-4b3f-91d2-64cbff8ec9d1">
+      <FirstName>Roger</FirstName>
+      <LastName>Fenton</LastName>
+      <UniqueFullName>fc5ef8f806a2f54f79f53a3a4aee224b1a657637</UniqueFullName>
+      <SortFullName>fenton, roger</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="22e03565-3bef-4115-b312-53ecc38f6816">
+      <FirstName>Crystal</FirstName>
+      <LastName>Fulton</LastName>
+      <UniqueFullName>42fcb4d894fbfa331844708a1b3f832c16b512d4</UniqueFullName>
+      <SortFullName>fulton, crystal</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="55651643-6fa8-481e-999d-c5e41f6323da">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <FirstName>Gillian</FirstName>
+      <LastName>Galbraith</LastName>
+      <UniqueFullName>3834e18297839ae6824bff6eff1e47e828ebfda0</UniqueFullName>
+      <SortFullName>galbraith, gillian m.</SortFullName>
+      <MiddleName>M.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="1442a2c4-9a87-4540-917f-fd952e60e870">
+      <FirstName>Gordon</FirstName>
+      <LastName>Gee</LastName>
+      <UniqueFullName>e94efcf9e4ababf6283eb310fe8ebe8ba938d371</UniqueFullName>
+      <SortFullName>gee, gordon e.</SortFullName>
+      <MiddleName>E.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="d9039559-67cc-4baa-8ebd-2cd252598831">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:45:29</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:45:29</ModifiedOn>
+      <FirstName>Kay</FirstName>
+      <LastName>Gillespie</LastName>
+      <UniqueFullName>c9134cdab2e6c874c201d110c36e5be0dbd71179</UniqueFullName>
+      <SortFullName>gillespie, kay herr</SortFullName>
+      <MiddleName>Herr</MiddleName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="7b812d70-a70d-4119-8d28-15e7692f8994">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:22:02</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:22:02</ModifiedOn>
+      <FirstName>Donna</FirstName>
+      <LastName>Gilton</LastName>
+      <UniqueFullName>a05831f03be4c1fc9ce779c7cf5a1eadb3943390</UniqueFullName>
+      <SortFullName>gilton, donna l.</SortFullName>
+      <MiddleName>L.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="df56cb0b-6a86-4db1-b397-7edd4bb42bdb">
+      <FirstName>Tom</FirstName>
+      <LastName>Goad</LastName>
+      <UniqueFullName>e06c740184575cb84bcffd01c5c9756f6d9e5fbf</UniqueFullName>
+      <SortFullName>goad, tom w.</SortFullName>
+      <MiddleName>W.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="35199b59-1351-4056-a61d-b49c792f958f">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:15</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:15</ModifiedOn>
+      <FirstName>Cara</FirstName>
+      <LastName>Gormally</LastName>
+      <UniqueFullName>77ec9b05234208e03da6800b6541d071c2cf1729</UniqueFullName>
+      <SortFullName>gormally, cara</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="529db5bc-59e5-492d-b53a-9c7f96cf5185">
+      <FirstName>Luis</FirstName>
+      <LastName>Gouveia</LastName>
+      <UniqueFullName>ac0476a101729fd076f021e737a17cc5d1381dc3</UniqueFullName>
+      <SortFullName>gouveia, luis</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="575fd956-60c4-4c6a-92b8-5193100fd402">
+      <FirstName>Ann</FirstName>
+      <LastName>Grafstein</LastName>
+      <UniqueFullName>a4290d51c4295e86c9db5db6ef23a5b5bb31c729</UniqueFullName>
+      <SortFullName>grafstein, ann</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="da4ede13-a359-40ec-8472-33adc6407dcf">
+      <FirstName>Esther</FirstName>
+      <LastName>Grassian</LastName>
+      <UniqueFullName>930d87264d19fbc52245bc5f976e8678ec44cebc</UniqueFullName>
+      <SortFullName>grassian, esther s.</SortFullName>
+      <MiddleName>S.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="030bc281-ba23-4ce6-95ad-61ef45343cc6">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-08-08T17:28:19</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-08T17:28:19</ModifiedOn>
+      <FirstName>Chong</FirstName>
+      <LastName>Guan</LastName>
+      <UniqueFullName>ea1c85e968f90255823cba63c0005ffcc058791d</UniqueFullName>
+      <SortFullName>guan, chong</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="d7d9be7f-896b-429a-a17d-2b2528940401">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <FirstName>Angela</FirstName>
+      <LastName>Hamilton</LastName>
+      <UniqueFullName>e41223bd5f97f4fa4b9574ea7b9242659148f4db</UniqueFullName>
+      <SortFullName>hamilton, angela</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="900c9668-c2d9-4fa2-8ef6-c2b7a502ee2f">
+      <FirstName>Robert</FirstName>
+      <LastName>Harris</LastName>
+      <UniqueFullName>c90f09b596efd2df5d0c40b5ec08cbe1bed4cf53</UniqueFullName>
+      <SortFullName>harris, robert</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="011f01c1-1f8a-4650-b707-2f4c45981418">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:04</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:04</ModifiedOn>
+      <FirstName>John</FirstName>
+      <LastName>Heinrichs</LastName>
+      <UniqueFullName>3831ea07f87090ea240cf693c5d857450294c6d2</UniqueFullName>
+      <SortFullName>heinrichs, john h.</SortFullName>
+      <MiddleName>H.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="5a06c432-e6d8-46f8-932e-2ab959bc09f2">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <FirstName>Matthew</FirstName>
+      <LastName>Herring</LastName>
+      <UniqueFullName>18edd613de96027673f4c7fe64bbc8d1ab10168d</UniqueFullName>
+      <SortFullName>herring, matthew</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="42b33b9e-3c4b-4621-bfbe-59fcf51e0f89">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:46:56</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:46:56</ModifiedOn>
+      <FirstName>Linda</FirstName>
+      <LastName>Hilsen</LastName>
+      <UniqueFullName>daacaf1c6a2ace66678d5a4d40f06121388d9b19</UniqueFullName>
+      <SortFullName>hilsen, linda r.</SortFullName>
+      <MiddleName>R.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="bc6ffca2-78e6-4bc6-9c26-1fd626c6a5cf">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-08-08T17:28:19</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-08T17:28:19</ModifiedOn>
+      <FirstName>Kong</FirstName>
+      <LastName>Ho</LastName>
+      <UniqueFullName>c45da98c5c7fb6789a9003d581dc08ae1d83745f</UniqueFullName>
+      <SortFullName>ho, kong weng</SortFullName>
+      <MiddleName>Weng</MiddleName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="81fa6851-27c0-42db-a337-5ebb12b60af2">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:37:14</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-09T15:54:14</ModifiedOn>
+      <FirstName>Tina</FirstName>
+      <LastName>Hohmann</LastName>
+      <UniqueFullName>5dfe520de1b9de22dfe50c36b480b2f750c69e44</UniqueFullName>
+      <SortFullName>hohmann, tina</SortFullName>
+      <Protected>true</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="51367817-53c9-416a-bde6-f7bbd7f89649">
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-09T16:15:40</ModifiedOn>
+      <FirstName>Kuan-Tsae</FirstName>
+      <LastName>Huang</LastName>
+      <UniqueFullName>d7381635c93037be1cd342c3b4b60f56db16b9d1</UniqueFullName>
+      <SortFullName>huang, kuan-tsae</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="e7ba92e0-efb2-4c2f-99d7-b4e20ad33a4b">
+      <FirstName>Jette</FirstName>
+      <LastName>Hyldegård</LastName>
+      <UniqueFullName>001779188bdbba752d6e60c396662c6580afd966</UniqueFullName>
+      <SortFullName>hyldegård, jette</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="f1199762-3b91-490a-a772-ae47da7e3ef4">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:22:02</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:22:02</ModifiedOn>
+      <FirstName>Jan</FirstName>
+      <LastName>Ihme</LastName>
+      <UniqueFullName>ed195da10726249b6add5f462408e74a8f87e5ff</UniqueFullName>
+      <SortFullName>ihme, jan marten</SortFullName>
+      <MiddleName>Marten</MiddleName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="2eaf7f3d-d08f-4517-8008-56a8be56f92c">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-08-09T15:45:48</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-09T15:45:48</ModifiedOn>
+      <LastName>International Association of Technological University Libraries</LastName>
+      <UniqueFullName>4514ca18551e87f01510c904e1cd62ede084ea43</UniqueFullName>
+      <SortFullName>international association of technological university libraries</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="3562c748-a834-4dab-9901-4ef9b2f49223">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <FirstName>Brian</FirstName>
+      <LastName>Jackson</LastName>
+      <UniqueFullName>a8d3b872397680318f4536bad7d3ccd0b382bc72</UniqueFullName>
+      <SortFullName>jackson, brian</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="8e673b97-5b52-49ac-aca4-4e45867a46fd">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:09:30</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:09:30</ModifiedOn>
+      <FirstName>Paul</FirstName>
+      <LastName>Jaeger</LastName>
+      <UniqueFullName>e84f7c6c1cd59a613f816aee4a4cdd4ef4d1363b</UniqueFullName>
+      <SortFullName>jaeger, paul t.</SortFullName>
+      <MiddleName>T.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="e38e2973-2809-4832-bc58-68118af3480e">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:14</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:14</ModifiedOn>
+      <FirstName>Robert</FirstName>
+      <LastName>Janke</LastName>
+      <UniqueFullName>519a1c07e5e31b1da7116a7bd4496b2ba4039e45</UniqueFullName>
+      <SortFullName>janke, robert</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="5d9a3671-9ecd-4b4f-afd9-834971d0562e">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-01-12T12:41:58</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-01-12T12:41:58</ModifiedOn>
+      <LastName>Jisc</LastName>
+      <UniqueFullName>ec679e68c9ef1988f561389085330b3913923822</UniqueFullName>
+      <SortFullName>jisc</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="1ab2776e-ba08-4473-ab13-c59e16816eb6">
+      <FirstName>Bill</FirstName>
+      <LastName>Johnston</LastName>
+      <UniqueFullName>9a4689ed29f44241f8549c6f4f56fef501900508</UniqueFullName>
+      <SortFullName>johnston, bill</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="e98af4e8-dd54-4b6a-a554-c4832161d67d">
+      <FirstName>Nicholas</FirstName>
+      <LastName>Joint</LastName>
+      <UniqueFullName>934fef09e6afa829dbf1edc324997ee42ecbae73</UniqueFullName>
+      <SortFullName>joint, nicholas</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="08d8ae60-df24-403e-b458-1522ea3e75d3">
+      <FirstName>Heidi</FirstName>
+      <LastName>Julien</LastName>
+      <UniqueFullName>e06c72e6c3ae12ec11c1251c4b5d51af255b95dd</UniqueFullName>
+      <SortFullName>julien, heidi</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="bc21527e-b01b-441e-aa77-7790c3d1bba0">
+      <FirstName>Joan</FirstName>
+      <LastName>Kaplowitz</LastName>
+      <UniqueFullName>6b9de8a7f4ab5f9bdde4ab7732cadf2c9d4f25ff</UniqueFullName>
+      <SortFullName>kaplowitz, joan r.</SortFullName>
+      <MiddleName>R.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="fa6cdec7-7429-49b3-9ad9-0e828404b5b7">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <FirstName>Karl</FirstName>
+      <LastName>Kingsley</LastName>
+      <UniqueFullName>bc2ad5153daf71ba0c642586ffda5f77bdd61f53</UniqueFullName>
+      <SortFullName>kingsley, karl</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="f76d747a-d948-4b41-a092-0ab64d32ca9e">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <FirstName>Karla</FirstName>
+      <LastName>Kingsley</LastName>
+      <UniqueFullName>2d247580ef6673c351d83b761c20c297fc51fc1e</UniqueFullName>
+      <SortFullName>kingsley, karla v.</SortFullName>
+      <MiddleName>V.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="cdb65cce-3359-4d68-a536-041b811ec22f">
+      <FirstName>Patricia</FirstName>
+      <LastName>Knapp</LastName>
+      <UniqueFullName>a1be16c9bf94a8ef201ad010a630c3ca40e1b363</UniqueFullName>
+      <SortFullName>knapp, patricia b.</SortFullName>
+      <MiddleName>B.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="8d7579c8-f606-45b4-972e-a56243691004">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:06:47</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:06:47</ModifiedOn>
+      <FirstName>Michele</FirstName>
+      <LastName>Knobel</LastName>
+      <UniqueFullName>57712326a0638535f81bc7caf6f0a9feff354f0f</UniqueFullName>
+      <SortFullName>knobel, michele</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="f6445f98-e3df-4e0a-aa92-023c3d893846">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <FirstName>Heather</FirstName>
+      <LastName>Koopmans</LastName>
+      <UniqueFullName>6a7f4f8c6fbb920e3c5b730ed0d3956f74ed1b21</UniqueFullName>
+      <SortFullName>koopmans, heather</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="00a71313-61b8-4f51-ba20-1a1a36d13fff">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:39:34</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:39:34</ModifiedOn>
+      <FirstName>Karel</FirstName>
+      <LastName>Kreijns</LastName>
+      <UniqueFullName>25de7009679a6f43e29160696d2eefa1260703af</UniqueFullName>
+      <SortFullName>kreijns, karel</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="ea2a9fb7-2c30-4284-88e9-3d48c3483894">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <FirstName>Dennis</FirstName>
+      <LastName>Kreps</LastName>
+      <UniqueFullName>fb9eb47c2a6343d9dc8dfaacef6caf8e76331a7e</UniqueFullName>
+      <SortFullName>kreps, dennis</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="74bf7290-4635-4829-bbab-09fbebf22cc7">
+      <FirstName>Alana</FirstName>
+      <LastName>Kumbier</LastName>
+      <UniqueFullName>fdfdc663ad537e4d137a614192b620af4e507158</UniqueFullName>
+      <SortFullName>kumbier, alana</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="0739fef3-096b-4210-a75a-e15e8062e1df">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:12:55</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:12:55</ModifiedOn>
+      <FirstName>Meagan</FirstName>
+      <LastName>Lacy</LastName>
+      <UniqueFullName>7e7fb0dd3e4aa0a3832c6383998b82329e748012</UniqueFullName>
+      <SortFullName>lacy, meagan</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="97c313d2-6a10-4dcb-96df-1e71a750f880">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:06:47</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:06:47</ModifiedOn>
+      <FirstName>Colin</FirstName>
+      <LastName>Lankshear</LastName>
+      <UniqueFullName>782bf440acd41422bc7edbfb931df4b4e94487b9</UniqueFullName>
+      <SortFullName>lankshear, colin</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="1ce56eb8-6cd6-4e8a-855d-e1a2a153ff5d">
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-09T16:15:40</ModifiedOn>
+      <FirstName>Yang</FirstName>
+      <LastName>Lee</LastName>
+      <UniqueFullName>29a4cf7fb595feec89aabdad90f1e35cf567e29d</UniqueFullName>
+      <SortFullName>lee, yang w.</SortFullName>
+      <MiddleName>W.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="38399a66-a58a-4d12-8446-4581c043d425">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:12:40</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:12:40</ModifiedOn>
+      <FirstName>Chris</FirstName>
+      <LastName>Leeder</LastName>
+      <UniqueFullName>422b692654002b8f8b954c61e6a1e58eef212eeb</UniqueFullName>
+      <SortFullName>leeder, chris</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="458201be-4a8e-4096-a1a6-f49cd4d4288e">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:17:58</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:17:58</ModifiedOn>
+      <FirstName>Kaisa</FirstName>
+      <LastName>Leino</LastName>
+      <UniqueFullName>fe4bd26a11100d0c8b1f359789891b885b2212e3</UniqueFullName>
+      <SortFullName>leino, kaisa</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="96351059-ff81-4373-8210-c7178975b344">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:06:47</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:06:47</ModifiedOn>
+      <FirstName>Donald</FirstName>
+      <LastName>Leu</LastName>
+      <UniqueFullName>3b9f0f4a87cc0a940d5388f7fed71c390d96cc6d</UniqueFullName>
+      <SortFullName>leu, donald j.</SortFullName>
+      <MiddleName>J.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="1522020a-e82f-485a-befd-b9e4bbc7de96">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:49:49</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:49:49</ModifiedOn>
+      <FirstName>Karron</FirstName>
+      <LastName>Lewis</LastName>
+      <UniqueFullName>da7d140e06b7a819096b2e1491702f83dfc543c2</UniqueFullName>
+      <SortFullName>lewis, karron g.</SortFullName>
+      <MiddleName>G.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="d8a70ce2-8a62-42c4-be79-d11bca4c50a4">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:04</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:04</ModifiedOn>
+      <FirstName>Jeen-su</FirstName>
+      <LastName>Lim</LastName>
+      <UniqueFullName>d5321634f319781aa498fc6df6b20f632fc7006b</UniqueFullName>
+      <SortFullName>lim, jeen-su</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="5383a0ca-06ff-42e2-98ab-af3dc3e362bb">
+      <FirstName>Annemaree</FirstName>
+      <LastName>Lloyd</LastName>
+      <UniqueFullName>49436cbdf7b484212e41f0a1dde2affe4feb5898</UniqueFullName>
+      <SortFullName>lloyd, annemaree</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="d797de79-a236-48ec-8fb2-1b21fa7f531f">
+      <FirstName>Emmett</FirstName>
+      <LastName>Lombard</LastName>
+      <UniqueFullName>2fd54f86fa1009374287fa1b626c64a6b0c08623</UniqueFullName>
+      <SortFullName>lombard, emmett</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="2255bae2-2569-4021-9f45-78c8983530e5">
+      <FirstName>Ray</FirstName>
+      <LastName>Lonsdale</LastName>
+      <UniqueFullName>9552c03a5b9c549e6f8ba6cb8a0b368c4a7a478d</UniqueFullName>
+      <SortFullName>lonsdale, ray</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="38b6fe5d-e7b3-4166-8c8c-0c66104bab16">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:54:46</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-09T16:13:54</ModifiedOn>
+      <FirstName>Marsha</FirstName>
+      <LastName>Lovett</LastName>
+      <UniqueFullName>9838933bc9f925c4d9dab9d8b289ca67004a7213</UniqueFullName>
+      <SortFullName>lovett, marsha c.</SortFullName>
+      <MiddleName>C.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="857e318b-9194-48c1-ac20-184d0032233c">
+      <FirstName>Carrie</FirstName>
+      <LastName>Lowe</LastName>
+      <UniqueFullName>ff875997bffebf48e7d116ec6590a727829e9f55</UniqueFullName>
+      <SortFullName>lowe, carrie a.</SortFullName>
+      <MiddleName>A.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="aebe8e86-125a-4eaf-b190-48691d707a8f">
+      <FirstName>Joe</FirstName>
+      <LastName>Luca</LastName>
+      <UniqueFullName>dfccdd25f7211fe34a25566dfac1e0c551b8fbba</UniqueFullName>
+      <SortFullName>luca, joe</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="2c6189f0-efe3-41fd-8d9e-b31134a50cb0">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:39:34</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:39:34</ModifiedOn>
+      <FirstName>Jan</FirstName>
+      <LastName>Lutgerink</LastName>
+      <UniqueFullName>1aa02a4e9e967e6c1a0288bc36a3678c5b36503b</UniqueFullName>
+      <SortFullName>lutgerink, jan</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="3984d1e0-eb8c-4d44-893f-555fb5df9de5">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:15</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:15</ModifiedOn>
+      <FirstName>Mary</FirstName>
+      <LastName>Lutz</LastName>
+      <UniqueFullName>1b95f62b2e9cbad014f3938fad13e1d2448181bb</UniqueFullName>
+      <SortFullName>lutz, mary</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="d6de1564-0f59-4d77-9c42-5b0ee3ba53b0">
+      <FirstName>Mary</FirstName>
+      <LastName>MacDonald</LastName>
+      <UniqueFullName>21303ae64ac8a14b2c739c72f45c61e3f84508ee</UniqueFullName>
+      <SortFullName>macdonald, mary c.</SortFullName>
+      <MiddleName>C.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="b1bfb76c-cffe-4a8f-9103-b9438e99f19b">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <FirstName>Margy</FirstName>
+      <LastName>MacMillan</LastName>
+      <UniqueFullName>dbe7eda7caa28d686546d7639779890cff39812a</UniqueFullName>
+      <SortFullName>macmillan, margy</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="56e50790-1ca1-4dd1-9eae-ff95e4086286">
+      <FirstName>J.</FirstName>
+      <LastName>Marcum</LastName>
+      <UniqueFullName>6a20851c958e84df0d3c32fbc4da82bebc127456</UniqueFullName>
+      <SortFullName>marcum, j. w.</SortFullName>
+      <MiddleName>W.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="7011f9cd-4a79-4f24-aed6-6a07f6e498db">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:12:40</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:12:40</ModifiedOn>
+      <FirstName>Karen</FirstName>
+      <LastName>Markey</LastName>
+      <UniqueFullName>912675e38953ab422035d7c4ecb1e76be03ed02d</UniqueFullName>
+      <SortFullName>markey, karen</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="66463893-43e5-4fec-b8e9-4a09d2ceb60e">
+      <FirstName>Allan</FirstName>
+      <LastName>Martin</LastName>
+      <UniqueFullName>9ff46287f13c8671a24bb80b87248be342089493</UniqueFullName>
+      <SortFullName>martin, allan</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="b4bdcec4-4ecb-4fe3-ba77-d3a10c131058">
+      <FirstName>Lucy</FirstName>
+      <LastName>Mason</LastName>
+      <UniqueFullName>d2e381f305870dd1be385fbe43febca150d8559e</UniqueFullName>
+      <SortFullName>mason, lucy</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="9dc4394c-c855-4742-863a-6ac11a91c30c">
+      <FirstName>Monty</FirstName>
+      <LastName>McAdoo</LastName>
+      <UniqueFullName>afed15e4f63be5428bafbc6bcc5ea19e5ce114b7</UniqueFullName>
+      <SortFullName>mcadoo, monty l.</SortFullName>
+      <MiddleName>L.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="3d52d579-e24c-418a-aef3-2c97ac802154">
+      <FirstName>Joseph</FirstName>
+      <LastName>McCade</LastName>
+      <UniqueFullName>627fc6616d62fe9ca4fb515e548c5aa75b28ab70</UniqueFullName>
+      <SortFullName>mccade, joseph m.</SortFullName>
+      <MiddleName>M.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="e69ea0cb-77db-45fc-8b71-ed2fb4f0ea38">
+      <FirstName>Catherine</FirstName>
+      <LastName>McLoughlin</LastName>
+      <UniqueFullName>b6aaf8122adf669cab83cb46cdcc2ea4a687d1e1</UniqueFullName>
+      <SortFullName>mcloughlin, catherine</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="80681592-e88e-47dd-b372-ead7cde7dfd7">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:58:46</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:00:42</ModifiedOn>
+      <FirstName>Kathleen</FirstName>
+      <LastName>McMillan</LastName>
+      <UniqueFullName>30274b0ac060779b69eff7bb4c1233d7a0b94e5f</UniqueFullName>
+      <SortFullName>mcmillan, kathleen</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="8aa1ec26-84ec-4b74-aa4e-f43aa8993b99">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:58:49</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T16:58:49</ModifiedOn>
+      <FirstName>Rosemarie</FirstName>
+      <LastName>Menager</LastName>
+      <UniqueFullName>b395fe63b2c7614905b6c51cda9d58dc6cae598a</UniqueFullName>
+      <SortFullName>menager, rosemarie</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="f484cc96-3e03-447c-bc00-b74ac5feaff4">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:38:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T16:38:17</ModifiedOn>
+      <FirstName>Peter</FirstName>
+      <LastName>Meurer</LastName>
+      <UniqueFullName>006758ace3eaa5db92ae9e0b5e7bb66e537c2c80</UniqueFullName>
+      <SortFullName>meurer, peter</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="607866d7-c8eb-4113-9710-2f97c1fc15e6">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-03-26T14:05:28</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-03-26T14:05:28</ModifiedOn>
+      <FirstName>Wolfgang</FirstName>
+      <LastName>Mommsen</LastName>
+      <UniqueFullName>1cacd1dcc624b6ce6d2a69dada4992cbdc216184</UniqueFullName>
+      <SortFullName>mommsen, wolfgang j.</SortFullName>
+      <MiddleName>J.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="36d9d5cf-6305-42ea-9a56-11e4ce65b957">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-03-26T14:05:28</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-03-26T14:05:28</ModifiedOn>
+      <FirstName>Birgitt</FirstName>
+      <LastName>Morgenbrod</LastName>
+      <UniqueFullName>c018133d9553ebc612614a078dd446a5fb4860ed</UniqueFullName>
+      <SortFullName>morgenbrod, birgitt</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="54123bfb-dec8-49c4-9e39-1e2bd093b46f">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:05</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:05</ModifiedOn>
+      <FirstName>Susanne</FirstName>
+      <LastName>Mühlbacher</LastName>
+      <UniqueFullName>4444fff84f6869b9e80095182b5db1a113fd1857</UniqueFullName>
+      <SortFullName>mühlbacher, susanne</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="cfa420df-dc97-455f-8828-2e5307a97de0">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:06</ModifiedOn>
+      <FirstName>Alistair</FirstName>
+      <LastName>Mutch</LastName>
+      <UniqueFullName>60916ad18945276536c86e93ece40fb20e8d78e1</UniqueFullName>
+      <SortFullName>mutch, alistair</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="eb7c1bef-44d7-469a-b89d-645c672431a3">
+      <LastName>NHS Education for Scotland</LastName>
+      <UniqueFullName>34b883c944d5ea937220a19b3e646920582186ab</UniqueFullName>
+      <SortFullName>nhs education for scotland</SortFullName>
+      <Protected>false</Protected>
+      <Sex>3</Sex>
+    </Person>
+    <Person id="df48e303-7179-4c72-b139-3957e7a87828">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:38:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T16:38:17</ModifiedOn>
+      <FirstName>Jürg</FirstName>
+      <LastName>Niederhauser</LastName>
+      <UniqueFullName>46c6f0e318942cf174b91b58a285eb418667d757</UniqueFullName>
+      <SortFullName>niederhauser, jürg</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="0e269240-f7d7-4fd3-888d-01e4a217b367">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:54:46</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-09T16:13:54</ModifiedOn>
+      <FirstName>Marie</FirstName>
+      <LastName>Norman</LastName>
+      <UniqueFullName>ba2cf30411f3066a9f12e520635e8cc100eee30f</UniqueFullName>
+      <SortFullName>norman, marie k.</SortFullName>
+      <MiddleName>K.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="ab7ae381-cc5a-4ca9-ba57-daafad037d21">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-01-12T12:42:08</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-01-12T12:42:08</ModifiedOn>
+      <LastName>Northumbria University</LastName>
+      <UniqueFullName>ac9ea7cc84f99774966fb6ca4ade19c9910c4082</UniqueFullName>
+      <SortFullName>northumbria university</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="a19df783-4fff-4428-bf1e-31edc408bbeb">
+      <FirstName>Diana</FirstName>
+      <LastName>Oblinger</LastName>
+      <UniqueFullName>25489eac99def721a6e44102cdce139d9d6be304</UniqueFullName>
+      <SortFullName>oblinger, diana</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="df8acd17-92eb-43c4-b146-6927a22a97ec">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:58:49</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T16:58:49</ModifiedOn>
+      <FirstName>Lyn</FirstName>
+      <LastName>Paulos</LastName>
+      <UniqueFullName>f11bd6958de9eafa48e93fda2140ba24110b6fda</UniqueFullName>
+      <SortFullName>paulos, lyn</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="51496534-c2f0-44b5-a3f2-b95e2e044a44">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T13:22:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T13:22:06</ModifiedOn>
+      <FirstName>Richard</FirstName>
+      <LastName>Pears</LastName>
+      <UniqueFullName>0bd7fccdaf8d1a42a2c69e2589c66491ece1f318</UniqueFullName>
+      <SortFullName>pears, richard</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="62b3052e-3694-4041-babe-eb98986c4b06">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:14</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:14</ModifiedOn>
+      <FirstName>Barbara</FirstName>
+      <LastName>Pesut</LastName>
+      <UniqueFullName>1002a80394bd08bfcc4009b4a7f6305a502ec53a</UniqueFullName>
+      <SortFullName>pesut, barbara</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="648b70be-a1cf-4e33-82eb-4443836db4d5">
+      <FirstName>Hannelore</FirstName>
+      <LastName>Rader</LastName>
+      <UniqueFullName>fac7bee9928d3b5344f817751e52c9acec48db57</UniqueFullName>
+      <SortFullName>rader, hannelore</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="2b1780d6-2a67-4e8d-b535-caf050c49f6a">
+      <FirstName>Hannelore</FirstName>
+      <LastName>Rader</LastName>
+      <UniqueFullName>e65e8d4301d8b26f32c18e826f7231a0e99f804a</UniqueFullName>
+      <SortFullName>rader, hannelore b.</SortFullName>
+      <MiddleName>B.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="9c95af40-bcce-408e-8756-9f75d7c44ab2">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:02:25</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:02:25</ModifiedOn>
+      <FirstName>Patrick</FirstName>
+      <LastName>Ragains</LastName>
+      <UniqueFullName>63a7ef427bae06b4ddc926fec0969ce83ca64db8</UniqueFullName>
+      <SortFullName>ragains, patrick</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="3c95a577-1725-4ed8-b29f-9c2d95862490">
+      <FirstName>Andrée</FirstName>
+      <LastName>Rathemacher</LastName>
+      <UniqueFullName>d86794f9cb28873724791f8621fc0f2f99043e76</UniqueFullName>
+      <SortFullName>rathemacher, andrée j.</SortFullName>
+      <MiddleName>J.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="5f27142d-1506-406f-98fe-29066caa7601">
+      <FirstName>Kathryn</FirstName>
+      <LastName>Ray</LastName>
+      <UniqueFullName>1f3698a08ce9d611b845fe2ea20111bf42c6483f</UniqueFullName>
+      <SortFullName>ray, kathryn</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="67debc49-7833-40b7-a447-1f39af344c4d">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <FirstName>Lynne</FirstName>
+      <LastName>Rhodes</LastName>
+      <UniqueFullName>7c79535dcb0490a1e1cb28081997eb9afa0c5e8e</UniqueFullName>
+      <SortFullName>rhodes, lynne a.</SortFullName>
+      <MiddleName>A.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="e7860122-c884-472d-8156-c4185763e2e7">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:12:40</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:12:40</ModifiedOn>
+      <FirstName>Soo</FirstName>
+      <LastName>Rieh</LastName>
+      <UniqueFullName>7f88e154059d26e46c4aa8329ab61960ac8116fe</UniqueFullName>
+      <SortFullName>rieh, soo young</SortFullName>
+      <MiddleName>Young</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="500a5466-c22a-49d0-9aae-49521be613a2">
+      <FirstName>James</FirstName>
+      <LastName>Robertson</LastName>
+      <UniqueFullName>a1c77dabb2d3d2903504081c1b712afd2ce1eca8</UniqueFullName>
+      <SortFullName>robertson, james</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="2bc9a53d-0f09-434c-addb-ed9c6351f60f">
+      <FirstName>Faith</FirstName>
+      <LastName>Rogow</LastName>
+      <UniqueFullName>c88c2aeacea8d9e83f5ebb2364f777f2cc60e33b</UniqueFullName>
+      <SortFullName>rogow, faith</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="a1270b8e-095d-4de7-b665-f840348b1901">
+      <FirstName>Bruce</FirstName>
+      <LastName>Ross-Larson</LastName>
+      <UniqueFullName>ec28b10750e2046807a73c0c3c04d293456a0d8a</UniqueFullName>
+      <SortFullName>ross-larson, bruce clifford</SortFullName>
+      <MiddleName>Clifford</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="c3cd8c37-fdab-4789-a43f-c64ae2106e7b">
+      <FirstName>Jennifer</FirstName>
+      <LastName>Rowley</LastName>
+      <UniqueFullName>7f4fddf2d6b6124f94ac20297a615f62df3119b5</UniqueFullName>
+      <SortFullName>rowley, jennifer</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="a966c26c-1e7e-4c0f-aea5-2d5c75a9ffc7">
+      <FirstName>Sally</FirstName>
+      <LastName>Rumsey</LastName>
+      <UniqueFullName>1bcf1d92af47f61e0848ec9f1fe150ad71bb563b</UniqueFullName>
+      <SortFullName>rumsey, sally</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="70dddd8f-619e-4786-8b58-6e3230e5a59a">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:38:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T16:38:17</ModifiedOn>
+      <FirstName>Manfred</FirstName>
+      <LastName>Schluchter</LastName>
+      <UniqueFullName>dac07be799bb489c06b19fe62c142b1adb8b175b</UniqueFullName>
+      <SortFullName>schluchter, manfred</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="9bd93c74-84bc-4874-87a6-99bd91b0e7d6">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-03-26T14:05:28</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-03-26T14:05:28</ModifiedOn>
+      <FirstName>Wolfgang</FirstName>
+      <LastName>Schluchter</LastName>
+      <UniqueFullName>5ab1157b6ba7844598443f776d045fab55563f86</UniqueFullName>
+      <SortFullName>schluchter, wolfgang</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="a9ea39e9-128c-41ba-81ae-c9fd8e2c5851">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-05T14:26:59</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-05T14:26:59</ModifiedOn>
+      <LastName>SCONUL Working Group on Information Literacy</LastName>
+      <UniqueFullName>0887e0894c39ab381c43c98e55778c3814445e79</UniqueFullName>
+      <SortFullName>sconul working group on information literacy</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="dcbca325-c55d-49c8-9015-c4f9baddcb3b">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:22:02</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:22:02</ModifiedOn>
+      <FirstName>Martin</FirstName>
+      <LastName>Senkbeil</LastName>
+      <UniqueFullName>59081203127d89608149e1de1a26ea353f4ac3c6</UniqueFullName>
+      <SortFullName>senkbeil, martin</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="d13b74b1-e641-4b79-a918-1c3a27e9a267">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:11</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:11</ModifiedOn>
+      <FirstName>Afsaneh</FirstName>
+      <LastName>Shahrabi</LastName>
+      <UniqueFullName>8affe3421a7b331f4e472f1d84f37dcb23bd1a55</UniqueFullName>
+      <SortFullName>shahrabi, afsaneh</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="84138623-a386-479e-9354-f9e04cee126f">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:24:25</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:24:25</ModifiedOn>
+      <FirstName>Laurie</FirstName>
+      <LastName>Sharp</LastName>
+      <UniqueFullName>23a3497a7fd98bc489a363f9f6e49f007c84501c</UniqueFullName>
+      <SortFullName>sharp, laurie a.</SortFullName>
+      <MiddleName>A.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="d89ba334-e266-4a20-b04a-84c509c56473">
+      <FirstName>Susan</FirstName>
+      <LastName>Sharpless Smith</LastName>
+      <UniqueFullName>0f2ed6f2cd318e75e2e361780364f83c3251f77a</UniqueFullName>
+      <SortFullName>sharpless smith, susan</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="2faabd3d-3cbe-49b6-9e89-85981eb29207">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T13:22:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T13:22:06</ModifiedOn>
+      <FirstName>Graham</FirstName>
+      <LastName>Shields</LastName>
+      <UniqueFullName>9ecb67cc59111a58925139f7e93a42c54cdcca54</UniqueFullName>
+      <SortFullName>shields, graham</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="0358706b-5286-4e4c-87ba-1cd856bc180f">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:11</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:11</ModifiedOn>
+      <FirstName>Hasan</FirstName>
+      <LastName>Siamian</LastName>
+      <UniqueFullName>a3aa0d59e87450a5f007875be2fdd98beecbad5c</UniqueFullName>
+      <SortFullName>siamian, hasan</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="4f462bd5-41df-4fcb-8228-f9b8e7658d91">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <FirstName>Michelle</FirstName>
+      <LastName>Sinotte</LastName>
+      <UniqueFullName>d7db416389f7d18985c337c60b1930718c1924c1</UniqueFullName>
+      <SortFullName>sinotte, michelle</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="8541e20a-e59c-42d4-a120-19b07b0033de">
+      <FirstName>Jane</FirstName>
+      <LastName>Smith</LastName>
+      <UniqueFullName>2e77e0c0cef2dcd2cf9bd8318fadfb31c48150ec</UniqueFullName>
+      <SortFullName>smith, jane bandy</SortFullName>
+      <MiddleName>Bandy</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="6aa64414-61a3-406e-b255-ea8e9b71d785">
+      <FirstName>Loanne</FirstName>
+      <LastName>Snavely</LastName>
+      <UniqueFullName>97621319acef4a39bd96fb942c15ed7cac211f9b</UniqueFullName>
+      <SortFullName>snavely, loanne</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="79d61989-90e5-4550-99c5-538b6d67bc85">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:50:24</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:50:24</ModifiedOn>
+      <FirstName>Mary</FirstName>
+      <LastName>Sorcinelli</LastName>
+      <UniqueFullName>94754c472322f62862fef704cb97a427e4fd687b</UniqueFullName>
+      <SortFullName>sorcinelli, mary deane</SortFullName>
+      <MiddleName>Deane</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="7f018dcf-4e67-48d4-b32b-e4686c125677">
+      <FirstName>Siân</FirstName>
+      <LastName>Spink</LastName>
+      <UniqueFullName>8e356044878193f8037bbaa21f284cd9d2c160c5</UniqueFullName>
+      <SortFullName>spink, siân</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="d01b0a87-4fbf-46de-8b83-6b62e18659d8">
+      <FirstName>Kathleen</FirstName>
+      <LastName>Spitzer</LastName>
+      <UniqueFullName>e1266ede44e2a40c18719f81fa01fdd4a12dac0b</UniqueFullName>
+      <SortFullName>spitzer, kathleen l.</SortFullName>
+      <MiddleName>L.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="bde9ce8b-ed5b-491f-b5dd-b5cbc45096f6">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:07:49</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:07:49</ModifiedOn>
+      <FirstName>Birgit</FirstName>
+      <LastName>Stark</LastName>
+      <UniqueFullName>669a30cfc3f88eaf759ee88ae275f6486ff994b0</UniqueFullName>
+      <SortFullName>stark, birgit</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="c48eec37-f6f8-412d-9c0b-d1d9430ff064">
+      <FirstName>Jane</FirstName>
+      <LastName>Staw</LastName>
+      <UniqueFullName>f66e4df2d95586b61f0afc5ed053037bac56bbfa</UniqueFullName>
+      <SortFullName>staw, jane anne</SortFullName>
+      <MiddleName>Anne</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="bec94035-ab18-44d0-8fbf-0d0d2945d04d">
+      <LastName>Step Two Designs</LastName>
+      <UniqueFullName>63d2917b5d6034725626b740b941e37a41564620</UniqueFullName>
+      <SortFullName>step two designs</SortFullName>
+      <Protected>false</Protected>
+      <Sex>3</Sex>
+    </Person>
+    <Person id="c03bf421-d620-4c7d-93a1-90682183a868">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <FirstName>Tanis</FirstName>
+      <LastName>Stewart</LastName>
+      <UniqueFullName>20acb1a80cc01b6869ec2974a794747bab130ea5</UniqueFullName>
+      <SortFullName>stewart, tanis</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="e5c02615-97fc-4f22-b83d-9dcb00b3f4d9">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:12</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:12</ModifiedOn>
+      <FirstName>Monique</FirstName>
+      <LastName>St-Jean</LastName>
+      <UniqueFullName>f913eee3c1ea39d0990b31461f53dfa5a92afe95</UniqueFullName>
+      <SortFullName>st-jean, monique</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="d57fcc59-8290-4772-bdaa-2a5ca21a2fed">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:17</ModifiedOn>
+      <FirstName>Eva</FirstName>
+      <LastName>Stowers</LastName>
+      <UniqueFullName>188203c200247c19de0f4cd0dc4fa79192d29414</UniqueFullName>
+      <SortFullName>stowers, eva</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="b5be89cc-138a-4d73-8ddf-34796845720e">
+      <FirstName>Diane</FirstName>
+      <LastName>Strong</LastName>
+      <UniqueFullName>8c38f43c8e9c556253efeaf39e865a08e6d0f650</UniqueFullName>
+      <SortFullName>strong, diane m.</SortFullName>
+      <MiddleName>M.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="dd6bb954-02ed-421b-a400-10ab29854b4b">
+      <FirstName>Ruth</FirstName>
+      <LastName>Stubbings</LastName>
+      <UniqueFullName>83eac59513bc32151462d55a15bd53b5ce8ae3fb</UniqueFullName>
+      <SortFullName>stubbings, ruth</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="54b9543f-4a03-425a-944c-743b63d819af">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T11:32:24</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T11:32:24</ModifiedOn>
+      <LastName>Swiss Academic Software GmbH</LastName>
+      <UniqueFullName>4753950ff23bf14475708792093dac48281764ed</UniqueFullName>
+      <SortFullName>swiss academic software gmbh</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="5008a68d-65f5-41d2-a7f7-2f3fde89db7b">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:09:30</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:09:30</ModifiedOn>
+      <FirstName>Natalie</FirstName>
+      <LastName>Taylor</LastName>
+      <UniqueFullName>1127c15a9347448a843fc73095b5ad4fe9918d62</UniqueFullName>
+      <SortFullName>taylor, natalie greene</SortFullName>
+      <MiddleName>Greene</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="8559b7ff-3c8f-45e9-b17f-24097fd3d331">
+      <FirstName>José</FirstName>
+      <LastName>Teixeira</LastName>
+      <UniqueFullName>4469cdbeb2d563a683bfebf5c024fb9191f8dc1e</UniqueFullName>
+      <SortFullName>teixeira, josé carlos</SortFullName>
+      <MiddleName>Carlos</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="e4f3dff5-3d98-4873-b719-35c7fe432e5e">
+      <FirstName>Rhian</FirstName>
+      <LastName>Thomas</LastName>
+      <UniqueFullName>b348e01af1eda2f9121451bd6fa6dc00b9d58636</UniqueFullName>
+      <SortFullName>thomas, rhian</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="d79161dd-a47e-48b7-ac4f-8068a91617cf">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:09:30</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:09:30</ModifiedOn>
+      <FirstName>Kim</FirstName>
+      <LastName>Thompson</LastName>
+      <UniqueFullName>174461ce20b8d4e97b3002982b518a53d48c53c0</UniqueFullName>
+      <SortFullName>thompson, kim mitzo</SortFullName>
+      <MiddleName>Mitzo</MiddleName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="8262da57-68dd-4cfd-8bea-8f7e77cd3eb9">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:51:40</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:51:40</ModifiedOn>
+      <FirstName>Richard</FirstName>
+      <LastName>Tiberius</LastName>
+      <UniqueFullName>c925f12c59fb73baa2938b1a71daca7a0cb8d3fb</UniqueFullName>
+      <SortFullName>tiberius, richard g.</SortFullName>
+      <MiddleName>G.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="0ffa5cca-d05b-45ed-8b91-31ac6784e993">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:33:44</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:33:44</ModifiedOn>
+      <FirstName>Kevin</FirstName>
+      <LastName>Townsend</LastName>
+      <UniqueFullName>f7fe647a352f88018b005a8ae83ce5241ac5c2c1</UniqueFullName>
+      <SortFullName>townsend, kevin</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="ce4e7363-c87b-49fc-8666-c46b105e5287">
+      <FirstName>Eileen</FirstName>
+      <LastName>Trauth</LastName>
+      <UniqueFullName>175310138ad8dad2a7be65db82fbb5d56b3bd909</UniqueFullName>
+      <SortFullName>trauth, eileen m.</SortFullName>
+      <MiddleName>M.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="2724e3f9-037f-4b18-9f06-611b1a326184">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-24T08:30:09</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-24T08:30:09</ModifiedOn>
+      <FirstName>Patricia</FirstName>
+      <LastName>Tremel</LastName>
+      <UniqueFullName>8485c8532bafacf1b99693768a94baa420c82d4e</UniqueFullName>
+      <SortFullName>tremel, patricia</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="0fe2ecdf-be25-4322-8f44-313a7ecdaa8b">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:00:15</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:00:15</ModifiedOn>
+      <LastName>Universität Regensburg</LastName>
+      <UniqueFullName>7e6dbcf7aac1a5fcfb806e12707789edbba10c69</UniqueFullName>
+      <SortFullName>universität regensburg</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="054d3b87-2ab9-4f3a-ad7a-f0b6c7d43452">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:21:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:21:06</ModifiedOn>
+      <LastName>University of Chicago Press</LastName>
+      <UniqueFullName>aaca3d5df8ac824361c09aa57d124e5b1df34a9e</UniqueFullName>
+      <SortFullName>university of chicago press</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="b26a4bef-bf8d-4560-9e24-117ac57277ad">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:18:42</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:18:42</ModifiedOn>
+      <LastName>University of Jyväskylä</LastName>
+      <UniqueFullName>b9124edd6dc958029843123fc5a0b8c4417ad91c</UniqueFullName>
+      <SortFullName>university of jyväskylä</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="e06365c5-82ed-4397-81a1-9731f4249df6">
+      <FirstName>Christine</FirstName>
+      <LastName>Urquhart</LastName>
+      <UniqueFullName>bf0207304445c9b77e5948b5309b07606540c4fb</UniqueFullName>
+      <SortFullName>urquhart, christine</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="b2a34e79-6fd5-4d53-afe1-4f926822e654">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:39:34</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:39:34</ModifiedOn>
+      <FirstName>Frederik</FirstName>
+      <LastName>van Acker</LastName>
+      <UniqueFullName>718367f5219e58a71f1f8fef87677e10672aa4dc</UniqueFullName>
+      <SortFullName>van acker, frederik</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="2c2a4dda-f3b7-4505-aa6a-18622be1a02e">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:39:34</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:39:34</ModifiedOn>
+      <FirstName>Hans</FirstName>
+      <LastName>van Buuren</LastName>
+      <UniqueFullName>04b767355030bbb4f60749e3db89b492b5756a4d</UniqueFullName>
+      <SortFullName>van buuren, hans</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="64bf20aa-2e63-47e9-befb-54d9252cc2c4">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:39:34</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:39:34</ModifiedOn>
+      <FirstName>Marjan</FirstName>
+      <LastName>Vermeulen</LastName>
+      <UniqueFullName>0fe250f52e572d094e32cdaca9fc8adfe3e27404</UniqueFullName>
+      <SortFullName>vermeulen, marjan</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="572afa2d-2b66-4e33-b06f-f42b7fec4284">
+      <FirstName>Sirje</FirstName>
+      <LastName>Virkus</LastName>
+      <UniqueFullName>8442ad0cf7af132b491ddead14e055ca45cfad7b</UniqueFullName>
+      <SortFullName>virkus, sirje</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="479d459f-7f04-4100-ae29-60a63df67c4d">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:46:56</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:46:56</ModifiedOn>
+      <FirstName>Emily</FirstName>
+      <LastName>Wadsworth</LastName>
+      <UniqueFullName>bba6d0f05a12ace29978077c6ba50df7f2839a9f</UniqueFullName>
+      <SortFullName>wadsworth, emily c.</SortFullName>
+      <MiddleName>C.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="0a884fab-c523-4708-90b6-eb2419d79471">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:06:47</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:06:47</ModifiedOn>
+      <FirstName>Li</FirstName>
+      <LastName>Wang</LastName>
+      <UniqueFullName>92b5df8c6cd003b823ae024c13556bf176001c38</UniqueFullName>
+      <SortFullName>wang, li</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="bd2847a7-9205-4019-ab27-d92205ac40f3">
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-09T16:15:40</ModifiedOn>
+      <FirstName>Richard</FirstName>
+      <LastName>Wang</LastName>
+      <UniqueFullName>7dcaa88f5030a8e1cb563f56e1476c39ed13d2eb</UniqueFullName>
+      <SortFullName>wang, richard y.</SortFullName>
+      <MiddleName>Y.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="240c5b77-25eb-4f32-953f-3f576a305480">
+      <FirstName>Marjorie</FirstName>
+      <LastName>Warmkessel</LastName>
+      <UniqueFullName>047aeb7091289bc84f5c9edde48a3c6a425fc933</UniqueFullName>
+      <SortFullName>warmkessel, marjorie m.</SortFullName>
+      <MiddleName>M.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="944d4cbf-a651-4d85-a593-22c15b35adc3">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <FirstName>Kari</FirstName>
+      <LastName>Weaver</LastName>
+      <UniqueFullName>e0c171ba16c6e7e9370433e92ef7bb56babd9dd5</UniqueFullName>
+      <SortFullName>weaver, kari d.</SortFullName>
+      <MiddleName>D.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="5d2266db-f9f5-44bc-9661-937aecd09370">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-03-26T14:05:28</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-03-26T14:05:28</ModifiedOn>
+      <FirstName>Max</FirstName>
+      <LastName>Weber</LastName>
+      <UniqueFullName>5094b674dd36796fc7679233b7ca4aaf8e2fb3b3</UniqueFullName>
+      <SortFullName>weber, max</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="d7384811-ad5c-487e-8faf-b5eaffd4b2c5">
+      <FirstName>Sheila</FirstName>
+      <LastName>Weber</LastName>
+      <UniqueFullName>44a44c1f3b73ba4f22cec07150991b3499fb1dad</UniqueFullName>
+      <SortFullName>weber, sheila</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="13f4ef3a-9ed0-40da-b703-d00315c70c72">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:06:47</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:06:47</ModifiedOn>
+      <FirstName>Sharon</FirstName>
+      <LastName>Weiner</LastName>
+      <UniqueFullName>e599ee64ea759ab8345193757b894391d8639546</UniqueFullName>
+      <SortFullName>weiner, sharon a.</SortFullName>
+      <MiddleName>A.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="ba79f503-e953-4023-8c76-4c54b56ae942">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:00:42</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:00:42</ModifiedOn>
+      <FirstName>Jonathan</FirstName>
+      <LastName>Weyers</LastName>
+      <UniqueFullName>6cacc8286fef1f8dbcc9a74e7884c09f750dce30</UniqueFullName>
+      <SortFullName>weyers, jonathan d. b.</SortFullName>
+      <MiddleName>D. B.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="7c04d40b-a30c-49fc-a54c-326718a3b85a">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:19:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:19:50</ModifiedOn>
+      <FirstName>Brett</FirstName>
+      <LastName>Williams</LastName>
+      <UniqueFullName>e04b2107efbc2346415cc74d88cd08aacb0220d6</UniqueFullName>
+      <SortFullName>williams, brett</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="09df03a4-6e6e-4fdb-84c5-68b388a9372d">
+      <FirstName>Kirsty</FirstName>
+      <LastName>Williamson</LastName>
+      <UniqueFullName>4e9122e9debff6b29e2304781055eb4d8436cf9a</UniqueFullName>
+      <SortFullName>williamson, kirsty</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="142ca3e9-d981-491d-9a41-57ed82e5b25f">
+      <FirstName>Patricia</FirstName>
+      <LastName>Willingham</LastName>
+      <UniqueFullName>5498d5011af5be9efc4b1b743a6c970ba4b55b9c</UniqueFullName>
+      <SortFullName>willingham, patricia</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="237d6419-7e29-4368-8bff-a89910f0bf82">
+      <FirstName>Cary</FirstName>
+      <LastName>Windham</LastName>
+      <UniqueFullName>12040211634b53a2241266328809ade02469bec8</UniqueFullName>
+      <SortFullName>windham, cary</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="35034d4e-8170-4457-bf50-ee04d5587348">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:22:02</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:22:02</ModifiedOn>
+      <FirstName>Jörg</FirstName>
+      <LastName>Wittwer</LastName>
+      <UniqueFullName>09473572eccb73f8329c18fcd42c072b0cad528b</UniqueFullName>
+      <SortFullName>wittwer, jörg</SortFullName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+    <Person id="121e6fd5-adfb-48d9-b2c4-43df3c7976f4">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:11</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:11</ModifiedOn>
+      <FirstName>Mousa</FirstName>
+      <LastName>Yaminfirooz</LastName>
+      <UniqueFullName>0f4992f1198f4ff5fe108af161ba7a618943faa0</UniqueFullName>
+      <SortFullName>yaminfirooz, mousa</SortFullName>
+      <Protected>false</Protected>
+      <Sex>0</Sex>
+    </Person>
+    <Person id="e65df4bf-918c-4dc2-aaaa-2a9fa3b7b1b6">
+      <FirstName>Alison</FirstName>
+      <LastName>Yeoman</LastName>
+      <UniqueFullName>8d22849b806fcb16e4b5481f461d149a1848417a</UniqueFullName>
+      <SortFullName>yeoman, alison</SortFullName>
+      <Protected>false</Protected>
+      <Sex>1</Sex>
+    </Person>
+    <Person id="be12f3ea-48b0-4de4-aba6-d7bebf78e6e9">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:01:10</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:01:10</ModifiedOn>
+      <FirstName>Paul</FirstName>
+      <LastName>Zurkowski</LastName>
+      <UniqueFullName>3144ce18ad00c20d3ab253047019f3983d56d34c</UniqueFullName>
+      <SortFullName>zurkowski, paul g.</SortFullName>
+      <MiddleName>G.</MiddleName>
+      <Protected>false</Protected>
+      <Sex>2</Sex>
+    </Person>
+  </Persons>
+  <Publishers>
+    <Publisher id="753481a4-3dc5-4b47-9008-9b341ad935e0">
+      <Name>American Library Association</Name>
+      <Protected>false</Protected>
+      <SortFullName>american library association</SortFullName>
+      <UniqueFullName>450cfee96a44eedc12747d2ac3ed0655f5643d26</UniqueFullName>
+    </Publisher>
+    <Publisher id="96c0b085-eb1b-4d47-a477-7bfe83ffb962">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:39:57</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:39:57</ModifiedOn>
+      <Name>American Psychological Association</Name>
+      <Protected>false</Protected>
+      <SortFullName>american psychological association</SortFullName>
+      <UniqueFullName>84624e65a96e61d7761620b89459ca27ebc4b386</UniqueFullName>
+    </Publisher>
+    <Publisher id="7c4b83cd-f3bc-426f-b8ec-862354bfc8db">
+      <Name>Association of College and Research Libraries</Name>
+      <Protected>false</Protected>
+      <SortFullName>association of college and research libraries</SortFullName>
+      <UniqueFullName>c929a85155b332d638fcf016d453b70da33af0a1</UniqueFullName>
+    </Publisher>
+    <Publisher id="c88a2a4c-d61b-4163-85b6-758d0c7ed499">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-08-08T17:15:17</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-08-08T17:15:17</ModifiedOn>
+      <Name>Bertelsmann</Name>
+      <Protected>false</Protected>
+      <SortFullName>bertelsmann</SortFullName>
+      <UniqueFullName>51a4c5ad9e7b3f67f34e47755245acc2081c466d</UniqueFullName>
+    </Publisher>
+    <Publisher id="a79ad97d-9951-4b09-8286-f1748bb55539">
+      <Name>Chandos</Name>
+      <Protected>false</Protected>
+      <SortFullName>chandos</SortFullName>
+      <UniqueFullName>1e1c4874cc3db2ead0f4c80b51ae90115f531b0f</UniqueFullName>
+    </Publisher>
+    <Publisher id="7f822d05-258c-42c9-b048-c13fc65e87ee">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:07:49</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:07:49</ModifiedOn>
+      <Name>De Gruyter</Name>
+      <Protected>false</Protected>
+      <SortFullName>de gruyter</SortFullName>
+      <UniqueFullName>315b0c6e3ca88ed0e0b218e1bdf92ab8896f9b75</UniqueFullName>
+    </Publisher>
+    <Publisher id="43663225-0a0f-4191-8990-5d56c4ed234a">
+      <Name>Facet</Name>
+      <Protected>false</Protected>
+      <SortFullName>facet</SortFullName>
+      <UniqueFullName>34ed107e760a2c78ab0ac637f155812bc9e59c9a</UniqueFullName>
+    </Publisher>
+    <Publisher id="3f759c86-111b-43a9-9b5b-16d0bda01b9b">
+      <Name>Greenwood Publishing Group</Name>
+      <Protected>false</Protected>
+      <SortFullName>greenwood publishing group</SortFullName>
+      <UniqueFullName>32cb8738bc190a168f8ebfa786f1bff959850c9b</UniqueFullName>
+    </Publisher>
+    <Publisher id="ce0c69b3-3309-4725-b65a-4a35fc221079">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:58:49</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T16:58:49</ModifiedOn>
+      <Name>Heinle &amp; Heinle</Name>
+      <Protected>false</Protected>
+      <SortFullName>heinle &amp; heinle</SortFullName>
+      <UniqueFullName>02dcb36f628a3f190b726dd9f70d6a840d3aa9af</UniqueFullName>
+    </Publisher>
+    <Publisher id="e4aba5d0-f28b-4e56-a86a-c32d75767407">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:59:37</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:59:37</ModifiedOn>
+      <Name>Hülsbusch</Name>
+      <Protected>false</Protected>
+      <SortFullName>hülsbusch</SortFullName>
+      <UniqueFullName>30e7c66840bea0231a94092468a78e26e8371190</UniqueFullName>
+    </Publisher>
+    <Publisher id="689beb48-af6b-48c1-b722-161f28e71821">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:45:29</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:45:29</ModifiedOn>
+      <Name>Jossey-Bass</Name>
+      <Protected>false</Protected>
+      <SortFullName>jossey-bass</SortFullName>
+      <UniqueFullName>7690d139cae5a661221c43e8e72a25ae5b0f175d</UniqueFullName>
+    </Publisher>
+    <Publisher id="0d594da1-2a3b-42a7-9c0b-4707ceb1029a">
+      <Name>Libraries Unlimited</Name>
+      <Protected>false</Protected>
+      <SortFullName>libraries unlimited</SortFullName>
+      <UniqueFullName>248b8238082be254d1737dfb0abf139bb8c7fff6</UniqueFullName>
+    </Publisher>
+    <Publisher id="873206a4-3ab1-4198-bc36-cd6ca844ce7d">
+      <Name>Library Juice Press</Name>
+      <Protected>false</Protected>
+      <SortFullName>library juice press</SortFullName>
+      <UniqueFullName>0781ebd95f9bfa6adbb7baa3268987fbca3c8e99</UniqueFullName>
+    </Publisher>
+    <Publisher id="77cee05c-9b50-4597-bc76-50f047a8666e">
+      <Name>Linworth Books</Name>
+      <Protected>false</Protected>
+      <SortFullName>linworth books</SortFullName>
+      <UniqueFullName>5efd5aa14c0bf531bb39fb27dc771135a7a81e47</UniqueFullName>
+    </Publisher>
+    <Publisher id="a74041f4-7dd6-4b4e-b962-e9b135178bfc">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2015-03-26T14:05:28</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2015-03-26T14:05:28</ModifiedOn>
+      <Name>Mohr</Name>
+      <Protected>false</Protected>
+      <SortFullName>mohr</SortFullName>
+      <UniqueFullName>9d08d3b5a7edf15fbf4dd0d4a0aeec99448234cc</UniqueFullName>
+    </Publisher>
+    <Publisher id="e641f232-4e13-484f-8ca4-a0df18c30c42">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:58:46</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T16:58:46</ModifiedOn>
+      <Name>Multilingual Matters</Name>
+      <Protected>false</Protected>
+      <SortFullName>multilingual matters</SortFullName>
+      <UniqueFullName>bcaf4322789bd732cd7714bc9a9c5d28276d2b04</UniqueFullName>
+    </Publisher>
+    <Publisher id="a5326b9d-4a92-4004-8bca-e31dc46d945e">
+      <Name>Neal-Schuman</Name>
+      <Protected>false</Protected>
+      <SortFullName>neal-schuman</SortFullName>
+      <UniqueFullName>f67102ad36d77b10e1e403e64d3aa2a4debd1f91</UniqueFullName>
+    </Publisher>
+    <Publisher id="ae04c54a-ed41-4473-8c34-d306e08a4e6d">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-24T08:30:09</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-24T08:30:09</ModifiedOn>
+      <Name>Nomos Verlagsgesellschaft mbH</Name>
+      <Protected>false</Protected>
+      <SortFullName>nomos verlagsgesellschaft mbh</SortFullName>
+      <UniqueFullName>52be910f46f5f36f327aaaae98aac45638a5911f</UniqueFullName>
+    </Publisher>
+    <Publisher id="c5e29430-f42b-49d5-88c8-c79b137d7a5f">
+      <Name>Open University Press</Name>
+      <Protected>false</Protected>
+      <SortFullName>open university press</SortFullName>
+      <UniqueFullName>335ae576171905cbc7281158795bfe8267f78bc7</UniqueFullName>
+    </Publisher>
+    <Publisher id="a4c38884-a941-428a-b2c5-b205081f7583">
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-02-23T21:33:44</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:33:44</ModifiedOn>
+      <Name>O'Reilly</Name>
+      <Protected>false</Protected>
+      <SortFullName>o'reilly</SortFullName>
+      <UniqueFullName>7463747dd84f0e3553ca958a369eefdb4aee3bd4</UniqueFullName>
+    </Publisher>
+    <Publisher id="6f61e3a5-4166-4da6-b968-7aedf5852606">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T13:22:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T13:22:06</ModifiedOn>
+      <Name>Palgrave Macmillan</Name>
+      <Protected>false</Protected>
+      <SortFullName>palgrave macmillan</SortFullName>
+      <UniqueFullName>b64a46b26c8a95a4e7cb5a914c9dd2416eeb93fc</UniqueFullName>
+    </Publisher>
+    <Publisher id="e8911a46-4751-4f30-89c3-136e3a68628d">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:58:46</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T16:58:46</ModifiedOn>
+      <Name>Pearson</Name>
+      <Protected>false</Protected>
+      <SortFullName>pearson</SortFullName>
+      <UniqueFullName>d1778a429682785735b96e0cfa8c3012ad3f58f2</UniqueFullName>
+    </Publisher>
+    <Publisher id="cf7861d6-f227-4214-aa5d-736376190ec9">
+      <Name>Prentice Hall</Name>
+      <Protected>false</Protected>
+      <SortFullName>prentice hall</SortFullName>
+      <UniqueFullName>fda6c1818d2ad66efd68868f0e0b81aae092941b</UniqueFullName>
+    </Publisher>
+    <Publisher id="129e6ae1-c4ce-4cd4-b5f0-819c7a5c0131">
+      <Name>Quorum Books</Name>
+      <Protected>false</Protected>
+      <SortFullName>quorum books</SortFullName>
+      <UniqueFullName>571c45e6920ef90a969648eb2d1ba2c8643f57d8</UniqueFullName>
+    </Publisher>
+    <Publisher id="ef1a4ae6-fb64-4e51-a08f-e3cdf2cf7f46">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:06</ModifiedOn>
+      <Name>Routledge</Name>
+      <Protected>false</Protected>
+      <SortFullName>routledge</SortFullName>
+      <UniqueFullName>cb45ed1c464aa60548536d4b450d77a3d9ddbc1f</UniqueFullName>
+    </Publisher>
+    <Publisher id="f9e5051c-2432-4b2b-b830-7739c4924586">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T17:13:11</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:13:11</ModifiedOn>
+      <Name>Rowman &amp; Littlefield</Name>
+      <Protected>false</Protected>
+      <SortFullName>rowman &amp; littlefield</SortFullName>
+      <UniqueFullName>2a26816127399e025dc443ce1d9fc97c6ae1a090</UniqueFullName>
+    </Publisher>
+    <Publisher id="2dbf29f8-05f7-44c7-a3d3-0a03d7ca856c">
+      <Name>Scarecrow Press</Name>
+      <Protected>false</Protected>
+      <SortFullName>scarecrow press</SortFullName>
+      <UniqueFullName>e15f307f1c40e9dd823b9e172fe77370892effe8</UniqueFullName>
+    </Publisher>
+    <Publisher id="25be7915-a1fd-492e-854c-0e383603a161">
+      <Name>St. Martin's Griffin</Name>
+      <Protected>false</Protected>
+      <SortFullName>st. martin's griffin</SortFullName>
+      <UniqueFullName>1bbb4125a99ebd6ed9e1f2e296224efaefb2bb3a</UniqueFullName>
+    </Publisher>
+    <Publisher id="69b7c824-3a2b-4ed5-a78e-90fcef3c6f0b">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:20:25</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:20:25</ModifiedOn>
+      <Name>University of Chicago Press</Name>
+      <Protected>false</Protected>
+      <SortFullName>university of chicago press</SortFullName>
+      <UniqueFullName>aaca3d5df8ac824361c09aa57d124e5b1df34a9e</UniqueFullName>
+    </Publisher>
+    <Publisher id="86c6a3b5-3d14-4b13-9a81-5bb67f969f03">
+      <Name>University of Illinois Press</Name>
+      <Protected>false</Protected>
+      <SortFullName>university of illinois press</SortFullName>
+      <UniqueFullName>48a559e06624a27504fb5d5c3423faa4ee03d762</UniqueFullName>
+    </Publisher>
+    <Publisher id="9fa8d24c-4a4b-411d-8985-9416a7f8a040">
+      <Name>W.W. Norton</Name>
+      <Protected>false</Protected>
+      <SortFullName>w.w. norton</SortFullName>
+      <UniqueFullName>397c3921f9c57609ebf000d847d931ff2333cf18</UniqueFullName>
+    </Publisher>
+    <Publisher id="a954fb10-2d9a-4e19-81d7-8edfd98db4c2">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:22:02</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T17:32:17</ModifiedOn>
+      <Name>Woodhead</Name>
+      <Protected>true</Protected>
+      <SortFullName>woodhead</SortFullName>
+      <UniqueFullName>eb7459e6a4e2e455c5b00961636e5a0aa2567c4e</UniqueFullName>
+    </Publisher>
+  </Publishers>
+  <SeriesTitles>
+    <SeriesTitle id="47d90814-b90d-4da2-b12e-32e4a69a5cb0">
+      <Name>Chandos information professional series</Name>
+      <Protected>false</Protected>
+      <SortFullName>chandos information professional series</SortFullName>
+      <UniqueFullName>90072c393a98e7ce2c5ce3560c1bf0771b421805</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="6d91baae-63ad-4b3f-9023-1f97a431b7e2">
+      <Name>ELI Paper</Name>
+      <Protected>false</Protected>
+      <SortFullName>eli paper</SortFullName>
+      <UniqueFullName>076f3f608abe9f50f5c0ec7eb8751fab85a28b8b</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="800ba4dc-deb4-4f23-95da-ceac86e3016b">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T17:10:30</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T17:10:30</ModifiedOn>
+      <Name>Libraries Faculty and Staff Presentations</Name>
+      <Protected>false</Protected>
+      <SortFullName>libraries faculty and staff presentations</SortFullName>
+      <UniqueFullName>59feb5b8a62f3eb1c76c50fa459a1e5b6cafee52</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="6c191602-69b4-45eb-b070-19af9a79f55d">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:07:49</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:07:49</ModifiedOn>
+      <Name>Media Convergence / Medienkonvergenz</Name>
+      <Protected>false</Protected>
+      <SortFullName>media convergence / medienkonvergenz</SortFullName>
+      <UniqueFullName>beff04e04a382242c1ef2ac72f741ac4cfc7a9bd</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="587d3805-9e80-45f1-8b11-e8824abcafb0">
+      <Name>Oryx Press Series on Higher Education</Name>
+      <Protected>false</Protected>
+      <SortFullName>oryx press series on higher education</SortFullName>
+      <UniqueFullName>280681d6f7d3caf8bda2062c75738237e92d6782</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="d69b8816-65e9-4fb0-b239-63420c2696ce">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T13:22:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T13:22:06</ModifiedOn>
+      <Name>Palgrave study skills</Name>
+      <Protected>false</Protected>
+      <SortFullName>palgrave study skills</SortFullName>
+      <UniqueFullName>fb7fc24169a1334cfe801736122ad110e3c22807</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="6a5591f6-a912-46f7-b313-dd2cd6be1b86">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2013-09-22T08:28:50</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2013-09-22T08:28:50</ModifiedOn>
+      <Name>Part of the Cultural Evolution Seminar Series at Brooklyn College</Name>
+      <Protected>false</Protected>
+      <SortFullName>part of the cultural evolution seminar series at brooklyn college</SortFullName>
+      <UniqueFullName>3d7bd3c7bbb14a43c6874833792b97605f517eb5</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="b6c609cc-d13f-482d-a5bd-6e7dea9b5940">
+      <Name>Publish or be damned</Name>
+      <Protected>false</Protected>
+      <SortFullName>publish or be damned</SortFullName>
+      <UniqueFullName>fbce54487b13f99c66b0a0b274e2cc10c2942278</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="93acc3e3-36cd-4938-9fd2-38deb8f80849">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:06</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:06</ModifiedOn>
+      <Name>Routledge series in information systems</Name>
+      <Protected>false</Protected>
+      <SortFullName>routledge series in information systems</SortFullName>
+      <UniqueFullName>4b3fb558723066e68c41379dfd04e2e7454ffd83</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="c32cf9d1-ca14-4686-bfd0-492a6e134aef">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T16:58:05</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T16:58:05</ModifiedOn>
+      <Name>Schriften zur Informationswissenschaft</Name>
+      <Protected>false</Protected>
+      <SortFullName>schriften zur informationswissenschaft</SortFullName>
+      <UniqueFullName>a9faf1f735d78a1a6565303b2de73e514cd863b1</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="b3c359d5-7a5b-4f3d-be93-47ffda829c52">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-11-01T16:58:46</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-11-01T16:58:46</ModifiedOn>
+      <Name>Smarter study skills</Name>
+      <Protected>false</Protected>
+      <SortFullName>smarter study skills</SortFullName>
+      <UniqueFullName>15f3e191c0b11241c7726e19df7ecce4cca5f916</UniqueFullName>
+    </SeriesTitle>
+    <SeriesTitle id="621cf477-cc9c-4c7e-afc2-46924cfbad51">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2014-10-31T15:45:29</CreatedOn>
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2014-10-31T15:45:29</ModifiedOn>
+      <Name>The Jossey-Bass higher and adult education series</Name>
+      <Protected>false</Protected>
+      <SortFullName>the jossey-bass higher and adult education series</SortFullName>
+      <UniqueFullName>5de9b94607d6fdd299892de6c6358da5ec85e677</UniqueFullName>
+    </SeriesTitle>
+  </SeriesTitles>
+  <References>
+    <Reference id="0781d673-88c9-4c66-8eda-e3a6877cde78">
+      <CreatedBy>pm</CreatedBy>
+      <CreatedOn>2008-03-14T00:00:00</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-11-26T10:52:08</ModifiedOn>
+      <AbstractIsComplex>false</AbstractIsComplex>
+      <AbstractSourceTextFormat>1</AbstractSourceTextFormat>
+      <Abstract>Abstract</Abstract>
+      <AbstractFormatted>{\rtf1\ansi\ansicpg1252\uc0\stshfdbch0\stshfloch0\stshfhich0\stshfbi0\deff0\adeff0{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset0 Arial;}}{\colortbl;\red0\green0\blue0;}{\stylesheet{\s0\snext0\ltrpar\li0\lin0\ri0\rin0&#xD;
+\ql\faauto\rtlch\afs20\ltrch\fs18\f0 Normal;}{\*\cs10\additive Default Paragraph Font;}}{\*\generator Aspose.Words for .NET 11.11.0.0;}{\info\version0\edmins0\nofpages0\nofwords0\nofchars0\nofcharsws0}&#xD;
+{\mmathPr\mbrkBin0\mbrkBinSub0\mdefJc1\mdispDef1\minterSp0\mintLim0\mintraSp0\mlMargin0\mmathFont0\mnaryLim1\mpostSp0\mpreSp0\mrMargin0\msmallFrac0\mwrapIndent1440\mwrapRight0}\deflang1031\deflangfe2052\adeflang1025\jexpand\showxmlerrors1\validatexml1\viewscale100\fet0&#xD;
+\ftnbj\aendnotes\aftnnrlc\nogrowautofit\nouicompat\nofeaturethrottle1\formshade\dghspace180\dgvspace180\dghorigin1800\dgvorigin1440\dghshow1\dgvshow1\dgmargin\pgbrdrhead\pgbrdrfoot\sectd\pgndec\sbkpage\pgwsxn11906\pghsxn16838\marglsxn1800\margrsxn1800\margtsxn1440\margbsxn1440\headery720\footery720\ltrsect\pard\plain\itap0\s0\ltrpar\li0\lin0\ri0\rin0\ql\faauto\rtlch\afs20\ltrch\fs18\f0{\rtlch\af0\afs24\ltrch\fs18\lang1031\langnp1031&#xD;
+\loch\af0\dbch\af0\hich\f0\cf1 Abstract}{\rtlch\af0\afs24\ltrch\fs18\lang1031\langnp1031\loch\af0\dbch\af0\hich\f0\cs10\cf1\par}{\*\latentstyles\lsdstimax267\lsdlockeddef0\lsdsemihiddendef1\lsdunhideuseddef1\lsdqformatdef0\lsdprioritydef99&#xD;
+{\lsdlockedexcept}}}</AbstractFormatted>
+      <AccessDate>31.10.2014</AccessDate>
+      <CitationKey>Har97</CitationKey>
+      <CitationKeyUpdateType>0</CitationKeyUpdateType>
+      <CoverPath>Harris 1997 - Evaluating Internet Research Sources.jpg</CoverPath>
+      <Date>17.11.1997</Date>
+      <DateForSorting>1997-11-17T00:00:00</DateForSorting>
+      <EvaluationIsComplex>false</EvaluationIsComplex>
+      <EvaluationSourceTextFormat>1</EvaluationSourceTextFormat>
+      <Evaluation>Super!</Evaluation>
+      <EvaluationFormatted>{\rtf1\ansi\ansicpg1252\uc0\stshfdbch0\stshfloch0\stshfhich0\stshfbi0\deff0\adeff0{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset0 Arial;}}{\colortbl;\red0\green0\blue0;}{\stylesheet{\s0\snext0\ltrpar\li0\lin0\ri0\rin0&#xD;
+\ql\faauto\rtlch\afs20\ltrch\fs18\f0 Normal;}{\*\cs10\additive Default Paragraph Font;}}{\*\generator Aspose.Words for .NET 11.11.0.0;}{\info\version0\edmins0\nofpages0\nofwords0\nofchars0\nofcharsws0}&#xD;
+{\mmathPr\mbrkBin0\mbrkBinSub0\mdefJc1\mdispDef1\minterSp0\mintLim0\mintraSp0\mlMargin0\mmathFont0\mnaryLim1\mpostSp0\mpreSp0\mrMargin0\msmallFrac0\mwrapIndent1440\mwrapRight0}\deflang1031\deflangfe2052\adeflang1025\jexpand\showxmlerrors1\validatexml1\viewscale100\fet0&#xD;
+\ftnbj\aendnotes\aftnnrlc\nogrowautofit\nouicompat\nofeaturethrottle1\formshade\dghspace180\dgvspace180\dghorigin1800\dgvorigin1440\dghshow1\dgvshow1\dgmargin\pgbrdrhead\pgbrdrfoot\sectd\pgndec\sbkpage\pgwsxn11906\pghsxn16838\marglsxn1800\margrsxn1800\margtsxn1440\margbsxn1440\headery720\footery720\ltrsect\pard\plain\itap0\s0\ltrpar\li0\lin0\ri0\rin0\ql\faauto\rtlch\afs20\ltrch\fs18\f0{\rtlch\af0\afs24\ltrch\fs18\lang1031\langnp1031&#xD;
+\loch\af0\dbch\af0\hich\f0\cf1 Super!}{\rtlch\af0\afs24\ltrch\fs18\lang1031\langnp1031\loch\af0\dbch\af0\hich\f0\cs10\cf1\par}{\*\latentstyles\lsdstimax267\lsdlockeddef0\lsdsemihiddendef1\lsdunhideuseddef1\lsdqformatdef0\lsdprioritydef99&#xD;
+{\lsdlockedexcept}}}</EvaluationFormatted>
+      <HasLabel1>false</HasLabel1>
+      <HasLabel2>false</HasLabel2>
+      <Notes>Notiz</Notes>
+      <OnlineAddress>http://www.virtualsalt.com/evalu8it.htm</OnlineAddress>
+      <PageRangeNumber>-1</PageRangeNumber>
+      <Rating>2</Rating>
+      <ReferenceType>InternetDocument</ReferenceType>
+      <SequenceNumber>3</SequenceNumber>
+      <ShortTitle>Harris 1997 – Evaluating Internet Research Sources</ShortTitle>
+      <ShortTitleUpdateType>0</ShortTitleUpdateType>
+      <TableOfContentsIsComplex>false</TableOfContentsIsComplex>
+      <TableOfContentsSourceTextFormat>1</TableOfContentsSourceTextFormat>
+      <TableOfContents>TOC</TableOfContents>
+      <TableOfContentsFormatted>{\rtf1\ansi\ansicpg1252\uc0\stshfdbch0\stshfloch0\stshfhich0\stshfbi0\deff0\adeff0{\fonttbl{\f0\fnil\fcharset0 Segoe UI;}{\f1\fnil\fcharset0 Arial;}}{\colortbl;\red0\green0\blue0;}{\stylesheet{\s0\snext0\ltrpar\li0\lin0\ri0\rin0\ql&#xD;
+\faauto\rtlch\afs20\ltrch\fs18\f0 Normal;}{\*\cs10\additive Default Paragraph Font;}}{\*\generator Aspose.Words for .NET 11.11.0.0;}{\info\version0\edmins0\nofpages0\nofwords0\nofchars0\nofcharsws0}&#xD;
+{\mmathPr\mbrkBin0\mbrkBinSub0\mdefJc1\mdispDef1\minterSp0\mintLim0\mintraSp0\mlMargin0\mmathFont0\mnaryLim1\mpostSp0\mpreSp0\mrMargin0\msmallFrac0\mwrapIndent1440\mwrapRight0}\deflang1031\deflangfe2052\adeflang1025\jexpand\showxmlerrors1\validatexml1\viewscale100\fet0&#xD;
+\ftnbj\aendnotes\aftnnrlc\nogrowautofit\nouicompat\nofeaturethrottle1\formshade\dghspace180\dgvspace180\dghorigin1800\dgvorigin1440\dghshow1\dgvshow1\dgmargin\pgbrdrhead\pgbrdrfoot\sectd\pgndec\sbkpage\pgwsxn11906\pghsxn16838\marglsxn1800\margrsxn1800\margtsxn1440\margbsxn1440\headery720\footery720\ltrsect\pard\plain\itap0\s0\ltrpar\li0\lin0\ri0\rin0\ql\faauto\rtlch\afs20\ltrch\fs18\f0{\rtlch\af0\afs24\ltrch\fs18\lang1031\langnp1031&#xD;
+\loch\af0\dbch\af0\hich\f0\cf1 TOC}{\rtlch\af0\afs24\ltrch\fs18\lang1031\langnp1031\loch\af0\dbch\af0\hich\f0\cs10\cf1\par}{\*\latentstyles\lsdstimax267\lsdlockeddef0\lsdsemihiddendef1\lsdunhideuseddef1\lsdqformatdef0\lsdprioritydef99&#xD;
+{\lsdlockedexcept}}}</TableOfContentsFormatted>
+      <Title>Evaluating Internet Research Sources</Title>
+    </Reference>
+  </References>
+  <ReferenceAuthors>
+    <OnetoN>0781d673-88c9-4c66-8eda-e3a6877cde78;900c9668-c2d9-4fa2-8ef6-c2b7a502ee2f</OnetoN>
+  </ReferenceAuthors>
+  <ReferenceCategories>
+    <OnetoN>0781d673-88c9-4c66-8eda-e3a6877cde78;032f629c-ad3c-4b45-8ebc-c3a2ba6ffc35</OnetoN>
+  </ReferenceCategories>
+  <ReferenceKeywords>
+    <OnetoN>0781d673-88c9-4c66-8eda-e3a6877cde78;27046e49-7a55-4751-8551-24c538fac470;ccf1741f-1d4d-42b4-9c43-6addc486d9e3</OnetoN>
+  </ReferenceKeywords>
+  <Locations>
+    <Location id="baa5cec4-bbb9-4675-9923-8a607d8be9fc">
+      <Address>http://www.virtualsalt.com/evalu8it.htm</Address>
+      <AddressInfo>4</AddressInfo>
+      <LocationType>0</LocationType>
+      <MirrorsReferencePropertyId>OnlineAddress</MirrorsReferencePropertyId>
+      <PreviewBehaviour>0</PreviewBehaviour>
+      <ReferenceID>0781d673-88c9-4c66-8eda-e3a6877cde78</ReferenceID>
+    </Location>
+  </Locations>
+  <KnowledgeItems>
+    <KnowledgeItem id="b74e6b24-5a63-4150-aff1-afacb42c2d05">
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2010-09-30T15:10:53</ModifiedOn>
+      <CoreStatement>Definitions</CoreStatement>
+      <CoreStatementUpdateType>0</CoreStatementUpdateType>
+      <KnowledgeItemType>2</KnowledgeItemType>
+      <PageRangeNumber>-1</PageRangeNumber>
+      <QuotationType>0</QuotationType>
+      <Relevance>0</Relevance>
+      <TextSourceTextFormat>0</TextSourceTextFormat>
+      <TextIsComplex>false</TextIsComplex>
+    </KnowledgeItem>
+    <KnowledgeItem id="a1b0de83-1331-4471-9d3c-56e57bf2feb0">
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2010-09-30T15:11:09</ModifiedOn>
+      <CoreStatement>Relationships &amp; Differences</CoreStatement>
+      <CoreStatementUpdateType>0</CoreStatementUpdateType>
+      <KnowledgeItemType>2</KnowledgeItemType>
+      <PageRangeNumber>-1</PageRangeNumber>
+      <QuotationType>0</QuotationType>
+      <Relevance>0</Relevance>
+      <TextSourceTextFormat>0</TextSourceTextFormat>
+      <TextIsComplex>false</TextIsComplex>
+    </KnowledgeItem>
+    <KnowledgeItem id="d335a303-8dfb-4a85-a2db-ee96f7f3dbe9">
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2010-09-30T17:47:20</ModifiedOn>
+      <CoreStatement>Thinking about curriculum</CoreStatement>
+      <CoreStatementUpdateType>0</CoreStatementUpdateType>
+      <KnowledgeItemType>2</KnowledgeItemType>
+      <PageRangeNumber>-1</PageRangeNumber>
+      <QuotationType>0</QuotationType>
+      <Relevance>0</Relevance>
+      <TextSourceTextFormat>0</TextSourceTextFormat>
+      <TextIsComplex>false</TextIsComplex>
+    </KnowledgeItem>
+    <KnowledgeItem id="809f54aa-2aae-4357-9bc6-90c7a0cad1b3">
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2010-09-30T17:47:52</ModifiedOn>
+      <CoreStatement>Defining learning objectives</CoreStatement>
+      <CoreStatementUpdateType>0</CoreStatementUpdateType>
+      <KnowledgeItemType>2</KnowledgeItemType>
+      <PageRangeNumber>-1</PageRangeNumber>
+      <QuotationType>0</QuotationType>
+      <Relevance>0</Relevance>
+      <TextSourceTextFormat>0</TextSourceTextFormat>
+      <TextIsComplex>false</TextIsComplex>
+    </KnowledgeItem>
+    <KnowledgeItem id="64926ce4-fc5c-4b4e-a180-8fc578ce4e38">
+      <ModifiedBy>pm</ModifiedBy>
+      <ModifiedOn>2011-02-21T10:23:06</ModifiedOn>
+      <CoreStatement>Criteria for assessing the trustworthiness of a source</CoreStatement>
+      <CoreStatementUpdateType>1</CoreStatementUpdateType>
+      <KnowledgeItemType>0</KnowledgeItemType>
+      <PageRangeNumber>-1</PageRangeNumber>
+      <QuotationIndex>0</QuotationIndex>
+      <QuotationType>1</QuotationType>
+      <ReferenceID>0781d673-88c9-4c66-8eda-e3a6877cde78</ReferenceID>
+      <Relevance>0</Relevance>
+      <TextSourceTextFormat>1</TextSourceTextFormat>
+      <Text>"Credibility:trustworthy source, author’s credentials, evidence of quality control, known or respected authority, organizational support. Goal: an authoritative source, a source that supplies some good evidence that allows you to trust it. &#xD;
+Accuracy: up to date, factual, detailed, exact, comprehensive, audience and purpose reflect intentions of completeness and accuracy. Goal: a source that is correct today (not yesterday), a source that gives the whole truth. &#xD;
+Reasonableness:fair, balanced, objective, reasoned, no conflict of interest, absence of fallacies or slanted tone. Goal: a source that engages the subject thoughtfully and reasonably, concerned with the truth. &#xD;
+Support: listed sources, contact information, available corroboration, claims supported, documentation supplied. Goal: a source that provides convincing evidence for the claims made, a source you can triangulate (find at least two other sources that support it). "</Text>
+      <TextIsComplex>false</TextIsComplex>
+      <TextFormatted>{\rtf1\ansi\ansicpg1252\uc0\stshfdbch0\stshfloch0\stshfhich0\stshfbi0\deff0\adeff0{\fonttbl{\f0\fnil\fcharset0 Times New Roman;}{\f1\fnil\fcharset0 Segoe UI;}{\f2\fnil\fcharset0 Arial Unicode MS;}}{\colortbl;\red0\green0\blue0;}{\stylesheet{\s0\snext0\fi0\ltrpar\li0\lin0\ri0\rin0\ql\faauto\rtlch\afs20\ltrch\fs18\f2\cf0 Normal;}{\*\cs10\additive\cf1 Default Paragraph Font;}}{\*\generator Aspose.Words for .NET 9.6.0.0;}{\info\version0\edmins0\nofpages0\nofwords0\nofchars0\nofcharsws0}\deftab1134\deflang1031\deflangfe2052\adeflang1025\jexpand\showxmlerrors1\validatexml1\viewscale100\fet0\ftnbj\aendnotes\aftnnrlc\nogrowautofit\formshade\dghspace180\dgvspace180\dghorigin1800\dgvorigin1440\dghshow1\dgvshow1\dgmargin\pgbrdrhead\pgbrdrfoot\sectd\pgndec\sbkpage\pgwsxn12240\pghsxn15840\marglsxn1800\margrsxn1800\margtsxn1440\margbsxn1440\headery720\footery720\ltrsect\sectdefaultcl\pard\plain\itap0\s0\fi0\sa120\ltrpar\li0\lin0\ri0\rin0\ql\faauto\rtlch\afs20\ltrch\fs18\f2\cf0{\rtlch\afs24\ltrch\fs18\f1\lang1033\langnp1033\cs10\cf0 "Credibility:\line trustworthy source, author\u8217 s credentials, evidence of quality control, known or respected authority, organizational support. Goal: an authoritative source, a source that supplies some good evidence that allows you to trust it. }{\rtlch\afs24\ltrch\fs18\f1\lang1033\langnp1033\cs10\cf1\par}\pard\plain\itap0\s0\fi0\sa120\ltrpar\li0\lin0\ri0\rin0\ql\faauto\rtlch\afs20\ltrch\fs18\f2\cf0{\rtlch\afs24\ltrch\fs18\f1\lang1033\langnp1033\cs10\cf0 Accuracy: \line up to date, factual, detailed, exact, comprehensive, audience and purpose reflect intentions of completeness and accuracy. Goal: a source that is correct today (not yesterday), a source that gives the whole truth. }{\rtlch\afs24\ltrch\fs18\f1\lang1033\langnp1033\cs10\cf1\par}\pard\plain\itap0\s0\fi0\sa120\ltrpar\li0\lin0\ri0\rin0\ql\faauto\rtlch\afs20\ltrch\fs18\f2\cf0{\rtlch\afs24\ltrch\fs18\f1\lang1033\langnp1033\cs10\cf0 Reasonableness:\line fair, balanced, objective, reasoned, no conflict of interest, absence of fallacies or slanted tone. Goal: a source that engages the subject thoughtfully and reasonably, concerned with the truth. }{\rtlch\afs24\ltrch\fs18\f1\lang1033\langnp1033\cs10\cf1\par}\pard\plain\itap0\s0\fi0\sa120\ltrpar\li0\lin0\ri0\rin0\ql\faauto\rtlch\afs20\ltrch\fs18\f2\cf0{\rtlch\afs24\ltrch\fs18\f1\lang1033\langnp1033\cs10\cf0 Support: \line listed sources, contact information, available corroboration, claims supported, documentation supplied. Goal: a source that provides convincing evidence for the claims made, a source you can triangulate (find at least two other sources that support it). "}{\rtlch\afs24\ltrch\fs18\f1\lang1033\langnp1033\cs10\cf1\par}{\*\latentstyles\lsdstimax267\lsdlockeddef0\lsdsemihiddendef1\lsdunhideuseddef1\lsdqformatdef0\lsdprioritydef99{\lsdlockedexcept}}}</TextFormatted>
+    </KnowledgeItem>
+  </KnowledgeItems>
+  <KnowledgeItemCategories>
+    <OnetoN>b74e6b24-5a63-4150-aff1-afacb42c2d05;7e254f3e-0178-4e47-8302-fdf8d46875a5:0</OnetoN>
+    <OnetoN>a1b0de83-1331-4471-9d3c-56e57bf2feb0;7e254f3e-0178-4e47-8302-fdf8d46875a5:1</OnetoN>
+    <OnetoN>d335a303-8dfb-4a85-a2db-ee96f7f3dbe9;cd3ac2ac-88f6-4055-ae74-b5ff11d08c2d:0</OnetoN>
+    <OnetoN>809f54aa-2aae-4357-9bc6-90c7a0cad1b3;cd3ac2ac-88f6-4055-ae74-b5ff11d08c2d:1</OnetoN>
+    <OnetoN>64926ce4-fc5c-4b4e-a180-8fc578ce4e38;032f629c-ad3c-4b45-8ebc-c3a2ba6ffc35:0</OnetoN>
+  </KnowledgeItemCategories>
+  <TaskItems>
+    <TaskItem id="6ddd18b3-e84f-42d7-b204-f8ea3195aeec">
+      <CreatedBy>Citavi 2</CreatedBy>
+      <CreatedOn>2010-10-31T00:00:00</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-02-23T21:28:39</ModifiedOn>
+      <DueDate>2016-11-27T00:00:00</DueDate>
+      <Importance>0</Importance>
+      <Name>Deadline: master thesis</Name>
+      <NameId>54207f21a38c29a83488e69ee46875d10bff6a43</NameId>
+      <State>0</State>
+    </TaskItem>
+    <TaskItem id="c123f95a-bef1-42fc-b02b-3ee1e3f22793">
+      <ReferenceID>0781d673-88c9-4c66-8eda-e3a6877cde78</ReferenceID>
+      <CreatedBy>z</CreatedBy>
+      <CreatedOn>2016-11-26T10:51:37</CreatedOn>
+      <ModifiedBy>z</ModifiedBy>
+      <ModifiedOn>2016-11-26T10:51:37</ModifiedOn>
+      <Importance>0</Importance>
+      <Name>Todo</Name>
+      <NameId>e990da9416194a748653b57f7beffcc1b171cdd1</NameId>
+      <State>1</State>
+    </TaskItem>
+  </TaskItems>
+</CitaviExchangeData>
