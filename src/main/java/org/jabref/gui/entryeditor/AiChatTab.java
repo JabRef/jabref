@@ -46,6 +46,7 @@ public class AiChatTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
     private final CitationKeyGenerator citationKeyGenerator;
+    private final PreferencesService preferencesService;
     private final AiService aiService;
 
     private final List<BibEntry> entriesUnderIngestion = new ArrayList<>();
@@ -64,6 +65,7 @@ public class AiChatTab extends EntryEditorTab {
         this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
+        this.preferencesService = preferencesService;
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));
@@ -88,7 +90,7 @@ public class AiChatTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (!aiService.getPreferences().getEnableAi()) {
             showPrivacyNotice(entry);
-        } else if (aiService.getPreferences().getSelectedApiKey().isEmpty()) {
+        } else if (aiService.getPreferences().getSelectedApiKey(preferencesService).isEmpty()) {
             showApiKeyMissing();
         } else if (entry.getFiles().isEmpty()) {
             showErrorNoFiles();
