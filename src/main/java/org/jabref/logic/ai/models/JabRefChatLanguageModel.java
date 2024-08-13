@@ -45,10 +45,6 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         this.apiKeyProvider = apiKeyProvider;
         this.httpClient = HttpClient.newBuilder().connectTimeout(CONNECTION_TIMEOUT).executor(executorService).build();
 
-        if (aiPreferences.getEnableAi()) {
-            rebuild();
-        }
-
         setupListeningToPreferencesChanges();
     }
 
