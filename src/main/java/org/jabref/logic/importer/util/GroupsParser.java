@@ -278,7 +278,9 @@ public class GroupsParser {
         int context = Integer.parseInt(tok.nextToken());
         String expression = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         EnumSet<SearchFlags> searchFlags = EnumSet.noneOf(SearchFlags.class);
-        tok.nextToken(); // This used to be the flag for CASE_SENSITIVE search. Skip it for backwards-compatibility
+        if (Integer.parseInt(tok.nextToken()) == 1) {
+            searchFlags.add(SearchFlags.CASE_SENSITIVE);
+        }
         if (Integer.parseInt(tok.nextToken()) == 1) {
             searchFlags.add(SearchFlags.REGULAR_EXPRESSION);
         }

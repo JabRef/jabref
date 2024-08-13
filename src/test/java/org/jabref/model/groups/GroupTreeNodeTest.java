@@ -83,7 +83,7 @@ public class GroupTreeNodeTest {
     }
 
     private static AbstractGroup getSearchGroup(String name) {
-        return new SearchGroup(name, GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.noneOf(SearchFlags.class));
+        return new SearchGroup(name, GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchFlags.CASE_SENSITIVE));
     }
 
     private static AbstractGroup getExplict(String name) {
@@ -333,7 +333,7 @@ public class GroupTreeNodeTest {
 
     @Test
     void addEntriesToGroupWorksNotForGroupsNotSupportingExplicitAddingOfEntries() {
-        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.noneOf(SearchFlags.class)));
+        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchFlags.CASE_SENSITIVE)));
         List<FieldChange> fieldChanges = searchGroup.addEntriesToGroup(entries);
 
         assertEquals(Collections.emptyList(), fieldChanges);
@@ -341,7 +341,7 @@ public class GroupTreeNodeTest {
 
     @Test
     void removeEntriesFromGroupWorksNotForGroupsNotSupportingExplicitRemovalOfEntries() {
-        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.noneOf(SearchFlags.class)));
+        GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchFlags.CASE_SENSITIVE)));
         List<FieldChange> fieldChanges = searchGroup.removeEntriesFromGroup(entries);
 
         assertEquals(Collections.emptyList(), fieldChanges);
