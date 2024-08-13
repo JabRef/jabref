@@ -2838,9 +2838,7 @@ public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
 
     public String getApiKeyForAiProvider(AiProvider aiProvider) {
         try (final Keyring keyring = Keyring.create()) {
-            String rawPassword = keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
-            Password password = new Password(rawPassword, getInternalPreferences().getUserAndHost());
-            return password.decrypt();
+            return keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
         } catch (PasswordAccessException e) {
             LOGGER.debug("No API key stored for provider {}. Returning an empty string", aiProvider.getLabel());
             return "";
@@ -2856,13 +2854,10 @@ public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
                 try {
                     keyring.deletePassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
                 } catch (PasswordAccessException ex) {
-                    LOGGER.debug("API key for provider {} not stored in keyring. JabRef won't store an empty key", aiProvider.getLabel());
+                    LOGGER.debug("API key for provider {} not stored in keyring. JabRef does not store an empty key.", aiProvider.getLabel());
                 }
             } else {
-                Password password = new Password(newKey, getInternalPreferences().getUserAndHost());
-                String rawPassword = password.encrypt();
-
-                keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name(), rawPassword);
+                keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name(), newKey);
             }
         } catch (Exception e) {
             LOGGER.warn("JabRef could not open keyring for storing {} API token", aiProvider.getLabel(), e);
