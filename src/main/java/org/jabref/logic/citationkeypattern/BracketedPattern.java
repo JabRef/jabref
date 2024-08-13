@@ -844,7 +844,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the initials of all authors' names
      */
-    static String authorsAlpha(AuthorList authorList) {
+    public static String authorsAlpha(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
         int numberOfAuthors = authorList.getNumberOfAuthors();
         boolean andOthersPresent = numberOfAuthors > 1 &&
@@ -887,7 +887,7 @@ public class BracketedPattern {
      * @return a string consisting of authors' last names separated by a `delimiter` and with any authors excess of
      * `maxAuthors` replaced with `suffix`
      */
-    private static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, final String suffix) {
+    public static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, final String suffix) {
         final String finalSuffix = authorList.getNumberOfAuthors() > maxAuthors ? suffix : "";
         return authorList.getAuthors().stream()
                          .map(author -> {

@@ -1,6 +1,5 @@
 package org.jabref.gui.entryeditor;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -96,25 +95,24 @@ public class SciteTabViewModel extends AbstractViewModel {
     }
 
     public SciteTallyModel fetchTallies(DOI doi) throws FetcherException {
+        URL url;
         try {
-            URL url = new URI(BASE_URL + "tallies/" + doi.getDOI()).toURL();
-            LOGGER.debug("Fetching tallies from {}", url);
-            URLDownload download = new URLDownload(url);
-            String response = download.asString();
-            LOGGER.debug("Response {}", response);
-            JSONObject tallies = new JSONObject(response);
-            if (tallies.has("detail")) {
-                String message = tallies.getString("detail");
-                throw new FetcherException(message);
-            } else if (!tallies.has("total")) {
-                throw new FetcherException("Unexpected result data.");
-            }
-            return SciteTallyModel.fromJSONObject(tallies);
+            url = new URI(BASE_URL + "tallies/" + doi.getDOI()).toURL();
         } catch (MalformedURLException | URISyntaxException ex) {
             throw new FetcherException("Malformed URL for DOI", ex);
-        } catch (IOException ioex) {
-            throw new FetcherException("Failed to retrieve tallies for DOI - I/O Exception", ioex);
         }
+        LOGGER.debug("Fetching tallies from {}", url);
+        URLDownload download = new URLDownload(url);
+        String response = download.asString();
+        LOGGER.debug("Response {}", response);
+        JSONObject tallies = new JSONObject(response);
+        if (tallies.has("detail")) {
+            String message = tallies.getString("detail");
+            throw new FetcherException(message);
+        } else if (!tallies.has("total")) {
+            throw new FetcherException("Unexpected result data.");
+        }
+        return SciteTallyModel.fromJSONObject(tallies);
     }
 
     public ObjectProperty<SciteStatus> statusProperty() {

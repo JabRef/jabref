@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
@@ -39,7 +38,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(SEARCH_URL);
         String query = new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("");
         // adding quotations for the query for more specified results

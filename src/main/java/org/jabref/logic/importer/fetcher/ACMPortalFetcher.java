@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
@@ -49,7 +48,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
      * @return query URL
      */
     @Override
-    public URL getURLForQuery(QueryNode query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         uriBuilder.addParameter("AllField", createQueryString(query));
         return uriBuilder.build().toURL();

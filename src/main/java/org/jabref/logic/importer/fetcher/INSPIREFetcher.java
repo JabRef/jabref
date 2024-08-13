@@ -1,11 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +55,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(INSPIRE_HOST);
         uriBuilder.addParameter("q", new DefaultLuceneQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         return uriBuilder.build().toURL();
@@ -88,27 +86,33 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        List<BibEntry> results = new ArrayList<>();
         Optional<String> doi = entry.getField(StandardField.DOI);
         Optional<String> archiveprefix = entry.getFieldOrAlias(StandardField.ARCHIVEPREFIX);
         Optional<String> eprint = entry.getField(StandardField.EPRINT);
-        String url;
 
+        String urlString;
         if (archiveprefix.filter("arxiv"::equals).isPresent() && eprint.isPresent()) {
-            url = INSPIRE_ARXIV_HOST + eprint.get();
+            urlString = INSPIRE_ARXIV_HOST + eprint.get();
         } else if (doi.isPresent()) {
-            url = INSPIRE_DOI_HOST + doi.get();
+            urlString = INSPIRE_DOI_HOST + doi.get();
         } else {
-            return results;
+            return List.of();
+        }
+
+        URL url;
+        try {
+            url = new URI(urlString).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
+            throw new FetcherException("Invalid URL", e);
         }
 
         try {
-            URLDownload download = getUrlDownload(new URI(url).toURL());
-            results = getParser().parseEntries(download.asInputStream());
+            URLDownload download = getUrlDownload(url);
+            List<BibEntry> results = getParser().parseEntries(download.asInputStream());
             results.forEach(this::doPostCleanup);
             return results;
-        } catch (IOException | ParseException | URISyntaxException e) {
-            throw new FetcherException("Error occurred during fetching", e);
+        } catch (ParseException e) {
+            throw new FetcherException(url, e);
         }
     }
 }
