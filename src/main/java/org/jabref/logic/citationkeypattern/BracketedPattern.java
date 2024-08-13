@@ -846,38 +846,34 @@ public class BracketedPattern {
      */
     static String authorsAlpha(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
-        int maxAuthors = Math.min(authorList.getNumberOfAuthors(), MAX_ALPHA_AUTHORS);
+        int numberOfAuthors = authorList.getNumberOfAuthors();
+        boolean andOthersPresent = numberOfAuthors > 1 &&
+                authorList.getAuthor(numberOfAuthors - 1).equals(Author.OTHERS);
 
-        if (authorList.getNumberOfAuthors() == 1) {
-            String[] firstAuthor = authorList.getAuthor(0).getNamePrefixAndFamilyName()
-                                             .replaceAll("\\s+", " ").trim().split(" ");
-            // take first letter of any "prefixes" (e.g. van der Aalst -> vd)
-            for (int j = 0; j < (firstAuthor.length - 1); j++) {
-                alphaStyle.append(firstAuthor[j], 0, 1);
-            }
-            // append last part of last name completely
-            alphaStyle.append(firstAuthor[firstAuthor.length - 1], 0,
-                    Math.min(4, firstAuthor[firstAuthor.length - 1].length()));
+        if (numberOfAuthors == 1 || andOthersPresent) {
+            // Single author or "and others" case
+            String lastName = getLastName(authorList.getAuthor(0));
+            alphaStyle.append(lastName, 0, Math.min(2, lastName.length()));
         } else {
-            boolean andOthersPresent = authorList.getAuthor(maxAuthors - 1).equals(Author.OTHERS);
-            if (andOthersPresent) {
-                maxAuthors--;
-            }
-            List<String> vonAndLastNames = authorList.getAuthors().stream()
-                                                     .limit(maxAuthors)
-                                                     .map(Author::getNamePrefixAndFamilyName)
-                                                     .toList();
-            for (String vonAndLast : vonAndLastNames) {
-                // replace all whitespaces by " "
-                // split the lastname at " "
-                String[] nameParts = vonAndLast.replaceAll("\\s+", " ").trim().split(" ");
-                for (String part : nameParts) {
-                    // use first character of each part of lastname
-                    alphaStyle.append(part, 0, 1);
+            int maxAuthors = Math.min(numberOfAuthors, MAX_ALPHA_AUTHORS);
+            for (int i = 0; i < maxAuthors; i++) {
+                String lastName = getLastName(authorList.getAuthor(i));
+                alphaStyle.append(lastName, 0, 1);
+                if (alphaStyle.length() >= 4) {
+                    // Stop after 4 authors
+                    break;
                 }
             }
         }
         return alphaStyle.toString();
+    }
+
+    static String getLastName(Author author) {
+        String[] nameParts = author.getNamePrefixAndFamilyName()
+                                   .replaceAll("\\s+", " ")
+                                   .trim()
+                                   .split(" ");
+        return nameParts[nameParts.length - 1];
     }
 
     /**
