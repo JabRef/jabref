@@ -98,8 +98,8 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         aiPreferences.enableAiProperty().addListener(obs -> langchainChatModel = Optional.empty());
         aiPreferences.aiProviderProperty().addListener(obs -> langchainChatModel = Optional.empty());
         aiPreferences.customizeExpertSettingsProperty().addListener(obs -> langchainChatModel = Optional.empty());
-        aiPreferences.listenToChatModels(() -> langchainChatModel = Optional.empty());
-        aiPreferences.listenToApiBaseUrls(() -> langchainChatModel = Optional.empty());
+        aiPreferences.addListenerToChatModels(() -> langchainChatModel = Optional.empty());
+        aiPreferences.addListenerToApiBaseUrls(() -> langchainChatModel = Optional.empty());
         aiPreferences.temperatureProperty().addListener(obs -> langchainChatModel = Optional.empty());
     }
 

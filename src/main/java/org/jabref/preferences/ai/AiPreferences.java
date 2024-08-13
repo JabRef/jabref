@@ -332,7 +332,7 @@ public class AiPreferences {
      *
      * @param runnable The runnable that should be executed when the preferences change.
      */
-    public void onEmbeddingsParametersChange(Runnable runnable) {
+    public void addListenerToEmbeddingsParametersChange(Runnable runnable) {
         embeddingModel.addListener((observableValue, oldValue, newValue) -> {
             if (newValue != oldValue) {
                 runnable.run();
@@ -352,7 +352,7 @@ public class AiPreferences {
         });
     }
 
-    public void listenToChatModels(Runnable runnable) {
+    public void addListenerToChatModels(Runnable runnable) {
         openAiChatModel.addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.equals(oldValue)) {
                 runnable.run();
@@ -372,7 +372,7 @@ public class AiPreferences {
         });
     }
 
-    public void listenToApiBaseUrls(Runnable runnable) {
+    public void addListenerToApiBaseUrls(Runnable runnable) {
         openAiApiBaseUrl.addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.equals(oldValue)) {
                 runnable.run();
