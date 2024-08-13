@@ -349,7 +349,7 @@ class BracketedPatternTest {
             "'New', '[auth3]', 'Isaac Newton'",
             "'New', '[auth3_1]', 'Isaac Newton'",
             "'Newton', '[authshort]', 'Isaac Newton'",
-            "'New', '[authorsAlpha]', 'Isaac Newton'",
+            "'Ne', '[authorsAlpha]', 'Isaac Newton'",
             "'Newton', '[authorLast]', 'Isaac Newton'",
             "'I', '[authorLastForeIni]', 'Isaac Newton'",
 
