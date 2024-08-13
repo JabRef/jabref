@@ -17,6 +17,8 @@ import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class AiPreferences {
+    private final PreferencesService preferencesService;
+
     private final BooleanProperty enableAi;
 
     private final ObjectProperty<AiProvider> aiProvider;
@@ -44,7 +46,8 @@ public class AiPreferences {
     private final IntegerProperty ragMaxResultsCount;
     private final DoubleProperty ragMinScore;
 
-    public AiPreferences(boolean enableAi,
+    public AiPreferences(PreferencesService preferencesService,
+                         boolean enableAi,
                          AiProvider aiProvider,
                          String openAiChatModel,
                          String mistralAiChatModel,
@@ -62,6 +65,8 @@ public class AiPreferences {
                          int ragMaxResultsCount,
                          double ragMinScore
     ) {
+        this.preferencesService = preferencesService;
+
         this.enableAi = new SimpleBooleanProperty(enableAi);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
@@ -462,16 +467,16 @@ public class AiPreferences {
         };
     }
 
-    public String getSelectedApiKey(PreferencesService preferencesService) {
+    public String getSelectedApiKey() {
         if (!enableAi.get()) {
             return "";
         }
 
-        retrieveKeys(preferencesService);
+        retrieveKeys();
         return getKeys();
     }
 
-    private void retrieveKeys(PreferencesService preferencesService) {
+    private void retrieveKeys() {
         switch (aiProvider.get()) {
             case OPEN_AI -> {
                 if (openAiApiKey.get().isEmpty()) {

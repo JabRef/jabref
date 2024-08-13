@@ -42,7 +42,6 @@ public class AiSummaryTab extends EntryEditorTab {
     private final TaskExecutor taskExecutor;
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
-    private final PreferencesService preferencesService;
 
     private final List<BibEntry> entriesUnderSummarization = new ArrayList<>();
 
@@ -60,7 +59,6 @@ public class AiSummaryTab extends EntryEditorTab {
         this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
-        this.preferencesService = preferencesService;
 
         setText(Localization.lang("AI summary"));
         setTooltip(new Tooltip(Localization.lang("AI-generated summary of attached file(s)")));
@@ -84,7 +82,7 @@ public class AiSummaryTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (!aiService.getPreferences().getEnableAi()) {
             showPrivacyNotice(entry);
-        } else if (aiService.getPreferences().getSelectedApiKey(preferencesService).isEmpty()) {
+        } else if (aiService.getPreferences().getSelectedApiKey().isEmpty()) {
             showApiKeyMissing();
         } else if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             showErrorNoDatabasePath();

@@ -2790,6 +2790,7 @@ public class JabRefPreferences implements PreferencesService {
         boolean aiEnabled = getBoolean(AI_ENABLED);
 
         aiPreferences = new AiPreferences(
+                this,
                 aiEnabled,
                 AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_OPEN_AI_CHAT_MODEL),

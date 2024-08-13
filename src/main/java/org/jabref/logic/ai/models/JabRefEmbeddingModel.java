@@ -68,10 +68,6 @@ public class JabRefEmbeddingModel implements dev.langchain4j.model.embedding.Emb
             return;
         }
 
-        if (predictorProperty.get().isPresent()) {
-            predictorProperty.get().get().close();
-        }
-
         predictorProperty.set(Optional.empty());
 
         new UpdateEmbeddingModelTask(aiPreferences, predictorProperty)

@@ -9,7 +9,6 @@ import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.ai.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -30,7 +29,6 @@ import org.h2.mvstore.MVStore;
 public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable {
     private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(5);
 
-    private final PreferencesService preferencesService;
     private final AiPreferences aiPreferences;
 
     private final HttpClient httpClient;
@@ -40,9 +38,8 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
 
     private Optional<ChatLanguageModel> langchainChatModel = Optional.empty();
 
-    public JabRefChatLanguageModel(PreferencesService preferencesService) {
-        this.preferencesService = preferencesService;
-        this.aiPreferences = preferencesService.getAiPreferences();
+    public JabRefChatLanguageModel(AiPreferences aiPreferences) {
+        this.aiPreferences = aiPreferences;
         this.httpClient = HttpClient.newBuilder().connectTimeout(CONNECTION_TIMEOUT).executor(executorService).build();
 
         if (aiPreferences.getEnableAi()) {
@@ -59,20 +56,20 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
      * and using {@link org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager}, where messages are stored in {@link MVStore}.
      */
     private void rebuild() {
-        if (!aiPreferences.getEnableAi() || aiPreferences.getSelectedApiKey(preferencesService).isEmpty()) {
+        if (!aiPreferences.getEnableAi() || aiPreferences.getSelectedApiKey().isEmpty()) {
             langchainChatModel = Optional.empty();
             return;
         }
 
         switch (aiPreferences.getAiProvider()) {
             case OPEN_AI -> {
-                langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(preferencesService, httpClient));
+                langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
             }
 
             case MISTRAL_AI -> {
                 langchainChatModel = Optional.of(MistralAiChatModel
                         .builder()
-                        .apiKey(aiPreferences.getSelectedApiKey(preferencesService))
+                        .apiKey(aiPreferences.getSelectedApiKey())
                         .modelName(aiPreferences.getSelectedChatModel())
                         .temperature(aiPreferences.getTemperature())
                         .baseUrl(aiPreferences.getSelectedApiBaseUrl())
@@ -86,7 +83,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
                 // NOTE: {@link HuggingFaceChatModel} doesn't support API base url :(
                 langchainChatModel = Optional.of(HuggingFaceChatModel
                         .builder()
-                        .accessToken(aiPreferences.getSelectedApiKey(preferencesService))
+                        .accessToken(aiPreferences.getSelectedApiKey())
                         .modelId(aiPreferences.getSelectedChatModel())
                         .temperature(aiPreferences.getTemperature())
                         .timeout(Duration.ofMinutes(2))
@@ -119,7 +116,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         if (langchainChatModel.isEmpty()) {
             if (!aiPreferences.getEnableAi()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)."));
-            } else if (aiPreferences.getSelectedApiKey(preferencesService).isEmpty()) {
+            } else if (aiPreferences.getSelectedApiKey().isEmpty()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, set OpenAI API key inside JabRef preferences (AI tab)."));
             } else {
                 throw new RuntimeException(Localization.lang("Unable to chat with AI."));

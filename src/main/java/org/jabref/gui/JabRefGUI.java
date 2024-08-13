@@ -156,7 +156,7 @@ public class JabRefGUI extends Application {
         JabRefGUI.clipBoardManager = new ClipBoardManager();
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
-        JabRefGUI.aiService = new AiService(preferencesService, dialogService, taskExecutor);
+        JabRefGUI.aiService = new AiService(preferencesService.getAiPreferences(), dialogService, taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
     }
 

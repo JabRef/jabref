@@ -17,7 +17,6 @@ import org.jabref.logic.ai.models.JabRefChatLanguageModel;
 import org.jabref.logic.ai.models.JabRefEmbeddingModel;
 import org.jabref.logic.ai.summarization.SummariesStorage;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.ai.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -57,8 +56,8 @@ public class AiService implements AutoCloseable {
 
     private final SummariesStorage summariesStorage;
 
-    public AiService(PreferencesService preferencesService, DialogService dialogService, TaskExecutor taskExecutor) {
-        this.aiPreferences = preferencesService.getAiPreferences();
+    public AiService(AiPreferences aiPreferences, DialogService dialogService, TaskExecutor taskExecutor) {
+        this.aiPreferences = aiPreferences;
 
         MVStore mvStore;
         try {
@@ -75,7 +74,7 @@ public class AiService implements AutoCloseable {
 
         this.mvStore = mvStore;
 
-        this.jabRefChatLanguageModel = new JabRefChatLanguageModel(preferencesService);
+        this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
         this.bibDatabaseChatHistoryManager = new BibDatabaseChatHistoryManager(mvStore);
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, dialogService, taskExecutor);
         this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, shutdownSignal, jabRefEmbeddingModel, mvStore);
