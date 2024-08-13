@@ -65,8 +65,6 @@ Copy following text into your clipboard:
 ```text
 --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
 --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
---add-exports=langchain4j/dev.langchain4j.data.document=org.jabref
---add-exports=langchain4j/dev.langchain4j.model.input=org.jabref
 --add-reads org.jabref=org.apache.commons.csv
 --add-reads org.jabref=org.fxmisc.flowless
 --add-reads org.jabref=langchain4j.core
