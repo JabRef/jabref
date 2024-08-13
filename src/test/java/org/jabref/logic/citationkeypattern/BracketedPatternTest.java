@@ -98,13 +98,17 @@ class BracketedPatternTest {
                 Arguments.of("AW", "van der Aalst and Weske"));
     }
 
+    /**
+     * <b>Precondition:</b> This test assumes that the method {@link BracketedPattern#getLastName(Author) getLastName} works properly.
+     * See {@link BracketedPatternTest#getLastNameTest(String, String) getLastNameTest}.
+     */
     @ParameterizedTest
     @MethodSource
     void authorsAlpha(String expected, AuthorList list) {
         assertEquals(expected, BracketedPattern.authorsAlpha(list));
     }
 
-    static Stream<Arguments> getLastName() {
+    static Stream<Arguments> getLastNameTest() {
         return Stream.of(
                 Arguments.of("Artemenko", "Alexander Artemenko"),
                 Arguments.of("Aachen", "Aachen"),
@@ -119,12 +123,14 @@ class BracketedPatternTest {
                 Arguments.of("Azubi", "Azubi, L."),
                 Arguments.of("Ezgarani", "Ezgarani, O."),
                 Arguments.of("GI", "GI, Gesellschaft für Informatik e.V."),
-                Arguments.of("Glück", "Glück, H. I."));
+                Arguments.of("Glück", "Glück, H. I."),
+                Arguments.of("Goethe", "von Goethe"),
+                Arguments.of("Aalst", "van der Aalst"));
     }
 
     @ParameterizedTest
     @MethodSource
-    void getLastName(String expected, String fullName) {
+    void getLastNameTest(String expected, String fullName) {
         AuthorList authorList = AuthorList.parse(fullName);
         Author firstAuthor = authorList.getAuthor(0);
         assertEquals(expected, BracketedPattern.getLastName(firstAuthor));
