@@ -33,7 +33,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - JabRef does not show finished background tasks in the status bar popup. [#11574](https://github.com/JabRef/jabref/pull/11574)
 - We enhanced the indexing speed. [#11502](https://github.com/JabRef/jabref/pull/11502)
 - ⚠️ Renamed command line parameters `embeddBibfileInPdf` to `embedBibFileInPdf`, `writeMetadatatoPdf` to `writeMetadataToPdf`, and `writeXMPtoPdf` to `writeXmpToPdf`. [#11575](https://github.com/JabRef/jabref/pull/11575)
-- The browse button for a Custom theme now opens in the directory of the current used CSS file [#11597](https://github.com/JabRef/jabref/pull/11597)
+- The browse button for a Custom theme now opens in the directory of the current used CSS file. [#11597](https://github.com/JabRef/jabref/pull/11597)
+- We improved the display of long messages in the integrity check dialog. [#11619](https://github.com/JabRef/jabref/pull/11619)
 
 ### Fixed
 
