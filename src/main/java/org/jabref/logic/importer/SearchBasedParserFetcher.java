@@ -32,6 +32,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  *     We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching {@link IdBasedFetcher}), complete entry {@link EntryBasedFetcher}, and search-based fetcher (this class).
  * </p>
  */
+
 public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetcher {
 
     /**
@@ -59,9 +60,11 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetc
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
         } catch (IOException e) {
-            throw new FetcherException("A network error occurred while fetching from " + urlForQuery, e);
+            // Regular expression to redact API keys from the error message
+            throw new FetcherException(urlForQuery, e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred while fetching from " + urlForQuery, e);
+            // Regular expression to redact API keys from the error message
+            throw new FetcherException(urlForQuery, "An internal parser error occurred while fetching", e);
         }
     }
 

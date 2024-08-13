@@ -1,7 +1,6 @@
 package org.jabref.logic.net;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,21 +26,21 @@ public class URLDownloadTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
 
     @Test
-    public void stringDownloadWithSetEncoding() throws IOException {
+    public void stringDownloadWithSetEncoding() throws Exception {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(dl.asString().contains("Google"), "google.com should contain google");
     }
 
     @Test
-    public void stringDownload() throws IOException {
+    public void stringDownload() throws Exception {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(dl.asString(StandardCharsets.UTF_8).contains("Google"), "google.com should contain google");
     }
 
     @Test
-    public void fileDownload() throws IOException {
+    public void fileDownload() throws Exception {
         File destination = File.createTempFile("jabref-test", ".html");
         try {
             URLDownload dl = new URLDownload(new URL("http://www.google.com"));
@@ -57,14 +55,14 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void determineMimeType() throws IOException {
+    public void determineMimeType() throws Exception {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(dl.getMimeType().startsWith("text/html"));
     }
 
     @Test
-    public void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws IOException {
+    public void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws Exception {
         URLDownload google = new URLDownload(new URL("http://www.google.com"));
 
         String path = google.toTemporaryFile().toString();
@@ -72,7 +70,7 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void downloadToTemporaryFileKeepsName() throws IOException {
+    public void downloadToTemporaryFileKeepsName() throws Exception {
         URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/main/LICENSE"));
 
         String path = google.toTemporaryFile().toString();
@@ -81,7 +79,7 @@ public class URLDownloadTest {
 
     @Test
     @DisabledOnCIServer("CI Server is apparently blocked")
-    public void downloadOfFTPSucceeds() throws IOException {
+    public void downloadOfFTPSucceeds() throws Exception {
         URLDownload ftp = new URLDownload(new URL("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
 
         Path path = ftp.toTemporaryFile();
@@ -89,7 +87,7 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void downloadOfHttpSucceeds() throws IOException {
+    public void downloadOfHttpSucceeds() throws Exception {
         URLDownload ftp = new URLDownload(new URL("http://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
@@ -97,7 +95,7 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void downloadOfHttpsSucceeds() throws IOException {
+    public void downloadOfHttpsSucceeds() throws Exception {
         URLDownload ftp = new URLDownload(new URL("https://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
@@ -128,18 +126,14 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void test503ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
+    public void test503ErrorThrowsFetcherServerException() throws Exception {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
-
-        Exception exception = assertThrows(IOException.class, urlDownload::asString);
-        assertInstanceOf(FetcherServerException.class, exception.getCause());
+        assertThrows(FetcherServerException.class, urlDownload::asString);
     }
 
     @Test
-    public void test429ErrorThrowsNestedIOExceptionWithFetcherServerException() throws Exception {
+    public void test429ErrorThrowsFetcherClientException() throws Exception {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
-
-        Exception exception = assertThrows(IOException.class, urlDownload::asString);
-        assertInstanceOf(FetcherClientException.class, exception.getCause());
+        Exception exception = assertThrows(FetcherClientException.class, urlDownload::asString);
     }
 }

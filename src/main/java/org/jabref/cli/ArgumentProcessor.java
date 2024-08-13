@@ -1,6 +1,7 @@
 package org.jabref.cli;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -133,7 +134,7 @@ public class ArgumentProcessor {
             // Download web resource to temporary file
             try {
                 file = new URLDownload(address).toTemporaryFile();
-            } catch (IOException e) {
+            } catch (FetcherException | MalformedURLException e) {
                 System.err.println(Localization.lang("Problem downloading from %1", address) + e.getLocalizedMessage());
                 return Optional.empty();
             }

@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
@@ -58,12 +57,12 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher {
      * @return URL
      */
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", new LOBIDQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // search query
         uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber)); // from entry number, starts indexing at 0
-        uriBuilder.addParameter("size", String.valueOf(getPageSize())); // page size
-        uriBuilder.addParameter("format", "json"); // response format
+        uriBuilder.addParameter("size", String.valueOf(getPageSize()));
+        uriBuilder.addParameter("format", "json");
         return uriBuilder.build().toURL();
     }
 
