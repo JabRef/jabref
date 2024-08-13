@@ -160,9 +160,6 @@ public class WebFetchers {
         return set;
     }
 
-    /**
-     * @return sorted set containing entry based fetchers
-     */
     public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImporterPreferences importerPreferences,
                                                                      ImportFormatPreferences importFormatPreferences,
                                                                      FilePreferences filePreferences,
@@ -178,9 +175,13 @@ public class WebFetchers {
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
-        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));
         set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
+
+        // Uses the PDFs - and then uses the parsed DOI. Makes it 10% a web fetcher.
+        // We list it here, because otherwise, it would be much more effort (other UI button, ...)
+        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));
+
         return set;
     }
 

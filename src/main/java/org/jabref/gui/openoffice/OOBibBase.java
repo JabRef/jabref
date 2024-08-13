@@ -24,11 +24,13 @@ import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.RangeForOverlapCheck;
 import org.jabref.logic.openoffice.oocsltext.CSLCitationOOAdapter;
+import org.jabref.logic.openoffice.oocsltext.CSLUpdateBibliography;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.CitationEntry;
 import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
 import org.jabref.model.openoffice.style.CitationGroupId;
@@ -43,6 +45,7 @@ import org.jabref.model.openoffice.uno.UnoUndo;
 import org.jabref.model.openoffice.util.OOResult;
 import org.jabref.model.openoffice.util.OOVoidResult;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyVetoException;
@@ -52,13 +55,14 @@ import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Class for manipulating the Bibliography of the currently started document in OpenOffice.
  */
-class OOBibBase {
+public class OOBibBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBase.class);
 
@@ -72,6 +76,8 @@ class OOBibBase {
 
     private final OOBibBaseConnect connection;
 
+    private CSLCitationOOAdapter cslCitationOOAdapter;
+
     public OOBibBase(Path loPath, DialogService dialogService)
             throws
             BootstrapException,
@@ -84,7 +90,12 @@ class OOBibBase {
         this.alwaysAddCitedOnPages = false;
     }
 
-    public void guiActionSelectDocument(boolean autoSelectForSingle) {
+    private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
+            this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
+            this.cslCitationOOAdapter.readExistingMarks();
+    }
+
+    public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {
         final String errorTitle = Localization.lang("Problem connecting");
 
         try {
@@ -95,13 +106,14 @@ class OOBibBase {
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (WrappedTargetException
-                | IndexOutOfBoundsException
-                | NoSuchElementException ex) {
+                 | IndexOutOfBoundsException
+                 | NoSuchElementException ex) {
             LOGGER.warn("Problem connecting", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         }
 
         if (this.isConnectedToDocument()) {
+            initializeCitationAdapter(this.getXTextDocument().get());
             dialogService.notify(Localization.lang("Connected to document") + ": "
                     + this.getCurrentDocumentTitle().orElse(""));
         }
@@ -524,6 +536,7 @@ class OOBibBase {
      */
     public void guiActionInsertEntry(List<BibEntry> entries,
                                      BibDatabaseContext bibDatabaseContext,
+                                     BibEntryTypesManager bibEntryTypesManager,
                                      OOStyle style,
                                      CitationType citationType,
                                      String pageInfo,
@@ -585,16 +598,26 @@ class OOBibBase {
         }
 
         try {
+
             UnoUndo.enterUndoContext(doc, "Insert citation");
             if (style instanceof CitationStyle citationStyle) {
                 // Handle insertion of CSL Style citations
-                if (citationType == CitationType.AUTHORYEAR_INTEXT) {
-                    CSLCitationOOAdapter.insertInText(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
-                } else {
-                    CSLCitationOOAdapter.insertBibliography(doc, cursor.get(), citationStyle, entries, bibDatabaseContext);
+
+                initializeCitationAdapter(doc);
+
+                if (citationType == CitationType.AUTHORYEAR_PAR) {
+                    // "Cite" button
+                    this.cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
+                    // "Cite in-text" button
+                    this.cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+                } else if (citationType == CitationType.INVISIBLE_CIT) {
+                    // "Insert empty citation"
+                    this.cslCitationOOAdapter.insertEmpty(cursor.get(), entries);
                 }
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
+
                 EditInsert.insertCitationGroup(doc,
                         frontend.get(),
                         cursor.get(),
@@ -620,6 +643,8 @@ class OOBibBase {
                  | NotRemoveableException ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             UnoUndo.leaveUndoContext(doc);
         }
@@ -811,9 +836,8 @@ class OOBibBase {
      * @param style     Style.
      */
     public void guiActionUpdateDocument(List<BibDatabase> databases, OOStyle style) {
+        final String errorTitle = Localization.lang("Unable to synchronize bibliography");
         if (style instanceof JStyle jStyle) {
-            final String errorTitle = Localization.lang("Unable to synchronize bibliography");
-
             try {
 
                 OOResult<XTextDocument, OOError> odoc = getXTextDocument();
@@ -866,9 +890,71 @@ class OOBibBase {
             } catch (DisposedException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } catch (CreationException
+                    | WrappedTargetException
+                    | com.sun.star.lang.IllegalArgumentException ex) {
+                LOGGER.warn("Could not update JStyle bibliography", ex);
+                OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
+            }
+        } else if (style instanceof CitationStyle citationStyle) {
+            try {
+
+                CSLUpdateBibliography cslUpdateBibliography = new CSLUpdateBibliography();
+
+                OOResult<XTextDocument, OOError> odoc = getXTextDocument();
+                if (testDialog(errorTitle, odoc.asVoidResult())) {
+                    return;
+                }
+
+                XTextDocument doc = odoc.get();
+
+                OOResult<FunctionalTextViewCursor, OOError> fcursor = getFunctionalTextViewCursor(doc, errorTitle);
+
+                if (testDialog(errorTitle,
+                        fcursor.asVoidResult(),
+                        checkIfOpenOfficeIsRecordingChanges(doc))) {
+                    return;
+                }
+
+                try {
+                    UnoUndo.enterUndoContext(doc, "Create CSL bibliography");
+
+                    initializeCitationAdapter(doc);
+
+                    // Collect only cited entries from all databases
+                    List<BibEntry> citedEntries = new ArrayList<>();
+                    for (BibDatabase database : databases) {
+                        for (BibEntry entry : database.getEntries()) {
+                            if (cslCitationOOAdapter.isCitedEntry(entry)) {
+                                citedEntries.add(entry);
+                            }
+                        }
+                    }
+
+                    // If no entries are cited, show a message and return
+                    if (citedEntries.isEmpty()) {
+                        dialogService.showInformationDialogAndWait(
+                                Localization.lang("Bibliography"),
+                                Localization.lang("No cited entries found in the document.")
+                        );
+                        return;
+                    }
+
+                    // A separate database and database
+                    BibDatabase bibDatabase = new BibDatabase(citedEntries);
+                    BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+
+                    cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                } catch (NoDocumentException
+                         | NoSuchElementException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    UnoUndo.leaveUndoContext(doc);
+                    fcursor.get().restore(doc);
+                }
+            } catch (CreationException
                      | WrappedTargetException
                      | com.sun.star.lang.IllegalArgumentException ex) {
-                LOGGER.warn("Could not update bibliography", ex);
+                LOGGER.warn("Could not update CSL bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         }

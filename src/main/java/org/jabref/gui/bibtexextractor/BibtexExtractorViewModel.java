@@ -1,8 +1,6 @@
 package org.jabref.gui.bibtexextractor;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.undo.UndoManager;
 
@@ -25,24 +23,33 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * View model for the feature "Extract BibTeX from plain text".
+ * Handles both online and offline case.
+ *
+ * @implNote Instead of using inheritance, we do if/else checks.
+ */
 public class BibtexExtractorViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexExtractorViewModel.class);
 
-    private final StringProperty inputTextProperty = new SimpleStringProperty("");
+    private final boolean onlineMode;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
+
     private final ImportHandler importHandler;
+    private final StringProperty inputTextProperty = new SimpleStringProperty("");
 
-    public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext,
-                                    DialogService dialogService,
-                                    PreferencesService preferencesService,
-                                    FileUpdateMonitor fileUpdateMonitor,
-                                    TaskExecutor taskExecutor,
-                                    UndoManager undoManager,
-                                    StateManager stateManager) {
-
+    public BibtexExtractorViewModel(boolean onlineMode,
+                                          BibDatabaseContext bibdatabaseContext,
+                                          DialogService dialogService,
+                                          PreferencesService preferencesService,
+                                          FileUpdateMonitor fileUpdateMonitor,
+                                          TaskExecutor taskExecutor,
+                                          UndoManager undoManager,
+                                          StateManager stateManager) {
+        this.onlineMode = onlineMode;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
@@ -56,25 +63,20 @@ public class BibtexExtractorViewModel {
                 taskExecutor);
     }
 
-    public StringProperty inputTextProperty() {
-        return this.inputTextProperty;
-    }
-
     public void startParsing() {
-        if (preferencesService.getGrobidPreferences().isGrobidEnabled()) {
-            parseUsingGrobid();
+        if (onlineMode) {
+            startParsingOnline();
         } else {
-            parseUsingBibtexExtractor();
+            startParsingOffline();
         }
     }
 
-    private void parseUsingBibtexExtractor() {
+    private void startParsingOffline() {
         BibEntry parsedEntry = new BibtexExtractor().extract(inputTextProperty.getValue());
         importHandler.importEntries(List.of(parsedEntry));
-        trackNewEntry(parsedEntry, "ParseWithBibTeXExtractor");
     }
 
-    private void parseUsingGrobid() {
+    private void startParsingOnline() {
         GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getGrobidPreferences(), preferencesService.getImportFormatPreferences());
         BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
@@ -90,14 +92,10 @@ public class BibtexExtractorViewModel {
                       .onSuccess(parsedEntries -> {
                           dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));
                           importHandler.importEntries(parsedEntries);
-                          for (BibEntry bibEntry : parsedEntries) {
-                              trackNewEntry(bibEntry, "ParseWithGrobid");
-                          }
                       }).executeWith(taskExecutor);
     }
 
-    private void trackNewEntry(BibEntry bibEntry, String eventMessage) {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("EntryType", bibEntry.typeProperty().getValue().getName());
+    public StringProperty inputTextProperty() {
+        return this.inputTextProperty;
     }
 }

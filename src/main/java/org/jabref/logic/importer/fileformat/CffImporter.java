@@ -12,6 +12,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.CffExporter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -57,7 +58,7 @@ public class CffImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Importer for the CFF format, which is intended to make software and datasets citable.";
+        return Localization.lang("Importer for the CFF format, which is intended to make software and datasets citable.");
     }
 
     // POJO classes for yaml data

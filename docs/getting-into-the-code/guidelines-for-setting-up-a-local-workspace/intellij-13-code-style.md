@@ -12,7 +12,8 @@ Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr
 Navigate to **File > Settings... > Plugins"**.
 On the top, click on "Marketplace".
 Then, search for "Checkstyle".
-Click on "Install" choose "CheckStyle-IDEA".
+Click on "Install" choose "CheckStyle-IDEA".<br>
+**Note:** In some MacBooks, `Settings` can be found at the "IntelliJ" button of the app menu instead of at "File".
 
 {% figure caption:"Install CheckStyle" %}
 ![Install CheckStyle](guidelines-intellij-install-checkstyle.png)
@@ -104,6 +105,8 @@ Also, set the "Scan Scope" to "Only Java sources (including tests)".
 
 Save settings by clicking "Apply" and then "OK"
 
+## Run checkstyle
+
 In the lower part of IntelliJ's window, click on "Checkstyle".
 In "Rules", change to "JabRef".
 Then, you can run a check on all modified files.
@@ -157,3 +160,5 @@ Press "OK".
 > Finally, you have Checkstyle running locally so that you can check for styling errors before submitting the pull request.
 
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. Please make sure to also read our [contribution guide](https://devdocs.jabref.org/contributing#contribute-code).
+
+<!-- markdownlint-disable-file MD033 -->

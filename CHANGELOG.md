@@ -11,28 +11,47 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added an AI-based chat for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
+- We added an AI-based summarization possibility for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
 - We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
 - We added Tools > New library based on references in PDF file... to create a new library based on the references section in a PDF file. [#11522](https://github.com/JabRef/jabref/pull/11522)
 - When converting the references section of a paper (PDF file), more than the last page is treated. [#11522](https://github.com/JabRef/jabref/pull/11522)
-- Added minimal support for [biblatex data annotation](https://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsection.3.7) fields in .layout files. [#11505](https://github.com/JabRef/jabref/issues/11505)
+- Added the functionality to invoke offline reference parsing explicitly. [#11565](https://github.com/JabRef/jabref/pull/11565)
+- The dialog for [adding an entry using reference text](https://docs.jabref.org/collect/newentryfromplaintext) is now filled with the clipboard contents as default. [#11565](https://github.com/JabRef/jabref/pull/11565)
+- Added minimal support for [biblatex data annotation](https://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdf#subsection.3.7) fields in `.layout` files. [#11505](https://github.com/JabRef/jabref/issues/11505)
 - Added saving of selected options in the [Lookup -> Search for unlinked local files dialog](https://docs.jabref.org/collect/findunlinkedfiles#link-the-pdfs-to-your-bib-library). [#11439](https://github.com/JabRef/jabref/issues/11439)
+- We fixed ans issue where text in Dark mode inside "Citation information" was not readable [#11512](https://github.com/JabRef/jabref/issues/11512)
+- We enabled creating a new file link manually. [#11017](https://github.com/JabRef/jabref/issues/11017)
+- We added a toggle button to invert the selected groups. [#9073](https://github.com/JabRef/jabref/issues/9073)
+- We reintroduced the floating search in the main table. [#4237](https://github.com/JabRef/jabref/issues/4237)
+- We fixed an issue where the selection of an entry in the table lost after searching for a group. [#3176](https://github.com/JabRef/jabref/issues/3176)
 
 ### Changed
 
+- When a communication error with an [online service](https://docs.jabref.org/collect/import-using-online-bibliographic-database) occurs, JabRef displays the HTTP error. [#11223](https://github.com/JabRef/jabref/issues/11223)
 - The Pubmed/Medline Plain importer now imports the PMID field as well [#11488](https://github.com/JabRef/jabref/issues/11488)
 - The 'Check for updates' menu bar button is now always enabled. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - JabRef respects the [configuration for storing files relative to the .bib file](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files) in more cases. [#11492](https://github.com/JabRef/jabref/pull/11492)
 - Getting rid of JaxbContext for [#9539](https://github.com/JabRef/jabref/issues/9539)
+- JabRef does not show finished background tasks in the status bar popup. [#11574](https://github.com/JabRef/jabref/pull/11574)
+- We enhanced the indexing speed. [#11502](https://github.com/JabRef/jabref/pull/11502)
+- ⚠️ Renamed command line parameters `embeddBibfileInPdf` to `embedBibFileInPdf`, `writeMetadatatoPdf` to `writeMetadataToPdf`, and `writeXMPtoPdf` to `writeXmpToPdf`. [#11575](https://github.com/JabRef/jabref/pull/11575)
+- The browse button for a Custom theme now opens in the directory of the current used CSS file. [#11597](https://github.com/JabRef/jabref/pull/11597)
+- We improved the display of long messages in the integrity check dialog. [#11619](https://github.com/JabRef/jabref/pull/11619)
 
 ### Fixed
 
-- We fixed an issue where the 'Check for updates' preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
+- We fixed an issue where the "Check for updates" preference was not saved. [#11485](https://github.com/JabRef/jabref/pull/11485)
 - We fixed an issue where an exception was thrown after changing "show preview as a tab" in the preferences. [#11515](https://github.com/JabRef/jabref/pull/11515)
-- We fixed an issue where a new unsaved library was not marked with an asterisk [#11519](https://github.com/JabRef/jabref/pull/11519)
+- We fixed an issue where JabRef put file paths as absolute path when an entry was created using drag and drop of a PDF file. [#11173](https://github.com/JabRef/jabref/issues/11173)
+- We fixed an issue that online and offline mode for new library creation were handled incorrectly. [#11565](https://github.com/JabRef/jabref/pull/11565)
+- We fixed an issue with colors in the search bar when dark theme is enabled. [#11569](https://github.com/JabRef/jabref/issues/11569)
+- We fixed an issue where a new unsaved library was not marked with an asterisk. [#11519](https://github.com/JabRef/jabref/pull/11519)
+- We fixed an issue where JabRef starts without window decorations. [#11440](https://github.com/JabRef/jabref/pull/11440)
 
 ### Removed
 
-
+- We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
 
 
 

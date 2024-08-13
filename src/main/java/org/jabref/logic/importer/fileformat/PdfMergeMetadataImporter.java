@@ -18,7 +18,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -30,18 +32,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.
+ * Tries to import BibTeX data trying multiple PDF content importers and merging the results.
+ * See {@Link org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter#metadataImporters} for the list of importers used.
+ *
+ * After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
  */
 public class PdfMergeMetadataImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);
 
-    private final List<Importer> metadataImporters;
     private final ImportFormatPreferences importFormatPreferences;
+    private final List<Importer> metadataImporters;
 
     public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
-        this.metadataImporters = new ArrayList<>();
+
+        this.metadataImporters = new ArrayList<>(5);
         this.metadataImporters.add(new PdfVerbatimBibTextImporter(importFormatPreferences));
         this.metadataImporters.add(new PdfEmbeddedBibFileImporter(importFormatPreferences));
         if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {
@@ -59,14 +65,14 @@ public class PdfMergeMetadataImporter extends Importer {
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException("PdfMergeMetadataImporter does not support importDatabase(BufferedReader reader)."
+        throw new UnsupportedOperationException("PdfMergeMetadataImporter does not support importDatabase(BufferedReader reader). "
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
-        throw new UnsupportedOperationException("PdfMergeMetadataImporter does not support importDatabase(String data)."
+        throw new UnsupportedOperationException("PdfMergeMetadataImporter does not support importDatabase(String data). "
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
@@ -84,7 +90,7 @@ public class PdfMergeMetadataImporter extends Importer {
         if (candidates.isEmpty()) {
             return new ParserResult();
         }
-        List<BibEntry> fetchedCandidates = new ArrayList<>();
+        List<BibEntry> fetchedCandidates = new ArrayList<>(2);
         for (BibEntry candidate : candidates) {
             if (candidate.hasField(StandardField.DOI)) {
                 try {
@@ -125,13 +131,15 @@ public class PdfMergeMetadataImporter extends Importer {
             }
         }
 
+        // We use the absolute path here as we do not know the context where this import will be used.
+        // The caller is responsible for making the path relative if necessary.
         entry.addFile(new LinkedFile("", filePath, StandardFileType.PDF.getName()));
         return new ParserResult(List.of(entry));
     }
 
     @Override
     public String getName() {
-        return "PDFmergemetadata";
+        return "PDF meta data merger";
     }
 
     @Override
@@ -141,7 +149,7 @@ public class PdfMergeMetadataImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "PdfMergeMetadataImporter imports metadata from a PDF using multiple strategies and merging the result.";
+        return Localization.lang("Imports BibTeX data from a PDF using multiple strategies (e.g., XMP, embedded BibTeX, text parsing, Grobid, and DOI lookup) and merges the result.");
     }
 
     public static class EntryBasedFetcherWrapper extends PdfMergeMetadataImporter implements EntryBasedFetcher {
@@ -164,7 +172,7 @@ public class PdfMergeMetadataImporter extends Importer {
                     try {
                         ParserResult result = importDatabase(filePath.get());
                         if (!result.isEmpty()) {
-                            return result.getDatabase().getEntries();
+                            return FileUtil.relativize(result.getDatabase().getEntries(), databaseContext, filePreferences);
                         }
                     } catch (IOException e) {
                         LOGGER.error("Cannot read {}", filePath.get(), e);

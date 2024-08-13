@@ -30,6 +30,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.mods.Identifier;
 import org.jabref.logic.importer.fileformat.mods.Name;
 import org.jabref.logic.importer.fileformat.mods.RecordInfo;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -624,7 +625,7 @@ public class ModsImporter extends Importer implements Parser {
 
     @Override
     public String getDescription() {
-        return "Importer for the MODS format";
+        return Localization.lang("Importer for the MODS format.");
     }
 
     @Override

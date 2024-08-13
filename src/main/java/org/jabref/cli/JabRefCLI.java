@@ -33,7 +33,6 @@ public class JabRefCLI {
 
     public JabRefCLI(String[] args) throws ParseException {
         Options options = getOptions();
-
         this.cl = new DefaultParser().parse(options, args, true);
         this.leftOver = cl.getArgList();
     }
@@ -153,21 +152,21 @@ public class JabRefCLI {
         return cl.hasOption("automaticallySetFileLinks");
     }
 
-    public boolean isWriteXMPtoPdf() {
-        return cl.hasOption("writeXMPtoPdf");
+    public boolean isWriteXmpToPdf() {
+        return cl.hasOption("writeXmpToPdf");
     }
 
-    public boolean isEmbeddBibfileInPdf() {
-        return cl.hasOption("embeddBibfileInPdf");
+    public boolean isEmbedBibFileInPdf() {
+        return cl.hasOption("embedBibFileInPdf");
     }
 
-    public boolean isWriteMetadatatoPdf() {
-        return cl.hasOption("writeMetadatatoPdf");
+    public boolean isWriteMetadataToPdf() {
+        return cl.hasOption("writeMetadataToPdf");
     }
 
-    public String getWriteMetadatatoPdf() {
-        return cl.hasOption("writeMetadatatoPdf") ? cl.getOptionValue("writeMetadatatoPdf") :
-                cl.hasOption("writeXMPtoPdf") ? cl.getOptionValue("writeXMPtoPdf") :
+    public String getWriteMetadataToPdf() {
+        return cl.hasOption("writeMetadatatoPdf") ? cl.getOptionValue("writeMetadataToPdf") :
+                cl.hasOption("writeXMPtoPdf") ? cl.getOptionValue("writeXmpToPdf") :
                         cl.hasOption("embeddBibfileInPdf") ? cl.getOptionValue("embeddBibfileInPdf") : null;
     }
 
@@ -273,15 +272,15 @@ public class JabRefCLI {
 
         options.addOption(Option
                 .builder()
-                .longOpt("writeXMPtoPdf")
-                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeXEntry as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .longOpt("writeXmpToPdf")
+                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeX as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
 
         options.addOption(Option
                 .builder()
-                .longOpt("embeddBibfileInPdf")
+                .longOpt("embedBibFileInPdf")
                 .desc("%s: '%s'".formatted(Localization.lang("Embed BibTeX as attached file in PDF."), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
@@ -289,8 +288,8 @@ public class JabRefCLI {
 
         options.addOption(Option
                 .builder("w")
-                .longOpt("writeMetadatatoPdf")
-                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeXEntry as metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .longOpt("writeMetadataToPdf")
+                .desc("%s: '%s'".formatted(Localization.lang("Write BibTeX to PDF (XMP and embedded)"), "-w pathToMyOwnPaper.pdf"))
                 .hasArg()
                 .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());

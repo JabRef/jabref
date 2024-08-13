@@ -27,6 +27,7 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -46,6 +47,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);
 
     private final PreferencesService preferences;
+    private final AiService aiService;
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final LibraryTabContainer tabContainer;
@@ -56,6 +58,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     private final TaskExecutor taskExecutor;
 
     public JabRefFrameViewModel(PreferencesService preferencesService,
+                                AiService aiService,
                                 StateManager stateManager,
                                 DialogService dialogService,
                                 LibraryTabContainer tabContainer,
@@ -65,6 +68,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                                 ClipBoardManager clipBoardManager,
                                 TaskExecutor taskExecutor) {
         this.preferences = preferencesService;
+        this.aiService = aiService;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.tabContainer = tabContainer;
@@ -201,6 +205,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                             tabContainer,
                             dialogService,
                             preferences,
+                            aiService,
                             stateManager,
                             entryTypesManager,
                             fileUpdateMonitor,

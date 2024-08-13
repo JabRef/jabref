@@ -57,7 +57,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private void onSelectionChanged(ListChangeListener.Change<? extends IntegrityMessage> change) {
         if (change.next()) {
             change.getAddedSubList().stream().findFirst().ifPresent(message ->
-                    libraryTab.editEntryAndFocusField(message.getEntry(), message.getField()));
+                    libraryTab.editEntryAndFocusField(message.entry(), message.field()));
         }
     }
 
@@ -71,9 +71,9 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
         messagesTable.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
         messagesTable.setItems(viewModel.getMessages());
-        keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getEntry().getCitationKey().orElse("")));
-        fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getField().getDisplayName()));
-        messageColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getMessage()));
+        keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().entry().getCitationKey().orElse("")));
+        fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().field().getDisplayName()));
+        messageColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().message()));
 
         new ValueTableCellFactory<IntegrityMessage, String>()
                 .withText(Function.identity())
@@ -83,40 +83,12 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         tableFilter = TableFilter.forTableView(messagesTable)
                                  .apply();
 
-        tableFilter.getColumnFilter(keyColumn).ifPresent(columnFilter -> {
-            ContextMenu keyContextMenu = keyColumn.getContextMenu();
-            if (keyContextMenu != null) {
-                keyFilterButton.setContextMenu(keyContextMenu);
-                keyFilterButton.setOnMouseClicked(event -> {
-                    if (event.getButton() == MouseButton.PRIMARY) {
-                        if (keyContextMenu.isShowing()) {
-                            keyContextMenu.setX(event.getScreenX());
-                            keyContextMenu.setY(event.getScreenY());
-                        } else {
-                            keyContextMenu.show(keyFilterButton, event.getScreenX(), event.getScreenY());
-                        }
-                    }
-                });
-            }
-        });
+        addMessageColumnFilter(keyColumn, keyFilterButton);
+        addMessageColumnFilter(fieldColumn, fieldFilterButton);
+        addMessageColumnFilter(messageColumn, messageFilterButton);
+    }
 
-        tableFilter.getColumnFilter(fieldColumn).ifPresent(columnFilter -> {
-            ContextMenu fieldContextMenu = fieldColumn.getContextMenu();
-            if (fieldContextMenu != null) {
-                fieldFilterButton.setContextMenu(fieldContextMenu);
-                fieldFilterButton.setOnMouseClicked(event -> {
-                    if (event.getButton() == MouseButton.PRIMARY) {
-                        if (fieldContextMenu.isShowing()) {
-                            fieldContextMenu.setX(event.getScreenX());
-                            fieldContextMenu.setY(event.getScreenY());
-                        } else {
-                            fieldContextMenu.show(fieldFilterButton, event.getScreenX(), event.getScreenY());
-                        }
-                    }
-                });
-            }
-        });
-
+    private void addMessageColumnFilter(TableColumn<IntegrityMessage, String> messageColumn, MenuButton messageFilterButton) {
         tableFilter.getColumnFilter(messageColumn).ifPresent(columnFilter -> {
             ContextMenu messageContextMenu = messageColumn.getContextMenu();
             if (messageContextMenu != null) {

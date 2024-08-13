@@ -17,7 +17,7 @@
                 <JabRefIconView glyph="LINKED_FILE_ADD"/>
             </graphic>
             <tooltip>
-                <Tooltip text="%Open"/>
+                <Tooltip text="%Add"/>
             </tooltip>
         </Button>
         <Button onAction="#fetchFulltext" styleClass="icon-button">

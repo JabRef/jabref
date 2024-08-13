@@ -10,7 +10,6 @@ import org.jabref.logic.formatter.bibtexfields.RemoveDigitsFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveRedundantSpacesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ReplaceTabsBySpaceFormater;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
@@ -35,7 +34,7 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         return new URIBuilder(BASIC_SEARCH_URL)
                 .addParameter("query", new CollectionOfComputerScienceBibliographiesQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""))
                 .addParameter("sort", "score")
