@@ -115,14 +115,16 @@ class BracketedPatternTest {
                 Arguments.of("Corleone", "Corleone, P."),
                 Arguments.of("Azubi", "Azubi, L."),
                 Arguments.of("Ezgarani", "Ezgarani, O."),
-                Arguments.of("e.V.", "GI, Gesellschaft für Informatik e.V."),
+                Arguments.of("GI", "GI, Gesellschaft für Informatik e.V."),
                 Arguments.of("Glück", "Glück, H. I."));
     }
 
     @ParameterizedTest
     @MethodSource
-    void getLastName(String expected, Author fullName) {
-        assertEquals(expected, BracketedPattern.getLastName(fullName));
+    void getLastName(String expected, String fullName) {
+        AuthorList authorList = AuthorList.parse(fullName);
+        Author firstAuthor = authorList.getAuthor(0);
+        assertEquals(expected, BracketedPattern.getLastName(firstAuthor));
     }
 
     /**
