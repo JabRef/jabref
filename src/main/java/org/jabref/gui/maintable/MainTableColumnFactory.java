@@ -162,15 +162,15 @@ public class MainTableColumnFactory {
         return column;
     }
 
-    private TableColumn<BibEntryTableViewModel, Float> createScoreColumn(MainTableColumnModel columnModel) {
-        TableColumn<BibEntryTableViewModel, Float> column = new MainTableColumn<>(columnModel);
+    private TableColumn<BibEntryTableViewModel, Number> createScoreColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, Number> column = new MainTableColumn<>(columnModel);
         Node header = new Text(Localization.lang("Score"));
         header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SCORE.getDisplayName()));
         column.setGraphic(header);
         column.setStyle("-fx-alignment: CENTER-RIGHT;");
-        column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().searchScoreProperty().getValue()));
-        new ValueTableCellFactory<BibEntryTableViewModel, Float>().withText(String::valueOf).install(column);
+        column.setCellValueFactory(cellData -> cellData.getValue().searchScoreProperty());
+        new ValueTableCellFactory<BibEntryTableViewModel, Number>().withText(String::valueOf).install(column);
         column.setSortable(true);
         column.setReorderable(false);
         column.visibleProperty().bind(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).isPresent());

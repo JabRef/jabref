@@ -8,7 +8,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -27,18 +26,24 @@ import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
+import org.jabref.model.search.envent.IndexAddedOrUpdatedEvent;
+import org.jabref.model.search.envent.IndexStartedEvent;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
+import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 
 public class MainTableDataModel {
 
+    private final ObservableList<BibEntry> allEntries;
     private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
@@ -54,6 +59,8 @@ public class MainTableDataModel {
     private final Subscription searchDisplayModeSubscription;
     private final Subscription selectedGroupsSubscription;
     private final Subscription groupViewModeSubscription;
+    private final LuceneIndexListener indexUpdatedListener;
+    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private Optional<MatcherSet> groupsMatcher;
 
     public MainTableDataModel(BibDatabaseContext context,
@@ -72,25 +79,17 @@ public class MainTableDataModel {
         this.luceneManager = luceneManager;
         this.bibDatabaseContext = context;
         this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
+        this.searchQueryProperty = searchQueryProperty;
+        this.indexUpdatedListener = new LuceneIndexListener();
+        if (luceneManager != null) {
+            this.luceneManager.registerListener(indexUpdatedListener);
+        }
 
         resetFieldFormatter();
 
-        ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
+        allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
         entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
         entriesFiltered = new FilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
-
-        entriesViewModel.addListener((ListChangeListener.Change<? extends BibEntryTableViewModel> change) -> {
-            while (change.next()) {
-                if (change.wasAdded() || change.wasUpdated()) {
-                    BackgroundTask.wrap(() -> {
-                        for (BibEntryTableViewModel entry : change.getList().subList(change.getFrom(), change.getTo())) {
-                            // updateEntrySearchMatch(searchQueryProperty.get(), entry, searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT);
-                            updateEntryGroupMatch(entry, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
-                        }
-                    }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered, change.getFrom(), change.getTo())).executeWith(taskExecutor);
-                }
-            }
-        });
 
         searchQuerySubscription = EasyBind.listen(searchQueryProperty, (observable, oldValue, newValue) -> updateSearchMatches(newValue));
         searchDisplayModeSubscription = EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (observable, oldValue, newValue) -> updateSearchDisplayMode(newValue));
@@ -187,6 +186,9 @@ public class MainTableDataModel {
         searchDisplayModeSubscription.unsubscribe();
         selectedGroupsSubscription.unsubscribe();
         groupViewModeSubscription.unsubscribe();
+        if (luceneManager != null) {
+            luceneManager.unregisterListener(indexUpdatedListener);
+        }
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
@@ -195,5 +197,36 @@ public class MainTableDataModel {
 
     public void resetFieldFormatter() {
         this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
+    }
+
+    class LuceneIndexListener {
+        @Subscribe
+        public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
+            indexAddedOrUpdatedEvent.addedEntries().forEach(entry -> {
+                BackgroundTask.wrap(() -> {
+                    int index = allEntries.indexOf(entry);
+                    if (index >= 0) {
+                        BibEntryTableViewModel viewModel = entriesViewModel.get(index);
+                        boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
+                        if (searchQueryProperty.get().isPresent()) {
+                            SearchQuery searchQuery = searchQueryProperty.get().get();
+                            String newSearchExpression = "+" + SearchFieldConstants.ENTRY_ID + ":" + entry.getId() + " +" + searchQuery.getSearchExpression();
+                            SearchQuery entryQuery = new SearchQuery(newSearchExpression, searchQuery.getSearchFlags());
+                            SearchResults results = luceneManager.search(entryQuery);
+
+                            viewModel.searchScoreProperty().set(results.getSearchScoreForEntry(entry));
+                            viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));
+                            updateEntrySearchMatch(viewModel, viewModel.searchScoreProperty().get() > 0, isFloatingMode);
+                        } else {
+                            viewModel.searchScoreProperty().set(0);
+                            viewModel.hasFullTextResultsProperty().set(false);
+                            updateEntrySearchMatch(viewModel, true, isFloatingMode);
+                        }
+                        updateEntryGroupMatch(viewModel, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
+                    }
+                    return index;
+                }).onSuccess(index -> FilteredListProxy.refilterListReflection(entriesFiltered, index, index + 1)).executeWith(taskExecutor);
+            });
+        }
     }
 }

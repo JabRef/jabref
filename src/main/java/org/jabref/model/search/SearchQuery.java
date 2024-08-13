@@ -95,6 +95,10 @@ public class SearchQuery {
         }
     }
 
+    public String getSearchExpression() {
+        return query;
+    }
+
     @Override
     public String toString() {
         return query;

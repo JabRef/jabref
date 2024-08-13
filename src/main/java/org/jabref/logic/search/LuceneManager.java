@@ -1,7 +1,6 @@
 package org.jabref.logic.search;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -20,8 +19,12 @@ import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
+import org.jabref.model.search.envent.IndexAddedOrUpdatedEvent;
+import org.jabref.model.search.envent.IndexRemovedEvent;
+import org.jabref.model.search.envent.IndexStartedEvent;
 import org.jabref.preferences.PreferencesService;
 
+import com.google.common.eventbus.EventBus;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.slf4j.Logger;
@@ -30,6 +33,7 @@ import org.slf4j.LoggerFactory;
 public class LuceneManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LuceneManager.class);
+    private final EventBus eventBus = new EventBus();
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferences;
@@ -100,7 +104,9 @@ public class LuceneManager {
                 bibFieldsIndexer.updateOnStart(this);
                 return null;
             }
-        }.showToUser(true).executeWith(taskExecutor);
+        }.showToUser(true)
+         .onFinished(() -> this.eventBus.post(new IndexStartedEvent()))
+         .executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && linkedFilesIndexer != null) {
             new BackgroundTask<>() {
@@ -113,14 +119,15 @@ public class LuceneManager {
         }
     }
 
-    public void addToIndex(Collection<BibEntry> entries) {
+    public void addToIndex(List<BibEntry> entries) {
         new BackgroundTask<>() {
             @Override
             protected Object call() {
                 bibFieldsIndexer.addToIndex(entries, this);
                 return null;
             }
-        }.showToUser(true).executeWith(taskExecutor);
+        }.onFinished(() -> this.eventBus.post(new IndexAddedOrUpdatedEvent(entries)))
+         .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get() && linkedFilesIndexer != null) {
             new BackgroundTask<>() {
@@ -133,14 +140,15 @@ public class LuceneManager {
         }
     }
 
-    public void removeFromIndex(Collection<BibEntry> entries) {
+    public void removeFromIndex(List<BibEntry> entries) {
         new BackgroundTask<>() {
             @Override
             protected Object call() {
                 bibFieldsIndexer.removeFromIndex(entries, this);
                 return null;
             }
-        }.showToUser(true).executeWith(taskExecutor);
+        }.onFinished(() -> this.eventBus.post(new IndexRemovedEvent()))
+        .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && linkedFilesIndexer != null) {
             new BackgroundTask<>() {
@@ -160,7 +168,8 @@ public class LuceneManager {
                 bibFieldsIndexer.updateEntry(entry, oldValue, newValue, this);
                 return null;
             }
-        }.showToUser(true).executeWith(taskExecutor);
+        }.onFinished(() -> this.eventBus.post(new IndexAddedOrUpdatedEvent(List.of(entry))))
+         .showToUser(true).executeWith(taskExecutor);
 
         if (isLinkedFile && shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get() && linkedFilesIndexer != null) {
             new BackgroundTask<>() {
@@ -180,7 +189,8 @@ public class LuceneManager {
                 bibFieldsIndexer.updateEntry(entry, "", "", this);
                 return null;
             }
-        }.showToUser(true).executeWith(taskExecutor);
+        }.onFinished(() -> this.eventBus.post(new IndexAddedOrUpdatedEvent(List.of(entry))))
+        .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get() && linkedFilesIndexer != null) {
             new BackgroundTask<>() {
@@ -200,7 +210,8 @@ public class LuceneManager {
                 bibFieldsIndexer.rebuildIndex(this);
                 return null;
             }
-        }.showToUser(true).executeWith(taskExecutor);
+        }.onFinished(() -> this.eventBus.post(new IndexStartedEvent()))
+         .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && linkedFilesIndexer != null) {
             new BackgroundTask<>() {
@@ -243,5 +254,13 @@ public class LuceneManager {
 
     public SearchResults search(SearchQuery query) {
         return luceneSearcher.search(query, getIndexSearcher(query));
+    }
+
+    public void registerListener(Object listener) {
+        this.eventBus.register(listener);
+    }
+
+    public void unregisterListener(Object listener) {
+        eventBus.unregister(listener);
     }
 }
