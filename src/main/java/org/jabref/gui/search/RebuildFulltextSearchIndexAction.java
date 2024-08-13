@@ -10,7 +10,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
-import static org.jabref.gui.actions.ActionHelper.shouldIndexLinkedFiles;
 
 public class RebuildFulltextSearchIndexAction extends SimpleCommand {
 
@@ -26,7 +25,7 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.tabSupplier = tabSupplier;
-        this.executable.bind(needsDatabase(stateManager).and(shouldIndexLinkedFiles(preferences)));
+        this.executable.bind(needsDatabase(stateManager).and(preferences.getFilePreferences().fulltextIndexLinkedFilesProperty()));
     }
 
     @Override

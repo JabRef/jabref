@@ -101,8 +101,4 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
                 entries -> entries.anyMatch(entry -> !entry.getFiles().isEmpty())));
     }
-
-    public static BooleanExpression shouldIndexLinkedFiles(PreferencesService preferencesService) {
-        return preferencesService.getFilePreferences().fulltextIndexLinkedFilesProperty();
-    }
 }
