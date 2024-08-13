@@ -67,7 +67,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
         indexDirectoryPath = databaseContext.getFulltextIndexPath();
         IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.Standard_ANALYZER);
-        if (indexDirectoryPath.getFileName().toString().equals("unsaved")) {
+        if ("unsaved".equals(indexDirectoryPath.getFileName().toString())) {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             indexDirectoryPath = indexDirectoryPath.resolveSibling("unsaved" + NUMBER_OF_UNSAVED_LIBRARIES++);
         }
@@ -331,7 +331,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
                 indexWriter.close();
                 indexDirectory.close();
                 LOGGER.debug("Linked files index closed");
-                if (databaseContext.getFulltextIndexPath().getFileName().toString().equals("unsaved")) {
+                if ("unsaved".equals(databaseContext.getFulltextIndexPath().getFileName().toString())) {
                     LOGGER.debug("Deleting unsaved index directory");
                     FileUtils.deleteDirectory(indexDirectoryPath.toFile());
                 }
