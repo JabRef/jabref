@@ -436,7 +436,8 @@ public class PreferencesMigrations {
      * they can deal with.
      */
     static void restoreVariablesForBackwardCompatibility(JabRefPreferences preferences) {
-        List<String> oldColumnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        // 5.0 preference name "columnNames". The new one is {@link JabRefPreferences#COLUMN_NAMES}
+        List<String> oldColumnNames = preferences.getStringList("columnNames");
         List<String> fieldColumnNames = oldColumnNames.stream()
                                                       .filter(columnName -> columnName.startsWith("field:") || columnName.startsWith("special:"))
                                                       .map(columnName -> {

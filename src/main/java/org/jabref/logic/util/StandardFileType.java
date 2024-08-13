@@ -15,7 +15,6 @@ public enum StandardFileType implements FileType {
     MEDLINE("Medline", "nbib", "xml"),
     MEDLINE_PLAIN("Medline Plain", "nbib", "txt"),
     PUBMED("Pubmed", "fcgi"),
-    SILVER_PLATTER("SilverPlatter", "dat", "txt"),
     AUX("Aux file", "aux"),
     BIBTEX_DB("Bibtex library", "bib"),
     BST("BibTeX-Style file", "bst"),

@@ -37,6 +37,156 @@
     -fx-padding: -2 0 0 0;
 }
 
+/** even and odd are swapped around somehow. Below "odd" matches lines 2, 4, ... **/
+
+.table-row-cell:matching-search-and-groups {
+    -fx-background-color: -jr-match-1-even;
+}
+.table-row-cell:matching-search-and-groups > .table-cell {
+    -fx-text-fill: -jr-match-1-text-color;
+}
+.table-row-cell:matching-search-and-groups:focused > .table-cell {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+.table-row-cell:matching-search-and-groups:focused:hover > .table-cell {
+    -fx-text-fill: -jr-maintable-focused-hover-text;
+}
+.table-row-cell:matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-maintable-focused-hover-text;
+}
+.table-row-cell:matching-search-and-groups:hover > .table-cell {
+    -fx-text-fill: -jr-hover-text;
+}
+.table-row-cell:matching-search-and-groups > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-match-1-text-color;
+}
+.table-row-cell:matching-search-and-groups:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-hover-text;
+}
+.table-row-cell:matching-search-and-groups:odd {
+    -fx-background-color: -jr-match-1-odd;
+}
+.table-row-cell:matching-search-and-groups:odd:selected,
+.table-row-cell:matching-search-and-groups:odd:focused,
+.table-row-cell:matching-search-and-groups:odd:focused:hover,
+.table-row-cell:matching-search-and-groups:focused:hover {
+    -fx-background-color: -jr-selected;
+}
+.table-row-cell:matching-search-and-groups:odd:hover {
+    -fx-background-color: -jr-hover;
+}
+
+.table-row-cell:matching-search-not-groups {
+    -fx-background-color: -jr-match-2-even;
+}
+.table-row-cell:matching-search-not-groups > .table-cell {
+    -fx-text-fill: -jr-match-2-text-color;
+}
+.table-row-cell:matching-search-not-groups:focused > .table-cell {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+.table-row-cell:matching-search-not-groups:focused:hover > .table-cell {
+    -fx-text-fill: -jr-maintable-focused-hover-text;
+}
+.table-row-cell:matching-search-not-groups:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-maintable-focused-hover-text;
+}
+.table-row-cell:matching-search-not-groups:hover > .table-cell {
+    -fx-text-fill: -jr-hover-text;
+}
+.table-row-cell:matching-search-not-groups > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-match-2-text-color;
+}
+.table-row-cell:matching-search-not-groups:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-hover-text;
+}
+.table-row-cell:matching-search-not-groups:odd {
+    -fx-background-color: -jr-match-2-odd;
+}
+.table-row-cell:matching-search-not-groups:odd:selected,
+.table-row-cell:matching-search-not-groups:odd:focused,
+.table-row-cell:matching-search-not-groups:odd:focused:hover,
+.table-row-cell:matching-search-not-groups:focused:hover {
+    -fx-background-color: -jr-selected;
+}
+.table-row-cell:matching-search-not-groups:odd:hover {
+    -fx-background-color: -jr-hover;
+}
+
+.table-row-cell:matching-groups-not-search {
+    -fx-background-color: -jr-match-3-even;
+}
+.table-row-cell:matching-groups-not-search > .table-cell {
+    -fx-text-fill: -jr-match-3-text-color;
+}
+.table-row-cell:matching-groups-not-search:focused > .table-cell {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+.table-row-cell:matching-groups-not-search:focused:hover > .table-cell {
+    -fx-text-fill: -jr-maintable-focused-hover-text;
+}
+.table-row-cell:matching-groups-not-search:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-maintable-focused-hover-text;
+}
+.table-row-cell:matching-groups-not-search:hover > .table-cell {
+    -fx-text-fill: -jr-hover-text;
+}
+.table-row-cell:matching-groups-not-search > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-match-3-text-color;
+}
+.table-row-cell:matching-groups-not-search:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-hover-text;
+}
+.table-row-cell:matching-groups-not-search:odd {
+    -fx-background-color: -jr-match-3-odd;
+}
+.table-row-cell:matching-groups-not-search:odd:selected,
+.table-row-cell:matching-groups-not-search:odd:focused,
+.table-row-cell:matching-groups-not-search:odd:focused:hover,
+.table-row-cell:matching-groups-not-search:focused:hover {
+    -fx-background-color: -jr-selected;
+}
+.table-row-cell:matching-groups-not-search:odd:hover {
+    -fx-background-color: -jr-hover;
+}
+
+.table-row-cell:not-matching-search-and-groups {
+    -fx-background-color: -jr-match-4-even;
+}
+.table-row-cell:not-matching-search-and-groups > .table-cell {
+    -fx-text-fill: -jr-match-4-text-color;
+}
+.table-row-cell:not-matching-search-and-groups:focused > .table-cell {
+    -fx-text-fill: -fx-focused-text-base-color;
+}
+.table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell {
+    -fx-text-fill: -jr-maintable-focused-hover-text;
+}
+.table-row-cell:not-matching-search-and-groups:focused:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-maintable-focused-hover-text;
+}
+.table-row-cell:not-matching-search-and-groups:hover > .table-cell {
+    -fx-text-fill: -jr-hover-text;
+}
+.table-row-cell:not-matching-search-and-groups > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-match-4-text-color;
+}
+.table-row-cell:not-matching-search-and-groups:hover > .table-cell > .ikonli-font-icon {
+    -fx-icon-color: -jr-hover-text;
+}
+.table-row-cell:not-matching-search-and-groups:odd {
+    -fx-background-color: -jr-match-4-odd;
+}
+.table-row-cell:not-matching-search-and-groups:odd:selected,
+.table-row-cell:not-matching-search-and-groups:odd:focused,
+.table-row-cell:not-matching-search-and-groups:odd:focused:hover,
+.table-row-cell:not-matching-search-and-groups:focused:hover {
+    -fx-background-color: -jr-selected;
+}
+.table-row-cell:not-matching-search-and-groups:odd:hover {
+    -fx-background-color: -jr-hover;
+}
+
 .rating > .container {
     -fx-spacing: 2;
 }

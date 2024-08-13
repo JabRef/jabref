@@ -56,7 +56,7 @@ public class ResearchGateTest {
     }
 
     @Test
-    void getDocumentByTitle() throws IOException, NullPointerException {
+    void getDocumentByTitle() throws Exception {
         Optional<String> source = fetcher.getURLByString(entry.getTitle().get());
         assertTrue(source.isPresent() && source.get().startsWith(URL_PAGE));
     }

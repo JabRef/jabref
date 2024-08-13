@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.jabref.logic.cleanup.DoiCleanup;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -103,7 +102,7 @@ public class Medra implements IdBasedParserFetcher {
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         return new URL(API_URL + "/" + identifier);
     }
 
