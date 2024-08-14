@@ -42,7 +42,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         this.bibDatabaseContext = bibDatabaseContext;
         this.filePreferences = filePreferences;
 
-        titleProperty().set(Localization.lang("Generating embeddings for for %0", citationKey));
+        titleProperty().set(Localization.lang("Generating embeddings for %0", citationKey));
         showToUser(true);
 
         progressCounter.listenToAllProperties(this::updateProgress);
