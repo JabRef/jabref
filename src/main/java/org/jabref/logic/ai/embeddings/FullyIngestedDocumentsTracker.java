@@ -56,4 +56,8 @@ public class FullyIngestedDocumentsTracker {
     public Set<String> getFullyIngestedDocuments() {
         return new HashSet<>(ingestedMap.keySet());
     }
+
+    public void unmarkAll() {
+        ingestedMap.clear();
+    }
 }

@@ -1,6 +1,8 @@
 package org.jabref.gui.ai.components.aichat;
 
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
@@ -28,6 +30,7 @@ import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.concurrent.impl.FutureConvertersImpl;
 
 public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
@@ -67,12 +70,6 @@ public class AiChatComponent extends VBox {
                 } else {
                     onSendMessage();
                 }
-            }
-        });
-
-        scrollPane.needsLayoutProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                scrollPane.setVvalue(1.0);
             }
         });
 

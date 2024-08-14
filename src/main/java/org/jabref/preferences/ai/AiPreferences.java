@@ -335,6 +335,12 @@ public class AiPreferences {
      * @param runnable The runnable that should be executed when the preferences change.
      */
     public void addListenerToEmbeddingsParametersChange(Runnable runnable) {
+        customizeExpertSettings.addListener((observableValue, oldValue, newValue) -> {
+            if (newValue != oldValue) {
+                runnable.run();
+            }
+        });
+
         embeddingModel.addListener((observableValue, oldValue, newValue) -> {
             if (newValue != oldValue) {
                 runnable.run();

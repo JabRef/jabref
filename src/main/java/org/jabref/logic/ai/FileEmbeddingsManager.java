@@ -54,7 +54,10 @@ public class FileEmbeddingsManager {
     }
 
     private void setupListeningToPreferencesChanges() {
-        aiPreferences.addListenerToEmbeddingsParametersChange(embeddingStore::removeAll);
+        aiPreferences.addListenerToEmbeddingsParametersChange(() -> {
+            embeddingStore.removeAll();
+            fullyIngestedDocumentsTracker.unmarkAll();
+        });
     }
 
     public void addDocument(String link, Document document, long modificationTimeInSeconds, IntegerProperty workDone, IntegerProperty workMax) throws InterruptedException {
