@@ -45,6 +45,7 @@ version = project.findProperty('projVersion') ?: '100.0.0'
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
     modularity.inferModulePath.set(false)
@@ -125,6 +126,8 @@ repositories {
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://oss.sonatype.org/content/groups/public' }
+
+    // Required for one.jpro.jproutils:tree-showing
     maven { url 'https://sandec.jfrog.io/artifactory/repo' }
 }
 
@@ -238,12 +241,17 @@ dependencies {
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
         exclude group: 'org.apache.commons.commons-logging'
+        exclude module: 'kotlin-stdlib-jdk8'
+        exclude group: 'com.squareup.retrofit2'
         exclude group: 'org.openjfx'
         exclude group: 'org.apache.logging.log4j'
         exclude group: 'tech.units'
     }
     // Required by gemsfx
     implementation 'tech.units:indriya:2.2'
+    implementation ('com.squareup.retrofit2:retrofit:2.11.0') {
+        exclude group: 'com.squareup.okhttp3'
+    }
 
     implementation 'org.controlsfx:controlsfx:11.2.1'
 
@@ -314,6 +322,25 @@ dependencies {
 
     // YAML formatting
     implementation 'org.yaml:snakeyaml:2.2'
+
+    // AI
+    implementation 'dev.langchain4j:langchain4j:0.33.0'
+    // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
+    implementation('dev.langchain4j:langchain4j-open-ai:0.33.0') {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    }
+    implementation('dev.langchain4j:langchain4j-mistral-ai:0.33.0')
+    implementation('dev.langchain4j:langchain4j-hugging-face:0.33.0')
+    implementation 'ai.djl:api:0.29.0'
+    implementation 'ai.djl.pytorch:pytorch-model-zoo:0.29.0'
+    implementation 'ai.djl.huggingface:tokenizers:0.29.0'
+    implementation 'io.github.stefanbratanov:jvm-openai:0.9.3'
+    // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
+    implementation ('com.squareup.okhttp3:okhttp:4.12.0') {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    }
+    // GemxFX also (transitively) depends on kotlin
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24'
 
     implementation 'commons-io:commons-io:2.16.1'
 
@@ -455,8 +482,8 @@ compileJava {
     options.generatedSourceOutputDirectory.set(file("src-gen/main/java"))
 
     moduleOptions {
-        // TODO: Remove access to internal api
         addExports = [
+                // TODO: Remove access to internal api
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
         ]
@@ -470,10 +497,10 @@ run {
         application.applicationDefaultJvmArgs = []
     }
 
-    // TODO: Remove access to internal api
     moduleOptions {
         // On a change here, also adapt "application > applicationDefaultJvmArgs"
         addExports = [
+                // TODO: Remove access to internal api
                 'javafx.base/com.sun.javafx.event' : 'org.jabref.merged.module',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
 

@@ -361,6 +361,7 @@ public class IconTheme {
         ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
         MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE),
         ADD_OR_MAKE_BIBLIOGRAPHY(JabRefMaterialDesignIcon.BIBLIOGRAPHY);
+
         private final JabRefIcon icon;
 
         JabRefIcons(Ikon... icons) {

@@ -38,6 +38,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -56,6 +57,7 @@ public class MainToolBar extends ToolBar {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
+    private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
     private final BibEntryTypesManager entryTypesManager;
@@ -72,6 +74,7 @@ public class MainToolBar extends ToolBar {
                        DialogService dialogService,
                        StateManager stateManager,
                        PreferencesService preferencesService,
+                       AiService aiService,
                        FileUpdateMonitor fileUpdateMonitor,
                        TaskExecutor taskExecutor,
                        BibEntryTypesManager entryTypesManager,
@@ -83,6 +86,7 @@ public class MainToolBar extends ToolBar {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
+        this.aiService = aiService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
         this.entryTypesManager = entryTypesManager;
@@ -110,7 +114,7 @@ public class MainToolBar extends ToolBar {
         getItems().addAll(
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferencesService)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(frame, preferencesService, aiService, dialogService, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferencesService, stateManager))),
 
                 leftSpacer,

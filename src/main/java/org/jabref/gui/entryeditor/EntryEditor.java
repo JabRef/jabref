@@ -48,6 +48,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.TypedBibEntry;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -62,6 +63,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.ai.AiApiKeyProvider;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -109,6 +111,7 @@ public class EntryEditor extends BorderPane {
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
+    @Inject private AiApiKeyProvider aiApiKeyProvider;
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
@@ -116,6 +119,7 @@ public class EntryEditor extends BorderPane {
     @Inject private BibEntryTypesManager bibEntryTypesManager;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject private AiService aiService;
 
     private final List<EntryEditorTab> allPossibleTabs;
     private final Collection<OffersPreview> previewTabs;
@@ -147,6 +151,7 @@ public class EntryEditor extends BorderPane {
                 activeTab.notifyAboutFocus(currentlyEditedEntry);
             }
         });
+
         EasyBind.listen(preferencesService.getPreviewPreferences().showPreviewAsExtraTabProperty(),
                 (obs, oldValue, newValue) -> {
                     if (currentlyEditedEntry != null) {
@@ -162,9 +167,11 @@ public class EntryEditor extends BorderPane {
             }
             event.consume();
         });
+
         this.setOnDragDropped(event -> {
             BibEntry entry = this.getCurrentlyEditedEntry();
             boolean success = false;
+
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 List<Path> draggedFiles = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
                 switch (event.getTransferMode()) {
@@ -307,6 +314,8 @@ public class EntryEditor extends BorderPane {
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor, libraryTab.searchQueryProperty()));
+        tabs.add(new AiSummaryTab(libraryTab.getLibraryTabContainer(), dialogService, preferencesService, aiApiKeyProvider, aiService, libraryTab.getBibDatabaseContext(), taskExecutor));
+        tabs.add(new AiChatTab(libraryTab.getLibraryTabContainer(), dialogService, preferencesService, aiApiKeyProvider, aiService, libraryTab.getBibDatabaseContext(), taskExecutor));
 
         return tabs;
     }
