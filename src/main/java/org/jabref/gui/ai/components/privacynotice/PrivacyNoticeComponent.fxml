@@ -11,21 +11,21 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
          <children>
-            <Text fx:id="text1" text="%Privacy notice">
+            <Label wrapText="true" text="%Privacy notice">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
-            </Text>
-            <Text fx:id="text2" text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). AI provider is an external service. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider.">
+            </Label>
+            <Label wrapText="true" text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). AI provider is an external service. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider.">
                <font>
                   <Font size="14.0" />
                </font>
-            </Text>
-            <Text fx:id="text3" text="%As soon as you ask a question, the text content of all PDFs attached to the entry are sent to external service.">
+            </Label>
+            <Label wrapText="true" text="%As soon as you ask a question, the text content of all PDFs attached to the entry are sent to external service.">
                <font>
                   <Font size="14.0" />
                </font>
-            </Text>
+            </Label>
             <TextFlow fx:id="openAiPrivacyTextFlow">
                <children>
                   <Text text="%If you have chosen the OpenAI as AI provider, the privacy policy of OpenAI applies. You find it at %0.">

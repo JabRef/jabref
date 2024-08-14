@@ -9,12 +9,12 @@
    <center>
       <VBox alignment="CENTER" spacing="10.0">
          <children>
-            <Text fx:id="titleText" strokeType="OUTSIDE" strokeWidth="0.0" text="%Unable to chat">
+            <Label text="%Unable to chat">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
-            </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%API key is missing." />
+            </Label>
+            <Label text="%API key is missing." />
             <Hyperlink onAction="#onHyperlinkClick" text="%Click here to navigate to AI preferences." />
          </children>
          <padding>

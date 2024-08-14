@@ -2,17 +2,17 @@ package org.jabref.gui.ai.components.errorstate;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class ErrorStateComponent extends BorderPane {
-    @FXML private Text titleText;
-    @FXML private Text contentText;
+    @FXML private Label titleText;
+    @FXML private Label contentText;
     @FXML private VBox contentsVBox;
 
     public ErrorStateComponent(String title, String content) {

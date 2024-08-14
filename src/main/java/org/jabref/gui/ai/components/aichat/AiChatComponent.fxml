@@ -33,7 +33,7 @@
          </children>
       </HBox>
              <HBox alignment="CENTER" spacing="50">
-                 <Text fx:id="noticeText" strokeType="OUTSIDE" strokeWidth="0.0" text="%Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided." BorderPane.alignment="CENTER" />
+                 <Label fx:id="noticeText" text="%Current AI model: %0. The AI may generate inaccurate or inappropriate responses. Please verify any information provided." BorderPane.alignment="CENTER" />
 
                  <Button alignment="CENTER" onAction="#onClearChatHistory" styleClass="icon-button,narrow" textAlignment="CENTER">
                      <graphic>

@@ -5,6 +5,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
@@ -12,7 +13,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
@@ -48,7 +48,7 @@ public class AiChatComponent extends VBox {
     @FXML private ExpandingTextArea userPromptTextArea;
     @FXML private Button submitButton;
     @FXML private StackPane stackPane;
-    @FXML private Text noticeText;
+    @FXML private Label noticeText;
 
     public AiChatComponent(AiPreferences aiPreferences, AiChatLogic aiChatLogic, String citationKey, DialogService dialogService, TaskExecutor taskExecutor) {
         this.aiPreferences = aiPreferences;
