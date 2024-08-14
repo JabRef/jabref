@@ -82,7 +82,7 @@ public class ExternalFilesEntryLinker {
             moveLinkedFilesToFileDir(entry);
             renameLinkedFilesToPattern(entry);
         } catch (Exception e) {
-            LOGGER.error("Could not block LinkedFileIndexer", e);
+            LOGGER.error("Could not block LinkedFilesIndexer", e);
         }
         luceneManager.updateAfterDropFiles(entry);
     }
@@ -95,7 +95,7 @@ public class ExternalFilesEntryLinker {
             }
             renameLinkedFilesToPattern(entry);
         } catch (Exception e) {
-            LOGGER.error("Could not block LinkedFileIndexer", e);
+            LOGGER.error("Could not block LinkedFilesIndexer", e);
         }
         luceneManager.updateAfterDropFiles(entry);
     }

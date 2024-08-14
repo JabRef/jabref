@@ -6,6 +6,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.swing.undo.UndoManager;
 
@@ -76,6 +78,7 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 public class GlobalSearchBar extends HBox {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
+
     private static final int SEARCH_DELAY = 400;
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
@@ -94,6 +97,8 @@ public class GlobalSearchBar extends HBox {
     private final SearchPreferences searchPreferences;
     private final DialogService dialogService;
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
+    private final BooleanProperty illegalSearch = new SimpleBooleanProperty(false);
+    private final BooleanProperty invalidRegex = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
     private final SearchType searchType;
 
@@ -117,24 +122,29 @@ public class GlobalSearchBar extends HBox {
         searchField = SearchTextField.create(keyBindingRepository);
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
+        Label currentResults = new Label();
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the tabContainer width is too small
-        Label currentResults = new Label("");
         currentResults.setPrefWidth(150);
         currentResults.visibleProperty().bind(stateManager.activeSearchQuery(searchType).isPresent());
-        currentResults.textProperty().bind(EasyBind.combine(stateManager.searchResultSize(searchType), stateManager.activeSearchQuery(searchType),
-                (size, query) -> {
-                    if (query.isPresent() && !query.get().isValid()) {
+
+        currentResults.textProperty().bind(EasyBind.combine(
+                stateManager.searchResultSize(searchType), illegalSearch, invalidRegex,
+                (matched, illegal, invalid) -> {
+                    if (illegal) {
                         searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
                         return Localization.lang("Search failed: illegal search expression");
-                    }
-                    if (size.intValue() == 0) {
+                    } else if (invalid) {
+                        searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
+                        return Localization.lang("Invalid regular expression");
+                    } else if (matched.intValue() == 0) {
                         searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
                         return Localization.lang("No results found.");
                     } else {
                         searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
-                        return Localization.lang("Found %0 results.", String.valueOf(size));
+                        return Localization.lang("Found %0 results.", String.valueOf(matched));
                     }
-                }));
+                }
+        ));
 
         searchField.setTooltip(searchFieldTooltip);
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -314,8 +324,32 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
+        // Invalid regular expression
+        if (regularExpressionButton.isSelected() && !validRegex()) {
+            invalidRegex.setValue(true);
+            return;
+        } else {
+            invalidRegex.setValue(false);
+        }
+
         SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
+        if (!searchQuery.isValid()) {
+            illegalSearch.set(true);
+            return;
+        } else {
+            illegalSearch.set(false);
+        }
         stateManager.activeSearchQuery(searchType).set(Optional.of(searchQuery));
+    }
+
+    private boolean validRegex() {
+        try {
+            Pattern.compile(searchField.getText());
+        } catch (PatternSyntaxException e) {
+            LOGGER.debug(e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {

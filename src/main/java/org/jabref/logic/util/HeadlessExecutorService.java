@@ -152,12 +152,19 @@ public class HeadlessExecutorService implements Executor {
      * Shuts everything down. After termination, this method returns.
      */
     public void shutdownEverything() {
+        LOGGER.trace("Stopping remote thread");
         stopRemoteThread();
 
+        LOGGER.trace("Gracefully shut down executor service");
         gracefullyShutdown(this.executorService);
+
+        LOGGER.trace("Gracefully shut down low priority executor service");
         gracefullyShutdown(this.lowPriorityExecutorService);
 
+        LOGGER.trace("Canceling timer");
         timer.cancel();
+
+        LOGGER.trace("Finished shutdownEverything");
     }
 
     private static class NamedRunnable implements Runnable {

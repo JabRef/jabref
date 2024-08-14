@@ -63,6 +63,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -117,6 +118,7 @@ public class LibraryTab extends Tab {
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
+    private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -167,6 +169,7 @@ public class LibraryTab extends Tab {
                        LibraryTabContainer tabContainer,
                        DialogService dialogService,
                        PreferencesService preferencesService,
+                       AiService aiService,
                        StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
@@ -179,6 +182,7 @@ public class LibraryTab extends Tab {
         this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.aiService = Objects.requireNonNull(aiService);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -1003,6 +1007,7 @@ public class LibraryTab extends Tab {
                                               Path file,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
+                                              AiService aiService,
                                               StateManager stateManager,
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -1018,6 +1023,7 @@ public class LibraryTab extends Tab {
                 tabContainer,
                 dialogService,
                 preferencesService,
+                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -1039,6 +1045,7 @@ public class LibraryTab extends Tab {
                                               LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
+                                              AiService aiService,
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
@@ -1052,6 +1059,7 @@ public class LibraryTab extends Tab {
                 tabContainer,
                 dialogService,
                 preferencesService,
+                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -1132,5 +1140,9 @@ public class LibraryTab extends Tab {
                 "bibDatabaseContext=" + bibDatabaseContext +
                 ", showing=" + showing +
                 '}';
+    }
+
+    public LibraryTabContainer getLibraryTabContainer() {
+        return tabContainer;
     }
 }
