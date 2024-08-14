@@ -1,6 +1,8 @@
 package org.jabref.gui.ai.components.aichat;
 
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
@@ -38,6 +40,8 @@ public class AiChatComponent extends VBox {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
+    private final IntegerProperty blockScroll = new SimpleIntegerProperty(0);
+
     @FXML private ScrollPane scrollPane;
     @FXML private VBox chatVBox;
     @FXML private HBox promptHBox;
@@ -72,7 +76,11 @@ public class AiChatComponent extends VBox {
 
         scrollPane.needsLayoutProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
-                scrollPane.setVvalue(1.0);
+                if (blockScroll.get() == 0) {
+                    scrollPane.setVvalue(1.0);
+                } else {
+                    blockScroll.set(blockScroll.get() - 1);
+                }
             }
         });
 
@@ -191,6 +199,8 @@ public class AiChatComponent extends VBox {
     }
 
     private void deleteMessage(ChatMessageComponent chatMessageComponent) {
+        blockScroll.set(2);
+
         aiChatLogic.getChatHistory().remove(chatMessageComponent.getChatMessage());
 
         chatVBox.getChildren().remove(chatMessageComponent);
