@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Last updated: 2023-08-24
+Last updated: 2024-08-06
 
 Your privacy is a fundamental right JabRef e.V. respects and supports.
 By using JabRef and its related online services, you choose to share some of your personal information.
@@ -49,17 +49,21 @@ These third-party services are the following:
 | [Collection of Computer Science Bibliographies](https://en.wikipedia.org/wiki/Collection_of_Computer_Science_Bibliographies) | **currently unavailable**, offline  |
 | [CrossRef](https://www.crossref.org/)                                                                                        | <https://www.crossref.org/operations-and-sustainability/privacy/> |
 | [dblp](https://dblp.uni-trier.de/)                                                                                           | <https://dblp.uni-trier.de/db/about/privacy.html> |
+| [DJL (Deep Java Library)](https://djl.ai/)                                                                                   | <https://github.com/deepjavalibrary/djl/discussions/3370#discussioncomment-10233632> |
 | [Directory of Open Access Books](https://www.doabooks.org/)                                                                  | <https://www.doabooks.org/en/resources/accessibility> |
 | [Digitala Vetenskapliga Arkivet](https://www.diva-portal.org/)                                                               | <https://www.uu.se/en/about-uu/data-protection-policy/> |
 | [DOI Foundation](https://www.doi.org/)                                                                                       | <https://www.doi.org/privacy-policy/> |
 | [Elsevier](https://www.elsevier.com/)                                                                                        | <https://www.elsevier.com/legal/privacy-policy> |
 | [Google Scholar](https://scholar.google.com/)                                                                                | <https://policies.google.com/privacy> |
 | [Gemeinsamer Verbundkatalog](https://www.gbv.de/)                                                                            | <https://www.gbv.de/datenschutz> |
+| [Hugging Face](https://huggingface.co/)                                                                                      | <https://huggingface.co/privacy> |
 | [IACR](https://www.iacr.org/)                                                                                                | <https://www.iacr.org/privacy.html> |
 | [IEEEXplore](https://ieeexplore.ieee.org/Xplore/home.jsp)                                                                    | <https://www.ieee.org/security-privacy.html> |
 | [INSPIRE](https://inspirehep.net/)                                                                                           | <https://cern.service-now.com/service-portal?id=privacy_policy&se=INSPIRE-Online&notice=main> |
+| [ISIDORE](https://isidore.science/)                                                                                          | <https://isidore.science/credit> |
 | [JSTOR](https://www.jstor.org/)                                                                                              | <https://www.ithaka.org/privacypolicy/> |
 | [Library of Congress](https://lccn.loc.gov/)                                                                                 | <https://www.loc.gov/legal/> |
+| [Mistral AI](https://mistral.ai/)                                                                                            | <https://mistral.ai/terms/#privacy-policy> |
 | [National Library of Medicine](https://www.ncbi.nlm.nih.gov/)                                                                | <https://www.nlm.nih.gov/web_policies.html> |
 | [MathSciNet](http://www.ams.org/mathscinet)                                                                                  | <https://www.ams.org/about-us/privacy> |
 | [mEDRA](https://www.medra.org/)                                                                                              | <https://www.medra.org/stdoc/en/Servizio_DOI_Informativa_ENG.pdf> |
@@ -73,9 +77,8 @@ These third-party services are the following:
 | [The SAO/NASA Astrophysics Data System](https://ui.adsabs.harvard.edu/)                                                      | <https://ui.adsabs.harvard.edu/help/privacy/> |
 | [Unpaywall](https://unpaywall.org/)                                                                                          | <https://unpaywall.org/legal/privacy> |
 | [zbMATH Open](https://www.zbmath.org)                                                                                        | <https://zbmath.org/privacy-policy/> |
-| [ISIDORE](https://isidore.science/)                                                                                          | <https://isidore.science/credit> |
 
-[1]: *Note: The Mr. DLib service is used for the related articles tab in the entry editor and collects also your language, your browser and operating system (by default*disabled*).*
+[1]: *Note: The Mr. DLib service is used for the related articles tab in the entry editor and collects also your language, your browser and operating system (*disabled* by default).*
 
 ## JabRef Browser Extension
 

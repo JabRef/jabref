@@ -31,6 +31,7 @@ import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
+import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -61,7 +62,6 @@ public class MainTableColumnFactory {
     private final UndoManager undoManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
     private final StateManager stateManager;
     private final MainTableTooltip tooltip;
 
@@ -80,8 +80,8 @@ public class MainTableColumnFactory {
         this.cellFactory = new CellFactory(preferencesService, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager,
-                themeManager, taskExecutor);
+        ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
+        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
@@ -134,10 +134,8 @@ public class MainTableColumnFactory {
     public List<TableColumn<BibEntryTableViewModel, ?>> createColumns() {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
-        columnPreferences.getColumns().forEach(column -> {
-            columns.add(createColumn(column));
-        });
-
+        columns.add(createMatchCategoryColumn(new MainTableColumnModel(MainTableColumnModel.Type.MATCH_CATEGORY)));
+        columnPreferences.getColumns().forEach(column -> columns.add(createColumn(column)));
         return columns;
     }
 
@@ -147,8 +145,22 @@ public class MainTableColumnFactory {
         column.setMaxWidth(width);
     }
 
+    private TableColumn<BibEntryTableViewModel, MatchCategory> createMatchCategoryColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, MatchCategory> column = new MainTableColumn<>(columnModel);
+        Node header = new Text(Localization.lang("Match category"));
+        header.getStyleClass().add("mainTable-header");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.MATCH_CATEGORY.getDisplayName()));
+        column.setGraphic(header);
+        column.setCellValueFactory(cellData -> cellData.getValue().matchCategory());
+        new ValueTableCellFactory<BibEntryTableViewModel, MatchCategory>().withText(String::valueOf).install(column);
+        column.setSortable(true);
+        column.setSortType(TableColumn.SortType.ASCENDING);
+        column.setVisible(false);
+        return column;
+    }
+
     /**
-     * Creates a column with a continous number
+     * Creates a column with a continuous number
      */
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
@@ -192,7 +204,7 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, ?> createGroupIconColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, List<AbstractGroup>> column = new MainTableColumn<>(columnModel);
         Node headerGraphic = IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLUMN.getGraphicNode();
-        Tooltip.install(headerGraphic, new Tooltip(Localization.lang("Group icons")));
+        Tooltip.install(headerGraphic, new Tooltip(MainTableColumnModel.Type.GROUP_ICONS.getDisplayName()));
         column.setGraphic(headerGraphic);
         column.getStyleClass().add(STYLE_ICON_COLUMN);
         column.setResizable(true);

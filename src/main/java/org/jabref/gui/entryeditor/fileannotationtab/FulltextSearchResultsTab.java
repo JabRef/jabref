@@ -24,9 +24,11 @@ import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.PdfSearchResults;
@@ -48,18 +50,21 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final ActionFactory actionFactory;
     private final TaskExecutor taskExecutor;
     private final TextFlow content;
+    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private BibEntry entry;
     private DocumentViewerView documentViewerView;
 
     public FulltextSearchResultsTab(StateManager stateManager,
                                     PreferencesService preferencesService,
                                     DialogService dialogService,
-                                    TaskExecutor taskExecutor) {
+                                    TaskExecutor taskExecutor,
+                                    OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
+        this.searchQueryProperty = searchQueryProperty;
 
         content = new TextFlow();
         ScrollPane scrollPane = new ScrollPane(content);
@@ -67,15 +72,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         content.setPadding(new Insets(10));
         setContent(scrollPane);
         setText(Localization.lang("Search results"));
-        this.stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> bindToEntry(entry));
+        searchQueryProperty.addListener((observable, oldValue, newValue) -> bindToEntry(entry));
     }
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return this.stateManager.activeSearchQueryProperty().isPresent().get() &&
-                this.stateManager.activeSearchQueryProperty().get().isPresent() &&
-                this.stateManager.activeSearchQueryProperty().get().get().getSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT) &&
-                !this.stateManager.activeSearchQueryProperty().get().get().getQuery().isEmpty();
+        return searchQueryProperty.get().map(query ->
+                !query.getQuery().isEmpty() && query.getSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT)
+        ).orElse(false);
     }
 
     @Override
@@ -87,7 +91,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             documentViewerView = new DocumentViewerView();
         }
         this.entry = entry;
-        PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
+        PdfSearchResults searchResults = searchQueryProperty.get().get().getRule().getFulltextResults(searchQueryProperty.get().get().getQuery(), entry);
 
         content.getChildren().clear();
 

@@ -10,6 +10,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.msbib.MSBibDatabase;
 import org.jabref.logic.util.StandardFileType;
 
@@ -87,7 +88,7 @@ public class MsBibImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Importer for the MS Office 2007 XML bibliography format.";
+        return Localization.lang("Importer for the MS Office 2007 XML bibliography format.");
     }
 
     /**

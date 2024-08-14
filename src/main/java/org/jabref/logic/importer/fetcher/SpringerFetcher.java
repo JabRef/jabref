@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
@@ -185,8 +184,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
      * @return URL
      */
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
-
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", new SpringerQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Search query
         uriBuilder.addParameter("api_key", importerPreferences.getApiKey(getName()).orElse(API_KEY)); // API key

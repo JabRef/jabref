@@ -126,15 +126,8 @@ public class BibtexImporterTest {
     }
 
     @Test
-    public void sGetExtensions() {
+    public void getExtensions() {
         assertEquals(StandardFileType.BIBTEX_DB, importer.getFileType());
-    }
-
-    @Test
-    public void getDescription() {
-        assertEquals(
-                "This importer enables `--importToOpen someEntry.bib`",
-                importer.getDescription());
     }
 
     @Test

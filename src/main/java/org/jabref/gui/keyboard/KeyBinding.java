@@ -93,6 +93,8 @@ public enum KeyBinding {
     PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl+shift+R", KeyBindingCategory.FILE),
     PREVIOUS_PREVIEW_LAYOUT("Previous preview layout", Localization.lang("Previous preview layout"), "shift+F9", KeyBindingCategory.VIEW),
     PREVIOUS_LIBRARY("Previous library", Localization.lang("Previous library"), "ctrl+PAGE_UP", KeyBindingCategory.VIEW),
+    SCROLL_TO_NEXT_MATCH_CATEGORY("Scroll to next match category", Localization.lang("Scroll to next match category"), "right", KeyBindingCategory.VIEW),
+    SCROLL_TO_PREVIOUS_MATCH_CATEGORY("Scroll to previous match category", Localization.lang("Scroll to previous match category"), "left", KeyBindingCategory.VIEW),
     PUSH_TO_APPLICATION("Push to application", Localization.lang("Push to application"), "ctrl+L", KeyBindingCategory.TOOLS),
     QUIT_JABREF("Quit JabRef", Localization.lang("Quit JabRef"), "ctrl+Q", KeyBindingCategory.FILE),
     REDO("Redo", Localization.lang("Redo"), "ctrl+Y", KeyBindingCategory.EDIT),

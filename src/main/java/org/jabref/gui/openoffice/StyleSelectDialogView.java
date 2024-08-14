@@ -191,6 +191,18 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
             }
         });
 
+        OOStyle currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
+        if (currentStyle instanceof JStyle) {
+            tabPane.getSelectionModel().select(1);
+        } else {
+            tabPane.getSelectionModel().select(0);
+        }
+
+        viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.setSelectedTab(newValue);
+        });
+
         updateCurrentStyleLabel();
     }
 

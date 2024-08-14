@@ -144,17 +144,22 @@ public class WebSearchPaneViewModel {
         }
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
-        Callable<ParserResult> parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
+
+        Callable<ParserResult> parserResultCallable;
+
         String fetcherName = activeFetcher.getName();
 
         if (CompositeIdFetcher.containsValidId(query)) {
             CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferencesService.getImportFormatPreferences());
             parserResultCallable = () -> new ParserResult(OptionalUtil.toList(compositeIdFetcher.performSearchById(query)));
             fetcherName = Localization.lang("Identifier-based Web Search");
+        } else {
+            // Exceptions are handled below at "task.onFailure(dialogService::showErrorDialogAndWait)"
+            parserResultCallable = () -> new ParserResult(activeFetcher.performSearch(query));
         }
 
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(parserResultCallable)
-                             .withInitialMessage(Localization.lang("Processing %0", query));
+                                                          .withInitialMessage(Localization.lang("Processing \"%0\"...", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);

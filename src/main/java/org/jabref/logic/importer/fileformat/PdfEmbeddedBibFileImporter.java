@@ -48,14 +48,14 @@ public class PdfEmbeddedBibFileImporter extends Importer {
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException("PdfEmbeddedBibFileImporter does not support importDatabase(BufferedReader reader)."
+        throw new UnsupportedOperationException("PdfEmbeddedBibFileImporter does not support importDatabase(BufferedReader reader). "
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
-        throw new UnsupportedOperationException("PdfEmbeddedBibFileImporter does not support importDatabase(String data)."
+        throw new UnsupportedOperationException("PdfEmbeddedBibFileImporter does not support importDatabase(String data). "
                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
@@ -157,6 +157,6 @@ public class PdfEmbeddedBibFileImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "PdfEmbeddedBibFileImporter imports an embedded Bib-File from the PDF.";
+        return Localization.lang("Imports a BibTeX file found inside a PDF.");
     }
 }

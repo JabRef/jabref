@@ -32,9 +32,9 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
         } catch (IOException e) {
-            throw new FetcherException("A network error occurred while fetching from " + urlForQuery, e);
+            throw new FetcherException(urlForQuery, "A network error occurred", e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred while fetching from " + urlForQuery, e);
+            throw new FetcherException(urlForQuery, "An internal parser error occurred", e);
         }
     }
 
@@ -44,10 +44,10 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
      * @param luceneQuery the search query
      * @param pageNumber  the number of the page indexed from 0
      */
-    URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException;
 
     @Override
-    default URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    default URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         return getURLForQuery(luceneQuery, 0);
     }
 

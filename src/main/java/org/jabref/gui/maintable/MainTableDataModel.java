@@ -5,17 +5,23 @@ import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
-import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.search.MatchCategory;
+import org.jabref.gui.search.SearchDisplayMode;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.FilteredListProxy;
+import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -23,66 +29,127 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.SearchPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 
 public class MainTableDataModel {
+    private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter = new SimpleObjectProperty<>();
     private final GroupsPreferences groupsPreferences;
+    private final SearchPreferences searchPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
+    private final TaskExecutor taskExecutor;
+    private final Subscription searchQuerySubscription;
+    private final Subscription searchDisplayModeSubscription;
+    private final Subscription selectedGroupsSubscription;
+    private final Subscription groupViewModeSubscription;
+    private Optional<MatcherSet> groupsMatcher;
 
-    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
+    public MainTableDataModel(BibDatabaseContext context,
+                              PreferencesService preferencesService,
+                              TaskExecutor taskExecutor,
+                              ListProperty<GroupTreeNode> selectedGroupsProperty,
+                              OptionalObjectProperty<SearchQuery> searchQueryProperty,
+                              IntegerProperty resultSizeProperty) {
         this.groupsPreferences = preferencesService.getGroupsPreferences();
+        this.searchPreferences = preferencesService.getSearchPreferences();
         this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
+        this.taskExecutor = taskExecutor;
         this.bibDatabaseContext = context;
+        this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
 
         resetFieldFormatter();
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
-                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
+        entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
+        entriesFiltered = new FilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
 
-        entriesFiltered = new FilteredList<>(entriesViewModel);
-        entriesFiltered.predicateProperty().bind(
-                EasyBind.combine(stateManager.activeGroupProperty(),
-                        stateManager.activeSearchQueryProperty(),
-                        groupsPreferences.groupViewModeProperty(),
-                        (groups, query, groupViewMode) -> entry -> isMatched(groups, query, entry))
-        );
+        entriesViewModel.addListener((ListChangeListener.Change<? extends BibEntryTableViewModel> change) -> {
+            while (change.next()) {
+                if (change.wasAdded() || change.wasUpdated()) {
+                    BackgroundTask.wrap(() -> {
+                        for (BibEntryTableViewModel entry : change.getList().subList(change.getFrom(), change.getTo())) {
+                            updateEntrySearchMatch(searchQueryProperty.get(), entry, searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT);
+                            updateEntryGroupMatch(entry, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
+                        }
+                    }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered, change.getFrom(), change.getTo())).executeWith(taskExecutor);
+                }
+            }
+        });
 
-        IntegerProperty resultSize = new SimpleIntegerProperty();
-        resultSize.bind(Bindings.size(entriesFiltered));
-        stateManager.setActiveSearchResultSize(context, resultSize);
+        searchQuerySubscription = EasyBind.listen(searchQueryProperty, (observable, oldValue, newValue) -> updateSearchMatches(newValue));
+        searchDisplayModeSubscription = EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (observable, oldValue, newValue) -> updateSearchDisplayMode(newValue));
+        selectedGroupsSubscription = EasyBind.listen(selectedGroupsProperty, (observable, oldValue, newValue) -> updateGroupMatches(newValue));
+        groupViewModeSubscription = EasyBind.listen(preferencesService.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(selectedGroupsProperty.get()));
+
+        resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS).get())));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
     }
 
-    private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry);
+    private void updateSearchMatches(Optional<SearchQuery> query) {
+        BackgroundTask.wrap(() -> {
+            boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
+            entriesViewModel.forEach(entry -> updateEntrySearchMatch(query, entry, isFloatingMode));
+        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
     }
 
-    private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return query.map(matcher -> matcher.isMatch(entry.getEntry()))
-                    .orElse(true);
+    private static void updateEntrySearchMatch(Optional<SearchQuery> query, BibEntryTableViewModel entry, boolean isFloatingMode) {
+        boolean isMatched = query.map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);
+        entry.isMatchedBySearch().set(isMatched);
+        entry.updateMatchCategory();
+        setEntrySearchVisibility(entry, isMatched, isFloatingMode);
     }
 
-    private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {
-        return createGroupMatcher(groups)
-                .map(matcher -> matcher.isMatch(entry.getEntry()))
-                .orElse(true);
+    private static void setEntrySearchVisibility(BibEntryTableViewModel entry, boolean isMatched, boolean isFloatingMode) {
+        if (isMatched) {
+            entry.isVisibleBySearch().set(true);
+        } else {
+            entry.isVisibleBySearch().set(isFloatingMode);
+        }
     }
 
-    private Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups) {
+    private void updateSearchDisplayMode(SearchDisplayMode mode) {
+        BackgroundTask.wrap(() -> {
+            boolean isFloatingMode = mode == SearchDisplayMode.FLOAT;
+            entriesViewModel.forEach(entry -> setEntrySearchVisibility(entry, entry.isMatchedBySearch().get(), isFloatingMode));
+        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+    }
+
+    private void updateGroupMatches(ObservableList<GroupTreeNode> groups) {
+        BackgroundTask.wrap(() -> {
+            groupsMatcher = createGroupMatcher(groups, groupsPreferences);
+            boolean isInvertMode = groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT);
+            boolean isFloatingMode = !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER);
+            entriesViewModel.forEach(entry -> updateEntryGroupMatch(entry, groupsMatcher, isInvertMode, isFloatingMode));
+        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+    }
+
+    private void updateEntryGroupMatch(BibEntryTableViewModel entry, Optional<MatcherSet> groupsMatcher, boolean isInvertMode, boolean isFloatingMode) {
+        boolean isMatched = groupsMatcher.map(matcher -> matcher.isMatch(entry.getEntry()) ^ isInvertMode)
+                                         .orElse(true);
+        entry.isMatchedByGroup().set(isMatched);
+        entry.updateMatchCategory();
+        if (isMatched) {
+            entry.isVisibleByGroup().set(true);
+        } else {
+            entry.isVisibleByGroup().set(isFloatingMode);
+        }
+    }
+
+    private static Optional<MatcherSet> createGroupMatcher(List<GroupTreeNode> selectedGroups, GroupsPreferences groupsPreferences) {
         if ((selectedGroups == null) || selectedGroups.isEmpty()) {
             // No selected group, show all entries
             return Optional.empty();
         }
 
         final MatcherSet searchRules = MatcherSets.build(
-                groupsPreferences.getGroupViewMode() == GroupViewMode.INTERSECTION
+                groupsPreferences.getGroupViewMode().contains(GroupViewMode.INTERSECTION)
                         ? MatcherSets.MatcherType.AND
                         : MatcherSets.MatcherType.OR);
 
@@ -90,6 +157,13 @@ public class MainTableDataModel {
             searchRules.addRule(node.getSearchMatcher());
         }
         return Optional.of(searchRules);
+    }
+
+    public void unbind() {
+        searchQuerySubscription.unsubscribe();
+        searchDisplayModeSubscription.unsubscribe();
+        selectedGroupsSubscription.unsubscribe();
+        groupViewModeSubscription.unsubscribe();
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {

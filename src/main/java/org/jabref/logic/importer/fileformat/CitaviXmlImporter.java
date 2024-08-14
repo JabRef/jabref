@@ -90,7 +90,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public String getDescription() {
-        return "Importer for the Citavi XML format.";
+        return Localization.lang("Importer for the Citavi XML format.");
     }
 
     @Override
