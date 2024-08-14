@@ -21,11 +21,12 @@ The process consists of 5 steps:
 
 Good icon design requires years of experience and cannot be covered here. Adapting color icons with a high degree of detail to look good in the flat, one-colored setting is an even harder task. Therefore, only 3 tips: 1. Look up some tutorials on icon design, 2. reuse the provided basic shapes in the template, and 3. export your icon in the SVG format.
 
-## Step 2. Packing the icons into a font
+## Step 2. Packing the icons into a font [JabRefMaterialDesign.json.zip](https://github.com/user-attachments/files/16617468/JabRefMaterialDesign.json.zip)
+
 
 Use the [IcoMoon](https://icomoon.io) tool for packing the icons.
 
-1. Create a new set by importing the json file [JabRefMaterialDesign.zip](https://github.com/user-attachments/files/16617397/JabRefMaterialDesign.zip)
+1. Create a new set by importing the json file 
 
 2. Next to the icons, click on the hamburger menu, chose "Import to Set" to add a new icon (it will be added to the front)
 Rearrange them so that they have the same order as in `org.jabref.gui.JabRefMaterialDesignIcon`. This will avoid that you have to change the code points for the existing glyphs. In the settings for your icon set, set the _Grid_ to 24. This is important to get the correct spacing. The name of the font is `JabRefMaterialDesign`.
