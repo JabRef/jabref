@@ -35,7 +35,7 @@ public class MainTableColumnModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
     public enum Type {
-        MATCH_CATEGORY("match_category", Localization.lang("Match category")),
+        MATCH_CATEGORY("match_category"),
         INDEX("index", Localization.lang("Index")),
         EXTRAFILE("extrafile", Localization.lang("File type")),
         FILES("files", Localization.lang("Linked files")),

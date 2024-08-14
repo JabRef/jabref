@@ -147,7 +147,7 @@ public class MainTableColumnFactory {
 
     private TableColumn<BibEntryTableViewModel, MatchCategory> createMatchCategoryColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, MatchCategory> column = new MainTableColumn<>(columnModel);
-        Node header = new Text(Localization.lang("Match category"));
+        Node header = new Text();
         header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.MATCH_CATEGORY.getDisplayName()));
         column.setGraphic(header);
