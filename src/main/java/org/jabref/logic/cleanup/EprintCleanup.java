@@ -20,11 +20,19 @@ public class EprintCleanup implements CleanupJob {
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
 
+        Optional<String> version = entry.getField(StandardField.VERSION);
+
         for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE, StandardField.EID)) {
             Optional<ArXivIdentifier> arXivIdentifier = entry.getField(field).flatMap(ArXivIdentifier::parse);
 
             if (arXivIdentifier.isPresent()) {
-                entry.setField(StandardField.EPRINT, arXivIdentifier.get().getNormalized())
+                String normalizedEprint = arXivIdentifier.get().getNormalized();
+
+                if (version.isPresent() && !normalizedEprint.contains("v" + version.get())) {
+                    normalizedEprint += "v" + version.get();
+                }
+
+                entry.setField(StandardField.EPRINT, normalizedEprint)
                      .ifPresent(changes::add);
 
                 entry.setField(StandardField.EPRINTTYPE, "arxiv")
