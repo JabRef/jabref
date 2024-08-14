@@ -15,6 +15,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.ai.ClearEmbeddingsAction;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.bibtexextractor.ExtractBibtexActionOffline;
 import org.jabref.gui.bibtexextractor.ExtractBibtexActionOnline;
@@ -71,6 +72,7 @@ import org.jabref.gui.texparser.ParseLatexAction;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
@@ -98,6 +100,7 @@ public class MainMenu extends MenuBar {
     private final UndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
     private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
+    private final AiService aiService;
 
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
@@ -112,7 +115,8 @@ public class MainMenu extends MenuBar {
                     BibEntryTypesManager entryTypesManager,
                     UndoManager undoManager,
                     ClipBoardManager clipBoardManager,
-                    Supplier<OpenDatabaseAction> openDatabaseActionSupplier) {
+                    Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
+                    AiService aiService) {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
         this.sidePane = sidePane;
@@ -127,6 +131,7 @@ public class MainMenu extends MenuBar {
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
         this.openDatabaseActionSupplier = openDatabaseActionSupplier;
+        this.aiService = aiService;
 
         createMenu();
     }
@@ -304,6 +309,7 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, frame::getCurrentLibraryTab, dialogService, preferencesService.getFilePreferences(), taskExecutor)),
+                factory.createMenuItem(StandardActions.CLEAR_EMBEDDINGS_CACHE, new ClearEmbeddingsAction(stateManager, dialogService, aiService, taskExecutor)),
 
                 new SeparatorMenuItem(),
 
