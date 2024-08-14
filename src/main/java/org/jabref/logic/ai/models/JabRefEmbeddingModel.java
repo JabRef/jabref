@@ -104,7 +104,13 @@ public class JabRefEmbeddingModel implements dev.langchain4j.model.embedding.Emb
             }
         });
 
-        aiPreferences.addListenerToEmbeddingsParametersChange(this::startRebuildingTask);
+        aiPreferences.customizeExpertSettingsProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue && predictorProperty.get().isEmpty()) {
+                startRebuildingTask();
+            }
+        });
+
+        aiPreferences.embeddingModelProperty().addListener(obs -> startRebuildingTask());
     }
 
     @Override
