@@ -6,7 +6,6 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
@@ -19,11 +18,9 @@ public class MainTableTooltip extends Tooltip {
     private final PreviewViewer preview;
     private final PreferencesService preferences;
 
-    public MainTableTooltip(BibDatabaseContext databaseContext, DialogService dialogService, PreferencesService preferences,
-                            StateManager stateManager, ThemeManager themeManager, TaskExecutor taskExecutor) {
-
+    public MainTableTooltip(BibDatabaseContext databaseContext, DialogService dialogService, PreferencesService preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
-        this.preview = new PreviewViewer(databaseContext, dialogService, preferences, stateManager, themeManager, taskExecutor);
+        this.preview = new PreviewViewer(databaseContext, dialogService, preferences, themeManager, taskExecutor);
     }
 
     public Tooltip createTooltip(BibEntry entry, String fieldValue) {

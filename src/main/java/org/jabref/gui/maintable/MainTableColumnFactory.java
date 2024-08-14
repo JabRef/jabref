@@ -81,7 +81,7 @@ public class MainTableColumnFactory {
         this.undoManager = undoManager;
         this.stateManager = stateManager;
         ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
-        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {

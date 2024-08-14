@@ -9,16 +9,17 @@ import javax.swing.undo.UndoManager;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -40,12 +41,12 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                                  RedoAction redoAction,
                                  DialogService dialogService,
                                  PreferencesService preferences,
-                                 StateManager stateManager,
                                  ThemeManager themeManager,
                                  IndexingTaskManager indexingTaskManager,
                                  BibEntryTypesManager entryTypesManager,
                                  TaskExecutor taskExecutor,
-                                 JournalAbbreviationRepository journalAbbreviationRepository) {
+                                 JournalAbbreviationRepository journalAbbreviationRepository,
+                                 OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(true,
                 databaseContext,
                 suggestionProviders,
@@ -54,11 +55,11 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                 redoAction,
                 dialogService,
                 preferences,
-                stateManager,
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                indexingTaskManager);
+                indexingTaskManager,
+                searchQueryProperty);
         this.entryTypesManager = entryTypesManager;
         this.isImportantOptionalFields = isImportantOptionalFields;
         setText(title);
