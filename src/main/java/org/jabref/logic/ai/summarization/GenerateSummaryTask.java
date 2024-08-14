@@ -110,8 +110,6 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
             throw new RuntimeException(Localization.lang("No summary can be generated for entry '%0' as the database does not have path", citationKey));
         }
 
-        addMoreWork(1); // For generating final summary.
-
         // Stream API would look better here, but we need to catch InterruptedException.
         List<String> linkedFilesSummary = new ArrayList<>();
         for (LinkedFile linkedFile : linkedFiles) {
@@ -130,6 +128,8 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
         LOGGER.info("All summaries for attached files of entry {} are generated. Generating final summary.", citationKey);
 
         String finalSummary;
+
+        addMoreWork(1); // For generating final summary.
 
         if (linkedFilesSummary.size() == 1) {
             finalSummary = linkedFilesSummary.getFirst();
