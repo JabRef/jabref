@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.ai.AiTab;
 import org.jabref.gui.preferences.autocompletion.AutoCompletionTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
 import org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab;
@@ -65,6 +66,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new KeyBindingsTab(),
                 new GroupsTab(),
                 new WebSearchTab(),
+                new AiTab(),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
