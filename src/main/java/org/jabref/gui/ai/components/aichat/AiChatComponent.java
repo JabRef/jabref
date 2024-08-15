@@ -79,8 +79,7 @@ public class AiChatComponent extends VBox {
                     currentUserMessageScroll.set(currentUserMessageScroll.get() - 1);
                 }
             } else if (keyEvent.getCode() == KeyCode.UP) {
-                if ((currentUserMessageScroll.get() < getReversedUserMessagesStream().count() - 1)
-                &&  (userPromptTextArea.getText().isEmpty() || showingHistoryMessage.get())) {
+                if ((currentUserMessageScroll.get() < getReversedUserMessagesStream().count() - 1) && (userPromptTextArea.getText().isEmpty() || showingHistoryMessage.get())) {
                     showingHistoryMessage.set(true);
                     currentUserMessageScroll.set(currentUserMessageScroll.get() + 1);
                 }
