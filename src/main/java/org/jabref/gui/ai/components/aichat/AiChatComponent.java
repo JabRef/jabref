@@ -149,8 +149,8 @@ public class AiChatComponent extends VBox {
         retryButton.setOnAction(event -> {
             userPromptTextArea.setText(userMessage);
 
-            chatVBox.getChildren().removeLast();
-            chatVBox.getChildren().removeLast();
+            removeLastMessage();
+            removeLastMessage();
 
             switchToNormalState();
 
@@ -165,6 +165,13 @@ public class AiChatComponent extends VBox {
 
         promptHBox.getChildren().add(retryButton);
         promptHBox.getChildren().add(cancelButton);
+    }
+
+    private void removeLastMessage() {
+        if (!chatVBox.getChildren().isEmpty()) {
+            ChatMessageComponent chatMessageComponent = (ChatMessageComponent) chatVBox.getChildren().getLast();
+            deleteMessage(chatMessageComponent);
+        }
     }
 
     private void switchToNormalState() {
@@ -201,9 +208,10 @@ public class AiChatComponent extends VBox {
     private void deleteMessage(ChatMessageComponent chatMessageComponent) {
         blockScroll.set(2);
 
-        aiChatLogic.getChatHistory().remove(chatMessageComponent.getChatMessage());
-
+        int index = chatVBox.getChildren().indexOf(chatMessageComponent);
         chatVBox.getChildren().remove(chatMessageComponent);
+
+        aiChatLogic.getChatHistory().remove(index);
     }
 
     private void requestUserPromptTextFieldFocus() {

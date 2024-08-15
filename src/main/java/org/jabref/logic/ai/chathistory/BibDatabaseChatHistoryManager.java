@@ -2,10 +2,10 @@ package org.jabref.logic.ai.chathistory;
 
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.IntStream;
 
 import org.jabref.gui.StateManager;
 import org.jabref.logic.ai.misc.ErrorMessage;
@@ -66,19 +66,24 @@ public class BibDatabaseChatHistoryManager {
             @Override
             public List<ChatMessage> getMessages() {
                 Map<Integer, ChatHistoryRecord> messages = getMap(bibDatabasePath, citationKey);
-                return IntStream.range(0, messages.size())
-                                .mapToObj(key -> messages.get(key).toLangchainMessage())
-                                .toList();
+
+                return messages
+                        .entrySet()
+                        .stream()
+                        .sorted(Comparator.comparingInt(Map.Entry::getKey))
+                        .map(entry -> entry.getValue().toLangchainMessage())
+                        .toList();
             }
 
             @Override
             public void add(ChatMessage chatMessage) {
                 Map<Integer, ChatHistoryRecord> map = getMap(bibDatabasePath, citationKey);
 
-                // We count 0-based, thus "size()" is the next number
-                // 0 entries -> 0 is the first new id
-                // 1 entry -> 0 is assigned, 1 is the next number, which is also the size
-                int id = map.keySet().size();
+                // We count 0-based, thus "size()" is the next number.
+                // 0 entries -> 0 is the first new id.
+                // 1 entry -> 0 is assigned, 1 is the next number, which is also the size.
+                // But if an entry is removed, keys are not updated, so we have to find the maximum key.
+                int id = map.keySet().stream().max(Integer::compareTo).orElse(0) + 1;
 
                 String content = getContentFromLangchainMessage(chatMessage);
 
@@ -86,22 +91,21 @@ public class BibDatabaseChatHistoryManager {
             }
 
             @Override
-            public void remove(ChatMessage chatMessage) {
+            public void remove(int index) {
                 Map<Integer, ChatHistoryRecord> map = getMap(bibDatabasePath, citationKey);
-
-                String content = getContentFromLangchainMessage(chatMessage);
 
                 Optional<Integer> id = map
                         .entrySet()
                         .stream()
-                        .filter(entry -> entry.getValue().className.equals(chatMessage.getClass().getName()) && entry.getValue().content.equals(content))
+                        .sorted(Comparator.comparingInt(Map.Entry::getKey))
+                        .skip(index)
                         .map(Map.Entry::getKey)
                         .findFirst();
 
                 if (id.isPresent()) {
                     map.remove(id.get());
                 } else {
-                    LOGGER.error("Attempted to delete a message that does not exist in the chat history: {}", chatMessage);
+                    LOGGER.error("Attempted to delete a message that does not exist in the chat history at index {}", index);
                 }
             }
 
