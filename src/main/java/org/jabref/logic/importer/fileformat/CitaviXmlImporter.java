@@ -34,6 +34,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -391,14 +392,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             }
         }
 
-        // Citavi XML files sometimes contains BOM markers. We just discard them.
-        // Solution inspired by https://stackoverflow.com/a/37445972/873282
-        return new BufferedReader(
-                new InputStreamReader(
-                        new BOMInputStream(
-                                Files.newInputStream(newFile, StandardOpenOption.READ),
-                                false,
-                                ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE)));
+        return pushbackInputStream;
     }
 
     private String clean(String input) {
