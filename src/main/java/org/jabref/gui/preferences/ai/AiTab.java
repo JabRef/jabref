@@ -25,6 +25,7 @@ import com.dlsc.unitfx.DoubleInputField;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
+import org.controlsfx.control.SearchableComboBox;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
@@ -41,7 +42,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private CheckBox customizeExpertSettingsCheckbox;
 
     @FXML private TextField apiBaseUrlTextField;
-    @FXML private ComboBox<EmbeddingModel> embeddingModelComboBox;
+    @FXML private SearchableComboBox<EmbeddingModel> embeddingModelComboBox;
     @FXML private TextArea instructionTextArea;
     @FXML private DoubleInputField temperatureTextField;
     @FXML private IntegerInputField contextWindowSizeTextField;
@@ -192,6 +193,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             visualizer.initVisualization(viewModel.getApiTokenValidationStatus(), apiKeyTextField);
             visualizer.initVisualization(viewModel.getChatModelValidationStatus(), chatModelComboBox);
             visualizer.initVisualization(viewModel.getApiBaseUrlValidationStatus(), apiBaseUrlTextField);
+            visualizer.initVisualization(viewModel.getEmbeddingModelValidationStatus(), embeddingModelComboBox);
             visualizer.initVisualization(viewModel.getSystemMessageValidationStatus(), instructionTextArea);
             visualizer.initVisualization(viewModel.getTemperatureValidationStatus(), temperatureTextField);
             visualizer.initVisualization(viewModel.getMessageWindowSizeValidationStatus(), contextWindowSizeTextField);
