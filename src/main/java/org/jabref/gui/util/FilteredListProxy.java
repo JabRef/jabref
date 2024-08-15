@@ -16,51 +16,23 @@ import org.slf4j.LoggerFactory;
 
 public class FilteredListProxy {
     private static final Logger LOGGER = LoggerFactory.getLogger(FilteredListProxy.class);
-    private static final Method BEGIN_CHANGE_METHOD;
-    private static final Method END_CHANGE_METHOD;
-    private static final Method NEXT_ADD_METHOD;
-    private static final Method NEXT_UPDATE_METHOD;
-    private static final Method NEXT_REMOVE_METHOD;
-    private static final Method REFILTER_METHOD;
-    private static final Method ENSURE_SIZE_METHOD;
-    private static final Method GET_PREDICATE_IMPL_METHOD;
-    private static final Field FILTERED_FIELD;
-    private static final Field SIZE_FIELD;
-
-    static {
-        try {
-            BEGIN_CHANGE_METHOD = ObservableListBase.class.getDeclaredMethod("beginChange");
-            END_CHANGE_METHOD = ObservableListBase.class.getDeclaredMethod("endChange");
-            NEXT_ADD_METHOD = ObservableListBase.class.getDeclaredMethod("nextAdd", int.class, int.class);
-            NEXT_UPDATE_METHOD = ObservableListBase.class.getDeclaredMethod("nextUpdate", int.class);
-            NEXT_REMOVE_METHOD = ObservableListBase.class.getDeclaredMethod("nextRemove", int.class, Object.class);
-
-            REFILTER_METHOD = FilteredList.class.getDeclaredMethod("refilter");
-            ENSURE_SIZE_METHOD = FilteredList.class.getDeclaredMethod("ensureSize", int.class);
-            GET_PREDICATE_IMPL_METHOD = FilteredList.class.getDeclaredMethod("getPredicateImpl");
-
-            FILTERED_FIELD = FilteredList.class.getDeclaredField("filtered");
-            SIZE_FIELD = FilteredList.class.getDeclaredField("size");
-
-            BEGIN_CHANGE_METHOD.setAccessible(true);
-            END_CHANGE_METHOD.setAccessible(true);
-            NEXT_ADD_METHOD.setAccessible(true);
-            NEXT_UPDATE_METHOD.setAccessible(true);
-            NEXT_REMOVE_METHOD.setAccessible(true);
-
-            REFILTER_METHOD.setAccessible(true);
-            ENSURE_SIZE_METHOD.setAccessible(true);
-            GET_PREDICATE_IMPL_METHOD.setAccessible(true);
-
-            FILTERED_FIELD.setAccessible(true);
-            SIZE_FIELD.setAccessible(true);
-        } catch (NoSuchMethodException | NoSuchFieldException e) {
-            throw new RuntimeException("Failed to initialize reflective methods or fields", e);
-        }
-    }
+    private static boolean initialized = false;
+    private static Method BEGIN_CHANGE_METHOD;
+    private static Method END_CHANGE_METHOD;
+    private static Method NEXT_ADD_METHOD;
+    private static Method NEXT_UPDATE_METHOD;
+    private static Method NEXT_REMOVE_METHOD;
+    private static Method REFILTER_METHOD;
+    private static Method ENSURE_SIZE_METHOD;
+    private static Method GET_PREDICATE_IMPL_METHOD;
+    private static Field FILTERED_FIELD;
+    private static Field SIZE_FIELD;
 
     public static void refilterListReflection(FilteredList<BibEntryTableViewModel> filteredList) {
         try {
+            if (!initialized) {
+                initReflection();
+            }
             REFILTER_METHOD.invoke(filteredList);
         } catch (Exception e) {
             LOGGER.warn("Could not refilter list", e);
@@ -69,6 +41,9 @@ public class FilteredListProxy {
 
     public static void refilterListReflection(FilteredList<BibEntryTableViewModel> filteredList, int sourceFrom, int sourceTo) {
         try {
+            if (!initialized) {
+                initReflection();
+            }
             if (sourceFrom < 0 || sourceTo > filteredList.getSource().size() || sourceFrom > sourceTo) {
                 throw new IndexOutOfBoundsException();
             }
@@ -115,5 +90,35 @@ public class FilteredListProxy {
         } catch (ReflectiveOperationException e) {
             LOGGER.warn("Could not refilter list", e);
         }
+    }
+
+    private static void initReflection() throws NoSuchMethodException, NoSuchFieldException {
+        BEGIN_CHANGE_METHOD = ObservableListBase.class.getDeclaredMethod("beginChange");
+        END_CHANGE_METHOD = ObservableListBase.class.getDeclaredMethod("endChange");
+        NEXT_ADD_METHOD = ObservableListBase.class.getDeclaredMethod("nextAdd", int.class, int.class);
+        NEXT_UPDATE_METHOD = ObservableListBase.class.getDeclaredMethod("nextUpdate", int.class);
+        NEXT_REMOVE_METHOD = ObservableListBase.class.getDeclaredMethod("nextRemove", int.class, Object.class);
+
+        REFILTER_METHOD = FilteredList.class.getDeclaredMethod("refilter");
+        ENSURE_SIZE_METHOD = FilteredList.class.getDeclaredMethod("ensureSize", int.class);
+        GET_PREDICATE_IMPL_METHOD = FilteredList.class.getDeclaredMethod("getPredicateImpl");
+
+        FILTERED_FIELD = FilteredList.class.getDeclaredField("filtered");
+        SIZE_FIELD = FilteredList.class.getDeclaredField("size");
+
+        BEGIN_CHANGE_METHOD.setAccessible(true);
+        END_CHANGE_METHOD.setAccessible(true);
+        NEXT_ADD_METHOD.setAccessible(true);
+        NEXT_UPDATE_METHOD.setAccessible(true);
+        NEXT_REMOVE_METHOD.setAccessible(true);
+
+        REFILTER_METHOD.setAccessible(true);
+        ENSURE_SIZE_METHOD.setAccessible(true);
+        GET_PREDICATE_IMPL_METHOD.setAccessible(true);
+
+        FILTERED_FIELD.setAccessible(true);
+        SIZE_FIELD.setAccessible(true);
+
+        initialized = true;
     }
 }
