@@ -54,7 +54,7 @@
         <Label styleClass="sectionHeader" text="%Expert settings" />
         <VBox>
             <children>
-                <Label text="%These parameters affect how the AI will answer you questions." />
+                <Label text="%These parameters affect how the AI will answer your questions." />
                 <Label text="%Leave these fields as is, if you are not sure of their purpose." />
             </children>
         </VBox>
