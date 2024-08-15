@@ -1,7 +1,11 @@
 package org.jabref.gui.ai.components.aichat;
 
+import java.util.stream.Stream;
+
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -41,6 +45,10 @@ public class AiChatComponent extends VBox {
     private final TaskExecutor taskExecutor;
 
     private final IntegerProperty blockScroll = new SimpleIntegerProperty(0);
+    // -1 for empty, new, or non-existent messages.
+    // Is user scrolls for messages, then it will be non-negative.
+    private final IntegerProperty currentUserMessageScroll = new SimpleIntegerProperty(-1);
+    private final BooleanProperty showingHistoryMessage = new SimpleBooleanProperty(false);
 
     @FXML private ScrollPane scrollPane;
     @FXML private VBox chatVBox;
@@ -65,11 +73,45 @@ public class AiChatComponent extends VBox {
     @FXML
     public void initialize() {
         userPromptTextArea.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.getCode() == KeyCode.ENTER) {
-                if (keyEvent.isControlDown()) {
-                    userPromptTextArea.appendText("\n");
-                } else {
-                    onSendMessage();
+            if (keyEvent.getCode() == KeyCode.DOWN) {
+                if (currentUserMessageScroll.get() != -1) {
+                    showingHistoryMessage.set(true);
+                    currentUserMessageScroll.set(currentUserMessageScroll.get() - 1);
+                }
+            } else if (keyEvent.getCode() == KeyCode.UP) {
+                if ((currentUserMessageScroll.get() < getReversedUserMessagesStream().count() - 1)
+                &&  (userPromptTextArea.getText().isEmpty() || showingHistoryMessage.get())) {
+                    showingHistoryMessage.set(true);
+                    currentUserMessageScroll.set(currentUserMessageScroll.get() + 1);
+                }
+            } else {
+                if (keyEvent.getCode() != KeyCode.RIGHT && keyEvent.getCode() != KeyCode.LEFT) {
+                    showingHistoryMessage.set(false);
+                    currentUserMessageScroll.set(-1);
+                }
+
+                if (keyEvent.getCode() == KeyCode.ENTER) {
+                    if (keyEvent.isControlDown()) {
+                        userPromptTextArea.appendText("\n");
+                    } else {
+                        onSendMessage();
+                    }
+                }
+            }
+        });
+
+        currentUserMessageScroll.addListener((observable, oldValue, newValue) -> {
+            if (newValue.intValue() != -1 && showingHistoryMessage.get()) {
+                if (userPromptTextArea.getCaretPosition() == 0 || !userPromptTextArea.getText().contains("\n")) {
+                    getReversedUserMessagesStream()
+                            .skip(newValue.intValue())
+                            .findFirst()
+                            .ifPresent(userMessage ->
+                                    userPromptTextArea.setText(userMessage.singleText()));
+                }
+            } else {
+                if (showingHistoryMessage.get()) {
+                    userPromptTextArea.setText("");
                 }
             }
         });
@@ -102,9 +144,19 @@ public class AiChatComponent extends VBox {
         Platform.runLater(() -> userPromptTextArea.requestFocus());
     }
 
+    private Stream<UserMessage> getReversedUserMessagesStream() {
+        return aiChatLogic
+                .getChatHistory()
+                .getMessages()
+                .reversed()
+                .stream()
+                .filter(message -> message instanceof UserMessage)
+                .map(UserMessage.class::cast);
+    }
+
     @FXML
     private void onSendMessage() {
-        String userPrompt = userPromptTextArea.getText();
+        String userPrompt = userPromptTextArea.getText().trim();
 
         if (!userPrompt.isEmpty()) {
             userPromptTextArea.clear();
@@ -171,6 +223,8 @@ public class AiChatComponent extends VBox {
         promptHBox.getChildren().clear();
         promptHBox.getChildren().add(userPromptTextArea);
         promptHBox.getChildren().add(submitButton);
+
+        Platform.runLater(() -> userPromptTextArea.requestFocus());
     }
 
     private void setLoading(boolean loading) {
