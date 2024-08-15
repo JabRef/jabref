@@ -38,6 +38,13 @@ public final class LuceneSearcher {
         this.databaseContext = databaseContext;
     }
 
+    public boolean isMatched(BibEntry entry, SearchQuery searchQuery, IndexSearcher indexSearcher) {
+        String query = "+" + SearchFieldConstants.ENTRY_ID + " +" + searchQuery.getSearchExpression();
+        SearchQuery newSearchQuery = new SearchQuery(query, searchQuery.getSearchFlags());
+        SearchResults searchResults = search(searchQuery, indexSearcher);
+        return searchResults.getSearchScoreForEntry(entry) > 0;
+    }
+
     /**
      * Search for results matching a query in the Lucene search index
      *

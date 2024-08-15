@@ -26,10 +26,12 @@ import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
 import org.jabref.model.search.envent.IndexAddedOrUpdatedEvent;
+import org.jabref.model.search.envent.IndexStartedEvent;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.PreferencesService;
@@ -59,6 +61,7 @@ public class MainTableDataModel {
     private final Subscription groupViewModeSubscription;
     private final LuceneIndexListener indexUpdatedListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    private final ListProperty<GroupTreeNode> selectedGroupsProperty;
     private Optional<MatcherSet> groupsMatcher;
 
     public MainTableDataModel(BibDatabaseContext context,
@@ -77,6 +80,7 @@ public class MainTableDataModel {
         this.luceneManager = luceneManager;
         this.bibDatabaseContext = context;
         this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
+        this.selectedGroupsProperty = selectedGroupsProperty;
         this.searchQueryProperty = searchQueryProperty;
         this.indexUpdatedListener = new LuceneIndexListener();
         if (luceneManager != null) {
@@ -225,6 +229,22 @@ public class MainTableDataModel {
                     return index;
                 }).onSuccess(index -> FilteredListProxy.refilterListReflection(entriesFiltered, index, index + 1)).executeWith(taskExecutor);
             });
+        }
+
+        @Subscribe
+        public void listen(IndexStartedEvent indexStartedEvent) {
+            bibDatabaseContext.getMetaData().getGroups().ifPresent(this::setLuceneManagerForSearchGroups);
+            updateSearchMatches(searchQueryProperty.get());
+            updateGroupMatches(selectedGroupsProperty);
+        }
+
+        private void setLuceneManagerForSearchGroups(GroupTreeNode root) {
+            for (GroupTreeNode node : root.getChildren()) {
+                if (node.getGroup() instanceof SearchGroup) {
+                    ((SearchGroup) node.getGroup()).setLuceneManager(luceneManager);
+                }
+                setLuceneManagerForSearchGroups(node);
+            }
         }
     }
 }

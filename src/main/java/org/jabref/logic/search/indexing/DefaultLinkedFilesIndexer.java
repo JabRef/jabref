@@ -291,10 +291,6 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     public IndexSearcher getIndexSearcher() {
         LOGGER.debug("Getting index searcher for linked files index");
         try {
-            if (indexSearcher != null) {
-                LOGGER.debug("Releasing index searcher for linked files index");
-                searcherManager.release(indexSearcher);
-            }
             searcherManager.maybeRefresh();
             indexSearcher = searcherManager.acquire();
         } catch (IOException e) {

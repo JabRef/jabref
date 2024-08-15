@@ -238,6 +238,14 @@ public class LuceneManager {
         return () -> isLinkedFilesIndexerBlocked.set(false);
     }
 
+    public void registerListener(Object listener) {
+        this.eventBus.register(listener);
+    }
+
+    public void unregisterListener(Object listener) {
+        eventBus.unregister(listener);
+    }
+
     public IndexSearcher getIndexSearcher(SearchQuery query) {
         if (query.getSearchFlags().contains(SearchFlags.FULLTEXT) && shouldIndexLinkedFiles.get()) {
             try {
@@ -256,11 +264,7 @@ public class LuceneManager {
         return luceneSearcher.search(query, getIndexSearcher(query));
     }
 
-    public void registerListener(Object listener) {
-        this.eventBus.register(listener);
-    }
-
-    public void unregisterListener(Object listener) {
-        eventBus.unregister(listener);
+    public boolean isMatched(BibEntry entry, SearchQuery query) {
+        return luceneSearcher.isMatched(entry, query, getIndexSearcher(query));
     }
 }
