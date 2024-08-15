@@ -17,6 +17,7 @@ import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -139,7 +140,7 @@ public class BibtexImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "This importer enables `--importToOpen someEntry.bib`";
+        return Localization.lang("This importer enables \"--importToOpen someEntry.bib\"");
     }
 
     /**

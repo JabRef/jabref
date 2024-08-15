@@ -30,6 +30,7 @@ public class GrobidPreferences {
         this.grobidEnabled.set(grobidEnabled);
     }
 
+    // region: optout; models "Do not ask again" option
     public boolean isGrobidOptOut() {
         return grobidOptOut.get();
     }
@@ -41,6 +42,7 @@ public class GrobidPreferences {
     public void setGrobidOptOut(boolean grobidOptOut) {
         this.grobidOptOut.set(grobidOptOut);
     }
+    // endregion: optout
 
     public String getGrobidURL() {
         return grobidURL.get();

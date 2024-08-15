@@ -44,6 +44,7 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.GrobidOptInDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
+import org.jabref.gui.linkedfile.LinkedFileEditDialog;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -217,7 +218,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
         Button writeMetadataToPdf = IconTheme.JabRefIcons.PDF_METADATA_WRITE.asButton();
-        writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeXEntry metadata to PDF.")));
+        writeMetadataToPdf.setTooltip(new Tooltip(Localization.lang("Write BibTeX to PDF (XMP and embedded)")));
         writeMetadataToPdf.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
         writeMetadataToPdf.getStyleClass().setAll("icon-button");
         WriteMetadataToSinglePdfAction writeMetadataToSinglePdfAction = new WriteMetadataToSinglePdfAction(
@@ -285,7 +286,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void addNewFile() {
-        viewModel.addNewFile();
+        dialogService.showCustomDialogAndWait(new LinkedFileEditDialog()).ifPresent(newLinkedFile -> {
+            viewModel.addNewLinkedFile(newLinkedFile);
+        });
     }
 
     @FXML

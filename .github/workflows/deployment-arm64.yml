@@ -54,8 +54,10 @@ jobs:
         run: |
           if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
+            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
+            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -66,12 +68,12 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v1.1.1
+        uses: gittools/actions/gitversion/setup@v3.0.0
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v1.1.1
+        uses: gittools/actions/gitversion/execute@v3.0.0
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -96,7 +98,7 @@ jobs:
           create-keychain: false
           keychain-password: jabref
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Prepare merged jars and modules dir (macOS)
@@ -109,6 +111,7 @@ jobs:
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
+          --add-modules jdk.incubator.vector \
           --dest build/distribution \
           --app-content buildres/mac/jabrefHost.py \
           --app-content buildres/mac/native-messaging-host \
@@ -137,7 +140,10 @@ jobs:
           --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref \
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
-          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
+          --java-options --add-modules=jdk.incubator.vector
       - name: Build pkg (macOS)
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -146,6 +152,7 @@ jobs:
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
+          --add-modules jdk.incubator.vector \
           --dest build/distribution \
           --app-content buildres/mac/jabrefHost.py \
           --app-content buildres/mac/native-messaging-host \
@@ -173,7 +180,10 @@ jobs:
           --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref \
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
           --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
-          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
+          --java-options --add-modules=jdk.incubator.vector
       - name: Rename files with arm64 suffix as well
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -225,8 +235,10 @@ jobs:
         run: |
           if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
+            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
+            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}

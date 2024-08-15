@@ -7,7 +7,6 @@ import java.util.List;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -30,17 +29,6 @@ class PdfVerbatimBibTextImporterTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.fieldPreferences().getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
         importer = new PdfVerbatimBibTextImporter(importFormatPreferences);
-    }
-
-    @Test
-    void sGetExtensions() {
-        assertEquals(StandardFileType.PDF, importer.getFileType());
-    }
-
-    @Test
-    void getDescription() {
-        assertEquals("PdfVerbatimBibTextImporter imports a verbatim BibTeX entry from the first page of the PDF.",
-                     importer.getDescription());
     }
 
     @Test

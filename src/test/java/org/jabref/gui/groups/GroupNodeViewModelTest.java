@@ -1,6 +1,7 @@
 package org.jabref.gui.groups;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,7 +46,7 @@ class GroupNodeViewModelTest {
         taskExecutor = new CurrentThreadTaskExecutor();
         preferencesService = mock(PreferencesService.class);
         when(preferencesService.getGroupsPreferences()).thenReturn(new GroupsPreferences(
-                GroupViewMode.UNION,
+                EnumSet.noneOf(GroupViewMode.class),
                 true,
                 true,
                 GroupHierarchyType.INDEPENDENT

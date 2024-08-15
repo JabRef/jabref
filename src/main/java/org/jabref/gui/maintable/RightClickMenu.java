@@ -53,8 +53,10 @@ public class RightClickMenu {
         ActionFactory factory = new ActionFactory();
         ContextMenu contextMenu = new ContextMenu();
 
-        MenuItem extractFileReferencesOnline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_ONLINE, new ExtractReferencesAction(true, dialogService, stateManager, preferencesService, taskExecutor));
-        MenuItem extractFileReferencesOffline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_OFFLINE, new ExtractReferencesAction(false, dialogService, stateManager, preferencesService, taskExecutor));
+        ExtractReferencesAction extractReferencesAction = new ExtractReferencesAction(dialogService, stateManager, preferencesService);
+        // Two menu items required, because of menu item display. Action checks preference internal what to do
+        MenuItem extractFileReferencesOnline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_ONLINE, extractReferencesAction);
+        MenuItem extractFileReferencesOffline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_OFFLINE, extractReferencesAction);
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),

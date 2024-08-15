@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jabref.logic.openoffice.frontend.OOFrontend;
 import org.jabref.logic.openoffice.frontend.UpdateCitationMarkers;
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOProcess;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -31,7 +31,7 @@ public class EditSeparate {
     public static boolean separateCitations(XTextDocument doc,
                                             OOFrontend frontend,
                                             List<BibDatabase> databases,
-                                            OOBibStyle style)
+                                            JStyle style)
             throws
             CreationException,
             IllegalTypeException,

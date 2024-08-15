@@ -11,11 +11,19 @@ public enum DateRange {
 
     private final String dateRange;
 
-    DateRange(String dateRange) { 
+    DateRange(String dateRange) {
        this.dateRange = dateRange;
     }
 
+    public static DateRange parse(String name) {
+        try {
+            return DateRange.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return ALL_TIME;
+        }
+    }
+
     public String getDateRange() {
-        return dateRange; 
-    } 
+        return dateRange;
+    }
 }

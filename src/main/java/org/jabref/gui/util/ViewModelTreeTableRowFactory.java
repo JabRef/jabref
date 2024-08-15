@@ -151,7 +151,7 @@ public class ViewModelTreeTableRowFactory<S> implements Callback<TreeTableView<S
 
                     // Activate context menu if user presses the "context menu" key
                     treeTableView.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-                        boolean rowFocused = isEmpty() && treeTableView.getFocusModel().getFocusedIndex() == getIndex();
+                        boolean rowFocused = !isEmpty() && treeTableView.getFocusModel().getFocusedIndex() == getIndex();
                         if (event.getCode() == KeyCode.CONTEXT_MENU && rowFocused) {
                             // Get center of focused cell
                             Bounds anchorBounds = getBoundsInParent();

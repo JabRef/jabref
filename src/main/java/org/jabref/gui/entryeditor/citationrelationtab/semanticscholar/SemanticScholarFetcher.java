@@ -1,6 +1,6 @@
 package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
 
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -33,50 +33,55 @@ public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyF
 
     @Override
     public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isPresent()) {
-            try {
-                URL citationsUrl = URI.create(getAPIUrl("citations", entry)).toURL();
-                URLDownload urlDownload = new URLDownload(citationsUrl);
-
-                String apiKey = getApiKey();
-                if (!apiKey.isEmpty()) {
-                    urlDownload.addHeader("x-api-key", apiKey);
-                }
-                CitationsResponse citationsResponse = new Gson()
-                        .fromJson(urlDownload.asString(), CitationsResponse.class);
-
-                return citationsResponse.getData()
-                                        .stream().filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
-                                        .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry()).toList();
-            } catch (IOException e) {
-                throw new FetcherException("Could not fetch", e);
-            }
+        if (!entry.getDOI().isPresent()) {
+            return List.of();
         }
-        return List.of();
+
+        URL citationsUrl;
+        try {
+            citationsUrl = URI.create(getAPIUrl("citations", entry)).toURL();
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Malformed URL", e);
+        }
+        URLDownload urlDownload = new URLDownload(citationsUrl);
+
+        String apiKey = getApiKey();
+        if (!apiKey.isEmpty()) {
+            urlDownload.addHeader("x-api-key", apiKey);
+        }
+        CitationsResponse citationsResponse = new Gson()
+                .fromJson(urlDownload.asString(), CitationsResponse.class);
+
+        return citationsResponse.getData()
+                                .stream().filter(citationDataItem -> citationDataItem.getCitingPaper() != null)
+                                .map(citationDataItem -> citationDataItem.getCitingPaper().toBibEntry()).toList();
     }
 
     @Override
     public List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
-        if (entry.getDOI().isPresent()) {
-            try {
-                URL referencesUrl = URI.create(getAPIUrl("references", entry)).toURL();
-                URLDownload urlDownload = new URLDownload(referencesUrl);
-                String apiKey = getApiKey();
-                if (!apiKey.isEmpty()) {
-                    urlDownload.addHeader("x-api-key", apiKey);
-                }
-                ReferencesResponse referencesResponse = new Gson()
-                        .fromJson(urlDownload.asString(), ReferencesResponse.class);
-
-                return referencesResponse.getData()
-                                         .stream()
-                                         .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
-                                         .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
-            } catch (IOException e) {
-                throw new FetcherException("Could not fetch", e);
-            }
+        if (!entry.getDOI().isPresent()) {
+            return List.of();
         }
-        return List.of();
+
+        URL referencesUrl;
+        try {
+            referencesUrl = URI.create(getAPIUrl("references", entry)).toURL();
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Malformed URL", e);
+        }
+
+        URLDownload urlDownload = new URLDownload(referencesUrl);
+        String apiKey = getApiKey();
+        if (!apiKey.isEmpty()) {
+            urlDownload.addHeader("x-api-key", apiKey);
+        }
+        ReferencesResponse referencesResponse = new Gson()
+                .fromJson(urlDownload.asString(), ReferencesResponse.class);
+
+        return referencesResponse.getData()
+                                 .stream()
+                                 .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
+                                 .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
     }
 
     @Override

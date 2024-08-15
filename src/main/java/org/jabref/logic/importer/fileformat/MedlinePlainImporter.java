@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -51,7 +52,7 @@ public class MedlinePlainImporter extends Importer {
 
     @Override
     public String getDescription() {
-        return "Importer for the MedlinePlain format.";
+        return Localization.lang("Importer for the MedlinePlain format.");
     }
 
     @Override
@@ -149,6 +150,7 @@ public class MedlinePlainImporter extends Importer {
 
                 // store the fields in a map
                 Map<String, Field> hashMap = new HashMap<>();
+                hashMap.put("PMID", StandardField.PMID);
                 hashMap.put("PG", StandardField.PAGES);
                 hashMap.put("PL", StandardField.ADDRESS);
                 hashMap.put("PHST", new UnknownField("history"));

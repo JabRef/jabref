@@ -43,6 +43,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
@@ -59,7 +60,6 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -70,6 +70,7 @@ import org.reactfx.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class GroupTreeView extends BorderPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeView.class);
@@ -396,7 +397,7 @@ public class GroupTreeView extends BorderPane {
         if ((newSelectedGroups == null) || newSelectedGroups.isEmpty()) {
             viewModel.selectedGroupsProperty().clear();
         } else {
-            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> (model != null) && !(model.getValue().getGroupNode().getGroup() instanceof AllEntriesGroup)).map(TreeItem::getValue).collect(Collectors.toList());
+            List<GroupNodeViewModel> list = newSelectedGroups.stream().filter(model -> (model != null) && (model.getValue() != null)).map(TreeItem::getValue).collect(Collectors.toList());
             viewModel.selectedGroupsProperty().setAll(list);
         }
     }

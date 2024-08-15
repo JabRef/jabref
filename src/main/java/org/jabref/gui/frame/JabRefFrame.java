@@ -46,6 +46,7 @@ import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
@@ -74,6 +75,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private final SplitPane splitPane = new SplitPane();
     private final PreferencesService prefs;
+    private final AiService aiService;
     private final GlobalSearchBar globalSearchBar;
 
     private final FileHistoryMenu fileHistory;
@@ -101,6 +103,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
                        PreferencesService preferencesService,
+                       AiService aiService,
                        StateManager stateManager,
                        CountingUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
@@ -110,6 +113,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.prefs = preferencesService;
+        this.aiService = aiService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
         this.entryTypesManager = entryTypesManager;
@@ -121,6 +125,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Create components
         this.viewModel = new JabRefFrameViewModel(
                 preferencesService,
+                aiService,
                 stateManager,
                 dialogService,
                 this,
@@ -148,6 +153,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.sidePane = new SidePane(
                 this,
                 prefs,
+                aiService,
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 taskExecutor,
                 dialogService,
@@ -189,6 +195,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 stateManager,
                 prefs,
+                aiService,
                 fileUpdateMonitor,
                 taskExecutor,
                 entryTypesManager,
@@ -209,7 +216,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
-                this::getOpenDatabaseAction);
+                this::getOpenDatabaseAction,
+                aiService);
 
         VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);
@@ -266,7 +274,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         event.consume();
                         break;
                     case SEARCH:
-                        globalSearchBar.focus();
+                        globalSearchBar.requestFocus();
+                        break;
+                    case OPEN_GLOBAL_SEARCH_DIALOG:
+                        globalSearchBar.openGlobalSearchDialog();
                         break;
                     case NEW_ARTICLE:
                         new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Article, dialogService, prefs, stateManager).execute();
@@ -323,18 +334,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
         // Subscribe to the search
-        EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
-                query -> {
-                    if (prefs.getSearchPreferences().shouldKeepSearchString()) {
-                        for (LibraryTab tab : getLibraryTabs()) {
-                            tab.setCurrentSearchQuery(query);
-                        }
-                    } else {
-                        if (getCurrentLibraryTab() != null) {
-                            getCurrentLibraryTab().setCurrentSearchQuery(query);
-                        }
-                    }
-                });
+        EasyBind.subscribe(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH), query -> {
+            if (getCurrentLibraryTab() != null) {
+                getCurrentLibraryTab().searchQueryProperty().set(query);
+            }
+        });
 
         // Wait for the scene to be created, otherwise focusOwnerProperty is not provided
         Platform.runLater(() -> stateManager.focusOwnerProperty().bind(
@@ -368,12 +372,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
 
             // Update active search query when switching between databases
-            if (prefs.getSearchPreferences().shouldKeepSearchString() && libraryTab.getCurrentSearchQuery().isEmpty() && stateManager.activeSearchQueryProperty().get().isPresent()) {
-                // apply search query also when opening a new library and keep search string is activated
-                libraryTab.setCurrentSearchQuery(stateManager.activeSearchQueryProperty().get());
+            if (prefs.getSearchPreferences().shouldKeepSearchString()) {
+                libraryTab.searchQueryProperty().set(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get());
             } else {
-                stateManager.activeSearchQueryProperty().set(libraryTab.getCurrentSearchQuery());
+                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(libraryTab.searchQueryProperty().get());
             }
+            stateManager.searchResultSize(SearchType.NORMAL_SEARCH).bind(libraryTab.resultSizeProperty());
 
             // Update search autocompleter with information for the correct database:
             globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
@@ -430,6 +434,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this,
                 dialogService,
                 prefs,
+                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -505,6 +510,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         return new OpenDatabaseAction(
                 this,
                 prefs,
+                aiService,
                 dialogService,
                 stateManager,
                 fileUpdateMonitor,

@@ -1,8 +1,9 @@
 package org.jabref.logic.openoffice.frontend;
 
+import java.io.IOException;
 import java.util.Optional;
 
-import org.jabref.logic.openoffice.style.OOBibStyle;
+import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOFormatBibliography;
 import org.jabref.model.openoffice.DocumentAnnotation;
 import org.jabref.model.openoffice.ootext.OOText;
@@ -39,12 +40,12 @@ public class UpdateBibliography {
     public static void rebuildBibTextSection(XTextDocument doc,
                                              OOFrontend frontend,
                                              CitedKeys bibliography,
-                                             OOBibStyle style,
+                                             JStyle style,
                                              boolean alwaysAddCitedOnPages)
             throws
             WrappedTargetException,
             CreationException,
-            NoDocumentException {
+            NoDocumentException, IOException {
 
         clearBibTextSectionContent2(doc);
 
@@ -102,13 +103,13 @@ public class UpdateBibliography {
     private static void populateBibTextSection(XTextDocument doc,
                                                OOFrontend frontend,
                                                CitedKeys bibliography,
-                                               OOBibStyle style,
+                                               JStyle style,
                                                boolean alwaysAddCitedOnPages)
             throws
             CreationException,
             IllegalArgumentException,
             NoDocumentException,
-            WrappedTargetException {
+            WrappedTargetException, IOException {
 
         XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
 

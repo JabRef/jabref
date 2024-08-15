@@ -87,7 +87,7 @@ final class StyleSheetFile extends StyleSheet {
      * This method allows callers to obtain the theme's additional stylesheet.
      *
      * @return the stylesheet location if there is an additional stylesheet present and available. The
-     * location will be a local URL. Typically it will be a {@code 'data:'} URL where the CSS is embedded. However for
+     * location will be a local URL. Typically, it will be a {@code 'data:'} URL where the CSS is embedded. However, for
      * large themes it can be {@code 'file:'}.
      */
     @Override

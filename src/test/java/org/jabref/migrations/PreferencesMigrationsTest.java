@@ -184,7 +184,7 @@ class PreferencesMigrationsTest {
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("100", "100", "100", "100", "100", "100", "100");
 
-        when(prefs.getStringList(JabRefPreferences.COLUMN_NAMES)).thenReturn(updatedNames);
+        when(prefs.getStringList("columnNames")).thenReturn(updatedNames);
 
         when(prefs.get(JabRefPreferences.MAIN_FONT_SIZE)).thenReturn("11.2");
 

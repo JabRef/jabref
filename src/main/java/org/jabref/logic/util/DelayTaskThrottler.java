@@ -61,13 +61,17 @@ public class DelayTaskThrottler {
         return scheduledTask;
     }
 
-    // Execute scheduled Runnable early
+    /**
+     * Execute scheduled Runnable early
+     */
     public void execute(Runnable command) {
         delay = 0;
         schedule(command);
     }
 
-    // Cancel scheduled Runnable gracefully
+    /**
+     * Cancel scheduled Runnable gracefully
+     */
     public void cancel() {
         scheduledTask.cancel(false);
     }

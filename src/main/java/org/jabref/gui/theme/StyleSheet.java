@@ -9,11 +9,13 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.JabRefGUI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 abstract class StyleSheet {
 
     static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";

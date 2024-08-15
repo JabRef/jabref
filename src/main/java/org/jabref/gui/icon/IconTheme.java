@@ -22,6 +22,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
+
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
@@ -50,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import static java.util.EnumSet.allOf;
 
+@AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class IconTheme {
 
     public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");
@@ -290,6 +293,8 @@ public class IconTheme {
         CASE_SENSITIVE(MaterialDesignA.ALPHABETICAL),
         REG_EX(MaterialDesignR.REGEX),
         FULLTEXT(MaterialDesignF.FILE_EYE),
+        FILTER(MaterialDesignF.FILTER),
+        INVERT(MaterialDesignI.INVERT_COLORS),
         CONSOLE(MaterialDesignC.CONSOLE),
         FORUM(MaterialDesignF.FORUM),
         FACEBOOK(MaterialDesignF.FACEBOOK),
@@ -349,12 +354,14 @@ public class IconTheme {
         SELECT_ICONS(MaterialDesignA.APPS),
         KEEP_SEARCH_STRING(MaterialDesignE.EARTH),
         KEEP_ON_TOP(MaterialDesignP.PIN),
-        KEEP_ON_TOP_OFF(MaterialDesignP.PIN_OFF_OUTLINE),
+        KEEP_ON_TOP_OFF(MaterialDesignP.PIN_OFF),
         OPEN_GLOBAL_SEARCH(MaterialDesignO.OPEN_IN_NEW),
         REMOVE_TAGS(MaterialDesignC.CLOSE),
         ACCEPT_LEFT(MaterialDesignS.SUBDIRECTORY_ARROW_LEFT),
         ACCEPT_RIGHT(MaterialDesignS.SUBDIRECTORY_ARROW_RIGHT),
-        MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE);
+        MERGE_GROUPS(MaterialDesignS.SOURCE_MERGE),
+        ADD_OR_MAKE_BIBLIOGRAPHY(JabRefMaterialDesignIcon.BIBLIOGRAPHY);
+
         private final JabRefIcon icon;
 
         JabRefIcons(Ikon... icons) {

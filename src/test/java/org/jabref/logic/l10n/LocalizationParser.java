@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -173,9 +174,11 @@ public class LocalizationParser {
 
     /**
      * Loads the fxml file and returns all used language resources.
+     *
+     * Note: FXML prefixes localization keys with <code>%</code>.
      */
-    private static List<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTest type) {
-        List<String> result = new ArrayList<>();
+    private static Collection<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTest type) {
+        Collection<String> result = new ArrayList<>();
 
         // Afterburner ViewLoader forces a controller factory, but we do not need any controller
         MockedStatic<ViewLoader> viewLoader = Mockito.mockStatic(ViewLoader.class, Answers.RETURNS_DEEP_STUBS);
@@ -184,6 +187,8 @@ public class LocalizationParser {
         ResourceBundle registerUsageResourceBundle = new ResourceBundle() {
             @Override
             protected Object handleGetObject(String key) {
+                // Here, we get the key without the percent sign at the beginning.
+                // All the "magic" is done at "loader.load()" called below.
                 result.add(key);
                 return "test";
             }
@@ -215,7 +220,7 @@ public class LocalizationParser {
 
         return result.stream()
                      .map(key -> new LocalizationEntry(path, key, type))
-                     .collect(Collectors.toList());
+                     .toList();
     }
 
     private static void setStaticLoad(FXMLLoader loader) {

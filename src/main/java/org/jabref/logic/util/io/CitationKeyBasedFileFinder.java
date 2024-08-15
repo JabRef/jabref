@@ -21,7 +21,12 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 class CitationKeyBasedFileFinder implements FileFinder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyBasedFileFinder.class);
 
     private final boolean exactKeyOnly;
 
@@ -36,6 +41,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
 
         Optional<String> citeKeyOptional = entry.getCitationKey();
         if (StringUtil.isBlank(citeKeyOptional)) {
+            LOGGER.debug("No citation key found in entry {}", entry);
             return Collections.emptyList();
         }
         String citeKey = citeKeyOptional.get();
@@ -52,16 +58,18 @@ class CitationKeyBasedFileFinder implements FileFinder {
 
             // First, look for exact matches
             if (nameWithoutExtension.equals(citeKey)) {
+                LOGGER.debug("Found exact match for key {} in file {}", citeKey, file);
                 result.add(file);
                 continue;
             }
             // If we get here, we did not find any exact matches. If non-exact matches are allowed, try to find one
             if (!exactKeyOnly && matches(name, citeKey)) {
+                LOGGER.debug("Found non-exact match for key {} in file {}", citeKey, file);
                 result.add(file);
             }
         }
 
-        return result.stream().sorted().collect(Collectors.toList());
+        return result.stream().sorted().toList();
     }
 
     private boolean matches(String filename, String citeKey) {

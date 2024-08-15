@@ -29,7 +29,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher, ParserFetcher {
      *
      * @param identifier the ID
      */
-    URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException;
 
     /**
      * Returns the parser used to convert the response to a list of {@link BibEntry}.
@@ -41,34 +41,31 @@ public interface IdBasedParserFetcher extends IdBasedFetcher, ParserFetcher {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
-
-        try (InputStream stream = getUrlDownload(getUrlForIdentifier(identifier)).asInputStream()) {
+        URL urlForIdentifier;
+        try {
+            urlForIdentifier = getUrlForIdentifier(identifier);
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        }
+        try (InputStream stream = getUrlDownload(urlForIdentifier).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
-
             if (fetchedEntries.isEmpty()) {
                 return Optional.empty();
             }
-
             if (fetchedEntries.size() > 1) {
                 LOGGER.info("Fetcher {} found more than one result for identifier {}. We will use the first entry.", getName(), identifier);
             }
-
             BibEntry entry = fetchedEntries.getFirst();
-
-            // Post-cleanup
             doPostCleanup(entry);
-
             return Optional.of(entry);
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
             // check for the case where we already have a FetcherException from UrlDownload
             if (e.getCause() instanceof FetcherException fe) {
                 throw fe;
             }
-            throw new FetcherException("A network error occurred", e);
+            throw new FetcherException(urlForIdentifier, "A network error occurred", e);
         } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred", e);
+            throw new FetcherException(urlForIdentifier, "An internal parser error occurred", e);
         }
     }
 }

@@ -15,6 +15,8 @@ import org.jabref.model.entry.BibEntry;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements an API to a GROBID server, as described at
@@ -27,6 +29,8 @@ import org.jsoup.Jsoup;
  * Each method corresponds to a GROBID service request. Only the ones already used are already implemented.
  */
 public class GrobidService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidService.class);
 
     public enum ConsolidateCitations {
         NO(0), WITH_METADATA(1), WITH_DOI_ONLY(2);
@@ -66,6 +70,7 @@ public class GrobidService {
                 .timeout(100_000)
                 .execute();
         String httpResponse = response.body();
+        LOGGER.debug("raw citation -> response: {}, {}", rawCitation, httpResponse);
 
         if (httpResponse == null || "@misc{-1,\n  author = {}\n}\n".equals(httpResponse) || httpResponse.equals("@misc{-1,\n  author = {" + rawCitation + "}\n}\n")) { // This filters empty BibTeX entries
             throw new IOException("The GROBID server response does not contain anything.");

@@ -46,11 +46,13 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+
+
   openrewrite:
     name: OpenRewrite
     runs-on: ubuntu-latest
@@ -66,12 +68,13 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
+
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
@@ -87,7 +90,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run modernizer
@@ -95,6 +98,7 @@ jobs:
           # enable failing of this task if modernizer complains
           sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
           ./gradlew modernizer
+
   markdown:
     name: Markdown
     runs-on: ubuntu-latest
@@ -110,6 +114,7 @@ jobs:
           globs: |
             *.md
             docs/**/*.md
+
   changelog:
     name: CHANGELOG.md
     runs-on: ubuntu-latest
@@ -136,6 +141,7 @@ jobs:
           # exit 1 in case of error
           # We have 1 "valid" issue in CHANGELOG.md
           grep -q "1 problem" heylogs.txt || exit 1
+
   changelog-unreleased-only:
     name: CHANGELOG.md - only unreleased touched
     runs-on: ubuntu-latest
@@ -156,6 +162,7 @@ jobs:
           diff \
             <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
+
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -171,7 +178,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run tests
@@ -187,6 +194,7 @@ jobs:
       - name: Format failed test results
         if: failure()
         run: scripts/after-failure.sh
+
   databasetests:
     name: Database tests
     runs-on: ubuntu-latest
@@ -213,7 +221,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run tests on PostgreSQL
@@ -238,6 +246,7 @@ jobs:
         env:
           CI: "true"
           DBMS: "mysql"
+
   guitests:
     name: GUI tests
     runs-on: ubuntu-latest
@@ -253,13 +262,14 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
         env:
           CI: "true"
+
   codecoverage:
     name: Code coverage
     runs-on: ubuntu-latest
@@ -282,8 +292,10 @@ jobs:
         run: |
           if [ "$CODECOV_TOKEN" == "" ]; then
             echo "secretspresent=NO" >> $GITHUB_OUTPUT
+            echo "❌ Secret CODECOV_TOKEN not present"
           else
             echo "secretspresent=YES" >> $GITHUB_OUTPUT
+            echo "✔️ Secret CODECOV_TOKEN present"
           fi
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -300,7 +312,7 @@ jobs:
           java-version: 21.0.2
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-home-cache-cleanup: true
       - name: Update test coverage metrics
@@ -319,6 +331,7 @@ jobs:
         run: bash <(curl -Ls https://coverage.codacy.com/get.sh)
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+
   # This is https://github.com/marketplace/actions/gradle-wrapper-validation
   # It ensures that the jar file is from gradle and not by a strange third party.
   gradlevalidation:
@@ -328,7 +341,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
-      - uses: gradle/actions/wrapper-validation@v3
+      - uses: gradle/actions/wrapper-validation@v4
+
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
     name: Find merge conflicts
@@ -339,6 +353,7 @@ jobs:
           show-progress: 'false'
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.0
+
   other_than_main:
     name: Source branch is other than "main"
     runs-on: ubuntu-latest

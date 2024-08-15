@@ -1,12 +1,9 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PushbackInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,6 +37,7 @@ import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems.KnowledgeItem;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.Persons.Person;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
@@ -55,6 +53,8 @@ import org.jabref.model.strings.StringUtil;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +109,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public String getDescription() {
-        return "Importer for the Citavi XML format.";
+        return Localization.lang("Importer for the Citavi XML format.");
     }
 
     @Override
@@ -431,7 +431,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException("CitaviXmlImporter does not support importDatabase(BufferedReader reader)."
+        throw new UnsupportedOperationException("CitaviXmlImporter does not support importDatabase(BufferedReader reader). "
                                                 + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
@@ -447,39 +447,25 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private BufferedReader getReaderFromZip(Path filePath) throws IOException {
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath.toFile()));
-        ZipEntry zipEntry = zis.getNextEntry();
-
         Path newFile = Files.createTempFile("citavicontent", ".xml");
+        newFile.toFile().deleteOnExit();
 
-        while (zipEntry != null) {
-            Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);
-
-            zipEntry = zis.getNextEntry();
-        }
-
-        zis.closeEntry();
-
-        InputStream stream = Files.newInputStream(newFile, StandardOpenOption.READ);
-
-        // check and delete the utf-8 BOM bytes
-        InputStream newStream = checkForUtf8BOMAndDiscardIfAny(stream);
-
-        // clean up the temp file
-        Files.delete(newFile);
-
-        return new BufferedReader(new InputStreamReader(newStream, StandardCharsets.UTF_8));
-    }
-
-    private static InputStream checkForUtf8BOMAndDiscardIfAny(InputStream inputStream) throws IOException {
-        PushbackInputStream pushbackInputStream = new PushbackInputStream(new BufferedInputStream(inputStream), 3);
-        byte[] bom = new byte[3];
-        if (pushbackInputStream.read(bom) != -1) {
-            if (!((bom[0] == (byte) 0xEF) && (bom[1] == (byte) 0xBB) && (bom[2] == (byte) 0xBF))) {
-                pushbackInputStream.unread(bom);
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(filePath))) {
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);
+                zipEntry = zis.getNextEntry();
             }
         }
-        return pushbackInputStream;
+
+        // Citavi XML files sometimes contains BOM markers. We just discard them.
+        // Solution inspired by https://stackoverflow.com/a/37445972/873282
+        return new BufferedReader(
+                new InputStreamReader(
+                        new BOMInputStream(
+                                Files.newInputStream(newFile, StandardOpenOption.READ),
+                                false,
+                                ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE)));
     }
 
     private String clean(String input) {

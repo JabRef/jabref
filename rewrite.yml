@@ -169,7 +169,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.RemoveUnusedLocalVariables
 #  - org.openrewrite.staticanalysis.RemoveUnusedPrivateFields
 #  - org.openrewrite.staticanalysis.RenameLocalVariablesToCamelCase
-  - org.openrewrite.staticanalysis.RenameMethodsNamedHashcodeEqualOrTostring
+  - org.openrewrite.staticanalysis.RenameMethodsNamedHashcodeEqualOrToString
   - org.openrewrite.staticanalysis.ReplaceRedundantFormatWithPrintf
   - org.openrewrite.staticanalysis.ReplaceStringBuilderWithString
   - org.openrewrite.staticanalysis.ReplaceWeekYearWithYear

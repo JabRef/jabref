@@ -1,14 +1,15 @@
 package org.jabref.logic.protectedterms;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
@@ -29,30 +30,39 @@ public class ProtectedTermsParser {
     private String location;
 
     public void readTermsFromResource(String resourceFileName, String descriptionString) {
-        try {
-            Path path = Path.of(Objects.requireNonNull(ProtectedTermsLoader.class.getResource(Objects.requireNonNull(resourceFileName))).toURI());
-            readTermsList(path);
-            description = descriptionString;
-            location = resourceFileName;
-        } catch (URISyntaxException e1) {
-            LOGGER.error("");
+        description = descriptionString;
+        location = resourceFileName;
+        try (InputStream inputStream = ProtectedTermsLoader.class.getResourceAsStream(Objects.requireNonNull(resourceFileName))) {
+            if (inputStream == null) {
+                LOGGER.error("Cannot find resource '{}' ({})", resourceFileName, descriptionString);
+                return;
+            }
+            readTermsList(inputStream);
+        } catch (IOException e) {
+            LOGGER.error("Cannot open resource '{}'", resourceFileName, e);
         }
     }
 
     public void readTermsFromFile(Path path) {
-        location = path.toAbsolutePath().toString();
-        readTermsList(path);
-    }
+        location = path.toString();
 
-    private void readTermsList(Path path) {
+        path = path.toAbsolutePath();
         if (!Files.exists(path)) {
             LOGGER.warn("Could not read terms from file {}", path);
             return;
         }
-        try (Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8)) {
-            this.terms.addAll(lines.map(this::setDescription).filter(Objects::nonNull).collect(Collectors.toList()));
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            readTermsList(inputStream);
         } catch (IOException e) {
-            LOGGER.warn("Could not read terms from file {}", path, e);
+            LOGGER.error("Cannot open file '{}'", path, e);
+        }
+    }
+
+    private void readTermsList(InputStream inputStream) {
+        try (Stream<String> lines = new BufferedReader(new InputStreamReader(inputStream)).lines()) {
+            this.terms.addAll(lines.map(this::setDescription).filter(Objects::nonNull).toList());
+        } catch (UncheckedIOException e) {
+            LOGGER.warn("Could not read terms from stream", e);
         }
     }
 

@@ -11,13 +11,11 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class OvidImporterTest {
 
     private static final String FILE_ENDING = ".txt";
-    private OvidImporter importer;
+    private OvidImporter importer = new OvidImporter();
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("OvidImporterTest")
@@ -40,31 +38,6 @@ public class OvidImporterTest {
     private static Stream<String> invalidFileNames() throws IOException {
         Predicate<String> fileName = name -> !name.contains("OvidImporterTest");
         return ImporterTestEngine.getTestFiles(fileName).stream();
-    }
-
-    @BeforeEach
-    public void setUp() {
-        importer = new OvidImporter();
-    }
-
-    @Test
-    public void getFormatName() {
-        assertEquals("Ovid", importer.getName());
-    }
-
-    @Test
-    public void getCLIId() {
-        assertEquals("ovid", importer.getId());
-    }
-
-    @Test
-    public void sGetExtensions() {
-        assertEquals(StandardFileType.TXT, importer.getFileType());
-    }
-
-    @Test
-    public void getDescription() {
-        assertEquals("Imports an Ovid file.", importer.getDescription());
     }
 
     @ParameterizedTest

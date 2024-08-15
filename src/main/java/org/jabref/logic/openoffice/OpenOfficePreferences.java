@@ -3,11 +3,15 @@ package org.jabref.logic.openoffice;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import org.jabref.logic.openoffice.style.OOStyle;
 
 public class OpenOfficePreferences {
 
@@ -25,26 +29,29 @@ public class OpenOfficePreferences {
     private final BooleanProperty useAllDatabases;
     private final BooleanProperty syncWhenCiting;
     private final ObservableList<String> externalStyles;
-    private final StringProperty currentStyle;
+    private final StringProperty currentJStyle;
+    private final ObjectProperty<OOStyle> currentStyle;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
                                  boolean syncWhenCiting,
                                  List<String> externalStyles,
-                                 String currentStyle) {
+                                 String currentJStyle,
+                                 OOStyle currentStyle) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
         this.externalStyles = FXCollections.observableArrayList(externalStyles);
-        this.currentStyle = new SimpleStringProperty(currentStyle);
+        this.currentJStyle = new SimpleStringProperty(currentJStyle);
+        this.currentStyle = new SimpleObjectProperty<>(currentStyle);
     }
 
     public void clearConnectionSettings() {
         this.executablePath.set("");
     }
 
-    public void clearCurrentStyle() {
-        this.currentStyle.set("");
+    public void clearCurrentJStyle() {
+        this.currentJStyle.set("");
     }
 
     /**
@@ -107,15 +114,27 @@ public class OpenOfficePreferences {
     /**
      * path to the used style file
      */
-    public String getCurrentStyle() {
+    public String getCurrentJStyle() {
+        return currentJStyle.get();
+    }
+
+    public StringProperty currentJStyleProperty() {
+        return currentJStyle;
+    }
+
+    public void setCurrentJStyle(String currentJStyle) {
+        this.currentJStyle.set(currentJStyle);
+    }
+
+    public OOStyle getCurrentStyle() {
         return currentStyle.get();
     }
 
-    public StringProperty currentStyleProperty() {
+    public ObjectProperty<OOStyle> currentStyleProperty() {
         return currentStyle;
     }
 
-    public void setCurrentStyle(String currentStyle) {
-        this.currentStyle.set(currentStyle);
+    public void setCurrentStyle(OOStyle style) {
+        this.currentStyle.set(style);
     }
 }

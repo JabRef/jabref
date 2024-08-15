@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -1043,6 +1044,19 @@ public class AuthorListTest {
         // TODO: Fix abbreviation to be "A."
         Author expected = new Author("ʿAbdallāh", "ʿ.", null, "al-Ṣāliḥ", null);
         assertEquals(AuthorList.of(expected), AuthorList.parse("al-Ṣāliḥ, ʿAbdallāh"));
+    }
+
+    @Test
+    @Disabled("Has issues with space character in W-P.")
+    public void parseWithDash() throws Exception {
+        assertEquals(
+                AuthorList.of(
+                        new Author("Z.", "Z.", null, "Yao", null),
+                        new Author("D. S.", "D. S.", null, "Weld", null),
+                        new Author("W-P.", "W-P.", null, "Chen", null),
+                        new Author("H.", "H.", null, "Sun", null)
+                ),
+                AuthorList.parse("Z. Yao, D. S. Weld, W.-P. Chen, and H. Sun"));
     }
 
     @Test
