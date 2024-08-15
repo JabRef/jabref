@@ -47,7 +47,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue with colors in the search bar when dark theme is enabled. [#11569](https://github.com/JabRef/jabref/issues/11569)
 - We fixed an issue where a new unsaved library was not marked with an asterisk. [#11519](https://github.com/JabRef/jabref/pull/11519)
 - We fixed an issue where JabRef starts without window decorations. [#11440](https://github.com/JabRef/jabref/pull/11440)
-- We fixed an issue when prompt text had similar color to entered text. Now it became a bit lighter.
 
 ### Removed
 
