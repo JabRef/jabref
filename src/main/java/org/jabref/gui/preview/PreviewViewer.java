@@ -230,7 +230,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public void setLayout(PreviewLayout newLayout) {
         // Change listeners might set the layout to null while the update method is executing, therefore we need to prevent this here
-        if (newLayout == null) {
+        if (newLayout == null || newLayout.equals(layout)) {
             return;
         }
         layout = newLayout;
@@ -238,6 +238,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setEntry(BibEntry newEntry) {
+        if (newEntry.equals(entry.orElse(null))) {
+            return;
+        }
+
         // Remove update listener for old entry
         entry.ifPresent(oldEntry -> {
             for (Observable observable : oldEntry.getObservables()) {

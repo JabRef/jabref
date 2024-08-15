@@ -115,12 +115,9 @@ public class PreviewPanel extends VBox {
         previewView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
-                switch (keyBinding.get()) {
-                    case COPY_PREVIEW:
-                        previewView.copyPreviewToClipBoard();
-                        event.consume();
-                        break;
-                    default:
+                if (keyBinding.get() == KeyBinding.COPY_PREVIEW) {
+                    previewView.copyPreviewToClipBoard();
+                    event.consume();
                 }
             }
         });
