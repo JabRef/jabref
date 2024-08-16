@@ -26,6 +26,11 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
 
+/**
+ * This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
+ * It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
+ * Any method in this class is NOT supposed to be moved.
+ */
 public class CSLCitationOOAdapter {
 
     private final XTextDocument document;
