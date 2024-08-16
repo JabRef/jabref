@@ -65,7 +65,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private List<String> refIdWithKeywords = new ArrayList<String>();
     private List<String> refIdWithPublishers = new ArrayList<String>();
 
-    private XmlMapper mapper;
+    private XmlMapper mapper = null;
 
     public CitaviXmlImporter() {
         xmlInputFactory = XMLInputFactory.newFactory();
@@ -318,7 +318,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private void initMapper() throws Exception {
         // Lazy init because this is expensive
         if (mapper == null) {
-            mapper = XmlMapper.xmlBuilder().addModule(new JaxbAnnotationModule()).build();
+            mapper = XmlMapper.xmlBuilder().build();
+            mapper.registerModule(new JaxbAnnotationModule());
         }
     }
 
@@ -392,7 +393,12 @@ public class CitaviXmlImporter extends Importer implements Parser {
             }
         }
 
-        return pushbackInputStream;
+        Path newFile = Files.createTempFile("citavicontent", ".xml");
+        newFile.toFile().deleteOnExit();
+
+        // Citavi XML files sometimes contains BOM markers. We just discard them.
+        // Solution inspired by https://stackoverflow.com/a/37445972/873282
+        return new BufferedInputStream(new BOMInputStream(Files.newInputStream(newFile, StandardOpenOption.READ), false, ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE));
     }
 
     private String clean(String input) {
