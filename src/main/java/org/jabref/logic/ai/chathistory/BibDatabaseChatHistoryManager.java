@@ -69,6 +69,7 @@ public class BibDatabaseChatHistoryManager {
 
                 return messages
                         .entrySet()
+                        // we need to check all keys, because upon deletion, there can be "holes" in the integer
                         .stream()
                         .sorted(Comparator.comparingInt(Map.Entry::getKey))
                         .map(entry -> entry.getValue().toLangchainMessage())
