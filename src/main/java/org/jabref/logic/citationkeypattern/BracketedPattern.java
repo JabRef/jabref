@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
+import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.formatter.casechanger.Word;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.database.BibDatabase;
@@ -83,6 +84,8 @@ public class BracketedPattern {
     private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern WHITESPACE = Pattern.compile("\\p{javaWhitespace}");
+
+    private static final RemoveEnclosingBracesFormatter ENCLOSING_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();
 
     private enum Institution {
         SCHOOL,
@@ -853,8 +856,10 @@ public class BracketedPattern {
         if (numberOfAuthors == 1 || andOthersPresent) {
             // Single author or "and others" case
             String lastName = authorList.getAuthor(0).getFamilyName().orElse("");
-            if (lastName.startsWith("{") && lastName.endsWith("}")) {
-                alphaStyle.append(getOrganizationInitials(lastName));
+            String formattedName = ENCLOSING_BRACES_FORMATTER.format(lastName);
+            if (!formattedName.equals(lastName)) {
+                // Inequality => braces were removed, indicating an organization
+                alphaStyle.append(getOrganizationInitials(formattedName));
             } else {
                 alphaStyle.append(lastName, 0, Math.min(2, lastName.length()));
             }
@@ -873,11 +878,8 @@ public class BracketedPattern {
     }
 
     private static String getOrganizationInitials(String orgName) {
-        // Remove the curly braces
-        String name = orgName.substring(1, orgName.length() - 1).trim();
-        // Get the initials of the organization
         StringBuilder initials = new StringBuilder();
-        for (String part : name.split("\\s+")) {
+        for (String part : orgName.split("\\s+")) {
             if (!part.isEmpty() && Character.isUpperCase(part.charAt(0))) {
                 initials.append(part.charAt(0));
             }
