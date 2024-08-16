@@ -135,7 +135,11 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
             saveSurveyButton.setText(Localization.lang("Start survey"));
         }
 
-        saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
+        saveSurveyButton.disableProperty().bind(Bindings.or(
+                Bindings.or(
+                        Bindings.or(
+                                Bindings.or(
+                                        Bindings.or(
                                                 Bindings.isEmpty(viewModel.getQueries()),
                                                 Bindings.isEmpty(viewModel.getCatalogs())),
                                         Bindings.isEmpty(viewModel.getAuthors())),
