@@ -10,9 +10,13 @@ import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 
+import com.sun.star.text.XTextCursor;
+import com.sun.star.text.XTextDocument;
 import org.apache.commons.text.StringEscapeUtils;
 
 /**
@@ -21,26 +25,25 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public class CSLFormatUtils {
 
-    private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
     public static final String[] PREFIXES = {"JABREF_", "CSL_"};
 
     // TODO: These are static final fields right now, should add the functionality to let user select these and store them in preferences.
     public static final String DEFAULT_BIBLIOGRAPHY_TITLE = "References";
     public static final String DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = "Heading 2";
     public static final CitationStyleOutputFormat OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
-    private static final int MAX_ALPHA_AUTHORS = 4;
+    private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 
     /**
-     * Transforms provided HTML into a format that can be fully parsed by OOTextIntoOO.write(...)
+     * Transforms provided HTML into a format that can be fully parsed by {@link OOTextIntoOO#write(XTextDocument, XTextCursor, OOText) write}.
      * The transformed HTML can be used for inserting into a LibreOffice document
      * Context: The HTML produced by CitationStyleGenerator.generateCitation(...) is not directly (completely) parsable by OOTextIntoOO.write(...)
-     * For more details, read the documentation of the write(...) method in the {@link OOTextIntoOO} class.
+     * For more details, read the documentation for the {@link OOTextIntoOO#write(XTextDocument, XTextCursor, OOText) write} method in the OOTextIntoOO  class.
      * <a href="https://devdocs.jabref.org/code-howtos/openoffice/code-reorganization.html">Additional Information</a>.
      *
      * @param html The HTML string to be transformed into OO-write ready HTML.
      * @return The formatted html string
      */
-    public static String transformHTML(String html) {
+    public static String transformHtml(String html) {
         // Initial clean up of escaped characters
         html = StringEscapeUtils.unescapeHtml4(html);
 
@@ -70,6 +73,42 @@ public class CSLFormatUtils {
         html = html.replaceAll("</?span[^>]*>", "");
 
         return html;
+    }
+
+    /**
+     * Alphanumeric citations are not natively supported by citeproc-java. (See {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateInText(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateInText}).
+     * Thus, we manually format a citation to produce its alphanumeric form.
+     *
+     * @param entries the list of entries for which the alphanumeric citation is to be generated.
+     * @return the alphanumeric citation (for a single entry or a group of entries).
+     */
+    public static String generateAlphanumericCitation(List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
+        StringBuilder citation = new StringBuilder("[");
+        for (int i = 0; i < entries.size(); i++) {
+            BibEntry entry = entries.get(i);
+            Optional<String> author = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase());
+            Optional<String> year = entry.getResolvedFieldOrAlias(StandardField.YEAR, bibDatabaseContext.getDatabase());
+
+            if (author.isPresent() && year.isPresent()) {
+                AuthorList authorList = AuthorList.parse(author.get());
+                String alphaKey = BracketedPattern.authorsAlpha(authorList);
+
+                // Extract last two digits of the year
+                String shortYear = year.get().length() >= 2 ?
+                        year.get().substring(year.get().length() - 2) :
+                        year.get();
+
+                citation.append(alphaKey).append(shortYear);
+            } else {
+                citation.append(entry.getCitationKey().orElse(""));
+            }
+
+            if (i < entries.size() - 1) {
+                citation.append("; ");
+            }
+        }
+        citation.append("]");
+        return citation.toString();
     }
 
     /**
@@ -120,34 +159,5 @@ public class CSLFormatUtils {
             return matcher.group(2) + " " + matcher.group(1) + matcher.group(3);
         }
         return formattedCitation;
-    }
-
-    public static String generateAlphanumericCitation(List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
-        StringBuilder citation = new StringBuilder("[");
-        for (int i = 0; i < entries.size(); i++) {
-            BibEntry entry = entries.get(i);
-            Optional<String> author = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase());
-            Optional<String> year = entry.getResolvedFieldOrAlias(StandardField.YEAR, bibDatabaseContext.getDatabase());
-
-            if (author.isPresent() && year.isPresent()) {
-                AuthorList authorList = AuthorList.parse(author.get());
-                String alphaKey = BracketedPattern.authorsAlpha(authorList);
-
-                // Extract last two digits of the year
-                String shortYear = year.get().length() >= 2 ?
-                        year.get().substring(year.get().length() - 2) :
-                        year.get();
-
-                citation.append(alphaKey).append(shortYear);
-            } else {
-                citation.append(entry.getCitationKey().orElse(""));
-            }
-
-            if (i < entries.size() - 1) {
-                citation.append("; ");
-            }
-        }
-        citation.append("]");
-        return citation.toString();
     }
 }
