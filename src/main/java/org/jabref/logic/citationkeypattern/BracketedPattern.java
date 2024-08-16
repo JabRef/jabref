@@ -853,7 +853,11 @@ public class BracketedPattern {
         if (numberOfAuthors == 1 || andOthersPresent) {
             // Single author or "and others" case
             String lastName = authorList.getAuthor(0).getFamilyName().orElse("");
-            alphaStyle.append(lastName, 0, Math.min(2, lastName.length()));
+            if (lastName.startsWith("{") && lastName.endsWith("}")) {
+                alphaStyle.append(getOrganizationInitials(lastName));
+            } else {
+                alphaStyle.append(lastName, 0, Math.min(2, lastName.length()));
+            }
         } else {
             int maxAuthors = Math.min(numberOfAuthors, MAX_ALPHA_AUTHORS);
             for (int i = 0; i < maxAuthors; i++) {
@@ -866,6 +870,19 @@ public class BracketedPattern {
             }
         }
         return alphaStyle.toString();
+    }
+
+    private static String getOrganizationInitials(String orgName) {
+        // Remove the curly braces
+        String name = orgName.substring(1, orgName.length() - 1).trim();
+        // Get the initials of the organization
+        StringBuilder initials = new StringBuilder();
+        for (String part : name.split("\\s+")) {
+            if (!part.isEmpty() && Character.isUpperCase(part.charAt(0))) {
+                initials.append(part.charAt(0));
+            }
+        }
+        return initials.toString();
     }
 
     /**

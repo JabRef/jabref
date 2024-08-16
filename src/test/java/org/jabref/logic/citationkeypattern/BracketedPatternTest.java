@@ -95,7 +95,8 @@ class BracketedPatternTest {
                 Arguments.of("Go", "von Goethe"),
                 Arguments.of("Aa", "van der Aalst"),
                 Arguments.of("AW", "van der Aalst and Weske"),
-                Arguments.of("GI", "{Gesellschaft für Informatik e.V.}"));
+                Arguments.of("GI", "{Gesellschaft für Informatik e.V.}"),
+                Arguments.of("AF", "{Apache Foundation}"));
     }
 
     @ParameterizedTest
