@@ -3,16 +3,13 @@ package org.jabref.gui.slr;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -161,14 +158,16 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
             viewModel = new ManageStudyDefinitionViewModel(
                     prefs.getImportFormatPreferences(),
                     prefs.getImporterPreferences(),
-                    dialogService);
+                    dialogService,
+                    prefs);
         } else {
             viewModel = new ManageStudyDefinitionViewModel(
                     study.get(),
                     pathToStudyDataDirectory,
                     prefs.getImportFormatPreferences(),
                     prefs.getImporterPreferences(),
-                    dialogService);
+                    dialogService,
+                    prefs);
 
             // The directory of the study cannot be changed
             studyDirectory.setEditable(false);
@@ -240,22 +239,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 })
                 .install(catalogTable);
 
-        ObservableList<String> selectedFetchers = prefs.getWorkspacePreferences().getSelectedSlrFetchers();
-        System.out.println(selectedFetchers);
-        System.out.println(catalogTable);
-        for (StudyCatalogItem item : catalogTable.getItems()) {
-            System.out.println(item.getName());
-            item.setEnabled(selectedFetchers.contains(item.getName()));
-            item.enabledProperty().addListener((obs, oldValue, newValue) -> {
-                if (newValue && !selectedFetchers.contains(item.getName())) {
-                    selectedFetchers.add(item.getName());
-                } else if (!newValue) {
-                    selectedFetchers.remove(item.getName());
-                }
-                updateSelectedFetchers();
-                System.out.println("Hi");
-            });
-        }
+        viewModel.initializeSelectedFetchers();
 
         catalogColumn.setReorderable(false);
         catalogColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -329,13 +313,5 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
             viewModel.setStudyDirectory(Optional.of(selectedDirectory));
             updateDirectoryWarning(selectedDirectory);
         });
-    }
-
-    private void updateSelectedFetchers() {
-        List<String> selectedFetchersList = catalogTable.getItems().stream()
-                                                        .filter(StudyCatalogItem::isEnabled)
-                                                        .map(StudyCatalogItem::getName)
-                                                        .collect(Collectors.toList());
-        prefs.getWorkspacePreferences().setSelectedSlrFetchers(selectedFetchersList);
     }
 }
