@@ -38,6 +38,10 @@ import org.slf4j.LoggerFactory;
 public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
 
+    // If current message that user is typing in prompt is non-existent, new, or empty, then we use
+    // this value in currentUserMessageScroll.
+    private static final int NEW_NON_EXISTENT_MESSAGE = -1;
+
     private final AiPreferences aiPreferences;
     private final AiChatLogic aiChatLogic;
     private final String citationKey;
@@ -45,9 +49,14 @@ public class AiChatComponent extends VBox {
     private final TaskExecutor taskExecutor;
 
     private final IntegerProperty blockScroll = new SimpleIntegerProperty(0);
-    // -1 for empty, new, or non-existent messages.
-    // Is user scrolls for messages, then it will be non-negative.
+
+    // This property stores index of a user history message.
+    // When user scrolls history in the prompt, this value is updated.
+    // Whenever user edits the prompt, this value is reset to NEW_NON_EXISTENT_MESSAGE.
     private final IntegerProperty currentUserMessageScroll = new SimpleIntegerProperty(-1);
+
+    // If the current content of the prompt is a history message, then this property is true.
+    // If user begins to edit or type a new text, then this property is false.
     private final BooleanProperty showingHistoryMessage = new SimpleBooleanProperty(false);
 
     @FXML private ScrollPane scrollPane;
@@ -74,19 +83,34 @@ public class AiChatComponent extends VBox {
     public void initialize() {
         userPromptTextArea.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode() == KeyCode.DOWN) {
-                if (currentUserMessageScroll.get() != -1) {
+                // Do not go down in the history.
+                if (currentUserMessageScroll.get() != NEW_NON_EXISTENT_MESSAGE) {
                     showingHistoryMessage.set(true);
                     currentUserMessageScroll.set(currentUserMessageScroll.get() - 1);
+
+                    // There could be two effects after setting the properties:
+                    // 1) User scrolls to a recent message, then we should properly update the prompt text.
+                    // 2) Scroll is set to -1 (which is NEW_NON_EXISTENT_MESSAGE) and we should clear the prompt text.
+                    // On the second event currentUserMessageScroll will be set to -1 and showingHistoryMessage
+                    // will be true (this is important).
                 }
             } else if (keyEvent.getCode() == KeyCode.UP) {
                 if ((currentUserMessageScroll.get() < getReversedUserMessagesStream().count() - 1) && (userPromptTextArea.getText().isEmpty() || showingHistoryMessage.get())) {
+                    // 1. We should not go up the maximum number of user messages.
+                    // 2. We can scroll history only on two conditions:
+                    //    1) The prompt is empty.
+                    //    2) User has already been scrolling the history.
                     showingHistoryMessage.set(true);
                     currentUserMessageScroll.set(currentUserMessageScroll.get() + 1);
                 }
             } else {
+                // Cursor left/right should not stop history scrolling
                 if (keyEvent.getCode() != KeyCode.RIGHT && keyEvent.getCode() != KeyCode.LEFT) {
+                    // It is okay to go back and forth in the prompt while showing a history message.
+                    // But if user begins doing something else, we should not track the history and reset
+                    // all the properties.
                     showingHistoryMessage.set(false);
-                    currentUserMessageScroll.set(-1);
+                    currentUserMessageScroll.set(NEW_NON_EXISTENT_MESSAGE);
                 }
 
                 if (keyEvent.getCode() == KeyCode.ENTER) {
@@ -100,8 +124,14 @@ public class AiChatComponent extends VBox {
         });
 
         currentUserMessageScroll.addListener((observable, oldValue, newValue) -> {
-            if (newValue.intValue() != -1 && showingHistoryMessage.get()) {
+            // When currentUserMessageScroll is reset, then its value is
+            // 1) either to NEW_NON_EXISTENT_MESSAGE,
+            // 2) or to a new history entry.
+            if (newValue.intValue() != NEW_NON_EXISTENT_MESSAGE && showingHistoryMessage.get()) {
                 if (userPromptTextArea.getCaretPosition() == 0 || !userPromptTextArea.getText().contains("\n")) {
+                    // If there are new lines in the prompt, then it is ambiguous whether the user tries to scroll up or down in history or editing lines in the current prompt.
+                    // The easy way to get rid of this ambiguity is to disallow scrolling when there are new lines in the prompt.
+                    // But the exception to this situation is when the caret position is at the beginning of the prompt.
                     getReversedUserMessagesStream()
                             .skip(newValue.intValue())
                             .findFirst()
@@ -109,6 +139,10 @@ public class AiChatComponent extends VBox {
                                     userPromptTextArea.setText(userMessage.singleText()));
                 }
             } else {
+                // When currentUserMessageScroll is set to NEW_NON_EXISTENT_MESSAGE, then we should:
+                // 1) either clear the prompt, if user scrolls down the most recent history entry.
+                // 2) do nothing, if user starts to edit the history entry.
+                // We distinguish these two cases by checking showingHistoryMessage, which is true for -1 message, and false for others.
                 if (showingHistoryMessage.get()) {
                     userPromptTextArea.setText("");
                 }
