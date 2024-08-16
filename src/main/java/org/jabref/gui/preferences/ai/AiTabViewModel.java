@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.ai;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -85,6 +86,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator apiKeyValidator;
     private final Validator chatModelValidator;
     private final Validator apiBaseUrlValidator;
+    private final Validator embeddingModelValidator;
     private final Validator instructionValidator;
     private final Validator temperatureValidator;
     private final Validator contextWindowSizeValidator;
@@ -203,6 +205,11 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 currentApiBaseUrl,
                 token -> !StringUtil.isBlank(token),
                 ValidationMessage.error(Localization.lang("API base URL has to be provided")));
+
+        this.embeddingModelValidator = new FunctionBasedValidator<>(
+                selectedEmbeddingModel,
+                Objects::nonNull,
+                ValidationMessage.error(Localization.lang("Embedding model has to be provided")));
 
         this.instructionValidator = new FunctionBasedValidator<>(
                 instruction,
@@ -346,6 +353,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     public boolean validateExpertSettings() {
         List<Validator> validators = List.of(
                 apiBaseUrlValidator,
+                embeddingModelValidator,
                 instructionValidator,
                 temperatureValidator,
                 contextWindowSizeValidator,
@@ -452,6 +460,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus getApiBaseUrlValidationStatus() {
         return apiBaseUrlValidator.getValidationStatus();
+    }
+
+    public ValidationStatus getEmbeddingModelValidationStatus() {
+        return embeddingModelValidator.getValidationStatus();
     }
 
     public ValidationStatus getSystemMessageValidationStatus() {
