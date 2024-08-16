@@ -22,15 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CitationStyleGeneratorTest {
 
+    private final BibEntry testEntry = TestEntry.getTestEntry();
+    private final BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(testEntry)));
     private final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+    private final List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
 
     @Test
     void aCMCitation() {
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
         context.setMode(BibDatabaseMode.BIBLATEX);
-        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
         CitationStyle style = styleList.stream().filter(e -> "ACM SIGGRAPH".equals(e.getTitle())).findAny().orElse(null);
-        String citation = CitationStyleGenerator.generateCitation(List.of(TestEntry.getTestEntry()), style.getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager()).getFirst();
+        String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), CitationStyleOutputFormat.HTML, context, bibEntryTypesManager).getFirst();
 
         // if the acm-siggraph.csl citation style changes this has to be modified
         String expected = "  <div class=\"csl-entry\">"
@@ -43,11 +44,9 @@ class CitationStyleGeneratorTest {
 
     @Test
     void aPACitation() {
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
         context.setMode(BibDatabaseMode.BIBLATEX);
-        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
         CitationStyle style = styleList.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().orElse(null);
-        String citation = CitationStyleGenerator.generateCitation(List.of(TestEntry.getTestEntry()), style.getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager()).getFirst();
+        String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), CitationStyleOutputFormat.HTML, context, bibEntryTypesManager).getFirst();
 
         // if the apa-7th-citation.csl citation style changes this has to be modified
         String expected = "  <div class=\"csl-entry\">"
@@ -97,11 +96,10 @@ class CitationStyleGeneratorTest {
                 "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, Jul. 2016, doi: 10.1001/bla.blubb.</div>\n" +
                 "  </div>\n";
 
-        BibEntry entry = TestEntry.getTestEntry();
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.HTML;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, new BibDatabaseContext(), bibEntryTypesManager).getFirst();
+        String actualCitation = CitationStyleGenerator.generateCitation(List.of(testEntry), style, format, context, bibEntryTypesManager).getFirst();
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -109,11 +107,10 @@ class CitationStyleGeneratorTest {
     void textFormat() {
         String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.\n";
 
-        BibEntry entry = TestEntry.getTestEntry();
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, new BibDatabaseContext(new BibDatabase(List.of(entry))), bibEntryTypesManager).getFirst();
+        String actualCitation = CitationStyleGenerator.generateCitation(List.of(testEntry), style, format, context, bibEntryTypesManager).getFirst();
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -134,12 +131,11 @@ class CitationStyleGeneratorTest {
     @Test
     void handleAmpersand() {
         String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “Famous quote: “&TitleTest&” - that is it,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.\n";
-        BibEntry entry = TestEntry.getTestEntry();
-        entry.setField(StandardField.TITLE, "Famous quote: “&TitleTest&” - that is it");
+        testEntry.setField(StandardField.TITLE, "Famous quote: “&TitleTest&” - that is it");
         String style = CitationStyle.getDefault().getSource();
         CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
 
-        String actualCitation = CitationStyleGenerator.generateCitation(List.of(entry), style, format, new BibDatabaseContext(), bibEntryTypesManager).getFirst();
+        String actualCitation = CitationStyleGenerator.generateCitation(List.of(testEntry), style, format, context, bibEntryTypesManager).getFirst();
         assertEquals(expectedCitation, actualCitation);
     }
 
@@ -208,7 +204,7 @@ class CitationStyleGeneratorTest {
                                 .withField(StandardField.ISSUE, "7")
                                 .withField(StandardField.EID, "e0270533"),
                         "ieee.csl"),
-                         Arguments.of(
+                Arguments.of(
                         "[1]F. Last and J. Doe, no. 33, pp. 7–8.\n",
                         BibDatabaseMode.BIBLATEX,
                         new BibEntry(StandardEntryType.Article)
@@ -574,15 +570,14 @@ class CitationStyleGeneratorTest {
 
     @ParameterizedTest
     @MethodSource
-    void cslMapping(String expected, BibDatabaseMode mode, BibEntry entry, String cslFileName) throws Exception {
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(List.of(entry)));
-        bibDatabaseContext.setMode(mode);
+    void cslMapping(String expected, BibDatabaseMode mode, BibEntry entry, String cslFileName) {
+        context.setMode(mode);
 
         String citation = CitationStyleGenerator.generateCitation(
                 List.of(entry),
                 CitationStyle.createCitationStyleFromFile(cslFileName).orElseThrow().getSource(),
                 CitationStyleOutputFormat.TEXT,
-                bibDatabaseContext,
+                context,
                 bibEntryTypesManager).getFirst();
         assertEquals(expected, citation);
     }
