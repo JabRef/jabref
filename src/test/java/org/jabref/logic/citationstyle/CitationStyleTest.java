@@ -1,6 +1,8 @@
 package org.jabref.logic.citationstyle;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabase;
@@ -9,14 +11,18 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CitationStyleTest {
 
     @Test
-    void getDefault() throws Exception {
+    void getDefault() {
         assertNotNull(CitationStyle.getDefault());
     }
 
@@ -37,8 +43,31 @@ class CitationStyleTest {
     }
 
     @Test
-    void discoverCitationStylesNotNull() throws Exception {
+    void discoverCitationStylesNotNull() {
         List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
         assertNotNull(styleList);
+    }
+
+    @ParameterizedTest
+    @MethodSource("citationStyleProvider")
+    void testParseStyleInfo(String cslFileName, String expectedTitle, boolean expectedNumericNature) {
+        Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(cslFileName);
+
+        assertTrue(citationStyle.isPresent(), "Citation style should be present for " + cslFileName);
+
+        CitationStyle.StyleInfo styleInfo = new CitationStyle.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
+
+        assertEquals(expectedTitle, styleInfo.title(), "Title should match for " + cslFileName);
+        assertEquals(expectedNumericNature, styleInfo.isNumericStyle(), "Numeric style should match for " + cslFileName);
+    }
+
+    private static Stream<Arguments> citationStyleProvider() {
+        return Stream.of(
+                Arguments.of("ieee.csl", "IEEE", true),
+                Arguments.of("apa.csl", "American Psychological Association 7th edition", false),
+                Arguments.of("vancouver.csl", "Vancouver", true),
+                Arguments.of("chicago-author-date.csl", "Chicago Manual of Style 17th edition (author-date)", false),
+                Arguments.of("nature.csl", "Nature", true)
+        );
     }
 }

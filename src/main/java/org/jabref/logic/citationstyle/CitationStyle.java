@@ -76,7 +76,7 @@ public class CitationStyle implements OOStyle {
     public record StyleInfo(String title, boolean isNumericStyle) {
     }
 
-    private static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
+    public static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
         FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
 
         try {
