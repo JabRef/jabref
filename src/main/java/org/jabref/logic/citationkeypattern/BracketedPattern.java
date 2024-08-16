@@ -852,12 +852,12 @@ public class BracketedPattern {
 
         if (numberOfAuthors == 1 || andOthersPresent) {
             // Single author or "and others" case
-            String lastName = getLastName(authorList.getAuthor(0));
+            String lastName = authorList.getAuthor(0).getFamilyName().orElse("");
             alphaStyle.append(lastName, 0, Math.min(2, lastName.length()));
         } else {
             int maxAuthors = Math.min(numberOfAuthors, MAX_ALPHA_AUTHORS);
             for (int i = 0; i < maxAuthors; i++) {
-                String lastName = getLastName(authorList.getAuthor(i));
+                String lastName = authorList.getAuthor(i).getFamilyName().orElse("");
                 alphaStyle.append(lastName, 0, 1);
                 if (alphaStyle.length() >= 4) {
                     // Stop after 4 authors
@@ -866,14 +866,6 @@ public class BracketedPattern {
             }
         }
         return alphaStyle.toString();
-    }
-
-    static String getLastName(Author author) {
-        String[] nameParts = author.getNamePrefixAndFamilyName()
-                                   .replaceAll("\\s+", " ")
-                                   .trim()
-                                   .split(" ");
-        return nameParts[nameParts.length - 1];
     }
 
     /**

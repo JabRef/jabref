@@ -3,7 +3,6 @@ package org.jabref.logic.citationkeypattern;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
@@ -98,42 +97,10 @@ class BracketedPatternTest {
                 Arguments.of("AW", "van der Aalst and Weske"));
     }
 
-    /**
-     * <b>Precondition:</b> This test assumes that the method {@link BracketedPattern#getLastName(Author) getLastName} works properly.
-     * See {@link BracketedPatternTest#getLastNameTest(String, String) getLastNameTest}.
-     */
     @ParameterizedTest
     @MethodSource
     void authorsAlpha(String expected, AuthorList list) {
         assertEquals(expected, BracketedPattern.authorsAlpha(list));
-    }
-
-    static Stream<Arguments> getLastNameTest() {
-        return Stream.of(
-                Arguments.of("Artemenko", "Alexander Artemenko"),
-                Arguments.of("Aachen", "Aachen"),
-                Arguments.of("Berlin", "Berlin"),
-                Arguments.of("Chemnitz", "Chemnitz"),
-                Arguments.of("Düsseldorf", "Düsseldorf"),
-                Arguments.of("Essen", "Essen"),
-                Arguments.of("Abel", "Abel, K."),
-                Arguments.of("Bibel", "Bibel, U."),
-                Arguments.of("Abraham", "Abraham, N."),
-                Arguments.of("Corleone", "Corleone, P."),
-                Arguments.of("Azubi", "Azubi, L."),
-                Arguments.of("Ezgarani", "Ezgarani, O."),
-                Arguments.of("GI", "GI, Gesellschaft für Informatik e.V."),
-                Arguments.of("Glück", "Glück, H. I."),
-                Arguments.of("Goethe", "von Goethe"),
-                Arguments.of("Aalst", "van der Aalst"));
-    }
-
-    @ParameterizedTest
-    @MethodSource
-    void getLastNameTest(String expected, String fullName) {
-        AuthorList authorList = AuthorList.parse(fullName);
-        Author firstAuthor = authorList.getAuthor(0);
-        assertEquals(expected, BracketedPattern.getLastName(firstAuthor));
     }
 
     /**
