@@ -260,6 +260,14 @@
     /* Consistent size for headers of tab-pane and side-panels*/
     -jr-header-height: 3em;
 
+    /* AI chat style */
+    -jr-ai-message-user: -jr-accent;
+    -jr-ai-message-user-border: -jr-theme;
+    -jr-ai-message-ai: -jr-accent;
+    -jr-ai-message-ai-border: -jr-theme;
+    -jr-ai-message-error: -jr-error;
+    -jr-ai-message-error-border: derive(-jr-error, -40%);
+
     /* region: maintable base colors **/
 
     -jr-match-1-odd: -jr-row-odd-background;
