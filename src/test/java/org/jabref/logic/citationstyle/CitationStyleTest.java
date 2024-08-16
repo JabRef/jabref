@@ -50,7 +50,7 @@ class CitationStyleTest {
 
     @ParameterizedTest
     @MethodSource("citationStyleProvider")
-    void parseStyleInfo(String cslFileName, String expectedTitle, boolean expectedNumericNature) {
+    void parseStyleInfoTest(String cslFileName, String expectedTitle, boolean expectedNumericNature) {
         Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(cslFileName);
 
         assertTrue(citationStyle.isPresent(), "Citation style should be present for " + cslFileName);
