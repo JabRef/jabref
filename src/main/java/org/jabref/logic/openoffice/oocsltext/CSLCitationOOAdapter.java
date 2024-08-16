@@ -59,7 +59,7 @@ public class CSLCitationOOAdapter {
         String formattedCitation = CSLFormatUtils.transformHtml(inTextCitation);
 
         if (selectedStyle.isNumericStyle()) {
-            formattedCitation = updateMultipleCitations(formattedCitation, entries);
+            formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, entries);
         }
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
@@ -98,7 +98,7 @@ public class CSLCitationOOAdapter {
             String formattedCitation = CSLFormatUtils.transformHtml(inTextCitation);
             String finalText;
             if (selectedStyle.isNumericStyle()) {
-                formattedCitation = updateMultipleCitations(formattedCitation, List.of(currentEntry));
+                formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, List.of(currentEntry));
                 String prefix = currentEntry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
                                             .map(AuthorList::parse)
                                             .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al.") + " ")
@@ -157,7 +157,7 @@ public class CSLCitationOOAdapter {
 
             String formattedCitation;
             if (selectedStyle.isNumericStyle()) {
-                formattedCitation = CSLFormatUtils.updateSingleCitation(CSLFormatUtils.transformHtml(citation), currentNumber);
+                formattedCitation = CSLFormatUtils.updateSingleBibliographyNumber(CSLFormatUtils.transformHtml(citation), currentNumber);
             } else {
                 formattedCitation = CSLFormatUtils.transformHtml(citation);
             }
@@ -221,7 +221,7 @@ public class CSLCitationOOAdapter {
     /**
      * Transforms the numbers in the citation to globally-unique (and thus, reusable) numbers.
      */
-    private String updateMultipleCitations(String citation, List<BibEntry> entries) {
+    private String updateSingleOrMultipleCitationNumbers(String citation, List<BibEntry> entries) {
         Pattern pattern = Pattern.compile("(\\D*)(\\d+)(\\D*)");
         Matcher matcher = pattern.matcher(citation);
         StringBuilder sb = new StringBuilder();

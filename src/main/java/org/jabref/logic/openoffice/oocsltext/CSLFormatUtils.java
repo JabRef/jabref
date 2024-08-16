@@ -25,8 +25,6 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public class CSLFormatUtils {
 
-    public static final String[] PREFIXES = {"JABREF_", "CSL_"};
-
     // TODO: These are static final fields right now, should add the functionality to let user select these and store them in preferences.
     public static final String DEFAULT_BIBLIOGRAPHY_TITLE = "References";
     public static final String DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = "Heading 2";
@@ -34,14 +32,13 @@ public class CSLFormatUtils {
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 
     /**
-     * Transforms provided HTML into a format that can be fully parsed by {@link OOTextIntoOO#write(XTextDocument, XTextCursor, OOText) write}.
-     * The transformed HTML can be used for inserting into a LibreOffice document
-     * Context: The HTML produced by CitationStyleGenerator.generateCitation(...) is not directly (completely) parsable by OOTextIntoOO.write(...)
-     * For more details, read the documentation for the {@link OOTextIntoOO#write(XTextDocument, XTextCursor, OOText) write} method in the OOTextIntoOO  class.
+     * Transforms provided HTML into a format that can be fully parsed and inserted into an OO document.
+     * Context: The HTML produced by {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation} or {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateInText(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateInText} is not directly (completely) parsable by by {@link OOTextIntoOO#write(XTextDocument, XTextCursor, OOText) write}.
+     * For more details, read the documentation for the {@link OOTextIntoOO} class.
      * <a href="https://devdocs.jabref.org/code-howtos/openoffice/code-reorganization.html">Additional Information</a>.
      *
      * @param html The HTML string to be transformed into OO-write ready HTML.
-     * @return The formatted html string
+     * @return The formatted html string.
      */
     public static String transformHtml(String html) {
         // Initial clean up of escaped characters
@@ -76,7 +73,7 @@ public class CSLFormatUtils {
     }
 
     /**
-     * Alphanumeric citations are not natively supported by citeproc-java. (See {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateInText(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateInText}).
+     * Alphanumeric citations are not natively supported by citeproc-java (see {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateInText(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateInText}).
      * Thus, we manually format a citation to produce its alphanumeric form.
      *
      * @param entries the list of entries for which the alphanumeric citation is to be generated.
@@ -112,18 +109,18 @@ public class CSLFormatUtils {
     }
 
     /**
-     * Method to update citation number of a bibliographic entry.
-     * By default, citeproc-java's generateCitation always starts the numbering of a list of citations with "1".
+     * Method to update citation number of a bibliographic entry (to be inserted in the list of references).
+     * By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation} always start the numbering of a list of citations with "1".
      * If a citation doesn't correspond to the first cited entry, the number should be changed to the relevant current citation number.
-     * If an entries has been cited before, the current number should be old number.
+     * If an entries has been cited before, the colder number should be reused.
      * The number can be enclosed in different formats, such as "1", "1.", "1)", "(1)" or "[1]".
-     * Precondition: Use ONLY with numeric citation styles.
+     * <b>Precondition:</b> Use ONLY with numeric citation styles.
      *
      * @param citation the numeric citation with an unresolved number.
      * @param currentNumber the correct number to update the citation with.
      * @return the bibliographic citation with resolved number.
      */
-    public static String updateSingleCitation(String citation, int currentNumber) {
+    public static String updateSingleBibliographyNumber(String citation, int currentNumber) {
         Pattern pattern = Pattern.compile("(\\[|\\()?(\\d+)(\\]|\\))?(\\.)?\\s*");
         Matcher matcher = pattern.matcher(citation);
         StringBuilder sb = new StringBuilder();
@@ -151,7 +148,7 @@ public class CSLFormatUtils {
     /**
      * Extracts year from a citation having single or multiple entries, for the purpose of using in in-text citations.
      *
-     * @param formattedCitation - the citation cleaned up and formatted using transformHTML
+     * @param formattedCitation the citation cleaned up and formatted using {@link CSLFormatUtils#transformHtml transformHTML}.
      */
     public static String changeToInText(String formattedCitation) {
         Matcher matcher = YEAR_IN_CITATION_PATTERN.matcher(formattedCitation);
