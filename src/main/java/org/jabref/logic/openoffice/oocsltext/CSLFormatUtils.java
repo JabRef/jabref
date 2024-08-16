@@ -40,7 +40,7 @@ public class CSLFormatUtils {
      * @param html The HTML string to be transformed into OO-write ready HTML.
      * @return The formatted html string.
      */
-    public static String transformHtml(String html) {
+    public static String transformHTML(String html) {
         // Initial clean up of escaped characters
         html = StringEscapeUtils.unescapeHtml4(html);
 
@@ -114,7 +114,8 @@ public class CSLFormatUtils {
      * If a citation doesn't correspond to the first cited entry, the number should be changed to the relevant current citation number.
      * If an entries has been cited before, the colder number should be reused.
      * The number can be enclosed in different formats, such as "1", "1.", "1)", "(1)" or "[1]".
-     * <b>Precondition:</b> Use ONLY with numeric citation styles.
+     * <p>
+     * <b>Precondition:</b> Use ONLY with numeric citation styles.</p>
      *
      * @param citation the numeric citation with an unresolved number.
      * @param currentNumber the correct number to update the citation with.
@@ -148,7 +149,7 @@ public class CSLFormatUtils {
     /**
      * Extracts year from a citation having single or multiple entries, for the purpose of using in in-text citations.
      *
-     * @param formattedCitation the citation cleaned up and formatted using {@link CSLFormatUtils#transformHtml transformHTML}.
+     * @param formattedCitation the citation cleaned up and formatted using {@link CSLFormatUtils#transformHTML transformHTML}.
      */
     public static String changeToInText(String formattedCitation) {
         Matcher matcher = YEAR_IN_CITATION_PATTERN.matcher(formattedCitation);

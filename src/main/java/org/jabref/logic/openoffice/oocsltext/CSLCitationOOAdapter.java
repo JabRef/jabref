@@ -56,7 +56,7 @@ public class CSLCitationOOAdapter {
             inTextCitation = CitationStyleGenerator.generateInText(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
         }
 
-        String formattedCitation = CSLFormatUtils.transformHtml(inTextCitation);
+        String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
 
         if (selectedStyle.isNumericStyle()) {
             formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, entries);
@@ -95,7 +95,7 @@ public class CSLCitationOOAdapter {
             } else {
                 inTextCitation = CitationStyleGenerator.generateInText(List.of(currentEntry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
             }
-            String formattedCitation = CSLFormatUtils.transformHtml(inTextCitation);
+            String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
             String finalText;
             if (selectedStyle.isNumericStyle()) {
                 formattedCitation = updateSingleOrMultipleCitationNumbers(formattedCitation, List.of(currentEntry));
@@ -157,9 +157,9 @@ public class CSLCitationOOAdapter {
 
             String formattedCitation;
             if (selectedStyle.isNumericStyle()) {
-                formattedCitation = CSLFormatUtils.updateSingleBibliographyNumber(CSLFormatUtils.transformHtml(citation), currentNumber);
+                formattedCitation = CSLFormatUtils.updateSingleBibliographyNumber(CSLFormatUtils.transformHTML(citation), currentNumber);
             } else {
-                formattedCitation = CSLFormatUtils.transformHtml(citation);
+                formattedCitation = CSLFormatUtils.transformHTML(citation);
             }
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
 
