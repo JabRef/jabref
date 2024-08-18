@@ -33,7 +33,7 @@ public class ExporterTest {
     public List<BibEntry> entries;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         databaseContext = new BibDatabaseContext();
         entries = Collections.emptyList();
     }
@@ -56,7 +56,7 @@ public class ExporterTest {
 
     @ParameterizedTest
     @MethodSource("exportFormats")
-    public void exportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws Exception {
+    void exportingEmptyDatabaseYieldsEmptyFile(Exporter exportFormat, String name, @TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
         Files.createFile(tmpFile);
         exportFormat.export(databaseContext, tmpFile, entries);
@@ -65,7 +65,7 @@ public class ExporterTest {
 
     @ParameterizedTest
     @MethodSource("exportFormats")
-    public void exportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
+    void exportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
         assertThrows(NullPointerException.class, () -> {
             Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
             Files.createFile(tmpFile);

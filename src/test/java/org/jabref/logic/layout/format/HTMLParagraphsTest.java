@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HTMLParagraphsTest {
+class HTMLParagraphsTest {
 
     LayoutFormatter htmlFormatter = new HTMLParagraphs();
 

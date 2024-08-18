@@ -29,7 +29,7 @@ public class HtmlExportFormatTest {
     private Exporter exportFormat;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         exportFormat = new TemplateExporter("HTML",
                 "html",
                 "html",
@@ -48,12 +48,12 @@ public class HtmlExportFormatTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         exportFormat = null;
     }
 
     @Test
-    public void emitWellFormedHtml(@TempDir Path testFolder) throws Exception {
+    void emitWellFormedHtml(@TempDir Path testFolder) throws Exception {
         Path path = testFolder.resolve("ThisIsARandomlyNamedFile");
         exportFormat.export(databaseContext, path, entries);
         List<String> lines = Files.readAllLines(path);

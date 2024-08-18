@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class BackupFileUtilTest {
+class BackupFileUtilTest {
 
     Path backupDir;
 

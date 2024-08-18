@@ -4,12 +4,14 @@ import java.util.Optional;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class YearRangeByFilteringQueryTransformerTest<T extends YearRangeByFilteringQueryTransformer> extends InfixTransformerTest<T> {
 
     @Override
+    @Test
     public void convertYearRangeField() throws Exception {
         YearRangeByFilteringQueryTransformer transformer = getTransformer();
 

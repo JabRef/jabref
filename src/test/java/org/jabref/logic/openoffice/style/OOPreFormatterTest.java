@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class OOPreFormatterTest {
+class OOPreFormatterTest {
 
     @Test
-    public void plainFormat() {
+    void plainFormat() {
         assertEquals("aaa", new OOPreFormatter().format("aaa"));
         assertEquals("$", new OOPreFormatter().format("\\$"));
         assertEquals("%", new OOPreFormatter().format("\\%"));
@@ -15,19 +15,19 @@ public class OOPreFormatterTest {
     }
 
     @Test
-    public void removeBraces() {
+    void removeBraces() {
         assertEquals("aaa", new OOPreFormatter().format("{aaa}"));
     }
 
     @Test
-    public void formatAccents() {
+    void formatAccents() {
         assertEquals("ä", new OOPreFormatter().format("{\\\"{a}}"));
         assertEquals("Ä", new OOPreFormatter().format("{\\\"{A}}"));
         assertEquals("Ç", new OOPreFormatter().format("{\\c{C}}"));
     }
 
     @Test
-    public void specialCommands() {
+    void specialCommands() {
         assertEquals("å", new OOPreFormatter().format("{\\aa}"));
         assertEquals("bb", new OOPreFormatter().format("{\\bb}"));
         assertEquals("å a", new OOPreFormatter().format("\\aa a"));
@@ -37,24 +37,24 @@ public class OOPreFormatterTest {
     }
 
     @Test
-    public void unsupportedSpecialCommands() {
+    void unsupportedSpecialCommands() {
         assertEquals("ftmch", new OOPreFormatter().format("\\ftmch"));
         assertEquals("ftmch", new OOPreFormatter().format("{\\ftmch}"));
         assertEquals("ftmchaaa", new OOPreFormatter().format("{\\ftmch\\aaa}"));
     }
 
     @Test
-    public void equations() {
+    void equations() {
         assertEquals("Σ", new OOPreFormatter().format("$\\Sigma$"));
     }
 
     @Test
-    public void formatStripLatexCommands() {
+    void formatStripLatexCommands() {
         assertEquals("-", new OOPreFormatter().format("\\mbox{-}"));
     }
 
     @Test
-    public void formatting() {
+    void formatting() {
         assertEquals("<i>kkk</i>", new OOPreFormatter().format("\\textit{kkk}"));
         assertEquals("<i>kkk</i>", new OOPreFormatter().format("{\\it kkk}"));
         assertEquals("<i>kkk</i>", new OOPreFormatter().format("\\emph{kkk}"));

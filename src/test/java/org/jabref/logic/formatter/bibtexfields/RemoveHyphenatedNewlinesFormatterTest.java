@@ -5,29 +5,29 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RemoveHyphenatedNewlinesFormatterTest {
+class RemoveHyphenatedNewlinesFormatterTest {
 
     private RemoveHyphenatedNewlinesFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new RemoveHyphenatedNewlinesFormatter();
     }
 
     @Test
-    public void removeHyphensBeforeNewlines() {
+    void removeHyphensBeforeNewlines() {
         assertEquals("water", formatter.format("wa-\nter"));
         assertEquals("water", formatter.format("wa-\r\nter"));
         assertEquals("water", formatter.format("wa-\rter"));
     }
 
     @Test
-    public void withoutHyphensUnmodified() {
+    void withoutHyphensUnmodified() {
         assertEquals("water", formatter.format("water"));
     }
 
     @Test
-    public void removeHyphensBeforePlatformSpecificNewlines() {
+    void removeHyphensBeforePlatformSpecificNewlines() {
         String newLine = "%n".formatted();
         assertEquals("water", formatter.format("wa-" + newLine + "ter"));
     }

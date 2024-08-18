@@ -198,4 +198,4 @@ recipeList:
 
   - org.openrewrite.java.testing.cleanup.RemoveTestPrefix
   - org.openrewrite.java.testing.junit5.CleanupAssertions
-#  - org.openrewrite.java.testing.junit5.JUnit5BestPractices
+  - org.openrewrite.java.testing.junit5.JUnit5BestPractices

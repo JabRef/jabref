@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @AllowedToUseAwt("Requires AWT for clipboard access")
-public class ClipBoardManagerTest {
+class ClipBoardManagerTest {
 
     private BibEntryTypesManager entryTypesManager;
     private ClipBoardManager clipBoardManager;

@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RemoveLinksToNotExistentFilesTest {
+class RemoveLinksToNotExistentFilesTest {
     private Path fileBefore;
     private BibEntry entry;
     private RemoveLinksToNotExistentFiles removeLinks;

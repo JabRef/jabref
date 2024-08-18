@@ -65,7 +65,7 @@ import static org.mockito.Mockito.when;
 /**
  * Tests for reading can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
  */
-public class BibtexDatabaseWriterTest {
+class BibtexDatabaseWriterTest {
 
     private BibtexDatabaseWriter databaseWriter;
     private BibDatabase database;

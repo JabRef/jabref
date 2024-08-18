@@ -21,7 +21,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class NewEntryActionTest {
+class NewEntryActionTest {
 
     private NewEntryAction newEntryAction;
     private final LibraryTab libraryTab = mock(LibraryTab.class);
@@ -31,13 +31,13 @@ public class NewEntryActionTest {
     private final StateManager stateManager = mock(StateManager.class);
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
         newEntryAction = new NewEntryAction(() -> libraryTab, dialogService, preferencesService, stateManager);
     }
 
     @Test
-    public void executeOnSuccessWithFixedType() {
+    void executeOnSuccessWithFixedType() {
         EntryType type = StandardEntryType.Article;
         newEntryAction = new NewEntryAction(() -> libraryTab, type, dialogService, preferencesService, stateManager);
         when(tabContainer.getLibraryTabs()).thenReturn(List.of(libraryTab));

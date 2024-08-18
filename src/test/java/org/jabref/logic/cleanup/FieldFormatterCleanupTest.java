@@ -16,13 +16,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FieldFormatterCleanupTest {
+class FieldFormatterCleanupTest {
 
     private BibEntry entry;
     private Map<Field, String> fieldMap;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fieldMap = new HashMap<>();
         entry = new BibEntry();
 
@@ -38,7 +38,7 @@ public class FieldFormatterCleanupTest {
     }
 
     @Test
-    public void internalAllField() throws Exception {
+    void internalAllField() throws Exception {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new UpperCaseFormatter());
         cleanup.cleanup(entry);
 
@@ -52,7 +52,7 @@ public class FieldFormatterCleanupTest {
     }
 
     @Test
-    public void internalAllTextFieldsField() throws Exception {
+    void internalAllTextFieldsField() throws Exception {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UpperCaseFormatter());
         cleanup.cleanup(entry);
 
@@ -66,7 +66,7 @@ public class FieldFormatterCleanupTest {
     }
 
     @Test
-    public void cleanupAllFieldsIgnoresKeyField() throws Exception {
+    void cleanupAllFieldsIgnoresKeyField() throws Exception {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new UnicodeToLatexFormatter());
         entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);
@@ -75,7 +75,7 @@ public class FieldFormatterCleanupTest {
     }
 
     @Test
-    public void cleanupAllTextFieldsIgnoresKeyField() throws Exception {
+    void cleanupAllTextFieldsIgnoresKeyField() throws Exception {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UnicodeToLatexFormatter());
         entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);
@@ -84,7 +84,7 @@ public class FieldFormatterCleanupTest {
     }
 
     @Test
-    public void cleanupKeyFieldCleansUpKeyField() throws Exception {
+    void cleanupKeyFieldCleansUpKeyField() throws Exception {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.KEY_FIELD, new UnicodeToLatexFormatter());
         entry.setField(InternalField.KEY_FIELD, "François-Marie Arouet"); // Contains ç, not in Basic Latin
         cleanup.cleanup(entry);

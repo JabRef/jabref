@@ -19,7 +19,7 @@ class SpecialFieldsToSeparateFieldsTest {
 
     @ParameterizedTest
     @MethodSource("provideKeywordFieldPairs")
-    public void migrateToCorrectField(SpecialField field, String fieldInKeyword, BibEntry expected) {
+    void migrateToCorrectField(SpecialField field, String fieldInKeyword, BibEntry expected) {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, fieldInKeyword);
 
         new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
@@ -28,7 +28,7 @@ class SpecialFieldsToSeparateFieldsTest {
     }
 
     @Test
-    public void noKewordToMigrate() {
+    void noKewordToMigrate() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
                                        .withField(StandardField.KEYWORDS, "tdd");
         BibEntry expected = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
@@ -40,7 +40,7 @@ class SpecialFieldsToSeparateFieldsTest {
     }
 
     @Test
-    public void noKeywordToMigrateButDuplicateKeywords() {
+    void noKeywordToMigrateButDuplicateKeywords() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
                                        .withField(StandardField.KEYWORDS, "asdf, asdf, asdf");
         BibEntry expected = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
@@ -52,7 +52,7 @@ class SpecialFieldsToSeparateFieldsTest {
     }
 
     @Test
-    public void migrateMultipleSpecialFields() {
+    void migrateMultipleSpecialFields() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
                                        .withField(StandardField.KEYWORDS, "printed, prio1");
         BibEntry expected = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
@@ -65,7 +65,7 @@ class SpecialFieldsToSeparateFieldsTest {
     }
 
     @Test
-    public void migrateSpecialFieldsMixedWithKeyword() {
+    void migrateSpecialFieldsMixedWithKeyword() {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
                                        .withField(StandardField.KEYWORDS, "tdd, prio1, SE");
 

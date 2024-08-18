@@ -8,133 +8,133 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AuthorsTest {
+class AuthorsTest {
 
     private ParamLayoutFormatter authorsLayoutFormatter = new Authors();
 
     @Test
-    public void standardUsage() {
+    void standardUsage() {
         assertEquals("B. C. Bruce, C. Manson and J. Jumper",
                 authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper"));
     }
 
     @Test
-    public void standardUsageOne() {
+    void standardUsageOne() {
         authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma, Comma");
         assertEquals("Bruce, Bob Croydon, Jumper, Jolly", authorsLayoutFormatter.format("Bob Croydon Bruce and Jolly Jumper"));
     }
 
     @Test
-    public void standardUsageTwo() {
+    void standardUsageTwo() {
         authorsLayoutFormatter.setArgument("initials");
         assertEquals("B. C. Bruce and J. Jumper", authorsLayoutFormatter.format("Bob Croydon Bruce and Jolly Jumper"));
     }
 
     @Test
-    public void standardUsageThree() {
+    void standardUsageThree() {
         authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma");
         assertEquals("Bruce, Bob Croydon, Manson, Charles and Jumper, Jolly",
                 authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper"));
     }
 
     @Test
-    public void standardUsageFour() {
+    void standardUsageFour() {
         authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma, 2");
         assertEquals("Bruce, Bob Croydon et al.",
                 authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper"));
     }
 
     @Test
-    public void standardUsageFive() {
+    void standardUsageFive() {
         authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma, 3");
         assertEquals("Bruce, Bob Croydon et al.",
                 authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles"));
     }
 
     @Test
-    public void standardUsageSix() {
+    void standardUsageSix() {
         authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma, 3, 2");
         assertEquals("Bruce, Bob Croydon, Manson, Charles et al.",
                 authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles"));
     }
 
     @Test
-    public void specialEtAl() {
+    void specialEtAl() {
         authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma, 3, etal= and a few more");
         assertEquals("Bruce, Bob Croydon and a few more",
                 authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles"));
     }
 
     @Test
-    public void standardUsageNull() {
+    void standardUsageNull() {
         assertEquals("", authorsLayoutFormatter.format(null));
     }
 
     @Test
-    public void standardOxford() {
+    void standardOxford() {
         authorsLayoutFormatter.setArgument("Oxford");
         assertEquals("B. C. Bruce, C. Manson, and J. Jumper",
                 authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper"));
     }
 
     @Test
-    public void standardOxfordFullName() {
+    void standardOxfordFullName() {
         authorsLayoutFormatter.setArgument("FullName,Oxford");
         assertEquals("Bob Croydon Bruce, Charles Manson, and Jolly Jumper",
                 authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Manson and Jolly Jumper"));
     }
 
     @Test
-    public void standardCommaFullName() {
+    void standardCommaFullName() {
         authorsLayoutFormatter.setArgument("FullName,Comma,Comma");
         assertEquals("Bob Croydon Bruce, Charles Manson, Jolly Jumper",
                 authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Manson and Jolly Jumper"));
     }
 
     @Test
-    public void standardAmpFullName() {
+    void standardAmpFullName() {
         authorsLayoutFormatter.setArgument("FullName,Amp");
         assertEquals("Bob Croydon Bruce, Charles Manson & Jolly Jumper",
                 authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Manson and Jolly Jumper"));
     }
 
     @Test
-    public void lastName() {
+    void lastName() {
         authorsLayoutFormatter.setArgument("LastName");
         assertEquals("Bruce, von Manson and Jumper",
                 authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles von Manson and Jolly Jumper"));
     }
 
     @Test
-    public void middleInitial() {
+    void middleInitial() {
         authorsLayoutFormatter.setArgument("MiddleInitial");
         assertEquals("Bob C. Bruce, Charles K. von Manson and Jolly Jumper",
                 authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Kermit von Manson and Jumper, Jolly"));
     }
 
     @Test
-    public void noPeriod() {
+    void noPeriod() {
         authorsLayoutFormatter.setArgument("NoPeriod");
         assertEquals("B C Bruce, C K von Manson and J Jumper",
                 authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Kermit von Manson and Jumper, Jolly"));
     }
 
     @Test
-    public void etAl() {
+    void etAl() {
         authorsLayoutFormatter.setArgument("2,1");
         assertEquals("B. C. Bruce et al.",
                 authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Kermit von Manson and Jumper, Jolly"));
     }
 
     @Test
-    public void etAlNotEnoughAuthors() {
+    void etAlNotEnoughAuthors() {
         authorsLayoutFormatter.setArgument("2,1");
         assertEquals("B. C. Bruce and C. K. von Manson",
                 authorsLayoutFormatter.format("Bruce, Bob Croydon and Charles Kermit von Manson"));
     }
 
     @Test
-    public void emptyEtAl() {
+    void emptyEtAl() {
         authorsLayoutFormatter.setArgument("fullname, LastFirst, Comma, 3, etal=");
         assertEquals("Bruce, Bob Croydon",
                 authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles"));
@@ -146,7 +146,7 @@ public class AuthorsTest {
             "LastFirst, 'Bruce, B. C., Manson, C., Jumper, J. and Chuckles, C.'", // LastFirst
             "LastFirstFirstFirst, 'Bruce, B. C., C. Manson, J. Jumper and C. Chuckles'" // LastFirstFirstFirst
     })
-    public void authorOrder(String arg, String expectedResult) {
+    void authorOrder(String arg, String expectedResult) {
         authorsLayoutFormatter.setArgument(arg);
         String formattedStr = authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles");
         assertEquals(expectedResult, formattedStr);
@@ -161,7 +161,7 @@ public class AuthorsTest {
             "LastName, 'Bruce, Manson, Jumper and Chuckles'", // LastName
             "InitialsNoSpace, 'B.C. Bruce, C. Manson, J. Jumper and C. Chuckles'" // InitialsNoSpace
     })
-    public void authorABRV(String arg, String expectedResult) {
+    void authorABRV(String arg, String expectedResult) {
         authorsLayoutFormatter.setArgument(arg);
         String formattedStr = authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles");
         assertEquals(expectedResult, formattedStr);
@@ -174,7 +174,7 @@ public class AuthorsTest {
             "NoComma, 'B. C. Bruce, C. Manson, J. Jumper and C. Chuckles'", // NoComma
             "NoPeriod, 'B C Bruce, C Manson, J Jumper and C Chuckles'" // NoPeriod
     })
-    public void authorPUNC(String arg, String expectedResult) {
+    void authorPUNC(String arg, String expectedResult) {
         authorsLayoutFormatter.setArgument(arg);
         String formattedStr = authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles");
         assertEquals(expectedResult, formattedStr);
@@ -196,7 +196,7 @@ public class AuthorsTest {
             "'Comma, Colon', 'B. C. Bruce, C. Manson, J. Jumper: C. Chuckles'", // Comma Colon
             "'Comma, Semicolon', 'B. C. Bruce, C. Manson, J. Jumper; C. Chuckles'", // Comma Semicolon
     })
-    public void authorSEPARATORS(String arg, String expectedResult) {
+    void authorSEPARATORS(String arg, String expectedResult) {
         authorsLayoutFormatter.setArgument(arg);
         String formattedStr = authorsLayoutFormatter.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles");
         assertEquals(expectedResult, formattedStr);

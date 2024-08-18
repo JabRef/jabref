@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-public class PdfXmpImporterTest {
+class PdfXmpImporterTest {
 
     private PdfXmpImporter importer;
 
@@ -33,20 +33,20 @@ public class PdfXmpImporterTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         importer = new PdfXmpImporter(mock(XmpPreferences.class));
     }
 
     @Disabled("XMP reader prints warnings to the logger when parsing does not work")
     @Test
-    public void importEncryptedFileReturnsError() throws URISyntaxException {
+    void importEncryptedFileReturnsError() throws URISyntaxException {
         Path file = Path.of(PdfXmpImporterTest.class.getResource("/pdfs/encrypted.pdf").toURI());
         ParserResult result = importer.importDatabase(file);
         assertTrue(result.hasWarnings());
     }
 
     @Test
-    public void importEntries() throws URISyntaxException {
+    void importEntries() throws URISyntaxException {
         Path file = Path.of(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -60,19 +60,19 @@ public class PdfXmpImporterTest {
     }
 
     @Test
-    public void isRecognizedFormat() throws IOException, URISyntaxException {
+    void isRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
         assertTrue(importer.isRecognizedFormat(file));
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void isRecognizedFormatReject(String fileName) throws IOException, URISyntaxException {
+    void isRecognizedFormatReject(String fileName) throws IOException, URISyntaxException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
     @Test
-    public void getCommandLineId() {
+    void getCommandLineId() {
         assertEquals("xmp", importer.getId());
     }
 }

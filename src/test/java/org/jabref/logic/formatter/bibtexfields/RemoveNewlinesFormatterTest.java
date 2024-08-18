@@ -6,37 +6,37 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RemoveNewlinesFormatterTest {
+class RemoveNewlinesFormatterTest {
 
     private RemoveNewlinesFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new RemoveNewlinesFormatter();
     }
 
     @Test
-    public void removeCarriageReturnLineFeed() {
+    void removeCarriageReturnLineFeed() {
         assertEquals("rn linebreak", formatter.format("rn\r\nlinebreak"));
     }
 
     @Test
-    public void removeCarriageReturn() {
+    void removeCarriageReturn() {
         assertEquals("r linebreak", formatter.format("r\rlinebreak"));
     }
 
     @Test
-    public void removeLineFeed() {
+    void removeLineFeed() {
         assertEquals("n linebreak", formatter.format("n\nlinebreak"));
     }
 
     @Test
-    public void withoutNewLineUnmodified() {
+    void withoutNewLineUnmodified() {
         assertEquals("no linebreak", formatter.format("no linebreak"));
     }
 
     @Test
-    public void removePlatformSpecificNewLine() {
+    void removePlatformSpecificNewLine() {
         String newLine = "%n".formatted();
         assertEquals("linebreak on current platform", formatter.format("linebreak on" + newLine + "current platform"));
     }

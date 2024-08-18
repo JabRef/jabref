@@ -42,7 +42,7 @@ public class MetaDataSerializerTest {
     private BibEntryType newCustomType;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         metaData = new MetaData();
         pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         newCustomType = new BibEntryType(
@@ -52,12 +52,12 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    public void serializeNewMetadataReturnsEmptyMap() {
+    void serializeNewMetadataReturnsEmptyMap() {
         assertEquals(Collections.emptyMap(), MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 
     @Test
-    public void serializeSingleSaveAction() {
+    void serializeSingleSaveAction() {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
@@ -69,7 +69,7 @@ public class MetaDataSerializerTest {
     }
 
     @Test
-    public void serializeSingleContentSelectors() {
+    void serializeSingleContentSelectors() {
         List<String> values = List.of(
                 "approved",
                 "captured",
