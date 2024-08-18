@@ -22,8 +22,7 @@ public abstract class YearRangeByFilteringQueryTransformerTest<T extends YearRan
         // The API does not support querying for a year range
         // The implementation of the fetcher filters the results manually
 
-        // The implementations returns an empty query
-        assertEquals(Optional.of(""), result);
+        assertEquals(Optional.empty(), result);
 
         // The implementation sets the start year and end year values according to the query
         assertEquals(2018, transformer.getStartYear());
