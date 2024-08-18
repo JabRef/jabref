@@ -5,11 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.logic.bst.util.BstCaseChangersTest;
-import org.jabref.logic.bst.util.BstNameFormatterTest;
-import org.jabref.logic.bst.util.BstPurifierTest;
-import org.jabref.logic.bst.util.BstTextPrefixerTest;
-import org.jabref.logic.bst.util.BstWidthCalculatorTest;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -28,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * For additional tests see for
  * <ul>
- * <li> purify: {@link BstPurifierTest}</li>
- * <li> width: {@link BstWidthCalculatorTest}</li>
- * <li> format.name: {@link BstNameFormatterTest}</li>
- * <li> change.case: {@link BstCaseChangersTest}</li>
- * <li> prefix: {@link BstTextPrefixerTest}</li>
+ * <li> purify: {@link org.jabref.logic.bst.util.BstPurifierTest}</li>
+ * <li> width: {@link org.jabref.logic.bst.util.BstWidthCalculatorTest}</li>
+ * <li> format.name: {@link org.jabref.logic.bst.util.BstNameFormatterTest}</li>
+ * <li> change.case: {@link org.jabref.logic.bst.util.BstCaseChangersTest}</li>
+ * <li> prefix: {@link org.jabref.logic.bst.util.BstTextPrefixerTest}</li>
  * </ul>
  */
 class BstFunctionsTest {
@@ -599,9 +594,8 @@ class BstFunctionsTest {
     }
 
     /**
-     * See also {@link BstWidthCalculatorTest}
+     * See also {@link org.jabref.logic.bst.util.BstWidthCalculatorTest}
      */
-
     @Test
     void width() throws RecognitionException {
         BstVM vm = new BstVM("""
