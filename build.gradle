@@ -29,7 +29,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.17.1'
+    id 'org.openrewrite.rewrite' version '6.20.0'
 }
 
 // Enable following for debugging
@@ -362,7 +362,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.16.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.17.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")

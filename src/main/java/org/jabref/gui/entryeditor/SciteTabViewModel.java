@@ -23,11 +23,13 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.core.json.JSONObject;
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SciteTabViewModel extends AbstractViewModel {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SciteTabViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SciteTabViewModel.class);
 
     public enum SciteStatus {
         IN_PROGRESS,

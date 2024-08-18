@@ -126,7 +126,7 @@ public class AiChatComponent extends VBox {
                                 LOGGER.error("Got an error while sending a message to AI", e);
                                 setLoading(false);
 
-                                if (e.getMessage().equals("401 - null") || e.getMessage().equals("404 - null")) {
+                                if ("401 - null".equals(e.getMessage()) || "404 - null".equals(e.getMessage())) {
                                     addError(Localization.lang("API base URL setting appears to be incorrect. Please check it in AI expert settings."));
                                 } else {
                                     addError(e.getMessage());
