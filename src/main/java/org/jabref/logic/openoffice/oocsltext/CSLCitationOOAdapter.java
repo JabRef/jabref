@@ -191,7 +191,7 @@ public class CSLCitationOOAdapter {
             preceedingSpaceExists = true;
         } else {
             // If not at the start of document, check if there is a space before
-            preceedingSpaceExists = checkCursor.getString().equals(" ");
+            preceedingSpaceExists = " ".equals(checkCursor.getString());
             // If not a space, check if it's a paragraph break
             if (!preceedingSpaceExists) {
                 preceedingSpaceExists = checkCursor.getString().matches("\\R");
