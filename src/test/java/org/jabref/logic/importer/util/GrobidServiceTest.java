@@ -10,7 +10,6 @@ import java.util.Optional;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
-import org.jabref.logic.importer.fileformat.PdfGrobidImporterTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -93,7 +92,7 @@ class GrobidServiceTest {
 
     @Test
     void processPdfTest() throws IOException, ParseException, URISyntaxException {
-        Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
+        Path file = Path.of(GrobidServiceTest.class.getResource("LNCS-minimal.pdf").toURI());
         List<BibEntry> response = grobidService.processPDF(file, importFormatPreferences);
         assertEquals(1, response.size());
         BibEntry be0 = response.getFirst();
@@ -115,7 +114,7 @@ class GrobidServiceTest {
                 .withField(StandardField.VOLUME, "8274")
                 .withField(StandardField.YEAR, "2013");
 
-        Path file = Path.of(Objects.requireNonNull(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf")).toURI());
+        Path file = Path.of(Objects.requireNonNull(GrobidServiceTest.class.getResource("LNCS-minimal.pdf")).toURI());
         List<BibEntry> extractedReferences = grobidService.processReferences(file, importFormatPreferences);
         assertEquals(List.of(ref1), extractedReferences);
     }
