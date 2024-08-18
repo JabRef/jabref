@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -170,7 +169,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 String elementName = reader.getName().getLocalPart();
 
                 if (elementName.equals("Title")) {
-                    entry.setField(StandardField.TITLE,     reader.getText());
+                    entry.setField(StandardField.TITLE, reader.getText());
                 }
                 if (elementName.equals("Abstract")) {
                     entry.setField(StandardField.ABSTRACT, reader.getText());
@@ -263,7 +262,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
             }
 
             pages = startPage + "-" + endPage;
-
         } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
         }
