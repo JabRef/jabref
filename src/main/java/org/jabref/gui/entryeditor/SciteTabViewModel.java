@@ -23,7 +23,6 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.core.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
