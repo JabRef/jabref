@@ -44,7 +44,6 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      * server has to look up the entry.
      *
      * @return A BibTeX string if extraction is successful
-     * @throws FetcherException
      */
     private Optional<BibEntry> parseUsingGrobid(String plainText) throws FetcherException {
         try {
