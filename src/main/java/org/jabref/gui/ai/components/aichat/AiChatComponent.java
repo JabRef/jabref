@@ -53,7 +53,7 @@ public class AiChatComponent extends VBox {
     // This property stores index of a user history message.
     // When user scrolls history in the prompt, this value is updated.
     // Whenever user edits the prompt, this value is reset to NEW_NON_EXISTENT_MESSAGE.
-    private final IntegerProperty currentUserMessageScroll = new SimpleIntegerProperty(-1);
+    private final IntegerProperty currentUserMessageScroll = new SimpleIntegerProperty(NEW_NON_EXISTENT_MESSAGE);
 
     // If the current content of the prompt is a history message, then this property is true.
     // If user begins to edit or type a new text, then this property is false.
