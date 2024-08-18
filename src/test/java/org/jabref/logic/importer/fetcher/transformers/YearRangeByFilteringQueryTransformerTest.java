@@ -25,7 +25,7 @@ public abstract class YearRangeByFilteringQueryTransformerTest<T extends YearRan
         assertEquals(Optional.empty(), result);
 
         // The implementation sets the start year and end year values according to the query
-        assertEquals(2018, transformer.getStartYear());
-        assertEquals(2021, transformer.getEndYear());
+        assertEquals(Optional.of(2018), transformer.getStartYear());
+        assertEquals(Optional.of(2021), transformer.getEndYear());
     }
 }

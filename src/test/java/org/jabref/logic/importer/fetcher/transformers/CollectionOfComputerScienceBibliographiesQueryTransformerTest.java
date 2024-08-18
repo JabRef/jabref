@@ -38,7 +38,7 @@ class CollectionOfComputerScienceBibliographiesQueryTransformerTest extends Infi
     @Override
     @Test
     public void convertYearField() throws Exception {
-        String queryString = "2018";
+        String queryString = "year:2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.of("year:2018"), query);

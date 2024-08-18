@@ -40,9 +40,11 @@ class DBLPQueryTransformerTest extends InfixTransformerTest<DBLPQueryTransformer
     public void convertYearField() throws Exception {
         String queryString = "year:2015";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of("2015");
-        assertEquals(expected, searchQuery);
+        DBLPQueryTransformer transformer = getTransformer();
+        Optional<String> searchQuery = transformer.transformLuceneQuery(luceneQuery);
+        assertEquals(Optional.empty(), searchQuery);
+        assertEquals(Optional.of(2015), transformer.getStartYear());
+        assertEquals(Optional.of(2015), transformer.getEndYear());
     }
 
     @Override
@@ -50,8 +52,10 @@ class DBLPQueryTransformerTest extends InfixTransformerTest<DBLPQueryTransformer
     public void convertYearRangeField() throws Exception {
         String queryString = "year-range:2012-2015";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of("2012|2013|2014|2015");
-        assertEquals(expected, searchQuery);
+        DBLPQueryTransformer transformer = getTransformer();
+        Optional<String> searchQuery = transformer.transformLuceneQuery(luceneQuery);
+        assertEquals(Optional.empty(), searchQuery);
+        assertEquals(Optional.of(2012), transformer.getStartYear());
+        assertEquals(Optional.of(2015), transformer.getEndYear());
     }
 }

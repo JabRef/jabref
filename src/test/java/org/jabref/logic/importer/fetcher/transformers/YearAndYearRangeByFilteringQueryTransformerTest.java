@@ -16,8 +16,8 @@ public abstract class YearAndYearRangeByFilteringQueryTransformerTest<T extends 
         String queryString = "year:2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> query = transformer.transformLuceneQuery(luceneQuery);
-        assertEquals(Optional.of(""), query);
-        assertEquals(2021, transformer.getStartYear());
-        assertEquals(2021, transformer.getEndYear());
+        assertEquals(Optional.empty(), query);
+        assertEquals(Optional.of(2021), transformer.getStartYear());
+        assertEquals(Optional.of(2021), transformer.getEndYear());
     }
 }
