@@ -157,25 +157,25 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     @Test
     @Disabled("Year search is currently broken, because the API returns mutliple years.")
     @Override
-    void supportsYearSearch() {
+    public void supportsYearSearch() {
     }
 
     @Test
     @Disabled("Year range search is not natively supported by the API, but can be emulated by multiple single year searches.")
     @Override
-    void supportsYearRangeSearch() {
+    public void supportsYearRangeSearch() {
     }
 
     @Test
     @Disabled("401 as of 2024-08-18")
     @Override
-    void supportsAuthorSearch() {
+    public void supportsAuthorSearch() {
     }
 
     @Test
     @Disabled("401 as of 2024-08-18")
     @Override
-    void supportsJournalSearch() {
+    public void supportsJournalSearch() {
     }
 
     @Test
