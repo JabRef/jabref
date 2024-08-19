@@ -122,8 +122,8 @@ public class GrobidCitationFetcherTest {
     @ParameterizedTest
     @MethodSource("provideInvalidInput")
     public void grobidPerformSearchWithInvalidDataTest(String invalidInput) throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(invalidInput);
-        assertEquals(Collections.emptyList(), entries);
+        assertThrows(FetcherException.class, () ->
+                grobidCitationFetcher.performSearch("invalidInput"), "performSearch should throw an FetcherException.");
     }
 
     @Test
