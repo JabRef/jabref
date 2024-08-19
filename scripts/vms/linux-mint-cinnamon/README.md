@@ -2,7 +2,7 @@
 
 [Linux Mint](https://linuxmint.com/) with JabRef snap and libreoffice-connection pre-installed.
 
-Uses <https://portal.cloud.hashicorp.com/vagrant/discover/aaronvonawesome/linux-mint-21-cinnamon>.
+Uses <https://app.vagrantup.com/archman/boxes/linuxmint/versions/22>.
 
 Start JabRef by following steps:
 
