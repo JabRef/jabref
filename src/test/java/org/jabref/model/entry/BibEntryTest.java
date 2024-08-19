@@ -59,13 +59,13 @@ class BibEntryTest {
     }
 
     @Test
-    void getFieldIsCaseInsensitive() throws Exception {
+    void getFieldIsCaseInsensitive() {
         entry.setField(new UnknownField("TeSt"), "value");
         assertEquals(Optional.of("value"), entry.getField(new UnknownField("tEsT")));
     }
 
     @Test
-    void getFieldWorksWithBibFieldAsWell() throws Exception {
+    void getFieldWorksWithBibFieldAsWell() {
         entry.setField(StandardField.AUTHOR, "value");
         assertEquals(Optional.of("value"), entry.getField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).field()));
     }
@@ -76,80 +76,80 @@ class BibEntryTest {
     }
 
     @Test
-    void setFieldLeadsToAChangedEntry() throws Exception {
+    void setFieldLeadsToAChangedEntry() {
         entry.setField(StandardField.AUTHOR, "value");
         assertTrue(entry.hasChanged());
     }
 
     @Test
-    void setFieldWorksWithBibFieldAsWell() throws Exception {
+    void setFieldWorksWithBibFieldAsWell() {
         entry.setField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).field(), "value");
         assertEquals(Optional.of("value"), entry.getField(StandardField.AUTHOR));
     }
 
     @Test
-    void clonedBibEntryHasUniqueID() throws Exception {
+    void clonedBibEntryHasUniqueID() {
         BibEntry entryClone = (BibEntry) entry.clone();
         assertNotEquals(entry.getId(), entryClone.getId());
     }
 
     @Test
-    void clonedBibEntryWithMiscTypeHasOriginalChangedFlag() throws Exception {
+    void clonedBibEntryWithMiscTypeHasOriginalChangedFlag() {
         BibEntry entryClone = (BibEntry) entry.clone();
         assertFalse(entryClone.hasChanged());
     }
 
     @Test
-    void clonedBibEntryWithBookTypeAndOneFieldHasOriginalChangedFlag() throws Exception {
+    void clonedBibEntryWithBookTypeAndOneFieldHasOriginalChangedFlag() {
         entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
         BibEntry entryClone = (BibEntry) entry.clone();
         assertFalse(entryClone.hasChanged());
     }
 
     @Test
-    void setAndGetAreConsistentForMonth() throws Exception {
+    void setAndGetAreConsistentForMonth() {
         entry.setField(StandardField.MONTH, "may");
         assertEquals(Optional.of("may"), entry.getField(StandardField.MONTH));
     }
 
     @Test
-    void setAndGetAreConsistentForCapitalizedMonth() throws Exception {
+    void setAndGetAreConsistentForCapitalizedMonth() {
         entry.setField(StandardField.MONTH, "May");
         assertEquals(Optional.of("May"), entry.getField(StandardField.MONTH));
     }
 
     @Test
-    void setAndGetAreConsistentForMonthString() throws Exception {
+    void setAndGetAreConsistentForMonthString() {
         entry.setField(StandardField.MONTH, "#may#");
         assertEquals(Optional.of("#may#"), entry.getField(StandardField.MONTH));
     }
 
     @Test
-    void monthCorrectlyReturnedForMonth() throws Exception {
+    void monthCorrectlyReturnedForMonth() {
         entry.setField(StandardField.MONTH, "may");
         assertEquals(Optional.of(Month.MAY), entry.getMonth());
     }
 
     @Test
-    void monthCorrectlyReturnedForCapitalizedMonth() throws Exception {
+    void monthCorrectlyReturnedForCapitalizedMonth() {
         entry.setField(StandardField.MONTH, "May");
         assertEquals(Optional.of(Month.MAY), entry.getMonth());
     }
 
     @Test
-    void monthCorrectlyReturnedForMonthString() throws Exception {
+    void monthCorrectlyReturnedForMonthString() {
         entry.setField(StandardField.MONTH, "#may#");
         assertEquals(Optional.of(Month.MAY), entry.getMonth());
     }
 
     @Test
-    void monthCorrectlyReturnedForMonthMay() throws Exception {
+    void monthCorrectlyReturnedForMonthMay() {
         entry.setMonth(Month.MAY);
         assertEquals(Optional.of(Month.MAY), entry.getMonth());
     }
 
     @Test
-    void monthFieldCorrectlyReturnedForMonthMay() throws Exception {
+    void monthFieldCorrectlyReturnedForMonthMay() {
         entry.setMonth(Month.MAY);
         assertEquals(Optional.of("#may#"), entry.getField(StandardField.MONTH));
     }
@@ -362,23 +362,23 @@ class BibEntryTest {
     }
 
     @Test
-    void identicObjectsareEqual() throws Exception {
+    void identicObjectsareEqual() {
         BibEntry otherEntry = entry;
         assertEquals(entry, otherEntry);
     }
 
     @Test
-    void compareToNullObjectIsFalse() throws Exception {
+    void compareToNullObjectIsFalse() {
         assertNotEquals(null, entry);
     }
 
     @Test
-    void compareToDifferentClassIsFalse() throws Exception {
+    void compareToDifferentClassIsFalse() {
         assertNotEquals(entry, new Object());
     }
 
     @Test
-    void compareIsTrueWhenIdAndFieldsAreEqual() throws Exception {
+    void compareIsTrueWhenIdAndFieldsAreEqual() {
         entry.setId("1");
         entry.setField(new UnknownField("key"), "value");
         BibEntry otherEntry = new BibEntry();

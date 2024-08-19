@@ -868,7 +868,7 @@ TextFlow > .tooltip-text-monospaced {
 .text-input {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
-    -fx-prompt-text-fill: -fx-mid-text-color;
+    -fx-prompt-text-fill: -jr-gray-2;
 }
 
 .text-input:focused {

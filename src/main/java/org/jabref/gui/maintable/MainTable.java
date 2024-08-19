@@ -303,7 +303,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         MatchCategory currentMatchCategory = selectedEntry.matchCategory().get();
         for (int i = getSelectionModel().getSelectedIndex(); i < getItems().size(); i++) {
-            if (!getItems().get(i).matchCategory().get().equals(currentMatchCategory)) {
+            if (getItems().get(i).matchCategory().get() != currentMatchCategory) {
                 getSelectionModel().clearSelection();
                 getSelectionModel().select(i);
                 scrollTo(i);
@@ -320,10 +320,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         MatchCategory currentMatchCategory = selectedEntry.matchCategory().get();
         for (int i = getSelectionModel().getSelectedIndex(); i >= 0; i--) {
-            if (!getItems().get(i).matchCategory().get().equals(currentMatchCategory)) {
+            if (getItems().get(i).matchCategory().get() != currentMatchCategory) {
                 MatchCategory targetMatchCategory = getItems().get(i).matchCategory().get();
                 // found the previous category, scroll to the first entry of that category
-                while ((i >= 0) && getItems().get(i).matchCategory().get().equals(targetMatchCategory)) {
+                while ((i >= 0) && getItems().get(i).matchCategory().get() == targetMatchCategory) {
                     i--;
                 }
                 getSelectionModel().clearSelection();
