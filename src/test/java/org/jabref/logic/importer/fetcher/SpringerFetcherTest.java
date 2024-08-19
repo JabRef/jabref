@@ -157,16 +157,29 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     @Test
     @Disabled("Year search is currently broken, because the API returns mutliple years.")
     @Override
-    public void supportsYearSearch() {
+    void supportsYearSearch() {
     }
 
     @Test
     @Disabled("Year range search is not natively supported by the API, but can be emulated by multiple single year searches.")
     @Override
-    public void supportsYearRangeSearch() {
+    void supportsYearRangeSearch() {
     }
 
     @Test
+    @Disabled("401 as of 2024-08-18")
+    @Override
+    void supportsAuthorSearch() {
+    }
+
+    @Test
+    @Disabled("401 as of 2024-08-18")
+    @Override
+    void supportsJournalSearch() {
+    }
+
+    @Test
+    @Disabled("401 as of 2024-08-18")
     void supportsPhraseSearch() throws Exception {
         // Normal search should match due to Redmiles, Elissa M., phrase search on the other hand should not find it.
         BibEntry expected = new BibEntry(StandardEntryType.InCollection)
@@ -192,6 +205,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     }
 
     @Test
+    @Disabled("401 as of 2024-08-18")
     void supportsBooleanANDSearch() throws Exception {
         List<BibEntry> resultJustByAuthor = fetcher.performSearch("author:\"Redmiles, David\"");
         List<BibEntry> result = fetcher.performSearch("author:\"Redmiles, David\" AND journal:\"Computer Supported Cooperative Work\"");
