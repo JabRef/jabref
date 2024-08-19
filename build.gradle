@@ -29,7 +29,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '6.17.1'
+    id 'org.openrewrite.rewrite' version '6.20.0'
 }
 
 // Enable following for debugging
@@ -172,7 +172,7 @@ dependencies {
     implementation "org.apache.lucene:lucene-highlighter:$luceneVersion"
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.11.0'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.15.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.16.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
     implementation 'commons-logging:commons-logging:1.3.3'
     implementation 'com.h2database:h2-mvstore:2.3.230'
@@ -236,7 +236,7 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.3'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.32.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.43.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
@@ -297,7 +297,7 @@ dependencies {
     // API
     implementation 'jakarta.ws.rs:jakarta.ws.rs-api:4.0.0'
     // Implementation of the API
-    implementation 'org.glassfish.jersey.core:jersey-server:3.1.7'
+    implementation 'org.glassfish.jersey.core:jersey-server:3.1.8'
     // injection framework
     implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.8'
     implementation 'org.glassfish.hk2:hk2-api:3.1.1'
@@ -345,7 +345,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.16.1'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.174'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.3'
 
     testImplementation 'org.mockito:mockito-core:5.12.0'
@@ -362,7 +362,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.16.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.17.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
