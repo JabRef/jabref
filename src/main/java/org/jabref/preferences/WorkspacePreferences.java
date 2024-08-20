@@ -163,7 +163,7 @@ public class WorkspacePreferences {
         this.confirmDelete.set(confirmDelete);
     }
 
-    public List<String> getSelectedSlrFetchers() {
+    public ObservableList<String> getSelectedSlrFetchers() {
         return selectedSlrFetchers;
     }
 
