@@ -2187,7 +2187,6 @@ public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
                 getStringList(SELECTED_SLR_FETCHERS));
-        putStringList(SELECTED_SLR_FETCHERS, new ArrayList<>(workspacePreferences.getSelectedSlrFetchers()));
 
         EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
