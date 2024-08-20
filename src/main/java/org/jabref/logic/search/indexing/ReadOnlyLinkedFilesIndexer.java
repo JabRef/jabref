@@ -9,7 +9,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.LuceneIndexer;
 
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -20,7 +19,6 @@ public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReadOnlyLinkedFilesIndexer.class);
     private Directory indexDirectory;
     private SearcherManager searcherManager;
-    private IndexSearcher indexSearcher;
 
     public ReadOnlyLinkedFilesIndexer(BibDatabaseContext databaseContext) {
         try {
@@ -56,17 +54,8 @@ public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
     }
 
     @Override
-    public IndexSearcher getIndexSearcher() {
-        try {
-            if (indexSearcher != null) {
-                searcherManager.release(indexSearcher);
-            }
-            searcherManager.maybeRefresh();
-            indexSearcher = searcherManager.acquire();
-        } catch (IOException e) {
-            LOGGER.error("Error refreshing searcher", e);
-        }
-        return indexSearcher;
+    public SearcherManager getSearcherManager() {
+        return searcherManager;
     }
 
     @Override

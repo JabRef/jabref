@@ -210,6 +210,7 @@ public class MainTableDataModel {
                     if (index >= 0) {
                         BibEntryTableViewModel viewModel = entriesViewModel.get(index);
                         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
+                        boolean isMatched = true;
                         if (searchQueryProperty.get().isPresent()) {
                             SearchQuery searchQuery = searchQueryProperty.get().get();
                             String newSearchExpression = "+" + SearchFieldConstants.ENTRY_ID + ":" + entry.getId() + " +" + searchQuery.getSearchExpression();
@@ -218,12 +219,12 @@ public class MainTableDataModel {
 
                             viewModel.searchScoreProperty().set(results.getSearchScoreForEntry(entry));
                             viewModel.hasFullTextResultsProperty().set(results.hasFulltextResults(entry));
-                            updateEntrySearchMatch(viewModel, viewModel.searchScoreProperty().get() > 0, isFloatingMode);
+                            isMatched = viewModel.searchScoreProperty().get() > 0;
                         } else {
                             viewModel.searchScoreProperty().set(0);
                             viewModel.hasFullTextResultsProperty().set(false);
-                            updateEntrySearchMatch(viewModel, true, isFloatingMode);
                         }
+                        updateEntrySearchMatch(viewModel, isMatched, isFloatingMode);
                         updateEntryGroupMatch(viewModel, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
                     }
                     return index;
@@ -240,8 +241,8 @@ public class MainTableDataModel {
 
         private void setLuceneManagerForSearchGroups(GroupTreeNode root) {
             for (GroupTreeNode node : root.getChildren()) {
-                if (node.getGroup() instanceof SearchGroup) {
-                    ((SearchGroup) node.getGroup()).setLuceneManager(luceneManager);
+                if (node.getGroup() instanceof SearchGroup searchGroup) {
+                    searchGroup.setLuceneManager(luceneManager);
                 }
                 setLuceneManagerForSearchGroups(node);
             }

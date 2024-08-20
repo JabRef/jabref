@@ -19,7 +19,6 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.store.Directory;
@@ -33,19 +32,22 @@ public class BibFieldsIndexer implements LuceneIndexer {
     private final BibDatabaseContext databaseContext;
     private final String libraryName;
     private final Directory indexDirectory;
-    private final IndexWriter indexWriter;
-    private final SearcherManager searcherManager;
-    private IndexSearcher indexSearcher;
+    private IndexWriter indexWriter;
+    private SearcherManager searcherManager;
 
-    public BibFieldsIndexer(BibDatabaseContext databaseContext) throws IOException {
+    public BibFieldsIndexer(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "unsaved");
 
         IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.NGram_Analyzer_For_INDEXING);
 
         this.indexDirectory = new ByteBuffersDirectory();
-        this.indexWriter = new IndexWriter(indexDirectory, config);
-        this.searcherManager = new SearcherManager(indexWriter, null);
+        try {
+            this.indexWriter = new IndexWriter(indexDirectory, config);
+            this.searcherManager = new SearcherManager(indexWriter, null);
+        } catch (IOException e) {
+            LOGGER.error("Error initializing bib fields index", e);
+        }
     }
 
     @Override
@@ -147,19 +149,8 @@ public class BibFieldsIndexer implements LuceneIndexer {
     }
 
     @Override
-    public IndexSearcher getIndexSearcher() {
-        LOGGER.debug("Getting index searcher for bib fields index");
-        try {
-            if (indexSearcher != null) {
-                LOGGER.debug("Releasing bib fields index searcher");
-                searcherManager.release(indexSearcher);
-            }
-            searcherManager.maybeRefresh();
-            indexSearcher = searcherManager.acquire();
-        } catch (IOException e) {
-            LOGGER.error("Error refreshing searcher for bib fields index", e);
-        }
-        return indexSearcher;
+    public SearcherManager getSearcherManager() {
+        return searcherManager;
     }
 
     @Override

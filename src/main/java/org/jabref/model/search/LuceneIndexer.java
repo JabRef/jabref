@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.SearcherManager;
 
 public interface LuceneIndexer {
     void updateOnStart(BackgroundTask<?> task);
@@ -20,7 +20,7 @@ public interface LuceneIndexer {
 
     void rebuildIndex(BackgroundTask<?> task);
 
-    IndexSearcher getIndexSearcher();
+    SearcherManager getSearcherManager();
 
     void close();
 }

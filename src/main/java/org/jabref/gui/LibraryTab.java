@@ -290,7 +290,7 @@ public class LibraryTab extends Tab {
     }
 
     public void setLuceneManager() {
-        luceneManager = new LuceneManager(bibDatabaseContext, taskExecutor, preferencesService);
+        luceneManager = new LuceneManager(bibDatabaseContext, taskExecutor, preferencesService.getFilePreferences());
         luceneManager.updateOnStart();
     }
 

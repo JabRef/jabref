@@ -57,7 +57,6 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     private final SearcherManager searcherManager;
     private Path indexDirectoryPath;
     private Map<String, Long> indexedFiles;
-    private IndexSearcher indexSearcher;
 
     public DefaultLinkedFilesIndexer(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
         this.databaseContext = databaseContext;
@@ -238,7 +237,8 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         Map<String, Long> linkedFiles = new HashMap<>();
         try {
             TermQuery query = new TermQuery(new Term(SearchFieldConstants.PAGE_NUMBER.toString(), "1"));
-            IndexSearcher searcher = getIndexSearcher();
+            searcherManager.maybeRefresh();
+            IndexSearcher searcher = searcherManager.acquire();
             StoredFields storedFields = searcher.storedFields();
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
@@ -249,6 +249,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
                     linkedFiles.put(pathField.stringValue(), Long.valueOf(modifiedField.stringValue()));
                 }
             }
+            searcherManager.release(searcher);
         } catch (IOException e) {
             LOGGER.error("Error getting linked files from index", e);
         }
@@ -287,18 +288,6 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         }
     }
 
-    @Override
-    public IndexSearcher getIndexSearcher() {
-        LOGGER.debug("Getting index searcher for linked files index");
-        try {
-            searcherManager.maybeRefresh();
-            indexSearcher = searcherManager.acquire();
-        } catch (IOException e) {
-            LOGGER.error("Error refreshing searcher", e);
-        }
-        return indexSearcher;
-    }
-
     private void optimizeIndex() {
         LOGGER.debug("Optimizing index");
         if (indexWriter.hasDeletions()) {
@@ -315,6 +304,11 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         } catch (IOException e) {
             LOGGER.warn("Could not force merge segments.", e);
         }
+    }
+
+    @Override
+    public SearcherManager getSearcherManager() {
+        return searcherManager;
     }
 
     @Override
