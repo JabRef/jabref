@@ -5,7 +5,7 @@ name: Deployment (JDK early access builds)
 
 on:
   schedule:
-    - cron: "0 5 * * 2"
+    - cron: "0 18 * * 1"
   pull_request:
     paths:
       - .github/workflows/deployment-jdk-ea.yml

@@ -17,6 +17,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.output.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This class listens to preferences changes.
  */
-public class JabRefEmbeddingModel implements dev.langchain4j.model.embedding.EmbeddingModel, AutoCloseable {
+public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefEmbeddingModel.class);
 
     private final AiPreferences aiPreferences;

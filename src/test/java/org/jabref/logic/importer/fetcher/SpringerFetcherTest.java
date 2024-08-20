@@ -168,6 +168,19 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     }
 
     @Test
+    @Disabled("401 as of 2024-08-18")
+    @Override
+    public void supportsAuthorSearch() {
+    }
+
+    @Test
+    @Disabled("401 as of 2024-08-18")
+    @Override
+    public void supportsJournalSearch() {
+    }
+
+    @Test
+    @Disabled("401 as of 2024-08-18")
     public void supportsPhraseSearch() throws Exception {
         // Normal search should match due to Redmiles, Elissa M., phrase search on the other hand should not find it.
         BibEntry expected = new BibEntry(StandardEntryType.InCollection)
@@ -193,6 +206,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     }
 
     @Test
+    @Disabled("401 as of 2024-08-18")
     public void supportsBooleanANDSearch() throws Exception {
         List<BibEntry> resultJustByAuthor = fetcher.performSearch("author:\"Redmiles, David\"");
         List<BibEntry> result = fetcher.performSearch("author:\"Redmiles, David\" AND journal:\"Computer Supported Cooperative Work\"");
