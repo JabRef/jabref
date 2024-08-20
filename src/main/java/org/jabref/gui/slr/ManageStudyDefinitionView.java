@@ -96,7 +96,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
      */
     public ManageStudyDefinitionView(Path pathToStudyDataDirectory) {
         this.pathToStudyDataDirectory = pathToStudyDataDirectory;
-        this.setTitle("Define study parameters");
+        this.setTitle(Localization.lang("Define study parameters"));
         this.study = Optional.empty();
 
         ViewLoader.view(this)
