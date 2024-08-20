@@ -35,7 +35,7 @@ class ManageStudyDefinitionViewModelTest {
 
     @Test
     void emptyStudyConstructorFillsDatabasesCorrectly() {
-        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, dialogService);
+        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, dialogService, preferencesService);
         assertEquals(List.of(
                 new StudyCatalogItem("ACM Portal", true),
                 new StudyCatalogItem("ArXiv", false),
