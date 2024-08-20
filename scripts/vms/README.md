@@ -29,7 +29,7 @@ If asked for a password, this is `vagrant`.
 #### Multiple Screens
 
 One can configure mulitple screen as the virtual machine settings of Virtual Box:
-Navigate to "Display" (1) and then adjust the number of displays (2).
+Navigate to "Display" (1), set "Video Memory" to the maximum value (2), and then adjust the number of displays (3).
 
 ![Virtual Box settings for multiple screens at VM settings](virtualbox-multiple-screens-1.png)
 
