@@ -33,7 +33,7 @@ public class LuceneManager {
     private final EventBus eventBus = new EventBus();
     private final TaskExecutor taskExecutor;
     private final BooleanProperty shouldIndexLinkedFiles;
-    private final BooleanProperty isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);;
+    private final BooleanProperty isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
     private final ChangeListener<Boolean> preferencesListener;
     private final LuceneSearcher luceneSearcher;
     private final LuceneIndexer bibFieldsIndexer;
