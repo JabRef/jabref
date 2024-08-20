@@ -19,19 +19,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class EntryAnnotationImporterTest {
+class EntryAnnotationImporterTest {
 
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private BibEntry entry;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         entry = new BibEntry();
         when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs/")));
     }
 
     @Test
-    public void readEntryExampleThesis() {
+    void readEntryExampleThesis() {
         // given
         entry.setField(StandardField.FILE, ":thesis-example.pdf:PDF");
         EntryAnnotationImporter entryAnnotationImporter = new EntryAnnotationImporter(entry);

@@ -22,10 +22,10 @@ import static org.mockito.Mockito.mock;
 
 @Disabled("Page https://doi-to-bibtex-converter.herokuapp.com is down")
 @FetcherTest
-public class DoiToBibtexConverterComIsbnFetcherTest extends AbstractIsbnFetcherTest {
+class DoiToBibtexConverterComIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         bibEntryEffectiveJava = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Effective Java(TM) Programming Language Guide (2nd Edition) (The Java Series)")
                 .withField(StandardField.PUBLISHER, "Prentice Hall PTR")
@@ -73,17 +73,17 @@ public class DoiToBibtexConverterComIsbnFetcherTest extends AbstractIsbnFetcherT
     }
 
     @Test
-    public void isbnNeitherAvailable() {
+    void isbnNeitherAvailable() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("9785646216541"));
     }
 
     @Test
-    public void searchByIdFailedWithLongISBN() {
+    void searchByIdFailedWithLongISBN() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("9780321356680"));
     }
 
     @Test
-    public void searchByIdFailedWithShortISBN() throws FetcherException {
+    void searchByIdFailedWithShortISBN() throws FetcherException {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("0321356683"));
     }
 }

@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AuthorAndsCommaReplacerTest {
+class AuthorAndsCommaReplacerTest {
 
     /**
      * Test method for {@link org.jabref.logic.layout.format.AuthorAndsCommaReplacer#format(java.lang.String)}.
      */
     @Test
-    public void format() {
+    void format() {
         LayoutFormatter a = new AuthorAndsCommaReplacer();
 
         // Empty case

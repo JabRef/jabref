@@ -10,17 +10,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ConvertToBiblatexCleanupTest {
+class ConvertToBiblatexCleanupTest {
 
     private ConvertToBiblatexCleanup worker;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         worker = new ConvertToBiblatexCleanup();
     }
 
     @Test
-    public void cleanupMovesYearMonthToDate() {
+    void cleanupMovesYearMonthToDate() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "2011");
         entry.setField(StandardField.MONTH, "#jan#");
@@ -33,7 +33,7 @@ public class ConvertToBiblatexCleanupTest {
     }
 
     @Test
-    public void cleanupWithDateAlreadyPresentAndDifferentFromYearDoesNothing() {
+    void cleanupWithDateAlreadyPresentAndDifferentFromYearDoesNothing() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "2011");
         entry.setField(StandardField.MONTH, "#jan#");
@@ -47,7 +47,7 @@ public class ConvertToBiblatexCleanupTest {
     }
 
     @Test
-    public void cleanupWithDateAlreadyPresentAndDifferentFromMonthDoesNothing() {
+    void cleanupWithDateAlreadyPresentAndDifferentFromMonthDoesNothing() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "2011");
         entry.setField(StandardField.MONTH, "#jan#");
@@ -61,7 +61,7 @@ public class ConvertToBiblatexCleanupTest {
     }
 
     @Test
-    public void cleanupWithEmptyDateDoesNothing() {
+    void cleanupWithEmptyDateDoesNothing() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "");
         entry.setField(StandardField.MONTH, "");
@@ -75,7 +75,7 @@ public class ConvertToBiblatexCleanupTest {
     }
 
     @Test
-    public void cleanupWithDateAlreadyPresentAndEqualsToYearAndMonth() {
+    void cleanupWithDateAlreadyPresentAndEqualsToYearAndMonth() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "2011");
         entry.setField(StandardField.MONTH, "#jan#");
@@ -89,7 +89,7 @@ public class ConvertToBiblatexCleanupTest {
     }
 
     @Test
-    public void cleanupMovesJournalToJournaltitle() {
+    void cleanupMovesJournalToJournaltitle() {
         BibEntry entry = new BibEntry().withField(StandardField.JOURNAL, "Best of JabRef");
 
         worker.cleanup(entry);

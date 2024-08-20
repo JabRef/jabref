@@ -20,12 +20,12 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,7 +41,7 @@ class DBMSProcessorTest {
     private DBMSType dbmsType;
 
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws Exception {
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
         this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(ConnectorTest.getTestDBMSConnection(dbmsType));
@@ -50,7 +50,7 @@ class DBMSProcessorTest {
     }
 
     @AfterEach
-    public void closeDbmsConnection() throws SQLException {
+    void closeDbmsConnection() throws SQLException {
         this.dbmsConnection.getConnection().close();
     }
 
@@ -436,7 +436,7 @@ class DBMSProcessorTest {
     // Oracle does not support multiple tuple insertion in one INSERT INTO command.
     // Therefore this function was defined to improve the readability and to keep the code short.
     private void insertMetaData(String key, String value, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
-        Assertions.assertDoesNotThrow(() -> {
+        assertDoesNotThrow(() -> {
             dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape_Table("METADATA", dbmsProcessor) + "("
                     + escape("KEY", dbmsProcessor) + ", " + escape("VALUE", dbmsProcessor) + ") VALUES("
                     + escapeValue(key) + ", " + escapeValue(value) + ")");

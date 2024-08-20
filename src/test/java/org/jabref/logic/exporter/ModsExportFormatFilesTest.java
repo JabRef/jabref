@@ -52,7 +52,7 @@ public class ModsExportFormatFilesTest {
     }
 
     @BeforeEach
-    public void setUp(@TempDir Path testFolder) throws Exception {
+    void setUp(@TempDir Path testFolder) throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -70,7 +70,7 @@ public class ModsExportFormatFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public final void performExport(String filename) throws Exception {
+    final void performExport(String filename) throws Exception {
         importFile = Path.of(ModsExportFormatFilesTest.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile).getDatabase().getEntries();
@@ -85,7 +85,7 @@ public class ModsExportFormatFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public final void exportAsModsAndThenImportAsMods(String filename) throws Exception {
+    final void exportAsModsAndThenImportAsMods(String filename) throws Exception {
         importFile = Path.of(ModsExportFormatFilesTest.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile).getDatabase().getEntries();
 
@@ -95,7 +95,7 @@ public class ModsExportFormatFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public final void importAsModsAndExportAsMods(String filename) throws Exception {
+    final void importAsModsAndExportAsMods(String filename) throws Exception {
         importFile = Path.of(ModsExportFormatFilesTest.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
         Path xmlFile = Path.of(ModsExportFormatFilesTest.class.getResource(xmlFileName).toURI());

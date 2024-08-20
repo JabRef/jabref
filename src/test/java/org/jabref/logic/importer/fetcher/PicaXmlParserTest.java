@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @FetcherTest
-public class PicaXmlParserTest {
+class PicaXmlParserTest {
 
     private void doTest(String xmlName, int expectedSize, List<String> resourceNames) throws Exception {
         try (InputStream is = PicaXmlParserTest.class.getResourceAsStream(xmlName)) {
@@ -35,22 +35,22 @@ public class PicaXmlParserTest {
     }
 
     @Test
-    public void emptyResult() throws Exception {
+    void emptyResult() throws Exception {
         doTest("gvk_empty_result_because_of_bad_query.xml", 0, Collections.emptyList());
     }
 
     @Test
-    public void resultFor797485368() throws Exception {
+    void resultFor797485368() throws Exception {
         doTest("gvk_result_for_797485368.xml", 1, Collections.singletonList("gvk_result_for_797485368.bib"));
     }
 
     @Test
-    public void gMP() throws Exception {
+    void gMP() throws Exception {
         doTest("gvk_gmp.xml", 2, Arrays.asList("gvk_gmp.1.bib", "gvk_gmp.2.bib"));
     }
 
     @Test
-    public void subTitleTest() throws Exception {
+    void subTitleTest() throws Exception {
         try (InputStream is = PicaXmlParserTest.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
             PicaXmlParser parser = new PicaXmlParser();
             List<BibEntry> entries = parser.parseEntries(is);

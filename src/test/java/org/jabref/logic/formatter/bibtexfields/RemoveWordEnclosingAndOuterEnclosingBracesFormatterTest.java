@@ -6,7 +6,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RemoveWordEnclosingAndOuterEnclosingBracesFormatterTest {
+class RemoveWordEnclosingAndOuterEnclosingBracesFormatterTest {
     private final RemoveWordEnclosingAndOuterEnclosingBracesFormatter formatter = new RemoveWordEnclosingAndOuterEnclosingBracesFormatter();
 
     @ParameterizedTest
@@ -20,12 +20,12 @@ public class RemoveWordEnclosingAndOuterEnclosingBracesFormatterTest {
             "Vall{\\'e}e Poussin, {Vall{\\'e}e Poussin}",
             "Vall{\\'e}e Poussin, Vall{\\'e}e Poussin"
     })
-    public void format(String expected, String input) {
+    void format(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("In CDMA", formatter.format(formatter.getExampleInput()));
     }
 }

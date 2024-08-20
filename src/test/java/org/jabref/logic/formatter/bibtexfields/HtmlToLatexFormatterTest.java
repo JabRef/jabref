@@ -8,42 +8,42 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class HtmlToLatexFormatterTest {
+class HtmlToLatexFormatterTest {
 
     private HtmlToLatexFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new HtmlToLatexFormatter();
     }
 
     @Test
-    public void formatWithoutHtmlCharactersReturnsSameString() {
+    void formatWithoutHtmlCharactersReturnsSameString() {
         assertEquals("abc", formatter.format("abc"));
     }
 
     @Test
-    public void formatIeeeHtml() {
+    void formatIeeeHtml() {
         assertEquals("Towards situation-aware adaptive workflows: SitOPT --- A general purpose situation-aware workflow management system", formatter.format("Towards situation-aware adaptive workflows: SitOPT &amp;#x2014; A general purpose situation-aware workflow management system"));
     }
 
     @Test
-    public void formatMultipleHtmlCharacters() {
+    void formatMultipleHtmlCharacters() {
         assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", formatter.format("&aring;&auml;&ouml;"));
     }
 
     @Test
-    public void formatCombinedAccent() {
+    void formatCombinedAccent() {
         assertEquals("{\\'{\\i}}", formatter.format("i&#x301;"));
     }
 
     @Test
-    public void basic() {
+    void basic() {
         assertEquals("aaa", formatter.format("aaa"));
     }
 
     @Test
-    public void html() {
+    void html() {
         assertEquals("{\\\"{a}}", formatter.format("&auml;"));
         assertEquals("{\\\"{a}}", formatter.format("&#228;"));
         assertEquals("{\\\"{a}}", formatter.format("&#xe4;"));
@@ -51,12 +51,12 @@ public class HtmlToLatexFormatterTest {
     }
 
     @Test
-    public void htmlRemoveTags() {
+    void htmlRemoveTags() {
         assertEquals("aaa", formatter.format("<b>aaa</b>"));
     }
 
     @Test
-    public void htmlCombiningAccents() {
+    void htmlCombiningAccents() {
         assertEquals("{\\\"{a}}", formatter.format("a&#776;"));
         assertEquals("{\\\"{a}}", formatter.format("a&#x308;"));
         assertEquals("{\\\"{a}}b", formatter.format("a&#776;b"));
@@ -64,13 +64,13 @@ public class HtmlToLatexFormatterTest {
     }
 
     @Test
-    public void keepsSingleLessThan() {
+    void keepsSingleLessThan() {
         String text = "(p < 0.01)";
         assertEquals(text, formatter.format(text));
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("JabRef", formatter.format(formatter.getExampleInput()));
     }
 }

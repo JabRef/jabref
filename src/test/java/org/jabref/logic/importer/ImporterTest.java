@@ -39,56 +39,56 @@ public class ImporterTest {
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void isRecognizedFormatWithNullForBufferedReaderThrowsException(Importer format) {
+    void isRecognizedFormatWithNullForBufferedReaderThrowsException(Importer format) {
         assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((BufferedReader) null));
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
+    void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
         assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void importDatabaseWithNullForBufferedReaderThrowsException(Importer format) {
+    void importDatabaseWithNullForBufferedReaderThrowsException(Importer format) {
         assertThrows(NullPointerException.class, () -> format.importDatabase((BufferedReader) null));
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void importDatabaseWithNullForStringThrowsException(Importer format) {
+    void importDatabaseWithNullForStringThrowsException(Importer format) {
         assertThrows(NullPointerException.class, () -> format.importDatabase((String) null));
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void getFormatterNameDoesNotReturnNull(Importer format) {
+    void getFormatterNameDoesNotReturnNull(Importer format) {
         assertNotNull(format.getName());
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void getFileTypeDoesNotReturnNull(Importer format) {
+    void getFileTypeDoesNotReturnNull(Importer format) {
         assertNotNull(format.getFileType());
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void getIdDoesNotReturnNull(Importer format) {
+    void getIdDoesNotReturnNull(Importer format) {
         assertNotNull(format.getId());
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void getIdDoesNotContainWhitespace(Importer format) {
+    void getIdDoesNotContainWhitespace(Importer format) {
         Pattern whitespacePattern = Pattern.compile("\\s");
         assertFalse(whitespacePattern.matcher(format.getId()).find());
     }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void getIdStripsSpecialCharactersAndConvertsToLowercase(Importer format) {
+    void getIdStripsSpecialCharactersAndConvertsToLowercase(Importer format) {
         Importer importer = mock(Importer.class, Mockito.CALLS_REAL_METHODS);
         when(importer.getName()).thenReturn("*Test-Importer");
         assertEquals("testimporter", importer.getId());
@@ -96,7 +96,7 @@ public class ImporterTest {
 
     @ParameterizedTest
     @MethodSource("instancesToTest")
-    public void getDescriptionDoesNotReturnNull(Importer format) {
+    void getDescriptionDoesNotReturnNull(Importer format) {
         assertNotNull(format.getDescription());
     }
 

@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DatabaseSearcherWithBibFilesTest {
+class DatabaseSearcherWithBibFilesTest {
 
     private static BibEntry titleSentenceCased = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("title-sentence-cased")
@@ -109,7 +109,7 @@ public class DatabaseSearcherWithBibFilesTest {
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    void tearDown() throws Exception {
         pdfIndexer.close();
     }
 
@@ -166,7 +166,7 @@ public class DatabaseSearcherWithBibFilesTest {
 
     @ParameterizedTest(name = "{index} => query={2}, searchFlags={3}, testFile={1}, expected={0}")
     @MethodSource
-    public void searchLibrary(List<BibEntry> expected, String testFile, String query, EnumSet<SearchRules.SearchFlags> searchFlags) throws Exception {
+    void searchLibrary(List<BibEntry> expected, String testFile, String query, EnumSet<SearchRules.SearchFlags> searchFlags) throws Exception {
         BibDatabase database = initializeDatabaseFromPath(testFile);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), database).getMatches();
         assertEquals(expected, matches);

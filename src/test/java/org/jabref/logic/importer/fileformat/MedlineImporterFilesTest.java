@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class MedlineImporterFilesTest {
+class MedlineImporterFilesTest {
 
     private static final String FILE_ENDING = ".xml";
 
@@ -26,19 +26,19 @@ public class MedlineImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void isRecognizedFormat(String fileName) throws IOException {
+    void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new MedlineImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void isNotRecognizedFormat(String fileName) throws IOException {
+    void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(new MedlineImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void importEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new MedlineImporter(), fileName, FILE_ENDING);
     }
 
@@ -50,7 +50,7 @@ public class MedlineImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("malformedFileNames")
-    public void importMalfomedFiles(String fileName) throws IOException {
+    void importMalfomedFiles(String fileName) throws IOException {
         ImporterTestEngine.testImportMalformedFiles(new MedlineImporter(), fileName);
     }
 }

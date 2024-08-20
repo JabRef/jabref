@@ -29,7 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 
-public class EndnoteXmlExporterFilesTest {
+class EndnoteXmlExporterFilesTest {
 
     private Exporter exporter;
     private BibDatabaseContext databaseContext;
@@ -39,7 +39,7 @@ public class EndnoteXmlExporterFilesTest {
     private EndnoteXmlImporter endnoteXmlImporter;
 
     @BeforeEach
-    public void setUp(@TempDir Path testFolder) throws Exception {
+    void setUp(@TempDir Path testFolder) throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -65,7 +65,7 @@ public class EndnoteXmlExporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public final void performExport(String filename) throws Exception {
+    final void performExport(String filename) throws Exception {
         bibFileToExport = Path.of(EndnoteXmlExporterFilesTest.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(bibFileToExport).getDatabase().getEntries();
         exporter.export(databaseContext, exportFile, entries);
@@ -86,7 +86,7 @@ public class EndnoteXmlExporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public final void exportAsEndnoteAndThenImportAsEndnote(String filename) throws Exception {
+    final void exportAsEndnoteAndThenImportAsEndnote(String filename) throws Exception {
         bibFileToExport = Path.of(EndnoteXmlExporterFilesTest.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(bibFileToExport).getDatabase().getEntries();
 

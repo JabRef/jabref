@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 
 @DatabaseTest
 @Execution(ExecutionMode.SAME_THREAD)
-public class DBMSSynchronizerTest {
+class DBMSSynchronizerTest {
 
     private DBMSSynchronizer dbmsSynchronizer;
     private BibDatabase bibDatabase;
@@ -56,7 +56,7 @@ public class DBMSSynchronizerTest {
     }
 
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws Exception {
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
         this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
@@ -76,12 +76,12 @@ public class DBMSSynchronizerTest {
     }
 
     @AfterEach
-    public void clear() {
+    void clear() {
         dbmsSynchronizer.closeSharedDatabase();
     }
 
     @Test
-    public void entryAddedEventListener() throws Exception {
+    void entryAddedEventListener() throws Exception {
         BibEntry expectedEntry = createExampleBibEntry(1);
         BibEntry furtherEntry = createExampleBibEntry(1);
 
@@ -95,7 +95,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void twoLocalFieldChangesAreSynchronizedCorrectly() throws Exception {
+    void twoLocalFieldChangesAreSynchronizedCorrectly() throws Exception {
         BibEntry expectedEntry = createExampleBibEntry(1);
         expectedEntry.registerListener(dbmsSynchronizer);
 
@@ -108,7 +108,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void oneLocalAndOneSharedFieldChangeIsSynchronizedCorrectly() throws Exception {
+    void oneLocalAndOneSharedFieldChangeIsSynchronizedCorrectly() throws Exception {
         BibEntry exampleBibEntry = createExampleBibEntry(1);
         exampleBibEntry.registerListener(dbmsSynchronizer);
 
@@ -126,7 +126,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void entriesRemovedEventListener() throws Exception {
+    void entriesRemovedEventListener() throws Exception {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
 
@@ -148,7 +148,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void metaDataChangedEventListener() throws Exception {
+    void metaDataChangedEventListener() throws Exception {
         MetaData testMetaData = new MetaData();
         testMetaData.registerListener(dbmsSynchronizer);
         dbmsSynchronizer.setMetaData(testMetaData);
@@ -162,7 +162,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void initializeDatabases() throws Exception {
+    void initializeDatabases() throws Exception {
         dbmsSynchronizer.initializeDatabases();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
         dbmsSynchronizer.initializeDatabases();
@@ -170,7 +170,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void synchronizeLocalDatabaseWithEntryRemoval() throws Exception {
+    void synchronizeLocalDatabaseWithEntryRemoval() throws Exception {
         List<BibEntry> expectedBibEntries = Arrays.asList(createExampleBibEntry(1), createExampleBibEntry(2));
 
         dbmsProcessor.insertEntry(expectedBibEntries.getFirst());
@@ -192,7 +192,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void synchronizeLocalDatabaseWithEntryUpdate() throws Exception {
+    void synchronizeLocalDatabaseWithEntryUpdate() throws Exception {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
         assertEquals(List.of(bibEntry), bibDatabase.getEntries());
@@ -211,7 +211,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void updateEntryDoesNotModifyLocalDatabase() throws Exception {
+    void updateEntryDoesNotModifyLocalDatabase() throws Exception {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
         assertEquals(List.of(bibEntry), bibDatabase.getEntries());
@@ -228,7 +228,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void applyMetaData() throws Exception {
+    void applyMetaData() throws Exception {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
 

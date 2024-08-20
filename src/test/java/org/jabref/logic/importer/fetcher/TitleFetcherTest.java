@@ -17,13 +17,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
-public class TitleFetcherTest {
+class TitleFetcherTest {
 
     private TitleFetcher fetcher;
     private BibEntry bibEntryBischof2009;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fetcher = new TitleFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntryBischof2009 = new BibEntry(StandardEntryType.InProceedings)
@@ -38,24 +38,24 @@ public class TitleFetcherTest {
     }
 
     @Test
-    public void getName() {
+    void getName() {
         assertEquals("Title", fetcher.getName());
     }
 
     @Test
-    public void performSearchKopp2007() throws FetcherException {
+    void performSearchKopp2007() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("BPELscript: A simplified script syntax for WS-BPEL 2.0");
         assertEquals(Optional.of(bibEntryBischof2009), fetchedEntry);
     }
 
     @Test
-    public void performSearchEmptyTitle() throws FetcherException {
+    void performSearchEmptyTitle() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test
-    public void performSearchInvalidTitle() throws FetcherException {
+    void performSearchInvalidTitle() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("An unknown title where noi DOI can be determined");
         assertEquals(Optional.empty(), fetchedEntry);
     }

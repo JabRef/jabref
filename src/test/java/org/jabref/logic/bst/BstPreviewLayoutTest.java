@@ -18,7 +18,7 @@ class BstPreviewLayoutTest {
     private final BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
 
     @Test
-    public void generatePreviewForSimpleEntryUsingAbbr() throws Exception {
+    void generatePreviewForSimpleEntryUsingAbbr() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "Thoughts on Development");
@@ -28,7 +28,7 @@ class BstPreviewLayoutTest {
     }
 
     @Test
-    public void monthMayIsCorrectlyRendered() throws Exception {
+    void monthMayIsCorrectlyRendered() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "Thoughts on Development")
@@ -39,14 +39,14 @@ class BstPreviewLayoutTest {
     }
 
     @Test
-    public void generatePreviewForSliceTheoremPaperUsingAbbr() throws Exception {
+    void generatePreviewForSliceTheoremPaperUsingAbbr() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
         assertEquals("T. Diez. Slice theorem for fréchet group actions and covariant symplectic field theory. May 2014.", preview);
     }
 
     @Test
-    public void generatePreviewForSliceTheoremPaperUsingIEEE() throws Exception {
+    void generatePreviewForSliceTheoremPaperUsingIEEE() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(ClassLoader.getSystemResource("bst/IEEEtran.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
         assertEquals("T. Diez, \"Slice theorem for fréchet group actions and covariant symplectic field theory\" May 2014.", preview);

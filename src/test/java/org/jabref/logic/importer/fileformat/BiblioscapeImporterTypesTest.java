@@ -12,10 +12,11 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BiblioscapeImporterTypesTest {
 
@@ -49,6 +50,6 @@ class BiblioscapeImporterTypesTest {
         entry.setField(StandardField.YEAR, "1999");
         entry.setType(bibtexType);
 
-        Assertions.assertEquals(Collections.singletonList(entry), bibEntries);
+        assertEquals(Collections.singletonList(entry), bibEntries);
     }
 }

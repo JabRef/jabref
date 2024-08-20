@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DefaultTexParserTest {
+class DefaultTexParserTest {
 
     private final static String DARWIN = "Darwin1888";
     private final static String EINSTEIN = "Einstein1920";
@@ -40,7 +40,7 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void citeCommands() {
+    void citeCommands() {
         testMatchCite(UNRESOLVED, "\\cite[pre][post]{UnresolvedKey}");
         testMatchCite(UNRESOLVED, "\\cite*{UnresolvedKey}");
         testMatchCite(UNRESOLVED, "\\parencite[post]{UnresolvedKey}");
@@ -58,7 +58,7 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void twoCitationsSameLine() {
+    void twoCitationsSameLine() {
         Path path = Path.of("");
         String citeString = "\\citep{Einstein1920c} and \\citep{Einstein1920a}";
 
@@ -72,7 +72,7 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void fileEncodingUtf8() throws URISyntaxException {
+    void fileEncodingUtf8() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("utf-8.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
@@ -84,7 +84,7 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void fileEncodingIso88591() throws URISyntaxException {
+    void fileEncodingIso88591() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
@@ -97,7 +97,7 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void fileEncodingIso885915() throws URISyntaxException {
+    void fileEncodingIso885915() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
@@ -110,7 +110,7 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void fileEncodingForThreeFiles() throws URISyntaxException {
+    void fileEncodingForThreeFiles() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("utf-8.tex").toURI());
         Path texFile2 = Path.of(DefaultTexParserTest.class.getResource("iso-8859-1.tex").toURI());
         Path texFile3 = Path.of(DefaultTexParserTest.class.getResource("iso-8859-15.tex").toURI());
@@ -130,7 +130,7 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void singleFile() throws URISyntaxException {
+    void singleFile() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("paper.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
@@ -146,7 +146,7 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void twoFiles() throws URISyntaxException {
+    void twoFiles() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("paper.tex").toURI());
         Path texFile2 = Path.of(DefaultTexParserTest.class.getResource("paper2.tex").toURI());
 
@@ -171,7 +171,7 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void duplicateFiles() throws URISyntaxException {
+    void duplicateFiles() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("paper.tex").toURI());
 
         LatexParserResults parserResults = new DefaultLatexParser().parse(List.of(texFile, texFile));
@@ -190,7 +190,7 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void unknownKey() throws URISyntaxException {
+    void unknownKey() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("unknown_key.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
@@ -205,14 +205,14 @@ public class DefaultTexParserTest {
     }
 
     @Test
-    public void fileNotFound() {
+    void fileNotFound() {
         Path texFile = Path.of("file_not_found.tex");
         Optional<LatexParserResult> parserResult = new DefaultLatexParser().parse(texFile);
         assertEquals(Optional.empty(), parserResult);
     }
 
     @Test
-    public void nestedFiles() throws URISyntaxException {
+    void nestedFiles() throws URISyntaxException {
         Path texFile = Path.of(DefaultTexParserTest.class.getResource("nested.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile).get();
