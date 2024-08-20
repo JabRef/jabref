@@ -239,7 +239,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 })
                 .install(catalogTable);
 
-        viewModel.initializeSelectedCatalogs();
+        if (study.isEmpty()) {
+            viewModel.initializeSelectedCatalogs();
+        }
 
         catalogColumn.setReorderable(false);
         catalogColumn.setCellFactory(TextFieldTableCell.forTableColumn());
