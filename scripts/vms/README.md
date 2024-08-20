@@ -18,8 +18,9 @@ This folder contains directories making use of [Vagrant](https://www.vagrantup.c
 
 1. `cd` into `{vmdir}`, e..g, `cd ubuntu`
 2. Start the vm `vagrant up`
-3. Ensure that the guest additions are up to date: `vagrant vbguest --do install`
-4. Linux machines: Store ssh configuration: `vagrant ssh-config > vagrant-ssh`
+3. Restart the vm
+4. Ensure that the guest additions are up to date: `vagrant vbguest --do install`
+5. Linux virtual machines: Store ssh configuration: `vagrant ssh-config > vagrant-ssh`
 
 ### Use VM
 
@@ -70,3 +71,7 @@ More info on snaps is available at <https://snapcraft.io/docs/quickstart-tour>.
 > `An error occurred during installation of VirtualBox Guest Additions 7.0.20. Some functionality may not work as intended.`
 
 Install the guest additions manually by "Devices" > "Install Virtual Box Gueat Additions".
+
+> I get a strange installation error.
+
+Look at <https://stackoverflow.com/a/78040474/873282>.
