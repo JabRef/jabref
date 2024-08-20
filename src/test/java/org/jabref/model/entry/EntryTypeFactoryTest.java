@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class EntryTypeFactoryTest {
+class EntryTypeFactoryTest {
 
     @Test
-    public void parseEntryTypePatent() {
+    void parseEntryTypePatent() {
         EntryType patent = IEEETranEntryType.Patent;
         assertEquals(patent, EntryTypeFactory.parse("patent"));
     }

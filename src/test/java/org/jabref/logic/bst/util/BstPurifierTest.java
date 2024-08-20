@@ -8,11 +8,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BstPurifierTest {
+class BstPurifierTest {
 
     @ParameterizedTest
     @MethodSource("provideTestStrings")
-    public void purify(String expected, String toBePurified) {
+    void purify(String expected, String toBePurified) {
         assertEquals(expected, BstPurifier.purify(toBePurified));
     }
 

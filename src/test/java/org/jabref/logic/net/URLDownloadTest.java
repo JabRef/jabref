@@ -21,26 +21,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
-public class URLDownloadTest {
+class URLDownloadTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
 
     @Test
-    public void stringDownloadWithSetEncoding() throws Exception {
+    void stringDownloadWithSetEncoding() throws Exception {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(dl.asString().contains("Google"), "google.com should contain google");
     }
 
     @Test
-    public void stringDownload() throws Exception {
+    void stringDownload() throws Exception {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(dl.asString(StandardCharsets.UTF_8).contains("Google"), "google.com should contain google");
     }
 
     @Test
-    public void fileDownload() throws Exception {
+    void fileDownload() throws Exception {
         File destination = File.createTempFile("jabref-test", ".html");
         try {
             URLDownload dl = new URLDownload(new URL("http://www.google.com"));
@@ -55,14 +55,14 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void determineMimeType() throws Exception {
+    void determineMimeType() throws Exception {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(dl.getMimeType().startsWith("text/html"));
     }
 
     @Test
-    public void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws Exception {
+    void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws Exception {
         URLDownload google = new URLDownload(new URL("http://www.google.com"));
 
         String path = google.toTemporaryFile().toString();
@@ -70,7 +70,7 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void downloadToTemporaryFileKeepsName() throws Exception {
+    void downloadToTemporaryFileKeepsName() throws Exception {
         URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/main/LICENSE"));
 
         String path = google.toTemporaryFile().toString();
@@ -79,7 +79,7 @@ public class URLDownloadTest {
 
     @Test
     @DisabledOnCIServer("CI Server is apparently blocked")
-    public void downloadOfFTPSucceeds() throws Exception {
+    void downloadOfFTPSucceeds() throws Exception {
         URLDownload ftp = new URLDownload(new URL("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
 
         Path path = ftp.toTemporaryFile();
@@ -87,7 +87,7 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void downloadOfHttpSucceeds() throws Exception {
+    void downloadOfHttpSucceeds() throws Exception {
         URLDownload ftp = new URLDownload(new URL("http://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
@@ -95,7 +95,7 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void downloadOfHttpsSucceeds() throws Exception {
+    void downloadOfHttpsSucceeds() throws Exception {
         URLDownload ftp = new URLDownload(new URL("https://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
@@ -103,21 +103,21 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void checkConnectionSuccess() throws MalformedURLException {
+    void checkConnectionSuccess() throws MalformedURLException {
         URLDownload google = new URLDownload(new URL("http://www.google.com"));
 
         assertTrue(google.canBeReached());
     }
 
     @Test
-    public void checkConnectionFail() throws MalformedURLException {
+    void checkConnectionFail() throws MalformedURLException {
         URLDownload nonsense = new URLDownload(new URL("http://nonsenseadddress"));
 
         assertThrows(UnirestException.class, nonsense::canBeReached);
     }
 
     @Test
-    public void connectTimeoutIsNeverNull() throws MalformedURLException {
+    void connectTimeoutIsNeverNull() throws MalformedURLException {
         URLDownload urlDownload = new URLDownload(new URL("http://www.example.com"));
         assertNotNull(urlDownload.getConnectTimeout(), "there's a non-null default by the constructor");
 
@@ -126,13 +126,13 @@ public class URLDownloadTest {
     }
 
     @Test
-    public void test503ErrorThrowsFetcherServerException() throws Exception {
+    void test503ErrorThrowsFetcherServerException() throws Exception {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/503"));
         assertThrows(FetcherServerException.class, urlDownload::asString);
     }
 
     @Test
-    public void test429ErrorThrowsFetcherClientException() throws Exception {
+    void test429ErrorThrowsFetcherClientException() throws Exception {
         URLDownload urlDownload = new URLDownload(new URL("http://httpstat.us/429"));
         Exception exception = assertThrows(FetcherClientException.class, urlDownload::asString);
     }

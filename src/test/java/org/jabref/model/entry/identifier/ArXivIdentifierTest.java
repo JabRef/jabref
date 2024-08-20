@@ -52,13 +52,13 @@ class ArXivIdentifierTest {
     }
 
     @Test
-    public void acceptLegacyEprint() {
+    void acceptLegacyEprint() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("astro-ph.GT/1234567");
         assertEquals(Optional.of(new ArXivIdentifier("astro-ph.GT/1234567", "astro-ph.GT")), parsed);
     }
 
     @Test
-    public void acceptLegacyMathEprint() {
+    void acceptLegacyMathEprint() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("math/1234567");
         assertEquals(Optional.of(new ArXivIdentifier("math/1234567", "math")), parsed);
     }
@@ -112,61 +112,61 @@ class ArXivIdentifierTest {
     }
 
     @Test
-    public void acceptPlainEprint() {
+    void acceptPlainEprint() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("0706.0001");
         assertEquals(Optional.of(new ArXivIdentifier("0706.0001")), parsed);
     }
 
     @Test
-    public void acceptPlainEprintWithVersion() {
+    void acceptPlainEprintWithVersion() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("0706.0001v1");
         assertEquals(Optional.of(new ArXivIdentifier("0706.0001", "v1", "")), parsed);
     }
 
     @Test
-    public void acceptArxivPrefix() {
+    void acceptArxivPrefix() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("arXiv:0706.0001v1");
         assertEquals(Optional.of(new ArXivIdentifier("0706.0001", "v1", "")), parsed);
     }
 
     @Test
-    public void ignoreLeadingAndTrailingWhitespaces() {
+    void ignoreLeadingAndTrailingWhitespaces() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("  0706.0001v1 ");
         assertEquals(Optional.of(new ArXivIdentifier("0706.0001", "v1", "")), parsed);
     }
 
     @Test
-    public void rejectEmbeddedEprint() {
+    void rejectEmbeddedEprint() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("other stuff 0706.0001v1 end");
         assertEquals(Optional.empty(), parsed);
     }
 
     @Test
-    public void rejectInvalidEprint() {
+    void rejectInvalidEprint() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("https://thisisnouri");
         assertEquals(Optional.empty(), parsed);
     }
 
     @Test
-    public void acceptUrlHttpEprint() {
+    void acceptUrlHttpEprint() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("http://arxiv.org/abs/0706.0001v1");
         assertEquals(Optional.of(new ArXivIdentifier("0706.0001", "v1", "")), parsed);
     }
 
     @Test
-    public void acceptUrlHttpsEprint() {
+    void acceptUrlHttpsEprint() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("https://arxiv.org/abs/0706.0001v1");
         assertEquals(Optional.of(new ArXivIdentifier("0706.0001", "v1", "")), parsed);
     }
 
     @Test
-    public void rejectUrlOtherDomainEprint() {
+    void rejectUrlOtherDomainEprint() {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("https://asdf.org/abs/0706.0001v1");
         assertEquals(Optional.empty(), parsed);
     }
 
     @Test
-    public void constructCorrectURLForEprint() throws Exception {
+    void constructCorrectURLForEprint() throws Exception {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("0706.0001v1");
         assertEquals(Optional.of(new URI("https://arxiv.org/abs/0706.0001v1")), parsed.get().getExternalURI());
     }

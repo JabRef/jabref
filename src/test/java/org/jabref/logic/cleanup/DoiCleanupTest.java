@@ -12,11 +12,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DoiCleanupTest {
+class DoiCleanupTest {
 
     @ParameterizedTest
     @MethodSource("provideDoiForAllLowers")
-    public void changeDoi(BibEntry expected, BibEntry doiInfoField) {
+    void changeDoi(BibEntry expected, BibEntry doiInfoField) {
         DoiCleanup cleanUp = new DoiCleanup();
         cleanUp.cleanup(doiInfoField);
 

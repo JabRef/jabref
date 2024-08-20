@@ -163,13 +163,13 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    public void performSearchByEmptyQuery() throws Exception {
+    void performSearchByEmptyQuery() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 
     @Test
     @Disabled("We seem to be blocked")
-    public void findByEntry() throws Exception {
+    void findByEntry() throws Exception {
         BibEntry barrosEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns")
                 .withField(StandardField.AUTHOR, "Chiara Muzi and Luise Pufahl and Lorenzo Rossi and M. Weske and F. Tiezzi")

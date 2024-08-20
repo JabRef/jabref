@@ -165,7 +165,7 @@ class XmpPdfExporterTest {
 
     @ParameterizedTest
     @MethodSource("providePathToNewPDFs")
-    public void roundtripExportImport(Path path) throws Exception {
+    void roundtripExportImport(Path path) throws Exception {
         try (PDDocument document = new PDDocument()) {
             PDPage page = new PDPage();
             document.addPage(page);

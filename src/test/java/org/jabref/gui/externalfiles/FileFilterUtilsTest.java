@@ -20,48 +20,48 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FileFilterUtilsTest {
+class FileFilterUtilsTest {
 
     private final FileFilterUtils fileFilterUtils = new FileFilterUtils();
     private final LocalDateTime time = LocalDateTime.now();
 
     @Test
-    public void isDuringLastDayNegativeTest() {
+    void isDuringLastDayNegativeTest() {
         assertFalse(fileFilterUtils.isDuringLastDay(time.minusHours(24)));
     }
 
     @Test
-    public void isDuringLastDayPositiveTest() {
+    void isDuringLastDayPositiveTest() {
         assertTrue(fileFilterUtils.isDuringLastDay(time.minusHours(23)));
     }
 
     @Test
-    public void isDuringLastWeekNegativeTest() {
+    void isDuringLastWeekNegativeTest() {
         assertFalse(fileFilterUtils.isDuringLastWeek(time.minusDays(7)));
     }
 
     @Test
-    public void isDuringLastWeekPositiveTest() {
+    void isDuringLastWeekPositiveTest() {
         assertTrue(fileFilterUtils.isDuringLastWeek(time.minusDays(6).minusHours(23)));
     }
 
     @Test
-    public void isDuringLastMonthNegativeTest() {
+    void isDuringLastMonthNegativeTest() {
         assertFalse(fileFilterUtils.isDuringLastMonth(time.minusDays(30)));
     }
 
     @Test
-    public void isDuringLastMonthPositiveTest() {
+    void isDuringLastMonthPositiveTest() {
         assertTrue(fileFilterUtils.isDuringLastMonth(time.minusDays(29).minusHours(23)));
     }
 
     @Test
-    public void isDuringLastYearNegativeTest() {
+    void isDuringLastYearNegativeTest() {
         assertFalse(fileFilterUtils.isDuringLastYear(time.minusDays(365)));
     }
 
     @Test
-    public void isDuringLastYearPositiveTest() {
+    void isDuringLastYearPositiveTest() {
         assertTrue(fileFilterUtils.isDuringLastYear(time.minusDays(364).minusHours(23)));
     }
 
@@ -75,7 +75,7 @@ public class FileFilterUtilsTest {
 
         /* Initialize the directory and files used in the sorting tests, and change their last edited dates. */
         @BeforeEach
-        public void setUp(@TempDir Path tempDir) throws Exception {
+        void setUp(@TempDir Path tempDir) throws Exception {
 
             Path firstPath = tempDir.resolve("firstFile.pdf");
             Path secondPath = tempDir.resolve("secondFile.pdf");
@@ -117,7 +117,7 @@ public class FileFilterUtilsTest {
         }
 
         @Test
-        public void sortByDateAscendingPositiveTest() {
+        void sortByDateAscendingPositiveTest() {
             List<String> sortedPaths = fileFilterUtils
                 .sortByDateAscending(files)
                 .stream()
@@ -127,7 +127,7 @@ public class FileFilterUtilsTest {
         }
 
         @Test
-        public void sortByDateAscendingNegativeTest() {
+        void sortByDateAscendingNegativeTest() {
             List<String> sortedPaths = fileFilterUtils
                 .sortByDateAscending(files)
                 .stream()
@@ -137,7 +137,7 @@ public class FileFilterUtilsTest {
         }
 
         @Test
-        public void sortByDateDescendingPositiveTest() {
+        void sortByDateDescendingPositiveTest() {
             List<String> sortedPaths = fileFilterUtils
                 .sortByDateDescending(files)
                 .stream()
@@ -147,7 +147,7 @@ public class FileFilterUtilsTest {
         }
 
         @Test
-        public void sortByDateDescendingNegativeTest() {
+        void sortByDateDescendingNegativeTest() {
             List<String> sortedPaths = fileFilterUtils
                 .sortByDateDescending(files)
                 .stream()
@@ -164,7 +164,7 @@ public class FileFilterUtilsTest {
         private final Set<String> ignoreFileSet = new HashSet<>();
 
         @BeforeEach
-        public void setUp(@TempDir Path tempDir) throws Exception {
+        void setUp(@TempDir Path tempDir) throws Exception {
             ignoreFileSet.add(".DS_Store");
             ignoreFileSet.add("Thumbs.db");
 

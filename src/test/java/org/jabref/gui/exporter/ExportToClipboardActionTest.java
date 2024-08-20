@@ -41,7 +41,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ExportToClipboardActionTest {
+class ExportToClipboardActionTest {
 
     private ExportToClipboardAction exportToClipboardAction;
     private final DialogService dialogService = spy(DialogService.class);
@@ -54,7 +54,7 @@ public class ExportToClipboardActionTest {
     private ObservableList<BibEntry> selectedEntries;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.AUTHOR, "Souti Chattopadhyay and Nicholas Nelson and Audrey Au and Natalia Morales and Christopher Sanchez and Rahul Pandita and Anita Sarma")
                 .withField(StandardField.TITLE, "A tale from the trenches")
@@ -73,7 +73,7 @@ public class ExportToClipboardActionTest {
     }
 
     @Test
-    public void executeIfNoSelectedEntries() {
+    void executeIfNoSelectedEntries() {
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
 
         exportToClipboardAction.execute();
@@ -81,7 +81,7 @@ public class ExportToClipboardActionTest {
     }
 
     @Test
-    public void executeOnSuccess() {
+    void executeOnSuccess() {
         Exporter selectedExporter = new Exporter("html", "HTML", StandardFileType.HTML) {
             @Override
             public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) {

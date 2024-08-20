@@ -12,12 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class NormalizePagesFormatterTest {
+class NormalizePagesFormatterTest {
 
     private NormalizePagesFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new NormalizePagesFormatter();
     }
 
@@ -108,7 +108,7 @@ public class NormalizePagesFormatterTest {
 
     @ParameterizedTest
     @MethodSource("tests")
-    public void test(String expected, String input) {
+    void test(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
 }

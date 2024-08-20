@@ -5,7 +5,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class StringSimilarityTest {
+class StringSimilarityTest {
 
     private StringSimilarity similarityChecker = new StringSimilarity();
 
@@ -24,7 +24,7 @@ public class StringSimilarityTest {
             "abcdef, ab, true", // no empty strings and similarity == threshold (4)
             "abcdef, a, false" // no empty string sand similarity > threshold (4)
     })
-    public void stringSimilarity(String a, String b, String expectedResult) {
+    void stringSimilarity(String a, String b, String expectedResult) {
         assertEquals(Boolean.valueOf(expectedResult), similarityChecker.isSimilar(a, b));
     }
 }

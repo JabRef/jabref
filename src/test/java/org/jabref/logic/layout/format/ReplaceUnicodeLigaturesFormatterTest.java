@@ -5,34 +5,34 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ReplaceUnicodeLigaturesFormatterTest {
+class ReplaceUnicodeLigaturesFormatterTest {
 
     private ReplaceUnicodeLigaturesFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new ReplaceUnicodeLigaturesFormatter();
     }
 
     @Test
-    public void plainFormat() {
+    void plainFormat() {
         assertEquals("lorem ipsum", formatter.format("lorem ipsum"));
     }
 
     @Test
-    public void singleLigatures() {
+    void singleLigatures() {
         assertEquals("AA", formatter.format("\uA732"));
         assertEquals("fi", formatter.format("ﬁ"));
         assertEquals("et", formatter.format("\uD83D\uDE70"));
     }
 
     @Test
-    public void ligatureSequence() {
+    void ligatureSequence() {
         assertEquals("aefffflstue", formatter.format("æﬀﬄﬆᵫ"));
     }
 
     @Test
-    public void sampleInput() {
+    void sampleInput() {
         assertEquals("AEneas", formatter.format("Æneas"));
     }
 }
