@@ -227,7 +227,7 @@ public class ManageStudyDefinitionViewModel {
     }
 
     public void initializeSelectedFetchers() {
-        List<String> selectedFetchers = new ArrayList<>(preferencesService.getWorkspacePreferences().getSelectedSlrFetchers());
+        List<String> selectedFetchers = preferencesService.getWorkspacePreferences().getSelectedSlrFetchers();
         for (StudyCatalogItem item : databases) {
             item.setEnabled(selectedFetchers.contains(item.getName()));
             item.enabledProperty().addListener((obs, oldValue, newValue) -> updateSelectedFetchers());
