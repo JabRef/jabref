@@ -10,6 +10,8 @@ This folder contains directories making use of [Vagrant](https://www.vagrantup.c
     - Windows: `winget install -e --id Oracle.VirtualBox`
 2. [Install Vagrant](https://developer.hashicorp.com/vagrant/install?product_intent=vagrant)
     - Windows: `winget install  -e --id Hashicorp.Vagrant`
+3. [Install Vagrant Virtual Box Guest Additions Plugin](https://subscription.packtpub.com/book/cloud-and-networking/9781786464910/1/ch01lvl1sec12/enabling-virtualbox-guest-additions-in-vagrant). This ensures that the guest additions of each box are automatically updated.
+    - `vagrant plugin install vagrant-vbguest`
 
 ### Setup VM
 
