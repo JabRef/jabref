@@ -180,11 +180,12 @@ public class CSLCitationOOAdapter {
     }
 
     /**
-     * It is difficult to "segment" a single citation generated for a group of entries into distinct parts based on the entries such that each entry can be draped with its corresponding reference mark.
+     * Inserts multiple references and also adds a space before the citation if not already present ("smart space").
+     *
+     * @implNote It is difficult to "segment" a single citation generated for a group of entries into distinct parts based on the entries such that each entry can be draped with its corresponding reference mark.
      * This is because of the sheer variety in the styles of citations and the separators between them (when grouped) in case of Citation Style Language.
      * Furthermore, it is also difficult to generate a "single" reference mark for a group of entries.
      * Thus, in case of citations for a group of entries, we first insert the citation (text), then insert the invisible reference marks for each entry separately after it.
-     * Implements "smart spaces" - adds a space before the citation if not already present.
      */
     private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText)
             throws CreationException, Exception {
