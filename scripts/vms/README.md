@@ -66,3 +66,7 @@ Solution: Delete folder `C:\Users\$username\VirtualBox VMs\jabref-ubuntu`
 
 Solution: `snap refresh --edge jabref` (or `--stable`, ...).
 More info on snaps is available at <https://snapcraft.io/docs/quickstart-tour>.
+
+> `An error occurred during installation of VirtualBox Guest Additions 7.0.20. Some functionality may not work as intended.`
+
+Install the guest additions manually by "Devices" > "Install Virtual Box Gueat Additions".
