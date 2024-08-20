@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
@@ -94,7 +95,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 LOGGER.trace("Thread %s, searching for DOI '%s', waited %.2fs because of API rate limiter".formatted(
                         Thread.currentThread().threadId(), identifier, waitingTime));
             }
-        } catch (IOException e) {
+        } catch (FetcherException | MalformedURLException e) {
             LOGGER.warn("Could not limit DOI API access rate", e);
         }
     }
@@ -114,64 +115,63 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<DOI> doi = DOI.parse(identifier);
 
+        if (doi.isEmpty()) {
+            throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
+        }
+
+        URL doiURL;
         try {
-            if (doi.isPresent()) {
-                Optional<BibEntry> fetchedEntry;
+            doiURL = new URL(doi.get().getURIAsASCIIString());
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Malformed URL", e);
+        }
 
-                // mEDRA does not return a parsable bibtex string
-                Optional<String> agency = getAgency(doi.get());
-                if (agency.isPresent() && "medra".equalsIgnoreCase(agency.get())) {
-                    return new Medra().performSearchById(identifier);
-                }
-                URL doiURL = new URL(doi.get().getURIAsASCIIString());
+        try {
+            Optional<BibEntry> fetchedEntry;
 
-                // BibTeX data
-                URLDownload download = getUrlDownload(doiURL);
-                download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
-
-                String bibtexString;
-                URLConnection openConnection;
-                try {
-                    openConnection = download.openConnection();
-                    bibtexString = URLDownload.asString(openConnection).trim();
-                } catch (IOException e) {
-                    // an IOException with a nested FetcherException will be thrown when you encounter a 400x or 500x http status code
-                    if (e.getCause() instanceof FetcherException fe) {
-                        throw fe;
-                    }
-                    throw e;
-                }
-
-                // BibTeX entry
-                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
-                fetchedEntry.ifPresent(this::doPostCleanup);
-
-                // Crossref has a dynamic API rate limit
-                if (agency.isPresent() && "crossref".equalsIgnoreCase(agency.get())) {
-                    updateCrossrefAPIRate(openConnection);
-                }
-
-                // Check if the entry is an APS journal and add the article id as the page count if page field is missing
-                if (fetchedEntry.isPresent() && fetchedEntry.get().hasField(StandardField.DOI)) {
-                    BibEntry entry = fetchedEntry.get();
-                    if (isAPSJournal(entry, entry.getField(StandardField.DOI).get()) && !entry.hasField(StandardField.PAGES)) {
-                        setPageCountToArticleId(entry, entry.getField(StandardField.DOI).get());
-                    }
-                }
-
-                if (openConnection instanceof HttpURLConnection connection) {
-                    connection.disconnect();
-                }
-                return fetchedEntry;
-            } else {
-                throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
+            // mEDRA does not return a parsable bibtex string
+            Optional<String> agency = getAgency(doi.get());
+            if (agency.isPresent() && "medra".equalsIgnoreCase(agency.get())) {
+                return new Medra().performSearchById(identifier);
             }
+
+            // BibTeX data
+            URLDownload download = getUrlDownload(doiURL);
+            download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
+
+            String bibtexString;
+            URLConnection openConnection;
+
+            openConnection = download.openConnection();
+            bibtexString = URLDownload.asString(openConnection).trim();
+
+            // BibTeX entry
+            fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
+            fetchedEntry.ifPresent(this::doPostCleanup);
+
+            // Crossref has a dynamic API rate limit
+            if (agency.isPresent() && "crossref".equalsIgnoreCase(agency.get())) {
+                updateCrossrefAPIRate(openConnection);
+            }
+
+            // Check if the entry is an APS journal and add the article id as the page count if page field is missing
+            if (fetchedEntry.isPresent() && fetchedEntry.get().hasField(StandardField.DOI)) {
+                BibEntry entry = fetchedEntry.get();
+                if (isAPSJournal(entry, entry.getField(StandardField.DOI).get()) && !entry.hasField(StandardField.PAGES)) {
+                    setPageCountToArticleId(entry, entry.getField(StandardField.DOI).get());
+                }
+            }
+
+            if (openConnection instanceof HttpURLConnection connection) {
+                connection.disconnect();
+            }
+            return fetchedEntry;
         } catch (IOException e) {
-            throw new FetcherException(Localization.lang("Connection error"), e);
+            throw new FetcherException(doiURL, Localization.lang("Connection error"), e);
         } catch (ParseException e) {
-            throw new FetcherException("Could not parse BibTeX entry", e);
+            throw new FetcherException(doiURL, "Could not parse BibTeX entry", e);
         } catch (JSONException e) {
-            throw new FetcherException("Could not retrieve Registration Agency", e);
+            throw new FetcherException(doiURL, "Could not retrieve Registration Agency", e);
         }
     }
 
@@ -215,7 +215,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
      *
      * @param doi the DOI to be searched
      */
-    public Optional<String> getAgency(DOI doi) throws IOException {
+    public Optional<String> getAgency(DOI doi) throws FetcherException, MalformedURLException {
         Optional<String> agency = Optional.empty();
         try {
             URLDownload download = getUrlDownload(new URL(DOI.AGENCY_RESOLVER + "/" + doi.getDOI()));

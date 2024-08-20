@@ -143,14 +143,11 @@ Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR), 201
 
 ## Praises and media coverage
 
-> I have learnt more from this single pull request regarding production-ready code than I ever have from my three years of CS degree.
+* [O. Kopp et al.: JabRef: BibTeX-based literature management software, TUGboat 44(3)](https://doi.org/10.47397/tb/44-3/tb138kopp-jabref) - explains the motivation and the concept of the curated issues.
+* "I have learnt more from this single pull request regarding production-ready code than I ever have from my three years of CS degree."
+* JabRef mentioned as one of "Top 8 Open Source GitHub Projects to Level-Up Your Coding" by [CodeGym](https://codegym.cc/groups/posts/383-top-8-open-source-github-projects-to-level-up-your-coding).
 
 (Please send us your praise if you enjoyed the experience)
-
----
-
-* JabRef mentioned as one of "Top 8 Open Source GitHub Projects to Level-Up Your Coding" by [CodeGym](https://codegym.cc/groups/posts/383-top-8-open-source-github-projects-to-level-up-your-coding).
-* [O. Kopp et al.: JabRef: BibTeX-based literature management software, TUGboat 44(3)](https://doi.org/10.47397/tb/44-3/tb138kopp-jabref) - explains the motivation and the concept of the curated issues.
 
 ## Notes
 

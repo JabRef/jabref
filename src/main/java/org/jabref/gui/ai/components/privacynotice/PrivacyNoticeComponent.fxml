@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<fx:root type="ScrollPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent">
+      <VBox spacing="10.0">
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <children>
+            <Label wrapText="true" text="%Privacy notice">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label wrapText="true" text="%JabRef uses AI providers to enable AI functionality (chatting with attached file(s) and summarization). AI provider is an external service. To enable processing of attached file(s), their contents need to be shared with the currently selected AI provider.">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label wrapText="true" text="%As soon as you ask a question, the text content of all PDFs attached to the entry are sent to external service.">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <TextFlow fx:id="openAiPrivacyTextFlow">
+               <children>
+                  <Text text="%If you have chosen the OpenAI as AI provider, the privacy policy of OpenAI applies. You find it at %0.">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
+               </children>
+            </TextFlow>
+            <TextFlow fx:id="mistralAiPrivacyTextFlow">
+               <children>
+                  <Text text="%If you have chosen the Mistral AI as AI provider, the privacy policy of Mistral AI applies. You find it at %0.">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
+               </children>
+            </TextFlow>
+            <TextFlow fx:id="huggingFacePrivacyTextFlow">
+               <children>
+                  <Text text="%If you have chosen the Hugging Face as AI provider, the privacy policy of Hugging Face applies. You find it at %0.">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Text>
+               </children>
+            </TextFlow>
+             <TextFlow>
+                <Text fx:id="embeddingModelText" text="%Additionally, we use Deep Java Library (DJL) embedding models for both chatting and summarization. The embedding model will be downloaded in background (size %0) from Deep Java Library servers anonymously.">
+                   <font>
+                      <Font size="14.0" />
+                   </font>
+                </Text>
+                 <Hyperlink wrapText="true" onAction="#onDjlPrivacyPolicyClick" style="-fx-padding: 0.166667em 0.25em 0.166667em 0.25em;" text="%You find information about the privacy policy here.">
+                     <font>
+                         <Font size="14.0" />
+                     </font>
+                 </Hyperlink>
+             </TextFlow>
+            <Button mnemonicParsing="false" onAction="#onIAgreeButtonClick" text="%I agree">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+         </children>
+      </VBox>
+</fx:root>

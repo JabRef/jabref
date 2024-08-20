@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<fx:root prefHeight="200.0" prefWidth="500.0" type="BorderPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.apikeymissing.ApiKeyMissingComponent">
+   <center>
+      <VBox alignment="CENTER" spacing="10.0">
+         <children>
+            <Label text="%Unable to chat">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label text="%API key is missing." />
+            <Hyperlink onAction="#onHyperlinkClick" text="%Click here to navigate to AI preferences." />
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </VBox>
+   </center>
+</fx:root>

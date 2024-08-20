@@ -104,7 +104,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/bibtexoutput/");
         uriBuilder.addParameter("q", new ZbMathQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // search all fields
         uriBuilder.addParameter("start", "0"); // start index
@@ -113,7 +113,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/bibtexoutput/");
         String query = "an:".concat(identifier); // use an: to search for a zbMATH identifier
         uriBuilder.addParameter("q", query);

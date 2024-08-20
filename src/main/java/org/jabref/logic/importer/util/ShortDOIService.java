@@ -1,11 +1,11 @@
 package org.jabref.logic.importer.util;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.identifier.DOI;
@@ -36,8 +36,8 @@ public class ShortDOIService {
 
     private JSONObject makeRequest(DOI doi) throws ShortDOIServiceException {
 
-        URIBuilder uriBuilder = null;
-        URL url = null;
+        URIBuilder uriBuilder;
+        URL url;
 
         try {
             uriBuilder = new URIBuilder(BASIC_URL);
@@ -58,7 +58,7 @@ public class ShortDOIService {
                 throw new ShortDOIServiceException("Cannot get short DOI");
             }
             return resultAsJSON;
-        } catch (ParseException | IOException | JSONException e) {
+        } catch (ParseException | JSONException | FetcherException e) {
             throw new ShortDOIServiceException("Cannot get short DOI", e);
         }
     }

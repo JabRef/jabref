@@ -20,7 +20,7 @@ import javafx.util.StringConverter;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.FetcherException;
 
 import org.controlsfx.control.textfield.CustomPasswordField;
 import org.controlsfx.dialog.ProgressDialog;
@@ -97,9 +97,9 @@ public interface DialogService {
      *
      * @param exception the exception causing the error
      */
-    default void showErrorDialogAndWait(Exception exception) {
-        showErrorDialogAndWait(Localization.lang("Unhandled exception occurred."), exception);
-    }
+    void showErrorDialogAndWait(Exception exception);
+
+    void showErrorDialogAndWait(FetcherException fetcherException);
 
     /**
      * Create and display error dialog displaying the given exception.

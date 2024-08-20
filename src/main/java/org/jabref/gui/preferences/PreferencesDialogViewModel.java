@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.ai.AiTab;
 import org.jabref.gui.preferences.autocompletion.AutoCompletionTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
 import org.jabref.gui.preferences.customentrytypes.CustomEntryTypesTab;
@@ -65,6 +66,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new KeyBindingsTab(),
                 new GroupsTab(),
                 new WebSearchTab(),
+                new AiTab(),
                 new EntryTab(),
                 new TableTab(),
                 new PreviewTab(),
@@ -144,14 +146,12 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         if (resetPreferencesConfirmed) {
             try {
                 preferences.clear();
-
                 dialogService.showWarningDialogAndWait(Localization.lang("Reset preferences"),
                         Localization.lang("You must restart JabRef for this to come into effect."));
             } catch (BackingStoreException ex) {
                 LOGGER.error("Error while resetting preferences", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Reset preferences"), ex);
             }
-
             setValues();
         }
     }
@@ -169,16 +169,13 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     public void storeAllSettings() {
-        List<String> restartWarnings = new ArrayList<>();
-
-        // Run validation checks
         if (!validSettings()) {
             return;
         }
 
         // Store settings
         preferences.getInternalPreferences().setMemoryStickMode(memoryStickProperty.get());
-
+        List<String> restartWarnings = new ArrayList<>();
         for (PreferencesTab tab : preferenceTabs) {
             tab.storeSettings();
             restartWarnings.addAll(tab.getRestartWarnings());
@@ -194,8 +191,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
         dialogService.notify(Localization.lang("Preferences recorded."));
-
-        setValues();
     }
 
     /**

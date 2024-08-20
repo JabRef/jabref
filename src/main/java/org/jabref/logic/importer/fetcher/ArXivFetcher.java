@@ -529,20 +529,30 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 throw new IllegalArgumentException("The arXiv API limits the number of maximal results to be 2000");
             }
 
+            URIBuilder uriBuilder;
             try {
-                URIBuilder uriBuilder = new URIBuilder(API_URL);
-                // The arXiv API has problems with accents, so we remove them (i.e. Fréchet -> Frechet)
-                if (StringUtil.isNotBlank(searchQuery)) {
-                    uriBuilder.addParameter("search_query", StringUtil.stripAccents(searchQuery));
-                }
-                if (!ids.isEmpty()) {
-                    uriBuilder.addParameter("id_list",
-                            ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
-                }
-                uriBuilder.addParameter("start", String.valueOf(start));
-                uriBuilder.addParameter("max_results", String.valueOf(maxResults));
-                URL url = uriBuilder.build().toURL();
+                uriBuilder = new URIBuilder(API_URL);
+            } catch (URISyntaxException e) {
+                throw new FetcherException("Invalid URL", e);
+            }
+            // The arXiv API has problems with accents, so we remove them (i.e. Fréchet -> Frechet)
+            if (StringUtil.isNotBlank(searchQuery)) {
+                uriBuilder.addParameter("search_query", StringUtil.stripAccents(searchQuery));
+            }
+            if (!ids.isEmpty()) {
+                uriBuilder.addParameter("id_list",
+                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
+            }
+            uriBuilder.addParameter("start", String.valueOf(start));
+            uriBuilder.addParameter("max_results", String.valueOf(maxResults));
+            URL url = null;
+            try {
+                url = uriBuilder.build().toURL();
+            } catch (MalformedURLException | URISyntaxException e) {
+                throw new FetcherException("Invalid URL", e);
+            }
 
+            try {
                 DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -552,8 +562,8 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 } else {
                     return builder.parse(connection.getInputStream());
                 }
-            } catch (SAXException | ParserConfigurationException | IOException | URISyntaxException exception) {
-                throw new FetcherException("arXiv API request failed", exception);
+            } catch (SAXException | ParserConfigurationException | IOException exception) {
+                throw new FetcherException(url, "arXiv API request failed", exception);
             }
         }
 

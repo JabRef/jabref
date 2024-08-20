@@ -11,7 +11,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
@@ -48,7 +47,7 @@ public class GvkFetcher extends AbstractIsbnFetcher implements SearchBasedParser
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");
         uriBuilder.addParameter("operation", "searchRetrieve");
@@ -62,7 +61,7 @@ public class GvkFetcher extends AbstractIsbnFetcher implements SearchBasedParser
     }
 
     @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         this.ensureThatIsbnIsValid(identifier);
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");

@@ -26,6 +26,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
@@ -39,6 +40,7 @@ import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.ai.AiApiKeyProvider;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -56,6 +58,9 @@ public class JabRefGUI extends Application {
     private static List<UiCommand> uiCommands;
     private static JabRefPreferences preferencesService;
     private static FileUpdateMonitor fileUpdateMonitor;
+
+    // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
+    private static AiService aiService;
 
     private static StateManager stateManager;
     private static ThemeManager themeManager;
@@ -90,6 +95,7 @@ public class JabRefGUI extends Application {
                 dialogService,
                 fileUpdateMonitor,
                 preferencesService,
+                aiService,
                 stateManager,
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
@@ -150,6 +156,9 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.clipBoardManager = new ClipBoardManager();
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
+
+        JabRefGUI.aiService = new AiService(preferencesService.getAiPreferences(), Injector.instantiateModelOrService(AiApiKeyProvider.class), dialogService, taskExecutor);
+        Injector.setModelOrService(AiService.class, aiService);
     }
 
     private void setupProxy() {
@@ -214,9 +223,11 @@ public class JabRefGUI extends Application {
         debugLogWindowState(mainStage);
 
         Scene scene = new Scene(JabRefGUI.mainFrame);
+
+        LOGGER.debug("installing CSS");
         themeManager.installCss(scene);
 
-        // Handle TextEditor key bindings
+        LOGGER.debug("Handle TextEditor key bindings");
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(
                 scene,
                 event,
@@ -228,7 +239,11 @@ public class JabRefGUI extends Application {
         mainStage.setOnShowing(this::onShowing);
         mainStage.setOnCloseRequest(this::onCloseRequest);
         mainStage.setOnHiding(this::onHiding);
+
+        LOGGER.debug("Showing mainStage");
         mainStage.show();
+
+        LOGGER.debug("frame initialized");
 
         Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
     }
@@ -337,9 +352,19 @@ public class JabRefGUI extends Application {
 
     @Override
     public void stop() {
+        LOGGER.trace("Closing AI service");
+        try {
+            aiService.close();
+        } catch (Exception e) {
+            LOGGER.error("Unable to close AI service", e);
+        }
+        LOGGER.trace("Closing OpenOffice connection");
         OOBibBaseConnect.closeOfficeConnection();
+        LOGGER.trace("Stopping background tasks");
         stopBackgroundTasks();
+        LOGGER.trace("Shutting down thread pools");
         shutdownThreadPools();
+        LOGGER.trace("Finished stop");
     }
 
     public void stopBackgroundTasks() {
@@ -347,10 +372,15 @@ public class JabRefGUI extends Application {
     }
 
     public static void shutdownThreadPools() {
+        LOGGER.trace("Shutting down taskExecutor");
         taskExecutor.shutdown();
+        LOGGER.trace("Shutting down fileUpdateMonitor");
         fileUpdateMonitor.shutdown();
+        LOGGER.trace("Shutting down directoryMonitor");
         DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
         directoryMonitor.shutdown();
+        LOGGER.trace("Shutting down HeadlessExecutorService");
         HeadlessExecutorService.INSTANCE.shutdownEverything();
+        LOGGER.trace("Finished shutdownThreadPools");
     }
 }

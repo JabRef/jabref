@@ -19,6 +19,8 @@ open module org.jabref {
 
     requires com.dlsc.gemsfx;
     uses com.dlsc.gemsfx.TagsField;
+    // Provides number input fields for parameters in AI expert settings
+    requires com.dlsc.unitfx;
 
     requires com.tobiasdiez.easybind;
 
@@ -140,6 +142,17 @@ open module org.jabref {
 
     requires org.jooq.jool;
 
+    // region: AI
+    requires ai.djl.api;
+    requires ai.djl.tokenizers;
+    requires jvm.openai;
+    requires langchain4j;
+    requires langchain4j.core;
+    requires langchain4j.hugging.face;
+    requires langchain4j.mistral.ai;
+    requires langchain4j.open.ai;
+    // endregion
+
     // region: fulltext search
     requires org.apache.lucene.core;
     // In case the version is updated, please also adapt SearchFieldConstants#VERSION to the newly used version
@@ -161,7 +174,10 @@ open module org.jabref {
     requires transitive org.jspecify;
 
     // region: other libraries (alphabetically)
+    requires cuid;
     requires dd.plist;
+    // required by okhttp and some AI library
+    requires kotlin.stdlib;
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
