@@ -6,16 +6,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CompositeFormatTest {
+class CompositeFormatTest {
 
     @Test
-    public void emptyComposite() {
+    void emptyComposite() {
         LayoutFormatter f = new CompositeFormat();
         assertEquals("No Change", f.format("No Change"));
     }
 
     @Test
-    public void arrayComposite() {
+    void arrayComposite() {
         LayoutFormatter f = new CompositeFormat(new LayoutFormatter[]{fieldText -> fieldText + fieldText,
                 fieldText -> "A" + fieldText, fieldText -> "B" + fieldText});
 
@@ -23,7 +23,7 @@ public class CompositeFormatTest {
     }
 
     @Test
-    public void doubleComposite() {
+    void doubleComposite() {
         LayoutFormatter f = new CompositeFormat(new AuthorOrgSci(), new NoSpaceBetweenAbbreviations());
         LayoutFormatter first = new AuthorOrgSci();
         LayoutFormatter second = new NoSpaceBetweenAbbreviations();

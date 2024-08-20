@@ -18,7 +18,6 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.WorkspacePreferences;
 import org.jabref.support.DisabledOnCIServer;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -27,6 +26,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -50,7 +50,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    public void themeManagerUsesProvidedTheme() throws IOException {
+    void themeManagerUsesProvidedTheme() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -68,7 +68,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    public void customThemeAvailableEvenWhenDeleted() throws IOException {
+    void customThemeAvailableEvenWhenDeleted() throws IOException {
         /* Create a temporary custom theme that is just a small snippet of CSS. There is no CSS
          validation (at the moment) but by making a valid CSS block we don't preclude adding validation later */
         Path testCss = tempFolder.resolve("test.css");
@@ -99,7 +99,7 @@ class ThemeManagerTest {
      */
     @Disabled
     @Test
-    public void customThemeBecomesAvailableAfterFileIsCreated() throws IOException {
+    void customThemeBecomesAvailableAfterFileIsCreated() throws IOException {
         Path testCss = tempFolder.resolve("test.css");
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class);
         when(workspacePreferences.getTheme()).thenReturn(new Theme(testCss.toString()));
@@ -121,7 +121,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    public void largeCustomThemeNotHeldInMemory() throws IOException {
+    void largeCustomThemeNotHeldInMemory() throws IOException {
         /* Create a temporary custom theme that is just a large comment over 48 kilobytes in size. There is no CSS
         validation (at the moment) but by making a valid CSS comment we don't preclude adding validation later */
         Path largeCssTestFile = tempFolder.resolve("test.css");
@@ -159,7 +159,7 @@ class ThemeManagerTest {
 
     @Test
     @DisabledOnCIServer("Randomly fails on CI server")
-    public void installThemeOnScene() throws IOException {
+    void installThemeOnScene() throws IOException {
         Scene scene = mock(Scene.class);
         when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
         when(scene.getRoot()).thenReturn(mock(Parent.class));
@@ -178,7 +178,7 @@ class ThemeManagerTest {
     }
 
     @Test
-    public void installThemeOnWebEngine() throws IOException {
+    void installThemeOnWebEngine() throws IOException {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -195,7 +195,7 @@ class ThemeManagerTest {
             webEngineStyleSheetLocation.complete(webEngine.getUserStyleSheetLocation());
         });
 
-        Assertions.assertDoesNotThrow(() -> {
+        assertDoesNotThrow(() -> {
             assertEquals(TEST_CSS_DATA, webEngineStyleSheetLocation.get());
         });
     }
@@ -205,7 +205,7 @@ class ThemeManagerTest {
      * for the thread to start up and the changed css to reload.
      */
     @Test
-    public void liveReloadCssDataUrl() throws IOException, InterruptedException {
+    void liveReloadCssDataUrl() throws IOException, InterruptedException {
         Path testCss = tempFolder.resolve("reload.css");
         Files.writeString(testCss, TEST_CSS_CONTENT, StandardOpenOption.CREATE);
         WorkspacePreferences workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);

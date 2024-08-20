@@ -12,23 +12,23 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ShortMonthFormatterTest {
+class ShortMonthFormatterTest {
 
     private LayoutFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new ShortMonthFormatter();
     }
 
     @Test
-    public void formatNullInput() {
+    void formatNullInput() {
         assertEquals("", formatter.format(null));
     }
 
     @ParameterizedTest
     @MethodSource("provideArguments")
-    public void formatDifferentInputs(String formattedString, String originalString) {
+    void formatDifferentInputs(String formattedString, String originalString) {
         assertEquals(formattedString, formatter.format(originalString));
     }
 

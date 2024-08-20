@@ -20,7 +20,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -29,47 +28,50 @@ import org.mockito.Answers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
 @DisabledOnCIServer("Produces too many requests on CI")
-public class CompositeSearchBasedFetcherTest {
+class CompositeSearchBasedFetcherTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
 
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
     @Test
-    public void createCompositeFetcherWithNullSet() {
-        Assertions.assertThrows(IllegalArgumentException.class,
+    void createCompositeFetcherWithNullSet() {
+        assertThrows(IllegalArgumentException.class,
                 () -> new CompositeSearchBasedFetcher(null, importerPreferences, 0));
     }
 
     @Test
-    public void performSearchWithoutFetchers() throws Exception {
+    void performSearchWithoutFetchers() throws Exception {
         Set<SearchBasedFetcher> empty = new HashSet<>();
         CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, importerPreferences, Integer.MAX_VALUE);
 
         List<BibEntry> result = fetcher.performSearch("quantum");
 
-        Assertions.assertEquals(result, Collections.emptyList());
+        assertEquals(result, Collections.emptyList());
     }
 
     @ParameterizedTest(name = "Perform Search on empty query.")
     @MethodSource("performSearchParameters")
-    public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
+    void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
 
         List<BibEntry> queryResult = compositeFetcher.performSearch("");
 
-        Assertions.assertEquals(queryResult, Collections.emptyList());
+        assertEquals(queryResult, Collections.emptyList());
     }
 
     @ParameterizedTest(name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +
             "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
-    public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
+    void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
@@ -80,7 +82,7 @@ public class CompositeSearchBasedFetcherTest {
             try {
                 List<BibEntry> fetcherResult = fetcher.performSearch("quantum");
                 fetcherResult.forEach(cleanup::doPostCleanup);
-                Assertions.assertTrue(compositeResult.containsAll(fetcherResult), "Did not contain " + fetcherResult);
+                assertTrue(compositeResult.containsAll(fetcherResult), "Did not contain " + fetcherResult);
             } catch (FetcherException e) {
                 /* We catch the Fetcher exception here, since the failing fetcher also fails in the CompositeFetcher
                  * and just leads to no additional results in the returned list. Therefore, the test should not fail

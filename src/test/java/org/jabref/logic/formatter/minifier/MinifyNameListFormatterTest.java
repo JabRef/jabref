@@ -12,12 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class MinifyNameListFormatterTest {
+class MinifyNameListFormatterTest {
 
     private MinifyNameListFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new MinifyNameListFormatter();
     }
 

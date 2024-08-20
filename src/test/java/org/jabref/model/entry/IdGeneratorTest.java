@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class IdGeneratorTest {
+class IdGeneratorTest {
 
     @Test
-    public void createNeutralId() {
+    void createNeutralId() {
         HashSet<String> set = new HashSet<>();
         for (int i = 0; i < 10000; i++) {
             String string = IdGenerator.next();

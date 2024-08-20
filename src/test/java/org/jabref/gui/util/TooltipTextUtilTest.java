@@ -12,12 +12,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TooltipTextUtilTest {
+class TooltipTextUtilTest {
 
     private String testText = "this is a test text";
 
     @Test
-    public void retrieveCorrectTextStyleNormal() {
+    void retrieveCorrectTextStyleNormal() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.NORMAL);
         String textStyle = "Regular";
 
@@ -25,14 +25,14 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void stringRemainsTheSameAfterTransformationToNormal() {
+    void stringRemainsTheSameAfterTransformationToNormal() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.NORMAL);
 
         assertEquals(testText, text.getText());
     }
 
     @Test
-    public void retrieveCorrectTextStyleBold() {
+    void retrieveCorrectTextStyleBold() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.BOLD);
         String textStyle = "tooltip-text-bold";
 
@@ -40,14 +40,14 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void stringRemainsTheSameAfterTransformationToBold() {
+    void stringRemainsTheSameAfterTransformationToBold() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.BOLD);
 
         assertEquals(testText, text.getText());
     }
 
     @Test
-    public void retrieveCorrectTextStyleItalic() {
+    void retrieveCorrectTextStyleItalic() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.ITALIC);
         String textStyle = "tooltip-text-italic";
 
@@ -55,21 +55,21 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void stringRemainsTheSameAfterTransformationToItalic() {
+    void stringRemainsTheSameAfterTransformationToItalic() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.ITALIC);
 
         assertEquals(testText, text.getText());
     }
 
     @Test
-    public void createTextMonospaced() {
+    void createTextMonospaced() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
         assertEquals("tooltip-text-monospaced", text.getStyleClass().toString());
         assertEquals(testText, text.getText());
     }
 
     @Test
-    public void retrieveCorrectStyleMonospaced() {
+    void retrieveCorrectStyleMonospaced() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
         String textStyle = "tooltip-text-monospaced";
 
@@ -77,14 +77,14 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void stringRemainsTheSameAfterTransformationToMonospaced() {
+    void stringRemainsTheSameAfterTransformationToMonospaced() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
 
         assertEquals(testText, text.getText());
     }
 
     @Test
-    public void transformTextToHtmlStringBold() {
+    void transformTextToHtmlStringBold() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.BOLD);
         String htmlString = TooltipTextUtil.textToHtmlString(text);
         String expectedString = "<b>" + testText + "</b>";
@@ -93,7 +93,7 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void transformTextToHtmlStringItalic() {
+    void transformTextToHtmlStringItalic() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.ITALIC);
         String htmlString = TooltipTextUtil.textToHtmlString(text);
         String expectedString = "<i>" + testText + "</i>";
@@ -102,7 +102,7 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void transformTextToHtmlStringMonospaced() {
+    void transformTextToHtmlStringMonospaced() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
         String htmlString = TooltipTextUtil.textToHtmlString(text);
         String expectedString = "<tt>" + testText + "</tt>";
@@ -111,7 +111,7 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void transformTextToHtmlStringMonospacedBold() {
+    void transformTextToHtmlStringMonospacedBold() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
         text.getStyleClass().add("tooltip-text-bold");
         String htmlString = TooltipTextUtil.textToHtmlString(text);
@@ -121,7 +121,7 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void transformTextToHtmlStringWithLinebreaks() {
+    void transformTextToHtmlStringWithLinebreaks() {
         String testText = "this\nis a\ntest text";
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.NORMAL);
         String htmlString = TooltipTextUtil.textToHtmlString(text);
@@ -131,7 +131,7 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void formatToTextsNoReplacements() {
+    void formatToTextsNoReplacements() {
         List<Text> expectedTextList = new ArrayList<>();
         expectedTextList.add(TooltipTextUtil.createText("This search contains entries in which any field contains the regular expression "));
         String test = "This search contains entries in which any field contains the regular expression ";
@@ -141,7 +141,7 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void formatToTextsEnd() {
+    void formatToTextsEnd() {
         List<Text> expectedTextList = new ArrayList<>();
         expectedTextList.add(TooltipTextUtil.createText("This search contains entries in which any field contains the regular expression "));
         expectedTextList.add(TooltipTextUtil.createText("replacing text", TooltipTextUtil.TextType.BOLD));
@@ -152,7 +152,7 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void formatToTextsBegin() {
+    void formatToTextsBegin() {
         List<Text> expectedTextList = new ArrayList<>();
         expectedTextList.add(TooltipTextUtil.createText("replacing text", TooltipTextUtil.TextType.BOLD));
         expectedTextList.add(TooltipTextUtil.createText(" This search contains entries in which any field contains the regular expression"));
@@ -163,7 +163,7 @@ public class TooltipTextUtilTest {
     }
 
     @Test
-    public void formatToTextsMiddle() {
+    void formatToTextsMiddle() {
         List<Text> expectedTextList = new ArrayList<>();
         expectedTextList.add(TooltipTextUtil.createText("This search contains entries "));
         expectedTextList.add(TooltipTextUtil.createText("replacing text", TooltipTextUtil.TextType.BOLD));

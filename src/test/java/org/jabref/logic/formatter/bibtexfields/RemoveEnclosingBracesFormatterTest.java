@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class RemoveEnclosingBracesFormatterTest {
+class RemoveEnclosingBracesFormatterTest {
 
     private final RemoveEnclosingBracesFormatter formatter = new RemoveEnclosingBracesFormatter();
 
@@ -28,12 +28,12 @@ public class RemoveEnclosingBracesFormatterTest {
             "Vall{\\'e}e Poussin, {Vall{\\'e}e Poussin}", // formatDoesNotRemoveBracesInBrokenString
             "Vall{\\'e}e Poussin, Vall{\\'e}e Poussin"
     })
-    public void format(String expected, String input) {
+    void format(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("In CDMA", formatter.format(formatter.getExampleInput()));
     }
 }

@@ -6,16 +6,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SpecialFieldTest {
+class SpecialFieldTest {
 
     @Test
-    public void getSpecialFieldInstanceFromFieldNameValid() {
+    void getSpecialFieldInstanceFromFieldNameValid() {
         assertEquals(Optional.of(SpecialField.RANKING),
                 SpecialField.fromName("ranking"));
     }
 
     @Test
-    public void getSpecialFieldInstanceFromFieldNameEmptyForInvalidField() {
+    void getSpecialFieldInstanceFromFieldNameEmptyForInvalidField() {
         assertEquals(Optional.empty(), SpecialField.fromName("title"));
     }
 }

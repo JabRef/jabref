@@ -35,11 +35,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * \bibcite{canh05}{CMM{$^{+}$}05}
  * </code>
  */
-public class BstWidthCalculatorTest {
+class BstWidthCalculatorTest {
 
     @ParameterizedTest
     @MethodSource("provideTestWidth")
-    public void width(int i, String str) {
+    void width(int i, String str) {
         assertEquals(i, BstWidthCalculator.width(str));
     }
 
@@ -59,7 +59,7 @@ public class BstWidthCalculatorTest {
 
     @ParameterizedTest
     @MethodSource("provideTestGetCharWidth")
-    public void getCharWidth(int i, Character c) {
+    void getCharWidth(int i, Character c) {
         assertEquals(i, BstWidthCalculator.getCharWidth(c));
     }
 

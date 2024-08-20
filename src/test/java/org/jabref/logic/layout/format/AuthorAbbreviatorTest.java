@@ -9,10 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Is the save as the AuthorLastFirstAbbreviator.
  */
-public class AuthorAbbreviatorTest {
+class AuthorAbbreviatorTest {
 
     @Test
-    public void format() {
+    void format() {
         LayoutFormatter a = new AuthorLastFirstAbbreviator();
         LayoutFormatter b = new AuthorAbbreviator();
 

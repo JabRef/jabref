@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CffExporterTest {
+class CffExporterTest {
 
     private static Exporter cffExporter;
     private static BibDatabaseContext databaseContext;
@@ -40,7 +40,7 @@ public class CffExporterTest {
     }
 
     @Test
-    public final void exportForNoEntriesWritesNothing(@TempDir Path tempDir) throws Exception {
+    final void exportForNoEntriesWritesNothing(@TempDir Path tempDir) throws Exception {
         Path file = tempDir.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
         cffExporter.export(databaseContext, tempDir, Collections.emptyList());
@@ -48,7 +48,7 @@ public class CffExporterTest {
     }
 
     @Test
-    public final void exportsCorrectContent(@TempDir Path tempDir) throws Exception {
+    final void exportsCorrectContent(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -77,7 +77,7 @@ public class CffExporterTest {
     }
 
     @Test
-    public final void usesCorrectType(@TempDir Path tempDir) throws Exception {
+    final void usesCorrectType(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -106,7 +106,7 @@ public class CffExporterTest {
     }
 
     @Test
-    public final void usesCorrectDefaultValues(@TempDir Path tempDir) throws Exception {
+    final void usesCorrectDefaultValues(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Thesis).withCitationKey("test");
 
         Path file = tempDir.resolve("RandomFileName");
@@ -129,7 +129,7 @@ public class CffExporterTest {
     }
 
     @Test
-    public final void exportsSoftwareCorrectly(@TempDir Path tempDir) throws Exception {
+    final void exportsSoftwareCorrectly(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Software)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -154,7 +154,7 @@ public class CffExporterTest {
     }
 
     @Test
-    public final void exportsSoftwareDateCorrectly(@TempDir Path tempDir) throws Exception {
+    final void exportsSoftwareDateCorrectly(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Software)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -179,7 +179,7 @@ public class CffExporterTest {
     }
 
     @Test
-    public final void exportsArticleDateCorrectly(@TempDir Path tempDir) throws Exception {
+    final void exportsArticleDateCorrectly(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -209,7 +209,7 @@ public class CffExporterTest {
     }
 
     @Test
-    public final void passesModifiedCharset(@TempDir Path tempDir) throws Exception {
+    final void passesModifiedCharset(@TempDir Path tempDir) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "谷崎 潤一郎")
@@ -238,7 +238,7 @@ public class CffExporterTest {
     }
 
     @Test
-    public final void roundTripTest(@TempDir Path tempDir) throws Exception {
+    final void roundTripTest(@TempDir Path tempDir) throws Exception {
         CitationKeyPatternPreferences citationKeyPatternPreferences = mock(
                 CitationKeyPatternPreferences.class,
                 Answers.RETURNS_SMART_NULLS

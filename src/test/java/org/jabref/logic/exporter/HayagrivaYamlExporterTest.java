@@ -21,7 +21,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class HayagrivaYamlExporterTest {
+class HayagrivaYamlExporterTest {
 
     private static Exporter hayagrivaYamlExporter;
     private static BibDatabaseContext databaseContext;
@@ -42,7 +42,7 @@ public class HayagrivaYamlExporterTest {
     }
 
     @Test
-    public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
+    final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
         hayagrivaYamlExporter.export(databaseContext, tempFile, Collections.emptyList());
@@ -50,7 +50,7 @@ public class HayagrivaYamlExporterTest {
     }
 
     @Test
-    public final void exportsCorrectContent(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectContent(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -77,7 +77,7 @@ public class HayagrivaYamlExporterTest {
     }
 
     @Test
-    public final void exportsCorrectMultipleAuthors(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectMultipleAuthors(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author and Other One")
@@ -105,7 +105,7 @@ public class HayagrivaYamlExporterTest {
     }
 
     @Test
-    public final void formatsContentCorrect(@TempDir Path tempFile) throws Exception {
+    final void formatsContentCorrect(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -185,7 +185,7 @@ public class HayagrivaYamlExporterTest {
     }
 
     @Test
-    public final void exportsCorrectParentField(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectParentField(@TempDir Path tempFile) throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")

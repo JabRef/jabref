@@ -25,7 +25,7 @@ class PushToEmacsTest {
     PushToEmacs pushToEmacs;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
         PreferencesService preferencesService = mock(PreferencesService.class);
 

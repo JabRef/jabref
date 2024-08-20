@@ -17,10 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class IconsPropertiesTest {
+class IconsPropertiesTest {
 
     @Test
-    public void existenceOfIconImagesReferencedFromIconsProperties() throws IOException {
+    void existenceOfIconImagesReferencedFromIconsProperties() throws IOException {
         String folder = "src/main/resources/images/external";
         String iconsProperties = "Icons.properties";
         String iconsPropertiesPath = "src/main/resources/images/" + iconsProperties;

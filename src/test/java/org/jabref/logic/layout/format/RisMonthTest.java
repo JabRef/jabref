@@ -6,15 +6,15 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RisMonthTest {
+class RisMonthTest {
 
     @Test
-    public void empty() {
+    void empty() {
         assertEquals("", new RisMonth().format(""));
     }
 
     @Test
-    public void testNull() {
+    void testNull() {
         assertEquals("", new RisMonth().format(null));
     }
 
@@ -33,13 +33,13 @@ public class RisMonthTest {
             "nov, 11", // nov
             "dec, 12", // dec
     })
-    public void validMonth(String input, String expectedResult) {
+    void validMonth(String input, String expectedResult) {
         String formattedStr = new RisMonth().format(input);
         assertEquals(expectedResult, formattedStr);
     }
 
     @Test
-    public void invalidMonth() {
+    void invalidMonth() {
         assertEquals("abcd", new RisMonth().format("abcd"));
     }
 }
