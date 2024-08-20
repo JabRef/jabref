@@ -19,8 +19,7 @@ This folder contains directories making use of [Vagrant](https://www.vagrantup.c
 1. `cd` into `{vmdir}`, e..g, `cd ubuntu`
 2. Start the vm `vagrant up`
 3. Restart the vm
-4. Ensure that the guest additions are up to date: `vagrant vbguest --do install`
-5. Linux virtual machines: Store ssh configuration: `vagrant ssh-config > vagrant-ssh`
+4. Linux virtual machines: Store ssh configuration: `vagrant ssh-config > vagrant-ssh`
 
 ### Use VM
 
@@ -75,3 +74,8 @@ Install the guest additions manually by "Devices" > "Install Virtual Box Gueat A
 > I get a strange installation error.
 
 Look at <https://stackoverflow.com/a/78040474/873282>.
+
+> How can I update the guest additions?
+
+They should be automatically updated during a reboot.
+A manual update can be triggered by `vagrant vbguest --do install`.
