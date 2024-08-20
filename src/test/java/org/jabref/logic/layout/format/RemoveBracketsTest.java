@@ -7,36 +7,36 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RemoveBracketsTest {
+class RemoveBracketsTest {
     private LayoutFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new RemoveBrackets();
     }
 
     @Test
-    public void bracePairCorrectlyRemoved() throws Exception {
+    void bracePairCorrectlyRemoved() throws Exception {
         assertEquals("some text", formatter.format("{some text}"));
     }
 
     @Test
-    public void singleOpeningBraceCorrectlyRemoved() throws Exception {
+    void singleOpeningBraceCorrectlyRemoved() throws Exception {
         assertEquals("some text", formatter.format("{some text"));
     }
 
     @Test
-    public void singleClosingBraceCorrectlyRemoved() throws Exception {
+    void singleClosingBraceCorrectlyRemoved() throws Exception {
         assertEquals("some text", formatter.format("some text}"));
     }
 
     @Test
-    public void bracePairWithEscapedBackslashCorrectlyRemoved() throws Exception {
+    void bracePairWithEscapedBackslashCorrectlyRemoved() throws Exception {
         assertEquals("\\some text\\", formatter.format("\\{some text\\}"));
     }
 
     @Test
-    public void withoutBracketsUnmodified() throws Exception {
+    void withoutBracketsUnmodified() throws Exception {
         assertEquals("some text", formatter.format("some text"));
     }
 }

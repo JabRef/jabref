@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 @ExtendWith(ApplicationExtension.class)
-public class FileHistoryMenuTest {
+class FileHistoryMenuTest {
     private static final String BIBTEX_LIBRARY_PATH = "src/test/resources/org/jabref/";
 
     private FileHistoryMenu fileHistoryMenu;
@@ -27,7 +27,7 @@ public class FileHistoryMenuTest {
     private DialogService dialogService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         openMocks(this);
         // "null" is a workaround, because OpenDatabaseAction cannot be mocked easily
         fileHistoryMenu = new FileHistoryMenu(fileHistory, dialogService, null);

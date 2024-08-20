@@ -18,22 +18,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
-public class DiVATest {
+class DiVATest {
 
     private DiVA fetcher;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fetcher = new DiVA(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test
-    public void getName() {
+    void getName() {
         assertEquals("DiVA", fetcher.getName());
     }
 
     @Test
-    public void performSearchById() throws Exception {
+    void performSearchById() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setCitationKey("Gustafsson260746");
@@ -53,17 +53,17 @@ public class DiVATest {
     }
 
     @Test
-    public void validIdentifier() {
+    void validIdentifier() {
         assertTrue(fetcher.isValidId("diva2:260746"));
     }
 
     @Test
-    public void invalidIdentifier() {
+    void invalidIdentifier() {
         assertFalse(fetcher.isValidId("banana"));
     }
 
     @Test
-    public void emptyId() throws Exception {
+    void emptyId() throws Exception {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 }

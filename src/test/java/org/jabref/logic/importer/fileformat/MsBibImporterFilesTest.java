@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class MsBibImporterFilesTest {
+class MsBibImporterFilesTest {
 
     private static final String FILE_ENDING = ".xml";
 
@@ -24,19 +24,19 @@ public class MsBibImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void isRecognizedFormat(String fileName) throws IOException {
+    void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new MsBibImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void isNotRecognizedFormat(String fileName) throws IOException {
+    void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(new MsBibImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void importEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new MsBibImporter(), fileName, FILE_ENDING);
     }
 }

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RankingFieldComparatorTest {
+class RankingFieldComparatorTest {
 
     private RankingFieldComparator comparator;
     private final SpecialFieldValue value1 = SpecialFieldValue.RANK_1;
@@ -21,39 +21,39 @@ public class RankingFieldComparatorTest {
     private final Optional<SpecialFieldValueViewModel> rank3 = Optional.of(new SpecialFieldValueViewModel(value3));
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         comparator = new RankingFieldComparator();
     }
 
     @Test
-    public void compareHigherRankFirst() {
+    void compareHigherRankFirst() {
         assertEquals(-2, comparator.compare(rank3, rank1));
         assertEquals(-1, comparator.compare(rank2, rank1));
     }
 
     @Test
-    public void compareLowerRankFirst() {
+    void compareLowerRankFirst() {
         assertEquals(1, comparator.compare(rank1, rank2));
         assertEquals(2, comparator.compare(rank1, rank3));
     }
 
     @Test
-    public void compareSameRank() {
+    void compareSameRank() {
         assertEquals(0, comparator.compare(rank1, rank1));
     }
 
     @Test
-    public void compareTwoEmptyInputs() {
+    void compareTwoEmptyInputs() {
         assertEquals(0, comparator.compare(Optional.empty(), Optional.empty()));
     }
 
     @Test
-    public void compareTwoInputsWithFirstEmpty() {
+    void compareTwoInputsWithFirstEmpty() {
         assertEquals(1, comparator.compare(Optional.empty(), rank1));
     }
 
     @Test
-    public void compareTwoInputsWithSecondEmpty() {
+    void compareTwoInputsWithSecondEmpty() {
         assertEquals(-1, comparator.compare(rank1, Optional.empty()));
     }
 }

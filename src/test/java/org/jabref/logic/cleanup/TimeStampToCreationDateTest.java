@@ -53,7 +53,7 @@ class TimeStampToCreationDateTest {
      */
     @ParameterizedTest
     @MethodSource("standardFieldToCreationDate")
-    public void withStandardFieldToCreationDate(BibEntry expected, BibEntry input) {
+    void withStandardFieldToCreationDate(BibEntry expected, BibEntry input) {
         makeMockReturnStandardField();
         TimeStampToCreationDate migrator = new TimeStampToCreationDate(timestampPreferences);
         migrator.cleanup(input);
@@ -82,7 +82,7 @@ class TimeStampToCreationDateTest {
      */
     @ParameterizedTest
     @MethodSource("customFieldToCreationDate")
-    public void withCustomFieldToCreationDate(BibEntry expected, BibEntry input) {
+    void withCustomFieldToCreationDate(BibEntry expected, BibEntry input) {
         makeMockReturnCustomField();
         TimeStampToCreationDate migrator = new TimeStampToCreationDate(timestampPreferences);
         migrator.cleanup(input);
@@ -169,7 +169,7 @@ class TimeStampToCreationDateTest {
      */
     @ParameterizedTest
     @MethodSource("entriesMigratedToCreationDateFromDifferentFormats")
-    public void withDifferentFormats(BibEntry expected, BibEntry input) {
+    void withDifferentFormats(BibEntry expected, BibEntry input) {
         makeMockReturnStandardField();
         TimeStampToCreationDate migrator = new TimeStampToCreationDate(timestampPreferences);
         ParserResult parserResult = new ParserResult(List.of(input));

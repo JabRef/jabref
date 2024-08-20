@@ -51,7 +51,7 @@ class TimeStampToModificationDateTest {
      */
     @ParameterizedTest
     @MethodSource("standardFieldToModificationDate")
-    public void withStandardFieldToModificationDate(BibEntry expected, BibEntry input) {
+    void withStandardFieldToModificationDate(BibEntry expected, BibEntry input) {
         makeMockReturnStandardField();
         TimeStampToModificationDate migrator = new TimeStampToModificationDate(timestampPreferences);
         migrator.cleanup(input);
@@ -80,7 +80,7 @@ class TimeStampToModificationDateTest {
      */
     @ParameterizedTest
     @MethodSource("customFieldToModificationDate")
-    public void withCustomFieldToModificationDate(BibEntry expected, BibEntry input) {
+    void withCustomFieldToModificationDate(BibEntry expected, BibEntry input) {
         makeMockReturnCustomField();
         TimeStampToModificationDate migrator = new TimeStampToModificationDate(timestampPreferences);
         migrator.cleanup(input);

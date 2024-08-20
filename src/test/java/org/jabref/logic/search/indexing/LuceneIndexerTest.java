@@ -7,7 +7,7 @@ public class LuceneIndexerTest {
     private BibDatabaseContext context = mock(BibDatabaseContext.class);
 
     @BeforeEach
-    public void setUp(@TempDir Path indexDir) throws IOException {
+    void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
         when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
         PreferencesService preferencesService = mock(PreferencesService.class);
@@ -24,7 +24,7 @@ public class LuceneIndexerTest {
     }
 
     @Test
-    public void exampleThesisIndex() throws IOException {
+    void exampleThesisIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
@@ -44,7 +44,7 @@ public class LuceneIndexerTest {
     }
 
     @Test
-    public void dontIndexNonPdf() throws IOException {
+    void dontIndexNonPdf() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.AUX.getName())));
@@ -64,7 +64,7 @@ public class LuceneIndexerTest {
     }
 
     @Test
-    public void dontIndexOnlineLinks() throws IOException {
+    void dontIndexOnlineLinks() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "https://raw.githubusercontent.com/JabRef/jabref/main/src/test/resources/pdfs/thesis-example.pdf", StandardFileType.PDF.getName())));
@@ -84,7 +84,7 @@ public class LuceneIndexerTest {
     }
 
     @Test
-    public void exampleThesisIndexWithKey() throws IOException {
+    void exampleThesisIndexWithKey() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setCitationKey("Example2017");
@@ -105,7 +105,7 @@ public class LuceneIndexerTest {
     }
 
     @Test
-    public void metaDataIndex() throws IOException {
+    void metaDataIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "metaData.pdf", StandardFileType.PDF.getName())));
@@ -153,7 +153,7 @@ public class LuceneIndexerTest {
     }
 
     @Test
-    public void exampleThesisIndexAppendMetaData() throws IOException {
+    void exampleThesisIndexAppendMetaData() throws IOException {
         // given
         BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis);
         exampleThesis.setCitationKey("ExampleThesis2017");

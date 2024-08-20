@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ASCIICharacterCheckerTest {
+class ASCIICharacterCheckerTest {
 
     private final ASCIICharacterChecker checker = new ASCIICharacterChecker();
     private final BibEntry entry = new BibEntry();
