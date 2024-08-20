@@ -19,6 +19,7 @@ Vagrant.configure("2") do |config|
     sudo apt-get install -y git
   SHELL
 
+  # Install JDK, clone JabRef's source code, and do an initial build
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
     curl -s "https://get.sdkman.io" | bash
     source "$HOME/.sdkman/bin/sdkman-init.sh"
