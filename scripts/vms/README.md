@@ -24,6 +24,20 @@ On Linux, you can also do `ssh -Y -F vagrant-ssh default` to SSH into the machin
 
 If asked for a password, this is `vagrant`.
 
+#### Multiple Screens
+
+One can configure mulitple screen as the virtual machine settings of Virtual Box:
+Navigate to "Display" (1) and then adjust the number of displays (2).
+
+![Virtual Box settings for multiple screens at VM settings](virtualbox-multiple-screens-1.png)
+
+In case you want to have a fixed resoltuion, one can pin the screen resolution as follows:
+During running of Virutal Box,
+(1) unselect "Auto-size Guest Display" and
+(2) adjust the screen resolution to full HD
+
+![Virtual Box settings for multiple screens at running VM](virtualbox-multiple-screens-1.png)
+
 ### Remove VM
 
 Execute `vagrant destroy`.
