@@ -30,7 +30,7 @@ public class DocbookExporterTest {
     private Exporter exportFormat;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         exportFormat = new TemplateExporter(
                 "DocBook 4",
                 "docbook4",
@@ -42,7 +42,7 @@ public class DocbookExporterTest {
     }
 
     @Test
-    public void corruptedTitleBraces(@TempDir Path testFolder) throws Exception {
+    void corruptedTitleBraces(@TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
@@ -58,7 +58,7 @@ public class DocbookExporterTest {
     }
 
     @Test
-    public void corruptedTitleUnicode(@TempDir Path testFolder) throws Exception {
+    void corruptedTitleUnicode(@TempDir Path testFolder) throws Exception {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SciteTabViewModelTest {
+class SciteTabViewModelTest {
 
     @Mock
     private PreferencesService preferencesService;
@@ -34,7 +34,7 @@ public class SciteTabViewModelTest {
     }
 
     @Test
-    public void sciteTallyDTO() {
+    void sciteTallyDTO() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("total", 1);
         jsonObject.put("supporting", 2);

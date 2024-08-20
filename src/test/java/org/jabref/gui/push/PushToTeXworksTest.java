@@ -30,7 +30,7 @@ class PushToTeXworksTest {
     private PushToTeXworks pushToTeXworks;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
         PreferencesService preferencesService = mock(PreferencesService.class);
         PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);

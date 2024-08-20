@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ProtectedTermsListTest {
+class ProtectedTermsListTest {
 
     private ProtectedTermsList internalList;
     private ProtectedTermsList externalList;
 
     @BeforeEach
-    public void setUp(@TempDir Path temporaryFolder) throws IOException {
+    void setUp(@TempDir Path temporaryFolder) throws IOException {
         Path path = temporaryFolder.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(path);
         String tempFileName = path.toString();
@@ -30,70 +30,70 @@ public class ProtectedTermsListTest {
     }
 
     @Test
-    public void protectedTermsListStringListOfStringStringBoolean() {
+    void protectedTermsListStringListOfStringStringBoolean() {
         assertTrue(internalList.isInternalList());
     }
 
     @Test
-    public void protectedTermsListStringListOfStringString() {
+    void protectedTermsListStringListOfStringString() {
         assertFalse(externalList.isInternalList());
     }
 
     @Test
-    public void getDescription() {
+    void getDescription() {
         assertEquals("Name", internalList.getDescription());
     }
 
     @Test
-    public void getTermList() {
+    void getTermList() {
         assertEquals(Arrays.asList("AAA", "BBB"), internalList.getTermList());
     }
 
     @Test
-    public void getLocation() {
+    void getLocation() {
         assertEquals("location", internalList.getLocation());
     }
 
     @Test
-    public void getTermListing() {
+    void getTermListing() {
         assertEquals("AAA\nBBB", internalList.getTermListing());
     }
 
     @Test
-    public void compareTo() {
+    void compareTo() {
         assertEquals(-2, internalList.compareTo(externalList));
     }
 
     @Test
-    public void setEnabledIsEnabled() {
+    void setEnabledIsEnabled() {
         assertFalse(internalList.isEnabled());
         internalList.setEnabled(true);
         assertTrue(internalList.isEnabled());
     }
 
     @Test
-    public void notEnabledByDefault() {
+    void notEnabledByDefault() {
         assertFalse(internalList.isEnabled());
     }
 
     @Test
-    public void canNotAddTermToInternalList() {
+    void canNotAddTermToInternalList() {
         assertFalse(internalList.addProtectedTerm("CCC"));
     }
 
     @Test
-    public void termNotAddedToInternalList() {
+    void termNotAddedToInternalList() {
         internalList.addProtectedTerm("CCC");
         assertFalse(internalList.getTermList().contains("CCC"));
     }
 
     @Test
-    public void canAddTermToExternalList() {
+    void canAddTermToExternalList() {
         assertTrue(externalList.addProtectedTerm("CCC"));
     }
 
     @Test
-    public void termAddedToExternalList() {
+    void termAddedToExternalList() {
         externalList.addProtectedTerm("CCC");
         assertTrue(externalList.getTermList().contains("CCC"));
     }

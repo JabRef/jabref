@@ -38,20 +38,20 @@ class StudyYamlParserTest {
     }
 
     @Test
-    public void parseStudyFileSuccessfully() throws Exception {
+    void parseStudyFileSuccessfully() throws Exception {
         Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
         assertEquals(expectedStudy, study);
     }
 
     @Test
-    public void writeStudyFileSuccessfully() throws Exception {
+    void writeStudyFileSuccessfully() throws Exception {
         new StudyYamlParser().writeStudyYamlFile(expectedStudy, testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
         Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
         assertEquals(expectedStudy, study);
     }
 
     @Test
-    public void readsJabRef57StudySuccessfully() throws Exception {
+    void readsJabRef57StudySuccessfully() throws Exception {
         // The field "last-search-date" was removed
         // If the field is "just" removed from the datamodel, one gets following exception:
         //   com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException: Unrecognized field "last-search-date" (class org.jabref.model.study.Study), not marked as ignorable (5 known properties: "authors", "research-questions", "queries", "title", "databases"])

@@ -53,7 +53,7 @@ class CrawlerTest {
      * Set up mocks and copies the study definition file into the test repository
      */
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         setUpRepository();
 
         CitationKeyPatternPreferences citationKeyPatternPreferences = new CitationKeyPatternPreferences(
@@ -101,7 +101,7 @@ class CrawlerTest {
     }
 
     @Test
-    public void whetherAllFilesAreCreated() throws Exception {
+    void whetherAllFilesAreCreated() throws Exception {
         Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
                 gitHandler,
                 preferencesService,

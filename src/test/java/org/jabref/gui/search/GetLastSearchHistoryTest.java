@@ -7,15 +7,16 @@ import javafx.stage.Stage;
 import org.jabref.gui.StateManager;
 import org.jabref.testutils.category.GUITest;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @GUITest
 @ExtendWith(ApplicationExtension.class)
-public class GetLastSearchHistoryTest {
+class GetLastSearchHistoryTest {
     @Start
     void onStart(Stage stage) {
         // Needed to init JavaFX thread
@@ -31,7 +32,7 @@ public class GetLastSearchHistoryTest {
         List<String> lastSearchHistory = stateManager.getLastSearchHistory(2);
         List<String> expected = List.of("test2", "test3");
 
-        Assertions.assertEquals(expected, lastSearchHistory);
+        assertEquals(expected, lastSearchHistory);
     }
 
     @Test
@@ -44,7 +45,7 @@ public class GetLastSearchHistoryTest {
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory();
         List<String> expected = List.of("test2", "test3", "test1");
 
-        Assertions.assertEquals(expected, lastSearchHistory);
+        assertEquals(expected, lastSearchHistory);
     }
 
     @Test
@@ -55,10 +56,10 @@ public class GetLastSearchHistoryTest {
         stateManager.addSearchHistory("test3");
         List<String> lastSearchHistory = stateManager.getWholeSearchHistory();
         List<String> expected = List.of("test1", "test2", "test3");
-        Assertions.assertEquals(expected, lastSearchHistory);
+        assertEquals(expected, lastSearchHistory);
         stateManager.clearSearchHistory();
         lastSearchHistory = stateManager.getWholeSearchHistory();
         expected = List.of();
-        Assertions.assertEquals(expected, lastSearchHistory);
+        assertEquals(expected, lastSearchHistory);
     }
 }

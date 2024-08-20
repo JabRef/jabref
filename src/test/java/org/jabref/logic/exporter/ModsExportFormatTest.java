@@ -17,13 +17,13 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class ModsExportFormatTest {
+class ModsExportFormatTest {
 
     private ModsExporter modsExportFormat;
     private BibDatabaseContext databaseContext;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
         modsExportFormat = new ModsExporter();
         new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
@@ -31,7 +31,7 @@ public class ModsExportFormatTest {
     }
 
     @Test
-    public final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
+    final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
         modsExportFormat.export(databaseContext, tempFile, Collections.emptyList());

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DoiDuplicationCheckerTest {
+class DoiDuplicationCheckerTest {
 
     private final DoiDuplicationChecker checker = new DoiDuplicationChecker();
     private String doiA = "10.1023/A:1022883727209";
@@ -25,7 +25,7 @@ public class DoiDuplicationCheckerTest {
     private BibEntry doiC_entry1 = new BibEntry().withField(StandardField.DOI, doiC);
 
     @Test
-    public void onePairDuplicateDOI() {
+    void onePairDuplicateDOI() {
         List<BibEntry> entries = List.of(doiA_entry1, doiA_entry2, doiC_entry1);
         BibDatabase database = new BibDatabase(entries);
         List<IntegrityMessage> results = List.of(new IntegrityMessage(Localization.lang("Same DOI used in multiple entries"), doiA_entry1, StandardField.DOI),
@@ -34,7 +34,7 @@ public class DoiDuplicationCheckerTest {
     }
 
     @Test
-    public void multiPairsDuplicateDOI() {
+    void multiPairsDuplicateDOI() {
         List<BibEntry> entries = List.of(doiA_entry1, doiA_entry2, doiB_entry1, doiB_entry2, doiC_entry1);
         BibDatabase database = new BibDatabase(entries);
         List<IntegrityMessage> results = List.of(new IntegrityMessage(Localization.lang("Same DOI used in multiple entries"), doiA_entry1, StandardField.DOI),
@@ -45,7 +45,7 @@ public class DoiDuplicationCheckerTest {
     }
 
     @Test
-    public void noDuplicateDOI() {
+    void noDuplicateDOI() {
         List<BibEntry> entries = List.of(doiA_entry1, doiB_entry1, doiC_entry1);
         BibDatabase database = new BibDatabase(entries);
         assertEquals(Collections.emptyList(), checker.check(database));

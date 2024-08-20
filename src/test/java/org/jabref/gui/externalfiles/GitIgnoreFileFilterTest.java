@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GitIgnoreFileFilterTest {
 
     @Test
-    public void checkSimpleGitIgnore(@TempDir Path dir) throws Exception {
+    void checkSimpleGitIgnore(@TempDir Path dir) throws Exception {
         Files.writeString(dir.resolve(".gitignore"), """
                 *.png
                 """);
@@ -21,7 +21,7 @@ class GitIgnoreFileFilterTest {
     }
 
     @Test
-    public void checkSimpleGitIgnoreWithAllowing(@TempDir Path dir) throws Exception {
+    void checkSimpleGitIgnoreWithAllowing(@TempDir Path dir) throws Exception {
         Files.writeString(dir.resolve(".gitignore"), """
                 !*.png
                 """);
@@ -30,7 +30,7 @@ class GitIgnoreFileFilterTest {
     }
 
     @Test
-    public void checkSimpleGitIgnoreWithOverwritingDefs(@TempDir Path dir) throws Exception {
+    void checkSimpleGitIgnoreWithOverwritingDefs(@TempDir Path dir) throws Exception {
         Files.writeString(dir.resolve(".gitignore"), """
                 !*.png
                 *.png
@@ -40,7 +40,7 @@ class GitIgnoreFileFilterTest {
     }
 
     @Test
-    public void checkDirectoryGitIgnore(@TempDir Path dir) throws Exception {
+    void checkDirectoryGitIgnore(@TempDir Path dir) throws Exception {
         Files.writeString(dir.resolve(".gitignore"), """
                 **/*.png
                 """);

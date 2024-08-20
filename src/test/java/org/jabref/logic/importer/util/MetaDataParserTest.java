@@ -67,7 +67,7 @@ public class MetaDataParserTest {
     }
 
     @Test
-    public void saveActions() throws Exception {
+    void saveActions() throws Exception {
         Map<String, String> data = Map.of("saveActions", "enabled;title[lower_case]");
         MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());
         MetaData parsed = metaDataParser.parse(new MetaData(), data, ',');

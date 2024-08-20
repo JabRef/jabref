@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class CitaviXmlImporterFilesTest {
+class CitaviXmlImporterFilesTest {
 
     private static final String FILE_ENDING = ".ctv6bak";
     private final CitaviXmlImporter citaviXmlImporter = new CitaviXmlImporter();

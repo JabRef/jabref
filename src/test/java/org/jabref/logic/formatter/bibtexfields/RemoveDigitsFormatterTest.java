@@ -5,27 +5,27 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RemoveDigitsFormatterTest {
+class RemoveDigitsFormatterTest {
 
     private RemoveDigitsFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new RemoveDigitsFormatter();
     }
 
     @Test
-    public void doNothingIfSingleSpace() {
+    void doNothingIfSingleSpace() {
         assertEquals("one digit", formatter.format("one 1 digit"));
     }
 
     @Test
-    public void doNothingIfNoSpace() {
+    void doNothingIfNoSpace() {
         assertEquals("two digits", formatter.format("two 01 digits"));
     }
 
     @Test
-    public void removeAllButOneSpacesIfTwo() {
+    void removeAllButOneSpacesIfTwo() {
         assertEquals("no digits", formatter.format("no digits"));
     }
 }

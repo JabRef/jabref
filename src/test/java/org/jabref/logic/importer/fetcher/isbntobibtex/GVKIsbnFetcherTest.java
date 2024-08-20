@@ -18,12 +18,12 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class GVKIsbnFetcherTest extends AbstractIsbnFetcherTest {
+class GVKIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
     private BibEntry bibEntryEffectiveJavaLongISBN;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         bibEntryEffectiveJava = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Effective Java(TM) Programming Language Guide (2nd Edition) (The Java Series)")
                 .withField(StandardField.PUBLISHER, "Prentice Hall PTR")
@@ -95,7 +95,7 @@ public class GVKIsbnFetcherTest extends AbstractIsbnFetcherTest {
      * Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
      */
     @Test
-    public void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
+    void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
        assertEquals(Optional.empty(), fetcher.performSearchById("9785646216541"));

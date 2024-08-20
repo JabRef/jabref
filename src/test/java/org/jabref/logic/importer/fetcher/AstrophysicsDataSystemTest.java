@@ -65,7 +65,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
             .withField(StandardField.ABSTRACT, "The Clementine mission to the Moon returned global imaging data         collected by the ultraviolet visible (UVVIS) camera. This data         set is now in a final state of calibration, and a five-band         multispectral digital image model (DIM) of the lunar surface         will soon be available to the science community. We have used         observations of the lunar sample-return sites and stations         extracted from the final DIM in conjunction with compositional         information for returned lunar soils to revise our previously         published algorithms for the spectral determination of the FeO         and TiO$_{2}$ content of the lunar surface. The algorithms         successfully normalize the effects of space weathering so that         composition may be determined without regard to a surface's         state of maturity. These algorithms permit anyone with access to         the standard archived DIM to construct high spatial resolution         maps of FeO and TiO$_{2}$ abundance. Such maps will be of great         utility in a variety of lunar geologic studies.");
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
@@ -133,19 +133,19 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    public void getName() {
+    void getName() {
         assertEquals("SAO/NASA ADS", fetcher.getName());
     }
 
     @Test
-    public void searchByQueryFindsEntry() throws Exception {
+    void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie");
         assertFalse(fetchedEntries.isEmpty());
         assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
 
     @Test
-    public void searchByEntryFindsEntry() throws Exception {
+    void searchByEntryFindsEntry() throws Exception {
         BibEntry searchEntry = new BibEntry()
                 .withField(StandardField.TITLE, "slice theorem")
                 .withField(StandardField.AUTHOR, "Diez");
@@ -158,56 +158,56 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    public void performSearchByFamaeyMcGaughEntry() throws Exception {
+    void performSearchByFamaeyMcGaughEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
         fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(famaeyMcGaughEntry), fetchedEntry);
     }
 
     @Test
-    public void performSearchByIdEmptyDOI() throws Exception {
+    void performSearchByIdEmptyDOI() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test
-    public void performSearchByIdInvalidDoi() throws Exception {
+    void performSearchByIdInvalidDoi() throws Exception {
         assertEquals(Optional.empty(), fetcher.performSearchById("this.doi.will.fail"));
     }
 
     @Test
-    public void performSearchBySunWelchEntry() throws Exception {
+    void performSearchBySunWelchEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160");
         fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(sunWelchEntry), fetchedEntry);
     }
 
     @Test
-    public void performSearchByXiongSunEntry() throws Exception {
+    void performSearchByXiongSunEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/TGRS.2006.890567");
         assertEquals(Optional.of(xiongSunEntry), fetchedEntry);
     }
 
     @Test
-    public void performSearchByIngersollPollardEntry() throws Exception {
+    void performSearchByIngersollPollardEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1016/0019-1035(82)90169-5");
         assertEquals(Optional.of(ingersollPollardEntry), fetchedEntry);
     }
 
     @Test
-    public void performSearchByLuceyPaulEntry() throws Exception {
+    void performSearchByLuceyPaulEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("2000JGR...10520297L");
         assertEquals(Optional.of(luceyPaulEntry), fetchedEntry);
     }
 
     @Test
-    public void performSearchByQueryPaged_searchLimitsSize() throws Exception {
+    void performSearchByQueryPaged_searchLimitsSize() throws Exception {
         Page<BibEntry> page = fetcher.performSearchPaged("author:\"A\"", 0);
         assertEquals(fetcher.getPageSize(), page.getSize(), "fetcher return wrong page size");
     }
 
     @Test
-    public void performSearchByQueryPaged_invalidAuthorsReturnEmptyPages() throws Exception {
+    void performSearchByQueryPaged_invalidAuthorsReturnEmptyPages() throws Exception {
         Page<BibEntry> page = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 0);
         Page<BibEntry> page5 = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 5);
         assertEquals(0, page.getSize(), "fetcher doesnt return empty pages for invalid author");

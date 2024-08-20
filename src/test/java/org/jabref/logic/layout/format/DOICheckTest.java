@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DOICheckTest {
+class DOICheckTest {
 
     private final DOIPreferences doiPreferences = mock(DOIPreferences.class);
     private final LayoutFormatter layoutFormatter = new DOICheck(doiPreferences);

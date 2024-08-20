@@ -5,23 +5,23 @@ import java.io.ByteArrayInputStream;
 import org.jabref.logic.importer.ParseException;
 
 import kong.unirest.core.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class JsonReaderTest {
 
     @Test
     void nullStreamThrowsNullPointerException() {
-        Assertions.assertThrows(NullPointerException.class, () -> {
+        assertThrows(NullPointerException.class, () -> {
             JsonReader.toJsonObject(null);
         });
     }
 
     @Test
     void invalidJsonThrowsParserException() {
-        Assertions.assertThrows(ParseException.class, () -> {
+        assertThrows(ParseException.class, () -> {
             JsonReader.toJsonObject(new ByteArrayInputStream("invalid JSON".getBytes()));
         });
     }
@@ -35,7 +35,7 @@ class JsonReaderTest {
     @Test
     void arrayThrowsParserException() {
         // Reason: We expect a JSON object, not a JSON array
-        Assertions.assertThrows(ParseException.class, () -> {
+        assertThrows(ParseException.class, () -> {
             JsonReader.toJsonObject(new ByteArrayInputStream("[]".getBytes()));
         });
     }

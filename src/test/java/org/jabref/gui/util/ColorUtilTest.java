@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ColorUtilTest {
+class ColorUtilTest {
 
     private static final Color C1 = Color.color(0.2, 0.4, 1);
     private static final Color C2 = Color.rgb(255, 255, 255);
@@ -22,14 +22,14 @@ public class ColorUtilTest {
     private ColorUtil colorUtil = new ColorUtil();
 
     @Test
-    public void toRGBCodeTest() {
+    void toRGBCodeTest() {
         assertEquals("#3366FF", ColorUtil.toRGBCode(C1));
         assertEquals("#FFFFFF", ColorUtil.toRGBCode(C2));
     }
 
     @ParameterizedTest
     @MethodSource("provideToRGBACodeTest")
-    public void toRGBACodeTest(Color color, String expected) {
+    void toRGBACodeTest(Color color, String expected) {
         assertEquals(expected, ColorUtil.toRGBACode(color));
     }
 
@@ -44,7 +44,7 @@ public class ColorUtilTest {
     }
 
     @Test
-    public void toHexTest() {
+    void toHexTest() {
         assertEquals("#000001", ColorUtil.toHex(C1));
         assertEquals("#010101", ColorUtil.toHex(C2));
     }
