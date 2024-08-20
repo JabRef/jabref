@@ -494,7 +494,7 @@ public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
 
     // SLR
-    private static final String SELECTED_SLR_FETCHERS = "selectedSlrFetchers";
+    private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
 
     // The only instance of this class:
     private static JabRefPreferences singleton;
@@ -2186,7 +2186,7 @@ public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
                 getBoolean(SHOW_ADVANCED_HINTS),
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
-                getStringList(SELECTED_SLR_FETCHERS));
+                getStringList(SELECTED_SLR_CATALOGS));
 
         EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
@@ -2204,8 +2204,8 @@ public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
         EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
         EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
-        workspacePreferences.getSelectedSlrFetchers().addListener((ListChangeListener<String>) change ->
-                putStringList(SELECTED_SLR_FETCHERS, workspacePreferences.getSelectedSlrFetchers()));
+        workspacePreferences.getSelectedSlrCatalogs().addListener((ListChangeListener<String>) change ->
+                putStringList(SELECTED_SLR_CATALOGS, workspacePreferences.getSelectedSlrCatalogs()));
         return workspacePreferences;
     }
 

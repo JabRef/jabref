@@ -225,19 +225,19 @@ public class ManageStudyDefinitionViewModel {
         queries.remove(item);
     }
 
-    public void initializeSelectedFetchers() {
-        List<String> selectedFetchers = preferencesService.getWorkspacePreferences().getSelectedSlrFetchers();
+    public void initializeSelectedCatalogs() {
+        List<String> selectedCatalogs = preferencesService.getWorkspacePreferences().getSelectedSlrCatalogs();
         for (StudyCatalogItem catalog : databases) {
-            catalog.setEnabled(selectedFetchers.contains(catalog.getName()));
-            catalog.enabledProperty().addListener((obs, oldValue, newValue) -> updateSelectedFetchers());
+            catalog.setEnabled(selectedCatalogs.contains(catalog.getName()));
+            catalog.enabledProperty().addListener((obs, oldValue, newValue) -> updateSelectedCatalogs());
         }
     }
 
-    private void updateSelectedFetchers() {
-        List<String> selectedFetchersList = databases.stream()
+    private void updateSelectedCatalogs() {
+        List<String> selectedCatalogsList = databases.stream()
                                                      .filter(StudyCatalogItem::isEnabled)
                                                      .map(StudyCatalogItem::getName)
                                                      .collect(Collectors.toList());
-        preferencesService.getWorkspacePreferences().setSelectedSlrFetchers(selectedFetchersList);
+        preferencesService.getWorkspacePreferences().setSelectedSlrCatalogs(selectedCatalogsList);
     }
 }

@@ -25,7 +25,7 @@ public class WorkspacePreferences {
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
-    private final ObservableList<String> selectedSlrFetchers;
+    private final ObservableList<String> selectedSlrCatalogs;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -37,7 +37,7 @@ public class WorkspacePreferences {
                                 boolean showAdvancedHints,
                                 boolean warnAboutDuplicatesInInspection,
                                 boolean confirmDelete,
-                                List<String> selectedSlrFetchers) {
+                                List<String> selectedSlrCatalogs) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
@@ -48,7 +48,7 @@ public class WorkspacePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
-        this.selectedSlrFetchers = FXCollections.observableArrayList(selectedSlrFetchers);
+        this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
     }
 
     public Language getLanguage() {
@@ -163,11 +163,11 @@ public class WorkspacePreferences {
         this.confirmDelete.set(confirmDelete);
     }
 
-    public ObservableList<String> getSelectedSlrFetchers() {
-        return selectedSlrFetchers;
+    public ObservableList<String> getSelectedSlrCatalogs() {
+        return selectedSlrCatalogs;
     }
 
-    public void setSelectedSlrFetchers(List<String> fetchers) {
-        selectedSlrFetchers.setAll(fetchers);
+    public void setSelectedSlrCatalogs(List<String> catalogs) {
+        selectedSlrCatalogs.setAll(catalogs);
     }
 }
