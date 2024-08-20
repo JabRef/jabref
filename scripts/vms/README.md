@@ -15,7 +15,7 @@ This folder contains directories making use of [Vagrant](https://www.vagrantup.c
 
 1. `cd` into `{vmdir}`, e..g, `cd ubuntu`
 2. Start the vm `vagrant up`
-3. Linux machines: Store ssh configuration: `vagrant ssh-config > default`
+3. Linux machines: Store ssh configuration: `vagrant ssh-config > vagrant-ssh`
 
 ### Use VM
 
