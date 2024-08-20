@@ -25,7 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.jabref.logic.openoffice.oocsltext.CSLFormatUtils.generateAlphanumericCitation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CSLFormatUtilsTest {
+class CSLFormatUtilsTest {
 
     private static final List<CitationStyle> STYLE_LIST = CitationStyle.discoverCitationStyles();
 
