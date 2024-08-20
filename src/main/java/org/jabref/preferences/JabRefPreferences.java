@@ -2205,7 +2205,7 @@ public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
         EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
         EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
         workspacePreferences.getSelectedSlrFetchers().addListener((ListChangeListener<String>) change ->
-                putStringList(SELECTED_SLR_FETCHERS, new ArrayList<>(workspacePreferences.getSelectedSlrFetchers())));
+                putStringList(SELECTED_SLR_FETCHERS, workspacePreferences.getSelectedSlrFetchers()));
         return workspacePreferences;
     }
 
