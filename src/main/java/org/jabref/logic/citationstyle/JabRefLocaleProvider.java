@@ -9,6 +9,7 @@ import java.util.Map;
 
 import de.undercouch.citeproc.LocaleProvider;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link LocaleProvider} that loads locales from a directory in the current module.
@@ -17,7 +18,7 @@ import org.slf4j.Logger;
  */
 public class JabRefLocaleProvider implements LocaleProvider {
 
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(JabRefLocaleProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefLocaleProvider.class);
 
     private static final String LOCALES_ROOT = "/csl-locales";
 
