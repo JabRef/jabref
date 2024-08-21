@@ -1132,6 +1132,10 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0em 1.8em 0em 0em;
 }
 
+.global-search-bar:illegal-search {
+    -fx-background-color: derive(-jr-light-red, 70%);
+}
+
 /* The little arrow that shows up when not all tool-bar icons fit into the tool-bar.
 We want to have a look that matches our icons in the tool-bar */
 .mainToolbar .tool-bar-overflow-button > .arrow {
