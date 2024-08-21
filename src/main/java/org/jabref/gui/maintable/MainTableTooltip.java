@@ -29,12 +29,12 @@ public class MainTableTooltip extends Tooltip {
 
     public Tooltip createTooltip(BibEntry entry, String fieldValue) {
         fieldValueLabel.setText(fieldValue + "\n");
-        if (!preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip()) {
-            this.setGraphic(fieldValueLabel);
-        } else {
+        if (preferences.getPreviewPreferences().shouldShowPreviewEntryTableTooltip()) {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
             preview.setEntry(entry);
-           this.setGraphic(tooltipContent);
+            this.setGraphic(tooltipContent);
+        } else {
+            this.setGraphic(fieldValueLabel);
         }
         return this;
     }
