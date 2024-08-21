@@ -16,30 +16,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SearchQueryTest {
+class SearchQueryTest {
 
     @Test
-    public void testToString() {
+    void testToString() {
         assertEquals("\"asdf\" (case sensitive, regular expression) [CASE_SENSITIVE, REGULAR_EXPRESSION]", new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).toString());
         assertEquals("\"asdf\" (case insensitive, plain text) []", new SearchQuery("asdf", EnumSet.noneOf(SearchFlags.class)).toString());
     }
 
     @Test
-    public void isContainsBasedSearch() {
+    void isContainsBasedSearch() {
         assertTrue(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isContainsBasedSearch());
         assertTrue(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isContainsBasedSearch());
         assertFalse(new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isContainsBasedSearch());
     }
 
     @Test
-    public void isGrammarBasedSearch() {
+    void isGrammarBasedSearch() {
         assertFalse(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isGrammarBasedSearch());
         assertFalse(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isGrammarBasedSearch());
         assertTrue(new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isGrammarBasedSearch());
     }
 
     @Test
-    public void grammarSearch() {
+    void grammarSearch() {
         BibEntry entry = new BibEntry();
         entry.addKeyword("one two", ',');
         SearchQuery searchQuery = new SearchQuery("keywords=\"one two\"", EnumSet.noneOf(SearchFlags.class));
@@ -47,7 +47,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void grammarSearchFullEntryLastCharMissing() {
+    void grammarSearchFullEntryLastCharMissing() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "systematic revie");
         SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", EnumSet.noneOf(SearchFlags.class));
@@ -55,7 +55,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void grammarSearchFullEntry() {
+    void grammarSearchFullEntry() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "systematic review");
         SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", EnumSet.noneOf(SearchFlags.class));
@@ -63,7 +63,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void searchingForOpenBraketInBooktitle() {
+    void searchingForOpenBraketInBooktitle() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.BOOKTITLE, "Super Conference (SC)");
 
@@ -72,7 +72,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void searchMatchesSingleKeywordNotPart() {
+    void searchMatchesSingleKeywordNotPart() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
@@ -81,7 +81,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void searchMatchesSingleKeyword() {
+    void searchMatchesSingleKeyword() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
 
@@ -90,7 +90,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void searchAllFields() {
+    void searchAllFields() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.TITLE, "Fruity features");
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
@@ -100,7 +100,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void searchAllFieldsNotForSpecificField() {
+    void searchAllFieldsNotForSpecificField() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.TITLE, "Fruity features");
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
@@ -110,7 +110,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void searchAllFieldsAndSpecificField() {
+    void searchAllFieldsAndSpecificField() {
         BibEntry e = new BibEntry(StandardEntryType.InProceedings);
         e.setField(StandardField.TITLE, "Fruity features");
         e.setField(StandardField.KEYWORDS, "banana, pineapple, orange");
@@ -120,7 +120,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void isMatch() {
+    void isMatch() {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "asdf");
@@ -131,57 +131,57 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void isValidQueryNotAsRegEx() {
+    void isValidQueryNotAsRegEx() {
         assertTrue(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isValid());
     }
 
     @Test
-    public void isValidQueryContainsBracketNotAsRegEx() {
+    void isValidQueryContainsBracketNotAsRegEx() {
         assertTrue(new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isValid());
     }
 
     @Test
-    public void isNotValidQueryContainsBracketNotAsRegEx() {
+    void isNotValidQueryContainsBracketNotAsRegEx() {
         assertTrue(new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void isValidQueryAsRegEx() {
+    void isValidQueryAsRegEx() {
         assertTrue(new SearchQuery("asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void isValidQueryWithNumbersAsRegEx() {
+    void isValidQueryWithNumbersAsRegEx() {
         assertTrue(new SearchQuery("123", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void isValidQueryContainsBracketAsRegEx() {
+    void isValidQueryContainsBracketAsRegEx() {
         assertTrue(new SearchQuery("asdf[", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void isValidQueryWithEqualSignAsRegEx() {
+    void isValidQueryWithEqualSignAsRegEx() {
         assertTrue(new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void isValidQueryWithNumbersAndEqualSignAsRegEx() {
+    void isValidQueryWithNumbersAndEqualSignAsRegEx() {
         assertTrue(new SearchQuery("author=123", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE, SearchRules.SearchFlags.REGULAR_EXPRESSION)).isValid());
     }
 
     @Test
-    public void isValidQueryWithEqualSignNotAsRegEx() {
+    void isValidQueryWithEqualSignNotAsRegEx() {
         assertTrue(new SearchQuery("author=asdf", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isValid());
     }
 
     @Test
-    public void isValidQueryWithNumbersAndEqualSignNotAsRegEx() {
+    void isValidQueryWithNumbersAndEqualSignNotAsRegEx() {
         assertTrue(new SearchQuery("author=123", EnumSet.of(SearchRules.SearchFlags.CASE_SENSITIVE)).isValid());
     }
 
     @Test
-    public void isMatchedForNormalAndFieldBasedSearchMixed() {
+    void isMatchedForNormalAndFieldBasedSearchMixed() {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "asdf");
@@ -191,7 +191,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void simpleTerm() {
+    void simpleTerm() {
         String query = "progress";
 
         SearchQuery result = new SearchQuery(query, EnumSet.noneOf(SearchFlags.class));
@@ -199,7 +199,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void getPattern() {
+    void getPattern() {
         String query = "progress";
         SearchQuery result = new SearchQuery(query, EnumSet.noneOf(SearchFlags.class));
         Pattern pattern = Pattern.compile("(\\Qprogress\\E)");
@@ -208,7 +208,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void getRegexpPattern() {
+    void getRegexpPattern() {
         String queryText = "[a-c]\\d* \\d*";
         SearchQuery regexQuery = new SearchQuery(queryText, EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
         Pattern pattern = Pattern.compile("([a-c]\\d* \\d*)");
@@ -216,7 +216,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void getRegexpJavascriptPattern() {
+    void getRegexpJavascriptPattern() {
         String queryText = "[a-c]\\d* \\d*";
         SearchQuery regexQuery = new SearchQuery(queryText, EnumSet.of(SearchRules.SearchFlags.REGULAR_EXPRESSION));
         Pattern pattern = Pattern.compile("([a-c]\\d* \\d*)");
@@ -224,7 +224,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void escapingInPattern() {
+    void escapingInPattern() {
         // first word contain all java special regex characters
         String queryText = "<([{\\\\^-=$!|]})?*+.> word1 word2.";
         SearchQuery textQueryWithSpecialChars = new SearchQuery(queryText, EnumSet.noneOf(SearchFlags.class));
@@ -233,7 +233,7 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void escapingInJavascriptPattern() {
+    void escapingInJavascriptPattern() {
         // first word contain all javascript special regex characters that should be escaped individually in text based search
         String queryText = "([{\\\\^$|]})?*+./ word1 word2.";
         SearchQuery textQueryWithSpecialChars = new SearchQuery(queryText, EnumSet.noneOf(SearchFlags.class));

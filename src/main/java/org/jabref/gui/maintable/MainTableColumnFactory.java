@@ -81,7 +81,7 @@ public class MainTableColumnFactory {
         this.undoManager = undoManager;
         this.stateManager = stateManager;
         ThemeManager themeManager = Injector.instantiateModelOrService(ThemeManager.class);
-        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+        this.tooltip = new MainTableTooltip(database, dialogService, preferencesService, themeManager, taskExecutor);
     }
 
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
@@ -145,14 +145,15 @@ public class MainTableColumnFactory {
         column.setMaxWidth(width);
     }
 
+    /**
+     * Creates a column for the match category.
+     * <p>This column is always hidden but is used for sorting the table
+     * in the floating mode. The order of the {@link MatchCategory} enum constants
+     * determines the sorting order.</p>
+     */
     private TableColumn<BibEntryTableViewModel, MatchCategory> createMatchCategoryColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, MatchCategory> column = new MainTableColumn<>(columnModel);
-        Node header = new Text(Localization.lang("Match category"));
-        header.getStyleClass().add("mainTable-header");
-        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.MATCH_CATEGORY.getDisplayName()));
-        column.setGraphic(header);
         column.setCellValueFactory(cellData -> cellData.getValue().matchCategory());
-        new ValueTableCellFactory<BibEntryTableViewModel, MatchCategory>().withText(String::valueOf).install(column);
         column.setSortable(true);
         column.setSortType(TableColumn.SortType.ASCENDING);
         column.setVisible(false);

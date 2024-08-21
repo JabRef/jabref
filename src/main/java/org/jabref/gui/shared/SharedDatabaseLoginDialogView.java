@@ -20,6 +20,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -31,6 +32,10 @@ import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
+/**
+ * This offers the user to connect to a remove SQL database.
+ * Moreover, it directly opens the shared database after successful connection.
+ */
 public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private ComboBox<DBMSType> databaseType;
     @FXML private TextField host;
@@ -53,6 +58,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private AiService aiService;
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
@@ -96,6 +102,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
                 tabContainer,
                 dialogService,
                 preferencesService,
+                aiService,
                 stateManager,
                 entryTypesManager,
                 fileUpdateMonitor,

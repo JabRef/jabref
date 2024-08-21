@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CitationKeyDeviationCheckerTest {
+class CitationKeyDeviationCheckerTest {
 
     private final BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
     private final BibDatabase bibDatabase = mock(BibDatabase.class);

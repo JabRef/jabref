@@ -23,13 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DocumentReaderTest {
+class DocumentReaderTest {
 
     private BibDatabaseContext databaseContext;
     private FilePreferences filePreferences;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.databaseContext = mock(BibDatabaseContext.class);
         when(databaseContext.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
         this.filePreferences = mock(FilePreferences.class);
@@ -39,7 +39,7 @@ public class DocumentReaderTest {
     }
 
     @Test
-    public void unknownFileTestShouldReturnEmptyList() {
+    void unknownFileTestShouldReturnEmptyList() {
         // given
         BibEntry entry = new BibEntry();
         entry.setFiles(Collections.singletonList(new LinkedFile("Wrong path", "NOT_PRESENT.pdf", "Type")));
@@ -62,7 +62,7 @@ public class DocumentReaderTest {
 
     @ParameterizedTest
     @MethodSource("getLinesToMerge")
-    public void mergeLinesTest(String expected, String linesToMerge) {
+    void mergeLinesTest(String expected, String linesToMerge) {
         String result = DocumentReader.mergeLines(linesToMerge);
         assertEquals(expected, result);
     }

@@ -14,7 +14,7 @@ import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ContentSelectorSuggestionProviderTest {
+class ContentSelectorSuggestionProviderTest {
 
     private ContentSelectorSuggestionProvider autoCompleter;
 

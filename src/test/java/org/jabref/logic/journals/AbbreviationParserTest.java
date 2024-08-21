@@ -12,7 +12,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AbbreviationParserTest {
+class AbbreviationParserTest {
 
     private Path csvFile;
     private final AbbreviationParser parser = new AbbreviationParser();

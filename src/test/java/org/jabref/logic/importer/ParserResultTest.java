@@ -34,7 +34,7 @@ class ParserResultTest {
     }
 
     @Test
-    public void warningsAddedMatchErrorMessage() {
+    void warningsAddedMatchErrorMessage() {
         ParserResult parserResult = new ParserResult();
         parserResult.addWarning("Warning 1 ");
         parserResult.addWarning("Warning 2 ");
@@ -42,13 +42,13 @@ class ParserResultTest {
     }
 
     @Test
-    public void hasEmptyMessageForNoWarnings() {
+    void hasEmptyMessageForNoWarnings() {
         ParserResult parserResult = new ParserResult();
         assertEquals("", parserResult.getErrorMessage());
     }
 
     @Test
-    public void doesNotHaveDuplicateWarnings() {
+    void doesNotHaveDuplicateWarnings() {
         ParserResult parserResult = new ParserResult();
         parserResult.addWarning("Duplicate Warning");
         parserResult.addWarning("Duplicate Warning");
@@ -56,7 +56,7 @@ class ParserResultTest {
     }
 
     @Test
-    public void warningAddedForWhitespaceInCitationKeyImport(@TempDir Path tmpDir) throws IOException {
+    void warningAddedForWhitespaceInCitationKeyImport(@TempDir Path tmpDir) throws IOException {
         // whitespace after citation key "myArticle "
         String bibtexEntry = """
                 @article{ myArticle ,
@@ -75,7 +75,7 @@ class ParserResultTest {
     }
 
     @Test
-    public void warningAddedForMissingCommaInCitationKeyImport(@TempDir Path tmpDir) throws IOException {
+    void warningAddedForMissingCommaInCitationKeyImport(@TempDir Path tmpDir) throws IOException {
         // Comma replaced by whitespace instead in citation key "myArticle "
         String bibtexEntry = """
             @article{myArticle\s
@@ -94,7 +94,7 @@ class ParserResultTest {
     }
 
     @Test
-    public void warningAddedForCorruptedCitationKeyInImport(@TempDir Path tmpDir) throws IOException {
+    void warningAddedForCorruptedCitationKeyInImport(@TempDir Path tmpDir) throws IOException {
         String bibtexEntry = """
             @article{myArticle
                author    = "Author Name",
@@ -113,7 +113,7 @@ class ParserResultTest {
     }
 
     @Test
-    public void skipsImportEntryForImproperSyntax(@TempDir Path tmpDir) throws IOException {
+    void skipsImportEntryForImproperSyntax(@TempDir Path tmpDir) throws IOException {
         // Comma after '=' character on line 2 throws error
         String bibtexEntry = """
             @article{myArticle,

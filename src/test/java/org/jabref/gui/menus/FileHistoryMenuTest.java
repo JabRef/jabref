@@ -4,7 +4,6 @@ import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.FileHistoryMenu;
-import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.util.io.FileHistory;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 @ExtendWith(ApplicationExtension.class)
-public class FileHistoryMenuTest {
+class FileHistoryMenuTest {
     private static final String BIBTEX_LIBRARY_PATH = "src/test/resources/org/jabref/";
 
     private FileHistoryMenu fileHistoryMenu;
@@ -26,13 +25,12 @@ public class FileHistoryMenuTest {
     private FileHistory fileHistory;
     @Mock
     private DialogService dialogService;
-    @Mock
-    private OpenDatabaseAction openDatabaseAction;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         openMocks(this);
-        fileHistoryMenu = new FileHistoryMenu(fileHistory, dialogService, openDatabaseAction);
+        // "null" is a workaround, because OpenDatabaseAction cannot be mocked easily
+        fileHistoryMenu = new FileHistoryMenu(fileHistory, dialogService, null);
     }
 
     @Test

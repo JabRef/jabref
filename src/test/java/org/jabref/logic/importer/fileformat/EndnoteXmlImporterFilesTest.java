@@ -14,7 +14,7 @@ import org.mockito.Answers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class EndnoteXmlImporterFilesTest {
+class EndnoteXmlImporterFilesTest {
 
     private static final String FILE_ENDING = ".xml";
     private ImportFormatPreferences importFormatPreferences;

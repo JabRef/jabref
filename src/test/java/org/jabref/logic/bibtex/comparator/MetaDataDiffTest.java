@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class MetaDataDiffTest {
+class MetaDataDiffTest {
     @Test
-    public void compareWithSameContentSelectorsDoesNotReportAnyDiffs() {
+    void compareWithSameContentSelectorsDoesNotReportAnyDiffs() {
         MetaData one = new MetaData();
         one.addContentSelector(new ContentSelector(StandardField.AUTHOR, "first", "second"));
         MetaData two = new MetaData();
@@ -28,7 +28,7 @@ public class MetaDataDiffTest {
     }
 
     @Test
-    public void defaultSettingEqualsEmptySetting() {
+    void defaultSettingEqualsEmptySetting() {
         MetaData one = new MetaData();
         // Field list is from {@link org.jabref.model.metadata.ContentSelectors.DEFAULT_FIELD_NAMES}
         one.addContentSelector(new ContentSelector(StandardField.AUTHOR, List.of()));
@@ -41,7 +41,7 @@ public class MetaDataDiffTest {
     }
 
     @Test
-    public void allEntriesGroupIgnored() {
+    void allEntriesGroupIgnored() {
         MetaData one = new MetaData();
         one.setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup()));
         MetaData two = new MetaData();
@@ -50,7 +50,7 @@ public class MetaDataDiffTest {
     }
 
     @Test
-    public void allEntriesGroupContainingGroupNotIgnored() {
+    void allEntriesGroupContainingGroupNotIgnored() {
         MetaData one = new MetaData();
         GroupTreeNode root = GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup());
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));

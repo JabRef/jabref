@@ -24,7 +24,7 @@ class AtomicFileOutputStreamTest {
     private static final String FIVE_THOUSAND_CHARS = Strings.repeat("A", 5_000);
 
     @Test
-    public void normalSaveWorks(@TempDir Path tempDir) throws Exception {
+    void normalSaveWorks(@TempDir Path tempDir) throws Exception {
         Path out = tempDir.resolve("normal-save.txt");
         Files.writeString(out, FIFTY_CHARS);
 
@@ -38,7 +38,7 @@ class AtomicFileOutputStreamTest {
     }
 
     @Test
-    public void originalContentExistsAtWriteError(@TempDir Path tempDir) throws Exception {
+    void originalContentExistsAtWriteError(@TempDir Path tempDir) throws Exception {
         Path pathToTestFile = tempDir.resolve("error-during-save.txt");
         Files.writeString(pathToTestFile, FIFTY_CHARS);
 

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 class UnlinkedFilesCrawlerTest {
 
     @Test
-    public void minimalGitIgnore(@TempDir Path testRoot) throws Exception {
+    void minimalGitIgnore(@TempDir Path testRoot) throws Exception {
         Files.writeString(testRoot.resolve(".gitignore"), """
                 *.png
                 """);
@@ -41,7 +41,7 @@ class UnlinkedFilesCrawlerTest {
     }
 
     @Test
-    public void excludingTheCurrentLibraryTest(@TempDir Path testRoot) throws IOException {
+    void excludingTheCurrentLibraryTest(@TempDir Path testRoot) throws IOException {
         // Adding 3 files one of which is the database file
         Files.createFile(testRoot.resolve("unlinkedPdf.pdf"));
         Files.createFile(testRoot.resolve("another-unlinkedPdf.pdf"));

@@ -10,13 +10,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DOIStripTest {
+class DOIStripTest {
 
   LayoutFormatter layoutFormatter = new DOIStrip();
 
-  @ParameterizedTest
-  @MethodSource("provideDOI")
-  public void formatDOIStrip(String formattedDOI, String originalDOI) {
+    @ParameterizedTest
+    @MethodSource("provideDOI")
+    void formatDOIStrip(String formattedDOI, String originalDOI) {
       assertEquals(formattedDOI, layoutFormatter.format(originalDOI));
   }
 

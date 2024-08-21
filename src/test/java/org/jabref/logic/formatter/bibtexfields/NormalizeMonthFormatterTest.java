@@ -8,22 +8,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class NormalizeMonthFormatterTest {
+class NormalizeMonthFormatterTest {
 
     private NormalizeMonthFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new NormalizeMonthFormatter();
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("#dec#", formatter.format(formatter.getExampleInput()));
     }
 
     @Test
-    public void plainAprilShouldBeApril() {
+    void plainAprilShouldBeApril() {
         assertEquals("#apr#", formatter.format("#apr#"));
     }
 }

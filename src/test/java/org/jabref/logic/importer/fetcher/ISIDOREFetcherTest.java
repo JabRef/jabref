@@ -15,18 +15,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
-public class ISIDOREFetcherTest {
+class ISIDOREFetcherTest {
 
     private ISIDOREFetcher fetcher;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         this.fetcher = new ISIDOREFetcher();
     }
 
     @Test
     @Disabled("Different result returned")
-    public void checkArticle1() throws FetcherException {
+    void checkArticle1() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "Investigating day-to-day variability of transit usage on a multimonth scale with smart card data. A case study in Lyon")
                 .withField(StandardField.AUTHOR, "Oscar Egu and Patrick Bonnel")
@@ -43,7 +43,7 @@ public class ISIDOREFetcherTest {
 
     @Test
     @Disabled("Returns too much results")
-    public void checkArticle2() throws FetcherException {
+    void checkArticle2() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "Inequality – What Can Be Done ? Cambridge (Mass.) Harvard University Press, 2015, XI-384 p. ")
                 .withField(StandardField.AUTHOR, "Benoît Rapoport")
@@ -59,7 +59,7 @@ public class ISIDOREFetcherTest {
     }
 
     @Test
-    public void checkThesis() throws FetcherException {
+    void checkThesis() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Thesis)
                 .withField(StandardField.TITLE, "Mapping English L2 errors: an integrated system and textual approach")
                 .withField(StandardField.AUTHOR, "Clive E. Hamilton")
@@ -73,7 +73,7 @@ public class ISIDOREFetcherTest {
 
     @Test
     @Disabled("No result returned. Searched for `Salvage Lymph Node`, results are returned")
-    public void checkArticle3() throws FetcherException {
+    void checkArticle3() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "Salvage Lymph Node Dissection for Nodal Recurrent Prostate Cancer: A Systematic Review.")
                 .withField(StandardField.AUTHOR, "G. Ploussard and G. Gandaglia and H. Borgmann and P. de Visschere and I. Heidegger and A. Kretschmer and R. Mathieu and C. Surcel and D. Tilki and I. Tsaur and M. Valerio and R. van den Bergh and P. Ost and A. Briganti")
@@ -88,13 +88,13 @@ public class ISIDOREFetcherTest {
     }
 
     @Test
-    public void noResults() throws FetcherException {
+    void noResults() throws FetcherException {
         List<BibEntry> actual = fetcher.performSearch("nothing notthingham jojoyolo");
         assertEquals(List.of(), actual);
     }
 
     @Test
-    public void author() throws FetcherException {
+    void author() throws FetcherException {
         List<BibEntry> actual = fetcher.performSearch("author:\"Adam Strange\"");
         assertEquals(List.of(new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Howard Green and Karen Boyland and Adam Strange")
