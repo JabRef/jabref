@@ -48,6 +48,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue with query transformers (JStor and others). [#11643](https://github.com/JabRef/jabref/pull/11643)
 - We fixed an issue where a new unsaved library was not marked with an asterisk. [#11519](https://github.com/JabRef/jabref/pull/11519)
 - We fixed an issue where JabRef starts without window decorations. [#11440](https://github.com/JabRef/jabref/pull/11440)
+- We fixed an issue where the entry preview highlight was not working when searching before opening the entry editor. [#11659](https://github.com/JabRef/jabref/pull/11659)
 
 ### Removed
 

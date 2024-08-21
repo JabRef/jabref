@@ -19,11 +19,10 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.search.SearchType;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
@@ -123,25 +122,21 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
-
     private final TaskExecutor taskExecutor;
     private final WebView previewView;
-    private PreviewLayout layout;
+    private final BibDatabaseContext database;
+    private final ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
+        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
+        highlightSearchPattern();
+    };
 
     /**
      * The entry currently shown
      */
     private Optional<BibEntry> entry = Optional.empty();
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
-
-    private final BibDatabaseContext database;
+    private PreviewLayout layout;
     private boolean registered;
-
-    private final ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
-        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
-        highlightSearchPattern();
-    };
 
     /**
      * @param database Used for resolving strings and pdf directories for links.
@@ -149,12 +144,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
                          PreferencesService preferencesService,
-                         StateManager stateManager,
                          ThemeManager themeManager,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
 
@@ -165,13 +159,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.setContextMenuEnabled(false);
 
         previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
+
             if (!registered) {
-                stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener(listener);
-                stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).addListener(listener);
+                searchHighlightPattern = searchQueryProperty.get().flatMap(SearchQuery::getJavaScriptPatternForWords);
+                searchQueryProperty.addListener(listener);
                 registered = true;
             }
             highlightSearchPattern();
@@ -202,6 +196,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         themeManager.installCss(previewView.getEngine());
     }
 
+    public PreviewViewer(BibDatabaseContext database,
+                         DialogService dialogService,
+                         PreferencesService preferencesService,
+                         ThemeManager themeManager,
+                         TaskExecutor taskExecutor) {
+        this(database, dialogService, preferencesService, themeManager, taskExecutor, OptionalObjectProperty.empty());
+    }
+
     private void highlightSearchPattern() {
         String callbackForUnmark = "";
         if (searchHighlightPattern.isPresent()) {
@@ -228,7 +230,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public void setLayout(PreviewLayout newLayout) {
         // Change listeners might set the layout to null while the update method is executing, therefore we need to prevent this here
-        if (newLayout == null) {
+        if (newLayout == null || newLayout.equals(layout)) {
             return;
         }
         layout = newLayout;
@@ -236,6 +238,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setEntry(BibEntry newEntry) {
+        if (newEntry.equals(entry.orElse(null))) {
+            return;
+        }
+
         // Remove update listener for old entry
         entry.ifPresent(oldEntry -> {
             for (Observable observable : oldEntry.getObservables()) {

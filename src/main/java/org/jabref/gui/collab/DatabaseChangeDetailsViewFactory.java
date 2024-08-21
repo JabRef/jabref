@@ -1,7 +1,6 @@
 package org.jabref.gui.collab;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.entryadd.EntryAdd;
 import org.jabref.gui.collab.entrychange.EntryChange;
 import org.jabref.gui.collab.entrychange.EntryChangeDetailsView;
@@ -31,7 +30,6 @@ import org.jabref.preferences.PreferencesService;
 public class DatabaseChangeDetailsViewFactory {
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
-    private final StateManager stateManager;
     private final ThemeManager themeManager;
     private final PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
@@ -40,7 +38,6 @@ public class DatabaseChangeDetailsViewFactory {
 
     public DatabaseChangeDetailsViewFactory(BibDatabaseContext databaseContext,
                                             DialogService dialogService,
-                                            StateManager stateManager,
                                             ThemeManager themeManager,
                                             PreferencesService preferencesService,
                                             BibEntryTypesManager entryTypesManager,
@@ -48,7 +45,6 @@ public class DatabaseChangeDetailsViewFactory {
                                             TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
-        this.stateManager = stateManager;
         this.themeManager = themeManager;
         this.preferencesService = preferencesService;
         this.entryTypesManager = entryTypesManager;
@@ -63,7 +59,6 @@ public class DatabaseChangeDetailsViewFactory {
                 entryChange.getNewEntry(),
                 databaseContext,
                 dialogService,
-                stateManager,
                 themeManager,
                 preferencesService,
                 entryTypesManager,
