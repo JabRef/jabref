@@ -233,11 +233,12 @@ public class ManageStudyDefinitionViewModel {
         }
     }
 
-    private void updateSelectedCatalogs() {
+    public void updateSelectedCatalogs() {
         List<String> selectedCatalogsList = databases.stream()
                                                      .filter(StudyCatalogItem::isEnabled)
                                                      .map(StudyCatalogItem::getName)
                                                      .collect(Collectors.toList());
+
         preferencesService.getWorkspacePreferences().setSelectedSlrCatalogs(selectedCatalogsList);
     }
 }
