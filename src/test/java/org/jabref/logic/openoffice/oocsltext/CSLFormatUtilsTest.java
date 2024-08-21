@@ -35,107 +35,107 @@ class CSLFormatUtilsTest {
 
     /**
      * Test to check transformation of raw, unsupported HTML into OO-ready HTML.
-     *
-     * @param input the raw HTML.
      */
     @ParameterizedTest
-    @MethodSource("rawHTMLProvider")
-    void ooHTMLTransformFromRawHTML(String input, String expected) {
-        String actual = CSLFormatUtils.transformHTML(input);
+    @MethodSource
+    void ooHTMLTransformFromRawHTML(String expected, String rawHtml) {
+        String actual = CSLFormatUtils.transformHTML(rawHtml);
         assertEquals(expected, actual);
     }
 
-    static Stream<Arguments> rawHTMLProvider() {
+    static Stream<Arguments> ooHTMLTransformFromRawHTML() {
         return Stream.of(
 
-                // First three are general test cases for unescaping HTML entities
+                // region: general test cases for unescaping HTML entities
 
                 // Ampersand (&amp entity)
                 Arguments.of(
-                        "Smith &amp; Jones",
-                        "Smith & Jones"
+                        "Smith & Jones",
+                        "Smith &amp; Jones"
                 ),
 
                 // Non-breaking space (&nbsp; entity)
                 Arguments.of(
-                        "Text with&nbsp;non-breaking&nbsp;spaces",
-                        "Text with non-breaking spaces"
+                        "Text with non-breaking spaces",
+                        "Text with&nbsp;non-breaking&nbsp;spaces"
                 ),
 
                 // Bold formatting, less than, greater than symbols (&lt, &gt entities)
                 Arguments.of(
-                        "&lt;b&gt;Bold Text&lt;/b&gt;",
-                        "<b>Bold Text</b>"
+                        "<b>Bold Text</b>",
+                        "&lt;b&gt;Bold Text&lt;/b&gt;"
                 ),
+
+                // endregion
 
                 // Handling margins
                 Arguments.of(
-                        "<div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">Citation text</div>",
-                        "[1] Citation text"
+                        "[1] Citation text",
+                        "<div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">Citation text</div>"
                 ),
 
                 // Removing unsupported div tags
                 Arguments.of(
-                        "<div style=\"text-align:left;\">Aligned text</div>",
-                        "Aligned text"
+                        "Aligned text",
+                        "<div style=\"text-align:left;\">Aligned text</div>"
                 ),
 
                 // Removing unsupported links
                 Arguments.of(
-                        "Text with <a href=\"http://example.com\">link</a>",
-                        "Text with link"
+                        "Text with link",
+                        "Text with <a href=\"http://example.com\">link</a>"
                 ),
 
                 // Replacing span tags with inline styles for bold
                 Arguments.of(
-                        "Text with <span style=\"font-weight:bold;\">bold</span>",
-                        "Text with <b>bold</b>"
+                        "Text with <b>bold</b>",
+                        "Text with <span style=\"font-weight:bold;\">bold</span>"
                 ),
 
                 // Replacing span tags with inline styles for italic
                 Arguments.of(
-                        "Text with <span style=\"font-style:italic;\">italic</span>",
-                        "Text with <i>italic</i>"
+                        "Text with <i>italic</i>",
+                        "Text with <span style=\"font-style:italic;\">italic</span>"
                 ),
 
                 // Replacing span tags with inline styles for underline
                 Arguments.of(
-                        "Text with <span style=\"text-decoration:underline;\">underline</span>",
-                        "Text with <u>underline</u>"
+                        "Text with <u>underline</u>",
+                        "Text with <span style=\"text-decoration:underline;\">underline</span>"
                 ),
 
                 // Replacing span tags with inline styles for small-caps
                 Arguments.of(
-                        "Text with <span style=\"font-variant:small-caps;\">small caps</span>",
-                        "Text with <smallcaps>small caps</smallcaps>"
+                        "Text with <smallcaps>small caps</smallcaps>",
+                        "Text with <span style=\"font-variant:small-caps;\">small caps</span>"
                 ),
 
                 // Test case for cleaning up remaining span tags
                 Arguments.of(
-                        "Text with <span>unnecessary span</span>",
-                        "Text with unnecessary span"
+                        "Text with unnecessary span",
+                        "Text with <span>unnecessary span</span>"
                 ),
 
                 // Test case combining multiple transformations
                 Arguments.of(
-                        "<div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\"><span style=\"font-weight:bold;\">Author</span>, &quot;Title,&quot; <span style=\"font-style:italic;\">Journal</span>, vol. 1, no. 1, pp. 1-10, 2023.</div>",
-                        "[1] <b>Author</b>, \"Title,\" <i>Journal</i>, vol. 1, no. 1, pp. 1-10, 2023."
+                        "[1] <b>Author</b>, \"Title,\" <i>Journal</i>, vol. 1, no. 1, pp. 1-10, 2023.",
+                        "<div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\"><span style=\"font-weight:bold;\">Author</span>, &quot;Title,&quot; <span style=\"font-style:italic;\">Journal</span>, vol. 1, no. 1, pp. 1-10, 2023.</div>"
                 ),
 
                 // Comprehensive test
                 Arguments.of(
+                        "[1] <b>Smith & Jones</b>, " +
+                                "\"<i>Analysis of <code> in HTML</i>,\" " +
+                                "<smallcaps>Journal of Web Development</smallcaps>, " +
+                                "vol. 1, no. 1, pp. 1-10, 2023. " +
+                                "https://doi.org/10.1000/example",
+
                         "<div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">" +
                                 "<span style=\"font-weight:bold;\">Smith&nbsp;&amp;&nbsp;Jones</span>, " +
                                 "&quot;<span style=\"font-style:italic;\">Analysis of &lt;code&gt; in HTML</span>,&quot; " +
                                 "<span style=\"font-variant:small-caps;\">Journal of Web&nbsp;Development</span>, " +
                                 "vol. 1, no. 1, pp. 1-10, 2023. " +
-                                "<a href=\"https://doi.org/10.1000/example\">https://doi.org/10.1000/example</a></div>",
-
-                        "[1] <b>Smith & Jones</b>, " +
-                                "\"<i>Analysis of <code> in HTML</i>,\" " +
-                                "<smallcaps>Journal of Web Development</smallcaps>, " +
-                                "vol. 1, no. 1, pp. 1-10, 2023. " +
-                                "https://doi.org/10.1000/example"
+                                "<a href=\"https://doi.org/10.1000/example\">https://doi.org/10.1000/example</a></div>"
                 )
         );
     }
@@ -145,131 +145,129 @@ class CSLFormatUtilsTest {
      * <p>
      * <b>Precondition:</b> This test assumes that {@link CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation} works as expected.
      * </p>
-     *
-     * @param style the CSL style to test transformation on.
      */
     @ParameterizedTest
-    @MethodSource("rawBibliographyProvider")
-    void ooHTMLTransformFromRawBibliography(CitationStyle style, String expected) {
+    @MethodSource
+    void ooHTMLTransformFromRawBibliography(String expected, CitationStyle style) {
         String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager).getFirst();
         String actual = CSLFormatUtils.transformHTML(citation);
         assertEquals(expected, actual);
     }
 
-    static Stream<Arguments> rawBibliographyProvider() {
+    static Stream<Arguments> ooHTMLTransformFromRawBibliography() {
         return Stream.of(
 
                 // Non-numeric, parentheses, commas, full stops, slashes, hyphens, colons, italics
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get(),
-                        "  Smith, B., Jones, B., & Williams, J. (2016). Title of the test entry. <i>BibTeX Journal</i>, <i>34</i>(3), 45–67. https://doi.org/10.1001/bla.blubb\n"
+                        "  Smith, B., Jones, B., & Williams, J. (2016). Title of the test entry. <i>BibTeX Journal</i>, <i>34</i>(3), 45–67. https://doi.org/10.1001/bla.blubb\n",
+                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric type "[1]", brackets, newlines
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    [1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric type "1."
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    1. Smith, B., Jones, B., Williams, J.: Title of the test entry. BibTeX Journal. 34, 45–67 (2016). https://doi.org/10.1001/bla.blubb.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get(),
-                        "  Smith, Bill, Bob Jones, and Jeff Williams. 2016. “Title of the Test Entry.” Edited by Phil Taylor. <i>BibTeX Journal</i> 34 (3): 45–67. https://doi.org/10.1001/bla.blubb.\n"
+                        "  Smith, Bill, Bob Jones, and Jeff Williams. 2016. “Title of the Test Entry.” Edited by Phil Taylor. <i>BibTeX Journal</i> 34 (3): 45–67. https://doi.org/10.1001/bla.blubb.\n",
+                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Semicolons
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, editor. BibTeX Journal [Internet]. 2016 Jul;34(3):45–67. Available from: https://github.com/JabRef\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    1. Smith, B., Jones, B. & Williams, J. Title of the test entry. <i>BibTeX Journal</i> <b>34</b>, 45–67 (2016).\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    1. Smith B, Jones B, Williams J. Title of the test entry. Taylor P, ed. <i>BibTeX Journal</i>. 2016;34(3):45-67. doi:10.1001/bla.blubb\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Small-caps
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get(),
-                        "  <smallcaps>Smith</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Jones</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Williams</smallcaps>, <smallcaps>J.</smallcaps> (2016) Title of the test entry <smallcaps>Taylor</smallcaps>, <smallcaps>P.</smallcaps> (ed.). <i>BibTeX Journal</i>, 34(3), pp. 45–67.\n"
+                        "  <smallcaps>Smith</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Jones</smallcaps>, <smallcaps>B.</smallcaps>, <smallcaps>Williams</smallcaps>, <smallcaps>J.</smallcaps> (2016) Title of the test entry <smallcaps>Taylor</smallcaps>, <smallcaps>P.</smallcaps> (ed.). <i>BibTeX Journal</i>, 34(3), pp. 45–67.\n",
+                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Underlines
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get(),
-                        "  Smith, Bill, Bob Jones, and Jeff Williams. “Title of the test entry.” Ed. Phil Taylor. <u>BibTeX Journal</u> 34.3 (2016): 45–67. <https://github.com/JabRef>.\n"
+                        "  Smith, Bill, Bob Jones, and Jeff Williams. “Title of the test entry.” Ed. Phil Taylor. <u>BibTeX Journal</u> 34.3 (2016): 45–67. <https://github.com/JabRef>.\n",
+                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Non-breaking spaces
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get(),
-                        "  Smith, Bill, Bob Jones, & Jeff Williams, “Title of the test entry,” <i>BibTeX Journal</i>, 2016, vol. 34, no. 3, pp. 45–67.\n"
+                        "  Smith, Bill, Bob Jones, & Jeff Williams, “Title of the test entry,” <i>BibTeX Journal</i>, 2016, vol. 34, no. 3, pp. 45–67.\n",
+                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric with a full stop - "1."
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    1. Smith, B., Jones, B. and Williams, J. 2016. Title of the test entry. <i>BibTeX Journal</i>. <b>34</b>: 45–67.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Bold text, bold numeric with a full stop - "<BOLD>1."
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    <b>1</b>. <b>Smith  B, Jones  B, Williams  J</b>. Title of the test entry. <i>BibTeX Journal</i> 2016 ; 34 : 45–67.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Naked numeric - "1"
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    1 Smith Bill, Jones Bob, Williams Jeff. Title of the test entry. <i>BibTeX Journal</i> 2016;<b>34</b>(3):45–67. Doi: 10.1001/bla.blubb.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric in parentheses - "(1)"
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    (1) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric with right parenthesis - "1)"
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    1) Smith B., Jones B., Williams J., <i>BibTeX Journal</i>, <b>34</b>, 45–67 (2016).\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Numeric in superscript - "<SUPERSCRIPT>1"
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get(),
-                        "  <sup>1</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).\n"
+                        "  <sup>1</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).\n",
+                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
                 )
         );
     }
@@ -279,12 +277,10 @@ class CSLFormatUtilsTest {
      * <p>
      * <b>Precondition:</b> This test assumes that {@link CitationStyleGenerator#generateInText(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateInText} works as expected.
      * </p>
-     *
-     * @param style the CSL style to test transformation on.
      */
     @ParameterizedTest
-    @MethodSource("rawCitationWithSingleEntryProvider")
-    void ooHTMLTransformFromCitationWithSingleEntry(CitationStyle style, String expected) throws IOException {
+    @MethodSource
+    void ooHTMLTransformFromCitationWithSingleEntry(String expected, CitationStyle style) throws IOException {
         Citation citation = CitationStyleGenerator.generateInText(List.of(testEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager);
         String inTextCitationText = citation.getText();
         String actual = CSLFormatUtils.transformHTML(inTextCitationText);
@@ -292,88 +288,88 @@ class CSLFormatUtilsTest {
         assertEquals(OOText.fromString(expected), ooText);
     }
 
-    static Stream<Arguments> rawCitationWithSingleEntryProvider() {
+    static Stream<Arguments> ooHTMLTransformFromCitationWithSingleEntry() {
         return Stream.of(
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get(),
-                        "(Smith et al., 2016)"
+                        "(Smith et al., 2016)",
+                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get(),
-                        "[1]"
+                        "[1]",
+                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get(),
-                        "[1]"
+                        "[1]",
+                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get(),
-                        "(Smith, Jones, and Williams 2016)"
+                        "(Smith, Jones, and Williams 2016)",
+                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get(),
-                        "(1)"
+                        "(1)",
+                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get(),
-                        "<sup>1</sup>"
+                        "<sup>1</sup>",
+                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get(),
-                        "<sup>1</sup>"
+                        "<sup>1</sup>",
+                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get(),
-                        "(Smith, Jones, Williams, 2016)"
+                        "(Smith, Jones, Williams, 2016)",
+                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get(),
-                        "(Smith, Jones, & Williams)"
+                        "(Smith, Jones, & Williams)",
+                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get(),
-                        "Smith, B., B. Jones, and J. Williams, 2016."
+                        "Smith, B., B. Jones, and J. Williams, 2016.",
+                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get(),
-                        "[1]"
+                        "[1]",
+                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get(),
-                        "(<i>1</i>)"
+                        "(<i>1</i>)",
+                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get(),
-                        "<sup>1</sup>"
+                        "<sup>1</sup>",
+                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get(),
-                        "<sup>1</sup>"
+                        "<sup>1</sup>",
+                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Note: not sure if the right parenthesis outside the superscript is correct, but that's how citeproc-java generates it in raw form as well.
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get(),
-                        "<sup>1</sup>)"
+                        "<sup>1</sup>)",
+                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get(),
-                        "<sup>1</sup>"
+                        "<sup>1</sup>",
+                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
                 )
         );
     }
@@ -383,12 +379,10 @@ class CSLFormatUtilsTest {
      * <p>
      * <b>Precondition:</b> This test assumes that {@link CitationStyleGenerator#generateInText(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateInText} works as expected.
      * </p>
-     *
-     * @param style the CSL style to test transformation on.
      */
     @ParameterizedTest
-    @MethodSource("rawCitationWithMultipleEntriesProvider")
-    void ooHTMLTransformFromCitationWithMultipleEntries(CitationStyle style, String expected) throws IOException {
+    @MethodSource
+    void ooHTMLTransformFromCitationWithMultipleEntries(String expected, CitationStyle style) throws IOException {
         BibEntry entry1 = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Garcia, Maria and Lee, David")
                 .withField(StandardField.JOURNAL, "International Review of Physics")
@@ -420,86 +414,86 @@ class CSLFormatUtilsTest {
         assertEquals(expected, actual);
     }
 
-    static Stream<Arguments> rawCitationWithMultipleEntriesProvider() {
+    static Stream<Arguments> ooHTMLTransformFromCitationWithMultipleEntries() {
         return Stream.of(
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get(),
-                        "(Garcia & Lee, 2021; Smith & Johnson, 2020)"
+                        "(Garcia & Lee, 2021; Smith & Johnson, 2020)",
+                        STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get(),
-                        "[1], [2]"
+                        "[1], [2]",
+                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get(),
-                        "[1, 2]"
+                        "[1, 2]",
+                        STYLE_LIST.stream().filter(e -> "Springer - Lecture Notes in Computer Science".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get(),
-                        "(Garcia and Lee 2021; Smith and Johnson 2020)"
+                        "(Garcia and Lee 2021; Smith and Johnson 2020)",
+                        STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get(),
-                        "(1,2)"
+                        "(1,2)",
+                        STYLE_LIST.stream().filter(e -> "Vancouver".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get(),
-                        "<sup>1,2</sup>"
+                        "<sup>1,2</sup>",
+                        STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get(),
-                        "<sup>1,2</sup>"
+                        "<sup>1,2</sup>",
+                        STYLE_LIST.stream().filter(e -> "American Medical Association 11th edition".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get(),
-                        "(Garcia, Lee, 2021; Smith, Johnson, 2020)"
+                        "(Garcia, Lee, 2021; Smith, Johnson, 2020)",
+                        STYLE_LIST.stream().filter(e -> "De Montfort University - Harvard".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get(),
-                        "(Garcia & Lee; Smith & Johnson)"
+                        "(Garcia & Lee; Smith & Johnson)",
+                        STYLE_LIST.stream().filter(e -> "Modern Language Association 7th edition (underline)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get(),
-                        "Garcia, M. and D. Lee, 2021 ; Smith, J. and E. Johnson, 2020."
+                        "Garcia, M. and D. Lee, 2021 ; Smith, J. and E. Johnson, 2020.",
+                        STYLE_LIST.stream().filter(e -> "Histoire & Mesure (Français)".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get(),
-                        "[1, 2]"
+                        "[1, 2]",
+                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get(),
-                        "(<i>1,2</i>)"
+                        "(<i>1,2</i>)",
+                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get(),
-                        "<sup>1,2</sup>"
+                        "<sup>1,2</sup>",
+                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get(),
-                        "<sup>1,2</sup>"
+                        "<sup>1,2</sup>",
+                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get(),
-                        "<sup>1,2</sup>)"
+                        "<sup>1,2</sup>)",
+                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get()
                 ),
 
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get(),
-                        "<sup>1,2</sup>"
+                        "<sup>1,2</sup>",
+                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
                 )
         );
     }
@@ -511,74 +505,72 @@ class CSLFormatUtilsTest {
      * <p>
      * <b>Precondition 1:</b> This test assumes that {@link CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation} works as expected.<br>
      * <b>Precondition 2:</b> This test assumes that the method {@link CSLFormatUtils#transformHTML(String) transformHTML} works as expected.<br>
-     * <b>Precondition 3:</b> Only run this test on numeric Citation Styles.</p>
-     *
-     * @param style the numeric style to test updation on
+     * <b>Precondition 3:</b> Run this test ONLY on numeric Citation Styles.</p>
      */
     @ParameterizedTest
-    @MethodSource("rawNumericCitationProvider")
-    void updateSingleNumericCitation(CitationStyle style, String expected) {
+    @MethodSource
+    void updateSingleNumericCitation(String expected, CitationStyle style) {
         String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager).getFirst();
         String transformedCitation = CSLFormatUtils.transformHTML(citation);
         String actual = CSLFormatUtils.updateSingleBibliographyNumber(transformedCitation, 3);
         assertEquals(expected, actual);
     }
 
-    static Stream<Arguments> rawNumericCitationProvider() {
+    static Stream<Arguments> updateSingleNumericCitation() {
         return Stream.of(
 
                 // Type: "[1]"
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    [3] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016, doi: 10.1001/bla.blubb.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Type: "1."
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    3. Smith, B., Jones, B. and Williams, J. 2016. Title of the test entry. <i>BibTeX Journal</i>. <b>34</b>: 45–67.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "The Journal of Veterinary Medical Science".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Type:"<BOLD>1."
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    <b>3</b>. <b>Smith  B, Jones  B, Williams  J</b>. Title of the test entry. <i>BibTeX Journal</i> 2016 ; 34 : 45–67.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "Acta Orthopædica Belgica".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Type: "1"
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    3 Smith Bill, Jones Bob, Williams Jeff. Title of the test entry. <i>BibTeX Journal</i> 2016;<b>34</b>(3):45–67. Doi: 10.1001/bla.blubb.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "Acta Anaesthesiologica Taiwanica".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Type: "(1)"
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    (3) Smith, B.; Jones, B.; Williams, J. Title of the Test Entry. <i>BibTeX Journal</i> <b>2016</b>, <i>34</i> (3), 45–67. https://doi.org/10.1001/bla.blubb.\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "American Chemical Society".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Type: "1)"
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get(),
                         "  \n" +
                                 "    3) Smith B., Jones B., Williams J., <i>BibTeX Journal</i>, <b>34</b>, 45–67 (2016).\n" +
-                                "  \n"
+                                "  \n",
+                        STYLE_LIST.stream().filter(e -> "Chemical and Pharmaceutical Bulletin".equals(e.getTitle())).findAny().get()
                 ),
 
                 // Type: "<SUPERSCRIPT>1"
                 Arguments.of(
-                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get(),
-                        "  <sup>3</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).\n"
+                        "  <sup>3</sup> B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal <b>34</b>(3), 45–67 (2016).\n",
+                        STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
                 )
         );
     }
@@ -587,19 +579,19 @@ class CSLFormatUtilsTest {
      * Tests if a citation (LaTeX "\cite") is converted into an in-text citation (LaTeX "\citet") as expected.
      */
     @ParameterizedTest
-    @MethodSource("provideCitations")
-    void ChangeToInText(String input, String expected) {
+    @MethodSource
+    void ChangeToInText(String expected, String input) {
         String actual = CSLFormatUtils.changeToInText(input);
         assertEquals(expected, actual);
     }
 
-    private static Stream<Arguments> provideCitations() {
+    private static Stream<Arguments> ChangeToInText() {
         return Stream.of(
 
                 // APA Style
-                Arguments.of("(Smith, 2020)", "Smith (2020)"),
-                Arguments.of("(Johnson & Brown, 2018)", "Johnson & Brown (2018)"),
-                Arguments.of("(Williams et al., 2019)", "Williams et al. (2019)"),
+                Arguments.of("Smith (2020)", "(Smith, 2020)"),
+                Arguments.of("Johnson & Brown (2018)", "(Johnson & Brown, 2018)"),
+                Arguments.of("Williams et al. (2019)", "(Williams et al., 2019)"),
 
                 // MLA Style
                 Arguments.of("(Smith 20)", "(Smith 20)"),
@@ -612,9 +604,9 @@ class CSLFormatUtilsTest {
                 Arguments.of("(Williams et al. 2019)", "(Williams et al. 2019)"),
 
                 // Harvard Style
-                Arguments.of("(Smith, 2020)", "Smith (2020)"),
-                Arguments.of("(Johnson and Brown, 2018)", "Johnson and Brown (2018)"),
-                Arguments.of("(Williams et al., 2019)", "Williams et al. (2019)"),
+                Arguments.of("Smith (2020)", "(Smith, 2020)"),
+                Arguments.of("Johnson and Brown (2018)", "(Johnson and Brown, 2018)"),
+                Arguments.of("Williams et al. (2019)", "(Williams et al., 2019)"),
 
                 // IEEE Style
                 Arguments.of("[1]", "[1]"),
@@ -622,15 +614,11 @@ class CSLFormatUtilsTest {
 
                 // Vancouver Style
                 Arguments.of("(1)", "(1)"),
-                Arguments.of("(1,2)", "(1,2)", "Vancouver"),
+                Arguments.of("(1,2)", "(1,2)"),
 
                 // Nature Style
-                Arguments.of("1", "1", "Nature"),
-                Arguments.of("1,2", "1,2", "Nature"),
-
-                // AMA Style
-                Arguments.of("1", "1", "AMA"),
-                Arguments.of("1,2", "1,2", "AMA")
+                Arguments.of("1", "1"),
+                Arguments.of("1,2", "1,2")
 
         );
     }
@@ -641,14 +629,14 @@ class CSLFormatUtilsTest {
      * <b>Precondition:</b> This test assumes that the method {@link org.jabref.logic.citationkeypattern.BracketedPattern#authorsAlpha authorsAlpha} works as expected.</p>
      */
     @ParameterizedTest
-    @MethodSource("provideBibEntries")
-    void testGenerateAlphanumericCitation(List<BibEntry> entries, String expected) {
+    @MethodSource
+    void generateAlphanumericCitationTest(String expected, List<BibEntry> entries) {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
         String actual = generateAlphanumericCitation(entries, context);
         assertEquals(expected, actual);
     }
 
-    private static Stream<Arguments> provideBibEntries() {
+    private static Stream<Arguments> generateAlphanumericCitationTest() {
         BibEntry entry1 = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Garcia, Maria")
                 .withField(StandardField.TITLE, "Quantum Entanglement in Superconductors")
@@ -702,22 +690,22 @@ class CSLFormatUtilsTest {
         return Stream.of(
 
                 // Entry with single author
-                Arguments.of(List.of(entry1), "[Ga21]"),
+                Arguments.of("[Ga21]", List.of(entry1)),
 
                 // Entry with two authors
-                Arguments.of(List.of(entry2), "[SJ20]"),
+                Arguments.of("[SJ20]", List.of(entry2)),
 
                 // Entry with three authors
-                Arguments.of(List.of(entry3), "[JWL19]"),
+                Arguments.of("[JWL19]", List.of(entry3)),
 
                 // Entry with four authors
-                Arguments.of(List.of(entry4), "[SJLW18]"),
+                Arguments.of("[SJLW18]", List.of(entry4)),
 
                 // Entry with five authors
-                Arguments.of(List.of(entry5), "[GSJL17]"),
+                Arguments.of("[GSJL17]", List.of(entry5)),
 
                 // Multiple entries with varying number of authors
-                Arguments.of(List.of(entry1, entry2, entry3, entry4, entry5), "[Ga21; SJ20; JWL19; SJLW18; GSJL17]")
+                Arguments.of("[Ga21; SJ20; JWL19; SJLW18; GSJL17]", List.of(entry1, entry2, entry3, entry4, entry5))
 
         );
     }

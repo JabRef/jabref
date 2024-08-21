@@ -49,25 +49,55 @@ class CitationStyleTest {
     }
 
     @ParameterizedTest
-    @MethodSource("citationStyleProvider")
-    void parseStyleInfoTest(String cslFileName, String expectedTitle, boolean expectedNumericNature) {
+    @MethodSource
+    void citationStylePresent(String cslFileName) {
         Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(cslFileName);
-
-        assertTrue(citationStyle.isPresent(), "Citation style should be present for " + cslFileName);
-
-        CitationStyle.StyleInfo styleInfo = new CitationStyle.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
-
-        assertEquals(expectedTitle, styleInfo.title(), "Title should match for " + cslFileName);
-        assertEquals(expectedNumericNature, styleInfo.isNumericStyle(), "Numeric style should match for " + cslFileName);
+        assertTrue(citationStyle.isPresent());
     }
 
-    private static Stream<Arguments> citationStyleProvider() {
+    static Stream<Arguments> citationStylePresent() {
+        return java.util.stream.Stream.of(
+                Arguments.of("ieee.csl"),
+                Arguments.of("apa.csl"),
+                Arguments.of("vancouver.csl"),
+                Arguments.of("chicago-author-date.csl"),
+                Arguments.of("nature.csl")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void titleMatches(String cslFileName, String expectedTitle) {
+        Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(cslFileName);
+        CitationStyle.StyleInfo styleInfo = new CitationStyle.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
+        assertEquals(expectedTitle, styleInfo.title());
+    }
+
+    static Stream<Arguments> titleMatches() {
         return Stream.of(
-                Arguments.of("ieee.csl", "IEEE", true),
-                Arguments.of("apa.csl", "American Psychological Association 7th edition", false),
-                Arguments.of("vancouver.csl", "Vancouver", true),
-                Arguments.of("chicago-author-date.csl", "Chicago Manual of Style 17th edition (author-date)", false),
-                Arguments.of("nature.csl", "Nature", true)
+                Arguments.of("ieee.csl", "IEEE"),
+                Arguments.of("apa.csl", "American Psychological Association 7th edition"),
+                Arguments.of("vancouver.csl", "Vancouver"),
+                Arguments.of("chicago-author-date.csl", "Chicago Manual of Style 17th edition (author-date)"),
+                Arguments.of("nature.csl", "Nature")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void numericPropertyMatches(String cslFileName, boolean expectedNumericNature) {
+        Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(cslFileName);
+        CitationStyle.StyleInfo styleInfo = new CitationStyle.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
+        assertEquals(expectedNumericNature, styleInfo.isNumericStyle());
+    }
+
+    private static Stream<Arguments> numericPropertyMatches() {
+        return java.util.stream.Stream.of(
+                Arguments.of("ieee.csl", true),
+                Arguments.of("apa.csl", false),
+                Arguments.of("vancouver.csl", true),
+                Arguments.of("chicago-author-date.csl", false),
+                Arguments.of("nature.csl", true)
         );
     }
 }

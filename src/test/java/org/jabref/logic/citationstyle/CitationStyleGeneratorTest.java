@@ -72,9 +72,7 @@ class CitationStyleGeneratorTest {
         Citation citation = CitationStyleGenerator.generateInText(List.of(testEntry), style.getSource(), CitationStyleOutputFormat.HTML, context, bibEntryTypesManager);
         String inTextCitationText = citation.getText();
 
-        String expected = "[Smit2016]";
-
-        assertEquals(expected, inTextCitationText);
+        assertEquals("[Smit2016]", inTextCitationText);
     }
 
     @Test
