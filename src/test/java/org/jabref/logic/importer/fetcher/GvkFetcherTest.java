@@ -24,14 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
-public class GvkFetcherTest {
+class GvkFetcherTest {
 
     private GvkFetcher fetcher;
     private BibEntry bibEntryPPN591166003;
     private BibEntry bibEntryPPN66391437X;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         fetcher = new GvkFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntryPPN591166003 = new BibEntry(StandardEntryType.Book)
@@ -61,47 +61,47 @@ public class GvkFetcherTest {
     }
 
     @Test
-    public void getName() {
+    void getName() {
         assertEquals("GVK", fetcher.getName());
     }
 
     @Test
-    public void simpleSearchQueryURLCorrect() throws Exception {
+    void simpleSearchQueryURLCorrect() throws Exception {
         String query = "java jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
-        assertEquals("https://sru.k10plus.de/opac-de-627?version=1.1&operation=searchRetrieve&query=pica.all%3Djava+and+pica.all%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
+        assertEquals("https://sru.k10plus.de/opac-de-627?version=1.1&operation=searchRetrieve&query=pica.all%3Djava%20and%20pica.all%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test
-    public void complexSearchQueryURLCorrect() throws Exception {
+    void complexSearchQueryURLCorrect() throws Exception {
         String query = "kon:java tit:jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
-        assertEquals("https://sru.k10plus.de/opac-de-627?version=1.1&operation=searchRetrieve&query=pica.kon%3Djava+and+pica.tit%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
+        assertEquals("https://sru.k10plus.de/opac-de-627?version=1.1&operation=searchRetrieve&query=pica.kon%3Djava%20and%20pica.tit%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test
-    public void performSearchMatchingMultipleEntries() throws FetcherException {
+    void performSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("title:\"effective java\"");
         assertTrue(searchResult.contains(bibEntryPPN591166003));
         assertTrue(searchResult.contains(bibEntryPPN66391437X));
     }
 
     @Test
-    public void performSearch591166003() throws FetcherException {
+    void performSearch591166003() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("ppn:591166003");
         assertEquals(Collections.singletonList(bibEntryPPN591166003), searchResult);
     }
 
     @Test
-    public void performSearch66391437X() throws FetcherException {
+    void performSearch66391437X() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("ppn:66391437X");
         assertEquals(Collections.singletonList(bibEntryPPN66391437X), searchResult);
     }
 
     @Test
-    public void performSearchEmpty() throws FetcherException {
+    void performSearchEmpty() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("");
         assertEquals(Collections.emptyList(), searchResult);
     }

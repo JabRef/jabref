@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class CopacImporterFilesTest {
+class CopacImporterFilesTest {
 
     private static final String FILE_ENDING = ".txt";
 
@@ -24,19 +24,19 @@ public class CopacImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void isRecognizedFormat(String fileName) throws IOException {
+    void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(new CopacImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("nonCopacfileNames")
-    public void isNotRecognizedFormat(String fileName) throws IOException {
+    void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(new CopacImporter(), fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void importEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(new CopacImporter(), fileName, FILE_ENDING);
     }
 }

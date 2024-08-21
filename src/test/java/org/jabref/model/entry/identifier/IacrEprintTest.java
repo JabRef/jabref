@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class IacrEprintTest {
+class IacrEprintTest {
 
     private static Stream<Arguments> provideTestData() {
         return Stream.of(
@@ -42,18 +42,18 @@ public class IacrEprintTest {
     }
 
     @Test
-    public void rejectInvalidIacrEprint() {
+    void rejectInvalidIacrEprint() {
         assertThrows(IllegalArgumentException.class, () -> new IacrEprint("2021/12"));
     }
 
     @ParameterizedTest(name = "{index} {0}")
     @MethodSource("provideTestData")
-    public void acceptCorrectIacrEprintIdentifier(String name, String identifier) {
+    void acceptCorrectIacrEprintIdentifier(String name, String identifier) {
         assertEquals("2019/001", new IacrEprint(identifier).getNormalized());
     }
 
     @Test
-    public void constructValidIacrEprintUrl() {
+    void constructValidIacrEprintUrl() {
         assertEquals("https://ia.cr/2019/001", new IacrEprint("2019/001").getAsciiUrl());
     }
 }

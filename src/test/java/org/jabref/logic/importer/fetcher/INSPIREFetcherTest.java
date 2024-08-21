@@ -44,7 +44,7 @@ class INSPIREFetcherTest {
     }
 
     @Test
-    public void searchByIdentifierFindsEntry() throws Exception {
+    void searchByIdentifierFindsEntry() throws Exception {
         BibEntry article = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Melnikov:1998pr")
                 .withField(StandardField.AUTHOR, "Melnikov, Kirill and Yelkhovsky, Alexander")
@@ -62,7 +62,7 @@ class INSPIREFetcherTest {
     }
 
     @Test
-    public void searchByExistingEntry() throws Exception {
+    void searchByExistingEntry() throws Exception {
         BibEntry article = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Melnikov:1998pr")
                 .withField(StandardField.AUTHOR, "Melnikov, Kirill and Yelkhovsky, Alexander")

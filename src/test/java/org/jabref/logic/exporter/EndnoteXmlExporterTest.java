@@ -21,14 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class EndnoteXmlExporterTest {
+class EndnoteXmlExporterTest {
 
     private Exporter exporter;
     private BibDatabaseContext databaseContext;
     private BibEntry bookEntry;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -48,7 +48,7 @@ public class EndnoteXmlExporterTest {
     }
 
     @Test
-    public void exportForEmptyEntryList(@TempDir Path tempDir) throws Exception {
+    void exportForEmptyEntryList(@TempDir Path tempDir) throws Exception {
         Path file = tempDir.resolve("EmptyFile.xml");
 
         exporter.export(databaseContext, file, Collections.emptyList());
@@ -56,7 +56,7 @@ public class EndnoteXmlExporterTest {
     }
 
     @Test
-    public void exportForNullDBThrowsException(@TempDir Path tempDir) {
+    void exportForNullDBThrowsException(@TempDir Path tempDir) {
         Path file = tempDir.resolve("NullDB");
 
         assertThrows(NullPointerException.class, () ->
@@ -64,13 +64,13 @@ public class EndnoteXmlExporterTest {
     }
 
     @Test
-    public void exportForNullExportPathThrowsException(@TempDir Path tempDir) {
+    void exportForNullExportPathThrowsException(@TempDir Path tempDir) {
         assertThrows(NullPointerException.class, () ->
                 exporter.export(databaseContext, null, Collections.singletonList(bookEntry)));
     }
 
     @Test
-    public void exportForNullEntryListThrowsException(@TempDir Path tempDir) {
+    void exportForNullEntryListThrowsException(@TempDir Path tempDir) {
         Path file = tempDir.resolve("EntryNull");
 
         assertThrows(NullPointerException.class, () ->

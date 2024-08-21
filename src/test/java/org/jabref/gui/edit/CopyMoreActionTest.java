@@ -33,7 +33,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class CopyMoreActionTest {
+class CopyMoreActionTest {
 
     private final DialogService dialogService = spy(DialogService.class);
     private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
@@ -48,7 +48,7 @@ public class CopyMoreActionTest {
     private BibEntry entry;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         String title = "A tale from the trenches";
         entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.AUTHOR, "Souti Chattopadhyay and Nicholas Nelson and Audrey Au and Natalia Morales and Christopher Sanchez and Rahul Pandita and Anita Sarma")
@@ -67,7 +67,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void executeOnFail() {
+    void executeOnFail() {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
@@ -78,7 +78,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void executeCopyTitleWithNoTitle() {
+    void executeCopyTitleWithNoTitle() {
         BibEntry entryWithNoTitle = (BibEntry) entry.clone();
         entryWithNoTitle.clearField(StandardField.TITLE);
         ObservableList<BibEntry> entriesWithNoTitles = FXCollections.observableArrayList(entryWithNoTitle);
@@ -94,7 +94,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void executeCopyTitleOnPartialSuccess() {
+    void executeCopyTitleOnPartialSuccess() {
         BibEntry entryWithNoTitle = (BibEntry) entry.clone();
         entryWithNoTitle.clearField(StandardField.TITLE);
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoTitle, entry);
@@ -112,7 +112,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void executeCopyTitleOnSuccess() {
+    void executeCopyTitleOnSuccess() {
         ObservableList<BibEntry> entriesWithTitles = FXCollections.observableArrayList(entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithTitles));
 
@@ -128,7 +128,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void executeCopyKeyWithNoKey() {
+    void executeCopyKeyWithNoKey() {
         BibEntry entryWithNoKey = (BibEntry) entry.clone();
         entryWithNoKey.clearCiteKey();
         ObservableList<BibEntry> entriesWithNoKeys = FXCollections.observableArrayList(entryWithNoKey);
@@ -144,7 +144,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void executeCopyKeyOnPartialSuccess() {
+    void executeCopyKeyOnPartialSuccess() {
         BibEntry entryWithNoKey = (BibEntry) entry.clone();
         entryWithNoKey.clearCiteKey();
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoKey, entry);
@@ -162,7 +162,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void executeCopyKeyOnSuccess() {
+    void executeCopyKeyOnSuccess() {
         ObservableList<BibEntry> entriesWithKeys = FXCollections.observableArrayList(entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithKeys));
 
@@ -178,7 +178,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void executeCopyDoiWithNoDoi() {
+    void executeCopyDoiWithNoDoi() {
         BibEntry entryWithNoDoi = (BibEntry) entry.clone();
         entryWithNoDoi.clearField(StandardField.DOI);
         ObservableList<BibEntry> entriesWithNoDois = FXCollections.observableArrayList(entryWithNoDoi);
@@ -194,7 +194,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void executeCopyDoiOnPartialSuccess() {
+    void executeCopyDoiOnPartialSuccess() {
         BibEntry entryWithNoDoi = (BibEntry) entry.clone();
         entryWithNoDoi.clearField(StandardField.DOI);
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoDoi, entry);
@@ -212,7 +212,7 @@ public class CopyMoreActionTest {
     }
 
     @Test
-    public void executeCopyDoiOnSuccess() {
+    void executeCopyDoiOnSuccess() {
         ObservableList<BibEntry> entriesWithDois = FXCollections.observableArrayList(entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithDois));
 
