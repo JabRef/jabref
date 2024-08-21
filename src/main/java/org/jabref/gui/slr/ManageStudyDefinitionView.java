@@ -145,11 +145,8 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
         setResultConverter(button -> {
             if (button == saveSurveyButtonType) {
-                SlrStudyAndDirectory result = viewModel.saveStudy();
-                if (result != null && isEdit) {
-                    viewModel.updateSelectedCatalogs();
-                }
-                return result;
+                viewModel.updateSelectedCatalogs();
+                return viewModel.saveStudy();
             }
             // Cancel button will return null
             return null;

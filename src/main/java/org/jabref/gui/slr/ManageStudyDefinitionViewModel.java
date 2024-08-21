@@ -229,7 +229,6 @@ public class ManageStudyDefinitionViewModel {
         List<String> selectedCatalogs = preferencesService.getWorkspacePreferences().getSelectedSlrCatalogs();
         for (StudyCatalogItem catalog : databases) {
             catalog.setEnabled(selectedCatalogs.contains(catalog.getName()));
-            catalog.enabledProperty().addListener((obs, oldValue, newValue) -> updateSelectedCatalogs());
         }
     }
 
