@@ -1,8 +1,8 @@
 # Linux Mint Cinnamon VM
 
-[Linux Mint](https://linuxmint.com/) with JabRef snap and libreoffice-connection pre-installed.
+[Linux Mint](https://linuxmint.com/) with JabRef sources.
 
-Uses <https://app.vagrantup.com/archman/boxes/linuxmint/versions/22>.
+Uses <https://portal.cloud.hashicorp.com/vagrant/discover/aaronvonawesome/linux-mint-21-cinnamon>.
 
 Start JabRef by following steps:
 
