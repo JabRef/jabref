@@ -20,7 +20,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
@@ -70,7 +69,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
-    @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
@@ -78,7 +76,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
-    private PreviewViewer cslPreviewViewer;
 
     public StyleSelectDialogView(StyleLoader loader) {
         this.loader = loader;
@@ -117,7 +114,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         availableListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 viewModel.selectedLayoutProperty().set(newValue));
 
-        cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
+        PreviewViewer cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), cslPreviewViewer::setLayout);
         cslPreviewBox.getChildren().add(cslPreviewViewer);
 
@@ -218,7 +215,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     }
 
     private PreviewViewer initializePreviewViewer(BibEntry entry) {
-        PreviewViewer viewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+        PreviewViewer viewer = new PreviewViewer(new BibDatabaseContext(), dialogService, preferencesService, themeManager, taskExecutor);
         viewer.setEntry(entry);
         return viewer;
     }
