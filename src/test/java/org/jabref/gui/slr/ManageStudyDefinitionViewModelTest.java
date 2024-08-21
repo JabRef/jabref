@@ -8,6 +8,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ class ManageStudyDefinitionViewModelTest {
     private ImportFormatPreferences importFormatPreferences;
     private ImporterPreferences importerPreferences;
     private DialogService dialogService;
+    private PreferencesService preferencesService;
 
     @BeforeEach
     void setUp() {
@@ -28,11 +30,12 @@ class ManageStudyDefinitionViewModelTest {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         dialogService = mock(DialogService.class);
+        preferencesService = mock(PreferencesService.class);
     }
 
     @Test
     void emptyStudyConstructorFillsDatabasesCorrectly() {
-        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, dialogService);
+        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, dialogService, preferencesService);
         assertEquals(List.of(
                 new StudyCatalogItem("ACM Portal", true),
                 new StudyCatalogItem("ArXiv", false),
@@ -103,6 +106,7 @@ class ManageStudyDefinitionViewModelTest {
                 tempDir,
                 importFormatPreferences,
                 importerPreferences,
-                dialogService);
+                dialogService,
+                preferencesService);
     }
 }

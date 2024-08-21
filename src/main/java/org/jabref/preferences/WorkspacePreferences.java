@@ -1,11 +1,15 @@
 package org.jabref.preferences;
 
+import java.util.List;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.l10n.Language;
@@ -21,6 +25,7 @@ public class WorkspacePreferences {
     private final BooleanProperty showAdvancedHints;
     private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
+    private final ObservableList<String> selectedSlrCatalogs;
 
     public WorkspacePreferences(Language language,
                                 boolean shouldOverrideDefaultFontSize,
@@ -31,7 +36,8 @@ public class WorkspacePreferences {
                                 boolean shouldOpenLastEdited,
                                 boolean showAdvancedHints,
                                 boolean warnAboutDuplicatesInInspection,
-                                boolean confirmDelete) {
+                                boolean confirmDelete,
+                                List<String> selectedSlrCatalogs) {
         this.language = new SimpleObjectProperty<>(language);
         this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);
         this.mainFontSize = new SimpleIntegerProperty(mainFontSize);
@@ -42,6 +48,7 @@ public class WorkspacePreferences {
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
         this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
+        this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
     }
 
     public Language getLanguage() {
@@ -154,5 +161,13 @@ public class WorkspacePreferences {
 
     public void setConfirmDelete(boolean confirmDelete) {
         this.confirmDelete.set(confirmDelete);
+    }
+
+    public ObservableList<String> getSelectedSlrCatalogs() {
+        return selectedSlrCatalogs;
+    }
+
+    public void setSelectedSlrCatalogs(List<String> catalogs) {
+        selectedSlrCatalogs.setAll(catalogs);
     }
 }
