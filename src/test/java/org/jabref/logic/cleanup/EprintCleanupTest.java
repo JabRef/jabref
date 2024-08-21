@@ -38,7 +38,8 @@ class EprintCleanupTest {
 
         BibEntry expected = new BibEntry()
                 .withField(StandardField.EPRINT, "1503.05173v1")
-                .withField(StandardField.EPRINTTYPE, "arxiv");
+                .withField(StandardField.EPRINTTYPE, "arxiv")
+                .withField(StandardField.INSTITUTION, "tbd");
 
         EprintCleanup cleanup = new EprintCleanup();
         cleanup.cleanup(input);

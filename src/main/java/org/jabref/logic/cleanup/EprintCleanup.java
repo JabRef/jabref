@@ -13,6 +13,7 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 
 /**
  * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
+ * Documentation: https://tex.stackexchange.com/questions/49757/what-should-an-entry-for-arxiv-entries-look-like-for-biblatex
  */
 public class EprintCleanup implements CleanupJob {
 
@@ -21,6 +22,7 @@ public class EprintCleanup implements CleanupJob {
         List<FieldChange> changes = new ArrayList<>();
 
         Optional<String> version = entry.getField(StandardField.VERSION);
+        Optional<String> institution = entry.getField(StandardField.INSTITUTION);
 
         for (Field field : Arrays.asList(StandardField.URL, StandardField.JOURNAL, StandardField.JOURNALTITLE, StandardField.NOTE, StandardField.EID)) {
             Optional<ArXivIdentifier> arXivIdentifier = entry.getField(field).flatMap(ArXivIdentifier::parse);
@@ -30,6 +32,11 @@ public class EprintCleanup implements CleanupJob {
 
                 if (version.isPresent() && !normalizedEprint.contains("v" + version.get())) {
                     normalizedEprint += "v" + version.get();
+                }
+
+                if (institution.isPresent()) {
+                    entry.setField(StandardField.INSTITUTION, "tbd")
+                         .ifPresent(changes::add);
                 }
 
                 entry.setField(StandardField.EPRINT, normalizedEprint)
@@ -54,7 +61,6 @@ public class EprintCleanup implements CleanupJob {
             }
         }
         entry.clearField(StandardField.VERSION).ifPresent(changes::add);
-        entry.clearField(StandardField.INSTITUTION).ifPresent(changes::add);
 
         return changes;
     }
