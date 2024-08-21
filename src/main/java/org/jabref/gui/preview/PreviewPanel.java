@@ -17,16 +17,17 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -44,27 +45,23 @@ public class PreviewPanel extends VBox {
     private final PreviewViewer previewView;
     private final PreviewPreferences previewPreferences;
     private final DialogService dialogService;
-    private final StateManager stateManager;
-    private final IndexingTaskManager indexingTaskManager;
     private BibEntry entry;
 
     public PreviewPanel(BibDatabaseContext database,
                         DialogService dialogService,
                         KeyBindingRepository keyBindingRepository,
                         PreferencesService preferencesService,
-                        StateManager stateManager,
                         ThemeManager themeManager,
                         IndexingTaskManager indexingTaskManager,
-                        TaskExecutor taskExecutor) {
+                        TaskExecutor taskExecutor,
+                        OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
-        this.stateManager = stateManager;
         this.previewPreferences = preferencesService.getPreviewPreferences();
-        this.indexingTaskManager = indexingTaskManager;
         this.fileLinker = new ExternalFilesEntryLinker(preferencesService.getFilePreferences(), database, dialogService);
 
         PreviewPreferences previewPreferences = preferencesService.getPreviewPreferences();
-        previewView = new PreviewViewer(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
+        previewView = new PreviewViewer(database, dialogService, preferencesService, themeManager, taskExecutor, searchQueryProperty);
         previewView.setLayout(previewPreferences.getSelectedPreviewLayout());
         previewView.setContextMenu(createPopupMenu());
         previewView.setOnDragDetected(event -> {
@@ -118,12 +115,9 @@ public class PreviewPanel extends VBox {
         previewView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
-                switch (keyBinding.get()) {
-                    case COPY_PREVIEW:
-                        previewView.copyPreviewToClipBoard();
-                        event.consume();
-                        break;
-                    default:
+                if (keyBinding.get() == KeyBinding.COPY_PREVIEW) {
+                    previewView.copyPreviewToClipBoard();
+                    event.consume();
                 }
             }
         });
