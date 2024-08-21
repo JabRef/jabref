@@ -17,7 +17,6 @@ public class ListenForCitationKeyChangeForAiAction implements GUIPostOpenAction 
 
     @Override
     public void performAction(ParserResult pr, DialogService dialogService, PreferencesService preferencesService) {
-        pr.getDatabase().registerListener(aiService.getChatHistoryManager());
         pr.getDatabase().registerListener(aiService.getSummariesStorage());
     }
 }

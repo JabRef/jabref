@@ -1,8 +1,10 @@
 package org.jabref.logic.ai;
 
 import java.util.List;
+import java.util.Objects;
 
-import org.jabref.logic.ai.chathistory.AiChatHistory;
+import javafx.collections.ObservableList;
+
 import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.CanonicalBibEntry;
@@ -31,38 +33,40 @@ public class AiChatLogic {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatLogic.class);
 
     private final AiService aiService;
-    private final AiChatHistory aiChatHistory;
+    private final ObservableList<ChatMessage> chatHistory;
     private final Filter embeddingsFilter;
     private final BibEntry entry;
 
     private ChatMemory chatMemory;
     private Chain<String, String> chain;
 
-    public AiChatLogic(AiService aiService, AiChatHistory aiChatHistory, Filter embeddingsFilter, BibEntry entry) {
+    public AiChatLogic(AiService aiService, ObservableList<ChatMessage> chatHistory, Filter embeddingsFilter, BibEntry entry) {
         this.aiService = aiService;
-        this.aiChatHistory = aiChatHistory;
+        this.chatHistory = chatHistory;
         this.embeddingsFilter = embeddingsFilter;
         this.entry = entry;
 
         setupListeningToPreferencesChanges();
-        rebuildFull(aiChatHistory.getMessages());
+        rebuildFull(chatHistory);
     }
 
-    public static AiChatLogic forBibEntry(AiService aiService, AiChatHistory aiChatHistory, BibEntry entry) {
-        Filter filter = MetadataFilterBuilder
-                .metadataKey(FileEmbeddingsManager.LINK_METADATA_KEY)
-                .isIn(entry
-                        .getFiles()
-                        .stream()
-                        .map(LinkedFile::getLink)
-                        .toList()
-                );
+    public static AiChatLogic forBibEntry(AiService aiService, ObservableList<ChatMessage> chatHistory, BibEntry entry) {
+        Filter filter;
 
-        if (entry.getCitationKey().isEmpty()) {
-            LOGGER.error("AiChatLogic should not be derived from BibEntry with no citation key");
+        if (entry.getFiles().isEmpty()) {
+            filter = o -> false;
+        } else {
+            filter = MetadataFilterBuilder
+                    .metadataKey(FileEmbeddingsManager.LINK_METADATA_KEY)
+                    .isIn(entry
+                            .getFiles()
+                            .stream()
+                            .map(LinkedFile::getLink)
+                            .toList()
+                    );
         }
 
-        return new AiChatLogic(aiService, aiChatHistory, filter, entry);
+        return new AiChatLogic(aiService, chatHistory, filter, entry);
     }
 
     private void setupListeningToPreferencesChanges() {
@@ -132,16 +136,16 @@ public class AiChatLogic {
                 entry.getCitationKey().orElse("<no citation key>"),
                 message.singleText());
 
-        aiChatHistory.add(message);
+        chatHistory.add(message);
         AiMessage result = new AiMessage(chain.execute(message.singleText()));
-        aiChatHistory.add(result);
+        chatHistory.add(result);
 
         LOGGER.debug("Message was answered by the AI provider for entry {}: {}", entry.getCitationKey().orElse("<no citation key>"), result.text());
 
         return result;
     }
 
-    public AiChatHistory getChatHistory() {
-        return aiChatHistory;
+    public ObservableList<ChatMessage> getChatHistory() {
+        return chatHistory;
     }
 }

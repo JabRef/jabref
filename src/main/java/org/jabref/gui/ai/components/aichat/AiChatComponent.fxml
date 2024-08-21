@@ -9,6 +9,10 @@
 <?import org.jabref.gui.ai.components.loadable.Loadable?>
 <?import org.jabref.gui.ai.components.chathistory.ChatHistoryComponent?>
 <?import org.jabref.gui.ai.components.chatprompt.ChatPromptComponent?>
+
+<?import org.controlsfx.control.PopOver?>
+
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <fx:root
         type="javafx.scene.layout.VBox"
         spacing="10"
@@ -27,7 +31,18 @@
             <ChatHistoryComponent fx:id="uiChatHistory" VBox.vgrow="ALWAYS" fitToWidth="true" />
         </Loadable>
 
-            <ChatPromptComponent fx:id="chatPrompt" />
+            <HBox spacing="10">
+                <Button alignment="CENTER"
+                        fx:id="notificationsButton"
+                        styleClass="icon-button,narrow"
+                        textAlignment="CENTER">
+                    <tooltip>
+                        <Tooltip
+                                text="%Notifications"/>
+                    </tooltip>
+                </Button>
+                <ChatPromptComponent fx:id="chatPrompt" HBox.hgrow="ALWAYS" />
+            </HBox>
 
             <HBox alignment="CENTER"
                   spacing="50">

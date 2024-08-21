@@ -12,11 +12,14 @@ import javafx.beans.property.SimpleBooleanProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager;
+import org.jabref.logic.ai.chathistory.ChatHistoryService;
+import org.jabref.logic.ai.chathistory.MVStoreChatHistory;
+import org.jabref.logic.ai.ingestion.IngestionService;
 import org.jabref.logic.ai.models.JabRefChatLanguageModel;
 import org.jabref.logic.ai.models.JabRefEmbeddingModel;
 import org.jabref.logic.ai.summarization.SummariesStorage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.ai.AiApiKeyProvider;
 import org.jabref.preferences.ai.AiPreferences;
 
@@ -50,15 +53,17 @@ public class AiService implements AutoCloseable {
     private final MVStore mvStore;
 
     private final JabRefChatLanguageModel jabRefChatLanguageModel;
-    private final BibDatabaseChatHistoryManager bibDatabaseChatHistoryManager;
+    private final ChatHistoryService chatHistoryService;
 
     private final JabRefEmbeddingModel jabRefEmbeddingModel;
     private final FileEmbeddingsManager fileEmbeddingsManager;
 
+    private final IngestionService ingestionService;
+
     private final SummariesStorage summariesStorage;
 
-    public AiService(AiPreferences aiPreferences, AiApiKeyProvider aiApiKeyProvider, DialogService dialogService, TaskExecutor taskExecutor) {
-        this.aiPreferences = aiPreferences;
+    public AiService(PreferencesService preferencesService, AiApiKeyProvider aiApiKeyProvider, DialogService dialogService, TaskExecutor taskExecutor) {
+        this.aiPreferences = preferencesService.getAiPreferences();
 
         MVStore mvStore;
         try {
@@ -76,9 +81,10 @@ public class AiService implements AutoCloseable {
         this.mvStore = mvStore;
 
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences, aiApiKeyProvider);
-        this.bibDatabaseChatHistoryManager = new BibDatabaseChatHistoryManager(mvStore);
+        this.chatHistoryService = new ChatHistoryService(preferencesService.getCitationKeyPatternPreferences(), new MVStoreChatHistory(mvStore));
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, dialogService, taskExecutor);
         this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, shutdownSignal, jabRefEmbeddingModel, mvStore);
+        this.ingestionService = new IngestionService();
         this.summariesStorage = new SummariesStorage(aiPreferences, mvStore);
     }
 
@@ -89,6 +95,7 @@ public class AiService implements AutoCloseable {
         this.cachedThreadPool.shutdownNow();
         this.jabRefChatLanguageModel.close();
         this.jabRefEmbeddingModel.close();
+        this.chatHistoryService.close();
         this.mvStore.close();
     }
 
@@ -108,12 +115,16 @@ public class AiService implements AutoCloseable {
         return jabRefEmbeddingModel;
     }
 
-    public BibDatabaseChatHistoryManager getChatHistoryManager() {
-        return bibDatabaseChatHistoryManager;
+    public ChatHistoryService getChatHistoryService() {
+        return chatHistoryService;
     }
 
     public FileEmbeddingsManager getEmbeddingsManager() {
         return fileEmbeddingsManager;
+    }
+
+    public IngestionService getIngestionService() {
+        return ingestionService;
     }
 
     public SummariesStorage getSummariesStorage() {
