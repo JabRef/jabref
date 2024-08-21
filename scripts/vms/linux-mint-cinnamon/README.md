@@ -6,9 +6,9 @@ Uses <https://portal.cloud.hashicorp.com/vagrant/discover/aaronvonawesome/linux-
 
 Start JabRef by following steps:
 
-- 1. Open termminal
-- 2. `cd jabref`
-- 3. `./gradlew run`
+1. Open termminal
+2. `cd jabref`
+3. `./gradlew run`
 
 ## Alternatives
 

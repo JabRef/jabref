@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
   # config.vm.synced_folder "C:/TEMP/JabRef", "/tmp/jabref"
 
   config.vm.define NAME
-  config.vm.hostname =NAME
+  config.vm.hostname = NAME
 
   config.vm.provider "virtualbox" do |v|
     v.name = NAME
