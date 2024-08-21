@@ -194,7 +194,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.apiKeyValidator = new FunctionBasedValidator<>(
                 currentApiKey,
                 token -> !StringUtil.isBlank(token),
-                ValidationMessage.error(Localization.lang("An API key has to be provided")));
+                ValidationMessage.warning(Localization.lang("An API key has to be provided")));
 
         this.chatModelValidator = new FunctionBasedValidator<>(
                 currentChatModel,
@@ -343,8 +343,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public boolean validateBasicSettings() {
         List<Validator> validators = List.of(
-                chatModelValidator,
-                apiKeyValidator
+                chatModelValidator
+                // apiKeyValidator -- skipped, it will generate warning, but the preferences should be able to save.
         );
 
         return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);
