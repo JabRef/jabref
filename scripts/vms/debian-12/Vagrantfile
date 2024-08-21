@@ -26,6 +26,8 @@ Vagrant.configure("2") do |config|
 
     sudo apt-get install -y git
 
+    # sudo apt-get install -y task-cinnamon-desktop
+
     # install IntelliJ Community Edition - source: https://snapcraft.io/install/intellij-idea-community/debian
     sudo rm /etc/apt/preferences.d/nosnap.pref # source: https://stackoverflow.com/a/77235743/873282
     sudo apt-get install -y snapd
@@ -36,8 +38,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
     # Install "Just Perfection GNOME Shell Extension"
     cd /tmp
-    # URL retrieved from https://extensions.gnome.org/review/56688
-    wget https://extensions.gnome.org/review/download/56688.shell-extension.zip -O shell-extension.zip
+    wget https://extensions.gnome.org/extension-data/just-perfection-desktopjust-perfection.v26.shell-extension.zip -O shell-extension.zip
     gnome-extensions install --force shell-extension.zip
 
     # Install JDK, clone JabRef's source code, and do an initial build
