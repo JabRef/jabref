@@ -370,32 +370,32 @@ class FileUtilTest {
     }
 
     @Test
-    public void extractFileExtension() {
+    void extractFileExtension() {
         final String filePath = FileUtilTest.class.getResource("pdffile.pdf").getPath();
         assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
     @Test
-    public void fileExtensionFromUrl() {
+    void fileExtensionFromUrl() {
         final String filePath = "https://link.springer.com/content/pdf/10.1007%2Fs40955-018-0121-9.pdf";
         assertEquals(Optional.of("pdf"), FileUtil.getFileExtension(filePath));
     }
 
     @Test
-    public void fileNameEmpty() {
+    void fileNameEmpty() {
         Path path = Path.of("/");
         assertEquals(Optional.of(path), FileUtil.find("", path));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"*", "?", ">", "\""})
-    public void fileNameIllegal(String fileName) {
+    void fileNameIllegal(String fileName) {
         Path path = Path.of("/");
         assertEquals(Optional.empty(), FileUtil.find(fileName, path));
     }
 
     @Test
-    public void findsFileInDirectory(@TempDir Path temp) throws Exception {
+    void findsFileInDirectory(@TempDir Path temp) throws Exception {
         Path firstFilePath = temp.resolve("files");
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
@@ -404,7 +404,7 @@ class FileUtilTest {
     }
 
     @Test
-    public void findsFileStartingWithTheSameDirectory(@TempDir Path temp) throws Exception {
+    void findsFileStartingWithTheSameDirectory(@TempDir Path temp) throws Exception {
         Path firstFilePath = temp.resolve("files");
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
@@ -413,7 +413,7 @@ class FileUtilTest {
     }
 
     @Test
-    public void doesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws Exception {
+    void doesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws Exception {
         Path firstFilesPath = temp.resolve("files");
         Path secondFilesPath = firstFilesPath.resolve("files");
         Files.createDirectories(secondFilesPath);
@@ -461,20 +461,20 @@ class FileUtilTest {
 
     @ParameterizedTest
     @MethodSource
-    public void relativize(List<BibEntry> expected, List<BibEntry> entries, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    void relativize(List<BibEntry> expected, List<BibEntry> entries, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         List<BibEntry> actual = FileUtil.relativize(entries, databaseContext, filePreferences);
         assertEquals(expected, actual);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"/mnt/tmp/test.pdf"})
-    public void legalPaths(String fileName) {
+    void legalPaths(String fileName) {
         assertFalse(FileUtil.detectBadFileName(fileName));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"te{}mp.pdf"})
-    public void illegalPaths(String fileName) {
+    void illegalPaths(String fileName) {
         assertTrue(FileUtil.detectBadFileName(fileName));
     }
 }

@@ -68,7 +68,7 @@ class DOAJFetcherTest {
     }
 
     @Test
-    public void searchByEmptyQuery() throws Exception {
+    void searchByEmptyQuery() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 

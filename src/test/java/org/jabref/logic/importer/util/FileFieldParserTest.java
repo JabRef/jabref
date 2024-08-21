@@ -32,7 +32,7 @@ class FileFieldParserTest {
 
     @ParameterizedTest
     @MethodSource("testData")
-    public void check(LinkedFile expected, List<String> input) {
+    void check(LinkedFile expected, List<String> input) {
         // we need to convert the unmodifiable list to a modifiable because of the side effect of "convert"
         assertEquals(expected, FileFieldParser.convert(new ArrayList<>(input)));
     }
@@ -219,7 +219,7 @@ class FileFieldParserTest {
 
     @ParameterizedTest
     @MethodSource
-    public void stringsToParseTest(List<LinkedFile> expected, String input) {
+    void stringsToParseTest(List<LinkedFile> expected, String input) {
         assertEquals(expected, FileFieldParser.parse(input));
     }
 }

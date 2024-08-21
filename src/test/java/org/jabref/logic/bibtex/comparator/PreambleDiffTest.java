@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PreambleDiffTest {
+class PreambleDiffTest {
 
     private final BibDatabaseContext originalDataBaseContext = mock(BibDatabaseContext.class);
     private final BibDatabaseContext newDataBaseContext = mock(BibDatabaseContext.class);

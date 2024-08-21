@@ -12,27 +12,27 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CopacImporterTest {
+class CopacImporterTest {
 
     private CopacImporter importer;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         importer = new CopacImporter();
     }
 
     @Test
-    public void sGetExtensions() {
+    void sGetExtensions() {
         assertEquals(StandardFileType.TXT, importer.getFileType());
     }
 
     @Test
-    public void getDescription() {
+    void getDescription() {
         assertEquals("Importer for COPAC format.", importer.getDescription());
     }
 
     @Test
-    public void importEmptyEntries() throws Exception {
+    void importEmptyEntries() throws Exception {
         Path path = Path.of(CopacImporterTest.class.getResource("Empty.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(path).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);

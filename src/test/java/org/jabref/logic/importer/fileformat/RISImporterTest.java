@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class RISImporterTest {
+class RISImporterTest {
 
     private RisImporter importer = new RisImporter();
 
     @Test
-    public void ifNotRecognizedFormat() throws IOException, URISyntaxException {
+    void ifNotRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
         assertFalse(importer.isRecognizedFormat(file));
     }

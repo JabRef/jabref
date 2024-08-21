@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class MsBibImporterTest {
+class MsBibImporterTest {
 
     Importer importer = new MsBibImporter();
 
     @Test
-    public final void isNotRecognizedFormat() throws Exception {
+    final void isNotRecognizedFormat() throws Exception {
         List<String> notAccepted = Arrays.asList("CopacImporterTest1.txt", "IsiImporterTest1.isi",
                 "IsiImporterTestInspec.isi", "emptyFile.xml", "IsiImporterTestWOS.isi");
         for (String s : notAccepted) {
@@ -30,26 +30,26 @@ public class MsBibImporterTest {
     }
 
     @Test
-    public final void importEntriesEmpty() throws IOException, URISyntaxException {
+    final void importEntriesEmpty() throws IOException, URISyntaxException {
         Path file = Path.of(MsBibImporter.class.getResource("EmptyMsBib_Test.xml").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
-    public final void importEntriesNotRecognizedFormat() throws IOException, URISyntaxException {
+    final void importEntriesNotRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(MsBibImporter.class.getResource("CopacImporterTest1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(0, entries.size());
     }
 
     @Test
-    public final void getFormatName() {
+    final void getFormatName() {
         assertEquals("MSBib", importer.getName());
     }
 
     @Test
-    public final void getCommandLineId() {
+    final void getCommandLineId() {
         assertEquals("msbib", importer.getId());
     }
 }

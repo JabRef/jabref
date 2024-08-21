@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class BooktitleCheckerTest {
+class BooktitleCheckerTest {
 
     private final BooktitleChecker checker = new BooktitleChecker();
 

@@ -13,12 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class UnprotectTermsFormatterTest {
+class UnprotectTermsFormatterTest {
 
     private UnprotectTermsFormatter formatter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         formatter = new UnprotectTermsFormatter();
     }
 
@@ -40,7 +40,7 @@ public class UnprotectTermsFormatterTest {
 
     @ParameterizedTest
     @MethodSource("terms")
-    public void test(String expected, String toFormat) {
+    void test(String expected, String toFormat) {
         assertEquals(expected, formatter.format(toFormat));
     }
 }

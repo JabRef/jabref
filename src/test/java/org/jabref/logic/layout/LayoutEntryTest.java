@@ -35,7 +35,7 @@ public class LayoutEntryTest {
     private BibEntry mBTE;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mBTE = new BibEntry();
         mBTE.setField(StandardField.ABSTRACT, "In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices");
         //  Specifically, we present a core typed language to describe Android applications, and to reason about their data-flow security properties. Our operational semantics and type system provide some necessary foundations to help both users and developers of Android applications deal with their security concerns.
@@ -69,7 +69,7 @@ public class LayoutEntryTest {
     }
 
     @Test
-    public void parseMethodCalls() {
+    void parseMethodCalls() {
         assertEquals(1, LayoutEntry.parseMethodsCalls("bla").size());
         assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla").getFirst()).getFirst());
 

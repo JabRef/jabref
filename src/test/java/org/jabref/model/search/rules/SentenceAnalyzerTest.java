@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SentenceAnalyzerTest {
+class SentenceAnalyzerTest {
 
     static Stream<Arguments> getParameters() {
         return Stream.of(
@@ -28,7 +28,7 @@ public class SentenceAnalyzerTest {
 
     @ParameterizedTest
     @MethodSource("getParameters")
-    public void getWords(List<String> expected, String input) {
+    void getWords(List<String> expected, String input) {
         assertEquals(expected, new SentenceAnalyzer(input).getWords());
     }
 }

@@ -15,7 +15,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import kong.unirest.core.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -181,7 +180,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @Test
     @Disabled("401 as of 2024-08-18")
-    public void supportsPhraseSearch() throws Exception {
+    void supportsPhraseSearch() throws Exception {
         // Normal search should match due to Redmiles, Elissa M., phrase search on the other hand should not find it.
         BibEntry expected = new BibEntry(StandardEntryType.InCollection)
                 .withField(StandardField.AUTHOR, "Booth, Kayla M. and Dosono, Bryan and Redmiles, Elissa M. and Morales, Miraida and Depew, Michael and Farzan, Rosta and Herman, Everett and Trahan, Keith and Tananis, Cindy")
@@ -200,18 +199,18 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
         List<BibEntry> result = fetcher.performSearch("author:Redmiles David");
 
         // Phrase search should be a subset of the normal search result.
-        Assertions.assertTrue(result.containsAll(resultPhrase));
+        assertTrue(result.containsAll(resultPhrase));
         result.removeAll(resultPhrase);
-        Assertions.assertEquals(Collections.singletonList(expected), result);
+        assertEquals(Collections.singletonList(expected), result);
     }
 
     @Test
     @Disabled("401 as of 2024-08-18")
-    public void supportsBooleanANDSearch() throws Exception {
+    void supportsBooleanANDSearch() throws Exception {
         List<BibEntry> resultJustByAuthor = fetcher.performSearch("author:\"Redmiles, David\"");
         List<BibEntry> result = fetcher.performSearch("author:\"Redmiles, David\" AND journal:\"Computer Supported Cooperative Work\"");
 
-        Assertions.assertTrue(resultJustByAuthor.containsAll(result));
+        assertTrue(resultJustByAuthor.containsAll(result));
         List<BibEntry> allEntriesFromCSCW = result.stream()
                                                   .filter(bibEntry -> "Computer Supported Cooperative Work (CSCW)"
                                                                               .equals(bibEntry.getField(StandardField.JOURNAL)

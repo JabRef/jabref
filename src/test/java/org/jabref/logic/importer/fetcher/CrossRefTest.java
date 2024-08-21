@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @FetcherTest
-public class CrossRefTest {
+class CrossRefTest {
 
     private CrossRef fetcher;
     private BibEntry barrosEntry;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         fetcher = new CrossRef();
 
         barrosEntry = new BibEntry();
@@ -38,7 +38,7 @@ public class CrossRefTest {
     }
 
     @Test
-    public void findExactData() throws Exception {
+    void findExactData() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "Service Interaction Patterns");
         entry.setField(StandardField.AUTHOR, "Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede");
@@ -47,7 +47,7 @@ public class CrossRefTest {
     }
 
     @Test
-    public void findMissingAuthor() throws Exception {
+    void findMissingAuthor() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb");
@@ -55,14 +55,14 @@ public class CrossRefTest {
     }
 
     @Test
-    public void findTitleOnly() throws Exception {
+    void findTitleOnly() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service");
         assertEquals("10.1109/sose.2014.26", fetcher.findIdentifier(entry).get().getDOI().toLowerCase(Locale.ENGLISH));
     }
 
     @Test
-    public void notFindIncompleteTitle() throws Exception {
+    void notFindIncompleteTitle() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "Towards Application Portability");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb and Guido Wirtz");
@@ -70,7 +70,7 @@ public class CrossRefTest {
     }
 
     @Test
-    public void acceptTitleUnderThreshold() throws Exception {
+    void acceptTitleUnderThreshold() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service----");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb and Guido Wirtz");
@@ -78,7 +78,7 @@ public class CrossRefTest {
     }
 
     @Test
-    public void notAcceptTitleOverThreshold() throws Exception {
+    void notAcceptTitleOverThreshold() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service-----");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb and Guido Wirtz");
@@ -86,7 +86,7 @@ public class CrossRefTest {
     }
 
     @Test
-    public void findWrongAuthor() throws Exception {
+    void findWrongAuthor() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb and Simon Harrer");
@@ -94,7 +94,7 @@ public class CrossRefTest {
     }
 
     @Test
-    public void findWithSubtitle() throws Exception {
+    void findWithSubtitle() throws Exception {
         BibEntry entry = new BibEntry();
         // CrossRef entry will only include { "title": "A break in the clouds", "subtitle": "towards a cloud definition" }
         entry.setField(StandardField.TITLE, "A break in the clouds: towards a cloud definition");
@@ -102,17 +102,17 @@ public class CrossRefTest {
     }
 
     @Test
-    public void findByDOI() throws Exception {
+    void findByDOI() throws Exception {
         assertEquals(Optional.of(barrosEntry), fetcher.performSearchById("10.1007/11538394_20"));
     }
 
     @Test
-    public void findByAuthors() throws Exception {
+    void findByAuthors() throws Exception {
         assertEquals(Optional.of(barrosEntry), fetcher.performSearch("\"Barros, Alistair\" AND \"Dumas, Marlon\" AND \"Arthur H.M. ter Hofstede\"").stream().findFirst());
     }
 
     @Test
-    public void findByEntry() throws Exception {
+    void findByEntry() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "Service Interaction Patterns");
         entry.setField(StandardField.AUTHOR, "Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede");
@@ -121,7 +121,7 @@ public class CrossRefTest {
     }
 
     @Test
-    public void performSearchByIdFindsPaperWithoutTitle() throws Exception {
+    void performSearchByIdFindsPaperWithoutTitle() throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "Dominik Wujastyk");
         entry.setField(StandardField.DOI, "10.1023/a:1003473214310");
@@ -137,12 +137,12 @@ public class CrossRefTest {
     }
 
     @Test
-    public void performSearchByEmptyId() throws Exception {
+    void performSearchByEmptyId() throws Exception {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 
     @Test
-    public void performSearchByEmptyQuery() throws Exception {
+    void performSearchByEmptyQuery() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 
@@ -150,7 +150,7 @@ public class CrossRefTest {
      * reveal fetching error on crossref performSearchById
      */
     @Test
-    public void performSearchValidReturnNothingDOI() throws FetcherException {
+    void performSearchValidReturnNothingDOI() throws FetcherException {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1392/BC1.0"));
     }
 }

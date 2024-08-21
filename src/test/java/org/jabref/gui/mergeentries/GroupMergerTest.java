@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GroupMergerTest {
+class GroupMergerTest {
 
     GroupMerger groupMerger;
 
@@ -35,7 +35,7 @@ public class GroupMergerTest {
 
     @ParameterizedTest
     @MethodSource
-    public void mergeShouldMergeGroupsCorrectly(String groupsA, String groupsB, String expected) {
+    void mergeShouldMergeGroupsCorrectly(String groupsA, String groupsB, String expected) {
      assertEquals(expected, groupMerger.merge(groupsA, groupsB));
     }
 }

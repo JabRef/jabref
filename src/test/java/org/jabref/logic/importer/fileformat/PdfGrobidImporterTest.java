@@ -25,12 +25,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class PdfGrobidImporterTest {
+class PdfGrobidImporterTest {
 
     private PdfGrobidImporter importer;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         GrobidPreferences grobidPreferences = mock(GrobidPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(grobidPreferences.isGrobidEnabled()).thenReturn(true);
         when(grobidPreferences.getGrobidURL()).thenReturn("http://grobid.jabref.org:8070");
@@ -43,13 +43,13 @@ public class PdfGrobidImporterTest {
     }
 
     @Test
-    public void getExtensions() {
+    void getExtensions() {
         assertEquals(StandardFileType.PDF, importer.getFileType());
     }
 
     @Test
     @Disabled("Currently does not return anything")
-    public void importEntries() throws URISyntaxException {
+    void importEntries() throws URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -62,19 +62,19 @@ public class PdfGrobidImporterTest {
     }
 
     @Test
-    public void isRecognizedFormat() throws IOException, URISyntaxException {
+    void isRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("annotated.pdf").toURI());
         assertTrue(importer.isRecognizedFormat(file));
     }
 
     @Test
-    public void isRecognizedFormatReject() throws IOException, URISyntaxException {
+    void isRecognizedFormatReject() throws IOException, URISyntaxException {
         Path file = Path.of(PdfGrobidImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         assertFalse(importer.isRecognizedFormat(file));
     }
 
     @Test
-    public void getCommandLineId() {
+    void getCommandLineId() {
         assertEquals("grobidPdf", importer.getId());
     }
 }

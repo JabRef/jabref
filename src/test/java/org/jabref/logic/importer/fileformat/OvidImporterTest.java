@@ -23,7 +23,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class OvidImporterTest {
+class OvidImporterTest {
 
     private static final String FILE_ENDING = ".txt";
     private OvidImporter importer = new OvidImporter();
@@ -42,25 +42,25 @@ public class OvidImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void isRecognizedFormatAccept(String fileName) throws IOException, URISyntaxException {
+    void isRecognizedFormatAccept(String fileName) throws IOException, URISyntaxException {
         ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void isRecognizedFormatRejected(String fileName) throws IOException, URISyntaxException {
+    void isRecognizedFormatRejected(String fileName) throws IOException, URISyntaxException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
     @Test
-    public void importEmpty() throws IOException, URISyntaxException {
+    void importEmpty() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("Empty.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
-    public void importEntries1() throws IOException, URISyntaxException {
+    void importEntries1() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(5, entries.size());
@@ -113,14 +113,14 @@ public class OvidImporterTest {
     }
 
     @Test
-    public void importEntries2() throws IOException, URISyntaxException {
+    void importEntries2() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest2Invalid.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
-    public void importSingleEntries() throws IOException, URISyntaxException {
+    void importSingleEntries() throws IOException, URISyntaxException {
 
         for (int n = 3; n <= 7; n++) {
             Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest" + n + ".txt").toURI());

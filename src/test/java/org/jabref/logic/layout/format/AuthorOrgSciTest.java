@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AuthorOrgSciTest {
+class AuthorOrgSciTest {
 
     LayoutFormatter authorOrgNatFormatter = new AuthorOrgSci();
     LayoutFormatter authorOrgNatFormatterComposite = new CompositeFormat(new AuthorOrgSci(), new NoSpaceBetweenAbbreviations());
