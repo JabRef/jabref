@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-public class MonthTest {
+class MonthTest {
 
     @ParameterizedTest
     @MethodSource({"parseShortName", "parseBibtexName", "parseFullName", "parseTwoDigitNumber", "parseNumber", "parseShortNameGerman", "parseFullNameGerman", "parseShortNameGermanLowercase", "parseSpecialCases"})
@@ -169,7 +169,7 @@ public class MonthTest {
 
     @ParameterizedTest
     @MethodSource("parseGermanShortMonthTest")
-    public void parseGermanShortMonthTest(Optional<Month> expected, String input) {
+    void parseGermanShortMonthTest(Optional<Month> expected, String input) {
         assertEquals(expected, Month.parseGermanShortMonth(input));
     }
 
@@ -205,7 +205,7 @@ public class MonthTest {
 
     @ParameterizedTest
     @MethodSource("getMonthByNumberTest")
-    public void getMonthByNumberTest(Optional<Month> expected, int input) {
+    void getMonthByNumberTest(Optional<Month> expected, int input) {
         assertEquals(expected, Month.getMonthByNumber(input));
     }
 
@@ -232,7 +232,7 @@ public class MonthTest {
 
     @ParameterizedTest
     @MethodSource({"parseShortName", "getMonthByShortNameSpecialCases"})
-    public void getMonthByShortNameLowercaseTest(Optional<Month> expected, String input) {
+    void getMonthByShortNameLowercaseTest(Optional<Month> expected, String input) {
         assertEquals(expected, Month.getMonthByShortName(input));
     }
 
@@ -249,7 +249,7 @@ public class MonthTest {
 
     @ParameterizedTest
     @MethodSource("getShortNameTest")
-    public void getShortNameTest(String expected, Month month) {
+    void getShortNameTest(String expected, Month month) {
         assertEquals(expected, month.getShortName());
     }
 
@@ -272,7 +272,7 @@ public class MonthTest {
 
     @ParameterizedTest
     @MethodSource("getJabRefFormatTest")
-    public void getJabRefFormatTest(String expected, Month month) {
+    void getJabRefFormatTest(String expected, Month month) {
         assertEquals(expected, month.getJabRefFormat());
     }
 
@@ -295,7 +295,7 @@ public class MonthTest {
 
     @ParameterizedTest
     @MethodSource("getNumberTest")
-    public void getNumberTest(int expected, Month month) {
+    void getNumberTest(int expected, Month month) {
         assertEquals(expected, month.getNumber());
     }
 
@@ -318,7 +318,7 @@ public class MonthTest {
 
     @ParameterizedTest
     @MethodSource("getFullNameTest")
-    public void getFullNameTest(String expected, Month month) {
+    void getFullNameTest(String expected, Month month) {
         assertEquals(expected, month.getFullName());
     }
 
@@ -341,7 +341,7 @@ public class MonthTest {
 
     @ParameterizedTest
     @MethodSource("getTwoDigitNumberTest")
-    public void getTwoDigitNumberTest(String expected, Month month) {
+    void getTwoDigitNumberTest(String expected, Month month) {
         assertEquals(expected, month.getTwoDigitNumber());
     }
 

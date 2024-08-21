@@ -4,27 +4,27 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MsBibMappingTest {
+class MsBibMappingTest {
     @Test
-    public void getLanguage() {
+    void getLanguage() {
         String lang = MSBibMapping.getLanguage(1609);
         assertEquals("basque", lang);
     }
 
     @Test
-    public void getLCID() {
+    void getLCID() {
         int lcid = MSBibMapping.getLCID("basque");
         assertEquals(1609, lcid);
     }
 
     @Test
-    public void getInvalidLanguage() {
+    void getInvalidLanguage() {
         String lang = MSBibMapping.getLanguage(1234567);
         assertEquals("english", lang);
     }
 
     @Test
-    public void invalidLCID() {
+    void invalidLCID() {
         int lcid = MSBibMapping.getLCID("not a language");
         assertEquals(1033, lcid);
     }

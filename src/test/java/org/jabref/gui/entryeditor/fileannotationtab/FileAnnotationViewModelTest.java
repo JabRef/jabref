@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FileAnnotationViewModelTest {
+class FileAnnotationViewModelTest {
 
     private FileAnnotationViewModel annotationViewModel;
     private FileAnnotationViewModel annotationViewModelWithoutFileAnnotation;
@@ -31,27 +31,27 @@ public class FileAnnotationViewModelTest {
     }
 
     @Test
-    public void sameAuthor() {
+    void sameAuthor() {
         assertEquals("Jaroslav Kucha ˇr", annotationViewModel.getAuthor());
     }
 
     @Test
-    public void retrieveCorrectPageNumberAsString() {
+    void retrieveCorrectPageNumberAsString() {
         assertEquals("1", annotationViewModel.getPage());
     }
 
     @Test
-    public void retrieveCorrectDateAsString() {
+    void retrieveCorrectDateAsString() {
         assertEquals("2017-07-20 10:11:30", annotationViewModel.getDate());
     }
 
     @Test
-    public void retrieveCorrectContent() {
+    void retrieveCorrectContent() {
         assertEquals("This is content", annotationViewModel.getContent());
     }
 
     @Test
-    public void retrieveCorrectContentWithoutLinkedFileAnnotation() {
+    void retrieveCorrectContentWithoutLinkedFileAnnotation() {
         String expectedMarking = ("This is paragraph 1.%n" +
                 "This is paragraph 2, and it crosses several lines, now you can see next paragraph:%n"
                 + "This is paragraph 3.").formatted();
@@ -60,7 +60,7 @@ public class FileAnnotationViewModelTest {
     }
 
     @Test
-    public void removeOnlyLineBreaksNotPrecededByPeriodOrColon() {
+    void removeOnlyLineBreaksNotPrecededByPeriodOrColon() {
         String expectedMarking = ("This is paragraph 1.%n" +
                 "This is paragraph 2, and it crosses several lines, now you can see next paragraph:%n"
                 + "This is paragraph 3.").formatted();
@@ -69,7 +69,7 @@ public class FileAnnotationViewModelTest {
     }
 
     @Test
-    public void retrieveCorrectMarkingWithoutLinkedFileAnnotation() {
+    void retrieveCorrectMarkingWithoutLinkedFileAnnotation() {
         assertEquals("", annotationViewModelWithoutFileAnnotation.getMarking());
     }
 }

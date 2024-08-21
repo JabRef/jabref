@@ -7,7 +7,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testfx.framework.junit5.ApplicationExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -41,25 +42,25 @@ public class SciteTabTest {
     }
 
     @Test
-    public void name() {
-        Assertions.assertEquals(SciteTab.NAME, "Citation information");
+    void name() {
+        assertEquals(SciteTab.NAME, "Citation information");
     }
 
     @Test
-    public void shouldShow() {
+    void shouldShow() {
         var tab = new SciteTab(preferencesService, taskExecutor, dialogService);
         boolean shouldShow = tab.shouldShow(null);
-        Assertions.assertTrue(shouldShow);
+        assertTrue(shouldShow);
     }
 
     @Test
-    public void bindNullEntry() {
+    void bindNullEntry() {
         var tab = new SciteTab(preferencesService, taskExecutor, dialogService);
         tab.bindToEntry(null);
     }
 
     @Test
-    public void bindEntry() {
+    void bindEntry() {
         var tab = new SciteTab(preferencesService, taskExecutor, dialogService);
         var entry = new BibEntry()
                 .withField(StandardField.DOI, SAMPLE_DOI);

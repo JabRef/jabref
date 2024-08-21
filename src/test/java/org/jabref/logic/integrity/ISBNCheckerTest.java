@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class ISBNCheckerTest {
+class ISBNCheckerTest {
 
     private final ISBNChecker checker = new ISBNChecker();
 
@@ -39,7 +39,7 @@ public class ISBNCheckerTest {
 
     @ParameterizedTest
     @MethodSource("provideBoundaryArgumentsForISBN13")
-    public void checkISBNValue(Optional optValue, String id) {
+    void checkISBNValue(Optional optValue, String id) {
         assertEquals(optValue, checker.checkValue(id));
     }
 

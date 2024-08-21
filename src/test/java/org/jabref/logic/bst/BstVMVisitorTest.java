@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BstVMVisitorTest {
 
     @Test
-    public void visitStringsCommand() {
+    void visitStringsCommand() {
         BstVM vm = new BstVM("STRINGS { test.string1 test.string2 test.string3 }");
 
         vm.render(Collections.emptyList());
@@ -36,7 +36,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void visitIntegersCommand() {
+    void visitIntegersCommand() {
         BstVM vm = new BstVM("INTEGERS { variable.a variable.b variable.c }");
 
         vm.render(Collections.emptyList());
@@ -118,7 +118,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void visitExecuteCommand() throws RecognitionException {
+    void visitExecuteCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 INTEGERS { variable.a }
                 FUNCTION { init.state.consts } { #5 'variable.a := }
@@ -131,7 +131,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void visitIterateCommand() throws RecognitionException {
+    void visitIterateCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { test } { cite$ }
@@ -151,7 +151,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void visitReverseCommand() throws RecognitionException {
+    void visitReverseCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { test } { cite$ }
@@ -171,7 +171,7 @@ class BstVMVisitorTest {
     }
 
     @Test
-    public void visitSortCommand() throws RecognitionException {
+    void visitSortCommand() throws RecognitionException {
         BstVM vm = new BstVM("""
                 ENTRY { } { } { }
                 FUNCTION { presort } { cite$ 'sort.key$ := }

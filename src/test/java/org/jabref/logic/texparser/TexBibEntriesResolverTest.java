@@ -21,7 +21,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class TexBibEntriesResolverTest {
+class TexBibEntriesResolverTest {
     private final static String DARWIN = "Darwin1888";
     private final static String EINSTEIN = "Einstein1920";
     private final static String NEWTON = "Newton1999";
@@ -87,7 +87,7 @@ public class TexBibEntriesResolverTest {
     }
 
     @Test
-    public void singleFile() throws URISyntaxException {
+    void singleFile() throws URISyntaxException {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         LatexParserResults latexParserResults = new DefaultLatexParser().parse(List.of(texFile));
 
@@ -99,7 +99,7 @@ public class TexBibEntriesResolverTest {
     }
 
     @Test
-    public void twoFiles() throws URISyntaxException {
+    void twoFiles() throws URISyntaxException {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         Path texFile2 = Path.of(TexBibEntriesResolverTest.class.getResource("paper2.tex").toURI());
         LatexParserResults latexParserResults = new DefaultLatexParser().parse(List.of(texFile, texFile2));
@@ -111,7 +111,7 @@ public class TexBibEntriesResolverTest {
     }
 
     @Test
-    public void duplicateFiles() throws URISyntaxException {
+    void duplicateFiles() throws URISyntaxException {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         LatexParserResults parserResults = new DefaultLatexParser().parse(List.of(texFile));
 
@@ -122,7 +122,7 @@ public class TexBibEntriesResolverTest {
     }
 
     @Test
-    public void unknownKey() throws URISyntaxException {
+    void unknownKey() throws URISyntaxException {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("unknown_key.tex").toURI());
         LatexParserResults parserResults = new DefaultLatexParser().parse(List.of(texFile));
 
@@ -133,7 +133,7 @@ public class TexBibEntriesResolverTest {
     }
 
     @Test
-    public void nestedFiles() throws URISyntaxException {
+    void nestedFiles() throws URISyntaxException {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("nested.tex").toURI());
         LatexParserResults parserResults = new DefaultLatexParser().parse(List.of(texFile));
 
@@ -144,7 +144,7 @@ public class TexBibEntriesResolverTest {
     }
 
     @Test
-    public void crossRef() throws URISyntaxException {
+    void crossRef() throws URISyntaxException {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("crossref.tex").toURI());
         LatexParserResults parserResults = new DefaultLatexParser().parse(List.of(texFile));
 

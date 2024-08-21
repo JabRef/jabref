@@ -10,11 +10,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LocalizationKeyParamsTest {
+class LocalizationKeyParamsTest {
 
     @ParameterizedTest
     @MethodSource("provideTestData")
-    public void replacePlaceholders(String expected, LocalizationKeyParams input) {
+    void replacePlaceholders(String expected, LocalizationKeyParams input) {
         assertEquals(expected, input.replacePlaceholders());
     }
 
@@ -29,7 +29,7 @@ public class LocalizationKeyParamsTest {
     }
 
     @Test
-    public void tooManyParams() {
+    void tooManyParams() {
         assertThrows(IllegalStateException.class, () -> new LocalizationKeyParams("", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"));
     }
 }

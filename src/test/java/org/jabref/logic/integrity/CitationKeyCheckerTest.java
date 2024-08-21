@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CitationKeyCheckerTest {
+class CitationKeyCheckerTest {
 
     private final CitationKeyChecker checker = new CitationKeyChecker();
 
