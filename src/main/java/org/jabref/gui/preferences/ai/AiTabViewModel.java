@@ -194,7 +194,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.apiKeyValidator = new FunctionBasedValidator<>(
                 currentApiKey,
                 token -> !StringUtil.isBlank(token),
-                ValidationMessage.warning(Localization.lang("An API key has to be provided")));
+                ValidationMessage.error(Localization.lang("An API key has to be provided")));
 
         this.chatModelValidator = new FunctionBasedValidator<>(
                 currentChatModel,
