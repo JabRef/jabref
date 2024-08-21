@@ -9,7 +9,7 @@
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.chatmessage.ChatMessageComponent">
     <children>
-        <VBox fx:id="wrapperVBox" spacing="10.0">
+        <HBox fx:id="wrapperHBox" spacing="10.0">
             <VBox fx:id="vBox" spacing="10.0">
                 <padding>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -24,7 +24,7 @@
                 </children>
             </VBox>
 
-            <HBox fx:id="buttonsHBox" alignment="BASELINE_RIGHT">
+            <VBox fx:id="buttonsVBox" alignment="BASELINE_RIGHT">
                 <children>
                     <Button onAction="#onDeleteClick" styleClass="icon-button,narrow" textAlignment="CENTER">
                         <graphic>
@@ -35,7 +35,7 @@
                         </tooltip>
                     </Button>
                 </children>
-            </HBox>
-        </VBox>
+            </VBox>
+        </HBox>
     </children>
 </fx:root>

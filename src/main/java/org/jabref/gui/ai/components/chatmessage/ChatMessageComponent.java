@@ -2,12 +2,18 @@ package org.jabref.gui.ai.components.chatmessage;
 
 import java.util.function.Consumer;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.ai.components.chathistory.ChatHistoryComponent;
 import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 
@@ -22,31 +28,43 @@ import org.slf4j.LoggerFactory;
 public class ChatMessageComponent extends HBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatMessageComponent.class);
 
-    private final ChatMessage chatMessage;
-    private final Consumer<ChatMessageComponent> onDeleteCallback;
+    private final ObjectProperty<ChatMessage> chatMessage = new SimpleObjectProperty<>();
+    private final ObjectProperty<Consumer<ChatMessageComponent>> onDelete = new SimpleObjectProperty<>();
 
-    @FXML private VBox wrapperVBox;
+    @FXML private HBox wrapperHBox;
     @FXML private VBox vBox;
     @FXML private Label sourceLabel;
     @FXML private ExpandingTextArea contentTextArea;
-    @FXML private HBox buttonsHBox;
+    @FXML private VBox buttonsVBox;
 
-    public ChatMessageComponent(ChatMessage chatMessage, Consumer<ChatMessageComponent> onDeleteCallback) {
-        this.chatMessage = chatMessage;
-        this.onDeleteCallback = onDeleteCallback;
-
+    public ChatMessageComponent() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
+
+        chatMessage.addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                loadChatMessage();
+            }
+        });
     }
 
-    public ChatMessage getChatMessage() {
-        return chatMessage;
+    public ChatMessageComponent(ChatMessage chatMessage, Consumer<ChatMessageComponent> onDeleteCallback) {
+        this();
+        setChatMessage(chatMessage);
+        setOnDelete(onDeleteCallback);
     }
 
-    @FXML
-    private void initialize() {
-        switch (chatMessage) {
+    public void setChatMessage(ChatMessage chatMessage) {
+        this.chatMessage.set(chatMessage);
+    }
+
+    public void setOnDelete(Consumer<ChatMessageComponent> onDeleteCallback) {
+        this.onDelete.set(onDeleteCallback);
+    }
+
+    private void loadChatMessage() {
+        switch (chatMessage.get()) {
             case UserMessage userMessage -> {
                 setColor("-jr-ai-message-user", "-jr-ai-message-user-border");
                 setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
@@ -69,15 +87,20 @@ public class ChatMessageComponent extends HBox {
             }
 
             default ->
-                LOGGER.error("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.type().name());
+                    LOGGER.error("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.get().type().name());
         }
+    }
 
-        buttonsHBox.visibleProperty().bind(wrapperVBox.hoverProperty());
+    @FXML
+    private void initialize() {
+        buttonsVBox.visibleProperty().bind(wrapperHBox.hoverProperty());
     }
 
     @FXML
     private void onDeleteClick() {
-        onDeleteCallback.accept(this);
+        if (onDelete.get() != null) {
+            onDelete.get().accept(this);
+        }
     }
 
     private void setColor(String fillColor, String borderColor) {
