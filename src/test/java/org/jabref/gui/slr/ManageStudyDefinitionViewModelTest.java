@@ -8,7 +8,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.WorkspacePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,21 +21,21 @@ import static org.mockito.Mockito.mock;
 class ManageStudyDefinitionViewModelTest {
     private ImportFormatPreferences importFormatPreferences;
     private ImporterPreferences importerPreferences;
+    private WorkspacePreferences workspacePreferences;
     private DialogService dialogService;
-    private PreferencesService preferencesService;
 
     @BeforeEach
     void setUp() {
         // code taken from org.jabref.logic.importer.WebFetchersTest.setUp
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        workspacePreferences = mock(WorkspacePreferences.class, Answers.RETURNS_DEEP_STUBS);
         dialogService = mock(DialogService.class);
-        preferencesService = mock(PreferencesService.class);
     }
 
     @Test
     void emptyStudyConstructorFillsDatabasesCorrectly() {
-        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, dialogService, preferencesService);
+        ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, workspacePreferences, dialogService);
         assertEquals(List.of(
                 new StudyCatalogItem("ACM Portal", true),
                 new StudyCatalogItem("ArXiv", false),
@@ -106,7 +106,7 @@ class ManageStudyDefinitionViewModelTest {
                 tempDir,
                 importFormatPreferences,
                 importerPreferences,
-                dialogService,
-                preferencesService);
+                workspacePreferences,
+                dialogService);
     }
 }
