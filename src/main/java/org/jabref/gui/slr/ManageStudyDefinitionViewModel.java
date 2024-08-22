@@ -32,7 +32,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.WorkspacePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,15 +61,15 @@ public class ManageStudyDefinitionViewModel {
 
     private final DialogService dialogService;
 
-    private final PreferencesService preferencesService;
+    private final WorkspacePreferences workspacePreferences;
 
     /**
      * Constructor for a new study
      */
     public ManageStudyDefinitionViewModel(ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
-                                          DialogService dialogService,
-                                          PreferencesService preferencesService) {
+                                          WorkspacePreferences workspacePreferences,
+                                          DialogService dialogService) {
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                     .stream()
                                     .map(SearchBasedFetcher::getName)
@@ -82,7 +82,7 @@ public class ManageStudyDefinitionViewModel {
                                     })
                                     .toList());
         this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
     }
 
     /**
@@ -95,8 +95,8 @@ public class ManageStudyDefinitionViewModel {
                                           Path studyDirectory,
                                           ImportFormatPreferences importFormatPreferences,
                                           ImporterPreferences importerPreferences,
-                                          DialogService dialogService,
-                                          PreferencesService preferencesService) {
+                                          WorkspacePreferences workspacePreferences,
+                                          DialogService dialogService) {
         // copy the content of the study object into the UI fields
         authors.addAll(Objects.requireNonNull(study).getAuthors());
         title.setValue(study.getTitle());
@@ -117,7 +117,7 @@ public class ManageStudyDefinitionViewModel {
 
         this.directory.set(Objects.requireNonNull(studyDirectory).toString());
         this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
     }
 
     public StringProperty getTitle() {
@@ -226,7 +226,7 @@ public class ManageStudyDefinitionViewModel {
     }
 
     public void initializeSelectedCatalogs() {
-        List<String> selectedCatalogs = preferencesService.getWorkspacePreferences().getSelectedSlrCatalogs();
+        List<String> selectedCatalogs = workspacePreferences.getSelectedSlrCatalogs();
         for (StudyCatalogItem catalog : databases) {
             catalog.setEnabled(selectedCatalogs.contains(catalog.getName()));
         }
@@ -238,6 +238,6 @@ public class ManageStudyDefinitionViewModel {
                                                      .map(StudyCatalogItem::getName)
                                                      .collect(Collectors.toList());
 
-        preferencesService.getWorkspacePreferences().setSelectedSlrCatalogs(selectedCatalogsList);
+        workspacePreferences.setSelectedSlrCatalogs(selectedCatalogsList);
     }
 }
