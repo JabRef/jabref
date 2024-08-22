@@ -159,16 +159,16 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
             viewModel = new ManageStudyDefinitionViewModel(
                     prefs.getImportFormatPreferences(),
                     prefs.getImporterPreferences(),
-                    dialogService,
-                    prefs);
+                    prefs.getWorkspacePreferences(),
+                    dialogService);
         } else {
             viewModel = new ManageStudyDefinitionViewModel(
                     study.get(),
                     pathToStudyDataDirectory,
                     prefs.getImportFormatPreferences(),
                     prefs.getImporterPreferences(),
-                    dialogService,
-                    prefs);
+                    prefs.getWorkspacePreferences(),
+                    dialogService);
 
             // The directory of the study cannot be changed
             studyDirectory.setEditable(false);
