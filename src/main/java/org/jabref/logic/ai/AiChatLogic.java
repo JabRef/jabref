@@ -26,6 +26,7 @@ import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
+import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,13 +35,13 @@ public class AiChatLogic {
 
     private final AiService aiService;
     private final ObservableList<ChatMessage> chatHistory;
-    private final Filter embeddingsFilter;
+    private final @Nullable Filter embeddingsFilter;
     private final BibEntry entry;
 
     private ChatMemory chatMemory;
     private Chain<String, String> chain;
 
-    public AiChatLogic(AiService aiService, ObservableList<ChatMessage> chatHistory, Filter embeddingsFilter, BibEntry entry) {
+    public AiChatLogic(AiService aiService, ObservableList<ChatMessage> chatHistory, @Nullable Filter embeddingsFilter, BibEntry entry) {
         this.aiService = aiService;
         this.chatHistory = chatHistory;
         this.embeddingsFilter = embeddingsFilter;
@@ -51,10 +52,10 @@ public class AiChatLogic {
     }
 
     public static AiChatLogic forBibEntry(AiService aiService, ObservableList<ChatMessage> chatHistory, BibEntry entry) {
-        Filter filter;
+        @Nullable Filter filter;
 
         if (entry.getFiles().isEmpty()) {
-            filter = o -> false;
+            filter = null;
         } else {
             filter = MetadataFilterBuilder
                     .metadataKey(FileEmbeddingsManager.LINK_METADATA_KEY)

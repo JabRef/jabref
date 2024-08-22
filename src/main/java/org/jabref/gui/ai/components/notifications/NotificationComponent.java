@@ -1,5 +1,6 @@
 package org.jabref.gui.ai.components.notifications;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -10,6 +11,7 @@ import org.jabref.gui.icon.IconTheme;
 public class NotificationComponent extends HBox {
     public NotificationComponent(Notification notification) {
         setSpacing(10);
+        setPadding(new Insets(10));
 
         getChildren().addAll(
                 getIcon(notification.type()),

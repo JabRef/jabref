@@ -84,7 +84,7 @@ public class AiService implements AutoCloseable {
         this.chatHistoryService = new ChatHistoryService(preferencesService.getCitationKeyPatternPreferences(), new MVStoreChatHistory(mvStore));
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, dialogService, taskExecutor);
         this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, shutdownSignal, jabRefEmbeddingModel, mvStore);
-        this.ingestionService = new IngestionService();
+        this.ingestionService = new IngestionService(preferencesService, this, taskExecutor);
         this.summariesStorage = new SummariesStorage(aiPreferences, mvStore);
     }
 
