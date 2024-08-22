@@ -7,5 +7,6 @@ import dev.langchain4j.data.message.ChatMessage;
 
 public interface ChatHistoryImplementation {
     List<ChatMessage> loadMessagesForEntry(Path bibDatabasePath, String citationKey);
+
     void storeMessagesForEntry(Path bibDatabasePath, String citationKey, List<ChatMessage> messages);
 }

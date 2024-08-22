@@ -9,7 +9,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
-import org.jabref.logic.ai.misc.ErrorMessage;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import dev.langchain4j.data.message.ChatMessage;

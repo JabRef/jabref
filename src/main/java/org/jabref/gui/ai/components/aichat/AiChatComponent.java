@@ -147,7 +147,7 @@ public class AiChatComponent extends VBox {
                     ingestionStatus.message().get()
                 ));
 
-                case INGESTION_SUCCESS -> {}
+                case INGESTION_SUCCESS -> { }
             }
         });
 
