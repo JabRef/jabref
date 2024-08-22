@@ -276,33 +276,41 @@ public class EndnoteXmlExporter extends Exporter {
     }
 
     private void writeUrls(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
-        writer.writeStartElement("urls");
 
-        entry.getFieldOrAlias(StandardField.FILE).ifPresent(fileField -> {
-            try {
-                writer.writeStartElement("pdf-urls");
-                writer.writeStartElement("url");
-                writer.writeCharacters(fileField);
-                writer.writeEndElement();
-                writer.writeEndElement(); // pdf-urls
-            } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        boolean hasUrls = entry.getFieldOrAlias(StandardField.FILE).isPresent()
+                || entry.getFieldOrAlias(StandardField.URL).isPresent();
 
-        entry.getFieldOrAlias(StandardField.URL).ifPresent(url -> {
-            try {
-                writer.writeStartElement("web-urls");
-                writer.writeStartElement("url");
-                writer.writeCharacters(url);
-                writer.writeEndElement();
-                writer.writeEndElement(); // web-urls
-            } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        if (hasUrls) {
+            writer.writeStartElement("urls");
 
-        writer.writeEndElement(); // urls
+            entry.getFieldOrAlias(StandardField.FILE).ifPresent(fileField -> {
+                try {
+                    writer.writeStartElement("pdf-urls");
+                    writer.writeStartElement("url");
+                    writer.writeCharacters(fileField);
+                    writer.writeEndElement();
+                    writer.writeEndElement(); // pdf-urls
+                } catch (
+                        XMLStreamException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            entry.getFieldOrAlias(StandardField.URL).ifPresent(url -> {
+                try {
+                    writer.writeStartElement("web-urls");
+                    writer.writeStartElement("url");
+                    writer.writeCharacters(url);
+                    writer.writeEndElement();
+                    writer.writeEndElement(); // web-urls
+                } catch (
+                        XMLStreamException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            writer.writeEndElement(); // urls
+        }
     }
 
     private void writeDates(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
