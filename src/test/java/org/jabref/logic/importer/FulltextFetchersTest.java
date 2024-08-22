@@ -18,12 +18,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class FulltextFetchersTest {
+class FulltextFetchersTest {
 
     private BibEntry entry = new BibEntry();
 
     @Test
-    public void acceptPdfUrls() throws MalformedURLException {
+    void acceptPdfUrls() throws MalformedURLException {
         URL pdfUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FulltextFetcher finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
@@ -31,7 +31,7 @@ public class FulltextFetchersTest {
     }
 
     @Test
-    public void rejectNonPdfUrls() throws MalformedURLException {
+    void rejectNonPdfUrls() throws MalformedURLException {
         URL pdfUrl = new URL("https://github.com/JabRef/jabref/blob/master/README.md");
         FulltextFetcher finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
@@ -40,7 +40,7 @@ public class FulltextFetchersTest {
     }
 
     @Test
-    public void noTrustLevel() throws MalformedURLException {
+    void noTrustLevel() throws MalformedURLException {
         URL pdfUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
         FulltextFetcher finder = e -> Optional.of(pdfUrl);
         FulltextFetchers fetcher = new FulltextFetchers(Set.of(finder));
@@ -49,7 +49,7 @@ public class FulltextFetchersTest {
     }
 
     @Test
-    public void higherTrustLevelWins() throws IOException, FetcherException {
+    void higherTrustLevelWins() throws IOException, FetcherException {
         FulltextFetcher finderHigh = mock(FulltextFetcher.class);
         when(finderHigh.getTrustLevel()).thenReturn(TrustLevel.SOURCE);
         final URL highUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");

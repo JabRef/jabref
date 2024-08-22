@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BstTextPrefixerTest {
+class BstTextPrefixerTest {
 
     @Test
-    public void prefix() {
+    void prefix() {
         assertPrefix("i", "i");
         assertPrefix("0I~ ", "0I~ ");
         assertPrefix("Hi Hi", "Hi Hi ");

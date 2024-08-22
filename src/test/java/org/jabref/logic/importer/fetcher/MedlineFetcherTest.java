@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
-public class MedlineFetcherTest {
+class MedlineFetcherTest {
 
     private MedlineFetcher fetcher;
     private BibEntry entryWijedasa;
@@ -28,7 +28,7 @@ public class MedlineFetcherTest {
     private BibEntry bibEntrySari;
 
     @BeforeEach
-    public void setUp() throws InterruptedException {
+    void setUp() throws InterruptedException {
         // pause between runs to avoid 403 and 429 at Medline
         Thread.sleep(1000);
 
@@ -127,12 +127,12 @@ public class MedlineFetcherTest {
     }
 
     @Test
-    public void getName() {
+    void getName() {
         assertEquals("Medline/PubMed", fetcher.getName());
     }
 
     @Test
-    public void searchByIDWijedasa() throws Exception {
+    void searchByIDWijedasa() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670948");
         assertTrue(fetchedEntry.isPresent());
 
@@ -141,7 +141,7 @@ public class MedlineFetcherTest {
     }
 
     @Test
-    public void searchByIDEndharti() throws Exception {
+    void searchByIDEndharti() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670445");
         assertTrue(fetchedEntry.isPresent());
 
@@ -150,7 +150,7 @@ public class MedlineFetcherTest {
     }
 
     @Test
-    public void searchByIDIchikawa() throws Exception {
+    void searchByIDIchikawa() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26197440");
         assertTrue(fetchedEntry.isPresent());
 
@@ -159,7 +159,7 @@ public class MedlineFetcherTest {
     }
 
     @Test
-    public void searchByIDSari() throws Exception {
+    void searchByIDSari() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26867355");
         assertTrue(fetchedEntry.isPresent());
 
@@ -168,39 +168,39 @@ public class MedlineFetcherTest {
     }
 
     @Test
-    public void multipleEntries() throws Exception {
+    void multipleEntries() throws Exception {
         List<BibEntry> entryList = fetcher.performSearch("java");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(50, entryList.size());
     }
 
     @Test
-    public void withLuceneQueryAuthorDate() throws Exception {
+    void withLuceneQueryAuthorDate() throws Exception {
         List<BibEntry> entryList = fetcher.performSearch("author:vigmond AND year:2021");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(18, entryList.size());
     }
 
     @Test
-    public void withLuceneQueryAuthorDateRange() throws Exception {
+    void withLuceneQueryAuthorDateRange() throws Exception {
         List<BibEntry> entryList = fetcher.performSearch("author:vigmond AND year-range:2020-2021");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(28, entryList.size());
     }
 
     @Test
-    public void invalidSearchTerm() throws Exception {
+    void invalidSearchTerm() throws Exception {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher"));
     }
 
     @Test
-    public void emptyEntryList() throws Exception {
+    void emptyEntryList() throws Exception {
         List<BibEntry> entryList = fetcher.performSearch("java is fantastic and awesome ");
         assertEquals(Collections.emptyList(), entryList);
     }
 
     @Test
-    public void emptyInput() throws Exception {
+    void emptyInput() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 }

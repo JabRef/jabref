@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BibStringDiffTest {
+class BibStringDiffTest {
 
     private final BibDatabase originalDataBase = mock(BibDatabase.class);
     private final BibDatabase newDataBase = mock(BibDatabase.class);

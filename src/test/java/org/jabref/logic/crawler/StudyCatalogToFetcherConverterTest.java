@@ -18,12 +18,12 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +48,7 @@ class StudyCatalogToFetcherConverterTest {
     }
 
     @Test
-    public void getActiveFetcherInstances() throws Exception {
+    void getActiveFetcherInstances() throws Exception {
         Path studyDefinition = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 
@@ -64,7 +64,7 @@ class StudyCatalogToFetcherConverterTest {
                 mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS));
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
-        Assertions.assertEquals(
+        assertEquals(
                 List.of("Springer", "ArXiv", "Medline/PubMed"),
                 result.stream().map(SearchBasedFetcher::getName).collect(Collectors.toList())
         );

@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class ISSNCleanupTest {
+class ISSNCleanupTest {
 
     private CleanupWorker worker;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         worker = new CleanupWorker(
                 mock(BibDatabaseContext.class),
                 mock(FilePreferences.class),
@@ -28,7 +28,7 @@ public class ISSNCleanupTest {
     }
 
     @Test
-    public void cleanupISSNReturnsCorrectISSN() {
+    void cleanupISSNReturnsCorrectISSN() {
         CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.ISSN, "0123-4567");
@@ -38,7 +38,7 @@ public class ISSNCleanupTest {
     }
 
     @Test
-    public void cleanupISSNAddsMissingDash() {
+    void cleanupISSNAddsMissingDash() {
         CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.ISSN, "01234567");
@@ -48,7 +48,7 @@ public class ISSNCleanupTest {
     }
 
     @Test
-    public void cleanupISSNJunkStaysJunk() {
+    void cleanupISSNJunkStaysJunk() {
         CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.ISSN, "Banana");

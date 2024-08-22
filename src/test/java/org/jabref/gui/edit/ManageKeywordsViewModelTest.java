@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ManageKeywordsViewModelTest {
+class ManageKeywordsViewModelTest {
 
     private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
     private ManageKeywordsViewModel keywordsViewModel;

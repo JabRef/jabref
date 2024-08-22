@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class NameFormatterTest {
+class NameFormatterTest {
 
     @Test
-    public void formatStringStringBibtexEntry() {
+    void formatStringStringBibtexEntry() {
         NameFormatter l = new NameFormatter();
 
         assertEquals("Doe", l.format("Joe Doe", "1@*@{ll}"));
@@ -30,7 +30,7 @@ public class NameFormatterTest {
     }
 
     @Test
-    public void format() {
+    void format() {
         NameFormatter a = new NameFormatter();
 
         // Empty case

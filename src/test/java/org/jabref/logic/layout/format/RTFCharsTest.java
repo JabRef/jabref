@@ -180,7 +180,7 @@ class RTFCharsTest {
             "ß, \\u223ss", // ss
             "¡, \\u161!" // !
     })
-    public void moreSpecialCharacters(String specialChar, String expectedResult) {
+    void moreSpecialCharacters(String specialChar, String expectedResult) {
         String formattedStr = formatter.format(specialChar);
         assertEquals(expectedResult, formattedStr);
     }

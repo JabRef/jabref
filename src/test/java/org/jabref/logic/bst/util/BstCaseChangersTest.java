@@ -12,11 +12,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BstCaseChangersTest {
+class BstCaseChangersTest {
 
     @ParameterizedTest
     @MethodSource("provideStringsForTitleLowers")
-    public void changeCaseTitleLowers(String expected, String toBeFormatted) {
+    void changeCaseTitleLowers(String expected, String toBeFormatted) {
         assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.TITLE_LOWERS));
     }
 
@@ -58,7 +58,7 @@ public class BstCaseChangersTest {
 
     @ParameterizedTest
     @MethodSource("provideStringsForAllLowers")
-    public void changeCaseAllLowers(String expected, String toBeFormatted) {
+    void changeCaseAllLowers(String expected, String toBeFormatted) {
         assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS));
     }
 
@@ -89,7 +89,7 @@ public class BstCaseChangersTest {
 
     @ParameterizedTest
     @MethodSource("provideStringsForAllUppers")
-    public void changeCaseAllUppers(String expected, String toBeFormatted) {
+    void changeCaseAllUppers(String expected, String toBeFormatted) {
         assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_UPPERS));
     }
 
@@ -120,7 +120,7 @@ public class BstCaseChangersTest {
 
     @ParameterizedTest
     @MethodSource("provideTitleCaseAllLowers")
-    public void titleCaseAllLowers(String expected, String toBeFormatted) {
+    void titleCaseAllLowers(String expected, String toBeFormatted) {
         assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS));
     }
 
@@ -138,7 +138,7 @@ public class BstCaseChangersTest {
 
     @Disabled
     @Test
-    public void titleCaseAllUppers() {
+    void titleCaseAllUppers() {
         /* the real test would look like as follows. Also from the comment of issue 176, order reversed as the "should be" comes first */
         // assertCaseChangerTitleUppers("This is a Simple Example {TITLE}", "This is a simple example {TITLE}");
         // assertCaseChangerTitleUppers("This {IS} Another Simple Example Tit{LE}", "This {IS} another simple example tit{LE}");

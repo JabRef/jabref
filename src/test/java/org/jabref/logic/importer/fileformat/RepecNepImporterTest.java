@@ -14,14 +14,14 @@ import org.mockito.Answers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RepecNepImporterTest {
+class RepecNepImporterTest {
 
     private static final String FILE_ENDING = ".txt";
 
     private RepecNepImporter testImporter;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
@@ -41,19 +41,19 @@ public class RepecNepImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void isRecognizedFormat(String fileName) throws IOException {
+    void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    public void isNotRecognizedFormat(String fileName) throws IOException {
+    void isNotRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(testImporter, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    public void importEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws Exception {
         ImporterTestEngine.testImportEntries(testImporter, fileName, FILE_ENDING);
     }
 }

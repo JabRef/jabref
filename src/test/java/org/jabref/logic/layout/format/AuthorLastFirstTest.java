@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AuthorLastFirstTest {
+class AuthorLastFirstTest {
 
     @Test
-    public void format() {
+    void format() {
         LayoutFormatter a = new AuthorLastFirst();
 
         // Empty case

@@ -21,13 +21,13 @@ public class MsBibExportFormatTest {
     public MSBibExporter msBibExportFormat;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
         msBibExportFormat = new MSBibExporter();
     }
 
     @Test
-    public final void performExportWithNoEntry(@TempDir Path tempFile) throws IOException, SaveException {
+    final void performExportWithNoEntry(@TempDir Path tempFile) throws IOException, SaveException {
         Path path = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(path);
         List<BibEntry> entries = Collections.emptyList();

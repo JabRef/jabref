@@ -13,19 +13,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BibDatabaseModeDetectionTest {
+class BibDatabaseModeDetectionTest {
 
     private static final EntryType UNKNOWN_TYPE = new UnknownEntryType("unknowntype");
 
     @Test
-    public void detectBiblatex() {
+    void detectBiblatex() {
         List<BibEntry> entries = Arrays.asList(new BibEntry(StandardEntryType.MvBook));
 
         assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(new BibDatabase(entries)));
     }
 
     @Test
-    public void detectUndistinguishableAsBibtex() {
+    void detectUndistinguishableAsBibtex() {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.TITLE, "My cool paper");
         List<BibEntry> entries = Arrays.asList(entry);
@@ -34,7 +34,7 @@ public class BibDatabaseModeDetectionTest {
     }
 
     @Test
-    public void detectMixedModeAsBiblatex() {
+    void detectMixedModeAsBiblatex() {
         BibEntry bibtex = new BibEntry(StandardEntryType.Article);
         bibtex.setField(StandardField.JOURNAL, "IEEE Trans. Services Computing");
         BibEntry biblatex = new BibEntry(StandardEntryType.Article);
@@ -45,7 +45,7 @@ public class BibDatabaseModeDetectionTest {
     }
 
     @Test
-    public void detectUnknownTypeAsBibtex() {
+    void detectUnknownTypeAsBibtex() {
         BibEntry entry = new BibEntry(UNKNOWN_TYPE);
         List<BibEntry> entries = Arrays.asList(entry);
 
@@ -53,7 +53,7 @@ public class BibDatabaseModeDetectionTest {
     }
 
     @Test
-    public void ignoreUnknownTypesForBibtexDecision() {
+    void ignoreUnknownTypesForBibtexDecision() {
         BibEntry custom = new BibEntry(UNKNOWN_TYPE);
         BibEntry bibtex = new BibEntry(StandardEntryType.Article);
         BibEntry biblatex = new BibEntry(StandardEntryType.Article);
@@ -63,7 +63,7 @@ public class BibDatabaseModeDetectionTest {
     }
 
     @Test
-    public void ignoreUnknownTypesForBiblatexDecision() {
+    void ignoreUnknownTypesForBiblatexDecision() {
         BibEntry custom = new BibEntry(UNKNOWN_TYPE);
         BibEntry bibtex = new BibEntry(StandardEntryType.Article);
         BibEntry biblatex = new BibEntry(StandardEntryType.MvBook);
