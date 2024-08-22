@@ -95,7 +95,7 @@ public class EndnoteXmlExporter extends Exporter {
     }
 
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException, XMLStreamException {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(file);
         Objects.requireNonNull(entries);
@@ -104,22 +104,25 @@ public class EndnoteXmlExporter extends Exporter {
             return;
         }
 
-        XMLStreamWriter writer = OUTPUT_FACTORY.createXMLStreamWriter(Files.newOutputStream(file), StandardCharsets.UTF_8.name());
+        try (var os = Files.newOutputStream(file)) {
+            XMLStreamWriter writer = OUTPUT_FACTORY.createXMLStreamWriter(os, StandardCharsets.UTF_8.name());
+            try {
+                writer.writeStartDocument(StandardCharsets.UTF_8.name(), "1.0");
+                writer.writeStartElement("xml");
+                writer.writeStartElement("records");
 
-        try {
-            writer.writeStartDocument(StandardCharsets.UTF_8.name(), "1.0");
-            writer.writeStartElement("xml");
-            writer.writeStartElement("records");
+                for (BibEntry entry : entries) {
+                    writeRecord(writer, entry, databaseContext);
+                }
 
-            for (BibEntry entry : entries) {
-                writeRecord(writer, entry, databaseContext);
+                writer.writeEndElement(); // records
+                writer.writeEndElement(); // xml
+                writer.writeEndDocument();
+            } finally {
+                writer.close();
             }
-
-            writer.writeEndElement(); // records
-            writer.writeEndElement(); // xml
-            writer.writeEndDocument();
-        } finally {
-            writer.close();
+        } catch (XMLStreamException | IOException e) {
+            throw new SaveException("Error exporting to EndNote XML", e);
         }
     }
 
@@ -145,7 +148,7 @@ public class EndnoteXmlExporter extends Exporter {
                     writer.writeCharacters(value);
                     writer.writeEndElement();
                 } catch (XMLStreamException e) {
-                    throw new RuntimeException(e);
+                    throw new IllegalStateException("Error writing field " + field, e);
                 }
             });
         }
@@ -177,20 +180,23 @@ public class EndnoteXmlExporter extends Exporter {
 
     private void writeAuthorAndEditor(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
         writer.writeStartElement("contributors");
+
         entry.getField(StandardField.AUTHOR).ifPresent(authors -> {
             try {
                 addPersons(writer, authors, "authors");
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Error writing authors", e);
             }
         });
+
         entry.getField(StandardField.EDITOR).ifPresent(editors -> {
             try {
                 addPersons(writer, editors, "secondary-authors");
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Error writing editors", e);
             }
         });
+
         writer.writeEndElement(); // contributors
     }
 
@@ -219,7 +225,7 @@ public class EndnoteXmlExporter extends Exporter {
                         writer.writeCharacters(altTitle);
                         writer.writeEndElement();
                     } catch (XMLStreamException e) {
-                        throw new RuntimeException(e);
+                        throw new IllegalStateException("Error writing alt-title", e);
                     }
                 });
 
@@ -229,13 +235,13 @@ public class EndnoteXmlExporter extends Exporter {
                         writer.writeCharacters(secondaryTitle);
                         writer.writeEndElement();
                     } catch (XMLStreamException e) {
-                        throw new RuntimeException(e);
+                        throw new IllegalStateException("Error writing secondary-title", e);
                     }
                 });
 
                 writer.writeEndElement(); // titles
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Error writing title", e);
             }
         });
     }
@@ -249,7 +255,7 @@ public class EndnoteXmlExporter extends Exporter {
                 writer.writeEndElement();
                 writer.writeEndElement(); // periodical
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Error writing journal title", e);
             }
         });
     }
@@ -258,6 +264,7 @@ public class EndnoteXmlExporter extends Exporter {
         entry.getFieldOrAlias(StandardField.KEYWORDS).ifPresent(keywords -> {
             try {
                 writer.writeStartElement("keywords");
+
                 entry.getResolvedKeywords(bibEntryPreferences.getKeywordSeparator(), bibDatabase).forEach(keyword -> {
                     try {
                         writer.writeStartElement("keyword");
@@ -265,18 +272,18 @@ public class EndnoteXmlExporter extends Exporter {
                         writer.writeCharacters(keyword.get());
                         writer.writeEndElement();
                     } catch (XMLStreamException e) {
-                        throw new RuntimeException(e);
+                        throw new IllegalStateException("Error writing keyword", e);
                     }
                 });
+
                 writer.writeEndElement(); // keywords
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Error writing keywords", e);
             }
         });
     }
 
     private void writeUrls(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
-
         boolean hasUrls = entry.getFieldOrAlias(StandardField.FILE).isPresent()
                 || entry.getFieldOrAlias(StandardField.URL).isPresent();
 
@@ -290,9 +297,8 @@ public class EndnoteXmlExporter extends Exporter {
                     writer.writeCharacters(fileField);
                     writer.writeEndElement();
                     writer.writeEndElement(); // pdf-urls
-                } catch (
-                        XMLStreamException e) {
-                    throw new RuntimeException(e);
+                } catch (XMLStreamException e) {
+                    throw new IllegalStateException("Error writing file URL", e);
                 }
             });
 
@@ -303,9 +309,8 @@ public class EndnoteXmlExporter extends Exporter {
                     writer.writeCharacters(url);
                     writer.writeEndElement();
                     writer.writeEndElement(); // web-urls
-                } catch (
-                        XMLStreamException e) {
-                    throw new RuntimeException(e);
+                } catch (XMLStreamException e) {
+                    throw new IllegalStateException("Error writing web URL", e);
                 }
             });
 
@@ -314,34 +319,39 @@ public class EndnoteXmlExporter extends Exporter {
     }
 
     private void writeDates(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
+
         writer.writeStartElement("dates");
+
         entry.getFieldOrAlias(StandardField.YEAR).ifPresent(year -> {
             try {
                 writer.writeStartElement("year");
                 writer.writeCharacters(year);
                 writer.writeEndElement();
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Error writing year", e);
             }
         });
+
         entry.getFieldOrAlias(StandardField.MONTH).ifPresent(month -> {
             try {
                 writer.writeStartElement("month");
                 writer.writeCharacters(month);
                 writer.writeEndElement();
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Error writing month", e);
             }
         });
+
         entry.getFieldOrAlias(StandardField.DAY).ifPresent(day -> {
             try {
                 writer.writeStartElement("day");
                 writer.writeCharacters(day);
                 writer.writeEndElement();
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Error writing day", e);
             }
         });
+
         // We need to use getField here - getFieldOrAlias for Date tries to convert year, month, and day to a date, which we do not want
         entry.getField(StandardField.DATE).ifPresent(date -> {
             try {
@@ -351,9 +361,10 @@ public class EndnoteXmlExporter extends Exporter {
                 writer.writeEndElement();
                 writer.writeEndElement(); // pub-dates
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Error writing date", e);
             }
         });
+
         writer.writeEndElement(); // dates
     }
 }
