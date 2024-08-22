@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.lang.Object;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
