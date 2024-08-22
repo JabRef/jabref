@@ -153,6 +153,7 @@ public class AiChatTab extends EntryEditorTab {
                 new AiChatComponent(
                     aiService,
                     entry,
+                    bibDatabaseContext,
                     dialogService,
                     taskExecutor
                 )

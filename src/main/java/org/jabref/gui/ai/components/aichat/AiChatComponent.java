@@ -1,7 +1,6 @@
 package org.jabref.gui.ai.components.aichat;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import javafx.fxml.FXML;
@@ -15,23 +14,20 @@ import org.jabref.gui.ai.components.chatprompt.ChatPromptComponent;
 import org.jabref.gui.ai.components.loadable.Loadable;
 import org.jabref.gui.ai.components.notifications.Notification;
 import org.jabref.gui.ai.components.notifications.NotificationType;
-import org.jabref.gui.ai.components.notifications.NotificationsComponent;
 import org.jabref.gui.ai.components.notifications.NotificationsList;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChatLogic;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.store.embedding.filter.logical.Not;
-import org.checkerframework.checker.units.qual.N;
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +37,7 @@ public class AiChatComponent extends VBox {
 
     private final AiService aiService;
     private final BibEntry entry;
+    private final BibDatabaseContext bibDatabaseContext;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
@@ -52,9 +49,10 @@ public class AiChatComponent extends VBox {
     @FXML private ChatPromptComponent chatPrompt;
     @FXML private Label noticeText;
 
-    public AiChatComponent(AiService aiService, BibEntry entry, DialogService dialogService, TaskExecutor taskExecutor) {
+    public AiChatComponent(AiService aiService, BibEntry entry, BibDatabaseContext bibDatabaseContext, DialogService dialogService, TaskExecutor taskExecutor) {
         this.aiService = aiService;
         this.entry = entry;
+        this.bibDatabaseContext = bibDatabaseContext;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
@@ -63,9 +61,6 @@ public class AiChatComponent extends VBox {
                 aiService.getChatHistoryService().getChatHistoryForEntry(entry),
                 entry
         );
-
-        entry.getFiles().forEach(file ->
-                aiService.getIngestionService().ingest(file).state().addListener((obs) -> updateNotifications()));
 
         ViewLoader.view(this)
                 .root(this)
@@ -77,6 +72,9 @@ public class AiChatComponent extends VBox {
         initializeChatHistory();
         initializeChatPrompt();
         initializeNotice();
+
+        entry.getFiles().forEach(file ->
+                aiService.getIngestionService().ingest(file, bibDatabaseContext).state().addListener((obs) -> updateNotifications()));
 
         updateNotifications();
     }
@@ -115,19 +113,43 @@ public class AiChatComponent extends VBox {
     private void updateNotifications() {
         NotificationsList notifications = new NotificationsList();
 
-        if (entry.getFiles().isEmpty()) {
-            notifications.add(new Notification(NotificationType.ERROR, Localization.lang("Unable to chat"), Localization.lang("No files")));
-        }
-
-        // TODO: Check that all are PDFs.
-
         if (entry.getCitationKey().isEmpty()) {
-            notifications.add(new Notification(NotificationType.ERROR, Localization.lang("Unable to chat"), Localization.lang("No citation key")));
+            notifications.add(new Notification(NotificationType.ERROR, Localization.lang("No citation key"), Localization.lang("The chat history will not be stored in next sessions")));
+        } else if (!aiService.getChatHistoryService().citationKeyIsValid(entry)) {
+            notifications.add(new Notification(NotificationType.ERROR, Localization.lang("Invalid citation key"), Localization.lang("The chat history will not be stored in next sessions")));
         }
 
-        if (!aiService.getChatHistoryService().citationKeyIsValid(entry)) {
-            notifications.add(new Notification(NotificationType.ERROR, Localization.lang("Unable to chat"), Localization.lang("Invalid citation key")));
+        if (entry.getFiles().isEmpty()) {
+            notifications.add(new Notification(NotificationType.ERROR, Localization.lang("Unable to chat"), Localization.lang("No files attached")));
         }
+
+        entry.getFiles().forEach(file -> {
+            if (!FileUtil.isPDFFile(Path.of(file.getLink()))) {
+                notifications.add(new Notification(
+                        NotificationType.WARNING,
+                        Localization.lang("File %0 is not a PDF file", file.getLink()),
+                        Localization.lang("Only PDF files can be used for chatting")
+                ));
+            }
+        });
+
+        entry.getFiles().stream().map(file -> aiService.getIngestionService().ingest(file, bibDatabaseContext)).forEach(ingestionStatus -> {
+            switch (ingestionStatus.state().get()) {
+                case INGESTING -> notifications.add(new Notification(
+                    NotificationType.WARNING,
+                    Localization.lang("File %0 is currently being processed", ingestionStatus.linkedFile().getLink()),
+                    Localization.lang("After the file will be ingested, you will be able to chat with it")
+                ));
+
+                case INGESTION_FAILED -> notifications.add(new Notification(
+                    NotificationType.ERROR,
+                    Localization.lang("File %0 could not be ingested", ingestionStatus.linkedFile().getLink()),
+                    ingestionStatus.message().get()
+                ));
+
+                case INGESTION_SUCCESS -> {}
+            }
+        });
 
         if (notifications.isEmpty()) {
             notificationsButton.setManaged(false);
