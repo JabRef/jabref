@@ -1,6 +1,8 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -9,14 +11,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.SequencedMap;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
@@ -32,12 +29,9 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.BibEntryPreferences;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 public class EndnoteXmlExporter extends Exporter {
 
-    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+    private static final XMLOutputFactory OUTPUT_FACTORY = XMLOutputFactory.newInstance();
 
     private record EndNoteType(String name, Integer number) {
     }
@@ -101,7 +95,7 @@ public class EndnoteXmlExporter extends Exporter {
     }
 
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException, XMLStreamException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(file);
         Objects.requireNonNull(entries);
@@ -110,199 +104,248 @@ public class EndnoteXmlExporter extends Exporter {
             return;
         }
 
-        DocumentBuilder dBuilder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
-        Document document = dBuilder.newDocument();
+        XMLStreamWriter writer = OUTPUT_FACTORY.createXMLStreamWriter(Files.newOutputStream(file), StandardCharsets.UTF_8.name());
 
-        Element rootElement = document.createElement("xml");
-        document.appendChild(rootElement);
+        try {
+            writer.writeStartDocument(StandardCharsets.UTF_8.name(), "1.0");
+            writer.writeStartElement("xml");
+            writer.writeStartElement("records");
 
-        Element recordsElement = document.createElement("records");
-        rootElement.appendChild(recordsElement);
-
-        for (BibEntry entry : entries) {
-            Element recordElement = document.createElement("record");
-            recordsElement.appendChild(recordElement);
-
-            mapEntryType(entry, document, recordElement);
-            createMetaInformationElements(databaseContext, document, recordElement);
-            mapAuthorAndEditor(entry, document, recordElement);
-            mapTitle(entry, document, recordElement);
-            mapJournalTitle(entry, document, recordElement);
-            mapKeywords(databaseContext.getDatabase(), entry, document, recordElement);
-            mapDates(entry, document, recordElement);
-            mapUrls(entry, document, recordElement);
-
-            for (Map.Entry<Field, String> fieldMapping : STANDARD_FIELD_MAPPING.entrySet()) {
-                Field field = fieldMapping.getKey();
-                String xmlElement = fieldMapping.getValue();
-
-                entry.getField(field).ifPresent(value -> {
-                    Element fieldElement = document.createElement(xmlElement);
-                    fieldElement.setTextContent(value);
-                    recordElement.appendChild(fieldElement);
-                });
+            for (BibEntry entry : entries) {
+                writeRecord(writer, entry, databaseContext);
             }
+
+            writer.writeEndElement(); // records
+            writer.writeEndElement(); // xml
+            writer.writeEndDocument();
+        } finally {
+            writer.close();
+        }
+    }
+
+    private void writeRecord(XMLStreamWriter writer, BibEntry entry, BibDatabaseContext databaseContext) throws XMLStreamException {
+        writer.writeStartElement("record");
+
+        writeEntryType(writer, entry);
+        writeMetaInformation(writer, databaseContext);
+        writeAuthorAndEditor(writer, entry);
+        writeTitle(writer, entry);
+        writeJournalTitle(writer, entry);
+        writeKeywords(writer, databaseContext.getDatabase(), entry);
+        writeDates(writer, entry);
+        writeUrls(writer, entry);
+
+        for (Map.Entry<Field, String> fieldMapping : STANDARD_FIELD_MAPPING.entrySet()) {
+            Field field = fieldMapping.getKey();
+            String xmlElement = fieldMapping.getValue();
+
+            entry.getField(field).ifPresent(value -> {
+                try {
+                    writer.writeStartElement(xmlElement);
+                    writer.writeCharacters(value);
+                    writer.writeEndElement();
+                } catch (XMLStreamException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
 
-        Transformer transformer = createTransformer();
-        DOMSource source = new DOMSource(document);
-        StreamResult result = new StreamResult(file.toFile());
-        transformer.transform(source, result);
+        writer.writeEndElement(); // record
     }
 
-    private static void mapTitle(BibEntry entry, Document document, Element recordElement) {
+    private void writeEntryType(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
+        EntryType entryType = entry.getType();
+        EndNoteType endNoteType = ENTRY_TYPE_MAPPING.getOrDefault(entryType, DEFAULT_TYPE);
+        writer.writeStartElement("ref-type");
+        writer.writeAttribute("name", endNoteType.name());
+        writer.writeCharacters(endNoteType.number().toString());
+        writer.writeEndElement();
+    }
+
+    private void writeMetaInformation(XMLStreamWriter writer, BibDatabaseContext databaseContext) throws XMLStreamException {
+        writer.writeStartElement("database");
+        writer.writeAttribute("name", "MyLibrary");
+        String name = databaseContext.getDatabasePath().map(Path::getFileName).map(Path::toString).orElse("MyLibrary");
+        writer.writeCharacters(name);
+        writer.writeEndElement();
+
+        writer.writeStartElement("source-app");
+        writer.writeAttribute("name", "JabRef");
+        writer.writeCharacters("JabRef");
+        writer.writeEndElement();
+    }
+
+    private void writeAuthorAndEditor(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
+        writer.writeStartElement("contributors");
+        entry.getField(StandardField.AUTHOR).ifPresent(authors -> {
+            try {
+                addPersons(writer, authors, "authors");
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        entry.getField(StandardField.EDITOR).ifPresent(editors -> {
+            try {
+                addPersons(writer, editors, "secondary-authors");
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        writer.writeEndElement(); // contributors
+    }
+
+    private void addPersons(XMLStreamWriter writer, String authors, String wrapTagName) throws XMLStreamException {
+        writer.writeStartElement(wrapTagName);
+        AuthorList parsedPersons = AuthorList.parse(authors).latexFree();
+        for (Author person : parsedPersons) {
+            writer.writeStartElement("author");
+            writer.writeCharacters(person.getFamilyGiven(false));
+            writer.writeEndElement();
+        }
+        writer.writeEndElement();
+    }
+
+    private void writeTitle(XMLStreamWriter writer, BibEntry entry) {
         entry.getFieldOrAlias(StandardField.TITLE).ifPresent(title -> {
-            Element titlesElement = document.createElement("titles");
+            try {
+                writer.writeStartElement("titles");
+                writer.writeStartElement("title");
+                writer.writeCharacters(title);
+                writer.writeEndElement();
 
-            Element titleElement = document.createElement("title");
-            titleElement.setTextContent(title);
-            titlesElement.appendChild(titleElement);
+                entry.getField(new UnknownField("alt-title")).ifPresent(altTitle -> {
+                    try {
+                        writer.writeStartElement("alt-title");
+                        writer.writeCharacters(altTitle);
+                        writer.writeEndElement();
+                    } catch (XMLStreamException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
-            entry.getField(new UnknownField("alt-title")).ifPresent(altTitle -> {
-                Element altTitleElement = document.createElement("alt-title");
-                altTitleElement.setTextContent(altTitle);
-                titlesElement.appendChild(altTitleElement);
-            });
+                entry.getField(StandardField.BOOKTITLE).ifPresent(secondaryTitle -> {
+                    try {
+                        writer.writeStartElement("secondary-title");
+                        writer.writeCharacters(secondaryTitle);
+                        writer.writeEndElement();
+                    } catch (XMLStreamException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
-            entry.getField(StandardField.BOOKTITLE).ifPresent(secondaryTitle -> {
-                Element secondaryTitleElement = document.createElement("secondary-title");
-                secondaryTitleElement.setTextContent(secondaryTitle);
-                titlesElement.appendChild(secondaryTitleElement);
-            });
-
-            recordElement.appendChild(titlesElement);
+                writer.writeEndElement(); // titles
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
-    private static void mapJournalTitle(BibEntry entry, Document document, Element recordElement) {
+    private void writeJournalTitle(XMLStreamWriter writer, BibEntry entry) {
         entry.getFieldOrAlias(StandardField.JOURNAL).ifPresent(journalTitle -> {
-            Element periodicalElement = document.createElement("periodical");
-            Element fullTitleElement = document.createElement("full-title");
-            fullTitleElement.setTextContent(journalTitle);
-            periodicalElement.appendChild(fullTitleElement);
-            recordElement.appendChild(periodicalElement);
+            try {
+                writer.writeStartElement("periodical");
+                writer.writeStartElement("full-title");
+                writer.writeCharacters(journalTitle);
+                writer.writeEndElement();
+                writer.writeEndElement(); // periodical
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
-    private void mapKeywords(BibDatabase bibDatabase, BibEntry entry, Document document, Element recordElement) {
+    private void writeKeywords(XMLStreamWriter writer, BibDatabase bibDatabase, BibEntry entry) {
         entry.getFieldOrAlias(StandardField.KEYWORDS).ifPresent(keywords -> {
-            Element keywordsElement = document.createElement("keywords");
-            entry.getResolvedKeywords(bibEntryPreferences.getKeywordSeparator(), bibDatabase).forEach(keyword -> {
-                Element keywordElement = document.createElement("keyword");
-                // Hierarchical keywords are separated by the '>' character. See {@link } for details.
-                keywordElement.setTextContent(keyword.get());
-                keywordsElement.appendChild(keywordElement);
-            });
-            recordElement.appendChild(keywordsElement);
+            try {
+                writer.writeStartElement("keywords");
+                entry.getResolvedKeywords(bibEntryPreferences.getKeywordSeparator(), bibDatabase).forEach(keyword -> {
+                    try {
+                        writer.writeStartElement("keyword");
+                        // Hierarchical keywords are separated by the '>' character. See {@link } for details.
+                        writer.writeCharacters(keyword.get());
+                        writer.writeEndElement();
+                    } catch (XMLStreamException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                writer.writeEndElement(); // keywords
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
-    private static void mapUrls(BibEntry entry, Document document, Element recordElement) {
-        Element urlsElement = document.createElement("urls");
+    private void writeUrls(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
+        writer.writeStartElement("urls");
 
         entry.getFieldOrAlias(StandardField.FILE).ifPresent(fileField -> {
-            Element pdfUrlsElement = document.createElement("pdf-urls");
-            Element urlElement = document.createElement("url");
-            urlElement.setTextContent(fileField);
-            pdfUrlsElement.appendChild(urlElement);
-            urlsElement.appendChild(pdfUrlsElement);
+            try {
+                writer.writeStartElement("pdf-urls");
+                writer.writeStartElement("url");
+                writer.writeCharacters(fileField);
+                writer.writeEndElement();
+                writer.writeEndElement(); // pdf-urls
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         entry.getFieldOrAlias(StandardField.URL).ifPresent(url -> {
-            Element webUrlsElement = document.createElement("web-urls");
-            Element urlElement = document.createElement("url");
-            urlElement.setTextContent(url);
-            webUrlsElement.appendChild(urlElement);
-            urlsElement.appendChild(webUrlsElement);
+            try {
+                writer.writeStartElement("web-urls");
+                writer.writeStartElement("url");
+                writer.writeCharacters(url);
+                writer.writeEndElement();
+                writer.writeEndElement(); // web-urls
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
         });
 
-        if (urlsElement.hasChildNodes()) {
-            recordElement.appendChild(urlsElement);
-        }
+        writer.writeEndElement(); // urls
     }
 
-    private static void mapDates(BibEntry entry, Document document, Element recordElement) {
-        Element datesElement = document.createElement("dates");
+    private void writeDates(XMLStreamWriter writer, BibEntry entry) throws XMLStreamException {
+        writer.writeStartElement("dates");
         entry.getFieldOrAlias(StandardField.YEAR).ifPresent(year -> {
-            Element yearElement = document.createElement("year");
-            yearElement.setTextContent(year);
-            datesElement.appendChild(yearElement);
+            try {
+                writer.writeStartElement("year");
+                writer.writeCharacters(year);
+                writer.writeEndElement();
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
         });
         entry.getFieldOrAlias(StandardField.MONTH).ifPresent(month -> {
-            Element yearElement = document.createElement("month");
-            yearElement.setTextContent(month);
-            datesElement.appendChild(yearElement);
+            try {
+                writer.writeStartElement("month");
+                writer.writeCharacters(month);
+                writer.writeEndElement();
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
         });
         entry.getFieldOrAlias(StandardField.DAY).ifPresent(day -> {
-            Element yearElement = document.createElement("day");
-            yearElement.setTextContent(day);
-            datesElement.appendChild(yearElement);
+            try {
+                writer.writeStartElement("day");
+                writer.writeCharacters(day);
+                writer.writeEndElement();
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
         });
         // We need to use getField here - getFieldOrAlias for Date tries to convert year, month, and day to a date, which we do not want
         entry.getField(StandardField.DATE).ifPresent(date -> {
-            Element pubDatesElement = document.createElement("pub-dates");
-            Element dateElement = document.createElement("date");
-            dateElement.setTextContent(date);
-            pubDatesElement.appendChild(dateElement);
-            datesElement.appendChild(pubDatesElement);
+            try {
+                writer.writeStartElement("pub-dates");
+                writer.writeStartElement("date");
+                writer.writeCharacters(date);
+                writer.writeEndElement();
+                writer.writeEndElement(); // pub-dates
+            } catch (XMLStreamException e) {
+                throw new RuntimeException(e);
+            }
         });
-        if (datesElement.hasChildNodes()) {
-            recordElement.appendChild(datesElement);
-        }
-    }
-
-    private static void mapEntryType(BibEntry entry, Document document, Element recordElement) {
-        EntryType entryType = entry.getType();
-        EndNoteType endNoteType = ENTRY_TYPE_MAPPING.getOrDefault(entryType, DEFAULT_TYPE);
-        Element refTypeElement = document.createElement("ref-type");
-        refTypeElement.setAttribute("name", endNoteType.name());
-        refTypeElement.setTextContent(endNoteType.number().toString());
-        recordElement.appendChild(refTypeElement);
-    }
-
-    private static void createMetaInformationElements(BibDatabaseContext databaseContext, Document document, Element recordElement) {
-        Element databaseElement = document.createElement("database");
-        databaseElement.setAttribute("name", "MyLibrary");
-        String name = databaseContext.getDatabasePath().map(Path::getFileName).map(Path::toString).orElse("MyLibrary");
-        databaseElement.setTextContent(name);
-        recordElement.appendChild(databaseElement);
-
-        Element sourceAppElement = document.createElement("source-app");
-        sourceAppElement.setAttribute("name", "JabRef");
-        sourceAppElement.setTextContent("JabRef");
-        recordElement.appendChild(sourceAppElement);
-    }
-
-    private static void mapAuthorAndEditor(BibEntry entry, Document document, Element recordElement) {
-        Element contributorsElement = document.createElement("contributors");
-        entry.getField(StandardField.AUTHOR).ifPresent(authors -> {
-            addPersons(authors, document, contributorsElement, "authors");
-        });
-        entry.getField(StandardField.EDITOR).ifPresent(editors -> {
-            addPersons(editors, document, contributorsElement, "secondary-authors");
-        });
-        if (contributorsElement.hasChildNodes()) {
-            recordElement.appendChild(contributorsElement);
-        }
-    }
-
-    private static void addPersons(String authors, Document document, Element contributorsElement, String wrapTagName) {
-        Element container = document.createElement(wrapTagName);
-        AuthorList parsedPersons = AuthorList.parse(authors).latexFree();
-        for (Author person : parsedPersons) {
-            Element authorElement = document.createElement("author");
-            authorElement.setTextContent(person.getFamilyGiven(false));
-            container.appendChild(authorElement);
-        }
-        contributorsElement.appendChild(container);
-    }
-
-    private static Transformer createTransformer() throws TransformerConfigurationException {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        Transformer transformer = transformerFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-        return transformer;
+        writer.writeEndElement(); // dates
     }
 }

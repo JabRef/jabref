@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
@@ -39,7 +40,7 @@ class EndnoteXmlExporterFilesTest {
     private EndnoteXmlImporter endnoteXmlImporter;
 
     @BeforeEach
-    void setUp(@TempDir Path testFolder) throws Exception {
+    void setUp(@TempDir Path testFolder) {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -53,7 +54,7 @@ class EndnoteXmlExporterFilesTest {
 
     static Stream<String> fileNames() throws IOException, URISyntaxException {
         // we have to point it to one existing file, otherwise it will return the default class path
-        Path resourceDir = Path.of(EndnoteXmlExporterFilesTest.class.getResource("EndnoteXmlExportTestSingleBookEntry.bib").toURI()).getParent();
+        Path resourceDir = Path.of(Objects.requireNonNull(EndnoteXmlExporterFilesTest.class.getResource("EndnoteXmlExportTestSingleBookEntry.bib")).toURI()).getParent();
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString())
                          .filter(n -> n.endsWith(".bib"))
@@ -66,13 +67,13 @@ class EndnoteXmlExporterFilesTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     final void performExport(String filename) throws Exception {
-        bibFileToExport = Path.of(EndnoteXmlExporterFilesTest.class.getResource(filename).toURI());
+        bibFileToExport = Path.of(Objects.requireNonNull(EndnoteXmlExporterFilesTest.class.getResource(filename)).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(bibFileToExport).getDatabase().getEntries();
         exporter.export(databaseContext, exportFile, entries);
         String actual = String.join("\n", Files.readAllLines(exportFile));
 
         String xmlFileName = filename.replace(".bib", ".xml");
-        Path expectedFile = Path.of(ModsExportFormatFilesTest.class.getResource(xmlFileName).toURI());
+        Path expectedFile = Path.of(Objects.requireNonNull(ModsExportFormatFilesTest.class.getResource(xmlFileName)).toURI());
         String expected = String.join("\n", Files.readAllLines(expectedFile));
 
         // The order of the XML elements changes
@@ -87,7 +88,7 @@ class EndnoteXmlExporterFilesTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     final void exportAsEndnoteAndThenImportAsEndnote(String filename) throws Exception {
-        bibFileToExport = Path.of(EndnoteXmlExporterFilesTest.class.getResource(filename).toURI());
+        bibFileToExport = Path.of(Objects.requireNonNull(EndnoteXmlExporterFilesTest.class.getResource(filename)).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(bibFileToExport).getDatabase().getEntries();
 
         exporter.export(databaseContext, exportFile, entries);
