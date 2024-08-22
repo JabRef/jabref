@@ -1,6 +1,7 @@
 package org.jabref.logic.exporter;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -104,7 +105,7 @@ public class EndnoteXmlExporter extends Exporter {
             return;
         }
 
-        try (var os = Files.newOutputStream(file)) {
+        try (OutputStream os = Files.newOutputStream(file)) {
             XMLStreamWriter writer = OUTPUT_FACTORY.createXMLStreamWriter(os, StandardCharsets.UTF_8.name());
             try {
                 writer.writeStartDocument(StandardCharsets.UTF_8.name(), "1.0");
