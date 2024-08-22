@@ -2,18 +2,14 @@ package org.jabref.gui.ai.components.chatmessage;
 
 import java.util.function.Consumer;
 
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.ai.components.chathistory.ChatHistoryComponent;
 import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 

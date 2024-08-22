@@ -140,7 +140,6 @@ public class ChatPromptComponent extends HBox {
                 }
             }
         });
-
     }
 
     public void setDisableToButtons(boolean disable) {

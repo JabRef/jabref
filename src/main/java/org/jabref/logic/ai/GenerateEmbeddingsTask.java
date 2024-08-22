@@ -4,13 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.ai.embeddings.FileToDocument;
-import org.jabref.logic.ai.ingestion.IngestionService;
 import org.jabref.logic.ai.ingestion.IngestionState;
 import org.jabref.logic.ai.ingestion.IngestionStatus;
 import org.jabref.logic.l10n.Localization;

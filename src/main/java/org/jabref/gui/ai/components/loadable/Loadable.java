@@ -1,9 +1,5 @@
 package org.jabref.gui.ai.components.loadable;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javafx.scene.Node;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
