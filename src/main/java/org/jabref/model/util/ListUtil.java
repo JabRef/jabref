@@ -1,6 +1,12 @@
 package org.jabref.model.util;
 
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 
 /**
  * Provides a few helper methods for lists.
@@ -29,5 +35,17 @@ public class ListUtil {
             }
         }
         return true;
+    }
+
+    /**
+     * Extract all {@link LinkedFile}s from a list of {@link BibEntry}s.
+     * The result is a stream of distinct {@link LinkedFile}s.
+     */
+    public static Stream<LinkedFile> getLinkedFiles(Iterable<BibEntry> entries) {
+        return StreamSupport
+                .stream(entries.spliterator(), false)
+                .map(BibEntry::getFiles)
+                .flatMap(List::stream)
+                .distinct();
     }
 }

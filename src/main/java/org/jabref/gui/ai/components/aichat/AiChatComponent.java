@@ -1,8 +1,11 @@
 package org.jabref.gui.ai.components.aichat;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,7 +17,7 @@ import org.jabref.gui.ai.components.chatprompt.ChatPromptComponent;
 import org.jabref.gui.ai.components.loadable.Loadable;
 import org.jabref.gui.ai.components.notifications.Notification;
 import org.jabref.gui.ai.components.notifications.NotificationType;
-import org.jabref.gui.ai.components.notifications.NotificationsList;
+import org.jabref.gui.ai.components.notifications.NotificationsComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChatLogic;
@@ -24,9 +27,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.ListUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
@@ -36,7 +41,7 @@ public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
 
     private final AiService aiService;
-    private final BibEntry entry;
+    private final ObservableList<BibEntry> entries;
     private final BibDatabaseContext bibDatabaseContext;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -49,18 +54,14 @@ public class AiChatComponent extends VBox {
     @FXML private ChatPromptComponent chatPrompt;
     @FXML private Label noticeText;
 
-    public AiChatComponent(AiService aiService, BibEntry entry, BibDatabaseContext bibDatabaseContext, DialogService dialogService, TaskExecutor taskExecutor) {
+    public AiChatComponent(AiService aiService, String name, ObservableList<ChatMessage> chatHistory, ObservableList<BibEntry> entries, BibDatabaseContext bibDatabaseContext, DialogService dialogService, TaskExecutor taskExecutor) {
         this.aiService = aiService;
-        this.entry = entry;
+        this.entries = entries;
         this.bibDatabaseContext = bibDatabaseContext;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        this.aiChatLogic = AiChatLogic.forBibEntry(
-                aiService,
-                aiService.getChatHistoryService().getChatHistoryForEntry(entry),
-                entry
-        );
+        this.aiChatLogic = new AiChatLogic(aiService, name, chatHistory, entries);
 
         ViewLoader.view(this)
                 .root(this)
@@ -73,7 +74,7 @@ public class AiChatComponent extends VBox {
         initializeChatPrompt();
         initializeNotice();
 
-        entry.getFiles().forEach(file ->
+        ListUtil.getLinkedFiles(entries).forEach(file ->
                 aiService.getIngestionService().ingest(file, bibDatabaseContext).state().addListener((obs) -> updateNotifications()));
 
         updateNotifications();
@@ -111,7 +112,21 @@ public class AiChatComponent extends VBox {
     }
 
     private void updateNotifications() {
-        NotificationsList notifications = new NotificationsList();
+        List<Notification> notifications = entries.stream().map(this::updateNotificationsForEntry).flatMap(List::stream).toList();
+
+        if (notifications.isEmpty()) {
+            notificationsButton.setManaged(false);
+        } else {
+            notificationsButton.setManaged(true);
+            notificationsButton.setGraphic(NotificationsComponent.findSuitableIcon(notifications).getGraphicNode());
+            notificationsButton.setOnAction(event ->
+                new PopOver(new NotificationsComponent(notifications)).show(notificationsButton)
+            );
+        }
+    }
+
+    private List<Notification> updateNotificationsForEntry(BibEntry entry) {
+        List<Notification> notifications = new ArrayList<>();
 
         if (entry.getCitationKey().isEmpty()) {
             notifications.add(new Notification(NotificationType.ERROR, Localization.lang("No citation key"), Localization.lang("The chat history will not be stored in next sessions")));
@@ -151,15 +166,7 @@ public class AiChatComponent extends VBox {
             }
         });
 
-        if (notifications.isEmpty()) {
-            notificationsButton.setManaged(false);
-        } else {
-            notificationsButton.setManaged(true);
-            notificationsButton.setGraphic(notifications.getIconNode());
-            notificationsButton.setOnAction(event ->
-                new PopOver(notifications.toComponent()).show(notificationsButton)
-            );
-        }
+        return notifications;
     }
 
     private void deleteMessage(int index) {
@@ -195,7 +202,7 @@ public class AiChatComponent extends VBox {
                             chatPrompt.switchToErrorState(userPrompt);
                         });
 
-        task.titleProperty().set(Localization.lang("Waiting for AI reply for %0...", entry.getCitationKey().orElse("<no citation key>")));
+        task.titleProperty().set(Localization.lang("Waiting for AI reply..."));
 
         task.executeWith(taskExecutor);
     }
