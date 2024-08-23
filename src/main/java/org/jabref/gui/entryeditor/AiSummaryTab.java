@@ -11,7 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
-import org.jabref.gui.ai.components.summary.SummaryComponent;
+import org.jabref.gui.ai.components.summary.SummaryShowingComponent;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -209,7 +209,7 @@ public class AiSummaryTab extends EntryEditorTab {
     private void bindToCorrectEntry(SummariesStorage.SummarizationRecord summary) {
         entriesUnderSummarization.remove(currentEntry);
 
-        SummaryComponent summaryComponent = new SummaryComponent(summary, () -> {
+        SummaryShowingComponent summaryShowingComponent = new SummaryShowingComponent(summary, () -> {
             if (bibDatabaseContext.getDatabasePath().isEmpty()) {
                 LOGGER.error("Bib database path is not set, but it was expected to be present. Unable to regenerate summary");
                 return;
@@ -224,7 +224,7 @@ public class AiSummaryTab extends EntryEditorTab {
             bindToEntry(currentEntry);
         });
 
-        setContent(summaryComponent);
+        setContent(summaryShowingComponent);
     }
 
     private class SummarySetListener {

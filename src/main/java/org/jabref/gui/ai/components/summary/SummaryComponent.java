@@ -1,53 +1,157 @@
 package org.jabref.gui.ai.components.summary;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
+import javafx.scene.Node;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponent;
+import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.summarization.GenerateSummaryTask;
 import org.jabref.logic.ai.summarization.SummariesStorage;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.PreferencesService;
 
-import com.airhacks.afterburner.views.ViewLoader;
+import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SummaryComponent extends VBox {
-    @FXML private TextArea summaryTextArea;
-    @FXML private Text summaryInfoText;
+import static org.jabref.logic.ai.chathistory.ChatHistoryService.citationKeyIsValid;
 
-    private final SummariesStorage.SummarizationRecord summary;
-    private final Runnable regenerateCallback;
+public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SummaryComponent.class);
+    private static final List<BibEntry> entriesUnderSummarization = new ArrayList<>();
 
-    public SummaryComponent(SummariesStorage.SummarizationRecord summary, Runnable regenerateCallback) {
-        this.summary = summary;
-        this.regenerateCallback = regenerateCallback;
+    private final BibDatabaseContext bibDatabaseContext;
+    private final BibEntry entry;
+    private final CitationKeyGenerator citationKeyGenerator;
+    private final AiService aiService;
+    private final FilePreferences filePreferences;
+    private final TaskExecutor taskExecutor;
 
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
+    public SummaryComponent(BibDatabaseContext bibDatabaseContext, BibEntry entry, AiService aiService, PreferencesService preferencesService, DialogService dialogService, TaskExecutor taskExecutor) {
+        super(aiService.getPreferences(), preferencesService.getFilePreferences(), dialogService);
+
+        this.bibDatabaseContext = bibDatabaseContext;
+        this.entry = entry;
+        this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
+        this.aiService = aiService;
+        this.filePreferences = preferencesService.getFilePreferences();
+        this.taskExecutor = taskExecutor;
+
+        aiService.getSummariesStorage().registerListener(this);
     }
 
-    @FXML
-    private void initialize() {
-        summaryTextArea.setText(summary.content());
-
-        String newInfo = summaryInfoText
-                .getText()
-                .replaceAll("%0", formatTimestamp(summary.timestamp()))
-                .replaceAll("%1", summary.aiProvider().getLabel() + " " + summary.model());
-
-        summaryInfoText.setText(newInfo);
+    @Override
+    protected Node showPrivacyPolicyGuardedContent() {
+        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
+            return showErrorNoDatabasePath();
+        } else if (entry.getFiles().isEmpty()) {
+            return showErrorNoFiles();
+        } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {
+            return showErrorNotPdfs();
+        } else if (entry.getCitationKey().isEmpty() || !citationKeyIsValid(bibDatabaseContext, entry)) {
+            // There is no need for additional check `entry.getCitationKey().isEmpty()` because method `citationKeyIsValid`,
+            // will check this. But with this call the linter is happy for the next expression in else if.
+            return tryToGenerateCitationKeyThenBind(entry);
+        } else {
+            Optional<SummariesStorage.SummarizationRecord> summary = aiService.getSummariesStorage().get(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
+            return summary
+                    .map(this::bindToCorrectEntry)
+                    .orElseGet(() -> startGeneratingSummary(entry));
+        }
     }
 
-    private static String formatTimestamp(LocalDateTime timestamp) {
-        return timestamp.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(Locale.getDefault()));
+    private Node showErrorNoDatabasePath() {
+        return new ErrorStateComponent(
+                Localization.lang("Unable to chat"),
+                Localization.lang("The path of the current library is not set, but it is required for summarization")
+        );
     }
 
-    @FXML
-    private void onRegenerateButtonClick() {
-        regenerateCallback.run();
+    private Node showErrorNotPdfs() {
+        return new ErrorStateComponent(
+                Localization.lang("Unable to chat"),
+                Localization.lang("Only PDF files are supported.")
+        );
+    }
+
+    private Node showErrorNoFiles() {
+        return new ErrorStateComponent(
+                Localization.lang("Unable to chat"),
+                Localization.lang("Please attach at least one PDF file to enable chatting with PDF file(s).")
+        );
+    }
+
+    private Node tryToGenerateCitationKeyThenBind(BibEntry entry) {
+        if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
+            return new ErrorStateComponent(
+                    Localization.lang("Unable to chat"),
+                    Localization.lang("Please provide a non-empty and unique citation key for this entry.")
+            );
+        } else {
+            return showPrivacyPolicyGuardedContent();
+        }
+    }
+
+    private Node startGeneratingSummary(BibEntry entry) {
+        assert entry.getCitationKey().isPresent();
+
+        if (!entriesUnderSummarization.contains(entry)) {
+            entriesUnderSummarization.add(entry);
+
+            new GenerateSummaryTask(bibDatabaseContext, entry.getCitationKey().get(), entry.getFiles(), aiService, filePreferences)
+                    .onSuccess(res -> rebuildUi())
+                    .onFailure(e -> rebuildUi())
+                    .executeWith(taskExecutor);
+        }
+
+        return showErrorNotSummarized();
+    }
+
+    private Node showErrorNotSummarized() {
+        return ErrorStateComponent.withSpinner(
+                Localization.lang("Processing..."),
+                Localization.lang("The attached file(s) are currently being processed by %0. Once completed, you will be able to see the summary.", aiService.getPreferences().getAiProvider().getLabel())
+        );
+    }
+
+
+    private Node bindToCorrectEntry(SummariesStorage.SummarizationRecord summary) {
+        entriesUnderSummarization.remove(entry);
+
+        return new SummaryShowingComponent(summary, () -> {
+            if (bibDatabaseContext.getDatabasePath().isEmpty()) {
+                LOGGER.error("Bib database path is not set, but it was expected to be present. Unable to regenerate summary");
+                return;
+            }
+
+            if (entry.getCitationKey().isEmpty()) {
+                LOGGER.error("Citation key is not set, but it was expected to be present. Unable to regenerate summary");
+                return;
+            }
+
+            aiService.getSummariesStorage().clear(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
+            rebuildUi();
+        });
+    }
+
+    private class SummarySetListener {
+        @Subscribe
+        public void listen(SummariesStorage.SummarySetEvent event) {
+            UiTaskExecutor.runInJavaFXThread(SummaryComponent.this::rebuildUi);
+        }
     }
 }
