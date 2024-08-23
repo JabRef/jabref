@@ -3,10 +3,10 @@ package org.jabref.gui.entryeditor;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.collections.FXCollections;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.ai.components.aichat.AiChatComponent;
 import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
@@ -15,51 +15,35 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.models.JabRefEmbeddingModel;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.ai.AiApiKeyProvider;
 
 import com.google.common.eventbus.Subscribe;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AiChatTab extends EntryEditorTab {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiChatTab.class);
-
-    private final LibraryTabContainer libraryTabContainer;
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
-    private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
-    private final AiApiKeyProvider aiApiKeyProvider;
 
-    private final List<BibEntry> entriesUnderIngestion = new ArrayList<>();
-
-    public AiChatTab(LibraryTabContainer libraryTabContainer,
-                     DialogService dialogService,
+    public AiChatTab(DialogService dialogService,
                      PreferencesService preferencesService,
-                     AiApiKeyProvider aiApiKeyProvider,
                      AiService aiService,
                      BibDatabaseContext bibDatabaseContext,
                      TaskExecutor taskExecutor) {
-        this.libraryTabContainer = libraryTabContainer;
         this.dialogService = dialogService;
 
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.aiApiKeyProvider = aiApiKeyProvider;
 
         this.aiService = aiService;
         this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
-        this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));
@@ -108,15 +92,6 @@ public class AiChatTab extends EntryEditorTab {
         }));
     }
 
-    private void showErrorNotIngested() {
-        setContent(
-                ErrorStateComponent.withSpinner(
-                        Localization.lang("Processing..."),
-                        Localization.lang("The embeddings of the file(s) are currently being generated. Please wait, and at the end you will be able to chat.")
-                )
-        );
-    }
-
     private void showErrorWhileBuildingEmbeddingModel() {
         setContent(
                 ErrorStateComponent.withTextAreaAndButton(
@@ -139,12 +114,12 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void bindToCorrectEntry(BibEntry entry) {
-        assert entry.getCitationKey().isPresent();
-
         setContent(
                 new AiChatComponent(
                     aiService,
-                    entry,
+                    "entry " + entry.getCitationKey().orElse("<no citation key>"),
+                    aiService.getChatHistoryService().getChatHistoryForEntry(entry),
+                    FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
                     bibDatabaseContext,
                     dialogService,
                     taskExecutor

@@ -1,13 +1,18 @@
 package org.jabref.logic.ai;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.ai.misc.ErrorMessage;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.CanonicalBibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.util.ListUtil;
 import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.chain.Chain;
@@ -34,39 +39,23 @@ public class AiChatLogic {
 
     private final AiService aiService;
     private final ObservableList<ChatMessage> chatHistory;
-    private final @Nullable Filter embeddingsFilter;
-    private final BibEntry entry;
+    private final ObservableList<BibEntry> entries;
+    private final StringProperty name;
 
     private ChatMemory chatMemory;
     private Chain<String, String> chain;
 
-    public AiChatLogic(AiService aiService, ObservableList<ChatMessage> chatHistory, @Nullable Filter embeddingsFilter, BibEntry entry) {
+    public AiChatLogic(AiService aiService, String name, ObservableList<ChatMessage> chatHistory, ObservableList<BibEntry> entries) {
         this.aiService = aiService;
         this.chatHistory = chatHistory;
-        this.embeddingsFilter = embeddingsFilter;
-        this.entry = entry;
+        this.entries = entries;
+
+        this.name = new SimpleStringProperty(name);
+
+        this.entries.addListener((ListChangeListener<BibEntry>) change -> rebuildChain());
 
         setupListeningToPreferencesChanges();
         rebuildFull(chatHistory);
-    }
-
-    public static AiChatLogic forBibEntry(AiService aiService, ObservableList<ChatMessage> chatHistory, BibEntry entry) {
-        @Nullable Filter filter;
-
-        if (entry.getFiles().isEmpty()) {
-            filter = null;
-        } else {
-            filter = MetadataFilterBuilder
-                    .metadataKey(FileEmbeddingsManager.LINK_METADATA_KEY)
-                    .isIn(entry
-                            .getFiles()
-                            .stream()
-                            .map(LinkedFile::getLink)
-                            .toList()
-                    );
-        }
-
-        return new AiChatLogic(aiService, chatHistory, filter, entry);
     }
 
     private void setupListeningToPreferencesChanges() {
@@ -97,10 +86,26 @@ public class AiChatLogic {
     private void rebuildChain() {
         AiPreferences aiPreferences = aiService.getPreferences();
 
+        List<LinkedFile> linkedFiles = ListUtil.getLinkedFiles(entries).toList();
+        @Nullable Filter filter;
+
+        if (linkedFiles.isEmpty()) {
+            // You must not pass an empty list to langchain4j {@link IsIn} filter.
+            filter = null;
+        } else {
+            filter = MetadataFilterBuilder
+                    .metadataKey(FileEmbeddingsManager.LINK_METADATA_KEY)
+                    .isIn(linkedFiles
+                            .stream()
+                            .map(LinkedFile::getLink)
+                            .toList()
+                    );
+        }
+
         ContentRetriever contentRetriever = EmbeddingStoreContentRetriever
                 .builder()
                 .embeddingStore(aiService.getEmbeddingsManager().getEmbeddingsStore())
-                .filter(embeddingsFilter)
+                .filter(filter)
                 .embeddingModel(aiService.getEmbeddingModel())
                 .maxResults(aiPreferences.getRagMaxResultsCount())
                 .minScore(aiPreferences.getRagMinScore())
@@ -125,22 +130,24 @@ public class AiChatLogic {
     }
 
     private String augmentSystemMessage(String systemMessage) {
-        return systemMessage + "\n" + CanonicalBibEntry.getCanonicalRepresentation(entry);
+        String entriesInfo = entries.stream().map(CanonicalBibEntry::getCanonicalRepresentation).collect(Collectors.joining("\n"));
+
+        return systemMessage + "\n" + entriesInfo;
     }
 
     public AiMessage execute(UserMessage message) {
         // Message will be automatically added to ChatMemory through ConversationalRetrievalChain.
 
-        LOGGER.info("Sending message to AI provider ({}) for answering in entry {}: {}",
+        LOGGER.info("Sending message to AI provider ({}) for answering in {}: {}",
                 AiDefaultPreferences.PROVIDERS_API_URLS.get(aiService.getPreferences().getAiProvider()),
-                entry.getCitationKey().orElse("<no citation key>"),
+                name.get(),
                 message.singleText());
 
         chatHistory.add(message);
         AiMessage result = new AiMessage(chain.execute(message.singleText()));
         chatHistory.add(result);
 
-        LOGGER.debug("Message was answered by the AI provider for entry {}: {}", entry.getCitationKey().orElse("<no citation key>"), result.text());
+        LOGGER.debug("Message was answered by the AI provider for {}: {}", name.get(), result.text());
 
         return result;
     }
