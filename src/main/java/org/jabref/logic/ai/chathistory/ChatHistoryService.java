@@ -135,7 +135,7 @@ public class ChatHistoryService implements AutoCloseable {
         return bibDatabaseContext.filter(databaseContext -> citationKeyIsValid(databaseContext, bibEntry)).isPresent();
     }
 
-    private static boolean citationKeyIsValid(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
+    public static boolean citationKeyIsValid(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
         return !hasEmptyCitationKey(bibEntry) && bibEntry.getCitationKey().map(key -> citationKeyIsUnique(bibDatabaseContext, key)).orElse(false);
     }
 
