@@ -13,6 +13,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.groups.AbstractGroup;
 
 import com.airhacks.afterburner.injection.Injector;
 import dev.langchain4j.data.message.ChatMessage;
@@ -27,6 +28,7 @@ public class ChatHistoryService implements AutoCloseable {
     private record ChatHistoryManagementRecord(Optional<BibDatabaseContext> bibDatabaseContext, ObservableList<ChatMessage> chatHistory) { }
 
     private final Map<BibEntry, ChatHistoryManagementRecord> bibEntriesChatHistory = new HashMap<>();
+    private final Map<AbstractGroup, ChatHistoryManagementRecord> groupsChatHistory = new HashMap<>();
 
     public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences,
                               ChatHistoryImplementation implementation) {
@@ -36,7 +38,7 @@ public class ChatHistoryService implements AutoCloseable {
 
     public ObservableList<ChatMessage> getChatHistoryForEntry(BibEntry entry) {
         return bibEntriesChatHistory.computeIfAbsent(entry, entryArg -> {
-            Optional<BibDatabaseContext> bibDatabaseContext = findBibDatabase(entry);
+            Optional<BibDatabaseContext> bibDatabaseContext = findBibDatabaseForEntry(entry);
 
             if (bibDatabaseContext.isEmpty() || entry.getCitationKey().isEmpty() || !correctCitationKey(bibDatabaseContext.get(), entry) || bibDatabaseContext.get().getDatabasePath().isEmpty()) {
                 return new ChatHistoryManagementRecord(bibDatabaseContext, FXCollections.observableArrayList());
@@ -75,6 +77,47 @@ public class ChatHistoryService implements AutoCloseable {
         bibEntriesChatHistory.remove(entry);
     }
 
+    public ObservableList<ChatMessage> getChatHistoryForGroup(AbstractGroup group) {
+        return groupsChatHistory.computeIfAbsent(group, groupArg -> {
+            Optional<BibDatabaseContext> bibDatabaseContext = findBibDatabaseForGroup(group);
+
+            if (bibDatabaseContext.isEmpty() || bibDatabaseContext.get().getDatabasePath().isEmpty()) {
+                return new ChatHistoryManagementRecord(bibDatabaseContext, FXCollections.observableArrayList());
+            } else {
+                return new ChatHistoryManagementRecord(
+                        bibDatabaseContext,
+                        FXCollections.observableArrayList(
+                                implementation.loadMessagesForGroup(
+                                        bibDatabaseContext.get().getDatabasePath().get(),
+                                        group.nameProperty().get()
+                                )
+                        )
+                );
+            }
+        });
+    }
+
+    // Do not forget to call this method.
+    public void closeChatHistoryForGroup(AbstractGroup group) {
+        ChatHistoryManagementRecord chatHistoryManagementRecord = groupsChatHistory.get(group);
+        if (chatHistoryManagementRecord == null) {
+            return;
+        }
+
+        Optional<BibDatabaseContext> bibDatabaseContext = chatHistoryManagementRecord.bibDatabaseContext();
+
+        if (bibDatabaseContext.isPresent() && bibDatabaseContext.get().getDatabasePath().isPresent()) {
+            implementation.storeMessagesForGroup(
+                    bibDatabaseContext.get().getDatabasePath().get(),
+                    group.nameProperty().get(),
+                    chatHistoryManagementRecord.chatHistory()
+            );
+        }
+
+        // TODO: What if there is two AI chats for the same entry? And one is closed and one is not?
+        groupsChatHistory.remove(group);
+    }
+
     private boolean correctCitationKey(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
         if (!citationKeyIsValid(bibDatabaseContext, bibEntry)) {
             tryToGenerateCitationKey(bibDatabaseContext, bibEntry);
@@ -88,7 +131,7 @@ public class ChatHistoryService implements AutoCloseable {
     }
 
     public boolean citationKeyIsValid(BibEntry bibEntry) {
-        Optional<BibDatabaseContext> bibDatabaseContext = findBibDatabase(bibEntry);
+        Optional<BibDatabaseContext> bibDatabaseContext = findBibDatabaseForEntry(bibEntry);
         return bibDatabaseContext.filter(databaseContext -> citationKeyIsValid(databaseContext, bibEntry)).isPresent();
     }
 
@@ -104,7 +147,7 @@ public class ChatHistoryService implements AutoCloseable {
         return bibDatabaseContext.getDatabase().getNumberOfCitationKeyOccurrences(citationKey) == 1;
     }
 
-    private Optional<BibDatabaseContext> findBibDatabase(BibEntry entry) {
+    private Optional<BibDatabaseContext> findBibDatabaseForEntry(BibEntry entry) {
         return stateManager
                 .getOpenDatabases()
                 .stream()
@@ -112,9 +155,24 @@ public class ChatHistoryService implements AutoCloseable {
                 .findFirst();
     }
 
+    private Optional<BibDatabaseContext> findBibDatabaseForGroup(AbstractGroup group) {
+        return stateManager
+                .getOpenDatabases()
+                .stream()
+                .filter(dbContext ->
+                        dbContext.getMetaData().groupsBinding().get().map(groupTreeNode ->
+                                groupTreeNode.containsGroup(group)
+                        ).orElse(false)
+                )
+                .findFirst();
+    }
+
     @Override
     public void close() {
         // We need to clone `bibEntriesChatHistory.keySet()` because closeChatHistoryForEntry() modifies the `bibEntriesChatHistory` map.
         new HashSet<>(bibEntriesChatHistory.keySet()).forEach(this::closeChatHistoryForEntry);
+
+        // Clone is for the same reason, as written above.
+        new HashSet<>(groupsChatHistory.keySet()).forEach(this::closeChatHistoryForGroup);
     }
 }

@@ -324,4 +324,12 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     public boolean isSameGroupAs(GroupTreeNode other) {
         return Objects.equals(group, other.group);
     }
+
+    public boolean containsGroup(AbstractGroup other) {
+        if (this.group == other) {
+            return true;
+        } else {
+            return this.getChildren().stream().anyMatch(child -> child.getGroup() == other);
+        }
+    }
 }

@@ -17,8 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MVStoreChatHistory implements ChatHistoryImplementation {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreChatHistory.class);
-
     private final MVStore mvStore;
 
     private record ChatHistoryRecord(String className, String content) implements Serializable {
@@ -69,8 +67,25 @@ public class MVStoreChatHistory implements ChatHistoryImplementation {
 
     @Override
     public List<ChatMessage> loadMessagesForEntry(Path bibDatabasePath, String citationKey) {
-        Map<Integer, ChatHistoryRecord> map = getMap(bibDatabasePath, citationKey);
+        return loadMessagesFromMap(getMapForEntry(bibDatabasePath, citationKey));
+    }
 
+    @Override
+    public void storeMessagesForEntry(Path bibDatabasePath, String citationKey, List<ChatMessage> messages) {
+        storeMessagesForMap(getMapForEntry(bibDatabasePath, citationKey), messages);
+    }
+
+    @Override
+    public List<ChatMessage> loadMessagesForGroup(Path bibDatabasePath, String name) {
+        return loadMessagesFromMap(getMapForGroup(bibDatabasePath, name));
+    }
+
+    @Override
+    public void storeMessagesForGroup(Path bibDatabasePath, String name, List<ChatMessage> messages) {
+        storeMessagesForMap(getMapForGroup(bibDatabasePath, name), messages);
+    }
+
+    private List<ChatMessage> loadMessagesFromMap(Map<Integer, ChatHistoryRecord> map) {
         return map
                 .entrySet()
                 // We need to check all keys, because upon deletion, there can be "holes" in the integer.
@@ -80,17 +95,23 @@ public class MVStoreChatHistory implements ChatHistoryImplementation {
                 .toList();
     }
 
-    @Override
-    public void storeMessagesForEntry(Path bibDatabasePath, String citationKey, List<ChatMessage> messages) {
-        Map<Integer, ChatHistoryRecord> map = getMap(bibDatabasePath, citationKey);
+    private void storeMessagesForMap(Map<Integer, ChatHistoryRecord> map, List<ChatMessage> messages) {
         map.clear();
 
         new IntRange(0, messages.size() - 1).forEach(i ->
-            map.put(i, ChatHistoryRecord.fromLangchainMessage(messages.get(i)))
+                map.put(i, ChatHistoryRecord.fromLangchainMessage(messages.get(i)))
         );
     }
 
-    private Map<Integer, ChatHistoryRecord> getMap(Path bibDatabasePath, String citationKey) {
-        return mvStore.openMap("chathistory-" + bibDatabasePath + "-" + citationKey);
+    private Map<Integer, ChatHistoryRecord> getMapForEntry(Path bibDatabasePath, String citationKey) {
+        return getMap(bibDatabasePath, "entry", citationKey);
+    }
+
+    private Map<Integer, ChatHistoryRecord> getMapForGroup(Path bibDatabasePath, String name) {
+        return getMap(bibDatabasePath, "group", name);
+    }
+
+    private Map<Integer, ChatHistoryRecord> getMap(Path bibDatabasePath, String type, String name) {
+        return mvStore.openMap("chathistory-" + bibDatabasePath + "-" + type + "-" + name);
     }
 }
