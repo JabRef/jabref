@@ -25,9 +25,9 @@ public abstract class AiPrivacyNoticeGuardedComponent extends DynamicallyChangea
         aiPreferences.enableAiProperty().addListener((observable) -> rebuildUi());
     }
 
-    protected void rebuildUi() {
+    protected final void rebuildUi() {
         if (aiPreferences.getEnableAi()) {
-            setContent(showGuardedContent());
+            setContent(showPrivacyPolicyGuardedContent());
         } else {
             setContent(
                     new PrivacyNoticeComponent(
@@ -40,5 +40,5 @@ public abstract class AiPrivacyNoticeGuardedComponent extends DynamicallyChangea
         }
     }
 
-    protected abstract Node showGuardedContent();
+    protected abstract Node showPrivacyPolicyGuardedContent();
 }
