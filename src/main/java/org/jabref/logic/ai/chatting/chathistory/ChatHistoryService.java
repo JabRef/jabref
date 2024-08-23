@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.chathistory;
+package org.jabref.logic.ai.chatting.chathistory;
 
 import java.util.HashMap;
 import java.util.HashSet;

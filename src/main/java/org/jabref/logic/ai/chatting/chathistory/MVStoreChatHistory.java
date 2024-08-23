@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.chathistory;
+package org.jabref.logic.ai.chatting.chathistory;
 
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.logic.ai.misc.ErrorMessage;
+import org.jabref.logic.ai.util.ErrorMessage;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;

@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.embeddings.FileToDocument;
+import org.jabref.logic.ai.ingestion.FileToDocument;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.ProgressCounter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -27,7 +27,12 @@ import dev.langchain4j.model.input.PromptTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GenerateSummaryTask extends BackgroundTask<Void> {
+/**
+ * This task generates a new summary for an entry.
+ * It will not check if summary was already generated.
+ * And it also does not store the summary.
+ */
+public class GenerateSummaryTask extends BackgroundTask<String> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateSummaryTask.class);
 
     // Be careful when constructing prompt.
@@ -85,11 +90,13 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
     }
 
     @Override
-    protected Void call() throws Exception {
+    protected String call() throws Exception {
         LOGGER.info("Starting summarization task for entry {}", citationKey);
 
+        String result = null;
+
         try {
-            summarizeAll();
+            result = summarizeAll();
         } catch (InterruptedException e) {
             LOGGER.info("There was a summarization task for {}. It will be canceled, because user quits JabRef.", citationKey);
         }
@@ -98,17 +105,13 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
         LOGGER.info("Finished summarization task for entry {}", citationKey);
 
-        return null;
+        return result;
     }
 
-    private void summarizeAll() throws InterruptedException {
+    private String summarizeAll() throws InterruptedException {
         // Rationale for RuntimeException here:
         // It follows the same idiom as in langchain4j. See {@link JabRefChatLanguageModel.generate}, this method
         // is used internally in the summarization, and it also throws RuntimeExceptions.
-
-        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-            throw new RuntimeException(Localization.lang("No summary can be generated for entry '%0' as the database does not have path", citationKey));
-        }
 
         // Stream API would look better here, but we need to catch InterruptedException.
         List<String> linkedFilesSummary = new ArrayList<>();
@@ -139,14 +142,7 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
         doneOneWork();
 
-        SummariesStorage.SummarizationRecord summaryRecord = new SummariesStorage.SummarizationRecord(
-                LocalDateTime.now(),
-                aiService.getPreferences().getAiProvider(),
-                aiService.getPreferences().getSelectedChatModel(),
-                finalSummary
-        );
-
-        aiService.getSummariesStorage().set(bibDatabaseContext.getDatabasePath().get(), citationKey, summaryRecord);
+        return finalSummary;
     }
 
     private Optional<String> generateSummary(LinkedFile linkedFile) throws InterruptedException {

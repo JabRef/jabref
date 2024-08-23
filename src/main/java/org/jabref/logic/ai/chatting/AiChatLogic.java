@@ -1,4 +1,4 @@
-package org.jabref.logic.ai;
+package org.jabref.logic.ai.chatting;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,7 +8,10 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.ai.misc.ErrorMessage;
+import org.jabref.logic.ai.AiDefaultPreferences;
+import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.ingestion.FileEmbeddingsManager;
+import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.CanonicalBibEntry;
 import org.jabref.model.entry.LinkedFile;

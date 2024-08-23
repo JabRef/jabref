@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.models;
+package org.jabref.logic.ai.ingestion.model;
 
 import java.util.List;
 import java.util.Optional;

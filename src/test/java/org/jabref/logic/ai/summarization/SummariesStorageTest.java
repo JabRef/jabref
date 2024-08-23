@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.jabref.preferences.ai.AiPreferences;
 import org.jabref.preferences.ai.AiProvider;
 
 import org.h2.mvstore.MVStore;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,7 +26,7 @@ class SummariesStorageTest {
     void setUp() {
         mvStore = MVStore.open(tempDir.resolve("test.mv").toString());
         bibPath = tempDir.resolve("test.bib");
-        summariesStorage = new SummariesStorage(Mockito.mock(AiPreferences.class), mvStore);
+        summariesStorage = new SummariesStorage(mvStore);
     }
 
     private void reopen() {
