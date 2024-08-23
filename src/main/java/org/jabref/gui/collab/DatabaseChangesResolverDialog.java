@@ -15,7 +15,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
@@ -57,7 +56,6 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
     private boolean areAllChangesDenied;
 
     @Inject private UndoManager undoManager;
-    @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
     @Inject private ThemeManager themeManager;
@@ -101,8 +99,8 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        PreviewViewer previewViewer = new PreviewViewer(database, dialogService, preferencesService, stateManager, themeManager, taskExecutor);
-        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, stateManager, themeManager, preferencesService, entryTypesManager, previewViewer, taskExecutor);
+        PreviewViewer previewViewer = new PreviewViewer(database, dialogService, preferencesService, themeManager, taskExecutor);
+        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, themeManager, preferencesService, entryTypesManager, previewViewer, taskExecutor);
 
         viewModel = new ExternalChangesResolverViewModel(changes, undoManager);
 

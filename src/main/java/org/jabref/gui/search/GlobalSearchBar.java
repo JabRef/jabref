@@ -78,10 +78,8 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 public class GlobalSearchBar extends HBox {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
-
     private static final int SEARCH_DELAY = 400;
-    private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
-    private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
+    private static final PseudoClass ILLEGAL_SEARCH = PseudoClass.getPseudoClass("illegal-search");
 
     private final CustomTextField searchField;
     private final ToggleButton regularExpressionButton;
@@ -125,22 +123,24 @@ public class GlobalSearchBar extends HBox {
         Label currentResults = new Label();
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the tabContainer width is too small
         currentResults.setPrefWidth(150);
-        currentResults.visibleProperty().bind(stateManager.activeSearchQuery(searchType).isPresent());
 
         currentResults.textProperty().bind(EasyBind.combine(
-                stateManager.searchResultSize(searchType), illegalSearch, invalidRegex,
-                (matched, illegal, invalid) -> {
+                stateManager.activeSearchQuery(searchType), stateManager.searchResultSize(searchType), illegalSearch, invalidRegex,
+                (searchQuery, matched, illegal, invalid) -> {
                     if (illegal) {
-                        searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
+                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, true);
                         return Localization.lang("Search failed: illegal search expression");
                     } else if (invalid) {
-                        searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
+                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, true);
                         return Localization.lang("Invalid regular expression");
+                    } else if (searchQuery.isEmpty()) {
+                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
+                        return "";
                     } else if (matched.intValue() == 0) {
-                        searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
+                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
                         return Localization.lang("No results found.");
                     } else {
-                        searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
+                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
                         return Localization.lang("Found %0 results.", String.valueOf(matched));
                     }
                 }
@@ -321,6 +321,8 @@ public class GlobalSearchBar extends HBox {
         if (searchField.getText().isEmpty()) {
             setSearchFieldHintTooltip();
             stateManager.activeSearchQuery(searchType).set(Optional.empty());
+            illegalSearch.set(false);
+            invalidRegex.set(false);
             return;
         }
 

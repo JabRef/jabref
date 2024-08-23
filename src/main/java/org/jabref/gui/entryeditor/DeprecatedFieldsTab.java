@@ -10,12 +10,12 @@ import javax.swing.undo.UndoManager;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -26,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -42,13 +43,13 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
                                RedoAction redoAction,
                                DialogService dialogService,
                                PreferencesService preferences,
-                               StateManager stateManager,
                                ThemeManager themeManager,
                                BibEntryTypesManager entryTypesManager,
                                TaskExecutor taskExecutor,
                                JournalAbbreviationRepository journalAbbreviationRepository,
-                               LuceneManager luceneManager) {
-        super(false, databaseContext, suggestionProviders, undoManager, undoAction, redoAction, dialogService, preferences, stateManager, themeManager, taskExecutor, journalAbbreviationRepository, luceneManager);
+                               LuceneManager luceneManager,
+                               OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+        super(false, databaseContext, suggestionProviders, undoManager, undoAction, redoAction, dialogService, preferences, themeManager, taskExecutor, journalAbbreviationRepository, luceneManager, searchQueryProperty);
         this.entryTypesManager = entryTypesManager;
 
         setText(Localization.lang("Deprecated fields"));

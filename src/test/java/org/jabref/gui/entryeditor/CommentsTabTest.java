@@ -12,6 +12,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.OwnerPreferences;
@@ -97,11 +98,11 @@ class CommentsTabTest {
                 mock(UndoAction.class),
                 mock(RedoAction.class),
                 dialogService,
-                stateManager,
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                mock(LuceneManager.class)
+                mock(LuceneManager.class),
+                OptionalObjectProperty.empty()
         );
     }
 

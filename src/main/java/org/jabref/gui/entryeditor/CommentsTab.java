@@ -17,7 +17,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
@@ -25,6 +24,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -34,6 +34,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 public class CommentsTab extends FieldsEditorTab {
@@ -51,11 +52,11 @@ public class CommentsTab extends FieldsEditorTab {
                        UndoAction undoAction,
                        RedoAction redoAction,
                        DialogService dialogService,
-                       StateManager stateManager,
                        ThemeManager themeManager,
                        TaskExecutor taskExecutor,
                        JournalAbbreviationRepository journalAbbreviationRepository,
-                       LuceneManager luceneManager) {
+                       LuceneManager luceneManager,
+                       OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(
                 false,
                 databaseContext,
@@ -65,11 +66,11 @@ public class CommentsTab extends FieldsEditorTab {
                 redoAction,
                 dialogService,
                 preferences,
-                stateManager,
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                luceneManager
+                luceneManager,
+                searchQueryProperty
         );
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
         setText(Localization.lang("Comments"));
