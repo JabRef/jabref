@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.models;
+package org.jabref.logic.ai.chatting.model;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.jabref.logic.ai.AiChatLogic;
+import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.ai.AiApiKeyProvider;
 import org.jabref.preferences.ai.AiPreferences;

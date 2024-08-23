@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.embeddings;
+package org.jabref.logic.ai.ingestion;
 
 import java.util.List;
 

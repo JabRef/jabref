@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.embeddings;
+package org.jabref.logic.ai.ingestion;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,8 +12,6 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import org.jabref.logic.ai.FileEmbeddingsManager;
 
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.embedding.Embedding;

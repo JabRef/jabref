@@ -32,7 +32,7 @@ public class SummariesStorage {
 
     public record SummarizationRecord(LocalDateTime timestamp, AiProvider aiProvider, String model, String content) implements Serializable { }
 
-    public SummariesStorage(AiPreferences aiPreferences, MVStore mvStore) {
+    public SummariesStorage(MVStore mvStore) {
         this.mvStore = mvStore;
     }
 

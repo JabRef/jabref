@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.chathistory;
+package org.jabref.logic.ai.chatting.chathistory;
 
 import java.nio.file.Path;
 import java.util.List;

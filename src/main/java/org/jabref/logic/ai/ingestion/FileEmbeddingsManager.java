@@ -1,16 +1,12 @@
-package org.jabref.logic.ai;
+package org.jabref.logic.ai.ingestion;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
-import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
-import org.jabref.logic.ai.embeddings.LowLevelIngestor;
-import org.jabref.logic.ai.embeddings.MVStoreEmbeddingStore;
-import org.jabref.logic.ai.models.JabRefEmbeddingModel;
+import org.jabref.logic.ai.ingestion.model.JabRefEmbeddingModel;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.ai.AiPreferences;
 
@@ -75,28 +71,12 @@ public class FileEmbeddingsManager {
         return embeddingStore;
     }
 
-    public Set<String> getIngestedDocuments() {
-        return fullyIngestedDocumentsTracker.getFullyIngestedDocuments();
-    }
-
     public Optional<Long> getIngestedDocumentModificationTimeInSeconds(String link) {
         return fullyIngestedDocumentsTracker.getIngestedDocumentModificationTimeInSeconds(link);
     }
 
     public void registerListener(Object object) {
         fullyIngestedDocumentsTracker.registerListener(object);
-    }
-
-    public boolean hasIngestedDocument(String link) {
-        return fullyIngestedDocumentsTracker.hasIngestedDocument(link);
-    }
-
-    public boolean hasIngestedDocuments(List<String> links) {
-        return links.stream().allMatch(this::hasIngestedDocument);
-    }
-
-    public boolean hasIngestedLinkedFiles(List<LinkedFile> linkedFiles) {
-        return hasIngestedDocuments(linkedFiles.stream().map(LinkedFile::getLink).toList());
     }
 
     public void clearEmbeddingsFor(List<LinkedFile> linkedFiles) {

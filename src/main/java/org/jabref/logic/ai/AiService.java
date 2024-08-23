@@ -12,11 +12,13 @@ import javafx.beans.property.SimpleBooleanProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.chathistory.ChatHistoryService;
-import org.jabref.logic.ai.chathistory.MVStoreChatHistory;
+import org.jabref.logic.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.logic.ai.chatting.chathistory.MVStoreChatHistory;
+import org.jabref.logic.ai.ingestion.FileEmbeddingsManager;
 import org.jabref.logic.ai.ingestion.IngestionService;
-import org.jabref.logic.ai.models.JabRefChatLanguageModel;
-import org.jabref.logic.ai.models.JabRefEmbeddingModel;
+import org.jabref.logic.ai.chatting.model.JabRefChatLanguageModel;
+import org.jabref.logic.ai.ingestion.model.JabRefEmbeddingModel;
+import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.SummariesStorage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
@@ -61,6 +63,7 @@ public class AiService implements AutoCloseable {
     private final IngestionService ingestionService;
 
     private final SummariesStorage summariesStorage;
+    private final SummariesService summariesService;
 
     public AiService(PreferencesService preferencesService, AiApiKeyProvider aiApiKeyProvider, DialogService dialogService, TaskExecutor taskExecutor) {
         this.aiPreferences = preferencesService.getAiPreferences();
@@ -85,7 +88,8 @@ public class AiService implements AutoCloseable {
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, dialogService, taskExecutor);
         this.fileEmbeddingsManager = new FileEmbeddingsManager(aiPreferences, shutdownSignal, jabRefEmbeddingModel, mvStore);
         this.ingestionService = new IngestionService(preferencesService, this, taskExecutor);
-        this.summariesStorage = new SummariesStorage(aiPreferences, mvStore);
+        this.summariesStorage = new SummariesStorage(mvStore);
+        this.summariesService = new SummariesService(this, preferencesService, taskExecutor);
     }
 
     @Override
@@ -129,6 +133,10 @@ public class AiService implements AutoCloseable {
 
     public SummariesStorage getSummariesStorage() {
         return summariesStorage;
+    }
+
+    public SummariesService getSummariesService() {
+        return summariesService;
     }
 
     public ReadOnlyBooleanProperty getShutdownSignal() {

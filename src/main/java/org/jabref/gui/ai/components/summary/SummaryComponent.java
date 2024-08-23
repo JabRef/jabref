@@ -13,6 +13,8 @@ import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.ai.processingstatus.ProcessingInfo;
+import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.logic.ai.summarization.GenerateSummaryTask;
 import org.jabref.logic.ai.summarization.SummariesStorage;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -28,11 +30,10 @@ import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.logic.ai.chathistory.ChatHistoryService.citationKeyIsValid;
+import static org.jabref.logic.ai.chatting.chathistory.ChatHistoryService.citationKeyIsValid;
 
 public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummaryComponent.class);
-    private static final List<BibEntry> entriesUnderSummarization = new ArrayList<>();
 
     private final BibDatabaseContext bibDatabaseContext;
     private final BibEntry entry;
@@ -50,8 +51,6 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
         this.aiService = aiService;
         this.filePreferences = preferencesService.getFilePreferences();
         this.taskExecutor = taskExecutor;
-
-        aiService.getSummariesStorage().registerListener(this);
     }
 
     @Override
@@ -67,10 +66,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
             // will check this. But with this call the linter is happy for the next expression in else if.
             return tryToGenerateCitationKeyThenBind(entry);
         } else {
-            Optional<SummariesStorage.SummarizationRecord> summary = aiService.getSummariesStorage().get(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
-            return summary
-                    .map(this::bindToCorrectEntry)
-                    .orElseGet(() -> startGeneratingSummary(entry));
+            return tryToShowSummary();
         }
     }
 
@@ -105,6 +101,38 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
             return showPrivacyPolicyGuardedContent();
         }
     }
+
+    private Node tryToShowSummary() {
+        ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo = aiService.getSummariesService().summarize(entry, bibDatabaseContext);
+
+        switch (processingInfo.state().get()) {
+            case SUCCESS:
+                return showSummary(processingInfo.data());
+            case ERROR:
+                return showErrorNotSummarized();
+            case RUNNING:
+                return startGeneratingSummary(entry);
+        }
+
+        if (processingInfo.state() == ProcessingState.SUCCESS) {
+            return showSummary(processingInfo.data());
+        } else if (pro)
+    }
+
+    private void showErrorWhileSummarizing(Exception e) {
+        LOGGER.error("Got an error while generating a summary for entry {}", entry.getCitationKey().orElse("<no citation key>"), e);
+
+        setContent(
+                ErrorStateComponent.withTextAreaAndButton(
+                        Localization.lang("Unable to chat"),
+                        Localization.lang("Got error while processing the file:"),
+                        e.getMessage(),
+                        Localization.lang("Regenerate"),
+                        () -> bindToEntry(currentEntry)
+                )
+        );
+    }
+
 
     private Node startGeneratingSummary(BibEntry entry) {
         assert entry.getCitationKey().isPresent();
@@ -146,12 +174,5 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
             aiService.getSummariesStorage().clear(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
             rebuildUi();
         });
-    }
-
-    private class SummarySetListener {
-        @Subscribe
-        public void listen(SummariesStorage.SummarySetEvent event) {
-            UiTaskExecutor.runInJavaFXThread(SummaryComponent.this::rebuildUi);
-        }
     }
 }

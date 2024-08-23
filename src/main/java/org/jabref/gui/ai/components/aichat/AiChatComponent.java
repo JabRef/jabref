@@ -20,9 +20,9 @@ import org.jabref.gui.ai.components.util.notifications.NotificationType;
 import org.jabref.gui.ai.components.util.notifications.NotificationsComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.AiChatLogic;
+import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.misc.ErrorMessage;
+import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -158,19 +158,19 @@ public class AiChatComponent extends VBox {
 
         entry.getFiles().stream().map(file -> aiService.getIngestionService().ingest(file, bibDatabaseContext)).forEach(ingestionStatus -> {
             switch (ingestionStatus.state().get()) {
-                case INGESTING -> notifications.add(new Notification(
+                case PROCESSING -> notifications.add(new Notification(
                     NotificationType.WARNING,
-                    Localization.lang("File %0 is currently being processed", ingestionStatus.linkedFile().getLink()),
+                    Localization.lang("File %0 is currently being processed", ingestionStatus.object().getLink()),
                     Localization.lang("After the file will be ingested, you will be able to chat with it")
                 ));
 
-                case INGESTION_FAILED -> notifications.add(new Notification(
+                case ERROR -> notifications.add(new Notification(
                     NotificationType.ERROR,
-                    Localization.lang("File %0 could not be ingested", ingestionStatus.linkedFile().getLink()),
-                    ingestionStatus.message().get()
+                    Localization.lang("File %0 could not be ingested", ingestionStatus.object().getLink()),
+                    ingestionStatus.errorMessage().get()
                 ));
 
-                case INGESTION_SUCCESS -> { }
+                case SUCCESS -> { }
             }
         });
 

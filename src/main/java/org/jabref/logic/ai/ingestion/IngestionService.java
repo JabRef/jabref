@@ -8,15 +8,15 @@ import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.FileEmbeddingsManager;
-import org.jabref.logic.ai.GenerateEmbeddingsTask;
+import org.jabref.logic.ai.processingstatus.ProcessingInfo;
+import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class IngestionService {
-    private final Map<LinkedFile, IngestionStatus> ingestionStatusMap = new HashMap<>();
+    private final Map<LinkedFile, ProcessingInfo<LinkedFile, Void>> ingestionStatusMap = new HashMap<>();
 
     private final FilePreferences filePreferences;
     private final FileEmbeddingsManager fileEmbeddingsManager;
@@ -28,11 +28,16 @@ public class IngestionService {
         this.taskExecutor = taskExecutor;
     }
 
-    public IngestionStatus ingest(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext) {
+    public ProcessingInfo<LinkedFile, Void> ingest(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext) {
         return ingestionStatusMap.computeIfAbsent(linkedFile, file -> {
-            IngestionStatus ingestionStatus = new IngestionStatus(linkedFile, new SimpleObjectProperty<>(IngestionState.INGESTING), new SimpleStringProperty(""));
-            new GenerateEmbeddingsTask(ingestionStatus, fileEmbeddingsManager, bibDatabaseContext, filePreferences).executeWith(taskExecutor);
-            return ingestionStatus;
+            ProcessingInfo<LinkedFile, Void> processingInfo = new ProcessingInfo<>(linkedFile, new SimpleObjectProperty<>(ProcessingState.PROCESSING), new SimpleStringProperty(""), null);
+
+            new GenerateEmbeddingsTask(linkedFile, fileEmbeddingsManager, bibDatabaseContext, filePreferences)
+                    .onSuccess((v) -> processingInfo.state().set(ProcessingState.SUCCESS))
+                    .onFailure(processingInfo::setError)
+                    .executeWith(taskExecutor);
+
+            return processingInfo;
         });
     }
 }

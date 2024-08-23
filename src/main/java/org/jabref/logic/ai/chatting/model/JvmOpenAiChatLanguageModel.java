@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.models;
+package org.jabref.logic.ai.chatting.model;
 
 import java.net.http.HttpClient;
 import java.util.List;
