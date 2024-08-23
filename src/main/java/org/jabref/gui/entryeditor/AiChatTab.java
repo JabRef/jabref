@@ -7,21 +7,14 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.ai.components.aichat.AiChatComponent;
-import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
-import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
+import org.jabref.gui.ai.components.aichat.AiChatGuardedComponentAi;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.ai.embeddings.FullyIngestedDocumentsTracker;
-import org.jabref.logic.ai.models.JabRefEmbeddingModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
-
-import com.google.common.eventbus.Subscribe;
 
 public class AiChatTab extends EntryEditorTab {
     private final DialogService dialogService;
@@ -57,13 +50,6 @@ public class AiChatTab extends EntryEditorTab {
         return entryEditorPreferences.shouldShowAiChatTab();
     }
 
-    @Override
-    protected void handleFocus() {
-        if (currentEntry != null) {
-            bindToEntry(currentEntry);
-        }
-    }
-
     /**
      * @implNote Method similar to {@link AiSummaryTab#bindToEntry(BibEntry)}
      */
@@ -73,72 +59,18 @@ public class AiChatTab extends EntryEditorTab {
             aiService.getChatHistoryService().closeChatHistoryForEntry(currentEntry);
         }
 
-        if (!aiService.getPreferences().getEnableAi()) {
-            showPrivacyNotice(entry);
-        } else if (!aiService.getEmbeddingModel().isPresent()) {
-            if (aiService.getEmbeddingModel().hadErrorWhileBuildingModel()) {
-                showErrorWhileBuildingEmbeddingModel();
-            } else {
-                showBuildingEmbeddingModel();
-            }
-        } else {
-            bindToCorrectEntry(entry);
-        }
-    }
+        AiChatGuardedComponentAi aiChatGuardedComponent =
+                new AiChatGuardedComponentAi(
+                        "entry " + entry.getCitationKey().orElse("<no citation key>"),
+                        aiService.getChatHistoryService().getChatHistoryForEntry(entry),
+                        FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
+                        dialogService,
+                        filePreferences,
+                        aiService,
+                        bibDatabaseContext,
+                        taskExecutor
+                );
 
-    private void showPrivacyNotice(BibEntry entry) {
-        setContent(new PrivacyNoticeComponent(dialogService, aiService.getPreferences(), filePreferences, () -> {
-            bindToEntry(entry);
-        }));
-    }
-
-    private void showErrorWhileBuildingEmbeddingModel() {
-        setContent(
-                ErrorStateComponent.withTextAreaAndButton(
-                        Localization.lang("Unable to chat"),
-                        Localization.lang("An error occurred while building the embedding model"),
-                        aiService.getEmbeddingModel().getErrorWhileBuildingModel(),
-                        Localization.lang("Rebuild"),
-                        () -> aiService.getEmbeddingModel().startRebuildingTask()
-                )
-        );
-    }
-
-    public void showBuildingEmbeddingModel() {
-        setContent(
-                ErrorStateComponent.withSpinner(
-                        Localization.lang("Downloading..."),
-                        Localization.lang("Downloading embedding model... Afterward, you will be able to chat with your files.")
-                )
-        );
-    }
-
-    private void bindToCorrectEntry(BibEntry entry) {
-        setContent(
-                new AiChatComponent(
-                    aiService,
-                    "entry " + entry.getCitationKey().orElse("<no citation key>"),
-                    aiService.getChatHistoryService().getChatHistoryForEntry(entry),
-                    FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
-                    bibDatabaseContext,
-                    dialogService,
-                    taskExecutor
-                )
-        );
-    }
-
-    @Subscribe
-    public void listen(FullyIngestedDocumentsTracker.DocumentIngestedEvent event) {
-        UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
-    }
-
-    @Subscribe
-    public void listen(JabRefEmbeddingModel.EmbeddingModelBuiltEvent event) {
-        UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
-    }
-
-    @Subscribe
-    public void listen(JabRefEmbeddingModel.EmbeddingModelBuildingErrorEvent event) {
-        UiTaskExecutor.runInJavaFXThread(AiChatTab.this::handleFocus);
+        setContent(aiChatGuardedComponent);
     }
 }

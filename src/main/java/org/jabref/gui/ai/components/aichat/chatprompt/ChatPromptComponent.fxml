@@ -11,7 +11,7 @@
         type="javafx.scene.layout.HBox"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.jabref.gui.ai.components.chatprompt.ChatPromptComponent"
+        fx:controller="org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent"
         alignment="CENTER"
         spacing="10.0">
     <ExpandingTextArea

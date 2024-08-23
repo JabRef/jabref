@@ -6,9 +6,9 @@
 
 <?import org.jabref.gui.icon.JabRefIconView?>
 
-<?import org.jabref.gui.ai.components.loadable.Loadable?>
-<?import org.jabref.gui.ai.components.chathistory.ChatHistoryComponent?>
-<?import org.jabref.gui.ai.components.chatprompt.ChatPromptComponent?>
+<?import org.jabref.gui.ai.components.util.Loadable?>
+<?import org.jabref.gui.ai.components.aichat.chathistory.ChatHistoryComponent?>
+<?import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent?>
 
 <?import org.controlsfx.control.PopOver?>
 

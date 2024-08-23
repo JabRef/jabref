@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.components.notifications;
+package org.jabref.gui.ai.components.util.notifications;
 
 import javafx.geometry.Insets;
 import javafx.scene.Node;

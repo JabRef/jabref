@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.components.loadable;
+package org.jabref.gui.ai.components.util;
 
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.BorderPane;
