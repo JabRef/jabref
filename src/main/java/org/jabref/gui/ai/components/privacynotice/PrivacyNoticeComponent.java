@@ -24,24 +24,18 @@ public class PrivacyNoticeComponent extends ScrollPane {
     @FXML private TextFlow openAiPrivacyTextFlow;
     @FXML private TextFlow mistralAiPrivacyTextFlow;
     @FXML private TextFlow huggingFacePrivacyTextFlow;
-    @FXML private Label text1;
-    @FXML private Label text2;
-    @FXML private Label text3;
     @FXML private Text embeddingModelText;
 
-    private final DialogService dialogService;
-
     private final AiPreferences aiPreferences;
+    private final Runnable onIAgreeButtonClickCallback;
+    private final DialogService dialogService;
     private final FilePreferences filePreferences;
 
-    private final Runnable onIAgreeButtonClickCallback;
-
-    public PrivacyNoticeComponent(DialogService dialogService, AiPreferences aiPreferences, FilePreferences filePreferences, Runnable onIAgreeButtonClickCallback) {
-        this.dialogService = dialogService;
+    public PrivacyNoticeComponent(AiPreferences aiPreferences, Runnable onIAgreeButtonClickCallback, FilePreferences filePreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
-        this.filePreferences = filePreferences;
-
         this.onIAgreeButtonClickCallback = onIAgreeButtonClickCallback;
+        this.dialogService = dialogService;
+        this.filePreferences = filePreferences;
 
         ViewLoader.view(this)
                   .root(this)

@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.components.chatprompt;
+package org.jabref.gui.ai.components.aichat.chatprompt;
 
 import java.util.function.Consumer;
 

@@ -12,12 +12,12 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.ai.components.chathistory.ChatHistoryComponent;
-import org.jabref.gui.ai.components.chatprompt.ChatPromptComponent;
-import org.jabref.gui.ai.components.loadable.Loadable;
-import org.jabref.gui.ai.components.notifications.Notification;
-import org.jabref.gui.ai.components.notifications.NotificationType;
-import org.jabref.gui.ai.components.notifications.NotificationsComponent;
+import org.jabref.gui.ai.components.aichat.chathistory.ChatHistoryComponent;
+import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent;
+import org.jabref.gui.ai.components.util.Loadable;
+import org.jabref.gui.ai.components.util.notifications.Notification;
+import org.jabref.gui.ai.components.util.notifications.NotificationType;
+import org.jabref.gui.ai.components.util.notifications.NotificationsComponent;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiChatLogic;
@@ -54,7 +54,14 @@ public class AiChatComponent extends VBox {
     @FXML private ChatPromptComponent chatPrompt;
     @FXML private Label noticeText;
 
-    public AiChatComponent(AiService aiService, String name, ObservableList<ChatMessage> chatHistory, ObservableList<BibEntry> entries, BibDatabaseContext bibDatabaseContext, DialogService dialogService, TaskExecutor taskExecutor) {
+    public AiChatComponent(AiService aiService,
+                           String name,
+                           ObservableList<ChatMessage> chatHistory,
+                           ObservableList<BibEntry> entries,
+                           BibDatabaseContext bibDatabaseContext,
+                           DialogService dialogService,
+                           TaskExecutor taskExecutor
+    ) {
         this.aiService = aiService;
         this.entries = entries;
         this.bibDatabaseContext = bibDatabaseContext;
@@ -120,7 +127,8 @@ public class AiChatComponent extends VBox {
             notificationsButton.setManaged(true);
             notificationsButton.setGraphic(NotificationsComponent.findSuitableIcon(notifications).getGraphicNode());
             notificationsButton.setOnAction(event ->
-                new PopOver(new NotificationsComponent(notifications)).show(notificationsButton)
+                new PopOver(new NotificationsComponent(notifications))
+                        .show(notificationsButton)
             );
         }
     }

@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.components.notifications;
+package org.jabref.gui.ai.components.util.notifications;
 
 import java.util.List;
 

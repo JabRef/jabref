@@ -7,7 +7,7 @@
 <?import javafx.scene.text.*?>
 
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.chatmessage.ChatMessageComponent">
+<fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.Pane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.aichat.chatmessage.ChatMessageComponent">
     <children>
         <HBox fx:id="wrapperHBox" spacing="10.0">
             <VBox fx:id="vBox" spacing="10.0">

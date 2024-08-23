@@ -9,8 +9,7 @@ import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
-import org.jabref.gui.ai.components.apikeymissing.ApiKeyMissingComponent;
-import org.jabref.gui.ai.components.errorstate.ErrorStateComponent;
+import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.ai.components.summary.SummaryComponent;
 import org.jabref.gui.util.TaskExecutor;
@@ -89,8 +88,6 @@ public class AiSummaryTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (!aiService.getPreferences().getEnableAi()) {
             showPrivacyNotice(entry);
-        } else if (aiApiKeyProvider.getApiKeyForAiProvider(aiService.getPreferences().getAiProvider()).isEmpty()) {
-            showApiKeyMissing();
         } else if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             showErrorNoDatabasePath();
         } else if (entry.getFiles().isEmpty()) {
@@ -112,13 +109,9 @@ public class AiSummaryTab extends EntryEditorTab {
     }
 
     private void showPrivacyNotice(BibEntry entry) {
-        setContent(new PrivacyNoticeComponent(dialogService, aiService.getPreferences(), filePreferences, () -> {
+        setContent(new PrivacyNoticeComponent(aiService.getPreferences(), () -> {
             bindToEntry(entry);
-        }));
-    }
-
-    private void showApiKeyMissing() {
-        setContent(new ApiKeyMissingComponent(libraryTabContainer, dialogService));
+        }, filePreferences, dialogService));
     }
 
     private void showErrorNoDatabasePath() {

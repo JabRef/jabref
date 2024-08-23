@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.components.errorstate;
+package org.jabref.gui.ai.components.util.errorstate;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

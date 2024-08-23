@@ -94,7 +94,7 @@ public class ChatHistoryService implements AutoCloseable {
                         )
                 );
             }
-        });
+        }).chatHistory;
     }
 
     // Do not forget to call this method.

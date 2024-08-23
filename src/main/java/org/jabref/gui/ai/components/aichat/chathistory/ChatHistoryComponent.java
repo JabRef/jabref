@@ -1,4 +1,4 @@
-package org.jabref.gui.ai.components.chathistory;
+package org.jabref.gui.ai.components.aichat.chathistory;
 
 import java.util.function.Consumer;
 
@@ -8,7 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.ai.components.chatmessage.ChatMessageComponent;
+import org.jabref.gui.ai.components.aichat.chatmessage.ChatMessageComponent;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import dev.langchain4j.data.message.ChatMessage;
