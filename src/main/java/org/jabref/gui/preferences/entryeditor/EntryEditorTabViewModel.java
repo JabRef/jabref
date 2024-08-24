@@ -94,6 +94,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         // entryEditorPreferences.setEntryEditorTabList();
         entryEditorPreferences.setShouldOpenOnNewEntry(openOnNewEntryProperty.getValue());
         entryEditorPreferences.setShouldShowRecommendationsTab(enableRelatedArticlesTabProperty.getValue());
+        entryEditorPreferences.setShouldShowAiSummaryTab(enableAiSummaryTabProperty.getValue());
         entryEditorPreferences.setShouldShowAiChatTab(enableAiChatTabProperty.getValue());
         mrDlibPreferences.setAcceptRecommendations(acceptRecommendationsProperty.getValue());
         entryEditorPreferences.setShouldShowLatexCitationsTab(enableLatexCitationsTabProperty.getValue());
