@@ -8,9 +8,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.JabRefException;
-import org.jabref.logic.ai.processingstatus.ProcessingState;
-import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.ProgressCounter;
 import org.jabref.model.database.BibDatabaseContext;

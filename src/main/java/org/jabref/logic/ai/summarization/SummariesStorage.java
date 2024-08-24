@@ -10,7 +10,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.preferences.ai.AiPreferences;
 import org.jabref.preferences.ai.AiProvider;
 
 import com.airhacks.afterburner.injection.Injector;
