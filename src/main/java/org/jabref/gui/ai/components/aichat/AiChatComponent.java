@@ -167,7 +167,7 @@ public class AiChatComponent extends VBox {
                 case ERROR -> notifications.add(new Notification(
                     NotificationType.ERROR,
                     Localization.lang("File %0 could not be ingested", ingestionStatus.object().getLink()),
-                    ingestionStatus.errorMessage().get()
+                    ingestionStatus.exception().get().getLocalizedMessage()
                 ));
 
                 case SUCCESS -> { }
