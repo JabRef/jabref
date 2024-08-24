@@ -23,7 +23,6 @@ public class ProgressCounter implements Progress {
     // The list should be sorted by ProgressMessage.maxTime, smaller first.
     private static final List<ProgressMessage> PROGRESS_MESSAGES = List.of(
             new ProgressMessage(5, Localization.lang("Estimated time left: 5 seconds.")),
-            new ProgressMessage(10, Localization.lang("Estimated time left: 10 seconds.")),
             new ProgressMessage(15, Localization.lang("Estimated time left: 15 seconds.")),
             new ProgressMessage(30, Localization.lang("Estimated time left: 30 seconds.")),
             new ProgressMessage(60, Localization.lang("Estimated time left: approx. 1 minute.")),
