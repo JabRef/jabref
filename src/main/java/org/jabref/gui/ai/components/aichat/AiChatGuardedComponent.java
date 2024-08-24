@@ -1,5 +1,6 @@
 package org.jabref.gui.ai.components.aichat;
 
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 
@@ -13,8 +14,8 @@ import org.jabref.preferences.FilePreferences;
 
 import dev.langchain4j.data.message.ChatMessage;
 
-public class AiChatGuardedComponentAi extends EmbeddingModelGuardedComponent {
-    private final String name;
+public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
+    private final StringProperty name;
     private final ObservableList<ChatMessage> chatHistory;
     private final ObservableList<BibEntry> entries;
     private final DialogService dialogService;
@@ -22,14 +23,14 @@ public class AiChatGuardedComponentAi extends EmbeddingModelGuardedComponent {
     private final TaskExecutor taskExecutor;
     private final AiService aiService;
 
-    public AiChatGuardedComponentAi(String name,
-                                    ObservableList<ChatMessage> chatHistory,
-                                    ObservableList<BibEntry> entries,
-                                    DialogService dialogService,
-                                    FilePreferences filePreferences,
-                                    AiService aiService,
-                                    BibDatabaseContext bibDatabaseContext,
-                                    TaskExecutor taskExecutor
+    public AiChatGuardedComponent(StringProperty name,
+                                  ObservableList<ChatMessage> chatHistory,
+                                  ObservableList<BibEntry> entries,
+                                  DialogService dialogService,
+                                  FilePreferences filePreferences,
+                                  AiService aiService,
+                                  BibDatabaseContext bibDatabaseContext,
+                                  TaskExecutor taskExecutor
     ) {
         super(aiService, filePreferences, dialogService);
 

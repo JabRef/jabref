@@ -48,12 +48,11 @@ public class AiChatLogic {
     private ChatMemory chatMemory;
     private Chain<String, String> chain;
 
-    public AiChatLogic(AiService aiService, String name, ObservableList<ChatMessage> chatHistory, ObservableList<BibEntry> entries) {
+    public AiChatLogic(AiService aiService, StringProperty name, ObservableList<ChatMessage> chatHistory, ObservableList<BibEntry> entries) {
         this.aiService = aiService;
         this.chatHistory = chatHistory;
         this.entries = entries;
-
-        this.name = new SimpleStringProperty(name);
+        this.name = name;
 
         this.entries.addListener((ListChangeListener<BibEntry>) change -> rebuildChain());
 

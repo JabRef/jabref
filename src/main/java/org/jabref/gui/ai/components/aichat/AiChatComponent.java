@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -55,7 +56,7 @@ public class AiChatComponent extends VBox {
     @FXML private Label noticeText;
 
     public AiChatComponent(AiService aiService,
-                           String name,
+                           StringProperty name,
                            ObservableList<ChatMessage> chatHistory,
                            ObservableList<BibEntry> entries,
                            BibDatabaseContext bibDatabaseContext,

@@ -182,5 +182,6 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires org.checkerframework.checker.qual;
+    requires jeuclid.core;
     // endregion
 }

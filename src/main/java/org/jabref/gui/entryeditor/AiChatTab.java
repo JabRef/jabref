@@ -3,11 +3,13 @@ package org.jabref.gui.entryeditor;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.ai.components.aichat.AiChatGuardedComponentAi;
+import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
@@ -56,8 +58,11 @@ public class AiChatTab extends EntryEditorTab {
             aiService.getChatHistoryService().closeChatHistoryForEntry(currentEntry);
         }
 
-        setContent(new AiChatGuardedComponentAi(
-                "entry " + entry.getCitationKey().orElse("<no citation key>"),
+        StringProperty chatName = new SimpleStringProperty("entry " + entry.getCitationKey().orElse("<no citation key>"));
+        entry.getCiteKeyBinding().addListener((observable, oldValue, newValue) -> chatName.setValue("entry " + newValue));
+
+        setContent(new AiChatGuardedComponent(
+                chatName,
                 aiService.getChatHistoryService().getChatHistoryForEntry(entry),
                 FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
                 dialogService,
