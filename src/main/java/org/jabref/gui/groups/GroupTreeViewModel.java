@@ -17,15 +17,20 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.components.aichat.AiChatDialog;
+import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -49,6 +54,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final AiService aiService;
     private final PreferencesService preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
@@ -72,9 +78,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, AiService aiService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
+        this.aiService = Objects.requireNonNull(aiService);
         this.preferences = Objects.requireNonNull(preferencesService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
@@ -376,6 +383,30 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 refresh();
             });
         });
+    }
+
+    public void chatWithGroup(GroupNodeViewModel group) {
+        // This should probably be done some other way. Please don't blame, it's just a thing to make it quick and fast.
+        if (currentDatabase.isEmpty()) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Unable to chat with group"), Localization.lang("No database is set."));
+            return;
+        }
+
+        StringProperty groupNameProperty = group.getGroupNode().getGroup().nameProperty();
+
+        StringProperty nameProperty = new SimpleStringProperty("Group " + groupNameProperty.get());
+        groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue("Group " + newValue));
+
+        dialogService.showCustomDialog(new AiChatDialog(
+                nameProperty,
+                aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode().getGroup()),
+                FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase())),
+                dialogService,
+                preferences.getFilePreferences(),
+                aiService,
+                currentDatabase.get(),
+                taskExecutor
+        ));
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {
