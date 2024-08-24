@@ -98,6 +98,8 @@ public class GenerateSummaryTask extends BackgroundTask<Void> {
 
         LOGGER.info("Finished summarization task for entry {}", citationKey);
 
+        progressCounter.stop();
+
         return null;
     }
 

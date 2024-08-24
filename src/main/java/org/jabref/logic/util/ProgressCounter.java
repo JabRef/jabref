@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -28,14 +30,24 @@ public class ProgressCounter implements Progress {
             new ProgressMessage(Integer.MAX_VALUE, Localization.lang("Estimated time left: more than 2 minutes."))
     );
 
+    private static final Duration PERIODIC_UPDATE_DURATION = Duration.ofSeconds(PROGRESS_MESSAGES.getFirst().maxTime);
+
     private final IntegerProperty workDone = new SimpleIntegerProperty(0);
     private final IntegerProperty workMax = new SimpleIntegerProperty(0);
     private final StringProperty message = new SimpleStringProperty("");
 
-    private Instant oneWorkTimeStart = Instant.now();
-    private Duration lastEtaCalculation = Duration.ofDays(1);
+    // Progress counter is updated on two events:
+    // 1) When workDone or workMax changes: this in normal behavior.
+    // 2) When PERIODIC_UPDATE_DURATION passes: it is used in situations where one piece of work takes too much time
+    //    (and so there are no events 1), and so the message could be "approx. 5 seconds", while it should be more.
+    private final Timeline periodicUpdate = new Timeline(new KeyFrame(new javafx.util.Duration(PERIODIC_UPDATE_DURATION.getSeconds() * 1000), e -> update()));
+
+    private final Instant workStartTime = Instant.now();
 
     public ProgressCounter() {
+        periodicUpdate.setCycleCount(Timeline.INDEFINITE);
+        periodicUpdate.play();
+
         workDone.addListener(obs -> update());
         workMax.addListener(obs -> update());
     }
@@ -79,16 +91,14 @@ public class ProgressCounter implements Progress {
     }
 
     private void update() {
-        Instant oneWorkTimeEnd = Instant.now();
-        Duration duration = Duration.between(oneWorkTimeStart, oneWorkTimeEnd);
-        oneWorkTimeStart = oneWorkTimeEnd;
+        Duration workTime = Duration.between(workStartTime, Instant.now());
+        Duration oneWorkTime = workTime.dividedBy(workDone.get() == 0 ? 1 : workDone.get());
+        Duration eta = oneWorkTime.multipliedBy(workMax.get() - workDone.get() <= 0 ? 1 : workMax.get() - workDone.get());
 
-        Duration eta = duration.multipliedBy(workMax.get() - workDone.get());
+        updateMessage(eta);
 
-        if (lastEtaCalculation.minus(eta).isPositive()) {
-            updateMessage(eta);
-
-            lastEtaCalculation = eta;
+        if (workDone.get() != 0 && workMax.get() != 0 && workDone.get() == workMax.get()) {
+            stop();
         }
     }
 
@@ -127,5 +137,9 @@ public class ProgressCounter implements Progress {
                 break;
             }
         }
+    }
+
+    public void stop() {
+        periodicUpdate.stop();
     }
 }
