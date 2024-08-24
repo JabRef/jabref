@@ -1,7 +1,6 @@
 package org.jabref.logic.ai.summarization;
 
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

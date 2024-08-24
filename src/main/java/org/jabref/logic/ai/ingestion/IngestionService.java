@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;

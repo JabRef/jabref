@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -55,13 +54,13 @@ public class SummariesService {
         } else if (bibEntry.getCitationKey().isEmpty()) {
             runGenerateSummaryTask(processingInfo, bibEntry, bibDatabaseContext);
         } else {
-            Optional<SummariesStorage.SummarizationRecord> record = aiService.getSummariesStorage().get(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get());
+            Optional<SummariesStorage.SummarizationRecord> summarizationRecord = aiService.getSummariesStorage().get(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get());
 
-            if (record.isEmpty()) {
+            if (summarizationRecord.isEmpty()) {
                 runGenerateSummaryTask(processingInfo, bibEntry, bibDatabaseContext);
             } else {
                 processingInfo.state().set(ProcessingState.SUCCESS);
-                processingInfo.data().set(record.get());
+                processingInfo.data().set(summarizationRecord.get());
             }
         }
     }
@@ -84,21 +83,21 @@ public class SummariesService {
     private void runGenerateSummaryTask(ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo, BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
         new GenerateSummaryTask(bibDatabaseContext, bibEntry.getCitationKey().orElse("<no citation key>"), bibEntry.getFiles(), aiService, filePreferences)
                 .onSuccess(summary -> {
-                    SummariesStorage.SummarizationRecord record = new SummariesStorage.SummarizationRecord(
+                    SummariesStorage.SummarizationRecord summarizationRecord = new SummariesStorage.SummarizationRecord(
                             LocalDateTime.now(),
                             aiService.getPreferences().getAiProvider(),
                             aiService.getPreferences().getSelectedChatModel(),
                             summary
                     );
 
-                    processingInfo.setSuccess(record);
+                    processingInfo.setSuccess(summarizationRecord);
 
                     if (bibDatabaseContext.getDatabasePath().isEmpty()) {
                         LOGGER.info("No database path is present. Summary will not be stored in the next sessions");
                     } else if (bibEntry.getCitationKey().isEmpty()) {
                         LOGGER.info("No citation key is present. Summary will not be stored in the next sessions");
                     } else {
-                        aiService.getSummariesStorage().set(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get(), record);
+                        aiService.getSummariesStorage().set(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get(), summarizationRecord);
                     }
                 })
                 .onFailure(processingInfo::setException)

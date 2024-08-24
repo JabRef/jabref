@@ -20,7 +20,7 @@
                             <Font name="System Bold" size="12.0" />
                         </font>
                     </Label>
-                    <ExpandingTextArea fx:id="contentTextArea" editable="false" nodeOrientation="LEFT_TO_RIGHT" text="Content" />
+                    <ExpandingTextArea fx:id="contentTextArea" editable="false" nodeOrientation="LEFT_TO_RIGHT" text="Content" styleClass="chat-message-text-area" />
                 </children>
             </VBox>
 
