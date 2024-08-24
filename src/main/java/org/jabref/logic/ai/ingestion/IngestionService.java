@@ -30,11 +30,11 @@ public class IngestionService {
 
     public ProcessingInfo<LinkedFile, Void> ingest(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext) {
         return ingestionStatusMap.computeIfAbsent(linkedFile, file -> {
-            ProcessingInfo<LinkedFile, Void> processingInfo = new ProcessingInfo<>(linkedFile, new SimpleObjectProperty<>(ProcessingState.PROCESSING), new SimpleStringProperty(""), null);
+            ProcessingInfo<LinkedFile, Void> processingInfo = new ProcessingInfo<>(linkedFile, new SimpleObjectProperty<>(ProcessingState.PROCESSING), new SimpleObjectProperty<>(null), null);
 
             new GenerateEmbeddingsTask(linkedFile, fileEmbeddingsManager, bibDatabaseContext, filePreferences)
                     .onSuccess((v) -> processingInfo.state().set(ProcessingState.SUCCESS))
-                    .onFailure(processingInfo::setError)
+                    .onFailure(processingInfo::setException)
                     .executeWith(taskExecutor);
 
             return processingInfo;

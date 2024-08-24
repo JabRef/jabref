@@ -1,32 +1,24 @@
 package org.jabref.gui.ai.components.summary;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
-import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
-import org.jabref.logic.ai.processingstatus.ProcessingState;
-import org.jabref.logic.ai.summarization.GenerateSummaryTask;
 import org.jabref.logic.ai.summarization.SummariesStorage;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PreferencesService;
 
-import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,18 +31,23 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private final BibEntry entry;
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
-    private final FilePreferences filePreferences;
-    private final TaskExecutor taskExecutor;
 
-    public SummaryComponent(BibDatabaseContext bibDatabaseContext, BibEntry entry, AiService aiService, PreferencesService preferencesService, DialogService dialogService, TaskExecutor taskExecutor) {
-        super(aiService.getPreferences(), preferencesService.getFilePreferences(), dialogService);
+    public SummaryComponent(BibDatabaseContext bibDatabaseContext,
+                            BibEntry entry, AiService aiService,
+                            FilePreferences filePreferences,
+                            CitationKeyPatternPreferences citationKeyPatternPreferences,
+                            DialogService dialogService
+    ) {
+        super(aiService.getPreferences(), filePreferences, dialogService);
 
         this.bibDatabaseContext = bibDatabaseContext;
         this.entry = entry;
-        this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
+        this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
         this.aiService = aiService;
-        this.filePreferences = preferencesService.getFilePreferences();
-        this.taskExecutor = taskExecutor;
+
+        aiService.getSummariesService().summarize(entry, bibDatabaseContext).state().addListener(o -> rebuildUi());
+
+        rebuildUi();
     }
 
     @Override
@@ -105,49 +102,28 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private Node tryToShowSummary() {
         ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo = aiService.getSummariesService().summarize(entry, bibDatabaseContext);
 
-        switch (processingInfo.state().get()) {
-            case SUCCESS:
-                return showSummary(processingInfo.data());
-            case ERROR:
-                return showErrorNotSummarized();
-            case RUNNING:
-                return startGeneratingSummary(entry);
-        }
-
-        if (processingInfo.state() == ProcessingState.SUCCESS) {
-            return showSummary(processingInfo.data());
-        } else if (pro)
+        return switch (processingInfo.state().get()) {
+            case SUCCESS ->
+                    showSummary(processingInfo.data().get());
+            case ERROR ->
+                    showErrorWhileSummarizing(processingInfo);
+            case PROCESSING ->
+                    showErrorNotSummarized();
+        };
     }
 
-    private void showErrorWhileSummarizing(Exception e) {
-        LOGGER.error("Got an error while generating a summary for entry {}", entry.getCitationKey().orElse("<no citation key>"), e);
+    private Node showErrorWhileSummarizing(ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo) {
+        LOGGER.error("Got an error while generating a summary for entry {}", entry.getCitationKey().orElse("<no citation key>"), processingInfo.exception().get());
 
-        setContent(
-                ErrorStateComponent.withTextAreaAndButton(
-                        Localization.lang("Unable to chat"),
-                        Localization.lang("Got error while processing the file:"),
-                        e.getMessage(),
-                        Localization.lang("Regenerate"),
-                        () -> bindToEntry(currentEntry)
-                )
+        return ErrorStateComponent.withTextAreaAndButton(
+                Localization.lang("Unable to chat"),
+                Localization.lang("Got error while processing the file:"),
+                processingInfo.exception().get().getLocalizedMessage(),
+                Localization.lang("Regenerate"),
+                () -> aiService.getSummariesService().regenerateSummary(entry, bibDatabaseContext)
         );
     }
 
-
-    private Node startGeneratingSummary(BibEntry entry) {
-        assert entry.getCitationKey().isPresent();
-
-        if (!entriesUnderSummarization.contains(entry)) {
-            entriesUnderSummarization.add(entry);
-
-            new GenerateSummaryTask(bibDatabaseContext, entry.getCitationKey().get(), entry.getFiles(), aiService, filePreferences)
-                    .onSuccess(res -> rebuildUi())
-                    .onFailure(e -> rebuildUi())
-                    .executeWith(taskExecutor);
-        }
-
-        return showErrorNotSummarized();
-    }
 
     private Node showErrorNotSummarized() {
         return ErrorStateComponent.withSpinner(
@@ -157,9 +133,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     }
 
 
-    private Node bindToCorrectEntry(SummariesStorage.SummarizationRecord summary) {
-        entriesUnderSummarization.remove(entry);
-
+    private Node showSummary(SummariesStorage.SummarizationRecord summary) {
         return new SummaryShowingComponent(summary, () -> {
             if (bibDatabaseContext.getDatabasePath().isEmpty()) {
                 LOGGER.error("Bib database path is not set, but it was expected to be present. Unable to regenerate summary");
@@ -171,8 +145,8 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
                 return;
             }
 
-            aiService.getSummariesStorage().clear(bibDatabaseContext.getDatabasePath().get(), entry.getCitationKey().get());
-            rebuildUi();
+            aiService.getSummariesService().regenerateSummary(entry, bibDatabaseContext);
+            // No need to rebuildUi(), because this class listens to the state of ProcessingInfo of the summary.
         });
     }
 }

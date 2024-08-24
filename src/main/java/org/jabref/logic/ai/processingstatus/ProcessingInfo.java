@@ -1,14 +1,13 @@
 package org.jabref.logic.ai.processingstatus;
 
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.StringProperty;
 
 import jakarta.annotation.Nullable;
 
 public record ProcessingInfo<T, D>(
         T object,
         ObjectProperty<ProcessingState> state,
-        StringProperty errorMessage,
+        ObjectProperty<Exception> exception,
         ObjectProperty<D> data
 ) {
     public void setSuccess(@Nullable D data) {
@@ -17,13 +16,9 @@ public record ProcessingInfo<T, D>(
         state().set(ProcessingState.SUCCESS);
     }
 
-    public void setError(String errorMessage) {
+    public void setException(Exception exception) {
         // Listeners will probably handle only state property, so be careful to set the error message BEFORE setting the state.
-        errorMessage().set(errorMessage);
+        exception().set(exception);
         state().set(ProcessingState.ERROR);
-    }
-
-    public void setError(Exception e) {
-        setError(e.getMessage());
     }
 }

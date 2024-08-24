@@ -40,9 +40,6 @@ public class AiChatTab extends EntryEditorTab {
 
         setText(Localization.lang("AI chat"));
         setTooltip(new Tooltip(Localization.lang("Chat with AI about content of attached file(s)")));
-
-        aiService.getEmbeddingsManager().registerListener(this);
-        aiService.getEmbeddingModel().registerListener(this);
     }
 
     @Override
@@ -59,18 +56,15 @@ public class AiChatTab extends EntryEditorTab {
             aiService.getChatHistoryService().closeChatHistoryForEntry(currentEntry);
         }
 
-        AiChatGuardedComponentAi aiChatGuardedComponent =
-                new AiChatGuardedComponentAi(
-                        "entry " + entry.getCitationKey().orElse("<no citation key>"),
-                        aiService.getChatHistoryService().getChatHistoryForEntry(entry),
-                        FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
-                        dialogService,
-                        filePreferences,
-                        aiService,
-                        bibDatabaseContext,
-                        taskExecutor
-                );
-
-        setContent(aiChatGuardedComponent);
+        setContent(new AiChatGuardedComponentAi(
+                "entry " + entry.getCitationKey().orElse("<no citation key>"),
+                aiService.getChatHistoryService().getChatHistoryForEntry(entry),
+                FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
+                dialogService,
+                filePreferences,
+                aiService,
+                bibDatabaseContext,
+                taskExecutor
+        ));
     }
 }

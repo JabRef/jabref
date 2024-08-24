@@ -37,28 +37,51 @@ public class SummariesService {
 
     public ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> summarize(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
         return summariesStatusMap.computeIfAbsent(bibEntry, file -> {
-            ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo = new ProcessingInfo<>(bibEntry, new SimpleObjectProperty<>(ProcessingState.PROCESSING), new SimpleStringProperty(""), null);
+            ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo = new ProcessingInfo<>(
+                    bibEntry,
+                    new SimpleObjectProperty<>(ProcessingState.PROCESSING),
+                    new SimpleObjectProperty<>(null),
+                    new SimpleObjectProperty<>(null)
+            );
 
-            if (bibDatabaseContext.getDatabasePath().isEmpty()) {
-                startGeneratingSummary(processingInfo, bibEntry, bibDatabaseContext);
-            } else if (bibEntry.getCitationKey().isEmpty()) {
-                startGeneratingSummary(processingInfo, bibEntry, bibDatabaseContext);
-            } else {
-                Optional<SummariesStorage.SummarizationRecord> record = aiService.getSummariesStorage().get(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get());
-
-                if (record.isEmpty()) {
-                    startGeneratingSummary(processingInfo, bibEntry, bibDatabaseContext);
-                } else {
-                    processingInfo.state().set(ProcessingState.SUCCESS);
-                    processingInfo.data().set(record.get());
-                }
-            }
-
+            generateSummary(bibEntry, bibDatabaseContext, processingInfo);
             return processingInfo;
         });
     }
 
-    private void startGeneratingSummary(ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo, BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
+    private void generateSummary(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext, ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo) {
+        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
+            runGenerateSummaryTask(processingInfo, bibEntry, bibDatabaseContext);
+        } else if (bibEntry.getCitationKey().isEmpty()) {
+            runGenerateSummaryTask(processingInfo, bibEntry, bibDatabaseContext);
+        } else {
+            Optional<SummariesStorage.SummarizationRecord> record = aiService.getSummariesStorage().get(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get());
+
+            if (record.isEmpty()) {
+                runGenerateSummaryTask(processingInfo, bibEntry, bibDatabaseContext);
+            } else {
+                processingInfo.state().set(ProcessingState.SUCCESS);
+                processingInfo.data().set(record.get());
+            }
+        }
+    }
+
+    public void regenerateSummary(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
+        ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo = summarize(bibEntry, bibDatabaseContext);
+        processingInfo.state().set(ProcessingState.PROCESSING);
+
+        if (bibDatabaseContext.getDatabasePath().isEmpty()) {
+            LOGGER.info("No database path is present. Could not clear stored summary for regeneration");
+        } else if (bibEntry.getCitationKey().isEmpty()) {
+            LOGGER.info("No citation key is present. Could not clear stored summary for regeneration");
+        } else {
+            aiService.getSummariesStorage().clear(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get());
+        }
+
+        generateSummary(bibEntry, bibDatabaseContext, processingInfo);
+    }
+
+    private void runGenerateSummaryTask(ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo, BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
         new GenerateSummaryTask(bibDatabaseContext, bibEntry.getCitationKey().orElse("<no citation key>"), bibEntry.getFiles(), aiService, filePreferences)
                 .onSuccess(summary -> {
                     SummariesStorage.SummarizationRecord record = new SummariesStorage.SummarizationRecord(
@@ -78,7 +101,7 @@ public class SummariesService {
                         aiService.getSummariesStorage().set(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get(), record);
                     }
                 })
-                .onFailure(processingInfo::setError)
+                .onFailure(processingInfo::setException)
                 .executeWith(taskExecutor);
     }
 }
