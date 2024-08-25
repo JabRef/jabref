@@ -123,7 +123,7 @@ public class LuceneManager {
                 bibFieldsIndexer.removeFromIndex(entries, this);
                 return null;
             }
-        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexRemovedEvent()))
+        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexRemovedEvent(entries)))
         .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -46,8 +47,8 @@ public class SearchResults {
         return results;
     }
 
-    public Map<BibEntry, List<SearchResult>> getAllSearchResults() {
-        return searchResults;
+    public Set<BibEntry> getMatchedEntries() {
+        return searchResults.keySet();
     }
 
     public int getNumberOfResults() {

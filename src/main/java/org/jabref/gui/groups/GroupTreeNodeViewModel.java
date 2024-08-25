@@ -18,13 +18,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class GroupTreeNodeViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeNodeViewModel.class);
-
     private final GroupTreeNode node;
 
     public GroupTreeNodeViewModel(GroupTreeNode node) {
@@ -33,10 +27,7 @@ public class GroupTreeNodeViewModel {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("GroupTreeNodeViewModel{");
-        sb.append("node=").append(node);
-        sb.append('}');
-        return sb.toString();
+        return "GroupTreeNodeViewModel{" + "node=" + node + '}';
     }
 
     public GroupTreeNode getNode() {
@@ -59,15 +50,17 @@ public class GroupTreeNodeViewModel {
         AbstractGroup group = node.getGroup();
         String shortDescription = "";
         boolean showDynamic = true;
-        if (group instanceof ExplicitGroup explicitGroup) {
-            shortDescription = GroupDescriptions.getShortDescriptionExplicitGroup(explicitGroup);
-        } else if (group instanceof KeywordGroup keywordGroup) {
-            shortDescription = GroupDescriptions.getShortDescriptionKeywordGroup(keywordGroup, showDynamic);
-        } else if (group instanceof SearchGroup searchGroup) {
-            shortDescription = GroupDescriptions.getShortDescription(searchGroup, showDynamic);
-        } else {
-            shortDescription = GroupDescriptions.getShortDescriptionAllEntriesGroup();
-        }
+        shortDescription = switch (group) {
+            case ExplicitGroup explicitGroup ->
+                    GroupDescriptions.getShortDescriptionExplicitGroup(explicitGroup);
+            case KeywordGroup keywordGroup ->
+                    GroupDescriptions.getShortDescriptionKeywordGroup(keywordGroup, showDynamic);
+            case SearchGroup searchGroup ->
+                    GroupDescriptions.getShortDescription(searchGroup, showDynamic);
+            case null,
+                 default ->
+                    GroupDescriptions.getShortDescriptionAllEntriesGroup();
+        };
         return "<html>" + shortDescription + "</html>";
     }
 
@@ -112,12 +105,12 @@ public class GroupTreeNodeViewModel {
     }
 
     public boolean canMoveUp() {
-        return (getNode().getPreviousSibling() != null)
+        return (getNode().getPreviousSibling().isPresent())
                 && !(getNode().getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveDown() {
-        return (getNode().getNextSibling() != null)
+        return (getNode().getNextSibling().isPresent())
                 && !(getNode().getGroup() instanceof AllEntriesGroup);
     }
 
@@ -128,7 +121,7 @@ public class GroupTreeNodeViewModel {
     }
 
     public boolean canMoveRight() {
-        return (getNode().getPreviousSibling() != null)
+        return (getNode().getPreviousSibling().isPresent())
                 && !(getNode().getGroup() instanceof AllEntriesGroup);
     }
 

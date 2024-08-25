@@ -1,9 +1,12 @@
 package org.jabref.model.groups;
 
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Objects;
 
-import org.jabref.logic.search.LuceneManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
@@ -18,8 +21,8 @@ import org.slf4j.LoggerFactory;
 public class SearchGroup extends AbstractGroup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
+    private final ObservableMap<Integer, BibEntry> matchedEntries = FXCollections.observableHashMap();
     private final SearchQuery query;
-    private LuceneManager luceneManager;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
         super(name, context);
@@ -38,10 +41,6 @@ public class SearchGroup extends AbstractGroup {
         return query.getSearchFlags();
     }
 
-    public void setLuceneManager(LuceneManager luceneManager) {
-        this.luceneManager = luceneManager;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -58,10 +57,24 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public boolean contains(BibEntry entry) {
-        if (luceneManager == null) {
-            return false;
+        return matchedEntries.containsKey(System.identityHashCode(entry));
+    }
+
+    public void setMatchedEntries(Collection<BibEntry> entries) {
+        matchedEntries.clear();
+        entries.forEach(entry -> matchedEntries.put(System.identityHashCode(entry), entry));
+    }
+
+    public void updateEntry(BibEntry entry, boolean matched) {
+        if (matched) {
+            matchedEntries.put(System.identityHashCode(entry), entry);
+        } else {
+            matchedEntries.remove(System.identityHashCode(entry));
         }
-        return luceneManager.isMatched(entry, query);
+    }
+
+    public ObservableMap<Integer, BibEntry> getMatchedEntries() {
+        return matchedEntries;
     }
 
     @Override

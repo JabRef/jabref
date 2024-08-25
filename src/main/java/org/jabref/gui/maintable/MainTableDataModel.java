@@ -31,6 +31,7 @@ import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
+import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
@@ -220,6 +221,9 @@ public class MainTableDataModel {
                             viewModel.searchScoreProperty().set(0);
                             viewModel.hasFullTextResultsProperty().set(false);
                         }
+
+                        bibDatabaseContext.getMetaData().getGroups().ifPresent(root -> updateSearchGroupsMatches(entry, root));
+
                         updateEntrySearchMatch(viewModel, isMatched, isFloatingMode);
                         updateEntryGroupMatch(viewModel, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
                     }
@@ -230,17 +234,47 @@ public class MainTableDataModel {
 
         @Subscribe
         public void listen(IndexStartedEvent indexStartedEvent) {
-            bibDatabaseContext.getMetaData().getGroups().ifPresent(this::setLuceneManagerForSearchGroups);
+            bibDatabaseContext.getMetaData().getGroups().ifPresent(this::setSearchGroupsMatches);
             updateSearchMatches(searchQueryProperty.get());
             updateGroupMatches(selectedGroupsProperty);
         }
 
-        private void setLuceneManagerForSearchGroups(GroupTreeNode root) {
+        private void setSearchGroupsMatches(GroupTreeNode root) {
             for (GroupTreeNode node : root.getChildren()) {
                 if (node.getGroup() instanceof SearchGroup searchGroup) {
-                    searchGroup.setLuceneManager(luceneManager);
+                    SearchQuery query = searchGroup.getQuery();
+                    SearchResults searchResults = luceneManager.search(query);
+                    searchGroup.setMatchedEntries(searchResults.getMatchedEntries());
                 }
-                setLuceneManagerForSearchGroups(node);
+                setSearchGroupsMatches(node);
+            }
+        }
+
+        private void updateSearchGroupsMatches(BibEntry entry, GroupTreeNode root) {
+            for (GroupTreeNode node : root.getChildren()) {
+                if (node.getGroup() instanceof SearchGroup searchGroup) {
+                    searchGroup.updateEntry(entry, luceneManager.isMatched(entry, searchGroup.getQuery()));
+                    searchGroup.updateEntry(entry, node.getSearchMatcher().isMatch(entry));
+                }
+                updateSearchGroupsMatches(entry, node);
+            }
+        }
+
+        @Subscribe
+        public void listen(IndexRemovedEvent indexRemovedEvent) {
+            BackgroundTask.wrap(() -> {
+                for (BibEntry entry : indexRemovedEvent.removedEntries()) {
+                    bibDatabaseContext.getMetaData().getGroups().ifPresent(root -> removeSearchGroupsMatches(entry, root));
+                }
+            }).executeWith(taskExecutor);
+        }
+
+        private void removeSearchGroupsMatches(BibEntry entry, GroupTreeNode root) {
+            for (GroupTreeNode node : root.getChildren()) {
+                if (node.getGroup() instanceof SearchGroup searchGroup) {
+                    searchGroup.updateEntry(entry, false);
+                }
+                removeSearchGroupsMatches(entry, node);
             }
         }
     }

@@ -59,7 +59,7 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
-    private final ObservableMap<Integer, BibEntry> matchedEntries = FXCollections.observableHashMap();
+    private final ObservableMap<Integer, BibEntry> matchedEntries;
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
@@ -94,6 +94,13 @@ public class GroupNodeViewModel {
         if (groupNode.getGroup() instanceof TexGroup) {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         }
+
+        if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
+            matchedEntries = searchGroup.getMatchedEntries();
+        } else {
+            matchedEntries = FXCollections.observableHashMap();
+        }
+
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
@@ -231,8 +238,13 @@ public class GroupNodeViewModel {
 
     /**
      * Gets invoked if an entry in the current database changes.
+     *
+     * @implNote Search groups are updated in {@link org.jabref.gui.maintable.MainTableDataModel.LuceneIndexListener#updateSearchGroupsMatches(org.jabref.model.entry.BibEntry, org.jabref.model.groups.GroupTreeNode)}.
      */
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
+        if (groupNode.getGroup() instanceof SearchGroup) {
+            return;
+        }
         while (change.next()) {
             if (change.wasPermutated()) {
                 // Nothing to do, as permutation doesn't change matched entries
@@ -388,7 +400,7 @@ public class GroupNodeViewModel {
             return true;
         } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)
                             .orElse(false);
         } else if (group instanceof KeywordGroup) {
@@ -416,7 +428,7 @@ public class GroupNodeViewModel {
         } else if (group instanceof KeywordGroup) {
             // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
         } else if (group instanceof SearchGroup) {
@@ -441,7 +453,7 @@ public class GroupNodeViewModel {
         } else if (group instanceof KeywordGroup) {
             // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
         } else if (group instanceof SearchGroup) {
@@ -466,7 +478,7 @@ public class GroupNodeViewModel {
         } else if (group instanceof KeywordGroup) {
             // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
         } else if (group instanceof SearchGroup) {
@@ -491,7 +503,7 @@ public class GroupNodeViewModel {
         } else if (group instanceof KeywordGroup) {
             // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
             return groupNode.getParent()
-                            .map(parent -> parent.getGroup())
+                            .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
         } else if (group instanceof SearchGroup) {
