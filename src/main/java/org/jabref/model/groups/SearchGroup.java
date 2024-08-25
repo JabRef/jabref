@@ -5,8 +5,8 @@ import java.util.Objects;
 
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.search.GroupSearchQuery;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.model.search.SearchQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,19 +18,19 @@ import org.slf4j.LoggerFactory;
 public class SearchGroup extends AbstractGroup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
-    private final GroupSearchQuery query;
+    private final SearchQuery query;
     private LuceneManager luceneManager;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
         super(name, context);
-        this.query = new GroupSearchQuery(searchExpression, searchFlags);
+        this.query = new SearchQuery(searchExpression, searchFlags);
     }
 
     public String getSearchExpression() {
         return query.getSearchExpression();
     }
 
-    public GroupSearchQuery getQuery() {
+    public SearchQuery getQuery() {
         return query;
     }
 

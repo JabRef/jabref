@@ -1,4 +1,4 @@
 package org.jabref.model.search.event;
 
-record IndexStartedEvent() {
+public record IndexStartedEvent() {
 }
