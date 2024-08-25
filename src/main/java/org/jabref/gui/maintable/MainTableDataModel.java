@@ -83,9 +83,7 @@ public class MainTableDataModel {
         this.selectedGroupsProperty = selectedGroupsProperty;
         this.searchQueryProperty = searchQueryProperty;
         this.indexUpdatedListener = new LuceneIndexListener();
-        if (luceneManager != null) {
-            this.luceneManager.registerListener(indexUpdatedListener);
-        }
+        this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);
 
         resetFieldFormatter();
 
@@ -188,9 +186,7 @@ public class MainTableDataModel {
         searchDisplayModeSubscription.unsubscribe();
         selectedGroupsSubscription.unsubscribe();
         groupViewModeSubscription.unsubscribe();
-        if (luceneManager != null) {
-            luceneManager.unregisterListener(indexUpdatedListener);
-        }
+        bibDatabaseContext.getDatabase().unregisterListener(indexUpdatedListener);
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {

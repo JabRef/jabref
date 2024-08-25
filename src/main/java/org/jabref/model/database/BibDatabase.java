@@ -550,6 +550,10 @@ public class BibDatabase {
         this.eventBus.register(listener);
     }
 
+    public void postEvent(Object event) {
+        this.eventBus.post(event);
+    }
+
     /**
      * Unregisters an listener object.
      *

@@ -23,15 +23,14 @@ import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.preferences.FilePreferences;
 
-import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LuceneManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(LuceneManager.class);
 
-    private final EventBus eventBus = new EventBus();
     private final TaskExecutor taskExecutor;
+    private final BibDatabaseContext databaseContext;
     private final BooleanProperty shouldIndexLinkedFiles;
     private final BooleanProperty isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
     private final ChangeListener<Boolean> preferencesListener;
@@ -41,7 +40,7 @@ public class LuceneManager {
 
     public LuceneManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences) {
         this.taskExecutor = executor;
-
+        this.databaseContext = databaseContext;
         this.shouldIndexLinkedFiles = preferences.fulltextIndexLinkedFilesProperty();
         this.preferencesListener = (observable, oldValue, newValue) -> bindToPreferences(newValue);
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
@@ -82,7 +81,7 @@ public class LuceneManager {
                 return null;
             }
         }.showToUser(true)
-         .onFinished(() -> this.eventBus.post(new IndexStartedEvent()))
+         .onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexStartedEvent()))
          .executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {
@@ -103,7 +102,7 @@ public class LuceneManager {
                 bibFieldsIndexer.addToIndex(entries, this);
                 return null;
             }
-        }.onFinished(() -> this.eventBus.post(new IndexAddedOrUpdatedEvent(entries)))
+        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(entries)))
          .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
@@ -124,7 +123,7 @@ public class LuceneManager {
                 bibFieldsIndexer.removeFromIndex(entries, this);
                 return null;
             }
-        }.onFinished(() -> this.eventBus.post(new IndexRemovedEvent()))
+        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexRemovedEvent()))
         .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {
@@ -145,7 +144,7 @@ public class LuceneManager {
                 bibFieldsIndexer.updateEntry(entry, oldValue, newValue, this);
                 return null;
             }
-        }.onFinished(() -> this.eventBus.post(new IndexAddedOrUpdatedEvent(List.of(entry))))
+        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
          .showToUser(true).executeWith(taskExecutor);
 
         if (isLinkedFile && shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
@@ -166,7 +165,7 @@ public class LuceneManager {
                 bibFieldsIndexer.updateEntry(entry, "", "", this);
                 return null;
             }
-        }.onFinished(() -> this.eventBus.post(new IndexAddedOrUpdatedEvent(List.of(entry))))
+        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
         .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
@@ -187,7 +186,7 @@ public class LuceneManager {
                 bibFieldsIndexer.rebuildIndex(this);
                 return null;
             }
-        }.onFinished(() -> this.eventBus.post(new IndexStartedEvent()))
+        }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexStartedEvent()))
          .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {
@@ -211,14 +210,6 @@ public class LuceneManager {
         LOGGER.debug("Blocking linked files indexer");
         isLinkedFilesIndexerBlocked.set(true);
         return () -> isLinkedFilesIndexerBlocked.set(false);
-    }
-
-    public void registerListener(Object listener) {
-        this.eventBus.register(listener);
-    }
-
-    public void unregisterListener(Object listener) {
-        eventBus.unregister(listener);
     }
 
     public SearchResults search(SearchQuery query) {
