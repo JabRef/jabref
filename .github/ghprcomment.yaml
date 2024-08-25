@@ -1,0 +1,36 @@
+- jobName: Checkstyle
+  message: |
+    Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+    We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
+    The tool reviewdog already placed comments on GitHub to indicate the places. See the tab "Files" in you PR.
+    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues.
+
+
+    You can check review dog's comments at the tab "Files changed" of your pull request.
+- jobName: OpenRewrite
+  message: |
+    Your code currently does not meet JabRef's code guidelines.
+    We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
+    The issues found can be **automatically fixed**.
+    Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "OpenRewrite".
+- jobName: Modernizer
+  message: |
+    Your code currently does not meet JabRef's code guidelines.
+    We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
+    Please fix the detected errors, commit, and push.
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
+- jobName: Markdown
+  message: |
+    You modified Markdown (`*.md`) files and did not meet JabRef's rules for consistently formatted Markdown files.
+    To ensure consistent styling, we have [markdown-lint](https://github.com/DavidAnson/markdownlint) in place.
+    [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Markdown".
+- jobName: CHANGELOG.md
+  message: |
+    While the PR was in progress, a new version of JabRef has been released.
+    You have to merge `upstream/main` and move your entry in `CHANGELOG.md` up to the section `## [Unreleased]`.
