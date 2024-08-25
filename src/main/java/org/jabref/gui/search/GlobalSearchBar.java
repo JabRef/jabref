@@ -132,7 +132,7 @@ public class GlobalSearchBar extends HBox {
                         return Localization.lang("Search failed: illegal search expression");
                     } else if (invalid) {
                         searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, true);
-                        return Localization.lang("Invalid regular expression");
+                        return Localization.lang("Invalid regular expression.");
                     } else if (searchQuery.isEmpty()) {
                         searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
                         return "";
