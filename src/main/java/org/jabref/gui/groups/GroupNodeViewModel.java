@@ -14,6 +14,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
 
@@ -58,15 +59,17 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
-    private final ObservableList<BibEntry> matchedEntries = FXCollections.observableArrayList();
+    private final ObservableMap<Integer, BibEntry> matchedEntries = FXCollections.observableHashMap();
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
     private final BooleanBinding allSelectedEntriesMatched;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
-    private final ObservableList<BibEntry> entriesList;
     private final PreferencesService preferencesService;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final ObservableList<BibEntry> entriesList;
+    @SuppressWarnings("FieldCanBeLocal")
     private final InvalidationListener onInvalidatedGroup = listener -> refreshGroup();
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
@@ -236,22 +239,18 @@ public class GroupNodeViewModel {
             } else if (change.wasUpdated()) {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
                     if (groupNode.matches(changedEntry)) {
-                        if (!matchedEntries.contains(changedEntry)) {
-                            matchedEntries.add(changedEntry);
-                        }
+                        matchedEntries.put(System.identityHashCode(changedEntry), changedEntry);
                     } else {
-                        matchedEntries.remove(changedEntry);
+                        matchedEntries.remove(System.identityHashCode(changedEntry));
                     }
                 }
             } else {
                 for (BibEntry removedEntry : change.getRemoved()) {
-                    matchedEntries.remove(removedEntry);
+                    matchedEntries.remove(System.identityHashCode(removedEntry));
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
                     if (groupNode.matches(addedEntry)) {
-                        if (!matchedEntries.contains(addedEntry)) {
-                            matchedEntries.add(addedEntry);
-                        }
+                        matchedEntries.put(System.identityHashCode(addedEntry), addedEntry);
                     }
                 }
             }
@@ -278,7 +277,7 @@ public class GroupNodeViewModel {
                     .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
                     .onSuccess(entries -> {
                         matchedEntries.clear();
-                        matchedEntries.addAll(entries);
+                        entries.forEach(entry -> matchedEntries.put(System.identityHashCode(entry), entry));
                     })
                     .executeWith(taskExecutor);
         }
