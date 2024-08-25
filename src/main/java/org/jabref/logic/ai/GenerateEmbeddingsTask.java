@@ -65,6 +65,8 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
         LOGGER.info("Finished embeddings generation task for entry {}", citationKey);
 
+        progressCounter.stop();
+
         return null;
     }
 
