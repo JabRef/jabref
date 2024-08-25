@@ -1,4 +1,4 @@
-package org.jabref.model.search.envent;
+package org.jabref.model.search.event;
 
 import java.util.List;
 

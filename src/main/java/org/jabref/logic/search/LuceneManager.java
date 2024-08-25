@@ -18,9 +18,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
-import org.jabref.model.search.envent.IndexAddedOrUpdatedEvent;
-import org.jabref.model.search.envent.IndexRemovedEvent;
-import org.jabref.model.search.envent.IndexStartedEvent;
+import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
+import org.jabref.model.search.event.IndexRemovedEvent;
+import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.preferences.FilePreferences;
 
 import com.google.common.eventbus.EventBus;
