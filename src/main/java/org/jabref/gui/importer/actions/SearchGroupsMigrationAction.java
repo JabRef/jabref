@@ -1,14 +1,16 @@
 package org.jabref.gui.importer.actions;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.search.rules.GrammarBasedSearchRule;
+import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
@@ -34,19 +36,15 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
         }
 
         Optional<GroupTreeNode> groups = parserResult.getMetaData().getGroups();
-        if (groups.isEmpty()) {
-            return false;
-        }
-
-        return groupOrSubgroupIsSearchGrooup(groups.get());
+        return groups.filter(this::groupOrSubgroupIsSearchGroup).isPresent();
     }
 
-    private boolean groupOrSubgroupIsSearchGrooup(GroupTreeNode groupTreeNode) {
+    private boolean groupOrSubgroupIsSearchGroup(GroupTreeNode groupTreeNode) {
         if (groupTreeNode.getGroup() instanceof SearchGroup) {
             return true;
         }
         for (GroupTreeNode child : groupTreeNode.getChildren()) {
-            if (groupOrSubgroupIsSearchGrooup(child)) {
+            if (groupOrSubgroupIsSearchGroup(child)) {
                 return true;
             }
         }
@@ -55,10 +53,9 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
 
     @Override
     public void performAction(ParserResult parserResult, DialogService dialogService, PreferencesService preferencesService) {
-        // TODO: Localization
-        if (!dialogService.showConfirmationDialogAndWait("Search groups migration of " + parserResult.getPath().map(path -> path.toString()).orElse(""),
-                "The search groups syntax is outdated. Do you want to migrate to the new syntax?",
-                "Migrate", "Cancel")) {
+        if (!dialogService.showConfirmationDialogAndWait(Localization.lang("Search groups migration of %0", parserResult.getPath().map(Path::toString).orElse("")),
+                Localization.lang("The search groups syntax is outdated. Do you want to migrate to the new syntax?"),
+                Localization.lang("Migrate"), Localization.lang("Cancel"))) {
             return;
         }
 
@@ -94,10 +91,10 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
     private static SearchParser.StartContext getStartContext(String searchExpression) {
         SearchLexer lexer = new SearchLexer(new ANTLRInputStream(searchExpression));
         lexer.removeErrorListeners(); // no infos on file system
-        lexer.addErrorListener(GrammarBasedSearchRule.ThrowingErrorListener.INSTANCE);
+        lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
         SearchParser parser = new SearchParser(new CommonTokenStream(lexer));
         parser.removeErrorListeners(); // no infos on file system
-        parser.addErrorListener(GrammarBasedSearchRule.ThrowingErrorListener.INSTANCE);
+        parser.addErrorListener(ThrowingErrorListener.INSTANCE);
         parser.setErrorHandler(new BailErrorStrategy()); // ParseCancellationException on parse errors
         return parser.start();
     }
