@@ -11,6 +11,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.data.message.ChatMessage;
 
@@ -18,11 +19,12 @@ public class AiChatDialog extends BaseDialog<Void> {
 
     public AiChatDialog(StringProperty name,
                         ObservableList<ChatMessage> chatHistory,
-                        ObservableList<BibEntry> entries,
-                        DialogService dialogService,
-                        FilePreferences filePreferences,
-                        AiService aiService,
                         BibDatabaseContext bibDatabaseContext,
+                        ObservableList<BibEntry> entries,
+                        AiService aiService,
+                        DialogService dialogService,
+                        AiPreferences aiPreferences,
+                        FilePreferences filePreferences,
                         TaskExecutor taskExecutor
     ) {
         this.initModality(Modality.NONE);
@@ -32,11 +34,12 @@ public class AiChatDialog extends BaseDialog<Void> {
         this.getDialogPane().setContent(new AiChatGuardedComponent(
                 name,
                 chatHistory,
-                entries,
-                dialogService,
-                filePreferences,
-                aiService,
                 bibDatabaseContext,
+                entries,
+                aiService,
+                dialogService,
+                aiPreferences,
+                filePreferences,
                 taskExecutor
         ));
     }

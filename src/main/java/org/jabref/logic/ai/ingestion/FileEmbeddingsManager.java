@@ -6,15 +6,14 @@ import java.util.Optional;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
-import org.jabref.logic.ai.ingestion.model.JabRefEmbeddingModel;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
-import org.h2.mvstore.MVStore;
 
 /**
  * This class is responsible for managing the embeddings cache. The cache is saved in a local user directory.
@@ -34,17 +33,21 @@ public class FileEmbeddingsManager {
     private final AiPreferences aiPreferences;
     private final ReadOnlyBooleanProperty shutdownProperty;
 
-    private final MVStoreEmbeddingStore embeddingStore;
+    private final EmbeddingStore<TextSegment> embeddingStore;
     private final FullyIngestedDocumentsTracker fullyIngestedDocumentsTracker;
     private final LowLevelIngestor lowLevelIngestor;
 
-    public FileEmbeddingsManager(AiPreferences aiPreferences, ReadOnlyBooleanProperty shutdownProperty, JabRefEmbeddingModel jabRefEmbeddingModel, MVStore mvStore) {
+    public FileEmbeddingsManager(AiPreferences aiPreferences,
+                                 ReadOnlyBooleanProperty shutdownProperty,
+                                 EmbeddingModel embeddingModel,
+                                 EmbeddingStore<TextSegment> embeddingStore,
+                                 FullyIngestedDocumentsTracker fullyIngestedDocumentsTracker
+    ) {
         this.aiPreferences = aiPreferences;
         this.shutdownProperty = shutdownProperty;
-
-        this.embeddingStore = new MVStoreEmbeddingStore(mvStore);
-        this.fullyIngestedDocumentsTracker = new FullyIngestedDocumentsTracker(mvStore);
-        this.lowLevelIngestor = new LowLevelIngestor(aiPreferences, embeddingStore, jabRefEmbeddingModel);
+        this.embeddingStore = embeddingStore;
+        this.fullyIngestedDocumentsTracker = fullyIngestedDocumentsTracker;
+        this.lowLevelIngestor = new LowLevelIngestor(aiPreferences, embeddingStore, embeddingModel);
 
         setupListeningToPreferencesChanges();
     }
@@ -73,10 +76,6 @@ public class FileEmbeddingsManager {
 
     public Optional<Long> getIngestedDocumentModificationTimeInSeconds(String link) {
         return fullyIngestedDocumentsTracker.getIngestedDocumentModificationTimeInSeconds(link);
-    }
-
-    public void registerListener(Object object) {
-        fullyIngestedDocumentsTracker.registerListener(object);
     }
 
     public void clearEmbeddingsFor(List<LinkedFile> linkedFiles) {
