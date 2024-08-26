@@ -63,9 +63,8 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         }
 
         showToUser(false);
-
         LOGGER.info("Finished embeddings generation task for file \"{}\"", linkedFile.getLink());
-
+        progressCounter.stop();
         return null;
     }
 
