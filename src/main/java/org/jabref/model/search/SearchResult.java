@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.model.entry.BibEntry;
-
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
@@ -22,7 +20,6 @@ public final class SearchResult {
     private final Highlighter highlighter;
     private List<String> contentResultStringsHtml;
     private List<String> annotationsResultStringsHtml;
-    private List<String> bibEntryStringsHtml;
 
     private SearchResult(float luceneScore,
                          boolean hasFulltextResults,
@@ -40,8 +37,8 @@ public final class SearchResult {
         this.highlighter = highlighter;
     }
 
-    public SearchResult(float luceneScore, Highlighter highlighter) {
-        this(luceneScore, false, "", "", "", -1, highlighter);
+    public SearchResult(float luceneScore) {
+        this(luceneScore, false, "", "", "", -1, null);
     }
 
     public SearchResult(float luceneScore, String path, String pageContent, String annotation, int pageNumber, Highlighter highlighter) {
@@ -60,13 +57,6 @@ public final class SearchResult {
             annotationsResultStringsHtml = getHighlighterFragments(highlighter, SearchFieldConstants.ANNOTATIONS, annotation);
         }
         return annotationsResultStringsHtml;
-    }
-
-    public List<String> getBibEntryStringsHtml(BibEntry bibEntry) {
-        if (bibEntryStringsHtml == null) {
-            bibEntryStringsHtml = getHighlighterFragments(highlighter, SearchFieldConstants.ENTRY_ID, bibEntry.getParsedSerialization());
-        }
-        return bibEntryStringsHtml;
     }
 
     public float getLuceneScore() {

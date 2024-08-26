@@ -127,7 +127,7 @@ public final class LuceneSearcher {
                 }
             } else {
                 String entryId = getFieldContents(document, SearchFieldConstants.ENTRY_ID);
-                searchResults.addSearchResult(entriesMap.get(entryId), new SearchResult(score, highlighter));
+                searchResults.addSearchResult(entriesMap.get(entryId), new SearchResult(score));
             }
         }
         LOGGER.debug("Mapping search results took {} ms", System.currentTimeMillis() - startTime);
