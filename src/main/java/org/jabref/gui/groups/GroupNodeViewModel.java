@@ -45,9 +45,14 @@ import org.jabref.model.groups.LastNameGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
+import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
+import org.jabref.model.search.event.IndexClosedEvent;
+import org.jabref.model.search.event.IndexRemovedEvent;
+import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
+import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 
@@ -59,7 +64,7 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
-    private final ObservableMap<Integer, BibEntry> matchedEntries;
+    private final ObservableMap<Integer, BibEntry> matchedEntries = FXCollections.observableHashMap();
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
@@ -95,12 +100,6 @@ public class GroupNodeViewModel {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         }
 
-        if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-            matchedEntries = searchGroup.getMatchedEntries();
-        } else {
-            matchedEntries = FXCollections.observableHashMap();
-        }
-
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
         EasyBind.subscribe(preferencesService.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
@@ -116,6 +115,8 @@ public class GroupNodeViewModel {
         anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
         // 'all' returns 'true' for empty streams, so this has to be checked explicitly
         allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
+
+        this.databaseContext.getDatabase().registerListener(new LuceneIndexListener());
     }
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, PreferencesService preferencesService) {
@@ -239,7 +240,7 @@ public class GroupNodeViewModel {
     /**
      * Gets invoked if an entry in the current database changes.
      *
-     * @implNote Search groups are updated in {@link org.jabref.gui.maintable.MainTableDataModel.LuceneIndexListener#updateSearchGroupsMatches(org.jabref.model.entry.BibEntry, org.jabref.model.groups.GroupTreeNode)}.
+     * @implNote Search groups are updated in {@link LuceneIndexListener}.
      */
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
         if (groupNode.getGroup() instanceof SearchGroup) {
@@ -516,6 +517,48 @@ public class GroupNodeViewModel {
             return true;
         } else {
             throw new UnsupportedOperationException("isEditable method not yet implemented in group: " + group.getClass().getName());
+        }
+    }
+
+    class LuceneIndexListener {
+        @Subscribe
+        public void listen(IndexStartedEvent event) {
+            if (groupNode.getGroup() instanceof SearchGroup group) {
+                group.setLuceneManager(stateManager.getLuceneManager(databaseContext).get());
+                refreshGroup();
+            }
+        }
+
+        @Subscribe
+        public void listen(IndexAddedOrUpdatedEvent event) {
+            if (groupNode.getGroup() instanceof SearchGroup) {
+                BackgroundTask.wrap(() -> {
+                    for (BibEntry entry : event.entries()) {
+                        if (groupNode.matches(entry)) {
+                            matchedEntries.put(System.identityHashCode(entry), entry);
+                        } else {
+                            matchedEntries.remove(System.identityHashCode(entry));
+                        }
+                    }
+                }).executeWith(taskExecutor);
+            }
+        }
+
+        @Subscribe
+        public void listen(IndexRemovedEvent event) {
+            if (groupNode.getGroup() instanceof SearchGroup) {
+                for (BibEntry entry : event.entries()) {
+                    matchedEntries.remove(System.identityHashCode(entry));
+                }
+            }
+        }
+
+        @Subscribe
+        public void listen(IndexClosedEvent event) {
+            if (groupNode.getGroup() instanceof SearchGroup group) {
+                group.setLuceneManager(null);
+                databaseContext.getDatabase().unregisterListener(this);
+            }
         }
     }
 }

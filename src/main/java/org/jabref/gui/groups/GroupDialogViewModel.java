@@ -24,6 +24,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
@@ -111,19 +112,22 @@ public class GroupDialogViewModel {
     private final AbstractGroup editedGroup;
     private final GroupTreeNode parentNode;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final StateManager stateManager;
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
                                 PreferencesService preferencesService,
                                 @Nullable AbstractGroup editedGroup,
                                 @Nullable GroupTreeNode parentNode,
-                                FileUpdateMonitor fileUpdateMonitor) {
+                                FileUpdateMonitor fileUpdateMonitor,
+                                StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
         this.parentNode = parentNode;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.stateManager = stateManager;
 
         setupValidation();
         setValues();
@@ -332,7 +336,8 @@ public class GroupDialogViewModel {
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
                         searchGroupSearchTermProperty.getValue().trim(),
-                        searchFlagsProperty.getValue());
+                        searchFlagsProperty.getValue(),
+                        stateManager.getLuceneManager(currentDatabase).orElse(null));
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical

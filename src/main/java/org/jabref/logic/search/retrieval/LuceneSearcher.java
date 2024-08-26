@@ -139,7 +139,7 @@ public final class LuceneSearcher {
     }
 
     private static IndexSearcher getIndexedSearcher(SearcherManager searcherManager) throws IOException {
-        searcherManager.maybeRefresh();
+        searcherManager.maybeRefreshBlocking();
         return searcherManager.acquire();
     }
 

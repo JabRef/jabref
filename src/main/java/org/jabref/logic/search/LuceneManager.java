@@ -19,6 +19,7 @@ import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
+import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.preferences.FilePreferences;
@@ -204,6 +205,7 @@ public class LuceneManager {
         bibFieldsIndexer.close();
         shouldIndexLinkedFiles.removeListener(preferencesListener);
         linkedFilesIndexer.close();
+        databaseContext.getDatabase().postEvent(new IndexClosedEvent());
     }
 
     public AutoCloseable blockLinkedFileIndexer() {

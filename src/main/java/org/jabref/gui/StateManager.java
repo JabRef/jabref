@@ -25,6 +25,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
@@ -57,6 +58,7 @@ public class StateManager {
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
+    private final ObservableMap<String, LuceneManager> luceneManagers = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final IntegerProperty searchResultSize = new SimpleIntegerProperty(0);
@@ -119,6 +121,14 @@ public class StateManager {
 
     public void clearSelectedGroups(BibDatabaseContext context) {
         selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).clear();
+    }
+
+    public void setLuceneManager(BibDatabaseContext database, LuceneManager luceneManager) {
+        luceneManagers.put(database.getUid(), luceneManager);
+    }
+
+    public Optional<LuceneManager> getLuceneManager(BibDatabaseContext database) {
+        return Optional.of(luceneManagers.get(database.getUid()));
     }
 
     public Optional<BibDatabaseContext> getActiveDatabase() {

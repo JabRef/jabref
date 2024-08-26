@@ -30,6 +30,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -113,6 +114,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private StateManager stateManager;
 
     public GroupDialogView(BibDatabaseContext currentDatabase,
                            @Nullable GroupTreeNode parentNode,
@@ -170,7 +172,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, stateManager);
 
         setResultConverter(viewModel::resultConverter);
 
