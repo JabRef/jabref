@@ -1,15 +1,14 @@
 package org.jabref.logic.ai.chatting;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.ai.AiDefaultPreferences;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.ingestion.FileEmbeddingsManager;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.model.entry.BibEntry;
@@ -24,13 +23,17 @@ import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.TokenWindowChatMemory;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.rag.DefaultRetrievalAugmentor;
 import dev.langchain4j.rag.RetrievalAugmentor;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
+import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.filter.Filter;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import jakarta.annotation.Nullable;
@@ -40,7 +43,12 @@ import org.slf4j.LoggerFactory;
 public class AiChatLogic {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatLogic.class);
 
-    private final AiService aiService;
+    private final AiPreferences aiPreferences;
+    private final ChatLanguageModel chatLanguageModel;
+    private final EmbeddingModel embeddingModel;
+    private final EmbeddingStore<TextSegment> embeddingStore;
+    private final Executor cachedThreadPool;
+
     private final ObservableList<ChatMessage> chatHistory;
     private final ObservableList<BibEntry> entries;
     private final StringProperty name;
@@ -48,8 +56,20 @@ public class AiChatLogic {
     private ChatMemory chatMemory;
     private Chain<String, String> chain;
 
-    public AiChatLogic(AiService aiService, StringProperty name, ObservableList<ChatMessage> chatHistory, ObservableList<BibEntry> entries) {
-        this.aiService = aiService;
+    public AiChatLogic(AiPreferences aiPreferences,
+                       ChatLanguageModel chatLanguageModel,
+                       EmbeddingModel embeddingModel,
+                       EmbeddingStore<TextSegment> embeddingStore,
+                       Executor cachedThreadPool,
+                       StringProperty name,
+                       ObservableList<ChatMessage> chatHistory,
+                       ObservableList<BibEntry> entries
+    ) {
+        this.aiPreferences = aiPreferences;
+        this.chatLanguageModel = chatLanguageModel;
+        this.embeddingModel = embeddingModel;
+        this.embeddingStore = embeddingStore;
+        this.cachedThreadPool = cachedThreadPool;
         this.chatHistory = chatHistory;
         this.entries = entries;
         this.name = name;
@@ -61,8 +81,6 @@ public class AiChatLogic {
     }
 
     private void setupListeningToPreferencesChanges() {
-        AiPreferences aiPreferences = aiService.getPreferences();
-
         aiPreferences.instructionProperty().addListener(obs -> setSystemMessage(aiPreferences.getInstruction()));
         aiPreferences.contextWindowSizeProperty().addListener(obs -> rebuildFull(chatMemory.messages()));
     }
@@ -73,8 +91,6 @@ public class AiChatLogic {
     }
 
     private void rebuildChatMemory(List<ChatMessage> chatMessages) {
-        AiPreferences aiPreferences = aiService.getPreferences();
-
         this.chatMemory = TokenWindowChatMemory
                 .builder()
                 .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenizer())
@@ -86,8 +102,6 @@ public class AiChatLogic {
     }
 
     private void rebuildChain() {
-        AiPreferences aiPreferences = aiService.getPreferences();
-
         List<LinkedFile> linkedFiles = ListUtil.getLinkedFiles(entries).toList();
         @Nullable Filter filter;
 
@@ -106,9 +120,9 @@ public class AiChatLogic {
 
         ContentRetriever contentRetriever = EmbeddingStoreContentRetriever
                 .builder()
-                .embeddingStore(aiService.getEmbeddingsManager().getEmbeddingsStore())
+                .embeddingStore(embeddingStore)
                 .filter(filter)
-                .embeddingModel(aiService.getEmbeddingModel())
+                .embeddingModel(embeddingModel)
                 .maxResults(aiPreferences.getRagMaxResultsCount())
                 .minScore(aiPreferences.getRagMinScore())
                 .build();
@@ -116,12 +130,12 @@ public class AiChatLogic {
         RetrievalAugmentor retrievalAugmentor = DefaultRetrievalAugmentor
                 .builder()
                 .contentRetriever(contentRetriever)
-                .executor(aiService.getCachedThreadPool())
+                .executor(cachedThreadPool)
                 .build();
 
         this.chain = ConversationalRetrievalChain
                 .builder()
-                .chatLanguageModel(aiService.getChatLanguageModel())
+                .chatLanguageModel(chatLanguageModel)
                 .retrievalAugmentor(retrievalAugmentor)
                 .chatMemory(chatMemory)
                 .build();
@@ -141,7 +155,7 @@ public class AiChatLogic {
         // Message will be automatically added to ChatMemory through ConversationalRetrievalChain.
 
         LOGGER.info("Sending message to AI provider ({}) for answering in {}: {}",
-                AiDefaultPreferences.PROVIDERS_API_URLS.get(aiService.getPreferences().getAiProvider()),
+                AiDefaultPreferences.PROVIDERS_API_URLS.get(aiPreferences.getAiProvider()),
                 name.get(),
                 message.singleText());
 

@@ -17,27 +17,32 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.ai.AiPreferences;
 
 public class AiChatTab extends EntryEditorTab {
+    private final BibDatabaseContext bibDatabaseContext;
+    private final AiService aiService;
     private final DialogService dialogService;
+    private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
     private final EntryEditorPreferences entryEditorPreferences;
-    private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
-    private final AiService aiService;
 
-    public AiChatTab(DialogService dialogService,
-                     PreferencesService preferencesService,
+    public AiChatTab(BibDatabaseContext bibDatabaseContext,
                      AiService aiService,
-                     BibDatabaseContext bibDatabaseContext,
-                     TaskExecutor taskExecutor) {
+                     DialogService dialogService,
+                     PreferencesService preferencesService,
+                     TaskExecutor taskExecutor
+    ) {
+        this.bibDatabaseContext = bibDatabaseContext;
+
+        this.aiService = aiService;
         this.dialogService = dialogService;
 
+        this.aiPreferences = preferencesService.getAiPreferences();
         this.filePreferences = preferencesService.getFilePreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
 
-        this.aiService = aiService;
-        this.bibDatabaseContext = bibDatabaseContext;
         this.taskExecutor = taskExecutor;
 
         setText(Localization.lang("AI chat"));
@@ -64,11 +69,12 @@ public class AiChatTab extends EntryEditorTab {
         setContent(new AiChatGuardedComponent(
                 chatName,
                 aiService.getChatHistoryService().getChatHistoryForEntry(entry),
-                FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
-                dialogService,
-                filePreferences,
-                aiService,
                 bibDatabaseContext,
+                FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
+                aiService,
+                dialogService,
+                aiPreferences,
+                filePreferences,
                 taskExecutor
         ));
     }

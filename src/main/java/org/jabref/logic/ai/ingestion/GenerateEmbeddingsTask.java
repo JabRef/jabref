@@ -42,6 +42,10 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         this.bibDatabaseContext = bibDatabaseContext;
         this.filePreferences = filePreferences;
 
+        configure(linkedFile);
+    }
+
+    private void configure(LinkedFile linkedFile) {
         titleProperty().set(Localization.lang("Generating embeddings for file '%0'", linkedFile.getLink()));
         showToUser(true);
 
@@ -100,7 +104,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Couldn't retrieve attributes of a linked file \"{}\"", linkedFile.getLink(), e);
+            LOGGER.error("Could not retrieve attributes of a linked file \"{}\"", linkedFile.getLink(), e);
             LOGGER.warn("Possibly regenerating embeddings for linked file \"{}\"", linkedFile.getLink());
         }
 

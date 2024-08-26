@@ -23,12 +23,14 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.chatting.AiChatLogic;
+import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.ListUtil;
+import org.jabref.preferences.ai.AiPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import dev.langchain4j.data.message.AiMessage;
@@ -44,6 +46,7 @@ public class AiChatComponent extends VBox {
     private final AiService aiService;
     private final ObservableList<BibEntry> entries;
     private final BibDatabaseContext bibDatabaseContext;
+    private final AiPreferences aiPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
@@ -60,16 +63,18 @@ public class AiChatComponent extends VBox {
                            ObservableList<ChatMessage> chatHistory,
                            ObservableList<BibEntry> entries,
                            BibDatabaseContext bibDatabaseContext,
+                           AiPreferences aiPreferences,
                            DialogService dialogService,
                            TaskExecutor taskExecutor
     ) {
         this.aiService = aiService;
         this.entries = entries;
         this.bibDatabaseContext = bibDatabaseContext;
+        this.aiPreferences = aiPreferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
 
-        this.aiChatLogic = new AiChatLogic(aiService, name, chatHistory, entries);
+        this.aiChatLogic = aiService.getAiChatService().makeChat(name, chatHistory, entries);
 
         ViewLoader.view(this)
                 .root(this)
@@ -81,9 +86,12 @@ public class AiChatComponent extends VBox {
         initializeChatHistory();
         initializeChatPrompt();
         initializeNotice();
+        initializeNotifications();
+    }
 
+    private void initializeNotifications() {
         ListUtil.getLinkedFiles(entries).forEach(file ->
-                aiService.getIngestionService().ingest(file, bibDatabaseContext).state().addListener((obs) -> updateNotifications()));
+                aiService.getIngestionService().ingest(file, bibDatabaseContext).stateProperty().addListener((obs) -> updateNotifications()));
 
         updateNotifications();
     }
@@ -91,7 +99,7 @@ public class AiChatComponent extends VBox {
     private void initializeNotice() {
         String newNotice = noticeText
                 .getText()
-                .replaceAll("%0", aiService.getPreferences().getAiProvider().getLabel() + " " + aiService.getPreferences().getSelectedChatModel());
+                .replaceAll("%0", aiPreferences.getAiProvider().getLabel() + " " + aiPreferences.getSelectedChatModel());
 
         noticeText.setText(newNotice);
     }
@@ -109,6 +117,8 @@ public class AiChatComponent extends VBox {
         });
 
         chatPrompt.requestPromptFocus();
+
+        updatePromptHistory();
     }
 
     private void initializeChatHistory() {
@@ -139,7 +149,7 @@ public class AiChatComponent extends VBox {
 
         if (entry.getCitationKey().isEmpty()) {
             notifications.add(new Notification(NotificationType.ERROR, Localization.lang("No citation key"), Localization.lang("The chat history will not be stored in next sessions")));
-        } else if (!aiService.getChatHistoryService().citationKeyIsValid(entry)) {
+        } else if (!CitationKeyCheck.citationKeyIsValid(bibDatabaseContext, entry)) {
             notifications.add(new Notification(NotificationType.ERROR, Localization.lang("Invalid citation key"), Localization.lang("The chat history will not be stored in next sessions")));
         }
 
@@ -158,18 +168,22 @@ public class AiChatComponent extends VBox {
         });
 
         entry.getFiles().stream().map(file -> aiService.getIngestionService().ingest(file, bibDatabaseContext)).forEach(ingestionStatus -> {
-            switch (ingestionStatus.state().get()) {
+            switch (ingestionStatus.getState()) {
                 case PROCESSING -> notifications.add(new Notification(
                     NotificationType.WARNING,
-                    Localization.lang("File %0 is currently being processed", ingestionStatus.object().getLink()),
+                    Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
                     Localization.lang("After the file will be ingested, you will be able to chat with it")
                 ));
 
-                case ERROR -> notifications.add(new Notification(
-                    NotificationType.ERROR,
-                    Localization.lang("File %0 could not be ingested", ingestionStatus.object().getLink()),
-                    ingestionStatus.exception().get().getLocalizedMessage()
-                ));
+                case ERROR -> {
+                    assert ingestionStatus.getException().isPresent(); // When the state is ERROR, the exception must be present.
+
+                    notifications.add(new Notification(
+                            NotificationType.ERROR,
+                            Localization.lang("File %0 could not be ingested", ingestionStatus.getObject().getLink()),
+                            ingestionStatus.getException().get().getLocalizedMessage()
+                    ));
+                }
 
                 case SUCCESS -> { }
             }

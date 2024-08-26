@@ -11,26 +11,31 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.ai.AiPreferences;
 
 public class AiSummaryTab extends EntryEditorTab {
-
+    private final BibDatabaseContext bibDatabaseContext;
+    private final AiService aiService;
     private final DialogService dialogService;
+    private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final EntryEditorPreferences entryEditorPreferences;
-    private final BibDatabaseContext bibDatabaseContext;
-    private final AiService aiService;
 
-    public AiSummaryTab(DialogService dialogService,
-                        PreferencesService preferencesService,
+    public AiSummaryTab(BibDatabaseContext bibDatabaseContext,
                         AiService aiService,
-                        BibDatabaseContext bibDatabaseContext) {
+                        DialogService dialogService,
+                        PreferencesService preferencesService
+    ) {
+        this.bibDatabaseContext = bibDatabaseContext;
+
+        this.aiService = aiService;
         this.dialogService = dialogService;
+
+        this.aiPreferences = preferencesService.getAiPreferences();
         this.filePreferences = preferencesService.getFilePreferences();
         this.citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.aiService = aiService;
-        this.bibDatabaseContext = bibDatabaseContext;
 
         setText(Localization.lang("AI summary"));
         setTooltip(new Tooltip(Localization.lang("AI-generated summary of attached file(s)")));
@@ -46,6 +51,14 @@ public class AiSummaryTab extends EntryEditorTab {
      */
     @Override
     protected void bindToEntry(BibEntry entry) {
-        setContent(new SummaryComponent(bibDatabaseContext, entry, aiService, filePreferences, citationKeyPatternPreferences, dialogService));
+        setContent(new SummaryComponent(
+                bibDatabaseContext,
+                entry,
+                aiService,
+                aiPreferences,
+                filePreferences,
+                citationKeyPatternPreferences,
+                dialogService
+        ));
     }
 }

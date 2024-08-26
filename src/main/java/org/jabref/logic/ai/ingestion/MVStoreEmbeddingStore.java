@@ -1,6 +1,7 @@
 package org.jabref.logic.ai.ingestion;
 
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -12,6 +13,10 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import org.jabref.gui.DialogService;
+import org.jabref.logic.ai.util.MVStoreBase;
+import org.jabref.logic.l10n.Localization;
 
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.embedding.Embedding;
@@ -37,14 +42,18 @@ import static java.util.Comparator.comparingDouble;
  * string (the content).
  * <p>
  */
-public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
+public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore<TextSegment> {
     // `file` field is nullable, because {@link Optional} can't be serialized.
     private record EmbeddingRecord(@Nullable String file, String content, float[] embeddingVector) implements Serializable { }
 
+    private static final String EMBEDDINGS_MAP_NAME = "embeddings";
+
     private final Map<String, EmbeddingRecord> embeddingsMap;
 
-    public MVStoreEmbeddingStore(MVStore mvStore) {
-        this.embeddingsMap = mvStore.openMap("embeddingsMap");
+    public MVStoreEmbeddingStore(Path path, DialogService dialogService) {
+        super(path, dialogService);
+
+        this.embeddingsMap = this.mvStore.openMap(EMBEDDINGS_MAP_NAME);
     }
 
     @Override
@@ -157,5 +166,15 @@ public class MVStoreEmbeddingStore implements EmbeddingStore<TextSegment> {
 
     private Stream<String> filterEntries(Predicate<Map.Entry<String, EmbeddingRecord>> predicate) {
         return embeddingsMap.entrySet().stream().filter(predicate).map(Map.Entry::getKey);
+    }
+
+    @Override
+    protected String errorMessageForOpening() {
+        return "An error occurred while opening the embeddings cache file. Embeddings will not be stored in the next session.";
+    }
+
+    @Override
+    protected String errorMessageForOpeningLocalized() {
+        return Localization.lang("An error occurred while opening the embeddings cache file. Embeddings will not be stored in the next session.");
     }
 }

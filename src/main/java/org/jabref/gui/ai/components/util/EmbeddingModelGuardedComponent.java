@@ -10,6 +10,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.ingestion.model.JabRefEmbeddingModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -20,8 +21,12 @@ import com.google.common.eventbus.Subscribe;
 public abstract class EmbeddingModelGuardedComponent extends AiPrivacyNoticeGuardedComponent {
     private final AiService aiService;
 
-    public EmbeddingModelGuardedComponent(AiService aiService, FilePreferences filePreferences, DialogService dialogService) {
-        super(aiService.getPreferences(), filePreferences, dialogService);
+    public EmbeddingModelGuardedComponent(AiService aiService,
+                                          AiPreferences aiPreferences,
+                                          FilePreferences filePreferences,
+                                          DialogService dialogService
+    ) {
+        super(aiPreferences, filePreferences, dialogService);
 
         this.aiService = aiService;
 

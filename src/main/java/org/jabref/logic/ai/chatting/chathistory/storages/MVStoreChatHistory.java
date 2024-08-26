@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.chatting.chathistory;
+package org.jabref.logic.ai.chatting.chathistory.storages;
 
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -6,18 +6,22 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.gui.DialogService;
+import org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage;
 import org.jabref.logic.ai.util.ErrorMessage;
+import org.jabref.logic.ai.util.MVStoreBase;
+import org.jabref.logic.l10n.Localization;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import kotlin.ranges.IntRange;
-import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MVStoreChatHistory implements ChatHistoryImplementation {
-    private final MVStore mvStore;
+public class MVStoreChatHistory extends MVStoreBase implements ChatHistoryStorage {
+    private static final String ENTRY_CHAT_HISTORY_PREFIX = "entry";
+    private static final String GROUP_CHAT_HISTORY_PREFIX = "group";
 
     private record ChatHistoryRecord(String className, String content) implements Serializable {
         private static final Logger LOGGER = LoggerFactory.getLogger(ChatHistoryRecord.class);
@@ -61,8 +65,8 @@ public class MVStoreChatHistory implements ChatHistoryImplementation {
         }
     }
 
-    public MVStoreChatHistory(MVStore mvStore) {
-        this.mvStore = mvStore;
+    public MVStoreChatHistory(Path path, DialogService dialogService) {
+        super(path, dialogService);
     }
 
     @Override
@@ -104,14 +108,28 @@ public class MVStoreChatHistory implements ChatHistoryImplementation {
     }
 
     private Map<Integer, ChatHistoryRecord> getMapForEntry(Path bibDatabasePath, String citationKey) {
-        return getMap(bibDatabasePath, "entry", citationKey);
+        return getMap(bibDatabasePath, ENTRY_CHAT_HISTORY_PREFIX, citationKey);
     }
 
     private Map<Integer, ChatHistoryRecord> getMapForGroup(Path bibDatabasePath, String name) {
-        return getMap(bibDatabasePath, "group", name);
+        return getMap(bibDatabasePath, GROUP_CHAT_HISTORY_PREFIX, name);
     }
 
     private Map<Integer, ChatHistoryRecord> getMap(Path bibDatabasePath, String type, String name) {
-        return mvStore.openMap("chathistory-" + bibDatabasePath + "-" + type + "-" + name);
+        return mvStore.openMap(bibDatabasePath + "-" + type + "-" + name);
+    }
+
+    public void commit() {
+        mvStore.commit();
+    }
+
+    @Override
+    protected String errorMessageForOpening() {
+        return "An error occurred while opening chat history storage. Chat history of entries and groups will not be stored in the next session.";
+    }
+
+    @Override
+    protected String errorMessageForOpeningLocalized() {
+        return Localization.lang("An error occurred while opening chat history storage. Chat history of entries and groups will not be stored in the next session.");
     }
 }

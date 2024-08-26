@@ -397,11 +397,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
         dialogService.showCustomDialog(new AiChatDialog(
                 nameProperty,
                 aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode().getGroup()),
-                FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase())),
-                dialogService,
-                preferences.getFilePreferences(),
-                aiService,
                 currentDatabase.get(),
+                FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase())),
+                aiService,
+                dialogService,
+                preferences.getAiPreferences(),
+                preferences.getFilePreferences(),
                 taskExecutor
         ));
     }

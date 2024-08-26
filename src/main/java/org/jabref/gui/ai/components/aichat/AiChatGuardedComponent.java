@@ -11,35 +11,39 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.data.message.ChatMessage;
 
 public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
     private final StringProperty name;
     private final ObservableList<ChatMessage> chatHistory;
-    private final ObservableList<BibEntry> entries;
-    private final DialogService dialogService;
     private final BibDatabaseContext bibDatabaseContext;
-    private final TaskExecutor taskExecutor;
+    private final ObservableList<BibEntry> entries;
     private final AiService aiService;
+    private final DialogService dialogService;
+    private final AiPreferences aiPreferences;
+    private final TaskExecutor taskExecutor;
 
     public AiChatGuardedComponent(StringProperty name,
                                   ObservableList<ChatMessage> chatHistory,
-                                  ObservableList<BibEntry> entries,
-                                  DialogService dialogService,
-                                  FilePreferences filePreferences,
-                                  AiService aiService,
                                   BibDatabaseContext bibDatabaseContext,
+                                  ObservableList<BibEntry> entries,
+                                  AiService aiService,
+                                  DialogService dialogService,
+                                  AiPreferences aiPreferences,
+                                  FilePreferences filePreferences,
                                   TaskExecutor taskExecutor
     ) {
-        super(aiService, filePreferences, dialogService);
+        super(aiService, aiPreferences, filePreferences, dialogService);
 
         this.name = name;
         this.chatHistory = chatHistory;
-        this.entries = entries;
-        this.dialogService = dialogService;
-        this.aiService = aiService;
         this.bibDatabaseContext = bibDatabaseContext;
+        this.entries = entries;
+        this.aiService = aiService;
+        this.dialogService = dialogService;
+        this.aiPreferences = aiPreferences;
         this.taskExecutor = taskExecutor;
 
         rebuildUi();
@@ -53,6 +57,7 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
                 chatHistory,
                 entries,
                 bibDatabaseContext,
+                aiPreferences,
                 dialogService,
                 taskExecutor
         );

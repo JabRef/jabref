@@ -10,7 +10,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.jabref.logic.ai.summarization.SummariesStorage;
+import org.jabref.logic.ai.summarization.Summary;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -18,10 +18,10 @@ public class SummaryShowingComponent extends VBox {
     @FXML private TextArea summaryTextArea;
     @FXML private Text summaryInfoText;
 
-    private final SummariesStorage.SummarizationRecord summary;
+    private final Summary summary;
     private final Runnable regenerateCallback;
 
-    public SummaryShowingComponent(SummariesStorage.SummarizationRecord summary, Runnable regenerateCallback) {
+    public SummaryShowingComponent(Summary summary, Runnable regenerateCallback) {
         this.summary = summary;
         this.regenerateCallback = regenerateCallback;
 

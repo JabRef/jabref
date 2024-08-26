@@ -9,7 +9,8 @@ import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponen
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
-import org.jabref.logic.ai.summarization.SummariesStorage;
+import org.jabref.logic.ai.summarization.Summary;
+import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -18,11 +19,10 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
+import org.jabref.preferences.ai.AiPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.jabref.logic.ai.chatting.chathistory.ChatHistoryService.citationKeyIsValid;
 
 public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummaryComponent.class);
@@ -31,21 +31,25 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private final BibEntry entry;
     private final CitationKeyGenerator citationKeyGenerator;
     private final AiService aiService;
+    private final AiPreferences aiPreferences;
 
     public SummaryComponent(BibDatabaseContext bibDatabaseContext,
-                            BibEntry entry, AiService aiService,
+                            BibEntry entry,
+                            AiService aiService,
+                            AiPreferences aiPreferences,
                             FilePreferences filePreferences,
                             CitationKeyPatternPreferences citationKeyPatternPreferences,
                             DialogService dialogService
     ) {
-        super(aiService.getPreferences(), filePreferences, dialogService);
+        super(aiPreferences, filePreferences, dialogService);
 
         this.bibDatabaseContext = bibDatabaseContext;
         this.entry = entry;
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);
         this.aiService = aiService;
+        this.aiPreferences = aiPreferences;
 
-        aiService.getSummariesService().summarize(entry, bibDatabaseContext).state().addListener(o -> rebuildUi());
+        aiService.getSummariesService().summarize(entry, bibDatabaseContext).stateProperty().addListener(o -> rebuildUi());
 
         rebuildUi();
     }
@@ -58,7 +62,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
             return showErrorNoFiles();
         } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {
             return showErrorNotPdfs();
-        } else if (entry.getCitationKey().isEmpty() || !citationKeyIsValid(bibDatabaseContext, entry)) {
+        } else if (entry.getCitationKey().isEmpty() || !CitationKeyCheck.citationKeyIsValid(bibDatabaseContext, entry)) {
             // There is no need for additional check `entry.getCitationKey().isEmpty()` because method `citationKeyIsValid`,
             // will check this. But with this call the linter is happy for the next expression in else if.
             return tryToGenerateCitationKeyThenBind(entry);
@@ -100,25 +104,30 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     }
 
     private Node tryToShowSummary() {
-        ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo = aiService.getSummariesService().summarize(entry, bibDatabaseContext);
+        ProcessingInfo<BibEntry, Summary> processingInfo = aiService.getSummariesService().summarize(entry, bibDatabaseContext);
 
-        return switch (processingInfo.state().get()) {
-            case SUCCESS ->
-                    showSummary(processingInfo.data().get());
+        return switch (processingInfo.getState()) {
+            case SUCCESS -> {
+                assert processingInfo.getData().isPresent(); // When the state is SUCCESS, the data must be present.
+                yield showSummary(processingInfo.getData().get());
+            }
             case ERROR ->
                     showErrorWhileSummarizing(processingInfo);
-            case PROCESSING ->
+            case PROCESSING,
+                 STOPPED ->
                     showErrorNotSummarized();
         };
     }
 
-    private Node showErrorWhileSummarizing(ProcessingInfo<BibEntry, SummariesStorage.SummarizationRecord> processingInfo) {
-        LOGGER.error("Got an error while generating a summary for entry {}", entry.getCitationKey().orElse("<no citation key>"), processingInfo.exception().get());
+    private Node showErrorWhileSummarizing(ProcessingInfo<BibEntry, Summary> processingInfo) {
+        assert processingInfo.getException().isPresent(); // When the state is ERROR, the exception must be present.
+
+        LOGGER.error("Got an error while generating a summary for entry {}", entry.getCitationKey().orElse("<no citation key>"), processingInfo.getException().get());
 
         return ErrorStateComponent.withTextAreaAndButton(
                 Localization.lang("Unable to chat"),
                 Localization.lang("Got error while processing the file:"),
-                processingInfo.exception().get().getLocalizedMessage(),
+                processingInfo.getException().get().getLocalizedMessage(),
                 Localization.lang("Regenerate"),
                 () -> aiService.getSummariesService().regenerateSummary(entry, bibDatabaseContext)
         );
@@ -127,11 +136,11 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private Node showErrorNotSummarized() {
         return ErrorStateComponent.withSpinner(
                 Localization.lang("Processing..."),
-                Localization.lang("The attached file(s) are currently being processed by %0. Once completed, you will be able to see the summary.", aiService.getPreferences().getAiProvider().getLabel())
+                Localization.lang("The attached file(s) are currently being processed by %0. Once completed, you will be able to see the summary.", aiPreferences.getAiProvider().getLabel())
         );
     }
 
-    private Node showSummary(SummariesStorage.SummarizationRecord summary) {
+    private Node showSummary(Summary summary) {
         return new SummaryShowingComponent(summary, () -> {
             if (bibDatabaseContext.getDatabasePath().isEmpty()) {
                 LOGGER.error("Bib database path is not set, but it was expected to be present. Unable to regenerate summary");
