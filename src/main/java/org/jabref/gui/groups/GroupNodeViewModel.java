@@ -98,6 +98,10 @@ public class GroupNodeViewModel {
         }
         if (groupNode.getGroup() instanceof TexGroup) {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
+        } else if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
+            stateManager.getLuceneManager(databaseContext).ifPresent(searchGroup::setLuceneManager);
+            searchGroup.updateMatches();
+            refreshGroup();
         }
 
         hasChildren = new SimpleBooleanProperty();
@@ -523,17 +527,19 @@ public class GroupNodeViewModel {
     class LuceneIndexListener {
         @Subscribe
         public void listen(IndexStartedEvent event) {
-            if (groupNode.getGroup() instanceof SearchGroup group) {
-                group.setLuceneManager(stateManager.getLuceneManager(databaseContext).get());
+            if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
+                stateManager.getLuceneManager(databaseContext).ifPresent(searchGroup::setLuceneManager);
+                searchGroup.updateMatches();
                 refreshGroup();
             }
         }
 
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent event) {
-            if (groupNode.getGroup() instanceof SearchGroup) {
+            if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
                 BackgroundTask.wrap(() -> {
                     for (BibEntry entry : event.entries()) {
+                        searchGroup.updateMatches(entry);
                         if (groupNode.matches(entry)) {
                             matchedEntries.put(System.identityHashCode(entry), entry);
                         } else {
@@ -546,10 +552,13 @@ public class GroupNodeViewModel {
 
         @Subscribe
         public void listen(IndexRemovedEvent event) {
-            if (groupNode.getGroup() instanceof SearchGroup) {
-                for (BibEntry entry : event.entries()) {
-                    matchedEntries.remove(System.identityHashCode(entry));
-                }
+            if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
+                BackgroundTask.wrap(() -> {
+                    for (BibEntry entry : event.entries()) {
+                        searchGroup.updateMatches(entry);
+                        matchedEntries.remove(System.identityHashCode(entry));
+                    }
+                }).executeWith(taskExecutor);
             }
         }
 

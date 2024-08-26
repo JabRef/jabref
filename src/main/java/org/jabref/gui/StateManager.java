@@ -128,7 +128,7 @@ public class StateManager {
     }
 
     public Optional<LuceneManager> getLuceneManager(BibDatabaseContext database) {
-        return Optional.of(luceneManagers.get(database.getUid()));
+        return Optional.ofNullable(luceneManagers.get(database.getUid()));
     }
 
     public Optional<BibDatabaseContext> getActiveDatabase() {

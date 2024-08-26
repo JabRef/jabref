@@ -3,6 +3,9 @@ package org.jabref.model.groups;
 import java.util.EnumSet;
 import java.util.Objects;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.entry.BibEntry;
@@ -20,13 +23,16 @@ import org.slf4j.LoggerFactory;
 public class SearchGroup extends AbstractGroup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
+
     private final SearchQuery query;
+    private final ObservableMap<Integer, BibEntry> matchedEntries = FXCollections.observableHashMap();
     private LuceneManager luceneManager;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags, LuceneManager luceneManager) {
         super(name, context);
         this.query = new SearchQuery(searchExpression, searchFlags);
         this.luceneManager = luceneManager;
+        updateMatches();
     }
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
@@ -49,6 +55,26 @@ public class SearchGroup extends AbstractGroup {
         this.luceneManager = luceneManager;
     }
 
+    public void updateMatches() {
+        if (luceneManager == null) {
+            return;
+        }
+        matchedEntries.clear();
+        // TODO: Search should be done in a background thread
+        luceneManager.search(query).getMatchedEntries().forEach(entry -> matchedEntries.put(System.identityHashCode(entry), entry));
+    }
+
+    public void updateMatches(BibEntry entry) {
+        if (luceneManager == null) {
+            return;
+        }
+        if (luceneManager.isMatched(entry, query)) {
+            matchedEntries.put(System.identityHashCode(entry), entry);
+        } else {
+            matchedEntries.remove(System.identityHashCode(entry));
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -65,10 +91,7 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public boolean contains(BibEntry entry) {
-        if (luceneManager == null) {
-            return false;
-        }
-        return luceneManager.isMatched(entry, query);
+        return matchedEntries.containsKey(System.identityHashCode(entry));
     }
 
     @Override
