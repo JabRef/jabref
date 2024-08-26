@@ -25,8 +25,6 @@ import org.apache.lucene.store.Directory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.model.entry.field.StandardField.GROUPS;
-
 public class BibFieldsIndexer implements LuceneIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
     private final BibDatabaseContext databaseContext;
@@ -84,12 +82,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
             StringBuilder allFields = new StringBuilder(bibEntry.getType().getName());
             for (Map.Entry<Field, String> mapEntry : bibEntry.getFieldMap().entrySet()) {
-                Field field = mapEntry.getKey();
-                if (field == GROUPS) {
-                    // https://github.com/JabRef/jabref/issues/7996
-                    continue;
-                }
-                document.add(new TextField(field.getName(), mapEntry.getValue(), storeDisabled));
+                document.add(new TextField(mapEntry.getKey().getName(), mapEntry.getValue(), storeDisabled));
                 allFields.append('\n').append(mapEntry.getValue());
             }
             document.add(new TextField(SearchFieldConstants.DEFAULT_FIELD.toString(), allFields.toString(), storeDisabled));

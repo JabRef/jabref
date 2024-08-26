@@ -563,7 +563,6 @@ public class GroupNodeViewModel {
                         searchGroup.updateMatches(entry);
                         matchedEntries.remove(System.identityHashCode(entry));
                     }
-                    databaseContext.getMetaData().groupsBinding().invalidate();
                 }).executeWith(taskExecutor);
             }
         }
