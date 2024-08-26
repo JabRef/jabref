@@ -45,6 +45,7 @@ import org.jabref.model.groups.LastNameGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
+import org.jabref.model.groups.event.SearchGroupUpdatedEvent;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
@@ -531,6 +532,7 @@ public class GroupNodeViewModel {
                 stateManager.getLuceneManager(databaseContext).ifPresent(searchGroup::setLuceneManager);
                 searchGroup.updateMatches();
                 refreshGroup();
+                databaseContext.getDatabase().postEvent(new SearchGroupUpdatedEvent(groupNode));
             }
         }
 
@@ -546,7 +548,7 @@ public class GroupNodeViewModel {
                             matchedEntries.remove(System.identityHashCode(entry));
                         }
                     }
-                }).executeWith(taskExecutor);
+                }).onFinished(() -> databaseContext.getDatabase().postEvent(new SearchGroupUpdatedEvent(groupNode))).executeWith(taskExecutor);
             }
         }
 

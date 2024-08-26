@@ -26,6 +26,7 @@ import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.event.SearchGroupUpdatedEvent;
 import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
@@ -59,6 +60,7 @@ public class MainTableDataModel {
     private final Subscription selectedGroupsSubscription;
     private final Subscription groupViewModeSubscription;
     private final LuceneIndexListener indexUpdatedListener;
+    private final SearchGroupsListener searchGroupsListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private final ListProperty<GroupTreeNode> selectedGroupsProperty;
     private Optional<MatcherSet> groupsMatcher;
@@ -82,8 +84,10 @@ public class MainTableDataModel {
         this.selectedGroupsProperty = selectedGroupsProperty;
         this.searchQueryProperty = searchQueryProperty;
         this.indexUpdatedListener = new LuceneIndexListener();
-        this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);
+        this.searchGroupsListener = new SearchGroupsListener();
 
+        this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);
+        this.bibDatabaseContext.getDatabase().registerListener(searchGroupsListener);
         resetFieldFormatter();
 
         allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
@@ -185,7 +189,9 @@ public class MainTableDataModel {
         searchDisplayModeSubscription.unsubscribe();
         selectedGroupsSubscription.unsubscribe();
         groupViewModeSubscription.unsubscribe();
+
         bibDatabaseContext.getDatabase().unregisterListener(indexUpdatedListener);
+        bibDatabaseContext.getDatabase().unregisterListener(searchGroupsListener);
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
@@ -231,6 +237,15 @@ public class MainTableDataModel {
         @Subscribe
         public void listen(IndexStartedEvent indexStartedEvent) {
             updateSearchMatches(searchQueryProperty.get());
+        }
+    }
+
+    class SearchGroupsListener {
+        @Subscribe
+        public void listen(SearchGroupUpdatedEvent event) {
+            if (selectedGroupsProperty.get().contains(event.group())) {
+                updateGroupMatches(selectedGroupsProperty.get());
+            }
         }
     }
 }
