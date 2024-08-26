@@ -32,6 +32,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Loading of groups is tested at {@link org.jabref.logic.importer.util.GroupsParserTest}.
+ */
 class GroupSerializerTest {
 
     private GroupSerializer groupSerializer;
