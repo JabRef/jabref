@@ -74,6 +74,8 @@ public class UpdateEmbeddingModelTask extends BackgroundTask<Void> {
             throw new RuntimeException(Localization.lang("An I/O error occurred while opening the embedding model by URL %0", modelUrl), e);
         }
 
+        progressCounter.stop();
+
         return null;
     }
 
