@@ -103,6 +103,7 @@ public class GroupNodeViewModel {
             stateManager.getLuceneManager(databaseContext).ifPresent(searchGroup::setLuceneManager);
             searchGroup.updateMatches();
             refreshGroup();
+            databaseContext.getMetaData().groupsBinding().invalidate();
         }
 
         hasChildren = new SimpleBooleanProperty();
@@ -533,6 +534,7 @@ public class GroupNodeViewModel {
                 searchGroup.updateMatches();
                 refreshGroup();
                 databaseContext.getDatabase().postEvent(new SearchGroupUpdatedEvent(groupNode));
+                databaseContext.getMetaData().groupsBinding().invalidate();
             }
         }
 
@@ -548,6 +550,7 @@ public class GroupNodeViewModel {
                             matchedEntries.remove(System.identityHashCode(entry));
                         }
                     }
+                    databaseContext.getMetaData().groupsBinding().invalidate();
                 }).onFinished(() -> databaseContext.getDatabase().postEvent(new SearchGroupUpdatedEvent(groupNode))).executeWith(taskExecutor);
             }
         }
@@ -560,6 +563,7 @@ public class GroupNodeViewModel {
                         searchGroup.updateMatches(entry);
                         matchedEntries.remove(System.identityHashCode(entry));
                     }
+                    databaseContext.getMetaData().groupsBinding().invalidate();
                 }).executeWith(taskExecutor);
             }
         }
