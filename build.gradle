@@ -175,7 +175,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.16.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
     implementation 'commons-logging:commons-logging:1.3.3'
-    implementation 'com.h2database:h2-mvstore:2.3.230'
+    implementation 'com.h2database:h2-mvstore:2.3.232'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
@@ -205,7 +205,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.9'
 
-    implementation 'org.postgresql:postgresql:42.7.3'
+    implementation 'org.postgresql:postgresql:42.7.4'
 
     // Support unix socket connection types
     implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.10.0'
@@ -334,7 +334,7 @@ dependencies {
     implementation 'ai.djl:api:0.29.0'
     implementation 'ai.djl.pytorch:pytorch-model-zoo:0.29.0'
     implementation 'ai.djl.huggingface:tokenizers:0.29.0'
-    implementation 'io.github.stefanbratanov:jvm-openai:0.9.3'
+    implementation 'io.github.stefanbratanov:jvm-openai:0.10.0'
     // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
     implementation ('com.squareup.okhttp3:okhttp:4.12.0') {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
@@ -344,7 +344,7 @@ dependencies {
 
     implementation 'commons-io:commons-io:2.16.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.174'
+    testImplementation 'io.github.classgraph:classgraph:4.8.175'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.10.3'
 
@@ -357,7 +357,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:3.0"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.17.0'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.18.0'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'

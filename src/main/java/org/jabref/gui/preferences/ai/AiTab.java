@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -21,6 +20,7 @@ import org.jabref.preferences.ai.AiProvider;
 import org.jabref.preferences.ai.EmbeddingModel;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.dlsc.gemsfx.ResizableTextArea;
 import com.dlsc.unitfx.DoubleInputField;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -43,7 +43,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
     @FXML private TextField apiBaseUrlTextField;
     @FXML private SearchableComboBox<EmbeddingModel> embeddingModelComboBox;
-    @FXML private TextArea instructionTextArea;
+    @FXML private ResizableTextArea instructionTextArea;
     @FXML private DoubleInputField temperatureTextField;
     @FXML private IntegerInputField contextWindowSizeTextField;
     @FXML private IntegerInputField documentSplitterChunkSizeTextField;
@@ -59,6 +59,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private Button embeddingModelHelp;
     @FXML private Button instructionHelp;
     @FXML private Button contextWindowSizeHelp;
+    @FXML private Button temperatureHelp;
     @FXML private Button documentSplitterChunkSizeHelp;
     @FXML private Button documentSplitterOverlapSizeHelp;
     @FXML private Button ragMaxResultsCountHelp;
@@ -212,6 +213,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_API_BASE_URL, dialogService, preferencesService.getFilePreferences()), apiBaseUrlHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_INSTRUCTION, dialogService, preferencesService.getFilePreferences()), instructionHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_CONTEXT_WINDOW_SIZE, dialogService, preferencesService.getFilePreferences()), contextWindowSizeHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_TEMPERATURE, dialogService, preferencesService.getFilePreferences()), temperatureHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_CHUNK_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterChunkSizeHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, dialogService, preferencesService.getFilePreferences()), documentSplitterOverlapSizeHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_RAG_MAX_RESULTS_COUNT, dialogService, preferencesService.getFilePreferences()), ragMaxResultsCountHelp);

@@ -343,8 +343,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public boolean validateBasicSettings() {
         List<Validator> validators = List.of(
-                chatModelValidator,
-                apiKeyValidator
+                chatModelValidator
+                // apiKeyValidator -- skipped, it will generate warning, but the preferences should be able to save.
         );
 
         return validators.stream().map(Validator::getValidationStatus).allMatch(ValidationStatus::isValid);

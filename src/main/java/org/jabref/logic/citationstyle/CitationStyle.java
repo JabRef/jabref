@@ -26,6 +26,7 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.util.StandardFileType;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,8 @@ public class CitationStyle implements OOStyle {
     public record StyleInfo(String title, boolean isNumericStyle) {
     }
 
-    private static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
+    @VisibleForTesting
+    static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
         FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
 
         try {

@@ -43,6 +43,21 @@ public class CSLReferenceMarkManager {
         this.citationKeyToNumber = new HashMap<>();
     }
 
+    public CSLReferenceMark createReferenceMark(BibEntry entry) throws Exception {
+        String citationKey = entry.getCitationKey().orElse(CUID.randomCUID2(8).toString());
+        int citationNumber = getCitationNumber(citationKey);
+        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKey, citationNumber, factory);
+        addMark(referenceMark);
+        return referenceMark;
+    }
+
+    public void addMark(CSLReferenceMark mark) {
+        marksByName.put(mark.getName(), mark);
+        idsByMark.put(mark, marksByID.size());
+        marksByID.add(mark);
+        updateCitationInfo(mark.getName());
+    }
+
     public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, document);
         XNameAccess marks = supplier.getReferenceMarks();
@@ -72,26 +87,11 @@ public class CSLReferenceMarkManager {
         }
     }
 
-    public void addMark(CSLReferenceMark mark) {
-        marksByName.put(mark.getName(), mark);
-        idsByMark.put(mark, marksByID.size());
-        marksByID.add(mark);
-        updateCitationInfo(mark.getName());
+    public boolean hasCitationForKey(String citationKey) {
+        return citationKeyToNumber.containsKey(citationKey);
     }
 
     public int getCitationNumber(String citationKey) {
         return citationKeyToNumber.computeIfAbsent(citationKey, k -> ++highestCitationNumber);
-    }
-
-    public CSLReferenceMark createReferenceMark(BibEntry entry) throws Exception {
-        String citationKey = entry.getCitationKey().orElse(CUID.randomCUID2(8).toString());
-        int citationNumber = getCitationNumber(citationKey);
-        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKey, citationNumber, factory);
-        addMark(referenceMark);
-        return referenceMark;
-    }
-
-    public boolean hasCitationForKey(String citationKey) {
-        return citationKeyToNumber.containsKey(citationKey);
     }
 }
