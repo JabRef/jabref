@@ -12,7 +12,7 @@ class SearchToLuceneMigrationTest {
 
     public static Stream<Arguments> transformationNormal() {
         return Stream.of(
-                Arguments.of("chocolate", "chocolate"),
+                Arguments.of("all:chocolate", "chocolate"),
 
                 Arguments.of("title:chocolate", "title=chocolate"),
                 Arguments.of("title:chocolate OR author:smith", "title = chocolate or author = smith"),
@@ -20,7 +20,7 @@ class SearchToLuceneMigrationTest {
                 Arguments.of("title:chocolate AND author:smith", "title contains \"chocolate\" AND author matches \"smith\""),
                 Arguments.of("( title:chocolate ) OR ( author:smith )", "(title == chocolate) or (author == smith)"),
                 Arguments.of("( title:chocolate OR author:smith ) AND ( year:2024 )", "(title contains chocolate or author matches smith) AND (year = 2024)"),
-                Arguments.of("video AND year:1932", "video and year == 1932"),
+                Arguments.of("all:video AND year:1932", "video and year == 1932"),
                 Arguments.of("title:neighbou?r", "title =neighbou?r"),
                 Arguments.of("abstract:model\\{1,2\\}ing", "abstract = model{1,2}ing"),
                 Arguments.of("all:* AND -title:chocolate", "title != chocolate"),

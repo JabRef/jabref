@@ -1,6 +1,5 @@
 package org.jabref.migrations;
 
-import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.search.ThrowingErrorListener;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
@@ -16,13 +15,7 @@ public class SearchToLuceneMigration {
         SearchParser.StartContext context = getStartContext(searchExpression);
         SearchToLuceneVisitor searchToLuceneVisitor = new SearchToLuceneVisitor(isRegularExpression);
         QueryNode luceneQueryNode = searchToLuceneVisitor.visit(context);
-        String result = luceneQueryNode.toQueryString(new EscapeQuerySyntaxImpl()).toString();
-        if (!searchToLuceneVisitor.isNegation()) {
-            // Remove "all:" prefix for some cleaner search queries
-            // There is no UnfieldedQueryNode in Lucene, only FieldQueryNode
-            return result.replace(SearchFieldConstants.DEFAULT_FIELD + ":", "");
-        }
-        return result;
+        return luceneQueryNode.toQueryString(new EscapeQuerySyntaxImpl()).toString();
     }
 
     private static SearchParser.StartContext getStartContext(String searchExpression) {
