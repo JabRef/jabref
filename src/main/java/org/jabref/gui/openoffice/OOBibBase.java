@@ -608,6 +608,9 @@ public class OOBibBase {
                 if (citationType == CitationType.AUTHORYEAR_PAR) {
                     // "Cite" button
                     this.cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+
+                    // If "Automatically sync bibliography when inserting citations" is enabled
+                    syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
                 } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     // "Cite in-text" button
                     this.cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
@@ -939,7 +942,7 @@ public class OOBibBase {
                         return;
                     }
 
-                    // A separate database and database
+                    // A separate database and database context
                     BibDatabase bibDatabase = new BibDatabase(citedEntries);
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
 
