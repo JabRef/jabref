@@ -261,8 +261,8 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         // if the database contents should be modified due to new features
         // in this version of JabRef.
         parserResults.forEach(pr -> {
-            boolean migrationPerformed = OpenDatabaseAction.performPostOpenActions(pr, dialogService, preferences);
-            if (migrationPerformed) {
+            OpenDatabaseAction.performPostOpenActions(pr, dialogService, preferences);
+            if (pr.getChangedOnMigration()) {
                 getLibraryTab(pr).ifPresent(LibraryTab::markBaseChanged);
             }
         });

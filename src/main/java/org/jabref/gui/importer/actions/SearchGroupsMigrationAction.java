@@ -50,8 +50,8 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
         }
 
         parserResult.getMetaData().getGroups().ifPresent(this::migrateGroups);
-
         parserResult.getMetaData().setGroupSearchSyntaxVersion(SearchGroup.VERSION_6_0_ALPHA);
+        parserResult.setChangedOnMigration(true);
     }
 
     private void migrateGroups(GroupTreeNode node) {

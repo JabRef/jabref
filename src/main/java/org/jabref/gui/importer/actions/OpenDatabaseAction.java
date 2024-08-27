@@ -93,18 +93,12 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
     }
 
-    /**
-     * @return true if any post open action was performed. False otherwise.
-     */
-    public static boolean performPostOpenActions(ParserResult result, DialogService dialogService, PreferencesService preferencesService) {
-        boolean anyActionPerformed = false;
+    public static void performPostOpenActions(ParserResult result, DialogService dialogService, PreferencesService preferencesService) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result, preferencesService)) {
                 action.performAction(result, dialogService, preferencesService);
-                anyActionPerformed = true;
             }
         }
-        return anyActionPerformed;
     }
 
     @Override

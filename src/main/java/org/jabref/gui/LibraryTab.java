@@ -279,8 +279,8 @@ public class LibraryTab extends Tab {
     }
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
-        boolean migrationPerformed = OpenDatabaseAction.performPostOpenActions(result, dialogService, preferencesService);
-        if (migrationPerformed) {
+        OpenDatabaseAction.performPostOpenActions(result, dialogService, preferencesService);
+        if (result.getChangedOnMigration()) {
             this.markBaseChanged();
         }
 
