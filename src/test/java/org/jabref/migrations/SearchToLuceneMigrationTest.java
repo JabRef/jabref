@@ -53,7 +53,8 @@ class SearchToLuceneMigrationTest {
     public static Stream<Arguments> transformationRegularExpression() {
         return Stream.of(
                 Arguments.of("all:* AND -groups:/.+/", "groups != .+"),
-                Arguments.of("( all:* AND -groups:/.+/ ) AND ( all:* AND -readstatus:/.+/ )", "groups != .+ and readstatus != .+")
+                Arguments.of("( all:* AND -groups:/.+/ ) AND ( all:* AND -readstatus:/.+/ )", "groups != .+ and readstatus != .+"),
+                Arguments.of("author:/(John|Doe).+(John|Doe)/", "author = \"(John|Doe).+(John|Doe)\"")
         );
     }
 
