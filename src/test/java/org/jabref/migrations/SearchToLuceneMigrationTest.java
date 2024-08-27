@@ -12,6 +12,7 @@ class SearchToLuceneMigrationTest {
 
     public static Stream<Arguments> transformationNormal() {
         return Stream.of(
+                // If "all:" should not be added, see e46e0a23d7b9526bd449cbecfb189ae6dbc40a28 for a fix
                 Arguments.of("all:chocolate", "chocolate"),
 
                 Arguments.of("title:chocolate", "title=chocolate"),
