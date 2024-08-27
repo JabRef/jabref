@@ -608,9 +608,6 @@ public class OOBibBase {
                 if (citationType == CitationType.AUTHORYEAR_PAR) {
                     // "Cite" button
                     this.cslCitationOOAdapter.insertCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
-
-                    // If "Automatically sync bibliography when inserting citations" is enabled
-                    syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
                 } else if (citationType == CitationType.AUTHORYEAR_INTEXT) {
                     // "Cite in-text" button
                     this.cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
@@ -618,6 +615,9 @@ public class OOBibBase {
                     // "Insert empty citation"
                     this.cslCitationOOAdapter.insertEmpty(cursor.get(), entries);
                 }
+
+                // If "Automatically sync bibliography when inserting citations" is enabled
+                syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
 
