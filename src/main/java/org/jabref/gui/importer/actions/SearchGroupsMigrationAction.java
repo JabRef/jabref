@@ -45,7 +45,7 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
     public void performAction(ParserResult parserResult, DialogService dialogService, PreferencesService preferencesService) {
         if (!dialogService.showConfirmationDialogAndWait(Localization.lang("Search groups migration of %0", parserResult.getPath().map(Path::toString).orElse("")),
                 Localization.lang("The search groups syntax is outdated. Do you want to migrate to the new syntax?"),
-                Localization.lang("Migrate"), Localization.lang("Cancel"))) {
+                Localization.lang("Migrate"), Localization.lang("Keep as is"))) {
             return;
         }
 
