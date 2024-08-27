@@ -251,10 +251,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         for (ParserResult parserResult : parserResults) {
             if (parserResult.hasWarnings()) {
                 ParserResultWarningDialog.showParserResultWarningDialog(parserResult, dialogService);
-                tabContainer.getLibraryTabs().stream()
-                     .filter(tab -> parserResult.getDatabase().equals(tab.getDatabase()))
-                     .findAny()
-                     .ifPresent(tabContainer::showLibraryTab);
+                getLibraryTab(parserResult).ifPresent(tabContainer::showLibraryTab);
             }
         }
 
@@ -263,9 +260,20 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         // if we found new entry types that can be imported, or checking
         // if the database contents should be modified due to new features
         // in this version of JabRef.
-        parserResults.forEach(pr -> OpenDatabaseAction.performPostOpenActions(pr, dialogService, preferences));
+        parserResults.forEach(pr -> {
+            boolean migrationPerformed = OpenDatabaseAction.performPostOpenActions(pr, dialogService, preferences);
+            if (migrationPerformed) {
+                getLibraryTab(pr).ifPresent(LibraryTab::markBaseChanged);
+            }
+        });
 
         LOGGER.debug("Finished adding panels");
+    }
+
+    private Optional<LibraryTab> getLibraryTab(ParserResult parserResult) {
+        return tabContainer.getLibraryTabs().stream()
+                           .filter(tab -> parserResult.getDatabase().equals(tab.getDatabase()))
+                           .findAny();
     }
 
     /**

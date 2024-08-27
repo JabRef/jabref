@@ -279,10 +279,12 @@ public class LibraryTab extends Tab {
     }
 
     private void onDatabaseLoadingSucceed(ParserResult result) {
-        BibDatabaseContext context = result.getDatabaseContext();
-        OpenDatabaseAction.performPostOpenActions(result, dialogService, preferencesService);
+        boolean migrationPerformed = OpenDatabaseAction.performPostOpenActions(result, dialogService, preferencesService);
+        if (migrationPerformed) {
+            this.markBaseChanged();
+        }
 
-        setDatabaseContext(context);
+        setDatabaseContext(result.getDatabaseContext());
 
         LOGGER.trace("loading.set(false);");
         loading.set(false);
