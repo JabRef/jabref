@@ -120,6 +120,7 @@ public class MetaData {
 
     public void setGroupSearchSyntaxVersion(Version version) {
         groupSearchSyntaxVersion = Optional.of(version);
+        postChange();
     }
 
     public Optional<Version> getGroupSearchSyntaxVersion() {
