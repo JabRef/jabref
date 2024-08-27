@@ -1,4 +1,4 @@
-package org.jabref.gui.importer.actions;
+package org.jabref.migrations;
 
 import java.util.List;
 import java.util.Optional;
