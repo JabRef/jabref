@@ -5,9 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -29,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 public class BibFieldsIndexer implements LuceneIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
-    private static final Formatter FORMATTER = new LatexToUnicodeFormatter();
     private final BibDatabaseContext databaseContext;
     private final String libraryName;
     private final Directory indexDirectory;
@@ -40,7 +37,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
         this.databaseContext = databaseContext;
         this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "unsaved");
 
-        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.NGram_Analyzer_For_INDEXING);
+        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.NGRAM_ANALYZER);
 
         this.indexDirectory = new ByteBuffersDirectory();
         try {
@@ -85,9 +82,8 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
             StringBuilder allFields = new StringBuilder(bibEntry.getType().getName());
             for (Map.Entry<Field, String> mapEntry : bibEntry.getFieldMap().entrySet()) {
-                String value = FORMATTER.format(mapEntry.getValue());
-                document.add(new TextField(mapEntry.getKey().getName(), value, storeDisabled));
-                allFields.append('\n').append(value);
+                document.add(new TextField(mapEntry.getKey().getName(), mapEntry.getValue(), storeDisabled));
+                allFields.append('\n').append(mapEntry.getValue());
             }
             document.add(new TextField(SearchFieldConstants.DEFAULT_FIELD.toString(), allFields.toString(), storeDisabled));
             indexWriter.addDocument(document);
