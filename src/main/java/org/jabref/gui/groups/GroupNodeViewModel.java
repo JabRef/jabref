@@ -258,17 +258,21 @@ public class GroupNodeViewModel {
             } else if (change.wasUpdated()) {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
                     if (groupNode.matches(changedEntry)) {
+                        // ADR-0038
                         matchedEntries.put(System.identityHashCode(changedEntry), changedEntry);
                     } else {
+                        // ADR-0038
                         matchedEntries.remove(System.identityHashCode(changedEntry));
                     }
                 }
             } else {
                 for (BibEntry removedEntry : change.getRemoved()) {
+                    // ADR-0038
                     matchedEntries.remove(System.identityHashCode(removedEntry));
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
                     if (groupNode.matches(addedEntry)) {
+                        // ADR-0038
                         matchedEntries.put(System.identityHashCode(addedEntry), addedEntry);
                     }
                 }
@@ -296,6 +300,7 @@ public class GroupNodeViewModel {
                     .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
                     .onSuccess(entries -> {
                         matchedEntries.clear();
+                        // ADR-0038
                         entries.forEach(entry -> matchedEntries.put(System.identityHashCode(entry), entry));
                     })
                     .executeWith(taskExecutor);
@@ -545,8 +550,10 @@ public class GroupNodeViewModel {
                     for (BibEntry entry : event.entries()) {
                         searchGroup.updateMatches(entry);
                         if (groupNode.matches(entry)) {
+                            // ADR-0038
                             matchedEntries.put(System.identityHashCode(entry), entry);
                         } else {
+                            // ADR-0038
                             matchedEntries.remove(System.identityHashCode(entry));
                         }
                     }
@@ -561,6 +568,7 @@ public class GroupNodeViewModel {
                 BackgroundTask.wrap(() -> {
                     for (BibEntry entry : event.entries()) {
                         searchGroup.updateMatches(entry);
+                        // ADR-0038
                         matchedEntries.remove(System.identityHashCode(entry));
                     }
                 }).executeWith(taskExecutor);

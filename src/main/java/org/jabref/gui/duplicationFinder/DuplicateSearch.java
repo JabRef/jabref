@@ -233,6 +233,7 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         public synchronized void remove(BibEntry entry) {
+            // ADR-0038
             toRemove.put(System.identityHashCode(entry), entry);
             duplicates++;
         }
@@ -250,6 +251,7 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         public synchronized boolean isToRemove(BibEntry entry) {
+            // ADR-0038
             return toRemove.containsKey(System.identityHashCode(entry));
         }
 

@@ -74,6 +74,7 @@ public class SearchGroup extends AbstractGroup {
         }
         matchedEntries.clear();
         // TODO: Search should be done in a background thread
+        // ADR-0038
         luceneManager.search(query).getMatchedEntries().forEach(entry -> matchedEntries.put(System.identityHashCode(entry), entry));
     }
 
@@ -82,8 +83,10 @@ public class SearchGroup extends AbstractGroup {
             return;
         }
         if (luceneManager.isMatched(entry, query)) {
+            // ADR-0038
             matchedEntries.put(System.identityHashCode(entry), entry);
         } else {
+            // ADR-0038
             matchedEntries.remove(System.identityHashCode(entry));
         }
     }
@@ -104,6 +107,7 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public boolean contains(BibEntry entry) {
+        // ADR-0038
         return matchedEntries.containsKey(System.identityHashCode(entry));
     }
 
