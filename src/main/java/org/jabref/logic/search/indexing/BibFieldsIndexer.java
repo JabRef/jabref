@@ -10,6 +10,7 @@ import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.LuceneIndexer;
 import org.jabref.model.search.SearchFieldConstants;
 
@@ -83,6 +84,10 @@ public class BibFieldsIndexer implements LuceneIndexer {
             StringBuilder allFields = new StringBuilder(bibEntry.getType().getName());
             for (Map.Entry<Field, String> mapEntry : bibEntry.getFieldMap().entrySet()) {
                 document.add(new TextField(mapEntry.getKey().getName(), mapEntry.getValue(), storeDisabled));
+                if (mapEntry.getKey().equals(StandardField.GROUPS)) {
+                    // Do not add groups to the allFields field: https://github.com/JabRef/jabref/issues/7996
+                    continue;
+                }
                 allFields.append('\n').append(mapEntry.getValue());
             }
             document.add(new TextField(SearchFieldConstants.DEFAULT_FIELD.toString(), allFields.toString(), storeDisabled));
