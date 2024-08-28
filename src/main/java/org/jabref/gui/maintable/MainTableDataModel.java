@@ -207,7 +207,17 @@ public class MainTableDataModel {
         public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
             indexAddedOrUpdatedEvent.entries().forEach(entry -> {
                 BackgroundTask.wrap(() -> {
-                    int index = allEntries.indexOf(entry);
+                    // Find the index of the entry in the list.
+                    // The indexOf() method is not used because it relies on the equals(),
+                    // which can return the wrong index if some entries are equal but different instances.
+                    // For example, two different instances of an empty entry would be treated as equal by .equals().
+                    int index = -1;
+                    for (int i = 0; i < allEntries.size(); i++) {
+                        if (allEntries.get(i) == entry) {
+                            index = i;
+                            break;
+                        }
+                    }
                     if (index >= 0) {
                         BibEntryTableViewModel viewModel = entriesViewModel.get(index);
                         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
@@ -230,7 +240,11 @@ public class MainTableDataModel {
                         updateEntryGroupMatch(viewModel, groupsMatcher, groupsPreferences.getGroupViewMode().contains(GroupViewMode.INVERT), !groupsPreferences.getGroupViewMode().contains(GroupViewMode.FILTER));
                     }
                     return index;
-                }).onSuccess(index -> FilteredListProxy.refilterListReflection(entriesFiltered, index, index + 1)).executeWith(taskExecutor);
+                }).onSuccess(index -> {
+                    if (index >= 0) {
+                        FilteredListProxy.refilterListReflection(entriesFiltered, index, index + 1);
+                    }
+                }).executeWith(taskExecutor);
             });
         }
 
