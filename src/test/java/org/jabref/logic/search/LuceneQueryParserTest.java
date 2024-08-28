@@ -2,8 +2,6 @@ package org.jabref.logic.search;
 
 import java.util.stream.Stream;
 
-import org.jabref.logic.cleanup.Formatter;
-import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.search.SearchFieldConstants;
 
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -15,7 +13,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LuceneQueryParserTest {
-    private static final Formatter FORMATTER = new LatexToUnicodeFormatter();
 
     public static Stream<Arguments> searchQuires() {
         return Stream.of(
@@ -25,9 +22,9 @@ public class LuceneQueryParserTest {
                 Arguments.of("all:breitenbucher", "breitenbücher"),
 
                 // latex
-                Arguments.of("all:preissinger", "prei{\\ss}inger"),
-                Arguments.of("all:jesus", "jes{\\'{u}}s"),
-                Arguments.of("all:breitenbucher", "breitenb{\\\"{u}}cher"),
+                Arguments.of("all:preissinger", "\"prei{\\\\ss}inger\""),
+                Arguments.of("all:jesus", "\"jes{\\\\'{u}}s\""),
+                Arguments.of("all:breitenbucher", "\"breitenb{\\\\\\\"{u}}cher\""),
 
                 Arguments.of("groups:/exclude", "groups:\\/exclude")
         );
@@ -36,8 +33,7 @@ public class LuceneQueryParserTest {
     @ParameterizedTest
     @MethodSource
     void searchQuires(String expected, String query) throws ParseException {
-        QueryParser parser = new QueryParser(SearchFieldConstants.DEFAULT_FIELD.toString(), SearchFieldConstants.Whitespace_ANALYZER);
-         query = FORMATTER.format(query);
+        QueryParser parser = new QueryParser(SearchFieldConstants.DEFAULT_FIELD.toString(), SearchFieldConstants.JABREF_ANALYZER);
         String result = parser.parse(query).toString();
         assertEquals(expected, result);
     }

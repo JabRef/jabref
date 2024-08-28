@@ -9,18 +9,19 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 
-public class WhitespaceAnalyzer extends Analyzer {
+public class JabRefAnalyzer extends Analyzer {
     private final CharArraySet stopWords;
-    public WhitespaceAnalyzer(CharArraySet stopWords) {
+    public JabRefAnalyzer(CharArraySet stopWords) {
         this.stopWords = stopWords;
     }
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
         Tokenizer source = new WhitespaceTokenizer();
-        TokenStream result = new LowerCaseFilter(source);
+        TokenStream result = new LatexToUnicodeFoldingFilter(source);
         result = new StopFilter(result, stopWords);
         result = new ASCIIFoldingFilter(result);
+        result = new LowerCaseFilter(result);
         return new TokenStreamComponents(source, result);
     }
 }

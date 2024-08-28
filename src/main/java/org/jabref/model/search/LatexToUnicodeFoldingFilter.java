@@ -10,11 +10,14 @@ import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @implNote Implementation based on {@link org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter}
  */
-public class LatexToUnicodeFoldingFilter extends TokenFilter {
+public final class LatexToUnicodeFoldingFilter extends TokenFilter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LatexToUnicodeFoldingFilter.class);
     private static final Formatter FORMATTER = new LatexToUnicodeFormatter();
 
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
@@ -58,12 +61,13 @@ public class LatexToUnicodeFoldingFilter extends TokenFilter {
     /**
      * @param input  The string to fold
      * @param length The number of characters in the input string
-     * @return
      */
     public FoldingResult foldToUnicode(char[] input, int length) {
         FoldingResult result = foldToUnicode(input, 0, length);
         if (result.length != length) {
-            state = captureState();
+            // ASCIIFoldingFilter does "state = captureState();"
+            // We do not do anything since the index also contains clean LaTeX only.
+            // If we capture the state, the result is Synonym(LaTeX, Unicode)
         }
         return result;
     }
@@ -77,7 +81,7 @@ public class LatexToUnicodeFoldingFilter extends TokenFilter {
         char[] subArray = Arrays.copyOfRange(input, inputPos, inputPos + length);
         String s = new String(subArray);
         String result = FORMATTER.format(s);
-
+        LOGGER.debug("Folding {} to {}", s, result);
         return new FoldingResult(result.toCharArray(), result.length());
     }
 }
