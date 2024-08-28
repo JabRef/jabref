@@ -33,7 +33,7 @@ public class LuceneQueryParserTest {
     @ParameterizedTest
     @MethodSource
     void searchQuires(String expected, String query) throws ParseException {
-        QueryParser parser = new QueryParser(SearchFieldConstants.DEFAULT_FIELD.toString(), SearchFieldConstants.JABREF_ANALYZER);
+        QueryParser parser = new QueryParser(SearchFieldConstants.DEFAULT_FIELD.toString(), SearchFieldConstants.LATEX_AWARE_ANALYZER);
         String result = parser.parse(query).toString();
         assertEquals(expected, result);
     }

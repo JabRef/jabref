@@ -79,7 +79,7 @@ public class SearchQuery {
             query = '/' + query + '/';
         }
 
-        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, SearchFieldConstants.JABREF_ANALYZER, boosts);
+        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, SearchFieldConstants.LATEX_AWARE_ANALYZER, boosts);
         queryParser.setAllowLeadingWildcard(true);
 
         try {

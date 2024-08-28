@@ -17,8 +17,8 @@ public enum SearchFieldConstants {
     PAGE_NUMBER("pageNumber"),
     MODIFIED("modified");
 
-    public static final Analyzer JABREF_ANALYZER = new JabRefAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-    public static final Analyzer NGRAM_ANALYZER = new NGramAnalyzer(1, Integer.MAX_VALUE, EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+    public static final Analyzer LATEX_AWARE_ANALYZER = new LatexAwareAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+    public static final Analyzer LATEX_AWARE_NGRAM_ANALYZER = new LatexAwareNGramAnalyzer(1, Integer.MAX_VALUE, EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
     public static final List<String> PDF_FIELDS = List.of(PATH.toString(), CONTENT.toString(), ANNOTATIONS.toString());
     private final String field;
 

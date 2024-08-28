@@ -10,12 +10,12 @@ import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 import org.apache.lucene.analysis.ngram.NGramTokenFilter;
 
-public class NGramAnalyzer extends Analyzer {
+public class LatexAwareNGramAnalyzer extends Analyzer {
     private final int minGram;
     private final int maxGram;
     private final CharArraySet stopWords;
 
-    public NGramAnalyzer(int minGram, int maxGram, CharArraySet stopWords) {
+    public LatexAwareNGramAnalyzer(int minGram, int maxGram, CharArraySet stopWords) {
         this.minGram = minGram;
         this.maxGram = maxGram;
         this.stopWords = stopWords;
