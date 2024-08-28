@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
-import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.QueryTermExtractor;
 import org.apache.lucene.search.highlight.WeightedTerm;
@@ -85,7 +84,7 @@ public class SearchQuery {
         try {
             parsedQuery = queryParser.parse(query);
             parseError = null;
-        } catch (ParseException e) {
+        } catch (Exception e) {
             parsedQuery = null;
             parseError = e.getMessage();
         }
