@@ -1,0 +1,52 @@
+# Description: This workflow is triggered when the "Check" workflow completes.
+# Since this pull request has write permissions on the target repo, we should **NOT** execute any untrusted code.
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+# Based on https://github.com/spring-projects/spring-security/pull/15477/files
+---
+name: Comment on PR
+
+on:
+  workflow_run:
+    workflows: ["Tests"]
+    types:
+      - completed
+
+jobs:
+  comment:
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
+    timeout-minutes: 10
+    steps:
+      - name: Download PR number
+        uses: actions/download-artifact@v4
+        with:
+          name: pr_number
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+      - name: Read pr_number.txt
+        id: read-pr_number
+        run: |
+          PR_NUMBER=$(cat pr_number.txt)
+          echo "Read PR number $PR_NUMBER"
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+      - name: Checkout
+        if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+          show-progress: 'false'
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: jbang
+        if: ${{ steps.read-pr_number.outputs.pr_number != '' }}
+        uses: jbangdev/jbang-action@v0.117.1
+        with:
+          script: ghprcomment@koppor/ghprcomment
+          scriptargs: "-r JabRef/jabref -p ${{ steps.read-pr_number.outputs.pr_number }} -w ${{ github.event.workflow_run.id }}"
+          trust: https://github.com/koppor/ghprcomment/
+        env:
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
