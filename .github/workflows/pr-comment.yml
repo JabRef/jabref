@@ -46,7 +46,7 @@ jobs:
         uses: jbangdev/jbang-action@v0.117.1
         with:
           script: ghprcomment@koppor/ghprcomment
-          scriptargs: "-r koppor/workflow-comment-test -p ${{ steps.read-pr_number.outputs.pr_number }} -w ${{ github.event.workflow_run.id }}"
+          scriptargs: "-r JabRef/jabref -p ${{ steps.read-pr_number.outputs.pr_number }} -w ${{ github.event.workflow_run.id }}"
           trust: https://github.com/koppor/ghprcomment/
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
