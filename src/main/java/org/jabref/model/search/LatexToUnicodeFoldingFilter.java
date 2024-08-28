@@ -3,6 +3,7 @@ package org.jabref.model.search;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @implNote Implementation based on {@link org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter}
  */
+@AllowedToUseLogic("because it needs access to the LaTeXToUnicodeFormatter")
 public final class LatexToUnicodeFoldingFilter extends TokenFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(LatexToUnicodeFoldingFilter.class);
     private static final Formatter FORMATTER = new LatexToUnicodeFormatter();
