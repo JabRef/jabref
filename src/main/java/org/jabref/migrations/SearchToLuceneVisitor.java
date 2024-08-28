@@ -30,8 +30,6 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
 
     private final boolean isRegularExpression;
 
-    private boolean isNegation = false;
-
     public SearchToLuceneVisitor(boolean isRegularExpression) {
         this.isRegularExpression = isRegularExpression;
     }
@@ -45,7 +43,6 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
         // See https://github.com/LoayGhreeb/lucene-mwe/issues/1 for more details
         if (result instanceof ModifierQueryNode modifierQueryNode) {
             if (modifierQueryNode.getModifier() == ModifierQueryNode.Modifier.MOD_NOT) {
-                isNegation = true;
                 return new AndQueryNode(List.of(new FieldQueryNode(SearchFieldConstants.DEFAULT_FIELD.toString(), "*", 0, 0), modifierQueryNode));
             }
         }
@@ -53,7 +50,6 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
         // User might search for NOT this AND NOT that - we also need to convert properly
         if (result instanceof AndQueryNode andQueryNode) {
             if (andQueryNode.getChildren().stream().allMatch(child -> child instanceof ModifierQueryNode modifierQueryNode && modifierQueryNode.getModifier() == ModifierQueryNode.Modifier.MOD_NOT)) {
-                isNegation = true;
                 List<QueryNode> children = andQueryNode.getChildren().stream()
                                                        // prepend "all:* AND" to each child
                                                        .map(child -> new AndQueryNode(List.of(new FieldQueryNode(SearchFieldConstants.DEFAULT_FIELD.toString(), "*", 0, 0), child)))
@@ -108,7 +104,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
                     context.EQUAL() != null ||
                     context.EEQUAL() != null) { // exact match
                 if (LOGGER.isDebugEnabled() && context.EEQUAL() != null) {
-                    LOGGER.warn("Exact match is currently  supported by Lucene, using contains instead. Term: {}", context.getText());
+                    LOGGER.warn("Exact match is currently not supported by Lucene, using contains instead. Term: {}", context.getText());
                 }
                 return getFieldQueryNode(field, right, startIndex, stopIndex);
             }
@@ -138,12 +134,5 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
             return new RegexpQueryNode(field, term, 0, term.length());
         }
         return new FieldQueryNode(field, term, startIndex, stopIndex);
-    }
-
-    /**
-     * Returns whether the search query is a negation (and was patched to be a filter).
-     */
-    public boolean isNegation() {
-        return this.isNegation;
     }
 }

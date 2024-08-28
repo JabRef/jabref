@@ -17,6 +17,7 @@ class SearchToLuceneMigrationTest {
 
                 Arguments.of("title:chocolate", "title=chocolate"),
                 Arguments.of("title:chocolate OR author:smith", "title = chocolate or author = smith"),
+                Arguments.of("groups:\\/exclude", "groups= /exclude"),
                 Arguments.of("title:chocolate AND author:smith", "title = \"chocolate\" AND author = \"smith\""),
                 Arguments.of("title:chocolate AND author:smith", "title contains \"chocolate\" AND author matches \"smith\""),
                 Arguments.of("( title:chocolate ) OR ( author:smith )", "(title == chocolate) or (author == smith)"),
@@ -26,6 +27,7 @@ class SearchToLuceneMigrationTest {
                 Arguments.of("abstract:model\\{1,2\\}ing", "abstract = model{1,2}ing"),
                 Arguments.of("all:* AND -title:chocolate", "title != chocolate"),
                 Arguments.of("all:* AND -title:chocolate", "not title contains chocolate"),
+                Arguments.of("groups=:\\:paywall AND -file=\"\" AND -groups=\\/exclude", "groups=:paywall and file!=\"\" and groups!=/exclude"),
 
                 // not converted, because not working in JabRef 5.x
                 // Arguments.of("title:\"image processing\" OR keywords:\"image processing\"", "title|keywords = \"image processing\""),

@@ -6,18 +6,18 @@ import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
-import org.apache.lucene.analysis.standard.StandardTokenizer;
 
-public class StandardAnalyzer extends Analyzer {
+public class WhitespaceAnalyzer extends Analyzer {
     private final CharArraySet stopWords;
-    public StandardAnalyzer(CharArraySet stopWords) {
+    public WhitespaceAnalyzer(CharArraySet stopWords) {
         this.stopWords = stopWords;
     }
 
     @Override
     protected TokenStreamComponents createComponents(String fieldName) {
-        Tokenizer source = new StandardTokenizer();
+        Tokenizer source = new WhitespaceTokenizer();
         TokenStream result = new LowerCaseFilter(source);
         result = new StopFilter(result, stopWords);
         result = new ASCIIFoldingFilter(result);
