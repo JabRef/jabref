@@ -12,16 +12,17 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.QueryTermExtractor;
 import org.apache.lucene.search.highlight.WeightedTerm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SearchQuery {
-
+    private static final Formatter FORMATTER = new LatexToUnicodeFormatter();
     /**
      * The mode of escaping special characters in regular expressions
      */
@@ -59,7 +60,6 @@ public class SearchQuery {
         abstract String format(String regex);
     }
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(SearchQuery.class);
     protected final String query;
     protected Query parsedQuery;
     protected String parseError;
@@ -87,7 +87,7 @@ public class SearchQuery {
         queryParser.setAllowLeadingWildcard(true);
 
         try {
-            parsedQuery = queryParser.parse(query);
+            parsedQuery = queryParser.parse(FORMATTER.format(query));
             parseError = null;
         } catch (ParseException e) {
             parsedQuery = null;
