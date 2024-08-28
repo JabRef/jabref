@@ -9,6 +9,10 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 
+/**
+ * Lucene analyzer respecting the special "features" of JabRef.
+ * Especially, LaTeX-encoded text.
+ */
 public class JabRefAnalyzer extends Analyzer {
     private final CharArraySet stopWords;
     public JabRefAnalyzer(CharArraySet stopWords) {
