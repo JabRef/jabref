@@ -110,7 +110,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                                 content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber()));
                             }
                             if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
-                                Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in Annotations:") + System.lineSeparator() + System.lineSeparator());
+                                Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in annotations:") + System.lineSeparator() + System.lineSeparator());
                                 annotationsText.setStyle("-fx-font-style: italic;");
                                 content.getChildren().add(annotationsText);
                             }
