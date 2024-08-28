@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added probable search hits instead of exact matches. Sorting by hit score can be done by the new score table column. [#11326](https://github.com/JabRef/jabref/pull/11326)
+- We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We added an AI-based chat for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
 - We added an AI-based summarization possibility for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
 - We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
@@ -29,6 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- The search syntax is changed to [Apache Lucene syntax](https://docs.jabref.org/collect/import-using-online-bibliographic-database#search-syntax) (also to be similar to the online search syntax). [#11542](https://github.com/JabRef/jabref/pull/11542/)
 - When a communication error with an [online service](https://docs.jabref.org/collect/import-using-online-bibliographic-database) occurs, JabRef displays the HTTP error. [#11223](https://github.com/JabRef/jabref/issues/11223)
 - The Pubmed/Medline Plain importer now imports the PMID field as well [#11488](https://github.com/JabRef/jabref/issues/11488)
 - The 'Check for updates' menu bar button is now always enabled. [#11485](https://github.com/JabRef/jabref/pull/11485)
@@ -56,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
+- We removed support for case-insentive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
 
 
