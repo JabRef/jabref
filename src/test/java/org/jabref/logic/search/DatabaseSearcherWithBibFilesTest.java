@@ -25,7 +25,6 @@ import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -98,17 +97,7 @@ class DatabaseSearcherWithBibFilesTest {
         when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
         Injector.setModelOrService(PreferencesService.class, preferencesService);
 
-        // pdfIndexer = PdfIndexerManager.getIndexer(context, filePreferences);
-        // Alternative - For debugging with Luke (part of the Apache Lucene distribution)
-        // pdfIndexer = PdfIndexer.of(context, Path.of("C:\\temp\\index"), filePreferences);
-
-        // pdfIndexer.rebuildIndex();
         return database;
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        // pdfIndexer.close();
     }
 
     private static Stream<Arguments> searchLibrary() {
