@@ -8,7 +8,7 @@ import org.apache.lucene.analysis.en.EnglishAnalyzer;
 public enum SearchFieldConstants {
 
     VERSION("99"),
-    DEFAULT_FIELD("all"),
+    DEFAULT_FIELD("any"),
     ENTRY_ID("id"),
     ENTRY_TYPE("entrytype"),
     PATH("path"),

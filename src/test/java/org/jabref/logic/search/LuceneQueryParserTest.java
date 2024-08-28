@@ -17,14 +17,14 @@ public class LuceneQueryParserTest {
     public static Stream<Arguments> searchQuires() {
         return Stream.of(
                 // unicode
-                Arguments.of("all:preissinger", "preißinger"),
-                Arguments.of("all:jesus", "jesús"),
-                Arguments.of("all:breitenbucher", "breitenbücher"),
+                Arguments.of("any:preissinger", "preißinger"),
+                Arguments.of("any:jesus", "jesús"),
+                Arguments.of("any:breitenbucher", "breitenbücher"),
 
                 // latex
-                Arguments.of("all:preissinger", "\"prei{\\\\ss}inger\""),
-                Arguments.of("all:jesus", "\"jes{\\\\'{u}}s\""),
-                Arguments.of("all:breitenbucher", "\"breitenb{\\\\\\\"{u}}cher\""),
+                Arguments.of("any:preissinger", "\"prei{\\\\ss}inger\""),
+                Arguments.of("any:jesus", "\"jes{\\\\'{u}}s\""),
+                Arguments.of("any:breitenbucher", "\"breitenb{\\\\\\\"{u}}cher\""),
 
                 Arguments.of("groups:/exclude", "groups:\\/exclude")
         );

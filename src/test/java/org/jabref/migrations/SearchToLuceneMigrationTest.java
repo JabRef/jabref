@@ -12,8 +12,8 @@ class SearchToLuceneMigrationTest {
 
     public static Stream<Arguments> transformationNormal() {
         return Stream.of(
-                // If "all:" should not be added, see e46e0a23d7b9526bd449cbecfb189ae6dbc40a28 for a fix
-                Arguments.of("all:chocolate", "chocolate"),
+                // If "any:" should not be added, see e46e0a23d7b9526bd449cbecfb189ae6dbc40a28 for a fix
+                Arguments.of("any:chocolate", "chocolate"),
 
                 Arguments.of("title:chocolate", "title=chocolate"),
                 Arguments.of("title:chocolate OR author:smith", "title = chocolate or author = smith"),
@@ -22,11 +22,11 @@ class SearchToLuceneMigrationTest {
                 Arguments.of("title:chocolate AND author:smith", "title contains \"chocolate\" AND author matches \"smith\""),
                 Arguments.of("( title:chocolate ) OR ( author:smith )", "(title == chocolate) or (author == smith)"),
                 Arguments.of("( title:chocolate OR author:smith ) AND ( year:2024 )", "(title contains chocolate or author matches smith) AND (year = 2024)"),
-                Arguments.of("all:video AND year:1932", "video and year == 1932"),
+                Arguments.of("any:video AND year:1932", "video and year == 1932"),
                 Arguments.of("title:neighbou?r", "title =neighbou?r"),
                 Arguments.of("abstract:model\\{1,2\\}ing", "abstract = model{1,2}ing"),
-                Arguments.of("all:* AND -title:chocolate", "title != chocolate"),
-                Arguments.of("all:* AND -title:chocolate", "not title contains chocolate"),
+                Arguments.of("any:* AND -title:chocolate", "title != chocolate"),
+                Arguments.of("any:* AND -title:chocolate", "not title contains chocolate"),
                 // https://github.com/JabRef/jabref/issues/11654#issuecomment-2313178736
                 Arguments.of("( groups:\\:paywall AND -file:/.+/ ) AND -groups:\\/exclude", "groups=:paywall and file!=\"\" and groups!=/exclude"),
 
@@ -40,7 +40,7 @@ class SearchToLuceneMigrationTest {
                 Arguments.of("title:image\\ processing AND author:smith", "title = \"image processing\" AND author= smith"),
 
                 // We renamed fields
-                Arguments.of("all:somecontent", "anyfield = somecontent"),
+                Arguments.of("any:somecontent", "anyfield = somecontent"),
                 Arguments.of("keywords:somekeyword", "anykeyword = somekeyword"),
                 Arguments.of("citationkey:somebibtexkey", "key = somebibtexkey")
         );
@@ -55,8 +55,8 @@ class SearchToLuceneMigrationTest {
 
     public static Stream<Arguments> transformationRegularExpression() {
         return Stream.of(
-                Arguments.of("all:* AND -groups:/.+/", "groups != .+"),
-                Arguments.of("( all:* AND -groups:/.+/ ) AND ( all:* AND -readstatus:/.+/ )", "groups != .+ and readstatus != .+"),
+                Arguments.of("any:* AND -groups:/.+/", "groups != .+"),
+                Arguments.of("( any:* AND -groups:/.+/ ) AND ( any:* AND -readstatus:/.+/ )", "groups != .+ and readstatus != .+"),
                 Arguments.of("author:/(John|Doe).+(John|Doe)/", "author = \"(John|Doe).+(John|Doe)\"")
         );
     }

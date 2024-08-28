@@ -51,7 +51,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
         if (result instanceof AndQueryNode andQueryNode) {
             if (andQueryNode.getChildren().stream().allMatch(child -> child instanceof ModifierQueryNode modifierQueryNode && modifierQueryNode.getModifier() == ModifierQueryNode.Modifier.MOD_NOT)) {
                 List<QueryNode> children = andQueryNode.getChildren().stream()
-                                                       // prepend "all:* AND" to each child
+                                                       // prepend "any:* AND" to each child
                                                        .map(child -> new AndQueryNode(List.of(new FieldQueryNode(SearchFieldConstants.DEFAULT_FIELD.toString(), "*", 0, 0), child)))
                                                        .map(child -> (QueryNode) child)
                                                        .toList();
