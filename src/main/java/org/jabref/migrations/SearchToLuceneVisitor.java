@@ -106,13 +106,23 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
                 if (LOGGER.isDebugEnabled() && context.EEQUAL() != null) {
                     LOGGER.warn("Exact match is currently not supported by Lucene, using contains instead. Term: {}", context.getText());
                 }
-                return getFieldQueryNode(field, right, startIndex, stopIndex);
+                return getFieldQueryNode(field, right, startIndex, stopIndex, false);
             }
 
             assert (context.NEQUAL() != null);
-            return new ModifierQueryNode(getFieldQueryNode(field, right, startIndex, stopIndex), ModifierQueryNode.Modifier.MOD_NOT);
+
+            // Treating of "wrong" query field != "". This did not work in v5.x, but should work in v6.x
+            boolean forceRegex;
+            if (right.isEmpty()) {
+                forceRegex = true;
+                right = ".+";
+            } else {
+                forceRegex = false;
+            }
+
+            return new ModifierQueryNode(getFieldQueryNode(field, right, startIndex, stopIndex, forceRegex), ModifierQueryNode.Modifier.MOD_NOT);
         } else {
-            return getFieldQueryNode(SearchFieldConstants.DEFAULT_FIELD.toString(), right, startIndex, stopIndex);
+            return getFieldQueryNode(SearchFieldConstants.DEFAULT_FIELD.toString(), right, startIndex, stopIndex, false);
         }
     }
 
@@ -121,7 +131,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
      * In Lucene, this is represented by a RegexpQueryNode or a FieldQueryNode.
      * They are created in this class accordingly.
      */
-    private QueryNode getFieldQueryNode(String field, String term, int startIndex, int stopIndex) {
+    private QueryNode getFieldQueryNode(String field, String term, int startIndex, int stopIndex, boolean forceRegex) {
         field = switch (field) {
             case "anyfield" -> SearchFieldConstants.DEFAULT_FIELD.toString();
             case "anykeyword" -> StandardField.KEYWORDS.getName();
@@ -129,7 +139,7 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<QueryNode> {
             default -> field;
         };
 
-        if (isRegularExpression) {
+        if (isRegularExpression || forceRegex) {
             // Lucene does a sanity check on the positions, thus we provide other fake positions
             return new RegexpQueryNode(field, term, 0, term.length());
         }

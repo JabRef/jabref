@@ -6,7 +6,6 @@ import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.search.SearchFieldConstants;
 
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -37,7 +36,7 @@ public class LuceneQueryParserTest {
     @ParameterizedTest
     @MethodSource
     void searchQuires(String expected, String query) throws ParseException {
-        QueryParser parser = new QueryParser(SearchFieldConstants.DEFAULT_FIELD.toString(), new WhitespaceAnalyzer());
+        QueryParser parser = new QueryParser(SearchFieldConstants.DEFAULT_FIELD.toString(), SearchFieldConstants.Whitespace_ANALYZER);
          query = FORMATTER.format(query);
         String result = parser.parse(query).toString();
         assertEquals(expected, result);

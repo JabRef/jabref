@@ -27,7 +27,8 @@ class SearchToLuceneMigrationTest {
                 Arguments.of("abstract:model\\{1,2\\}ing", "abstract = model{1,2}ing"),
                 Arguments.of("all:* AND -title:chocolate", "title != chocolate"),
                 Arguments.of("all:* AND -title:chocolate", "not title contains chocolate"),
-                Arguments.of("groups=:\\:paywall AND -file=\"\" AND -groups=\\/exclude", "groups=:paywall and file!=\"\" and groups!=/exclude"),
+                // https://github.com/JabRef/jabref/issues/11654#issuecomment-2313178736
+                Arguments.of("( groups:\\:paywall AND -file:/.+/ ) AND -groups:\\/exclude", "groups=:paywall and file!=\"\" and groups!=/exclude"),
 
                 // not converted, because not working in JabRef 5.x
                 // Arguments.of("title:\"image processing\" OR keywords:\"image processing\"", "title|keywords = \"image processing\""),

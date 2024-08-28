@@ -9,6 +9,7 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
 import org.apache.lucene.analysis.ngram.NGramTokenFilter;
+import org.apache.lucene.analysis.shingle.ShingleFilter;
 
 public class NGramAnalyzer extends Analyzer {
     private final int minGram;
@@ -27,6 +28,7 @@ public class NGramAnalyzer extends Analyzer {
         TokenStream result = new LowerCaseFilter(source);
         result = new StopFilter(result, stopWords);
         result = new ASCIIFoldingFilter(result);
+        result = new ShingleFilter(result);
         result = new NGramTokenFilter(result, minGram, maxGram, true);
         return new TokenStreamComponents(source, result);
     }
