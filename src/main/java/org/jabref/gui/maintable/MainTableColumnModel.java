@@ -36,7 +36,7 @@ public class MainTableColumnModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
     public enum Type {
         MATCH_CATEGORY("match_category"), // Not localized, because this column is always hidden
-        SCORE("search_score", Localization.lang("Search score")),
+        MATCH_SCORE("match_score", Localization.lang("Match score")),
         INDEX("index", Localization.lang("Index")),
         EXTRAFILE("extrafile", Localization.lang("File type")),
         FILES("files", Localization.lang("Linked files")),

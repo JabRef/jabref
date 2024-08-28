@@ -55,7 +55,7 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
         TableColumn scoreColumn = this.getColumns().stream()
                                       .filter(c -> c instanceof MainTableColumn<?>)
                                       .map(c -> ((MainTableColumn) c))
-                                      .filter(c -> c.getModel().getType() == MainTableColumnModel.Type.SCORE)
+                                      .filter(c -> c.getModel().getType() == MainTableColumnModel.Type.MATCH_SCORE)
                                       .findFirst().orElse(null);
 
         this.getSortOrder().clear();

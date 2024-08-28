@@ -87,7 +87,7 @@ public class MainTableColumnFactory {
     public TableColumn<BibEntryTableViewModel, ?> createColumn(MainTableColumnModel column) {
         TableColumn<BibEntryTableViewModel, ?> returnColumn = null;
         switch (column.getType()) {
-            case SCORE:
+            case MATCH_SCORE:
                 returnColumn = createScoreColumn(column);
                 break;
             case INDEX:
@@ -167,7 +167,7 @@ public class MainTableColumnFactory {
         TableColumn<BibEntryTableViewModel, Number> column = new MainTableColumn<>(columnModel);
         Node header = new Text(Localization.lang("Score"));
         header.getStyleClass().add("mainTable-header");
-        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.SCORE.getDisplayName()));
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.MATCH_SCORE.getDisplayName()));
         column.setGraphic(header);
         column.setStyle("-fx-alignment: CENTER-RIGHT;");
         column.setCellValueFactory(cellData -> cellData.getValue().searchScoreProperty());
