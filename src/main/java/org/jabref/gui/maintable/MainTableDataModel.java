@@ -211,6 +211,7 @@ public class MainTableDataModel {
                     // The indexOf() method is not used because it relies on the equals(),
                     // which can return the wrong index if some entries are equal but different instances.
                     // For example, two different instances of an empty entry would be treated as equal by .equals().
+                    // See also ADR-0038
                     int index = -1;
                     for (int i = 0; i < allEntries.size(); i++) {
                         if (allEntries.get(i) == entry) {
