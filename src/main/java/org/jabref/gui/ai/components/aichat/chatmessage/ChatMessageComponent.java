@@ -55,6 +55,10 @@ public class ChatMessageComponent extends HBox {
         this.chatMessage.set(chatMessage);
     }
 
+    public ChatMessage getChatMessage() {
+        return chatMessage.get();
+    }
+
     public void setOnDelete(Consumer<ChatMessageComponent> onDeleteCallback) {
         this.onDelete.set(onDeleteCallback);
     }

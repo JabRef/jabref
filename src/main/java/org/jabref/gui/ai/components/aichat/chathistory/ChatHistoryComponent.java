@@ -2,30 +2,31 @@ package org.jabref.gui.ai.components.aichat.chathistory;
 
 import java.util.function.Consumer;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.ai.components.aichat.chatmessage.ChatMessageComponent;
+import org.jabref.gui.util.UiTaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import dev.langchain4j.data.message.ChatMessage;
+import org.checkerframework.checker.guieffect.qual.UI;
 
 public class ChatHistoryComponent extends ScrollPane {
     @FXML private VBox vBox;
-
-    private final ObjectProperty<Consumer<Integer>> deleteMessageCallback = new SimpleObjectProperty<>();
 
     public ChatHistoryComponent() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
-
-        deleteMessageCallback.addListener((observable, oldValue, newValue) ->
-            vBox.getChildren().forEach(child -> ((ChatMessageComponent) child).setOnDelete(generateDeleteMessageCallback()))
-        );
 
         this.needsLayoutProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue) {
@@ -34,41 +35,25 @@ public class ChatHistoryComponent extends ScrollPane {
         });
     }
 
-    private Consumer<ChatMessageComponent> generateDeleteMessageCallback() {
-        return chatMessageComponent -> {
-            int index = vBox.getChildren().indexOf(chatMessageComponent);
-            deleteMessageCallback.get().accept(index);
-        };
+    // You must call this method only once.
+    public void setItems(ObservableList<ChatMessage> items) {
+        fill(items);
+        items.addListener((ListChangeListener<? super ChatMessage>) obs -> fill(items));
     }
 
-    public void setDeleteMessageCallback(Consumer<Integer> deleteMessageCallback) {
-        this.deleteMessageCallback.set(deleteMessageCallback);
+    private void fill(ObservableList<ChatMessage> items) {
+        UiTaskExecutor.runInJavaFXThread(() -> {
+            vBox.getChildren().clear();
+            items.forEach(chatMessage ->
+                    vBox.getChildren().add(new ChatMessageComponent(chatMessage, chatMessageComponent -> {
+                        int index = vBox.getChildren().indexOf(chatMessageComponent);
+                        items.remove(index);
+                    })));
+        });
     }
 
     public void scrollDown() {
         this.layout();
         this.setVvalue(this.getVmax());
-    }
-
-    public void addMessage(ChatMessage chatMessage) {
-        ChatMessageComponent component = new ChatMessageComponent(chatMessage, generateDeleteMessageCallback());
-        vBox.getChildren().add(component);
-        scrollDown();
-    }
-
-    // WARNING: This method won't call `deleteMessageCallback` for the deleted message.
-    public void deleteMessage(int index) {
-        vBox.getChildren().remove(index);
-    }
-
-    // WARNING: This method won't call `deleteMessageCallback` for each message that is deleted.
-    public void clearAll() {
-        vBox.getChildren().clear();
-    }
-
-    private void removeLastMessage() {
-        if (!vBox.getChildren().isEmpty()) {
-            deleteMessage(vBox.getChildren().size() - 1);
-        }
     }
 }

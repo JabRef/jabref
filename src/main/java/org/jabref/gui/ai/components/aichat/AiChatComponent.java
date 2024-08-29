@@ -86,7 +86,7 @@ public class AiChatComponent extends VBox {
 
     @FXML
     public void initialize() {
-        initializeChatHistory();
+        uiChatHistory.setItems(aiChatLogic.getChatHistory());
         initializeChatPrompt();
         initializeNotice();
         initializeNotifications();
@@ -127,14 +127,6 @@ public class AiChatComponent extends VBox {
         chatPrompt.requestPromptFocus();
 
         updatePromptHistory();
-    }
-
-    private void initializeChatHistory() {
-        uiChatHistory.setDeleteMessageCallback(this::deleteMessage);
-
-        aiChatLogic
-                .getChatHistory()
-                .forEach(uiChatHistory::addMessage);
     }
 
     private void updateNotifications() {
@@ -212,13 +204,11 @@ public class AiChatComponent extends VBox {
     }
 
     private void deleteMessage(int index) {
-        uiChatHistory.deleteMessage(index);
         aiChatLogic.getChatHistory().remove(index);
     }
 
     private void onSendMessage(String userPrompt) {
         UserMessage userMessage = new UserMessage(userPrompt);
-        uiChatHistory.addMessage(userMessage);
         updatePromptHistory();
         setLoading(true);
 
@@ -228,7 +218,6 @@ public class AiChatComponent extends VBox {
                         .showToUser(true)
                         .onSuccess(aiMessage -> {
                             setLoading(false);
-                            uiChatHistory.addMessage(aiMessage);
                             chatPrompt.requestPromptFocus();
                         })
                         .onFailure(e -> {
@@ -251,7 +240,6 @@ public class AiChatComponent extends VBox {
 
     private void addError(String error) {
         ErrorMessage chatMessage = new ErrorMessage(error);
-        uiChatHistory.addMessage(chatMessage);
         aiChatLogic.getChatHistory().add(chatMessage);
     }
 
@@ -282,7 +270,6 @@ public class AiChatComponent extends VBox {
         );
 
         if (agreed) {
-            uiChatHistory.clearAll();
             aiChatLogic.getChatHistory().clear();
         }
     }
@@ -291,7 +278,6 @@ public class AiChatComponent extends VBox {
         if (!aiChatLogic.getChatHistory().isEmpty()) {
             int index = aiChatLogic.getChatHistory().size() - 1;
             aiChatLogic.getChatHistory().remove(index);
-            uiChatHistory.deleteMessage(index);
         }
     }
 }
