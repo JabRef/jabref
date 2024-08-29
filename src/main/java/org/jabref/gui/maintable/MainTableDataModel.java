@@ -1,6 +1,8 @@
 package org.jabref.gui.maintable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
@@ -8,6 +10,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -62,6 +65,9 @@ public class MainTableDataModel {
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     @Nullable private final LuceneManager luceneManager;
 
+    // <BibEntry.getId, index> see ADR-0038
+    private final Map<String, Integer> entryIndexMap = new HashMap<>();
+
     private Optional<MatcherSet> groupsMatcher;
 
     public MainTableDataModel(BibDatabaseContext context,
@@ -98,6 +104,35 @@ public class MainTableDataModel {
         resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS).get())));
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesFilteredAndSorted = new SortedList<>(entriesFiltered);
+
+        initializeEntryIndexMap();
+    }
+
+    private void initializeEntryIndexMap() {
+        for (int i = 0; i < allEntries.size(); i++) {
+            entryIndexMap.put(allEntries.get(i).getId(), i);
+        }
+
+        allEntries.addListener((ListChangeListener.Change<? extends BibEntry> c) -> {
+            while (c.next()) {
+                if (c.wasPermutated()) {
+                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                        entryIndexMap.put(allEntries.get(i).getId(), i);
+                    }
+                } else {
+                    if (c.wasRemoved()) {
+                        for (BibEntry removedEntry : c.getRemoved()) {
+                            entryIndexMap.remove(removedEntry.getId());
+                        }
+                    }
+                    if (c.wasAdded()) {
+                        for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                            entryIndexMap.put(allEntries.get(i).getId(), i);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void updateSearchMatches(Optional<SearchQuery> query) {
@@ -202,18 +237,8 @@ public class MainTableDataModel {
         public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
             indexAddedOrUpdatedEvent.entries().forEach(entry -> {
                 BackgroundTask.wrap(() -> {
-                    // Find the index of the entry in the list.
-                    // The indexOf() method is not used because it relies on the equals(),
-                    // which can return the wrong index if some entries are equal but different instances.
-                    // For example, two different instances of an empty entry would be treated as equal by .equals().
-                    // See also ADR-0038
-                    int index = -1;
-                    for (int i = 0; i < allEntries.size(); i++) {
-                        if (allEntries.get(i) == entry) {
-                            index = i;
-                            break;
-                        }
-                    }
+                    // See ADR-0038
+                    int index = entryIndexMap.getOrDefault(entry.getId(), -1);
                     if (index >= 0) {
                         BibEntryTableViewModel viewModel = entriesViewModel.get(index);
                         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
