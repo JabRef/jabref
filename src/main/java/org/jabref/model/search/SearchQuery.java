@@ -74,10 +74,6 @@ public class SearchQuery {
         String[] fieldsToSearchArray = new String[boosts.size()];
         boosts.keySet().toArray(fieldsToSearchArray);
 
-        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
-            query = '/' + query + '/';
-        }
-
         MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, SearchFieldConstants.LATEX_AWARE_ANALYZER, boosts);
         queryParser.setAllowLeadingWildcard(true);
 

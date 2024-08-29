@@ -16,7 +16,6 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
-import javafx.collections.SetChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -82,7 +81,6 @@ public class GlobalSearchBar extends HBox {
     private static final PseudoClass ILLEGAL_SEARCH = PseudoClass.getPseudoClass("illegal-search");
 
     private final CustomTextField searchField;
-    private final ToggleButton regularExpressionButton;
     private final ToggleButton fulltextButton;
     private final Button openGlobalSearchButton;
     private final ToggleButton keepSearchString;
@@ -96,7 +94,6 @@ public class GlobalSearchBar extends HBox {
     private final DialogService dialogService;
     private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);
     private final BooleanProperty illegalSearch = new SimpleBooleanProperty(false);
-    private final BooleanProperty invalidRegex = new SimpleBooleanProperty(false);
     private GlobalSearchResultDialog globalSearchResultDialog;
     private final SearchType searchType;
 
@@ -125,14 +122,11 @@ public class GlobalSearchBar extends HBox {
         currentResults.setPrefWidth(150);
 
         currentResults.textProperty().bind(EasyBind.combine(
-                stateManager.activeSearchQuery(searchType), stateManager.searchResultSize(searchType), illegalSearch, invalidRegex,
-                (searchQuery, matched, illegal, invalid) -> {
+                stateManager.activeSearchQuery(searchType), stateManager.searchResultSize(searchType), illegalSearch,
+                (searchQuery, matched, illegal) -> {
                     if (illegal) {
                         searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, true);
                         return Localization.lang("Search failed: illegal search expression");
-                    } else if (invalid) {
-                        searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, true);
-                        return Localization.lang("Invalid regular expression.");
                     } else if (searchQuery.isEmpty()) {
                         searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, false);
                         return "";
@@ -169,7 +163,6 @@ public class GlobalSearchBar extends HBox {
             searchField.getContextMenu().getItems().add(SearchFieldRightClickMenu.createSearchFromHistorySubMenu(stateManager, searchField));
         });
 
-        regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
         fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
         openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();
         keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();
@@ -178,14 +171,11 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButtons();
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
-                                                    .or(regularExpressionButton.focusedProperty())
                                                     .or(fulltextButton.focusedProperty())
                                                     .or(keepSearchString.focusedProperty())
                                                     .or(filterModeButton.focusedProperty())
                                                     .or(searchField.textProperty().isNotEmpty());
 
-        regularExpressionButton.visibleProperty().unbind();
-        regularExpressionButton.visibleProperty().bind(focusedOrActive);
         fulltextButton.visibleProperty().unbind();
         fulltextButton.visibleProperty().bind(focusedOrActive);
         keepSearchString.visibleProperty().unbind();
@@ -195,9 +185,9 @@ public class GlobalSearchBar extends HBox {
 
         StackPane modifierButtons;
         if (searchType == SearchType.NORMAL_SEARCH) {
-            modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton, keepSearchString, filterModeButton));
+            modifierButtons = new StackPane(new HBox(fulltextButton, keepSearchString, filterModeButton));
         } else {
-            modifierButtons = new StackPane(new HBox(regularExpressionButton, fulltextButton));
+            modifierButtons = new StackPane(new HBox(fulltextButton));
         }
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
@@ -239,14 +229,6 @@ public class GlobalSearchBar extends HBox {
     }
 
     private void initSearchModifierButtons() {
-        regularExpressionButton.setSelected(searchPreferences.isRegularExpression());
-        regularExpressionButton.setTooltip(new Tooltip(Localization.lang("regular expression")));
-        initSearchModifierButton(regularExpressionButton);
-        regularExpressionButton.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            searchPreferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, newVal);
-            updateSearchQuery();
-        });
-
         fulltextButton.setSelected(searchPreferences.isFulltext());
         fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
         initSearchModifierButton(fulltextButton);
@@ -269,11 +251,6 @@ public class GlobalSearchBar extends HBox {
         openGlobalSearchButton.setTooltip(new Tooltip(Localization.lang("Search across libraries in a new window")));
         initSearchModifierButton(openGlobalSearchButton);
         openGlobalSearchButton.setOnAction(evt -> openGlobalSearchDialog());
-
-        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener.Change<? extends SearchFlags> change) -> {
-            regularExpressionButton.setSelected(searchPreferences.isRegularExpression());
-            fulltextButton.setSelected(searchPreferences.isFulltext());
-        });
     }
 
     public void openGlobalSearchDialog() {
@@ -322,16 +299,7 @@ public class GlobalSearchBar extends HBox {
             setSearchFieldHintTooltip();
             stateManager.activeSearchQuery(searchType).set(Optional.empty());
             illegalSearch.set(false);
-            invalidRegex.set(false);
             return;
-        }
-
-        // Invalid regular expression
-        if (regularExpressionButton.isSelected() && !validRegex()) {
-            invalidRegex.setValue(true);
-            return;
-        } else {
-            invalidRegex.setValue(false);
         }
 
         SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
