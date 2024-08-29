@@ -39,7 +39,6 @@ import org.jabref.preferences.SearchPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
-import io.github.adr.linked.ADR;
 import org.jspecify.annotations.Nullable;
 
 public class MainTableDataModel {
@@ -203,7 +202,6 @@ public class MainTableDataModel {
         public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
             indexAddedOrUpdatedEvent.entries().forEach(entry -> {
                 BackgroundTask.wrap(() -> {
-                    @ADR(38)
                     int index = bibDatabaseContext.getDatabase().indexOf(entry);
                     if (index >= 0) {
                         BibEntryTableViewModel viewModel = entriesViewModel.get(index);

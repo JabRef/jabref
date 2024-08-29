@@ -643,7 +643,7 @@ public class BibDatabase {
      */
     public int indexOf(BibEntry bibEntry) {
         int index = Collections.binarySearch(entries, bibEntry, Comparator.comparingInt(entry -> Integer.parseInt(entry.getId())));
-        return (index >= 0) ? index : -1;
+        return index >= 0 ? index : -1;
     }
 
     @Override
