@@ -241,7 +241,7 @@ public class MainTableDataModel {
         public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
             indexAddedOrUpdatedEvent.entries().forEach(entry -> {
                 BackgroundTask.wrap(() -> {
-                    // See ADR-0038
+                    @ADR(38)
                     int index = entryIndexMap.getOrDefault(entry.getId(), -1);
                     if (index >= 0) {
                         BibEntryTableViewModel viewModel = entriesViewModel.get(index);
