@@ -177,6 +177,7 @@ open module org.jabref {
     // region: other libraries (alphabetically)
     requires cuid;
     requires dd.plist;
+    requires io.github.adr;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
     requires mslinks;

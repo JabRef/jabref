@@ -42,6 +42,7 @@ import org.jabref.preferences.SearchPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
+import io.github.adr.linked.ADR;
 import org.jspecify.annotations.Nullable;
 
 public class MainTableDataModel {
@@ -65,7 +66,8 @@ public class MainTableDataModel {
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     @Nullable private final LuceneManager luceneManager;
 
-    // <BibEntry.getId, index> see ADR-0038
+    // <BibEntry.getId, index>
+    @ADR(38)
     private final Map<String, Integer> entryIndexMap = new HashMap<>();
 
     private Optional<MatcherSet> groupsMatcher;
