@@ -2,10 +2,10 @@ package org.jabref.gui.ai.components.aichat;
 
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
-import javafx.stage.Modality;
+import javafx.scene.Scene;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.BaseWindow;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.model.database.BibDatabaseContext;
@@ -15,9 +15,8 @@ import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.data.message.ChatMessage;
 
-public class AiChatDialog extends BaseDialog<Void> {
-
-    public AiChatDialog(StringProperty name,
+public class AiChatWindow extends BaseWindow {
+    public AiChatWindow(StringProperty name,
                         ObservableList<ChatMessage> chatHistory,
                         BibDatabaseContext bibDatabaseContext,
                         ObservableList<BibEntry> entries,
@@ -27,20 +26,23 @@ public class AiChatDialog extends BaseDialog<Void> {
                         FilePreferences filePreferences,
                         TaskExecutor taskExecutor
     ) {
-        this.initModality(Modality.NONE);
-
-        this.getDialogPane().getScene().getWindow().setOnCloseRequest(e -> this.close());
-
-        this.getDialogPane().setContent(new AiChatGuardedComponent(
-                name,
-                chatHistory,
-                bibDatabaseContext,
-                entries,
-                aiService,
-                dialogService,
-                aiPreferences,
-                filePreferences,
-                taskExecutor
-        ));
+        super(name);
+        setScene(
+                new Scene(
+                        new AiChatGuardedComponent(
+                                name,
+                                chatHistory,
+                                bibDatabaseContext,
+                                entries,
+                                aiService,
+                                dialogService,
+                                aiPreferences,
+                                filePreferences,
+                                taskExecutor
+                        ),
+                        800,
+                        600
+                )
+        );
     }
 }

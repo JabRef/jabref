@@ -24,7 +24,7 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.ai.components.aichat.AiChatDialog;
+import org.jabref.gui.ai.components.aichat.AiChatWindow;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -44,6 +44,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
+import dev.langchain4j.data.message.ChatMessage;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
@@ -376,7 +377,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                 dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
-                // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
+                // This is ugly, but we have no proper update mechanism in place to propagate the changes, so redraw everything
                 refresh();
             });
         });
@@ -394,17 +395,22 @@ public class GroupTreeViewModel extends AbstractViewModel {
         StringProperty nameProperty = new SimpleStringProperty("Group " + groupNameProperty.get());
         groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue("Group " + newValue));
 
-        dialogService.showCustomDialog(new AiChatDialog(
+        ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode().getGroup());
+        ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));
+
+        AiChatWindow aiChatWindow = new AiChatWindow(
                 nameProperty,
-                aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode().getGroup()),
+                chatHistory,
                 currentDatabase.get(),
-                FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase())),
+                bibEntries,
                 aiService,
                 dialogService,
                 preferences.getAiPreferences(),
                 preferences.getFilePreferences(),
                 taskExecutor
-        ));
+        );
+
+        dialogService.showCustomWindow(aiChatWindow);
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {
