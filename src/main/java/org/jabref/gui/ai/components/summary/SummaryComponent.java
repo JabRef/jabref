@@ -73,29 +73,29 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
 
     private Node showErrorNoDatabasePath() {
         return new ErrorStateComponent(
-                Localization.lang("Unable to chat"),
+                Localization.lang("Unable to generate summary"),
                 Localization.lang("The path of the current library is not set, but it is required for summarization")
         );
     }
 
     private Node showErrorNotPdfs() {
         return new ErrorStateComponent(
-                Localization.lang("Unable to chat"),
+                Localization.lang("Unable to generate summary"),
                 Localization.lang("Only PDF files are supported.")
         );
     }
 
     private Node showErrorNoFiles() {
         return new ErrorStateComponent(
-                Localization.lang("Unable to chat"),
-                Localization.lang("Please attach at least one PDF file to enable chatting with PDF file(s).")
+                Localization.lang("Unable to generate summary"),
+                Localization.lang("Please attach at least one PDF file to enable summarization of PDF file(s).")
         );
     }
 
     private Node tryToGenerateCitationKeyThenBind(BibEntry entry) {
         if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {
             return new ErrorStateComponent(
-                    Localization.lang("Unable to chat"),
+                    Localization.lang("Unable to generate summary"),
                     Localization.lang("Please provide a non-empty and unique citation key for this entry.")
             );
         } else {
