@@ -634,6 +634,18 @@ public class BibDatabase {
         return newLineSeparator;
     }
 
+    /**
+     * Returns the index of the given entry in the list of entries.
+     *
+     * @implNote New entries are always added to the end of the list and always get a higher ID.
+     *           See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType)}.
+     *           Therefore, using binary search to find the index.
+     */
+    public int indexOf(BibEntry bibEntry) {
+        int index = Collections.binarySearch(entries, bibEntry, Comparator.comparingInt(entry -> Integer.parseInt(entry.getId())));
+        return (index >= 0) ? index : -1;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

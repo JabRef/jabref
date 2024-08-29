@@ -203,18 +203,8 @@ public class MainTableDataModel {
         public void listen(IndexAddedOrUpdatedEvent indexAddedOrUpdatedEvent) {
             indexAddedOrUpdatedEvent.entries().forEach(entry -> {
                 BackgroundTask.wrap(() -> {
-                    // Find the index of the entry in the list.
-                    // The indexOf() method is not used because it relies on the equals(),
-                    // which can return the wrong index if some entries are equal but different instances.
-                    // For example, two different instances of an empty entry would be treated as equal by .equals().
                     @ADR(38)
-                    int index = -1;
-                    for (int i = 0; i < allEntries.size(); i++) {
-                        if (allEntries.get(i) == entry) {
-                            index = i;
-                            break;
-                        }
-                    }
+                    int index = bibDatabaseContext.getDatabase().indexOf(entry);
                     if (index >= 0) {
                         BibEntryTableViewModel viewModel = entriesViewModel.get(index);
                         boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
