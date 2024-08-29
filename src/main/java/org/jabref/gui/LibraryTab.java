@@ -127,7 +127,6 @@ public class LibraryTab extends Tab {
 
     private BibDatabaseContext bibDatabaseContext;
     private MainTableDataModel tableModel;
-    private CitationStyleCache citationStyleCache;
     private FileAnnotationCache annotationCache;
     private EntryEditor entryEditor;
     private MainTable mainTable;
@@ -165,6 +164,12 @@ public class LibraryTab extends Tab {
     private final DirectoryMonitorManager directoryMonitorManager;
     private LuceneManager luceneManager;
 
+    /**
+     * @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
+     *                       If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
+     *                       If the index is created for the dummy context, the actual context will not be able to open the index until it is closed by the dummy context.
+     *                       Closing the index takes time and will slow down opening the library.
+     */
     private LibraryTab(BibDatabaseContext bibDatabaseContext,
                        LibraryTabContainer tabContainer,
                        DialogService dialogService,
@@ -190,17 +195,32 @@ public class LibraryTab extends Tab {
         this.taskExecutor = taskExecutor;
         this.directoryMonitorManager = new DirectoryMonitorManager(Injector.instantiateModelOrService(DirectoryMonitor.class));
 
+        initializeComponentsAndListeners(isDummyContext);
+
+        // set LibraryTab ID for drag'n'drop
+        // ID content doesn't matter, we only need different tabs to have different ID
+        this.setId(Long.valueOf(new Random().nextLong()).toString());
+
+        setOnCloseRequest(this::onCloseRequest);
+        setOnClosed(this::onClosed);
+    }
+
+    private void initializeComponentsAndListeners(boolean isDummyContext) {
+        if (!isDummyContext) {
+            createLuceneManager();
+        }
+
+        if (tableModel != null) {
+            tableModel.unbind();
+        }
+
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
-
-        if (!isDummyContext) {
-            setLuceneManager();
-        }
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, taskExecutor, stateManager, getLuceneManager(), selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
 
-        citationStyleCache = new CitationStyleCache(bibDatabaseContext);
+        new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
         setupMainPanel();
@@ -218,18 +238,11 @@ public class LibraryTab extends Tab {
 
         this.entryEditor = createEntryEditor();
 
-        // set LibraryTab ID for drag'n'drop
-        // ID content doesn't matter, we only need different tabs to have different ID
-        this.setId(Long.valueOf(new Random().nextLong()).toString());
-
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
-
-        setOnCloseRequest(this::onCloseRequest);
-        setOnClosed(this::onClosed);
     }
 
     private EntryEditor createEntryEditor() {
@@ -291,7 +304,7 @@ public class LibraryTab extends Tab {
         dataLoadingTask = null;
     }
 
-    public void setLuceneManager() {
+    public void createLuceneManager() {
         luceneManager = new LuceneManager(bibDatabaseContext, taskExecutor, preferencesService.getFilePreferences());
         stateManager.setLuceneManager(bibDatabaseContext, luceneManager);
         luceneManager.updateOnStart();
@@ -334,38 +347,7 @@ public class LibraryTab extends Tab {
 
         stateManager.getOpenDatabases().add(bibDatabaseContext);
 
-        bibDatabaseContext.getDatabase().registerListener(this);
-        bibDatabaseContext.getMetaData().registerListener(this);
-
-        setLuceneManager();
-        this.tableModel.unbind();
-        this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, taskExecutor, stateManager, getLuceneManager(), selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
-
-        citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
-
-        setupMainPanel();
-        setupAutoCompletion();
-
-        this.getDatabase().registerListener(new IndexUpdateListener());
-        this.getDatabase().registerListener(new EntriesRemovedListener());
-
-        // ensure that at each addition of a new entry, the entry is added to the groups interface
-        this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
-        // ensure that all entry changes mark the panel as changed
-        this.bibDatabaseContext.getDatabase().registerListener(this);
-
-        this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
-
-        this.entryEditor = createEntryEditor();
-
-        Platform.runLater(() -> {
-            EasyBind.subscribe(changedProperty, this::updateTabTitle);
-            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
-                    updateTabTitle(changedProperty.getValue()));
-        });
-
+        initializeComponentsAndListeners(false);
         installAutosaveManagerAndBackupManager();
     }
 

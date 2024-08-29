@@ -39,6 +39,7 @@ import org.jabref.preferences.SearchPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
+import org.jspecify.annotations.Nullable;
 
 public class MainTableDataModel {
 
@@ -52,7 +53,6 @@ public class MainTableDataModel {
     private final NameDisplayPreferences nameDisplayPreferences;
     private final BibDatabaseContext bibDatabaseContext;
     private final StateManager stateManager;
-    private final LuceneManager luceneManager;
     private final TaskExecutor taskExecutor;
     private final Subscription searchQuerySubscription;
     private final Subscription searchDisplayModeSubscription;
@@ -60,13 +60,15 @@ public class MainTableDataModel {
     private final Subscription groupViewModeSubscription;
     private final LuceneIndexListener indexUpdatedListener;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    @Nullable private final LuceneManager luceneManager;
+
     private Optional<MatcherSet> groupsMatcher;
 
     public MainTableDataModel(BibDatabaseContext context,
                               PreferencesService preferencesService,
                               TaskExecutor taskExecutor,
                               StateManager stateManager,
-                              LuceneManager luceneManager,
+                              @Nullable LuceneManager luceneManager,
                               ListProperty<GroupTreeNode> selectedGroupsProperty,
                               OptionalObjectProperty<SearchQuery> searchQueryProperty,
                               IntegerProperty resultSizeProperty) {
@@ -77,9 +79,9 @@ public class MainTableDataModel {
         this.stateManager = stateManager;
         this.luceneManager = luceneManager;
         this.bibDatabaseContext = context;
-        this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
         this.searchQueryProperty = searchQueryProperty;
         this.indexUpdatedListener = new LuceneIndexListener();
+        this.groupsMatcher = createGroupMatcher(selectedGroupsProperty.get(), groupsPreferences);
 
         this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);
         resetFieldFormatter();

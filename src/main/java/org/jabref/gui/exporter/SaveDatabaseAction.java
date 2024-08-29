@@ -163,7 +163,7 @@ public class SaveDatabaseAction {
             // Reset (here: uninstall and install again) AutosaveManager, BackupManager and LuceneManager for the new file name
             libraryTab.resetChangeMonitor();
             libraryTab.installAutosaveManagerAndBackupManager();
-            libraryTab.setLuceneManager();
+            libraryTab.createLuceneManager();
 
             preferences.getGuiPreferences().getFileHistory().newFile(file);
         }
