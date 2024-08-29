@@ -153,15 +153,15 @@ open module org.jabref {
     requires langchain4j.open.ai;
     // endregion
 
-    // region: fulltext search
+    // region: Lucene
     /**
      * In case the version is updated, please also adapt {@link org.jabref.model.search.SearchFieldConstants#VERSION} to the newly used version.
      */
     uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
-    requires org.apache.lucene.core;
-    requires org.apache.lucene.queryparser;
-    requires org.apache.lucene.highlighter;
     requires org.apache.lucene.analysis.common;
+    requires org.apache.lucene.core;
+    requires org.apache.lucene.highlighter;
+    requires org.apache.lucene.queryparser;
     // endregion
 
     requires net.harawata.appdirs;
