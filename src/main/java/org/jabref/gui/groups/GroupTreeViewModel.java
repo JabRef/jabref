@@ -291,7 +291,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
                     dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                     writeGroupChangesToMetaData();
-                    // This is ugly but we have no proper update mechanism in place to propagate the changes, so redraw everything
+                    // This is ugly, but we have no proper update mechanism in place to propagate the changes, so redraw everything
                     refresh();
                     return;
                 }

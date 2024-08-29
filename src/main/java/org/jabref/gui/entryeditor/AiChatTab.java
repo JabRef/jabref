@@ -19,6 +19,8 @@ import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.ai.AiPreferences;
 
+import jakarta.annotation.Nullable;
+
 public class AiChatTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
     private final AiService aiService;
@@ -27,6 +29,8 @@ public class AiChatTab extends EntryEditorTab {
     private final FilePreferences filePreferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final TaskExecutor taskExecutor;
+
+    private @Nullable BibEntry previousBibEntry;
 
     public AiChatTab(BibDatabaseContext bibDatabaseContext,
                      AiService aiService,
@@ -59,9 +63,11 @@ public class AiChatTab extends EntryEditorTab {
      */
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (currentEntry != null) {
-            aiService.getChatHistoryService().closeChatHistoryForEntry(currentEntry);
+        if (previousBibEntry != null) {
+            aiService.getChatHistoryService().closeChatHistoryForEntry(previousBibEntry.getId());
         }
+
+        previousBibEntry = entry;
 
         StringProperty chatName = new SimpleStringProperty("entry " + entry.getCitationKey().orElse("<no citation key>"));
         entry.getCiteKeyBinding().addListener((observable, oldValue, newValue) -> chatName.setValue("entry " + newValue));

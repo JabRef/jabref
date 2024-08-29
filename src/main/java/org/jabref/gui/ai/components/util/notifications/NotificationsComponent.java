@@ -19,10 +19,13 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.ViewModelListCellFactory;
 
 public class NotificationsComponent extends ScrollPane {
+    private static final double SCROLL_PANE_MAX_HEIGHT = 300;
+
     private final VBox vBox = new VBox(10);
 
     public NotificationsComponent(ObservableList<Notification> notifications) {
         setContent(vBox);
+        setMaxHeight(SCROLL_PANE_MAX_HEIGHT);
 
         fill(notifications);
         notifications.addListener((ListChangeListener<? super Notification>) change -> fill(notifications));
