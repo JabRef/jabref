@@ -87,7 +87,7 @@ public class ChatMessageComponent extends HBox {
             }
 
             default ->
-                    LOGGER.error("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.get().type().name());
+                LOGGER.error("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.get().type().name());
         }
     }
 

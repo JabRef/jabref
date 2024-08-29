@@ -392,8 +392,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         StringProperty groupNameProperty = group.getGroupNode().getGroup().nameProperty();
 
-        StringProperty nameProperty = new SimpleStringProperty("Group " + groupNameProperty.get());
-        groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue("Group " + newValue));
+        // We localize the name here, because it is used as the title of the window.
+        // See documentation for {@link AiChatGuardedComponent#name}.
+        StringProperty nameProperty = new SimpleStringProperty(Localization.lang("Group %0", groupNameProperty.get()));
+        groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue(Localization.lang("Group %0", groupNameProperty.get())));
 
         ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode().getGroup());
         ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));

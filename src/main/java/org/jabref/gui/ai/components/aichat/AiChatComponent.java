@@ -94,7 +94,7 @@ public class AiChatComponent extends VBox {
 
     private void initializeNotifications() {
         ListUtil.getLinkedFiles(entries).forEach(file ->
-                aiService.getIngestionService().ingest(file, bibDatabaseContext).stateProperty().addListener((obs) -> updateNotifications()));
+                aiService.getIngestionService().ingest(file, bibDatabaseContext).stateProperty().addListener(obs -> updateNotifications()));
 
         updateNotifications();
     }
@@ -117,7 +117,7 @@ public class AiChatComponent extends VBox {
 
         chatPrompt.setCancelCallback(() -> chatPrompt.switchToNormalState());
 
-        chatPrompt.setRetryCallback((userMessage) -> {
+        chatPrompt.setRetryCallback(userMessage -> {
             deleteLastMessage();
             deleteLastMessage();
             chatPrompt.switchToNormalState();
@@ -224,7 +224,8 @@ public class AiChatComponent extends VBox {
                             LOGGER.error("Got an error while sending a message to AI", e);
                             setLoading(false);
 
-                            if ("401 - null".equals(e.getMessage()) || "404 - null".equals(e.getMessage())) {
+                            // Typically, if user has entered an invalid API base URL, we get either "401 - null" or "404 - null" strings.
+                            if ("401 - null".startsWith(e.getMessage()) || "404 - null".startsWith(e.getMessage())) {
                                 addError(Localization.lang("API base URL setting appears to be incorrect. Please check it in AI expert settings."));
                             } else {
                                 addError(e.getMessage());

@@ -1,15 +1,8 @@
 package org.jabref.gui.ai.components.aichat.chathistory;
 
-import java.util.function.Consumer;
-
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
@@ -18,7 +11,6 @@ import org.jabref.gui.util.UiTaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import dev.langchain4j.data.message.ChatMessage;
-import org.checkerframework.checker.guieffect.qual.UI;
 
 public class ChatHistoryComponent extends ScrollPane {
     @FXML private VBox vBox;
@@ -35,7 +27,9 @@ public class ChatHistoryComponent extends ScrollPane {
         });
     }
 
-    // You must call this method only once.
+    /**
+     * @implNote You must call this method only once.
+     */
     public void setItems(ObservableList<ChatMessage> items) {
         fill(items);
         items.addListener((ListChangeListener<? super ChatMessage>) obs -> fill(items));

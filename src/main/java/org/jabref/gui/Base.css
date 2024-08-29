@@ -1502,9 +1502,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-background-radius: 10;
 }
 
-/*
-    Fix for making text area round corners from: https://stackoverflow.com/a/49617953.
- */
+/* region: fix for making text area round corners (source: https://stackoverflow.com/a/49617953) */
 
 .chat-message-text-area .scroll-pane {
     -fx-background-color: transparent;
@@ -1517,3 +1515,5 @@ We want to have a look that matches our icons in the tool-bar */
 .chat-message-text-area .scroll-pane .content {
     -fx-background-color: transparent;
 }
+
+/* endregion */

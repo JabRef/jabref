@@ -72,7 +72,7 @@ public class IngestionService {
 
     private void startEmbeddingsGenerationTask(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, ProcessingInfo<LinkedFile, Void> processingInfo) {
         new GenerateEmbeddingsTask(linkedFile, fileEmbeddingsManager, bibDatabaseContext, filePreferences)
-                .onSuccess((v) -> processingInfo.setState(ProcessingState.SUCCESS))
+                .onSuccess(v -> processingInfo.setState(ProcessingState.SUCCESS))
                 .onFailure(processingInfo::setException)
                 .executeWith(taskExecutor);
     }

@@ -4,20 +4,17 @@ import java.util.List;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.util.Callback;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.util.ViewModelListCellFactory;
 
+/**
+ * A {@link ScrollPane} for displaying AI chat {@link Notification}s. See the documentation of {@link Notification} for
+ * more details.
+ */
 public class NotificationsComponent extends ScrollPane {
     private static final double SCROLL_PANE_MAX_HEIGHT = 300;
 

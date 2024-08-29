@@ -22,10 +22,10 @@ public abstract class AiPrivacyNoticeGuardedComponent extends DynamicallyChangea
         this.filePreferences = filePreferences;
         this.dialogService = dialogService;
 
-        aiPreferences.enableAiProperty().addListener((observable) -> rebuildUi());
+        aiPreferences.enableAiProperty().addListener(observable -> rebuildUi());
     }
 
-    protected final void rebuildUi() {
+    public final void rebuildUi() {
         if (aiPreferences.getEnableAi()) {
             setContent(showPrivacyPolicyGuardedContent());
         } else {

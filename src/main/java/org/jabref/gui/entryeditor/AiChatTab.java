@@ -95,6 +95,7 @@ public class AiChatTab extends EntryEditorTab {
     private void showPrivacyNotice(BibEntry entry) {
         setContent(new PrivacyNoticeComponent(aiPreferences, () -> bindToEntry(entry), filePreferences, dialogService));
     }
+
     private void showErrorNotPdfs() {
         setContent(
                 new ErrorStateComponent(
@@ -127,6 +128,8 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void bindToCorrectEntry(BibEntry entry) {
+        // We omit the localization here, because it is only a chat with one entry in the {@link EntryEditor}.
+        // See documentation for {@link AiChatGuardedComponent#name}.
         StringProperty chatName = new SimpleStringProperty("entry " + entry.getCitationKey().orElse("<no citation key>"));
         entry.getCiteKeyBinding().addListener((observable, oldValue, newValue) -> chatName.setValue("entry " + newValue));
 

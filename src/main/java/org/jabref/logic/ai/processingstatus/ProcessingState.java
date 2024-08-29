@@ -1,8 +1,8 @@
 package org.jabref.logic.ai.processingstatus;
 
 public enum ProcessingState {
-    STOPPED,
     PROCESSING,
+    SUCCESS,
     ERROR,
-    SUCCESS
+    STOPPED
 }

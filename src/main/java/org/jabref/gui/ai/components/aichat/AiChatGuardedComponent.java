@@ -15,8 +15,17 @@ import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.data.message.ChatMessage;
 
+/**
+ * Main class for AI chatting. It checks if the AI features are enabled and if the embedding model is properly set up.
+ */
 public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
+    /// This field is used for two purposes:
+    /// 1. Logging
+    /// 2. Title of group chat window
+    /// So, if you use {@link AiChatGuardedComponent} for one entry in {@link EntryEditor}, then you may not localize
+    /// this parameter. But for group chat window, you should.
     private final StringProperty name;
+
     private final ObservableList<ChatMessage> chatHistory;
     private final BibDatabaseContext bibDatabaseContext;
     private final ObservableList<BibEntry> entries;
