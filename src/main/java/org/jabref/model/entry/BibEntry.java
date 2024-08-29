@@ -748,6 +748,16 @@ public class BibEntry implements Cloneable {
     }
 
     /**
+     * @return A short textual description of the entry in the format:
+     * Author1, Author2: Title (Year)
+     * <p>
+     * See also {@link #getAuthorTitleYear(int maxCharacters)} to truncate the description.
+     */
+    public String getAuthorTitleYear() {
+        return getAuthorTitleYear(0);
+    }
+
+    /**
      * Returns the title of the given BibTeX entry as an Optional.
      *
      * @return an Optional containing the title of a BibTeX entry in case it exists, otherwise return an empty Optional.

@@ -62,7 +62,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
             return showErrorNoFiles();
         } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {
             return showErrorNotPdfs();
-        } else if (!CitationKeyCheck.citationKeyIsValid(bibDatabaseContext, entry)) {
+        } else if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {
             return tryToGenerateCitationKeyThenBind(entry);
         } else {
             return tryToShowSummary();

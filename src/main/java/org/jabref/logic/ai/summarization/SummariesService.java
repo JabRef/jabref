@@ -73,7 +73,7 @@ public class SummariesService {
     private void generateSummary(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext, ProcessingInfo<BibEntry, Summary> processingInfo) {
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             runGenerateSummaryTask(processingInfo, bibEntry, bibDatabaseContext);
-        } else if (bibEntry.getCitationKey().isEmpty() || CitationKeyCheck.citationKeyIsValid(bibDatabaseContext, bibEntry)) {
+        } else if (bibEntry.getCitationKey().isEmpty() || CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, bibEntry)) {
             runGenerateSummaryTask(processingInfo, bibEntry, bibDatabaseContext);
         } else {
             Optional<Summary> summary = summariesStorage.get(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get());
@@ -95,7 +95,7 @@ public class SummariesService {
 
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             LOGGER.info("No database path is present. Could not clear stored summary for regeneration");
-        } else if (bibEntry.getCitationKey().isEmpty() || CitationKeyCheck.citationKeyIsValid(bibDatabaseContext, bibEntry)) {
+        } else if (bibEntry.getCitationKey().isEmpty() || CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, bibEntry)) {
             LOGGER.info("No valid citation key is present. Could not clear stored summary for regeneration");
         } else {
             summariesStorage.clear(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get());
@@ -125,7 +125,7 @@ public class SummariesService {
 
                     if (bibDatabaseContext.getDatabasePath().isEmpty()) {
                         LOGGER.info("No database path is present. Summary will not be stored in the next sessions");
-                    } else if (CitationKeyCheck.citationKeyIsValid(bibDatabaseContext, bibEntry)) {
+                    } else if (CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, bibEntry)) {
                         LOGGER.info("No valid citation key is present. Summary will not be stored in the next sessions");
                     } else {
                         summariesStorage.set(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get(), Summary);

@@ -4,7 +4,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 public class CitationKeyCheck {
-    public static boolean citationKeyIsValid(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
+    public static boolean citationKeyIsPresentAndUnique(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
         return !hasEmptyCitationKey(bibEntry) && bibEntry.getCitationKey().map(key -> citationKeyIsUnique(bibDatabaseContext, key)).orElse(false);
     }
 

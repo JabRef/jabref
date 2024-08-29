@@ -2,37 +2,44 @@ package org.jabref.gui.ai.components.util.notifications;
 
 import java.util.List;
 
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.util.Callback;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.util.ViewModelListCellFactory;
 
-public class NotificationsComponent extends Pane {
-    public NotificationsComponent(List<Notification> notifications) {
-        VBox vBox = new VBox(10);
+public class NotificationsComponent extends ScrollPane {
+    private final VBox vBox = new VBox(10);
 
-        notifications
-                .stream()
-                .map(NotificationComponent::new)
-                .forEach(vBox.getChildren()::add);
+    public NotificationsComponent(ObservableList<Notification> notifications) {
+        setContent(vBox);
 
-        ScrollPane scrollPane = new ScrollPane(vBox);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setPadding(new Insets(10));
-
-        getChildren().add(scrollPane);
+        fill(notifications);
+        notifications.addListener((ListChangeListener<? super Notification>) change -> fill(notifications));
     }
 
-    public static IconTheme.JabRefIcons findSuitableIcon(List<Notification> notifications) {
+    private void fill(List<Notification> notifications) {
+        vBox.getChildren().clear();
+        notifications.stream().map(NotificationComponent::new).forEach(vBox.getChildren()::add);
+    }
+
+    public static JabRefIcon findSuitableIcon(List<Notification> notifications) {
         if (has(notifications, NotificationType.ERROR)) {
-            return IconTheme.JabRefIcons.ERROR;
+            return IconTheme.JabRefIcons.ERROR.withColor(Color.RED);
         } else if (has(notifications, NotificationType.WARNING)) {
-            return IconTheme.JabRefIcons.WARNING;
+            return IconTheme.JabRefIcons.WARNING.withColor(Color.YELLOW);
         } else {
-            return IconTheme.JabRefIcons.INTEGRITY_INFO;
+            return IconTheme.JabRefIcons.INTEGRITY_INFO.withColor(Color.BLUE);
         }
     }
 
