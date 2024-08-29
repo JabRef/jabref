@@ -66,6 +66,8 @@ public class MainTableDataModel {
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     @Nullable private final LuceneManager luceneManager;
 
+    // This stores the index of each entry in the allEntries list.
+    // Requried for a faster lookup for search results
     // <BibEntry.getId, index>
     @ADR(38)
     private final Map<String, Integer> entryIndexMap = new HashMap<>();
