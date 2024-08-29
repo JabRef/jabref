@@ -1,11 +1,11 @@
 ---
-title: Use System.identityHashCode for BibEntry at indexing
+title: Use BibEntry.getId for BibEntry at indexing
 nav_order: 38
 parent: Decision Records
 ---
 
 <!-- markdownlint-disable-next-line MD025 -->
-# Use `System.identityHashCode` for BibEntries at Indexing
+# Use `BibEntry.getId` for BibEntries at Indexing
 
 ## Context and Problem Statement
 
@@ -22,9 +22,9 @@ This, however, is not useful in the UI, where equal entries are not the same ent
 
 ## Considered Options
 
-* Use `System.identityHashCode` for indexing `BibEntry`
+* Use `BibEntry.getId` for indexing `BibEntry`
 * Rewrite `BibEntry` logic
 
 ## Decision Outcome
 
-Chosen option: "Use `System.identityHashCode` for indexing `BibEntry`", because is the "natural" thing to ensure distinction between two instances of a `BibEntry` object - regardless of equality.
+Chosen option: "Use `BibEntry.getId` for indexing `BibEntry`", because is the "natural" thing to ensure distinction between two instances of a `BibEntry` object - regardless of equality.

@@ -64,7 +64,7 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
-    private final ObservableMap<Integer, BibEntry> matchedEntries = FXCollections.observableHashMap();
+    private final ObservableMap<String, BibEntry> matchedEntries = FXCollections.observableHashMap();
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
@@ -258,21 +258,21 @@ public class GroupNodeViewModel {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
                     if (groupNode.matches(changedEntry)) {
                         // ADR-0038
-                        matchedEntries.put(System.identityHashCode(changedEntry), changedEntry);
+                        matchedEntries.put(changedEntry.getId(), changedEntry);
                     } else {
                         // ADR-0038
-                        matchedEntries.remove(System.identityHashCode(changedEntry));
+                        matchedEntries.remove(changedEntry.getId());
                     }
                 }
             } else {
                 for (BibEntry removedEntry : change.getRemoved()) {
                     // ADR-0038
-                    matchedEntries.remove(System.identityHashCode(removedEntry));
+                    matchedEntries.remove(removedEntry.getId());
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
                     if (groupNode.matches(addedEntry)) {
                         // ADR-0038
-                        matchedEntries.put(System.identityHashCode(addedEntry), addedEntry);
+                        matchedEntries.put(addedEntry.getId(), addedEntry);
                     }
                 }
             }
@@ -300,7 +300,7 @@ public class GroupNodeViewModel {
                     .onSuccess(entries -> {
                         matchedEntries.clear();
                         // ADR-0038
-                        entries.forEach(entry -> matchedEntries.put(System.identityHashCode(entry), entry));
+                        entries.forEach(entry -> matchedEntries.put(entry.getId(), entry));
                     })
                     .executeWith(taskExecutor);
         }
@@ -549,10 +549,10 @@ public class GroupNodeViewModel {
                         searchGroup.updateMatches(entry);
                         if (groupNode.matches(entry)) {
                             // ADR-0038
-                            matchedEntries.put(System.identityHashCode(entry), entry);
+                            matchedEntries.put(entry.getId(), entry);
                         } else {
                             // ADR-0038
-                            matchedEntries.remove(System.identityHashCode(entry));
+                            matchedEntries.remove(entry.getId());
                         }
                     }
                 }).executeWith(taskExecutor);
@@ -566,7 +566,7 @@ public class GroupNodeViewModel {
                     for (BibEntry entry : event.entries()) {
                         searchGroup.updateMatches(entry);
                         // ADR-0038
-                        matchedEntries.remove(System.identityHashCode(entry));
+                        matchedEntries.remove(entry.getId());
                     }
                 }).executeWith(taskExecutor);
             }

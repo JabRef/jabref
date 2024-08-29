@@ -28,7 +28,7 @@ public class SearchGroup extends AbstractGroup {
     public static final Version VERSION_6_0_ALPHA = Version.parse("6.0-alpha");
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
 
-    private final ObservableMap<Integer, BibEntry> matchedEntries = FXCollections.observableHashMap();
+    private final ObservableMap<String, BibEntry> matchedEntries = FXCollections.observableHashMap();
     private SearchQuery query;
     private LuceneManager luceneManager;
 
@@ -75,7 +75,7 @@ public class SearchGroup extends AbstractGroup {
         matchedEntries.clear();
         // TODO: Search should be done in a background thread
         // ADR-0038
-        luceneManager.search(query).getMatchedEntries().forEach(entry -> matchedEntries.put(System.identityHashCode(entry), entry));
+        luceneManager.search(query).getMatchedEntries().forEach(entry -> matchedEntries.put(entry.getId(), entry));
     }
 
     public void updateMatches(BibEntry entry) {
@@ -84,10 +84,10 @@ public class SearchGroup extends AbstractGroup {
         }
         if (luceneManager.isMatched(entry, query)) {
             // ADR-0038
-            matchedEntries.put(System.identityHashCode(entry), entry);
+            matchedEntries.put(entry.getId(), entry);
         } else {
             // ADR-0038
-            matchedEntries.remove(System.identityHashCode(entry));
+            matchedEntries.remove(entry.getId());
         }
     }
 
@@ -108,7 +108,7 @@ public class SearchGroup extends AbstractGroup {
     @Override
     public boolean contains(BibEntry entry) {
         // ADR-0038
-        return matchedEntries.containsKey(System.identityHashCode(entry));
+        return matchedEntries.containsKey(entry.getId());
     }
 
     @Override
