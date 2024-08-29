@@ -9,23 +9,29 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.icon.IconTheme;
 
 public class NotificationComponent extends HBox {
-    public NotificationComponent(Notification notification) {
+    private final Label title = new Label("Title");
+    private final Label message = new Label("Message");
+
+    public NotificationComponent() {
         setSpacing(10);
         setPadding(new Insets(10));
 
-        getChildren().addAll(
-                getIcon(notification.type()),
-                new VBox(10,
-                        new Label(notification.title()),
-                        new Label(notification.message())
-                )
-        );
+        this.getChildren().addAll(new VBox(10, title, message));
     }
 
-    private static Node getIcon(NotificationType type) {
-        return switch (type) {
-            case ERROR -> IconTheme.JabRefIcons.ERROR.getGraphicNode();
-            case WARNING -> IconTheme.JabRefIcons.WARNING.getGraphicNode();
-        };
+    public NotificationComponent(Notification notification) {
+        this();
+        setNotification(notification);
+    }
+
+    public void setNotification(Notification notification) {
+        if (this.getChildren().size() != 1) {
+            this.getChildren().removeFirst();
+        }
+
+        this.getChildren().addFirst(notification.type().getIcon().withColor(notification.type().getIconColor()).getGraphicNode());
+
+        title.setText(notification.title());
+        message.setText(notification.message());
     }
 }

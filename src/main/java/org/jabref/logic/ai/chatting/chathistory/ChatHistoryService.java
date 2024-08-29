@@ -159,11 +159,11 @@ public class ChatHistoryService implements AutoCloseable {
     }
 
     private boolean correctCitationKey(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {
-        if (!CitationKeyCheck.citationKeyIsValid(bibDatabaseContext, bibEntry)) {
+        if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, bibEntry)) {
             tryToGenerateCitationKey(bibDatabaseContext, bibEntry);
         }
 
-        return CitationKeyCheck.citationKeyIsValid(bibDatabaseContext, bibEntry);
+        return CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, bibEntry);
     }
 
     private void tryToGenerateCitationKey(BibDatabaseContext bibDatabaseContext, BibEntry bibEntry) {

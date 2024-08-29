@@ -62,7 +62,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
             return showErrorNoFiles();
         } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {
             return showErrorNotPdfs();
-        } else if (entry.getCitationKey().isEmpty() || !CitationKeyCheck.citationKeyIsValid(bibDatabaseContext, entry)) {
+        } else if (entry.getCitationKey().isEmpty() || !CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {
             // There is no need for additional check `entry.getCitationKey().isEmpty()` because method `citationKeyIsValid`,
             // will check this. But with this call the linter is happy for the next expression in else if.
             return tryToGenerateCitationKeyThenBind(entry);

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -51,6 +52,8 @@ public class AiChatComponent extends VBox {
     private final TaskExecutor taskExecutor;
 
     private final AiChatLogic aiChatLogic;
+
+    private final ObservableList<Notification> notifications = FXCollections.observableArrayList();
 
     @FXML private Loadable uiLoadableChatHistory;
     @FXML private ChatHistoryComponent uiChatHistory;
@@ -105,6 +108,11 @@ public class AiChatComponent extends VBox {
     }
 
     private void initializeChatPrompt() {
+        notificationsButton.setOnAction(event ->
+                new PopOver(new NotificationsComponent(notifications))
+                        .show(notificationsButton)
+        );
+
         chatPrompt.setSendCallback(this::onSendMessage);
 
         chatPrompt.setCancelCallback(() -> chatPrompt.switchToNormalState());
@@ -130,31 +138,42 @@ public class AiChatComponent extends VBox {
     }
 
     private void updateNotifications() {
-        List<Notification> notifications = entries.stream().map(this::updateNotificationsForEntry).flatMap(List::stream).toList();
+        notifications.clear();
+        notifications.addAll(entries.stream().map(this::updateNotificationsForEntry).flatMap(List::stream).toList());
 
-        if (notifications.isEmpty()) {
-            notificationsButton.setManaged(false);
-        } else {
-            notificationsButton.setManaged(true);
+        notificationsButton.setVisible(!notifications.isEmpty());
+        notificationsButton.setManaged(!notifications.isEmpty());
+
+        if (!notifications.isEmpty()) {
             notificationsButton.setGraphic(NotificationsComponent.findSuitableIcon(notifications).getGraphicNode());
-            notificationsButton.setOnAction(event ->
-                new PopOver(new NotificationsComponent(notifications))
-                        .show(notificationsButton)
-            );
         }
     }
 
     private List<Notification> updateNotificationsForEntry(BibEntry entry) {
         List<Notification> notifications = new ArrayList<>();
 
-        if (entry.getCitationKey().isEmpty()) {
-            notifications.add(new Notification(NotificationType.ERROR, Localization.lang("No citation key"), Localization.lang("The chat history will not be stored in next sessions")));
-        } else if (!CitationKeyCheck.citationKeyIsValid(bibDatabaseContext, entry)) {
-            notifications.add(new Notification(NotificationType.ERROR, Localization.lang("Invalid citation key"), Localization.lang("The chat history will not be stored in next sessions")));
+        if (entries.size() == 1) {
+            if (entry.getCitationKey().isEmpty()) {
+                notifications.add(new Notification(
+                        NotificationType.ERROR,
+                        Localization.lang("No citation key for %0", entry.getAuthorTitleYear()),
+                        Localization.lang("The chat history will not be stored in next sessions")
+                ));
+            } else if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {
+                notifications.add(new Notification(
+                        NotificationType.ERROR,
+                        Localization.lang("Invalid citation key for %0 (%1)", entry.getCitationKey().get(), entry.getAuthorTitleYear()),
+                        Localization.lang("The chat history will not be stored in next sessions")
+                ));
+            }
         }
 
         if (entry.getFiles().isEmpty()) {
-            notifications.add(new Notification(NotificationType.ERROR, Localization.lang("Unable to chat"), Localization.lang("No files attached")));
+            notifications.add(new Notification(
+                    NotificationType.ERROR,
+                    Localization.lang("No files attached to %0", entry.getCitationKey().orElse(entry.getAuthorTitleYear())),
+                    Localization.lang("The AI will not be able to find information in this entry")
+            ));
         }
 
         entry.getFiles().forEach(file -> {
