@@ -101,14 +101,14 @@ public class Benchmarks {
 
     @Benchmark
     public List<BibEntry> search() {
-        // FixMe: Create Benchmark for LuceneSearch
-        return null;
+        // TODO: Create Benchmark for LuceneSearch
+        return List.of();
     }
 
     @Benchmark
     public List<BibEntry> index() {
-        // FixMe: Create Benchmark for LuceneIndexer
-        return null;
+        // TODO: Create Benchmark for LuceneIndexer
+        return List.of();
     }
 
     @Benchmark
