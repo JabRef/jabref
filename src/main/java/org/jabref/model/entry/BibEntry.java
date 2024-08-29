@@ -730,7 +730,15 @@ public class BibEntry implements Cloneable {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
     }
 
+    public String getAuthorTitleYear() {
+        return getAuthorTitleYear(0);
+    }
+
     /**
+     * Creates a short textual description of the entry in the format: <code>Author1, Author2: Title (Year)</code>
+     *
+     * If <code>0</code> is passed as <code>maxCharacters</code>, the description is not truncated.
+     *
      * @param maxCharacters The maximum number of characters (additional
      *                      characters are replaced with "..."). Set to 0 to disable truncation.
      * @return A short textual description of the entry in the format:
@@ -745,16 +753,6 @@ public class BibEntry implements Cloneable {
             return text;
         }
         return text.substring(0, maxCharacters + 1) + "...";
-    }
-
-    /**
-     * @return A short textual description of the entry in the format:
-     * Author1, Author2: Title (Year)
-     * <p>
-     * See also {@link #getAuthorTitleYear(int maxCharacters)} to truncate the description.
-     */
-    public String getAuthorTitleYear() {
-        return getAuthorTitleYear(0);
     }
 
     /**
