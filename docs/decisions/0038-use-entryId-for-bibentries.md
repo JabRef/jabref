@@ -23,6 +23,7 @@ This, however, is not useful in the UI, where equal entries are not the same ent
 ## Considered Options
 
 * Use `BibEntry.getId` for indexing `BibEntry`
+* Use `System.identityHashCode` for indexing `BibEntry`
 * Rewrite `BibEntry` logic
 
 ## Decision Outcome
