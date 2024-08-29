@@ -454,11 +454,17 @@ public class ArgumentProcessor {
         // $ stands for a blank
         ParserResult pr = loaded.getLast();
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
-        BibDatabase dataBase = pr.getDatabase();
 
         SearchPreferences searchPreferences = preferencesService.getSearchPreferences();
         SearchQuery query = new SearchQuery(searchTerm, searchPreferences.getSearchFlags());
-        List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
+
+        List<BibEntry> matches;
+        try {
+            matches = new DatabaseSearcher(query, databaseContext, preferencesService.getFilePreferences()).getMatches();
+        } catch (IOException e) {
+            System.err.println(Localization.lang("Error occurred when searching") + ": " + e.getLocalizedMessage());
+            return false;
+        }
 
         // export matches
         if (!matches.isEmpty()) {
