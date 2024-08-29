@@ -63,7 +63,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We removed support for case-insentive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
-- We removed the descroption of search strings. [#11565](https://github.com/JabRef/jabref/pull/11565)
+- We removed the description of search strings. [#11565](https://github.com/JabRef/jabref/pull/11565)
 
 
 
