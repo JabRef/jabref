@@ -22,6 +22,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -47,6 +48,7 @@ public class BibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+    private static final Comparator<BibEntry> ID_COMPARATOR = new IdComparator();
 
     /**
      * State attributes
@@ -638,11 +640,13 @@ public class BibDatabase {
      * Returns the index of the given entry in the list of entries.
      *
      * @implNote New entries are always added to the end of the list and always get a higher ID.
-     *           See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType)}.
+     *           See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
+     *           {@link org.jabref.model.entry.IdGenerator IdGenerator},
+     *           {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
      *           Therefore, using binary search to find the index.
      */
     public int indexOf(BibEntry bibEntry) {
-        int index = Collections.binarySearch(entries, bibEntry, Comparator.comparingInt(entry -> Integer.parseInt(entry.getId())));
+        int index = Collections.binarySearch(entries, bibEntry, ID_COMPARATOR);
         return index >= 0 ? index : -1;
     }
 

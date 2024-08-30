@@ -462,7 +462,7 @@ public class ArgumentProcessor {
         try {
             matches = new DatabaseSearcher(query, databaseContext, preferencesService.getFilePreferences()).getMatches();
         } catch (IOException e) {
-            System.err.println(Localization.lang("Error occurred when searching") + ": " + e.getLocalizedMessage());
+            LOGGER.error("Error occurred when searching", e);
             return false;
         }
 

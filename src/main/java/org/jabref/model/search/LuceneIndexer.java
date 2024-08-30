@@ -24,5 +24,9 @@ public interface LuceneIndexer {
 
     void close();
 
+    /**
+     * Needed in unit tests where subsequent tests might need to access the same index,
+     * avoiding potential issues with the index being locked.
+     */
     void closeAndWait();
 }

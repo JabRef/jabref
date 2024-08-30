@@ -134,8 +134,7 @@ public final class LuceneSearcher {
         return searchResults;
     }
 
-    private static String getFieldContents(Document document, SearchFieldConstants
-        field) {
+    private static String getFieldContents(Document document, SearchFieldConstants field) {
         return Optional.ofNullable(document.get(field.toString())).orElse("");
     }
 
