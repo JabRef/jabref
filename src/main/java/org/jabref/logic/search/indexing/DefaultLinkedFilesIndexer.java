@@ -313,21 +313,28 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
 
     @Override
     public void close() {
-        HeadlessExecutorService.INSTANCE.execute(() -> {
-            try {
-                LOGGER.debug("Closing linked files index");
-                searcherManager.close();
-                optimizeIndex();
-                indexWriter.close();
-                indexDirectory.close();
-                LOGGER.debug("Linked files index closed");
-                if ("unsaved".equals(databaseContext.getFulltextIndexPath().getFileName().toString())) {
-                    LOGGER.debug("Deleting unsaved index directory");
-                    FileUtils.deleteDirectory(indexDirectoryPath.toFile());
-                }
-            } catch (IOException e) {
-                LOGGER.error("Error while closing linked files index", e);
+        HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
+    }
+
+    @Override
+    public void closeAndWait() {
+        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
+    }
+
+    private void closeIndex() {
+        try {
+            LOGGER.debug("Closing linked files index");
+            searcherManager.close();
+            optimizeIndex();
+            indexWriter.close();
+            indexDirectory.close();
+            LOGGER.debug("Linked files index closed");
+            if ("unsaved".equals(databaseContext.getFulltextIndexPath().getFileName().toString())) {
+                LOGGER.debug("Deleting unsaved index directory");
+                FileUtils.deleteDirectory(indexDirectoryPath.toFile());
             }
-        });
+        } catch (IOException e) {
+            LOGGER.error("Error while closing linked files index", e);
+        }
     }
 }

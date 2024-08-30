@@ -60,13 +60,20 @@ public class ReadOnlyLinkedFilesIndexer implements LuceneIndexer {
 
     @Override
     public void close() {
-        HeadlessExecutorService.INSTANCE.execute(() -> {
-            try {
-                searcherManager.close();
-                indexDirectory.close();
-            } catch (IOException e) {
-                LOGGER.error("Error closing index", e);
-            }
-        });
+        HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
+    }
+
+    @Override
+    public void closeAndWait() {
+        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
+    }
+
+    private void closeIndex() {
+        try {
+            searcherManager.close();
+            indexDirectory.close();
+        } catch (IOException e) {
+            LOGGER.error("Error closing index", e);
+        }
     }
 }

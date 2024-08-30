@@ -50,8 +50,8 @@ public class DatabaseSearcher {
             return Collections.emptyList();
         }
         List<BibEntry> matchEntries = luceneSearcher.search(query.getParsedQuery(), query.getSearchFlags()).getMatchedEntries().stream().toList();
-        bibFieldsIndexer.close();
-        linkedFilesIndexer.close();
+        bibFieldsIndexer.closeAndWait();
+        linkedFilesIndexer.closeAndWait();
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }
 }

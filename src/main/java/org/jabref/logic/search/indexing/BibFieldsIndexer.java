@@ -153,16 +153,23 @@ public class BibFieldsIndexer implements LuceneIndexer {
 
     @Override
     public void close() {
-        LOGGER.debug("Closing bib fields index");
-        HeadlessExecutorService.INSTANCE.execute(() -> {
-            try {
-                searcherManager.close();
-                indexWriter.close();
-                indexDirectory.close();
-                LOGGER.debug("Bib fields index closed");
-            } catch (IOException e) {
-                LOGGER.error("Error while closing bib fields index", e);
-            }
-        });
+        HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
+    }
+
+    @Override
+    public void closeAndWait() {
+        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
+    }
+
+    private void closeIndex() {
+        try {
+            LOGGER.debug("Closing bib fields index");
+            searcherManager.close();
+            indexWriter.close();
+            indexDirectory.close();
+            LOGGER.debug("Bib fields index closed");
+        } catch (IOException e) {
+            LOGGER.error("Error while closing bib fields index", e);
+        }
     }
 }
