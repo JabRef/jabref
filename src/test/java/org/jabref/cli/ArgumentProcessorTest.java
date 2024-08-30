@@ -96,7 +96,7 @@ class ArgumentProcessorTest {
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
         String outputBibFile = outputBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("-n", "--debug", "--exportMatches", "Author=Einstein," + outputBibFile, originBibFile);
+        List<String> args = List.of("-n", "--debug", "--exportMatches", "author:Einstein," + outputBibFile, originBibFile);
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
