@@ -32,8 +32,10 @@ public class DatabaseSearcher {
         this.query = Objects.requireNonNull(query);
         bibFieldsIndexer = new BibFieldsIndexer(databaseContext);
         bibFieldsIndexer.updateOnStart(DUMMY_TASK);
+
         linkedFilesIndexer = new DefaultLinkedFilesIndexer(databaseContext, filePreferences);
         linkedFilesIndexer.updateOnStart(DUMMY_TASK);
+
         this.luceneSearcher = new LuceneSearcher(databaseContext, bibFieldsIndexer, linkedFilesIndexer);
     }
 

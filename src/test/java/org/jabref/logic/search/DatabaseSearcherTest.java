@@ -77,7 +77,7 @@ public class DatabaseSearcherTest {
     }
 
     @Test
-    void correctMatchFromDatabaseWithIncollectionTypeEntry() throws IOException {
+    void correctMatchFromDatabaseWithInCollectionTypeEntry() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.InCollection);
         entry.setField(StandardField.AUTHOR, "tonho");
         databaseContext.getDatabase().insertEntry(entry);
@@ -104,7 +104,7 @@ public class DatabaseSearcherTest {
     }
 
     @Test
-    void noMatchesFromDabaseWithIncollectionTypeEntry() throws IOException {
+    void noMatchesFromDatabaseWithInCollectionTypeEntry() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.InCollection);
         entry.setField(StandardField.AUTHOR, "tonho");
         databaseContext.getDatabase().insertEntry(entry);
