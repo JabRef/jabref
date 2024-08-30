@@ -17,87 +17,41 @@ import com.sun.star.text.XTextRange;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import io.github.thibaultmeyer.cuid.CUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.jabref.logic.openoffice.backend.NamedRangeReferenceMark.safeInsertSpacesBetweenReferenceMarks;
 
-/**
- * Class to handle a reference mark. See {@link CSLReferenceMarkManager} for the management of all reference marks.
- */
 public class CSLReferenceMark {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CSLReferenceMark.class);
-
     private final ReferenceMark referenceMark;
-    private final XTextContent textContent;
+    private XTextContent textContent;
+    private final String citationKey;
+    private int citationNumber;
 
     public CSLReferenceMark(XNamed named, ReferenceMark referenceMark) {
         this.referenceMark = referenceMark;
-        textContent = UnoRuntime.queryInterface(XTextContent.class, named);
-    }
-
-    public CSLReferenceMark(XNamed named, String name, String citationKey, Integer citationNumber, String uniqueId) {
-        referenceMark = new ReferenceMark(name, citationKey, citationNumber, uniqueId);
         this.textContent = UnoRuntime.queryInterface(XTextContent.class, named);
+        this.citationKey = referenceMark.getCitationKey();
+        this.citationNumber = referenceMark.getCitationNumber();
     }
 
-    public static CSLReferenceMark of(String citationKey, Integer citationNumber, XMultiServiceFactory factory) throws Exception {
+    public static CSLReferenceMark of(String citationKey, int citationNumber, XMultiServiceFactory factory) throws Exception {
         String uniqueId = CUID.randomCUID2(8).toString();
         String name = "JABREF_" + citationKey + " CID_" + citationNumber + " " + uniqueId;
         XNamed named = UnoRuntime.queryInterface(XNamed.class, factory.createInstance("com.sun.star.text.ReferenceMark"));
         named.setName(name);
-        return new CSLReferenceMark(named, name, citationKey, citationNumber, uniqueId);
+        ReferenceMark referenceMark = new ReferenceMark(name, citationKey, citationNumber, uniqueId);
+        return new CSLReferenceMark(named, referenceMark);
     }
 
-    public void insertReferenceIntoOO(XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter, boolean withoutBrackets)
-            throws CreationException, WrappedTargetException {
-        // Ensure the cursor is at the end of its range
-        position.collapseToEnd();
+    public String getCitationKey() {
+        return citationKey;
+    }
 
-        // Insert spaces safely
-        XTextCursor cursor = safeInsertSpacesBetweenReferenceMarks(position.getEnd(), 2);
+    public int getCitationNumber() {
+        return citationNumber;
+    }
 
-        // Cursors before the first and after the last space
-        XTextCursor cursorBefore = cursor.getText().createTextCursorByRange(cursor.getStart());
-        XTextCursor cursorAfter = cursor.getText().createTextCursorByRange(cursor.getEnd());
-
-        cursor.collapseToStart();
-        cursor.goRight((short) 1, false);
-        // Now we are between two spaces
-
-        // Store the start position
-        XTextRange startRange = cursor.getStart();
-
-        // Insert the OOText content
-        OOTextIntoOO.write(doc, cursor, ooText);
-
-        // Store the end position
-        XTextRange endRange = cursor.getEnd();
-
-        // Move cursor to wrap the entire inserted content
-        cursor.gotoRange(startRange, false);
-        cursor.gotoRange(endRange, true);
-
-        // Create DocumentAnnotation and attach it
-        DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, referenceMark.getName(), cursor, true);
-        UnoReferenceMark.create(documentAnnotation);
-
-        // Move cursor to the end of the inserted content
-        cursor.gotoRange(endRange, false);
-
-        // Remove extra spaces
-        if (!insertSpaceBefore) {
-            cursorBefore.goRight((short) 1, true);
-            cursorBefore.setString("");
-        }
-        if (!insertSpaceAfter) {
-            cursorAfter.goLeft((short) 1, true);
-            cursorAfter.setString("");
-        }
-
-        // Move the original position cursor to the end of the inserted content
-        position.gotoRange(cursorAfter.getEnd(), false);
+    public void setCitationNumber(int number) {
+        this.citationNumber = number;
     }
 
     public XTextContent getTextContent() {
@@ -106,5 +60,62 @@ public class CSLReferenceMark {
 
     public String getName() {
         return referenceMark.getName();
+    }
+
+    public void insertReferenceIntoOO(XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter, boolean withoutBrackets)
+            throws CreationException, WrappedTargetException {
+        position.collapseToEnd();
+        XTextCursor cursor = safeInsertSpacesBetweenReferenceMarks(position.getEnd(), 2);
+        XTextCursor cursorBefore = cursor.getText().createTextCursorByRange(cursor.getStart());
+        XTextCursor cursorAfter = cursor.getText().createTextCursorByRange(cursor.getEnd());
+        cursor.collapseToStart();
+        cursor.goRight((short) 1, false);
+        XTextRange startRange = cursor.getStart();
+        OOTextIntoOO.write(doc, cursor, ooText);
+        XTextRange endRange = cursor.getEnd();
+        cursor.gotoRange(startRange, false);
+        cursor.gotoRange(endRange, true);
+        DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, referenceMark.getName(), cursor, true);
+        UnoReferenceMark.create(documentAnnotation);
+        cursor.gotoRange(endRange, false);
+        if (!insertSpaceBefore) {
+            cursorBefore.goRight((short) 1, true);
+            cursorBefore.setString("");
+        }
+        if (!insertSpaceAfter) {
+            cursorAfter.goLeft((short) 1, true);
+            cursorAfter.setString("");
+        }
+        position.gotoRange(cursorAfter.getEnd(), false);
+    }
+
+    public void delete() throws Exception {
+        XTextRange range = textContent.getAnchor();
+        range.setString("");
+        XTextContent xTextContent = UnoRuntime.queryInterface(XTextContent.class, textContent);
+        range.getText().removeTextContent(xTextContent);
+    }
+
+    public void select() throws Exception {
+        XTextRange range = textContent.getAnchor();
+        XTextCursor cursor = range.getText().createTextCursorByRange(range);
+        cursor.gotoRange(range, true);
+    }
+
+    public void setText(String textString, boolean isRich) throws Exception, CreationException {
+        XTextRange range = textContent.getAnchor();
+        XTextCursor cursor = range.getText().createTextCursorByRange(range);
+        cursor.setString("");
+        if (isRich) {
+            // Get the XTextDocument from the cursor's text
+            XTextDocument xTextDocument = UnoRuntime.queryInterface(XTextDocument.class, cursor.getText());
+            OOTextIntoOO.write(xTextDocument, cursor, OOText.fromString(textString));
+        } else {
+            cursor.setString(textString);
+        }
+    }
+
+    public void updateTextContent(XTextContent newTextContent) {
+        this.textContent = newTextContent;
     }
 }

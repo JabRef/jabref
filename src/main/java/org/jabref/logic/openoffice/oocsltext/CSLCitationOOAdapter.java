@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice.oocsltext;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +23,6 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
-import com.sun.star.uno.Exception;
 
 /**
  * This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
@@ -50,7 +48,7 @@ public class CSLCitationOOAdapter {
      * Comparable to LaTeX's \cite command.
      */
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws CreationException, IOException, Exception {
+            throws java.lang.Exception {
         String style = selectedStyle.getSource();
         boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
 
@@ -79,7 +77,7 @@ public class CSLCitationOOAdapter {
      * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager)} method.insertInText method
      */
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws IOException, CreationException, Exception {
+            throws java.lang.Exception {
         String style = selectedStyle.getSource();
         boolean isAlphanumeric = isAlphanumericStyle(selectedStyle);
 
@@ -128,7 +126,7 @@ public class CSLCitationOOAdapter {
      * Adds the entries to the list for which bibliography is to be generated.
      */
     public void insertEmpty(XTextCursor cursor, List<BibEntry> entries)
-            throws CreationException, Exception {
+            throws java.lang.Exception {
         for (BibEntry entry : entries) {
             CSLReferenceMark mark = markManager.createReferenceMark(entry);
             OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
@@ -188,7 +186,7 @@ public class CSLCitationOOAdapter {
      * Thus, in case of citations for a group of entries, we first insert the citation (text), then insert the invisible reference marks for each entry separately after it.
      */
     private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText)
-            throws CreationException, Exception {
+            throws java.lang.Exception {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
 

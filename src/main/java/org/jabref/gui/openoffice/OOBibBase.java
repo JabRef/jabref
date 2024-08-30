@@ -55,7 +55,6 @@ import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
-import com.sun.star.uno.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,12 +89,12 @@ public class OOBibBase {
         this.alwaysAddCitedOnPages = false;
     }
 
-    private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
+    private void initializeCitationAdapter(XTextDocument doc) throws Exception {
             this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
             this.cslCitationOOAdapter.readExistingMarks();
     }
 
-    public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {
+    public void guiActionSelectDocument(boolean autoSelectForSingle) throws Exception {
         final String errorTitle = Localization.lang("Problem connecting");
 
         try {
@@ -643,7 +642,8 @@ public class OOBibBase {
                  | NotRemoveableException ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             throw new RuntimeException(e);
         } finally {
             UnoUndo.leaveUndoContext(doc);
@@ -947,13 +947,15 @@ public class OOBibBase {
                 } catch (NoDocumentException
                          | NoSuchElementException e) {
                     throw new RuntimeException(e);
+                } catch (
+                        Exception e) {
+                    throw new RuntimeException(e);
                 } finally {
                     UnoUndo.leaveUndoContext(doc);
                     fcursor.get().restore(doc);
                 }
-            } catch (CreationException
-                     | WrappedTargetException
-                     | com.sun.star.lang.IllegalArgumentException ex) {
+            } catch (
+                    com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not update CSL bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }

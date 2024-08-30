@@ -210,6 +210,9 @@ public class OpenOfficePanel {
             } catch (WrappedTargetException
                      | NoSuchElementException ex) {
                 throw new RuntimeException(ex);
+            } catch (
+                    Exception ex) {
+                throw new RuntimeException(ex);
             }
         });
 
@@ -433,8 +436,8 @@ public class OpenOfficePanel {
 
             try {
                 ooBase.guiActionSelectDocument(true);
-            } catch (WrappedTargetException
-                     | NoSuchElementException e) {
+            } catch (
+                    Exception e) {
                 throw new RuntimeException(e);
             }
 
