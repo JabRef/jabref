@@ -30,6 +30,7 @@ class SearchToLuceneMigrationTest {
                 // https://github.com/JabRef/jabref/issues/11654#issuecomment-2313178736
                 Arguments.of("( groups:\\:paywall AND -file:/.+/ ) AND -groups:\\/exclude", "groups=:paywall and file!=\"\" and groups!=/exclude"),
 
+                Arguments.of("( any:* AND -( groups:alpha ) ) AND ( any:* AND -( groups:beta ) )", "NOT(groups=alpha) AND NOT(groups=beta)"),
                 // not converted, because not working in JabRef 5.x
                 // Arguments.of("title:\"image processing\" OR keywords:\"image processing\"", "title|keywords = \"image processing\""),
 
@@ -57,7 +58,9 @@ class SearchToLuceneMigrationTest {
         return Stream.of(
                 Arguments.of("any:* AND -groups:/.+/", "groups != .+"),
                 Arguments.of("( any:* AND -groups:/.+/ ) AND ( any:* AND -readstatus:/.+/ )", "groups != .+ and readstatus != .+"),
-                Arguments.of("author:/(John|Doe).+(John|Doe)/", "author = \"(John|Doe).+(John|Doe)\"")
+                Arguments.of("author:/(John|Doe).+(John|Doe)/", "author = \"(John|Doe).+(John|Doe)\""),
+                Arguments.of("any:/rev*/", "anyfield=rev*"),
+                Arguments.of("any:/*rev*/", "anyfield=*rev*")
         );
     }
 

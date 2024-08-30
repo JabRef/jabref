@@ -2,80 +2,79 @@ package org.jabref.model.groups;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Stream;
 
+import javafx.beans.property.BooleanProperty;
+
+import org.jabref.gui.util.CurrentThreadTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.search.LuceneManager;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.SearchFlags;
+import org.jabref.preferences.FilePreferences;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class SearchGroupTest {
+    private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
+    private static final FilePreferences FILE_PREFERENCES = mock(FilePreferences.class);
 
-    private static BibEntry entry1D = new BibEntry(StandardEntryType.Misc)
+    private static final BibEntry ENTRY_1 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("entry1")
             .withField(StandardField.AUTHOR, "Test")
             .withField(StandardField.TITLE, "Case")
             .withField(StandardField.GROUPS, "A");
 
-    private static BibEntry entry2D = new BibEntry(StandardEntryType.Misc)
+    private static final BibEntry ENTRY_2 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("entry2")
             .withField(StandardField.AUTHOR, "TEST")
             .withField(StandardField.TITLE, "CASE")
             .withField(StandardField.GROUPS, "A");
+    private static final Logger log = LoggerFactory.getLogger(SearchGroupTest.class);
 
-    @Test
-    void containsFindsWords() {
-        SearchGroup groupPositive = new SearchGroup("A", GroupHierarchyType.INDEPENDENT, "Test", EnumSet.noneOf(SearchFlags.class));
-        List<BibEntry> positiveResult = List.of(entry1D, entry2D);
-        assertTrue(groupPositive.containsAll(positiveResult));
+    private static Stream<Arguments> testSearchGroup() {
+        return Stream.of(
+                // containsFindsWords
+                Arguments.of("Test", List.of(ENTRY_1, ENTRY_2), true),
+                // containsDoesNotFindWords
+                Arguments.of("Unknown", List.of(ENTRY_1, ENTRY_2), false),
+                // containsFindsWordWithRegularExpression
+                Arguments.of("any:/rev*/", List.of(new BibEntry().withField(StandardField.KEYWORDS, "review")), true),
+                // containsDoesNotFindsWordWithInvalidRegularExpression
+                Arguments.of("any:/[rev/", List.of(new BibEntry().withField(StandardField.KEYWORDS, "review")), false),
+                // notQueryWorksWithLeftPartOfQuery
+                Arguments.of("(any:* AND -groups:alpha) AND (any:* AND -groups:beta)", List.of(new BibEntry().withField(StandardField.GROUPS, "alpha")), false),
+                // notQueryWorksWithLRightPartOfQuery
+                Arguments.of("(any:* AND -groups:alpha) AND (any:* AND -groups:beta)", List.of(new BibEntry().withField(StandardField.GROUPS, "beta")), false),
+                // notQueryWorksWithBothPartsOfQuery
+                Arguments.of("(any:* AND -groups:alpha) AND (any:* AND -groups:beta)", List.of(new BibEntry().withField(StandardField.GROUPS, "gamma")), true)
+        );
     }
 
-    @Test
-    void containsDoesNotFindWords() {
-        SearchGroup groupNegative = new SearchGroup("A", GroupHierarchyType.INDEPENDENT, "Unknown", EnumSet.noneOf(SearchFlags.class));
-        List<BibEntry> positiveResult = List.of(entry1D, entry2D);
-        assertFalse(groupNegative.containsAny(positiveResult));
-    }
+    @ParameterizedTest
+    @MethodSource
+    void testSearchGroup(String searchTerm, List<BibEntry> entries, boolean expectedResult) {
+        when(FILE_PREFERENCES.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
+        when(FILE_PREFERENCES.shouldFulltextIndexLinkedFiles()).thenReturn(false);
 
-    @Test
-    void containsFindsWordWithRegularExpression() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=rev*", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
-        BibEntry entry = new BibEntry();
-        entry.addKeyword("review", ',');
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        databaseContext.getDatabase().insertEntries(entries);
 
-        assertTrue(group.contains(entry));
-    }
+        LuceneManager luceneManager = new LuceneManager(databaseContext, TASK_EXECUTOR, FILE_PREFERENCES);
+        luceneManager.updateOnStart();
 
-    @Test
-    void containsDoesNotFindsWordWithInvalidRegularExpression() {
-        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "anyfield=*rev*", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
-        BibEntry entry = new BibEntry();
-        entry.addKeyword("review", ',');
-
-        assertFalse(group.contains(entry));
-    }
-
-    @Test
-    void notQueryWorksWithLeftPartOfQuery() {
-        SearchGroup groupToBeClassified = new SearchGroup("to-be-classified", GroupHierarchyType.INDEPENDENT, "NOT(groups=alpha) AND NOT(groups=beta)", EnumSet.noneOf(SearchFlags.class));
-
-        BibEntry alphaEntry = new BibEntry()
-                .withCitationKey("alpha")
-                .withField(StandardField.GROUPS, "alpha");
-        assertFalse(groupToBeClassified.contains(alphaEntry));
-    }
-
-    @Test
-    void notQueryWorksWithLRightPartOfQuery() {
-        SearchGroup groupToBeClassified = new SearchGroup("to-be-classified", GroupHierarchyType.INDEPENDENT, "NOT(groups=alpha) AND NOT(groups=beta)", EnumSet.noneOf(SearchFlags.class));
-
-        BibEntry betaEntry = new BibEntry()
-                .withCitationKey("beta")
-                .withField(StandardField.GROUPS, "beta");
-        assertFalse(groupToBeClassified.contains(betaEntry));
+        SearchGroup group = new SearchGroup("TestGroup", GroupHierarchyType.INDEPENDENT, searchTerm, EnumSet.noneOf(SearchFlags.class), luceneManager);
+        assertEquals(expectedResult, group.containsAll(entries));
     }
 }
