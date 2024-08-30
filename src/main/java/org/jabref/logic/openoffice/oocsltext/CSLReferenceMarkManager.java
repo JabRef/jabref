@@ -39,7 +39,7 @@ public class CSLReferenceMarkManager {
 
     public CSLReferenceMark createReferenceMark(BibEntry entry) throws Exception {
         String citationKey = entry.getCitationKey().orElse(CUID.randomCUID2(8).toString());
-        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKey, 0, factory);
+        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKey, 1, factory);
         marksByName.put(referenceMark.getName(), referenceMark);
         marksInOrder.add(referenceMark);
         updateAllCitationNumbers();
@@ -149,7 +149,7 @@ public class CSLReferenceMarkManager {
             if (name.startsWith("JABREF_")) {
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
                 String citationKey = name.split(" ")[0].substring(7);
-                CSLReferenceMark mark = new CSLReferenceMark(named, new ReferenceMark(name, citationKey, 0, ""));
+                CSLReferenceMark mark = new CSLReferenceMark(named, new ReferenceMark(name, citationKey, 1, ""));
                 marksByName.put(name, mark);
                 marksInOrder.add(mark);
             }
