@@ -101,7 +101,6 @@ public class GroupDialogViewModel {
     private Validator keywordRegexValidator;
     private Validator keywordFieldEmptyValidator;
     private Validator keywordSearchTermEmptyValidator;
-    private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
     private Validator texGroupFilePathValidator;
     private CompositeValidator validator;
@@ -208,25 +207,6 @@ public class GroupDialogViewModel {
                         Localization.lang("Search term is empty.")
                 )));
 
-        searchRegexValidator = new FunctionBasedValidator<>(
-                searchGroupSearchTermProperty,
-                input -> {
-                    if (StringUtil.isNullOrEmpty(input)) {
-                        return false;
-                    }
-
-                    try {
-                        Pattern.compile(input);
-                        return true;
-                    } catch (PatternSyntaxException e) {
-                        // Ignored
-                        return false;
-                    }
-                },
-                ValidationMessage.error("%s > %n %s".formatted(
-                        Localization.lang("Free search expression"),
-                        Localization.lang("Invalid regular expression."))));
-
         searchSearchTermEmptyValidator = new FunctionBasedValidator<>(
                 searchGroupSearchTermProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
@@ -245,7 +225,7 @@ public class GroupDialogViewModel {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
-                                .map(extension -> "aux".equalsIgnoreCase(extension))
+                                .map("aux"::equalsIgnoreCase)
                                 .orElse(false);
                     }
                 },
@@ -253,9 +233,9 @@ public class GroupDialogViewModel {
 
         typeSearchProperty.addListener((obs, _oldValue, isSelected) -> {
             if (isSelected) {
-                validator.addValidators(searchRegexValidator, searchSearchTermEmptyValidator);
+                validator.addValidators(searchSearchTermEmptyValidator);
             } else {
-                validator.removeValidators(searchRegexValidator, searchSearchTermEmptyValidator);
+                validator.removeValidators(searchSearchTermEmptyValidator);
             }
         });
 
@@ -513,10 +493,6 @@ public class GroupDialogViewModel {
 
     public ValidationStatus sameNameValidationStatus() {
         return sameNameValidator.getValidationStatus();
-    }
-
-    public ValidationStatus searchRegexValidationStatus() {
-        return searchRegexValidator.getValidationStatus();
     }
 
     public ValidationStatus searchSearchTermEmptyValidationStatus() {
