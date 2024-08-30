@@ -614,6 +614,9 @@ public class OOBibBase {
                     // "Insert empty citation"
                     this.cslCitationOOAdapter.insertEmpty(cursor.get(), entries);
                 }
+
+                // If "Automatically sync bibliography when inserting citations" is enabled
+                syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
 
@@ -939,7 +942,7 @@ public class OOBibBase {
                         return;
                     }
 
-                    // A separate database and database
+                    // A separate database and database context
                     BibDatabase bibDatabase = new BibDatabase(citedEntries);
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
 
