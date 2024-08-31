@@ -106,18 +106,18 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
 
     @Override
     protected String call() throws Exception {
-        LOGGER.info("Starting summarization task for entry {}", citationKey);
+        LOGGER.debug("Starting summarization task for entry {}", citationKey);
 
         String result = null;
 
         try {
             result = summarizeAll();
         } catch (InterruptedException e) {
-            LOGGER.info("There was a summarization task for {}. It will be canceled, because user quits JabRef.", citationKey);
+            LOGGER.debug("There was a summarization task for {}. It will be canceled, because user quits JabRef.", citationKey);
         }
 
         showToUser(false);
-        LOGGER.info("Finished summarization task for entry {}", citationKey);
+        LOGGER.debug("Finished summarization task for entry {}", citationKey);
         progressCounter.stop();
         return result;
     }
@@ -142,7 +142,7 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
             throw new RuntimeException(Localization.lang("No summary can be generated for entry '%0'. Could not find attached linked files.", citationKey));
         }
 
-        LOGGER.info("All summaries for attached files of entry {} are generated. Generating final summary.", citationKey);
+        LOGGER.debug("All summaries for attached files of entry {} are generated. Generating final summary.", citationKey);
 
         String finalSummary;
 
@@ -160,13 +160,13 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
     }
 
     private Optional<String> generateSummary(LinkedFile linkedFile) throws InterruptedException {
-        LOGGER.info("Generating summary for file \"{}\" of entry {}", linkedFile.getLink(), citationKey);
+        LOGGER.debug("Generating summary for file \"{}\" of entry {}", linkedFile.getLink(), citationKey);
 
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
 
         if (path.isEmpty()) {
             LOGGER.error("Could not find path for a linked file \"{}\" of entry {}", linkedFile.getLink(), citationKey);
-            LOGGER.info("Unable to generate summary for file \"{}\" of entry {}, because it was not found", linkedFile.getLink(), citationKey);
+            LOGGER.debug("Unable to generate summary for file \"{}\" of entry {}, because it was not found", linkedFile.getLink(), citationKey);
             return Optional.empty();
         }
 
@@ -174,13 +174,13 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
 
         if (document.isEmpty()) {
             LOGGER.warn("Could not extract text from a linked file \"{}\" of entry {}. It will be skipped when generating a summary.", linkedFile.getLink(), citationKey);
-            LOGGER.info("Unable to generate summary for file \"{}\" of entry {}, because it was not found", linkedFile.getLink(), citationKey);
+            LOGGER.debug("Unable to generate summary for file \"{}\" of entry {}, because it was not found", linkedFile.getLink(), citationKey);
             return Optional.empty();
         }
 
         String linkedFileSummary = summarizeOneDocument(path.get().toString(), document.get().text());
 
-        LOGGER.info("Summary for file \"{}\" of entry {} was generated successfully", linkedFile.getLink(), citationKey);
+        LOGGER.debug("Summary for file \"{}\" of entry {} was generated successfully", linkedFile.getLink(), citationKey);
         return Optional.of(linkedFileSummary);
     }
 
@@ -191,13 +191,13 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
 
         List<String> chunkSummaries = documentSplitter.split(new Document(document)).stream().map(TextSegment::text).toList();
 
-        LOGGER.info("The file \"{}\" of entry {} was split into {} chunk(s)", filePath, citationKey, chunkSummaries.size());
+        LOGGER.debug("The file \"{}\" of entry {} was split into {} chunk(s)", filePath, citationKey, chunkSummaries.size());
 
         int passes = 0;
 
         do {
             passes++;
-            LOGGER.info("Summarizing chunk(s) for file \"{}\" of entry {} ({} pass)", filePath, citationKey, passes);
+            LOGGER.debug("Summarizing chunk(s) for file \"{}\" of entry {} ({} pass)", filePath, citationKey, passes);
 
             addMoreWork(chunkSummaries.size());
 
@@ -210,9 +210,9 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
 
                 Prompt prompt = CHUNK_PROMPT_TEMPLATE.apply(Collections.singletonMap("document", chunkSummary));
 
-                LOGGER.info("Sending request to AI provider to summarize a chunk from file \"{}\" of entry {}", filePath, citationKey);
+                LOGGER.debug("Sending request to AI provider to summarize a chunk from file \"{}\" of entry {}", filePath, citationKey);
                 String chunk = chatLanguageModel.generate(prompt.toString());
-                LOGGER.info("Chunk summary for file \"{}\" of entry {} was generated successfully", filePath, citationKey);
+                LOGGER.debug("Chunk summary for file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 
                 list.add(chunk);
                 doneOneWork();
@@ -223,7 +223,7 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
 
         if (chunkSummaries.size() == 1) {
             doneOneWork(); // No need to call LLM for combination of summary chunks.
-            LOGGER.info("Summary of the file \"{}\" of entry {} was generated successfully", filePath, citationKey);
+            LOGGER.debug("Summary of the file \"{}\" of entry {} was generated successfully", filePath, citationKey);
             return chunkSummaries.getFirst();
         }
 
@@ -233,9 +233,9 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
             throw new InterruptedException();
         }
 
-        LOGGER.info("Sending request to AI provider to combine summary chunk(s) for file \"{}\" of entry {}", filePath, citationKey);
+        LOGGER.debug("Sending request to AI provider to combine summary chunk(s) for file \"{}\" of entry {}", filePath, citationKey);
         String result = chatLanguageModel.generate(prompt.toString());
-        LOGGER.info("Summary of the file \"{}\" of entry {} was generated successfully", filePath, citationKey);
+        LOGGER.debug("Summary of the file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 
         doneOneWork();
         return result;

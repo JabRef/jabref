@@ -74,7 +74,7 @@ public class AiChatTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (previousBibEntry != null) {
-            aiService.getChatHistoryService().closeChatHistoryForEntry(previousBibEntry.getId());
+            aiService.getChatHistoryService().closeChatHistoryForEntry(previousBibEntry);
         }
 
         previousBibEntry = entry;

@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.swing.plaf.basic.BasicViewportUI;
+
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -16,9 +19,11 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,10 +58,40 @@ public class ChatHistoryService implements AutoCloseable {
 
     private final ChatHistoryStorage implementation;
 
-    private record ChatHistoryManagementRecord<T>(T object, Optional<BibDatabaseContext> bibDatabaseContext, ObservableList<ChatMessage> chatHistory) { }
+    private record ChatHistoryManagementRecord(Optional<BibDatabaseContext> bibDatabaseContext, ObservableList<ChatMessage> chatHistory) { }
 
-    private final Map<String, ChatHistoryManagementRecord<BibEntry>> bibEntriesChatHistory = new HashMap<>();
-    private final Map<AbstractGroup, ChatHistoryManagementRecord<AbstractGroup>> groupsChatHistory = new HashMap<>();
+    private static class BibEntryWrapper {
+        private final BibEntry entry;
+
+        public BibEntryWrapper(BibEntry entry) {
+            this.entry = entry;
+        }
+
+        public BibEntry getEntry() {
+            return entry;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+
+            return entry == ((BibEntryWrapper) obj).entry;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(entry);
+        }
+    }
+
+    private final Map<BibEntryWrapper, ChatHistoryManagementRecord> bibEntriesChatHistory = new HashMap<>();
+    private final Map<AbstractGroup, ChatHistoryManagementRecord> groupsChatHistory = new HashMap<>();
 
     public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences,
                               ChatHistoryStorage implementation) {
@@ -78,7 +113,8 @@ public class ChatHistoryService implements AutoCloseable {
                         });
 
                         bibDatabaseContext.getDatabase().getEntries().forEach(entry -> {
-                            entry.getCiteKeyBinding().addListener((observable, oldValue, newValue) -> {
+                            // This doesn't work.
+                            EasyBind.listen(entry.getCiteKeyBinding(), (obs, oldValue, newValue) -> {
                                 if (newValue.isPresent() && oldValue.isPresent()) {
                                     transferEntryHistory(bibDatabaseContext, oldValue.get(), newValue.get());
                                 }
@@ -91,7 +127,7 @@ public class ChatHistoryService implements AutoCloseable {
     }
 
     public ObservableList<ChatMessage> getChatHistoryForEntry(BibEntry entry) {
-        return bibEntriesChatHistory.computeIfAbsent(entry.getId(), entryArg -> {
+        return bibEntriesChatHistory.computeIfAbsent(new BibEntryWrapper(entry), entryArg -> {
             Optional<BibDatabaseContext> bibDatabaseContext = findBibDatabaseForEntry(entry);
 
             ObservableList<ChatMessage> chatHistory;
@@ -103,7 +139,7 @@ public class ChatHistoryService implements AutoCloseable {
                 chatHistory = FXCollections.observableArrayList(chatMessagesList);
             }
 
-            return new ChatHistoryManagementRecord<>(entry, bibDatabaseContext, chatHistory);
+            return new ChatHistoryManagementRecord(bibDatabaseContext, chatHistory);
         }).chatHistory;
     }
 
@@ -116,13 +152,12 @@ public class ChatHistoryService implements AutoCloseable {
      * It is not necessary to call this method (everything will be stored in {@link ChatHistoryService#close()},
      * but it's best to call it when the chat history {@link AbstractGroup} is no longer needed.
      */
-    public void closeChatHistoryForEntry(String entryId) {
-        ChatHistoryManagementRecord<BibEntry> chatHistoryManagementRecord = bibEntriesChatHistory.get(entryId);
+    public void closeChatHistoryForEntry(BibEntry entry) {
+        ChatHistoryManagementRecord chatHistoryManagementRecord = bibEntriesChatHistory.get(new BibEntryWrapper(entry));
         if (chatHistoryManagementRecord == null) {
             return;
         }
 
-        BibEntry entry = chatHistoryManagementRecord.object();
         Optional<BibDatabaseContext> bibDatabaseContext = chatHistoryManagementRecord.bibDatabaseContext();
 
         if (bibDatabaseContext.isPresent() && entry.getCitationKey().isPresent() && correctCitationKey(bibDatabaseContext.get(), entry) && bibDatabaseContext.get().getDatabasePath().isPresent()) {
@@ -136,7 +171,7 @@ public class ChatHistoryService implements AutoCloseable {
         }
 
         // TODO: What if there is two AI chats for the same entry? And one is closed and one is not?
-        bibEntriesChatHistory.remove(entry.getId());
+        bibEntriesChatHistory.remove(new BibEntryWrapper(entry));
     }
 
     public ObservableList<ChatMessage> getChatHistoryForGroup(AbstractGroup group) {
@@ -156,7 +191,7 @@ public class ChatHistoryService implements AutoCloseable {
                 chatHistory = FXCollections.observableArrayList(chatMessagesList);
             }
 
-            return new ChatHistoryManagementRecord<>(group, bibDatabaseContext, chatHistory);
+            return new ChatHistoryManagementRecord(bibDatabaseContext, chatHistory);
         }).chatHistory;
     }
 
@@ -170,7 +205,7 @@ public class ChatHistoryService implements AutoCloseable {
      * but it's best to call it when the chat history {@link AbstractGroup} is no longer needed.
      */
     public void closeChatHistoryForGroup(AbstractGroup group) {
-        ChatHistoryManagementRecord<AbstractGroup> chatHistoryManagementRecord = groupsChatHistory.get(group);
+        ChatHistoryManagementRecord chatHistoryManagementRecord = groupsChatHistory.get(group);
         if (chatHistoryManagementRecord == null) {
             return;
         }
@@ -224,7 +259,7 @@ public class ChatHistoryService implements AutoCloseable {
     @Override
     public void close() {
         // We need to clone `bibEntriesChatHistory.keySet()` because closeChatHistoryForEntry() modifies the `bibEntriesChatHistory` map.
-        new HashSet<>(bibEntriesChatHistory.keySet()).forEach(this::closeChatHistoryForEntry);
+        new HashSet<>(bibEntriesChatHistory.keySet()).stream().map(BibEntryWrapper::getEntry).forEach(this::closeChatHistoryForEntry);
 
         // Clone is for the same reason, as written above.
         new HashSet<>(groupsChatHistory.keySet()).forEach(this::closeChatHistoryForGroup);
@@ -239,6 +274,7 @@ public class ChatHistoryService implements AutoCloseable {
         }
 
         List<ChatMessage> chatMessages = implementation.loadMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldName);
+        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldName, List.of());
         implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), newName, chatMessages);
     }
 
@@ -251,6 +287,7 @@ public class ChatHistoryService implements AutoCloseable {
         }
 
         List<ChatMessage> chatMessages = implementation.loadMessagesForEntry(bibDatabaseContext.getDatabasePath().get(), oldCitationKey);
+        implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldCitationKey, List.of());
         implementation.storeMessagesForEntry(bibDatabaseContext.getDatabasePath().get(), newCitationKey, chatMessages);
     }
 }

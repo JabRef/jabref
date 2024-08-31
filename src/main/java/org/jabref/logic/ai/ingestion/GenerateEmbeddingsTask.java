@@ -54,16 +54,16 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
     @Override
     protected Void call() throws Exception {
-        LOGGER.info("Starting embeddings generation task for file \"{}\"", linkedFile.getLink());
+        LOGGER.debug("Starting embeddings generation task for file \"{}\"", linkedFile.getLink());
 
         try {
             ingestLinkedFile(linkedFile);
         } catch (InterruptedException e) {
-            LOGGER.info("There is a embeddings generation task for file \"{}\". It will be cancelled, because user quits JabRef.", linkedFile.getLink());
+            LOGGER.debug("There is a embeddings generation task for file \"{}\". It will be cancelled, because user quits JabRef.", linkedFile.getLink());
         }
 
         showToUser(false);
-        LOGGER.info("Finished embeddings generation task for file \"{}\"", linkedFile.getLink());
+        LOGGER.debug("Finished embeddings generation task for file \"{}\"", linkedFile.getLink());
         progressCounter.stop();
         return null;
     }
@@ -72,13 +72,13 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         // Rationale for RuntimeException here:
         // See org.jabref.logic.ai.summarization.GenerateSummaryTask.summarizeAll
 
-        LOGGER.info("Generating embeddings for file \"{}\"", linkedFile.getLink());
+        LOGGER.debug("Generating embeddings for file \"{}\"", linkedFile.getLink());
 
         Optional<Path> path = linkedFile.findIn(bibDatabaseContext, filePreferences);
 
         if (path.isEmpty()) {
             LOGGER.error("Could not find path for a linked file \"{}\", while generating embeddings", linkedFile.getLink());
-            LOGGER.info("Unable to generate embeddings for file \"{}\", because it was not found while generating embeddings", linkedFile.getLink());
+            LOGGER.debug("Unable to generate embeddings for file \"{}\", because it was not found while generating embeddings", linkedFile.getLink());
             throw new RuntimeException(Localization.lang("Could not find path for a linked file '%0' while generating embeddings", linkedFile.getLink()));
         }
 
@@ -98,7 +98,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
                 if (currentModificationTimeInSeconds > ingestedModificationTimeInSeconds.get()) {
                     modTime = Optional.of(currentModificationTimeInSeconds);
                 } else {
-                    LOGGER.info("No need to generate embeddings for file \"{}\", because it was already generated", linkedFile.getLink());
+                    LOGGER.debug("No need to generate embeddings for file \"{}\", because it was already generated", linkedFile.getLink());
                     shouldIngest = false;
                 }
             }
@@ -114,7 +114,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         Optional<Document> document = FileToDocument.fromFile(path.get());
         if (document.isPresent()) {
             fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), modTime.orElse(0L), progressCounter.workDoneProperty(), progressCounter.workMaxProperty());
-            LOGGER.info("Embeddings for file \"{}\" were generated successfully", linkedFile.getLink());
+            LOGGER.debug("Embeddings for file \"{}\" were generated successfully", linkedFile.getLink());
         } else {
             LOGGER.error("Unable to generate embeddings for file \"{}\", because JabRef was unable to extract text from the file", linkedFile.getLink());
             throw new RuntimeException(Localization.lang("Unable to generate embeddings for file '%0', because JabRef was unable to extract text from the file", linkedFile.getLink()));
