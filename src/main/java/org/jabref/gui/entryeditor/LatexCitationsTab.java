@@ -27,7 +27,7 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class LatexCitationsTab extends EntryEditorTab {
 
-    public static final String NAME = "LaTeX Citations";
+    public static final String NAME = "LaTeX citations";
     private final LatexCitationsTabViewModel viewModel;
     private final GridPane searchPane;
     private final ProgressIndicator progressIndicator;
