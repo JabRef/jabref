@@ -74,12 +74,7 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
         return throttler;
     }
 
-    private static class FailedFuture<T> implements Future<T> {
-        private final Throwable exception;
-
-        FailedFuture(Throwable exception) {
-            this.exception = exception;
-        }
+    private record FailedFuture<T>(Throwable exception) implements Future<T> {
 
         @Override
         public T get() throws ExecutionException {

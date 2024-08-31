@@ -5,6 +5,10 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javafx.beans.property.BooleanProperty;
+
+import org.jabref.gui.util.CurrentThreadTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -23,13 +27,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DatabaseSearcherTest {
-
+    private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
     private static final FilePreferences FILE_PREFERENCES = mock(FilePreferences.class);
     private BibDatabaseContext databaseContext;
 
     @BeforeEach
     void setUp() {
         when(FILE_PREFERENCES.shouldFulltextIndexLinkedFiles()).thenReturn(false);
+        when(FILE_PREFERENCES.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
         databaseContext = new BibDatabaseContext();
     }
 
@@ -39,7 +44,7 @@ public class DatabaseSearcherTest {
         for (BibEntry entry : entries) {
             databaseContext.getDatabase().insertEntry(entry);
         }
-        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, FILE_PREFERENCES).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, TASK_EXECUTOR, FILE_PREFERENCES).getMatches();
         assertEquals(expectedMatches, matches);
     }
 

@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import javafx.beans.property.BooleanProperty;
+
+import org.jabref.gui.util.CurrentThreadTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
@@ -32,6 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class DatabaseSearcherWithBibFilesTest {
+    private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
     private static final BibEntry TITLE_SENTENCE_CASED = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("title-sentence-cased")
             .withField(StandardField.TITLE, "Title Sentence Cased");
@@ -74,6 +79,7 @@ class DatabaseSearcherWithBibFilesTest {
         BibDatabaseContext databaseContext = result.getDatabaseContext();
 
         when(FILE_PREFERENCES.shouldFulltextIndexLinkedFiles()).thenReturn(true);
+        when(FILE_PREFERENCES.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
         return databaseContext;
     }
 
@@ -125,7 +131,7 @@ class DatabaseSearcherWithBibFilesTest {
     @MethodSource
     void searchLibrary(List<BibEntry> expected, String testFile, String query, EnumSet<SearchFlags> searchFlags) throws Exception {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, FILE_PREFERENCES).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, FILE_PREFERENCES).getMatches();
         // assert that both lists has the same items, ignoring the order
         assertEquals(expected.stream().sorted(new IdComparator()).toList(), matches.stream().sorted(new IdComparator()).toList());
     }

@@ -316,11 +316,6 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         HeadlessExecutorService.INSTANCE.execute(this::closeIndex);
     }
 
-    @Override
-    public void closeAndWait() {
-        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);
-    }
-
     private void closeIndex() {
         try {
             LOGGER.debug("Closing linked files index");

@@ -15,6 +15,7 @@ import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -460,7 +461,7 @@ public class ArgumentProcessor {
 
         List<BibEntry> matches;
         try {
-            matches = new DatabaseSearcher(query, databaseContext, preferencesService.getFilePreferences()).getMatches();
+            matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), preferencesService.getFilePreferences()).getMatches();
         } catch (IOException e) {
             LOGGER.error("Error occurred when searching", e);
             return false;
