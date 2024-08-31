@@ -96,10 +96,6 @@ public class ProgressCounter implements Progress {
         Duration eta = oneWorkTime.multipliedBy(workMax.get() - workDone.get() <= 0 ? 1 : workMax.get() - workDone.get());
 
         updateMessage(eta);
-
-        if (workDone.get() != 0 && workMax.get() != 0 && workDone.get() == workMax.get()) {
-            stop();
-        }
     }
 
     @Override

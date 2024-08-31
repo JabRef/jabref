@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This task generates embeddings for a {@link LinkedFile}.
  * It will check if embeddings were already generated.
- * And it also will store the summary.
+ * And it also will store the embeddings.
  */
 public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsTask.class);
@@ -47,7 +47,6 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
 
     private void configure(LinkedFile linkedFile) {
         titleProperty().set(Localization.lang("Generating embeddings for file '%0'", linkedFile.getLink()));
-        showToUser(true);
 
         progressCounter.listenToAllProperties(this::updateProgress);
     }
@@ -62,7 +61,6 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
             LOGGER.debug("There is a embeddings generation task for file \"{}\". It will be cancelled, because user quits JabRef.", linkedFile.getLink());
         }
 
-        showToUser(false);
         LOGGER.debug("Finished embeddings generation task for file \"{}\"", linkedFile.getLink());
         progressCounter.stop();
         return null;

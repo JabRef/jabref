@@ -79,6 +79,8 @@ public class AiChatComponent extends VBox {
 
         this.aiChatLogic = aiService.getAiChatService().makeChat(name, chatHistory, entries);
 
+        aiService.getIngestionService().ingest(name, ListUtil.getLinkedFiles(entries).toList(), bibDatabaseContext);
+
         ViewLoader.view(this)
                 .root(this)
                 .load();
