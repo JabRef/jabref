@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.swing.plaf.basic.BasicViewportUI;
-
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -19,7 +16,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -60,35 +56,30 @@ public class ChatHistoryService implements AutoCloseable {
 
     private record ChatHistoryManagementRecord(Optional<BibDatabaseContext> bibDatabaseContext, ObservableList<ChatMessage> chatHistory) { }
 
-    private static class BibEntryWrapper {
-        private final BibEntry entry;
-
-        public BibEntryWrapper(BibEntry entry) {
-            this.entry = entry;
-        }
-
-        public BibEntry getEntry() {
-            return entry;
-        }
+    // This class is needed because the `equals` and `hashCode` methods of {@link BibEntry} are overridden.
+    // That means when you compare {@link BibEntry} instances, they are compared by value, not by reference.
+    // And when you store {@link BibEntry} instances in a {@link HashMap}, an old hash may be stored when the {@link BibEntry} is changed.
+    // See also ADR-38
+    private record BibEntryWrapper(BibEntry entry) {
 
         @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
+            public boolean equals(Object obj) {
+                if (obj == null) {
+                    return false;
+                }
+
+                if (getClass() != obj.getClass()) {
+                    return false;
+                }
+
+                return entry == ((BibEntryWrapper) obj).entry;
             }
 
-            if (getClass() != obj.getClass()) {
-                return false;
+            @Override
+            public int hashCode() {
+                return System.identityHashCode(entry);
             }
-
-            return entry == ((BibEntryWrapper) obj).entry;
         }
-
-        @Override
-        public int hashCode() {
-            return System.identityHashCode(entry);
-        }
-    }
 
     private final Map<BibEntryWrapper, ChatHistoryManagementRecord> bibEntriesChatHistory = new HashMap<>();
     private final Map<AbstractGroup, ChatHistoryManagementRecord> groupsChatHistory = new HashMap<>();
@@ -259,7 +250,7 @@ public class ChatHistoryService implements AutoCloseable {
     @Override
     public void close() {
         // We need to clone `bibEntriesChatHistory.keySet()` because closeChatHistoryForEntry() modifies the `bibEntriesChatHistory` map.
-        new HashSet<>(bibEntriesChatHistory.keySet()).stream().map(BibEntryWrapper::getEntry).forEach(this::closeChatHistoryForEntry);
+        new HashSet<>(bibEntriesChatHistory.keySet()).stream().map(BibEntryWrapper::entry).forEach(this::closeChatHistoryForEntry);
 
         // Clone is for the same reason, as written above.
         new HashSet<>(groupsChatHistory.keySet()).forEach(this::closeChatHistoryForGroup);
