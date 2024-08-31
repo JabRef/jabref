@@ -10,6 +10,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -18,6 +19,7 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Pair;
 
+import org.jabref.gui.ai.components.aichat.AiChatWindow;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
@@ -32,6 +34,7 @@ import org.jabref.model.groups.GroupTreeNode;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
+import dev.langchain4j.data.message.ChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +48,7 @@ import org.slf4j.LoggerFactory;
  *   <li>active number of search results</li>
  *   <li>focus owner</li>
  *   <li>dialog window sizes/positions</li>
+ *   <li>opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})</li>
  * </ul>
  */
 public class StateManager {
@@ -69,6 +73,7 @@ public class StateManager {
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
+    private final OptionalObjectProperty<AiChatWindow> aiChatWindow = OptionalObjectProperty.empty();
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
         return visibleSidePanes;
@@ -206,5 +211,9 @@ public class StateManager {
 
     public void clearSearchHistory() {
         searchHistory.clear();
+    }
+
+    public OptionalObjectProperty<AiChatWindow> getAiChatWindow() {
+        return aiChatWindow;
     }
 }

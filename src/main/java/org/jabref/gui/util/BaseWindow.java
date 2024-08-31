@@ -1,6 +1,11 @@
 package org.jabref.gui.util;
 
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -17,14 +22,19 @@ import org.jabref.gui.icon.IconTheme;
  * See {@link org.jabref.gui.ai.components.aichat.AiChatWindow} for example.
  */
 public class BaseWindow extends Stage {
-    public BaseWindow(StringProperty title, Window owner) {
-        initOwner(owner);
+    private final ObservableList<String> stylesheets = FXCollections.observableArrayList();
+
+    public BaseWindow() {
         this.initModality(Modality.NONE);
         this.getIcons().add(IconTheme.getJabRefImage());
-        this.titleProperty().bind(title);
+
+        setScene(new Scene(new Pane()));
+
+        stylesheets.addListener((ListChangeListener<String>) c -> getScene().getStylesheets().setAll(stylesheets));
+        sceneProperty().addListener((obs, oldValue, newValue) -> newValue.getStylesheets().setAll(stylesheets));
     }
 
-    public BaseWindow(StringProperty title) {
-        this(title, null);
+    public void applyStylesheets(ObservableList<String> stylesheets) {
+        this.stylesheets.setAll(stylesheets);
     }
 }

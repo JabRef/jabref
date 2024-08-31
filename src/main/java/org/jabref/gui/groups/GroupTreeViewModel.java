@@ -400,19 +400,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode().getGroup());
         ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));
 
-        AiChatWindow aiChatWindow = new AiChatWindow(
-                nameProperty,
-                chatHistory,
-                currentDatabase.get(),
-                bibEntries,
-                aiService,
-                dialogService,
-                preferences.getAiPreferences(),
-                preferences.getFilePreferences(),
-                taskExecutor
-        );
-
-        dialogService.showCustomWindow(aiChatWindow);
+        aiService.openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
     }
 
     public void removeSubgroups(GroupNodeViewModel group) {

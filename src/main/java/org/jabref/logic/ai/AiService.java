@@ -1,12 +1,17 @@
 package org.jabref.logic.ai;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.components.aichat.AiChatWindow;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.chatting.AiChatService;
@@ -20,11 +25,15 @@ import org.jabref.logic.ai.ingestion.storages.MVStoreFullyIngestedDocumentsTrack
 import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.ai.AiApiKeyProvider;
 import org.jabref.preferences.ai.AiPreferences;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import dev.langchain4j.data.message.ChatMessage;
 
 /**
  *  The main class for the AI functionality.
@@ -38,6 +47,13 @@ public class AiService implements AutoCloseable {
     private static final String EMBEDDINGS_FILE_NAME = "embeddings.mv";
     private static final String FULLY_INGESTED_FILE_NAME = "fully-ingested.mv";
     private static final String SUMMARIES_FILE_NAME = "summaries.mv";
+
+    private final StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
+
+    private final AiPreferences aiPreferences;
+    private final FilePreferences filePreferences;
+    private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
 
     // This field is used to shut down AI-related background tasks.
     // If a background task processes a big document and has a loop, then the task should check the status
@@ -60,7 +76,18 @@ public class AiService implements AutoCloseable {
     private final IngestionService ingestionService;
     private final SummariesService summariesService;
 
-    public AiService(AiPreferences aiPreferences, FilePreferences filePreferences, CitationKeyPatternPreferences citationKeyPatternPreferences, AiApiKeyProvider aiApiKeyProvider, DialogService dialogService, TaskExecutor taskExecutor) {
+    public AiService(AiPreferences aiPreferences,
+                     FilePreferences filePreferences,
+                     CitationKeyPatternPreferences citationKeyPatternPreferences,
+                     AiApiKeyProvider aiApiKeyProvider,
+                     DialogService dialogService,
+                     TaskExecutor taskExecutor
+    ) {
+        this.aiPreferences = aiPreferences;
+        this.filePreferences = filePreferences;
+        this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
+
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences, aiApiKeyProvider);
 
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(JabRefDesktop.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), dialogService);
@@ -105,6 +132,28 @@ public class AiService implements AutoCloseable {
 
     public SummariesService getSummariesService() {
         return summariesService;
+    }
+
+    public void openAiChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
+        if (stateManager.getAiChatWindow().get().isEmpty()) {
+            AiChatWindow aiChatWindow = new AiChatWindow(
+                    this,
+                    dialogService,
+                    aiPreferences,
+                    filePreferences,
+                    taskExecutor
+            );
+
+            aiChatWindow.setOnCloseRequest(event -> {
+                stateManager.getAiChatWindow().set(Optional.empty());
+            });
+
+            stateManager.getAiChatWindow().set(Optional.of(aiChatWindow));
+            dialogService.showCustomWindow(aiChatWindow);
+        }
+
+        stateManager.getAiChatWindow().get().get().setChat(name, chatHistory, bibDatabaseContext, entries);
+        stateManager.getAiChatWindow().get().get().requestFocus();
     }
 
     @Override
