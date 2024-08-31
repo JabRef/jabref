@@ -5,10 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.ObservableList;
 
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;

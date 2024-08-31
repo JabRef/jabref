@@ -1,6 +1,5 @@
 package org.jabref.gui.ai.components.aichat;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;

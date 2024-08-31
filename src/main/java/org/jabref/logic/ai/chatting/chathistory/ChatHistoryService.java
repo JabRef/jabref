@@ -61,7 +61,6 @@ public class ChatHistoryService implements AutoCloseable {
     // And when you store {@link BibEntry} instances in a {@link HashMap}, an old hash may be stored when the {@link BibEntry} is changed.
     // See also ADR-38
     private record BibEntryWrapper(BibEntry entry) {
-
         @Override
             public boolean equals(Object obj) {
                 if (obj == null) {

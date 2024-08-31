@@ -17,7 +17,6 @@ import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Int;
 
 /**
  * This task generates embeddings for several {@link LinkedFile} (typically used for groups).
@@ -79,7 +78,6 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
                             .executeWith(taskExecutor);
                 })
                 .toList();
-
 
         for (Future<?> future : futures) {
             future.get();
