@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.LuceneManager;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@AllowedToUseLogic("because it needs access to lucene manager")
 class SearchGroupTest {
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
     private static final FilePreferences FILE_PREFERENCES = mock(FilePreferences.class);
