@@ -583,8 +583,7 @@ public class OOBibBase {
             }
         }
 
-        syncOptions
-                .map(e -> e.setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages)); // TODO: Provide option to user: this is always false
+        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages)); // TODO: Provide option to user: this is always false
 
         try {
 
