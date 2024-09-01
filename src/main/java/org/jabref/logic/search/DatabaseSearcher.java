@@ -37,6 +37,8 @@ public class DatabaseSearcher {
             return Collections.emptyList();
         }
         List<BibEntry> matchEntries = luceneManager.search(query).getMatchedEntries().stream().toList();
+        LOGGER.debug("Found {} matches", matchEntries.size());
+        LOGGER.debug("Matches: {}", matchEntries);
         luceneManager.close();
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }

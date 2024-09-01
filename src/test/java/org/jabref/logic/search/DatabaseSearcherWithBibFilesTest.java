@@ -30,12 +30,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class DatabaseSearcherWithBibFilesTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSearcherWithBibFilesTest.class);
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
     private static final BibEntry TITLE_SENTENCE_CASED = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("title-sentence-cased")
@@ -132,6 +135,8 @@ class DatabaseSearcherWithBibFilesTest {
     void searchLibrary(List<BibEntry> expected, String testFile, String query, EnumSet<SearchFlags> searchFlags) throws Exception {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, FILE_PREFERENCES).getMatches();
+        LOGGER.debug("Expected: {}", expected);
+        LOGGER.debug("Matches: {}", matches);
         // assert that both lists has the same items, ignoring the order
         assertEquals(expected.stream().sorted(new IdComparator()).toList(), matches.stream().sorted(new IdComparator()).toList());
     }
