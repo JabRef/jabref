@@ -197,13 +197,6 @@ public class StateManager {
         return Optional.ofNullable(searchResults.get(databaseContext.getUid()));
     }
 
-    public int getSearchResultsCount() {
-        return activeDatabase.get()
-                             .flatMap(this::getSearchResults)
-                             .map(SearchResults::getNumberOfResults)
-                             .orElse(0);
-    }
-
     public List<String> collectAllDatabasePaths() {
         List<String> list = new ArrayList<>();
         getOpenDatabases().stream()

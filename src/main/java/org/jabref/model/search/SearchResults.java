@@ -13,8 +13,8 @@ public class SearchResults {
 
     private final Map<BibEntry, List<SearchResult>> searchResults = new HashMap<>();
 
-    public void addSearchResults(SearchResults newResults) {
-        this.searchResults.putAll(newResults.searchResults);
+    public void mergeSearchResults(SearchResults additionalResults) {
+        this.searchResults.putAll(additionalResults.searchResults);
     }
 
     public void addSearchResult(BibEntry entry, SearchResult result) {

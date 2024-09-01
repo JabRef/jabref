@@ -67,7 +67,7 @@ public class SearchResultsTableDataModel {
                 SearchResults searchResults = new SearchResults();
                 for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
                     stateManager.getLuceneManager(context).ifPresent(luceneManager -> {
-                        searchResults.addSearchResults(luceneManager.search(query.get()));
+                        searchResults.mergeSearchResults(luceneManager.search(query.get()));
                     });
                 }
                 for (BibEntryTableViewModel entry : entriesViewModel) {
