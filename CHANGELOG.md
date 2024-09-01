@@ -58,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the entry preview highlight was not working when searching before opening the entry editor. [#11659](https://github.com/JabRef/jabref/pull/11659)
 - We fixed an issue where text in Dark mode inside "Citation information" was not readable. [#11512](https://github.com/JabRef/jabref/issues/11512)
 - We fixed an issue where the selection of an entry in the table lost after searching for a group. [#3176](https://github.com/JabRef/jabref/issues/3176)
+- We fixed the non-functionality of the option "Automatically sync bibliography when inserting citations" in the OpenOffice panel, when enabled in case of JStyles. [#11684](https://github.com/JabRef/jabref/issues/11684)
 
 ### Removed
 
