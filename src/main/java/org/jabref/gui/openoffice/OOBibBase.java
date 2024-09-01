@@ -577,10 +577,7 @@ public class OOBibBase {
         OOResult<FunctionalTextViewCursor, OOError> fcursor = null;
         if (syncOptions.isPresent()) {
             fcursor = getFunctionalTextViewCursor(doc, errorTitle);
-            if (testDialog(errorTitle, fcursor.asVoidResult())) {
-                return;
-            }
-            if (testDialog(databaseIsRequired(syncOptions.get().databases,
+            if (testDialog(errorTitle, fcursor.asVoidResult()) || testDialog(databaseIsRequired(syncOptions.get().databases,
                     OOError::noDataBaseIsOpenForSyncingAfterCitation))) {
                 return;
             }
