@@ -136,5 +136,3 @@ class DatabaseSearcherWithBibFilesTest {
         assertEquals(expected.stream().sorted(new IdComparator()).toList(), matches.stream().sorted(new IdComparator()).toList());
     }
 }
-
-

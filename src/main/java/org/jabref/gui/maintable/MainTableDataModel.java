@@ -43,7 +43,6 @@ import org.jspecify.annotations.Nullable;
 
 public class MainTableDataModel {
 
-    private final ObservableList<BibEntry> allEntries;
     private final ObservableList<BibEntryTableViewModel> entriesViewModel;
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesFilteredAndSorted;
@@ -86,7 +85,7 @@ public class MainTableDataModel {
         this.bibDatabaseContext.getDatabase().registerListener(indexUpdatedListener);
         resetFieldFormatter();
 
-        allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
+        ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
         entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter), false);
         entriesFiltered = new FilteredList<>(entriesViewModel, BibEntryTableViewModel::isVisible);
 
