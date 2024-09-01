@@ -10,7 +10,6 @@ import javafx.beans.property.BooleanProperty;
 
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -25,6 +24,7 @@ import org.jabref.model.search.SearchQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -33,7 +33,7 @@ import org.mockito.Answers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -135,9 +135,6 @@ class DatabaseSearcherWithBibFilesTest {
     void searchLibrary(List<BibEntry> expected, String testFile, String query, EnumSet<SearchFlags> searchFlags) throws Exception {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, FILE_PREFERENCES).getMatches();
-        LOGGER.debug("Expected: {}", expected);
-        LOGGER.debug("Matches: {}", matches);
-        // assert that both lists has the same items, ignoring the order
-        assertEquals(expected.stream().sorted(new IdComparator()).toList(), matches.stream().sorted(new IdComparator()).toList());
+        assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }
 }
