@@ -72,7 +72,6 @@ class SearchGroupTest {
         databaseContext.getDatabase().insertEntries(entries);
 
         LuceneManager luceneManager = new LuceneManager(databaseContext, TASK_EXECUTOR, FILE_PREFERENCES);
-        luceneManager.updateOnStart();
 
         SearchGroup group = new SearchGroup("TestGroup", GroupHierarchyType.INDEPENDENT, searchTerm, EnumSet.noneOf(SearchFlags.class), luceneManager);
         assertEquals(expectedResult, group.containsAll(entries));

@@ -35,9 +35,9 @@ public class LuceneManager {
     private final BooleanProperty shouldIndexLinkedFiles;
     private final BooleanProperty isLinkedFilesIndexerBlocked = new SimpleBooleanProperty(false);
     private final ChangeListener<Boolean> preferencesListener;
-    private final LuceneSearcher luceneSearcher;
     private final LuceneIndexer bibFieldsIndexer;
     private final LuceneIndexer linkedFilesIndexer;
+    private final LuceneSearcher luceneSearcher;
 
     public LuceneManager(BibDatabaseContext databaseContext, TaskExecutor executor, FilePreferences preferences) {
         this.taskExecutor = executor;
@@ -58,6 +58,7 @@ public class LuceneManager {
         linkedFilesIndexer = indexer;
 
         this.luceneSearcher = new LuceneSearcher(databaseContext, bibFieldsIndexer, linkedFilesIndexer);
+        updateOnStart();
     }
 
     private void bindToPreferences(boolean newValue) {
@@ -74,7 +75,7 @@ public class LuceneManager {
         }
     }
 
-    public void updateOnStart() {
+    private void updateOnStart() {
         new BackgroundTask<>() {
             @Override
             protected Object call() {
@@ -125,7 +126,7 @@ public class LuceneManager {
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexRemovedEvent(entries)))
-        .showToUser(true).executeWith(taskExecutor);
+         .showToUser(true).executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get()) {
             new BackgroundTask<>() {
@@ -146,7 +147,7 @@ public class LuceneManager {
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
-         .showToUser(true).executeWith(taskExecutor);
+         .executeWith(taskExecutor);
 
         if (isLinkedFile && shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
             new BackgroundTask<>() {
@@ -155,7 +156,7 @@ public class LuceneManager {
                     linkedFilesIndexer.updateEntry(entry, oldValue, newValue, this);
                     return null;
                 }
-            }.showToUser(true).executeWith(taskExecutor);
+            }.executeWith(taskExecutor);
         }
     }
 
@@ -167,7 +168,7 @@ public class LuceneManager {
                 return null;
             }
         }.onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexAddedOrUpdatedEvent(List.of(entry))))
-        .showToUser(true).executeWith(taskExecutor);
+         .executeWith(taskExecutor);
 
         if (shouldIndexLinkedFiles.get() && !isLinkedFilesIndexerBlocked.get()) {
             new BackgroundTask<>() {
