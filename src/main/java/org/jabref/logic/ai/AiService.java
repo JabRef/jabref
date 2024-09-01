@@ -16,7 +16,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.chatting.AiChatService;
 import org.jabref.logic.ai.chatting.chathistory.ChatHistoryService;
-import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistory;
+import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage;
 import org.jabref.logic.ai.chatting.model.JabRefChatLanguageModel;
 import org.jabref.logic.ai.ingestion.IngestionService;
 import org.jabref.logic.ai.ingestion.MVStoreEmbeddingStore;
@@ -66,7 +66,7 @@ public class AiService implements AutoCloseable {
 
     private final MVStoreEmbeddingStore mvStoreEmbeddingStore;
     private final MVStoreFullyIngestedDocumentsTracker mvStoreFullyIngestedDocumentsTracker;
-    private final MVStoreChatHistory mvStoreChatHistory;
+    private final MVStoreChatHistoryStorage mvStoreChatHistoryStorage;
     private final MVStoreSummariesStorage mvStoreSummariesStorage;
 
     private final JabRefChatLanguageModel jabRefChatLanguageModel;
@@ -93,9 +93,9 @@ public class AiService implements AutoCloseable {
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(JabRefDesktop.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), dialogService);
         this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(JabRefDesktop.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), dialogService);
         this.mvStoreSummariesStorage = new MVStoreSummariesStorage(JabRefDesktop.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), dialogService);
-        this.mvStoreChatHistory = new MVStoreChatHistory(JabRefDesktop.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), dialogService);
+        this.mvStoreChatHistoryStorage = new MVStoreChatHistoryStorage(JabRefDesktop.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), dialogService);
 
-        this.chatHistoryService = new ChatHistoryService(citationKeyPatternPreferences, mvStoreChatHistory);
+        this.chatHistoryService = new ChatHistoryService(citationKeyPatternPreferences, mvStoreChatHistoryStorage);
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, dialogService, taskExecutor);
         this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, cachedThreadPool);
         this.ingestionService = new IngestionService(
@@ -167,7 +167,7 @@ public class AiService implements AutoCloseable {
 
         mvStoreFullyIngestedDocumentsTracker.close();
         mvStoreEmbeddingStore.close();
-        mvStoreChatHistory.close();
+        mvStoreChatHistoryStorage.close();
         mvStoreSummariesStorage.close();
     }
 }

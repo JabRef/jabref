@@ -23,7 +23,7 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
     /// 1. Logging
     /// 2. Title of group chat window
     /// So, if you use {@link AiChatGuardedComponent} for one entry in {@link EntryEditor}, then you may not localize
-    /// this parameter. But for group chat window, you should.
+    /// this parameter. However, for group chat window, you should.
     private final StringProperty name;
 
     private final ObservableList<ChatMessage> chatHistory;

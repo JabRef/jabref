@@ -77,7 +77,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
         if (path.isEmpty()) {
             LOGGER.error("Could not find path for a linked file \"{}\", while generating embeddings", linkedFile.getLink());
             LOGGER.debug("Unable to generate embeddings for file \"{}\", because it was not found while generating embeddings", linkedFile.getLink());
-            throw new RuntimeException(Localization.lang("Could not find path for a linked file '%0' while generating embeddings", linkedFile.getLink()));
+            throw new RuntimeException(Localization.lang("Could not find path for a linked file '%0' while generating embeddings.", linkedFile.getLink()));
         }
 
         Optional<Long> modTime = Optional.empty();

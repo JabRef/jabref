@@ -185,7 +185,7 @@ public class AiChatComponent extends VBox {
                 case PROCESSING -> notifications.add(new Notification(
                     NotificationType.WARNING,
                     Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
-                    Localization.lang("After the file will be ingested, you will be able to chat with it")
+                    Localization.lang("After the file will be ingested, you will be able to chat with it.")
                 ));
 
                 case ERROR -> {
@@ -227,6 +227,7 @@ public class AiChatComponent extends VBox {
                             setLoading(false);
 
                             // Typically, if user has entered an invalid API base URL, we get either "401 - null" or "404 - null" strings.
+                            // Since there might be other strings returned from other API endpoints, we use startsWith() here.
                             if ("401 - null".startsWith(e.getMessage()) || "404 - null".startsWith(e.getMessage())) {
                                 addError(Localization.lang("API base URL setting appears to be incorrect. Please check it in AI expert settings."));
                             } else {

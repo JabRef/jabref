@@ -10,7 +10,7 @@ import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponen
 /**
  * A node that can change its content using a setContent(Node) method, similar to {@link Tab}.
  * <p>
- * It's used in places where the content is changed dynamically, but you have to provide a one {@link Node} and set it
+ * It is used in places where the content is changed dynamically, but you have to provide a one {@link Node} and set it
  * only once.
  * <p>
  * See {@link AiPrivacyNoticeGuardedComponent#rebuildUi()} for example.

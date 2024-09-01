@@ -20,7 +20,6 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
 import dev.langchain4j.model.output.Response;
-import org.h2.mvstore.MVStore;
 
 /**
  * Wrapper around langchain4j chat language model.
@@ -52,7 +51,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
      * Update the underlying {@link dev.langchain4j.model.chat.ChatLanguageModel} by current {@link AiPreferences} parameters.
      * When the model is updated, the chat messages are not lost.
      * See {@link AiChatLogic}, where messages are stored in {@link ChatMemory},
-     * and using {@link org.jabref.logic.ai.chathistory.BibDatabaseChatHistoryManager}, where messages are stored in {@link MVStore}.
+     * and see {@link org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage}.
      */
     private void rebuild() {
         String apiKey = apiKeyProvider.getApiKeyForAiProvider(aiPreferences.getAiProvider());

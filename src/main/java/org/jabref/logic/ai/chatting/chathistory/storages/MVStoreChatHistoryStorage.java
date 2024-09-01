@@ -19,7 +19,7 @@ import kotlin.ranges.IntRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MVStoreChatHistory extends MVStoreBase implements ChatHistoryStorage {
+public class MVStoreChatHistoryStorage extends MVStoreBase implements ChatHistoryStorage {
     private static final String ENTRY_CHAT_HISTORY_PREFIX = "entry";
     private static final String GROUP_CHAT_HISTORY_PREFIX = "group";
 
@@ -65,7 +65,7 @@ public class MVStoreChatHistory extends MVStoreBase implements ChatHistoryStorag
         }
     }
 
-    public MVStoreChatHistory(Path path, DialogService dialogService) {
+    public MVStoreChatHistoryStorage(Path path, DialogService dialogService) {
         super(path, dialogService);
     }
 

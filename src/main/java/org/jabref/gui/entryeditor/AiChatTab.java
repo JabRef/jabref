@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -26,8 +27,6 @@ import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.ai.AiPreferences;
 
-import jakarta.annotation.Nullable;
-
 public class AiChatTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
     private final AiService aiService;
@@ -38,7 +37,7 @@ public class AiChatTab extends EntryEditorTab {
     private final CitationKeyGenerator citationKeyGenerator;
     private final TaskExecutor taskExecutor;
 
-    private @Nullable BibEntry previousBibEntry;
+    private Optional<BibEntry> previousBibEntry = Optional.empty();
 
     public AiChatTab(BibDatabaseContext bibDatabaseContext,
                      AiService aiService,
@@ -73,11 +72,10 @@ public class AiChatTab extends EntryEditorTab {
      */
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (previousBibEntry != null) {
-            aiService.getChatHistoryService().closeChatHistoryForEntry(previousBibEntry);
-        }
+        previousBibEntry.ifPresent(previousBibEntry ->
+                aiService.getChatHistoryService().closeChatHistoryForEntry(previousBibEntry));
 
-        previousBibEntry = entry;
+        previousBibEntry = Optional.of(entry);
 
         if (!aiPreferences.getEnableAi()) {
             showPrivacyNotice(entry);
