@@ -14,7 +14,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableColumnFactory;
-import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.PersistenceVisualStateTable;
 import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
@@ -51,12 +50,6 @@ public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
             allCols.addFirst(new LibraryColumn());
         }
         this.getColumns().addAll(allCols);
-
-        TableColumn scoreColumn = this.getColumns().stream()
-                                      .filter(c -> c instanceof MainTableColumn<?>)
-                                      .map(c -> ((MainTableColumn) c))
-                                      .filter(c -> c.getModel().getType() == MainTableColumnModel.Type.MATCH_SCORE)
-                                      .findFirst().orElse(null);
 
         this.getSortOrder().clear();
         preferencesService.getSearchDialogColumnPreferences().getColumnSortOrder().forEach(columnModel ->

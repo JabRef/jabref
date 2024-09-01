@@ -21,6 +21,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
+import org.jabref.model.search.SearchResults;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -61,14 +62,27 @@ public class SearchResultsTableDataModel {
     }
 
     private void updateSearchMatches(Optional<SearchQuery> query) {
-        BackgroundTask.wrap(() -> entriesViewModel.forEach(entry -> entry.isVisibleBySearch().set(isMatchedBySearch(query, entry))))
-                      .onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered))
-                      .executeWith(taskExecutor);
-    }
-
-    private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        /* query.map(matcher -> matcher.isMatch(entry.getEntry())).orElse(true);*/
-        return true;
+        BackgroundTask.wrap(() -> {
+            if (query.isPresent()) {
+                SearchResults searchResults = new SearchResults();
+                for (BibDatabaseContext context : stateManager.getOpenDatabases()) {
+                    stateManager.getLuceneManager(context).ifPresent(luceneManager -> {
+                        searchResults.addSearchResults(luceneManager.search(query.get()));
+                    });
+                }
+                for (BibEntryTableViewModel entry : entriesViewModel) {
+                    entry.searchScoreProperty().set(searchResults.getSearchScoreForEntry(entry.getEntry()));
+                    entry.hasFullTextResultsProperty().set(searchResults.hasFulltextResults(entry.getEntry()));
+                    entry.isVisibleBySearch().set(entry.searchScoreProperty().get() > 0);
+                }
+            } else {
+                for (BibEntryTableViewModel entry : entriesViewModel) {
+                    entry.searchScoreProperty().set(0);
+                    entry.hasFullTextResultsProperty().set(false);
+                    entry.isVisibleBySearch().set(true);
+                }
+            }
+        }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
     }
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {

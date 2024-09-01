@@ -13,6 +13,10 @@ public class SearchResults {
 
     private final Map<BibEntry, List<SearchResult>> searchResults = new HashMap<>();
 
+    public void addSearchResults(SearchResults newResults) {
+        this.searchResults.putAll(newResults.searchResults);
+    }
+
     public void addSearchResult(BibEntry entry, SearchResult result) {
         searchResults.computeIfAbsent(entry, k -> new ArrayList<>()).add(result);
     }
