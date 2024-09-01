@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
@@ -30,15 +30,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class DatabaseSearcherWithBibFilesTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSearcherWithBibFilesTest.class);
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
     private static final BibEntry TITLE_SENTENCE_CASED = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("title-sentence-cased")
@@ -81,8 +78,7 @@ class DatabaseSearcherWithBibFilesTest {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext databaseContext = result.getDatabaseContext();
 
-        when(FILE_PREFERENCES.shouldFulltextIndexLinkedFiles()).thenReturn(true);
-        when(FILE_PREFERENCES.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
+        when(FILE_PREFERENCES.fulltextIndexLinkedFilesProperty()).thenReturn(new SimpleBooleanProperty(true));
         return databaseContext;
     }
 
