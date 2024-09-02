@@ -87,8 +87,8 @@ public final class LuceneSearcher {
     }
 
     private SearchResults searchInBibFieldsAndLinkedFiles(Query searchQuery) throws IOException {
-        IndexSearcher bibFieldsIndexSearcher = acquireIndexedSearcher(bibFieldsSearcherManager);
-        IndexSearcher linkedFilesIndexSearcher = acquireIndexedSearcher(linkedFilesSearcherManager);
+        IndexSearcher bibFieldsIndexSearcher = acquireIndexSearcher(bibFieldsSearcherManager);
+        IndexSearcher linkedFilesIndexSearcher = acquireIndexSearcher(linkedFilesSearcherManager);
         try {
             MultiReader multiReader = new MultiReader(bibFieldsIndexSearcher.getIndexReader(), linkedFilesIndexSearcher.getIndexReader());
             IndexSearcher indexSearcher = new IndexSearcher(multiReader);
@@ -100,7 +100,7 @@ public final class LuceneSearcher {
     }
 
     private SearchResults searchInBibFields(Query searchQuery) throws IOException {
-        IndexSearcher indexSearcher = acquireIndexedSearcher(bibFieldsSearcherManager);
+        IndexSearcher indexSearcher = acquireIndexSearcher(bibFieldsSearcherManager);
         try {
             return search(indexSearcher, searchQuery, false);
         } finally {
@@ -170,6 +170,7 @@ public final class LuceneSearcher {
     }
 
     private Map<String, List<String>> getLinkedFilesMap() {
+        // fileLink to List of entry IDs
         Map<String, List<String>> linkedFilesMap = new HashMap<>();
         for (BibEntry bibEntry : databaseContext.getEntries()) {
             for (LinkedFile linkedFile : bibEntry.getFiles()) {
@@ -179,12 +180,11 @@ public final class LuceneSearcher {
         return linkedFilesMap;
     }
 
-    private static String getFieldContents(Document document, SearchFieldConstants
-        field) {
+    private static String getFieldContents(Document document, SearchFieldConstants field) {
         return Optional.ofNullable(document.get(field.toString())).orElse("");
     }
 
-    private static IndexSearcher acquireIndexedSearcher(SearcherManager searcherManager) throws IOException {
+    private static IndexSearcher acquireIndexSearcher(SearcherManager searcherManager) throws IOException {
         searcherManager.maybeRefreshBlocking();
         return searcherManager.acquire();
     }
