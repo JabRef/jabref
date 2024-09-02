@@ -17,6 +17,7 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResult;
 import org.jabref.model.search.SearchResults;
+import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.MultiReader;
@@ -39,105 +40,151 @@ import org.slf4j.LoggerFactory;
 public final class LuceneSearcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(LuceneSearcher.class);
 
+    private final FilePreferences filePreferences;
     private final BibDatabaseContext databaseContext;
     private final SearcherManager bibFieldsSearcherManager;
     private final SearcherManager linkedFilesSearcherManager;
 
-    public LuceneSearcher(BibDatabaseContext databaseContext, LuceneIndexer bibFieldsIndexer, LuceneIndexer linkedFilesIndexer) {
+    public LuceneSearcher(BibDatabaseContext databaseContext, LuceneIndexer bibFieldsIndexer, LuceneIndexer linkedFilesIndexer, FilePreferences filePreferences) {
         this.bibFieldsSearcherManager = bibFieldsIndexer.getSearcherManager();
         this.linkedFilesSearcherManager = linkedFilesIndexer.getSearcherManager();
         this.databaseContext = databaseContext;
+        this.filePreferences = filePreferences;
     }
 
-    public boolean isMatched(BibEntry entry, SearchQuery searchQuery) {
-        BooleanQuery booleanQuery = createBooleanQuery(entry, searchQuery);
+    public boolean isEntryMatched(BibEntry entry, SearchQuery searchQuery) {
+        BooleanQuery booleanQuery = buildBooleanQueryForEntry(entry, searchQuery);
         SearchResults results = search(booleanQuery, searchQuery.getSearchFlags());
         return results.getSearchScoreForEntry(entry) > 0;
     }
 
-    private BooleanQuery createBooleanQuery(BibEntry entry, SearchQuery searchQuery) {
-        Query query = searchQuery.getParsedQuery();
-        TermQuery termQuery = new TermQuery(new Term(SearchFieldConstants.ENTRY_ID.toString(), entry.getId()));
+    private BooleanQuery buildBooleanQueryForEntry(BibEntry entry, SearchQuery searchQuery) {
+        Query parsedQuery = searchQuery.getParsedQuery();
+        TermQuery entryIdQuery = new TermQuery(new Term(SearchFieldConstants.ENTRY_ID.toString(), entry.getId()));
         return new BooleanQuery.Builder()
-                .add(query, BooleanClause.Occur.MUST)
-                .add(termQuery, BooleanClause.Occur.MUST)
+                .add(parsedQuery, BooleanClause.Occur.MUST)
+                .add(entryIdQuery, BooleanClause.Occur.MUST)
                 .build();
     }
 
     public SearchResults search(Query searchQuery, EnumSet<SearchFlags> searchFlags) {
-        LOGGER.debug("Searching for entries matching query: {}", searchQuery);
+        LOGGER.debug("Executing search with query: {}", searchQuery);
         try {
-            if (searchFlags.contains(SearchFlags.FULLTEXT)) {
-                IndexSearcher bibFieldsIndexSearcher = getIndexedSearcher(bibFieldsSearcherManager);
-                IndexSearcher linkedFilesIndexSearcher = getIndexedSearcher(linkedFilesSearcherManager);
-                MultiReader multiReader = new MultiReader(bibFieldsIndexSearcher.getIndexReader(), linkedFilesIndexSearcher.getIndexReader());
-                IndexSearcher indexSearcher = new IndexSearcher(multiReader);
-
-                SearchResults searchResults = search(indexSearcher, searchQuery);
-                releaseIndexSearcher(bibFieldsSearcherManager, bibFieldsIndexSearcher);
-                releaseIndexSearcher(linkedFilesSearcherManager, linkedFilesIndexSearcher);
-                return searchResults;
-            } else {
-                IndexSearcher indexSearcher = getIndexedSearcher(bibFieldsSearcherManager);
-                SearchResults searchResults = search(indexSearcher, searchQuery);
-                releaseIndexSearcher(bibFieldsSearcherManager, indexSearcher);
-                return searchResults;
-            }
+            boolean shouldSearchInLinkedFiles = searchFlags.contains(SearchFlags.FULLTEXT) && filePreferences.shouldFulltextIndexLinkedFiles();
+            return performSearch(searchQuery, shouldSearchInLinkedFiles);
         } catch (IOException | IndexSearcher.TooManyClauses e) {
-            LOGGER.error("Error while searching", e);
+            LOGGER.error("Error during search execution", e);
         }
         return new SearchResults();
     }
 
-    private SearchResults search(IndexSearcher indexSearcher, Query searchQuery) throws IOException {
-        TopDocs topDocs = indexSearcher.search(searchQuery, Integer.MAX_VALUE);
-        StoredFields storedFields = indexSearcher.storedFields();
-        LOGGER.debug("Found {} matches", topDocs.totalHits.value);
-        return getSearchResults(topDocs, storedFields, searchQuery);
+    private SearchResults performSearch(Query searchQuery, boolean shouldSearchInLinkedFiles) throws IOException {
+        if (shouldSearchInLinkedFiles) {
+            return searchInBibFieldsAndLinkedFiles(searchQuery);
+        } else {
+            return searchInBibFields(searchQuery);
+        }
     }
 
-    private SearchResults getSearchResults(TopDocs topDocs, StoredFields storedFields, Query searchQuery) throws IOException {
-        SearchResults searchResults = new SearchResults();
-        // fileLink to List of entry IDs
-        Map<String, List<String>> linkedFilesMap = new HashMap<>();
+    private SearchResults searchInBibFieldsAndLinkedFiles(Query searchQuery) throws IOException {
+        IndexSearcher bibFieldsIndexSearcher = acquireIndexedSearcher(bibFieldsSearcherManager);
+        IndexSearcher linkedFilesIndexSearcher = acquireIndexedSearcher(linkedFilesSearcherManager);
+        try {
+            MultiReader multiReader = new MultiReader(bibFieldsIndexSearcher.getIndexReader(), linkedFilesIndexSearcher.getIndexReader());
+            IndexSearcher indexSearcher = new IndexSearcher(multiReader);
+            return search(indexSearcher, searchQuery, true);
+        } finally {
+            releaseIndexSearcher(bibFieldsSearcherManager, bibFieldsIndexSearcher);
+            releaseIndexSearcher(linkedFilesSearcherManager, linkedFilesIndexSearcher);
+        }
+    }
 
+    private SearchResults searchInBibFields(Query searchQuery) throws IOException {
+        IndexSearcher indexSearcher = acquireIndexedSearcher(bibFieldsSearcherManager);
+        try {
+            return search(indexSearcher, searchQuery, false);
+        } finally {
+            releaseIndexSearcher(bibFieldsSearcherManager, indexSearcher);
+        }
+    }
+
+    private SearchResults search(IndexSearcher indexSearcher, Query searchQuery, boolean shouldSearchInLinkedFiles) throws IOException {
+        TopDocs topDocs = indexSearcher.search(searchQuery, Integer.MAX_VALUE);
+        StoredFields storedFields = indexSearcher.storedFields();
+        LOGGER.debug("Found {} matching documents", topDocs.totalHits.value);
+        return getSearchResults(topDocs, storedFields, searchQuery, shouldSearchInLinkedFiles);
+    }
+
+    private SearchResults getSearchResults(TopDocs topDocs, StoredFields storedFields, Query searchQuery, boolean shouldSearchInLinkedFiles) throws IOException {
+        SearchResults searchResults = new SearchResults();
+        long startTime = System.currentTimeMillis();
+
+        if (shouldSearchInLinkedFiles) {
+            getBibFieldsAndLinkedFilesResults(topDocs, storedFields, searchQuery, searchResults);
+        } else {
+            getBibFieldsResults(topDocs, storedFields, searchResults);
+        }
+
+        LOGGER.debug("Getting search results took {} ms", System.currentTimeMillis() - startTime);
+        return searchResults;
+    }
+
+    private void getBibFieldsAndLinkedFilesResults(TopDocs topDocs, StoredFields storedFields, Query searchQuery, SearchResults searchResults) throws IOException {
+        Map<String, List<String>> linkedFilesMap = getLinkedFilesMap();
+        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(searchQuery));
+
+        for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+            Document document = storedFields.document(scoreDoc.doc);
+            String fileLink = getFieldContents(document, SearchFieldConstants.PATH);
+
+            if (!fileLink.isEmpty()) {
+                addLinkedFileToResults(document, fileLink, linkedFilesMap, highlighter, searchResults, scoreDoc.score);
+            } else {
+                addBibEntryToResults(document, searchResults, scoreDoc.score);
+            }
+        }
+    }
+
+    private void getBibFieldsResults(TopDocs topDocs, StoredFields storedFields, SearchResults searchResults) throws IOException {
+        for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+            Document document = storedFields.document(scoreDoc.doc);
+            addBibEntryToResults(document, searchResults, scoreDoc.score);
+        }
+    }
+
+    private void addLinkedFileToResults(Document document, String fileLink, Map<String, List<String>> linkedFilesMap, Highlighter highlighter, SearchResults searchResults, float score) {
+        List<String> entriesWithFile = linkedFilesMap.get(fileLink);
+        if (entriesWithFile != null && !entriesWithFile.isEmpty()) {
+            SearchResult searchResult = new SearchResult(score, fileLink,
+                    getFieldContents(document, SearchFieldConstants.CONTENT),
+                    getFieldContents(document, SearchFieldConstants.ANNOTATIONS),
+                    Integer.parseInt(getFieldContents(document, SearchFieldConstants.PAGE_NUMBER)),
+                    highlighter);
+            searchResults.addSearchResult(entriesWithFile, searchResult);
+        }
+    }
+
+    private void addBibEntryToResults(Document document, SearchResults searchResults, float score) {
+        String entryId = getFieldContents(document, SearchFieldConstants.ENTRY_ID);
+        searchResults.addSearchResult(entryId, new SearchResult(score));
+    }
+
+    private Map<String, List<String>> getLinkedFilesMap() {
+        Map<String, List<String>> linkedFilesMap = new HashMap<>();
         for (BibEntry bibEntry : databaseContext.getEntries()) {
             for (LinkedFile linkedFile : bibEntry.getFiles()) {
                 linkedFilesMap.computeIfAbsent(linkedFile.getLink(), k -> new ArrayList<>()).add(bibEntry.getId());
             }
         }
-
-        long startTime = System.currentTimeMillis();
-        Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter("<b>", "</b>"), new QueryScorer(searchQuery));
-        for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-            float score = scoreDoc.score;
-            Document document = storedFields.document(scoreDoc.doc);
-
-            String fileLink = getFieldContents(document, SearchFieldConstants.PATH);
-            if (!fileLink.isEmpty()) {
-                List<String> entriesWithFile = linkedFilesMap.get(fileLink);
-                if (!entriesWithFile.isEmpty()) {
-                    SearchResult searchResult = new SearchResult(score, fileLink,
-                            getFieldContents(document, SearchFieldConstants.CONTENT),
-                            getFieldContents(document, SearchFieldConstants.ANNOTATIONS),
-                            Integer.parseInt(getFieldContents(document, SearchFieldConstants.PAGE_NUMBER)),
-                            highlighter);
-                    searchResults.addSearchResult(entriesWithFile, searchResult);
-                }
-            } else {
-                String entryId = getFieldContents(document, SearchFieldConstants.ENTRY_ID);
-                searchResults.addSearchResult(entryId, new SearchResult(score));
-            }
-        }
-        LOGGER.debug("Mapping search results took {} ms", System.currentTimeMillis() - startTime);
-        return searchResults;
+        return linkedFilesMap;
     }
 
-    private static String getFieldContents(Document document, SearchFieldConstants field) {
+    private static String getFieldContents(Document document, SearchFieldConstants
+        field) {
         return Optional.ofNullable(document.get(field.toString())).orElse("");
     }
 
-    private static IndexSearcher getIndexedSearcher(SearcherManager searcherManager) throws IOException {
+    private static IndexSearcher acquireIndexedSearcher(SearcherManager searcherManager) throws IOException {
         searcherManager.maybeRefreshBlocking();
         return searcherManager.acquire();
     }

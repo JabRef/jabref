@@ -57,7 +57,7 @@ public class LuceneManager {
         }
         linkedFilesIndexer = indexer;
 
-        this.luceneSearcher = new LuceneSearcher(databaseContext, bibFieldsIndexer, linkedFilesIndexer);
+        this.luceneSearcher = new LuceneSearcher(databaseContext, bibFieldsIndexer, linkedFilesIndexer, preferences);
         updateOnStart();
     }
 
@@ -224,7 +224,7 @@ public class LuceneManager {
         return query.getSearchResults();
     }
 
-    public boolean isMatched(BibEntry entry, SearchQuery query) {
-        return luceneSearcher.isMatched(entry, query);
+    public boolean isEntryMatched(BibEntry entry, SearchQuery query) {
+        return luceneSearcher.isEntryMatched(entry, query);
     }
 }
