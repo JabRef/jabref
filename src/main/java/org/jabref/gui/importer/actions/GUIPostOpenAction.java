@@ -31,6 +31,8 @@ public interface GUIPostOpenAction {
      * Note: if several such methods need to be called sequentially, it is
      *       important that all implementations of this method do not return
      *       until the operation is finished.
+     *
+     * @param pr    The result of the BIB parse operation.
      */
     void performAction(ParserResult pr, DialogService dialogService, PreferencesService preferencesService);
 }
