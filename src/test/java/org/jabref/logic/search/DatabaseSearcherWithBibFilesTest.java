@@ -79,6 +79,7 @@ class DatabaseSearcherWithBibFilesTest {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext databaseContext = result.getDatabaseContext();
 
+        when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
         when(filePreferences.fulltextIndexLinkedFilesProperty()).thenReturn(new SimpleBooleanProperty(true));
         return databaseContext;
     }
