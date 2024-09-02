@@ -557,9 +557,11 @@ public class GroupNodeViewModel {
                 stateManager.getLuceneManager(databaseContext).ifPresent(luceneManager -> {
                     BackgroundTask.wrap(() -> {
                         for (BibEntry entry : event.entries()) {
-                            boolean matched = luceneManager.isMatched(entry, searchGroup.getQuery());
-                            searchGroup.updateMatches(entry, matched);
-                            if (matched) {
+                            searchGroup.updateMatches(entry, luceneManager.isMatched(entry, searchGroup.getQuery()));
+                        }
+                    }).onFinished(() -> {
+                        for (BibEntry entry : event.entries()) {
+                            if (groupNode.matches(entry)) {
                                 matchedEntries.add(entry.getId());
                             } else {
                                 matchedEntries.remove(entry.getId());
