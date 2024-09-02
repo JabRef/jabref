@@ -16,6 +16,7 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
+import javafx.collections.SetChangeListener;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -251,6 +252,10 @@ public class GlobalSearchBar extends HBox {
         openGlobalSearchButton.setTooltip(new Tooltip(Localization.lang("Search across libraries in a new window")));
         initSearchModifierButton(openGlobalSearchButton);
         openGlobalSearchButton.setOnAction(evt -> openGlobalSearchDialog());
+
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener.Change<? extends SearchFlags> change) -> {
+            fulltextButton.setSelected(searchPreferences.isFulltext());
+        });
     }
 
     public void openGlobalSearchDialog() {
@@ -296,7 +301,6 @@ public class GlobalSearchBar extends HBox {
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
-            setSearchFieldHintTooltip();
             stateManager.activeSearchQuery(searchType).set(Optional.empty());
             illegalSearch.set(false);
             return;
@@ -349,7 +353,7 @@ public class GlobalSearchBar extends HBox {
         }
     }
 
-    private void setSearchFieldHintTooltip() {
+    public void updateHintVisibility() {
         if (preferencesService.getWorkspacePreferences().shouldShowAdvancedHints()) {
             String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author:Smith AND title:electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
@@ -358,10 +362,6 @@ public class GlobalSearchBar extends HBox {
             emptyHintTooltip.getChildren().setAll(genericDescriptionTexts);
             searchFieldTooltip.setGraphic(emptyHintTooltip);
         }
-    }
-
-    public void updateHintVisibility() {
-        setSearchFieldHintTooltip();
     }
 
     public void setSearchTerm(SearchQuery searchQuery) {
