@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.logic.util.Version;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
@@ -20,10 +19,6 @@ import org.slf4j.LoggerFactory;
  * multiple fields.
  */
 public class SearchGroup extends AbstractGroup {
-
-    // We cannot have this constant in Version java because of recursion errors
-    // Thus, we keep it here, because it is (currently) used only in the context of groups.
-    public static final Version VERSION_6_0_ALPHA = Version.parse("6.0-alpha");
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
 
     @ADR(38)

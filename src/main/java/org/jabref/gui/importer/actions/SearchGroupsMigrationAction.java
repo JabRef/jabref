@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.Version;
 import org.jabref.migrations.SearchToLuceneMigration;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SearchGroup;
@@ -17,6 +18,7 @@ import org.jabref.preferences.PreferencesService;
  * If not we ask the user whether to migrate.
  */
 public class SearchGroupsMigrationAction implements GUIPostOpenAction {
+    public static final Version VERSION_6_0_ALPHA = Version.parse("6.0-alpha");
 
     @Override
     public boolean isActionNecessary(ParserResult parserResult, PreferencesService preferencesService) {
@@ -50,7 +52,7 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
         }
 
         parserResult.getMetaData().getGroups().ifPresent(this::migrateGroups);
-        parserResult.getMetaData().setGroupSearchSyntaxVersion(SearchGroup.VERSION_6_0_ALPHA);
+        parserResult.getMetaData().setGroupSearchSyntaxVersion(VERSION_6_0_ALPHA);
         parserResult.setChangedOnMigration(true);
     }
 
