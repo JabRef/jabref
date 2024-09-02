@@ -117,10 +117,11 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                                     Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in annotations:") + System.lineSeparator() + System.lineSeparator());
                                     annotationsText.setStyle("-fx-font-style: italic;");
                                     content.getChildren().add(annotationsText);
-                                }
-                                for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
-                                    content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
-                                    content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber()));
+
+                                    for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
+                                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
+                                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber()));
+                                    }
                                 }
                             }
                         });

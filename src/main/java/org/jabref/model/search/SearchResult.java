@@ -76,7 +76,7 @@ public final class SearchResult {
     }
 
     private static List<String> getHighlighterFragments(Highlighter highlighter, SearchFieldConstants field, String content) {
-        try (TokenStream contentStream = SearchFieldConstants.LATEX_AWARE_ANALYZER.tokenStream(field.toString(), content)) {
+        try (TokenStream contentStream = SearchFieldConstants.LINKED_FILES_ANALYZER.tokenStream(field.toString(), content)) {
             TextFragment[] frags = highlighter.getBestTextFragments(contentStream, content, true, 10);
             return Arrays.stream(frags).map(TextFragment::toString).toList();
         } catch (IOException | InvalidTokenOffsetsException e) {
