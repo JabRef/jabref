@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.QueryTermExtractor;
@@ -67,16 +69,21 @@ public class SearchQuery {
         this.searchFlags = searchFlags;
 
         Map<String, Float> boosts = new HashMap<>();
-        boosts.put(SearchFieldConstants.DEFAULT_FIELD.toString(), 4F);
+        Map<String, Analyzer> fieldAnalyzers = new HashMap<>();
 
+        boosts.put(SearchFieldConstants.DEFAULT_FIELD.toString(), 4F);
         if (searchFlags.contains(SearchFlags.FULLTEXT)) {
-            SearchFieldConstants.PDF_FIELDS.forEach(field -> boosts.put(field, 1F));
+            SearchFieldConstants.PDF_FIELDS.forEach(field -> {
+                boosts.put(field, 1F);
+                fieldAnalyzers.put(field, SearchFieldConstants.LINKED_FILES_ANALYZER);
+            });
         }
 
         String[] fieldsToSearchArray = new String[boosts.size()];
         boosts.keySet().toArray(fieldsToSearchArray);
 
-        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, SearchFieldConstants.LATEX_AWARE_ANALYZER, boosts);
+        PerFieldAnalyzerWrapper analyzerWrapper = new PerFieldAnalyzerWrapper(SearchFieldConstants.LATEX_AWARE_ANALYZER, fieldAnalyzers);
+        MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fieldsToSearchArray, analyzerWrapper, boosts);
         queryParser.setAllowLeadingWildcard(true);
 
         try {
