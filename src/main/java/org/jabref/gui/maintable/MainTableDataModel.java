@@ -101,22 +101,31 @@ public class MainTableDataModel {
 
     private void updateSearchMatches(Optional<SearchQuery> query) {
         BackgroundTask.wrap(() -> {
-            boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
             if (query.isPresent()) {
                 SearchResults results = luceneManager.search(query.get());
-                entriesViewModel.forEach(entry -> {
-                    entry.searchScoreProperty().set(results.getSearchScoreForEntry(entry.getEntry()));
-                    entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));
-                    updateEntrySearchMatch(entry, entry.searchScoreProperty().get() > 0, isFloatingMode);
-                });
+                setSearchMatches(results);
             } else {
-                entriesViewModel.forEach(entry -> {
-                    entry.searchScoreProperty().set(0);
-                    entry.hasFullTextResultsProperty().set(false);
-                    updateEntrySearchMatch(entry, true, isFloatingMode);
-                });
+                clearSearchMatches();
             }
         }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+    }
+
+    private void setSearchMatches(SearchResults results) {
+        boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
+        entriesViewModel.forEach(entry -> {
+            entry.searchScoreProperty().set(results.getSearchScoreForEntry(entry.getEntry()));
+            entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));
+            updateEntrySearchMatch(entry, entry.searchScoreProperty().get() > 0, isFloatingMode);
+        });
+    }
+
+    private void clearSearchMatches() {
+        boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
+        entriesViewModel.forEach(entry -> {
+            entry.searchScoreProperty().set(0);
+            entry.hasFullTextResultsProperty().set(false);
+            updateEntrySearchMatch(entry, true, isFloatingMode);
+        });
     }
 
     private static void updateEntrySearchMatch(BibEntryTableViewModel entry, boolean isMatched, boolean isFloatingMode) {
