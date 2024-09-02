@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added probable search hits instead of exact matches. Sorting by hit score can be done by the new score table column. [#11326](https://github.com/JabRef/jabref/pull/11326)
+- We added probable search hits instead of exact matches. Sorting by hit score can be done by the new score table column. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - When a search hits a file, the file icon of that entry is changed accordingly. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We added an AI-based chat for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
@@ -62,9 +62,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Removed
 
-- We removed support for case-insentive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- We removed support for case-sensitive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- We removed the description of search strings. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
-- We removed the description of search strings. [#11565](https://github.com/JabRef/jabref/pull/11565)
+
 
 
 

@@ -560,9 +560,9 @@ public class GroupNodeViewModel {
                             boolean matched = luceneManager.isMatched(entry, searchGroup.getQuery());
                             searchGroup.updateMatches(entry, matched);
                             if (matched) {
-                                 matchedEntries.add(entry.getId());
+                                matchedEntries.add(entry.getId());
                             } else {
-                                 matchedEntries.remove(entry.getId());
+                                matchedEntries.remove(entry.getId());
                             }
                         }
                     }).executeWith(taskExecutor);
