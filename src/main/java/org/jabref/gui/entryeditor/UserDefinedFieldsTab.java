@@ -38,7 +38,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
                                 TaskExecutor taskExecutor,
                                 JournalAbbreviationRepository journalAbbreviationRepository,
                                 LuceneManager luceneManager,
-        OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+                                OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(false, databaseContext, suggestionProviders, undoManager, undoAction, redoAction, dialogService, preferences, themeManager, taskExecutor, journalAbbreviationRepository, luceneManager, searchQueryProperty);
 
         this.fields = new LinkedHashSet<>(fields);
