@@ -27,22 +27,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class LinkedFilesIndexerTest {
-    private static final PreferencesService PREFERENCES_SERVICE = mock(PreferencesService.class);
-    private static final FilePreferences FILE_PREFERENCES = mock(FilePreferences.class);
+    private final PreferencesService preferencesService = mock(PreferencesService.class);
+    private final FilePreferences filePreferences = mock(FilePreferences.class);
 
     private LuceneIndexer indexer;
 
     @BeforeEach
     void setUp(@TempDir Path indexDir) throws IOException {
-        when(FILE_PREFERENCES.shouldFulltextIndexLinkedFiles()).thenReturn(true);
-        when(PREFERENCES_SERVICE.getFilePreferences()).thenReturn(FILE_PREFERENCES);
+        when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(true);
+        when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
 
         BibDatabaseContext context = mock(BibDatabaseContext.class);
         when(context.getDatabasePath()).thenReturn(Optional.of(Path.of("src/test/resources/pdfs/")));
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
 
-        this.indexer = new DefaultLinkedFilesIndexer(context, FILE_PREFERENCES);
+        this.indexer = new DefaultLinkedFilesIndexer(context, filePreferences);
     }
 
     @Test

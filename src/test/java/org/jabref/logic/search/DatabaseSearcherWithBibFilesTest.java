@@ -66,7 +66,8 @@ class DatabaseSearcherWithBibFilesTest {
             .withCitationKey("minimal-note-mixed-case")
             .withFiles(List.of(new LinkedFile("", "minimal-note-mixed-case.pdf", StandardFileType.PDF.getName())));
 
-    private static final FilePreferences FILE_PREFERENCES = mock(FilePreferences.class);
+    private final FilePreferences filePreferences = mock(FilePreferences.class);
+
     @TempDir
     private Path indexDir;
 
@@ -78,7 +79,7 @@ class DatabaseSearcherWithBibFilesTest {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext databaseContext = result.getDatabaseContext();
 
-        when(FILE_PREFERENCES.fulltextIndexLinkedFilesProperty()).thenReturn(new SimpleBooleanProperty(true));
+        when(filePreferences.fulltextIndexLinkedFilesProperty()).thenReturn(new SimpleBooleanProperty(true));
         return databaseContext;
     }
 
@@ -130,7 +131,7 @@ class DatabaseSearcherWithBibFilesTest {
     @MethodSource
     void searchLibrary(List<BibEntry> expected, String testFile, String query, EnumSet<SearchFlags> searchFlags) throws Exception {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, FILE_PREFERENCES).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, searchFlags), databaseContext, TASK_EXECUTOR, filePreferences).getMatches();
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }
 }

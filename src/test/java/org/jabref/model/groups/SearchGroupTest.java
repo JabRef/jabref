@@ -18,8 +18,6 @@ import org.jabref.preferences.FilePreferences;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -27,8 +25,6 @@ import static org.mockito.Mockito.when;
 
 class SearchGroupTest {
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
-    private static final FilePreferences FILE_PREFERENCES = mock(FilePreferences.class);
-
     private static final BibEntry ENTRY_1 = new BibEntry(StandardEntryType.Misc)
             .withCitationKey("entry1")
             .withField(StandardField.AUTHOR, "Test")
@@ -40,7 +36,8 @@ class SearchGroupTest {
             .withField(StandardField.AUTHOR, "TEST")
             .withField(StandardField.TITLE, "CASE")
             .withField(StandardField.GROUPS, "A");
-    private static final Logger log = LoggerFactory.getLogger(SearchGroupTest.class);
+
+    private final FilePreferences filePreferences = mock(FilePreferences.class);
 
     private static Stream<Arguments> testSearchGroup() {
         return Stream.of(
@@ -64,8 +61,8 @@ class SearchGroupTest {
     @ParameterizedTest
     @MethodSource
     void testSearchGroup(String searchTerm, List<BibEntry> entries, boolean expectedResult) {
-        when(FILE_PREFERENCES.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
-        when(FILE_PREFERENCES.shouldFulltextIndexLinkedFiles()).thenReturn(false);
+        when(filePreferences.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
+        when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(false);
 
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         databaseContext.getDatabase().insertEntries(entries);

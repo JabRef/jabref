@@ -28,13 +28,13 @@ import static org.mockito.Mockito.when;
 
 public class DatabaseSearcherTest {
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
-    private static final FilePreferences FILE_PREFERENCES = mock(FilePreferences.class);
     private BibDatabaseContext databaseContext;
+    private final FilePreferences filePreferences = mock(FilePreferences.class);
 
     @BeforeEach
     void setUp() {
-        when(FILE_PREFERENCES.shouldFulltextIndexLinkedFiles()).thenReturn(false);
-        when(FILE_PREFERENCES.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
+        when(filePreferences.shouldFulltextIndexLinkedFiles()).thenReturn(false);
+        when(filePreferences.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
         databaseContext = new BibDatabaseContext();
     }
 
@@ -44,7 +44,7 @@ public class DatabaseSearcherTest {
         for (BibEntry entry : entries) {
             databaseContext.getDatabase().insertEntry(entry);
         }
-        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, TASK_EXECUTOR, FILE_PREFERENCES).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, TASK_EXECUTOR, filePreferences).getMatches();
         assertEquals(expectedMatches, matches);
     }
 
