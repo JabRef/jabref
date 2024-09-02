@@ -2,7 +2,7 @@
 nav_order: 31
 parent: Decision Records
 ---
-# Use currently active tab in "Select style" (OO Panel) to decide style type
+# Use currently active tab in Select style (OO Panel) to decide style type
 
 ## Context and Problem Statement
 
