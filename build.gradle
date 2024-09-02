@@ -180,7 +180,7 @@ dependencies {
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
 
-    implementation 'commons-cli:commons-cli:1.8.0'
+    implementation 'commons-cli:commons-cli:1.9.0'
 
     // region: LibreOffice
     implementation 'org.libreoffice:unoloader:24.2.3'
