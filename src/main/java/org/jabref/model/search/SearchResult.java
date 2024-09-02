@@ -11,7 +11,7 @@ import org.apache.lucene.search.highlight.TextFragment;
 
 public final class SearchResult {
 
-    private final float luceneScore;
+    private final float searchScore;
     private final boolean hasFulltextResults;
     private final String path;
     private final String pageContent;
@@ -21,14 +21,14 @@ public final class SearchResult {
     private List<String> contentResultStringsHtml;
     private List<String> annotationsResultStringsHtml;
 
-    private SearchResult(float luceneScore,
+    private SearchResult(float searchScore,
                          boolean hasFulltextResults,
                          String path,
                          String pageContent,
                          String annotation,
                          int pageNumber,
                          Highlighter highlighter) {
-        this.luceneScore = luceneScore;
+        this.searchScore = searchScore;
         this.hasFulltextResults = hasFulltextResults;
         this.path = path;
         this.pageContent = pageContent;
@@ -37,12 +37,12 @@ public final class SearchResult {
         this.highlighter = highlighter;
     }
 
-    public SearchResult(float luceneScore) {
-        this(luceneScore, false, "", "", "", -1, null);
+    public SearchResult(float searchScore) {
+        this(searchScore, false, "", "", "", -1, null);
     }
 
-    public SearchResult(float luceneScore, String path, String pageContent, String annotation, int pageNumber, Highlighter highlighter) {
-        this(luceneScore, true, path, pageContent, annotation, pageNumber, highlighter);
+    public SearchResult(float searchScore, String path, String pageContent, String annotation, int pageNumber, Highlighter highlighter) {
+        this(searchScore, true, path, pageContent, annotation, pageNumber, highlighter);
     }
 
     public List<String> getContentResultStringsHtml() {
@@ -59,8 +59,8 @@ public final class SearchResult {
         return annotationsResultStringsHtml;
     }
 
-    public float getLuceneScore() {
-        return luceneScore;
+    public float getSearchScore() {
+        return searchScore;
     }
 
     public boolean hasFulltextResults() {

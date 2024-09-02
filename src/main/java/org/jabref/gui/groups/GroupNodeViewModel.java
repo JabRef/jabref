@@ -14,7 +14,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
+import javafx.collections.ObservableSet;
 import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
 
@@ -55,6 +55,7 @@ import org.jabref.preferences.PreferencesService;
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
+import io.github.adr.linked.ADR;
 
 public class GroupNodeViewModel {
 
@@ -64,7 +65,8 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
-    private final ObservableMap<String, BibEntry> matchedEntries = FXCollections.observableHashMap();
+    @ADR(38)
+    private final ObservableSet<String> matchedEntries = FXCollections.observableSet();
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
@@ -99,10 +101,14 @@ public class GroupNodeViewModel {
         if (groupNode.getGroup() instanceof TexGroup) {
             databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         } else if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-            stateManager.getLuceneManager(databaseContext).ifPresent(searchGroup::setLuceneManager);
-            searchGroup.updateMatches();
-            refreshGroup();
-            databaseContext.getMetaData().groupsBinding().invalidate();
+            stateManager.getLuceneManager(databaseContext).ifPresent(luceneManager -> {
+                BackgroundTask.wrap(() -> {
+                    searchGroup.setMatchedEntries(luceneManager.search(searchGroup.getQuery()).getMatchedEntries());
+                }).onSuccess(success -> {
+                    refreshGroup();
+                    databaseContext.getMetaData().groupsBinding().invalidate();
+                }).executeWith(taskExecutor);
+            });
         }
 
         hasChildren = new SimpleBooleanProperty();
@@ -258,7 +264,7 @@ public class GroupNodeViewModel {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
                     if (groupNode.matches(changedEntry)) {
                         // ADR-0038
-                        matchedEntries.put(changedEntry.getId(), changedEntry);
+                        matchedEntries.add(changedEntry.getId());
                     } else {
                         // ADR-0038
                         matchedEntries.remove(changedEntry.getId());
@@ -272,7 +278,7 @@ public class GroupNodeViewModel {
                 for (BibEntry addedEntry : change.getAddedSubList()) {
                     if (groupNode.matches(addedEntry)) {
                         // ADR-0038
-                        matchedEntries.put(addedEntry.getId(), addedEntry);
+                        matchedEntries.add(addedEntry.getId());
                     }
                 }
             }
@@ -300,7 +306,7 @@ public class GroupNodeViewModel {
                     .onSuccess(entries -> {
                         matchedEntries.clear();
                         // ADR-0038
-                        entries.forEach(entry -> matchedEntries.put(entry.getId(), entry));
+                        entries.forEach(entry -> matchedEntries.add(entry.getId()));
                     })
                     .executeWith(taskExecutor);
         }
@@ -534,48 +540,49 @@ public class GroupNodeViewModel {
         @Subscribe
         public void listen(IndexStartedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                stateManager.getLuceneManager(databaseContext).ifPresent(searchGroup::setLuceneManager);
-                searchGroup.updateMatches();
-                refreshGroup();
-                databaseContext.getMetaData().groupsBinding().invalidate();
+                stateManager.getLuceneManager(databaseContext).ifPresent(luceneManager -> {
+                    BackgroundTask.wrap(() -> {
+                        searchGroup.setMatchedEntries(luceneManager.search(searchGroup.getQuery()).getMatchedEntries());
+                    }).onSuccess(success -> {
+                        refreshGroup();
+                        databaseContext.getMetaData().groupsBinding().invalidate();
+                    }).executeWith(taskExecutor);
+                });
             }
         }
 
         @Subscribe
         public void listen(IndexAddedOrUpdatedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                BackgroundTask.wrap(() -> {
-                    for (BibEntry entry : event.entries()) {
-                        searchGroup.updateMatches(entry);
-                        if (groupNode.matches(entry)) {
-                            // ADR-0038
-                            matchedEntries.put(entry.getId(), entry);
-                        } else {
-                            // ADR-0038
-                            matchedEntries.remove(entry.getId());
+                stateManager.getLuceneManager(databaseContext).ifPresent(luceneManager -> {
+                    BackgroundTask.wrap(() -> {
+                        for (BibEntry entry : event.entries()) {
+                            boolean matched = luceneManager.isMatched(entry, searchGroup.getQuery());
+                            searchGroup.updateMatches(entry, matched);
+                            if (matched) {
+                                 matchedEntries.add(entry.getId());
+                            } else {
+                                 matchedEntries.remove(entry.getId());
+                            }
                         }
-                    }
-                }).executeWith(taskExecutor);
+                    }).executeWith(taskExecutor);
+                });
             }
         }
 
         @Subscribe
         public void listen(IndexRemovedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup searchGroup) {
-                BackgroundTask.wrap(() -> {
-                    for (BibEntry entry : event.entries()) {
-                        searchGroup.updateMatches(entry);
-                        // ADR-0038
-                        matchedEntries.remove(entry.getId());
-                    }
-                }).executeWith(taskExecutor);
+                for (BibEntry entry : event.entries()) {
+                    searchGroup.updateMatches(entry, false);
+                    matchedEntries.remove(entry.getId());
+                }
             }
         }
 
         @Subscribe
         public void listen(IndexClosedEvent event) {
             if (groupNode.getGroup() instanceof SearchGroup group) {
-                group.setLuceneManager(null);
                 databaseContext.getDatabase().unregisterListener(this);
             }
         }

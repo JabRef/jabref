@@ -65,7 +65,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         this.indexedFiles = new ConcurrentHashMap<>();
 
         indexDirectoryPath = databaseContext.getFulltextIndexPath();
-        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.LATEX_AWARE_ANALYZER);
+        IndexWriterConfig config = new IndexWriterConfig(SearchFieldConstants.LINKED_FILES_ANALYZER);
         if ("unsaved".equals(indexDirectoryPath.getFileName().toString())) {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             indexDirectoryPath = indexDirectoryPath.resolveSibling("unsaved" + NUMBER_OF_UNSAVED_LIBRARIES++);

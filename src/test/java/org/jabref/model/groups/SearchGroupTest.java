@@ -6,10 +6,8 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -27,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@AllowedToUseLogic("because it needs access to lucene manager")
 class SearchGroupTest {
     private static final TaskExecutor TASK_EXECUTOR = new CurrentThreadTaskExecutor();
     private static final FilePreferences FILE_PREFERENCES = mock(FilePreferences.class);
@@ -73,9 +70,7 @@ class SearchGroupTest {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         databaseContext.getDatabase().insertEntries(entries);
 
-        LuceneManager luceneManager = new LuceneManager(databaseContext, TASK_EXECUTOR, FILE_PREFERENCES);
-
-        SearchGroup group = new SearchGroup("TestGroup", GroupHierarchyType.INDEPENDENT, searchTerm, EnumSet.noneOf(SearchFlags.class), luceneManager);
+        SearchGroup group = new SearchGroup("TestGroup", GroupHierarchyType.INDEPENDENT, searchTerm, EnumSet.noneOf(SearchFlags.class));
         assertEquals(expectedResult, group.containsAll(entries));
     }
 }

@@ -1,13 +1,11 @@
 package org.jabref.model.groups;
 
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableMap;
-
-import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.Version;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchFlags;
@@ -21,31 +19,21 @@ import org.slf4j.LoggerFactory;
  * This group matches entries by a complex search pattern, which might include conditions about the values of
  * multiple fields.
  */
-@AllowedToUseLogic("because it needs access to lucene manager")
 public class SearchGroup extends AbstractGroup {
 
     // We cannot have this constant in Version java because of recursion errors
     // Thus, we keep it here, because it is (currently) used only in the context of groups.
     public static final Version VERSION_6_0_ALPHA = Version.parse("6.0-alpha");
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
 
-    @ADR(31)
-    private final ObservableMap<String, BibEntry> matchedEntries = FXCollections.observableHashMap();
+    @ADR(38)
+    private final Set<String> matchedEntries = new HashSet<>();
 
     private SearchQuery query;
 
-    private LuceneManager luceneManager;
-
-    public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags, LuceneManager luceneManager) {
+    public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
         super(name, context);
         this.query = new SearchQuery(searchExpression, searchFlags);
-        this.luceneManager = luceneManager;
-        updateMatches();
-    }
-
-    public SearchGroup(String name, GroupHierarchyType context, String searchExpression, EnumSet<SearchFlags> searchFlags) {
-        this(name, context, searchExpression, searchFlags, null);
     }
 
     public String getSearchExpression() {
@@ -69,29 +57,15 @@ public class SearchGroup extends AbstractGroup {
         return query.getSearchFlags();
     }
 
-    public void setLuceneManager(LuceneManager luceneManager) {
-        this.luceneManager = luceneManager;
-    }
-
-    public void updateMatches() {
-        if (luceneManager == null) {
-            return;
-        }
+    public void setMatchedEntries(Collection<String> entriesId) {
         matchedEntries.clear();
-        // TODO: Search should be done in a background thread
-        // ADR-0038
-        luceneManager.search(query).getMatchedEntries().forEach(entry -> matchedEntries.put(entry.getId(), entry));
+        matchedEntries.addAll(entriesId);
     }
 
-    public void updateMatches(BibEntry entry) {
-        if (luceneManager == null) {
-            return;
-        }
-        if (luceneManager.isMatched(entry, query)) {
-            // ADR-0038
-            matchedEntries.put(entry.getId(), entry);
+    public void updateMatches(BibEntry entry, boolean matched) {
+        if (matched) {
+            matchedEntries.add(entry.getId());
         } else {
-            // ADR-0038
             matchedEntries.remove(entry.getId());
         }
     }
@@ -112,14 +86,13 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public boolean contains(BibEntry entry) {
-        // ADR-0038
-        return matchedEntries.containsKey(entry.getId());
+        return matchedEntries.contains(entry.getId());
     }
 
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new SearchGroup(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags(), luceneManager);
+            return new SearchGroup(getName(), getHierarchicalContext(), getSearchExpression(), getSearchFlags());
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!

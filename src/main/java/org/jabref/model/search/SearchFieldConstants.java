@@ -2,8 +2,11 @@ package org.jabref.model.search;
 
 import java.util.List;
 
+import org.jabref.model.search.Analyzer.LatexAwareAnalyzer;
+import org.jabref.model.search.Analyzer.LatexAwareNGramAnalyzer;
+import org.jabref.model.search.Analyzer.LinkedFilesAnalyzer;
+
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.en.EnglishAnalyzer;
 
 public enum SearchFieldConstants {
 
@@ -17,9 +20,10 @@ public enum SearchFieldConstants {
     PAGE_NUMBER("pageNumber"),
     MODIFIED("modified");
 
-    public static final Analyzer LATEX_AWARE_ANALYZER = new LatexAwareAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-    public static final Analyzer LATEX_AWARE_NGRAM_ANALYZER = new LatexAwareNGramAnalyzer(1, Integer.MAX_VALUE, EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-    public static final List<String> PDF_FIELDS = List.of(PATH.toString(), CONTENT.toString(), ANNOTATIONS.toString());
+    public static final Analyzer LINKED_FILES_ANALYZER = new LinkedFilesAnalyzer();
+    public static final Analyzer LATEX_AWARE_ANALYZER = new LatexAwareAnalyzer();
+    public static final Analyzer LATEX_AWARE_NGRAM_ANALYZER = new LatexAwareNGramAnalyzer(1, Integer.MAX_VALUE);
+    public static final List<String> PDF_FIELDS = List.of(CONTENT.toString(), ANNOTATIONS.toString());
     private final String field;
 
     SearchFieldConstants(String field) {

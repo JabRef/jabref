@@ -30,6 +30,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -316,8 +317,13 @@ public class GroupDialogViewModel {
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
                         searchGroupSearchTermProperty.getValue().trim(),
-                        searchFlagsProperty.getValue(),
-                        stateManager.getLuceneManager(currentDatabase).orElse(null));
+                        searchFlagsProperty.getValue());
+
+                Optional<LuceneManager> luceneManager = stateManager.getLuceneManager(currentDatabase);
+                if (luceneManager.isPresent()) {
+                    SearchGroup searchGroup = (SearchGroup) resultingGroup;
+                    searchGroup.setMatchedEntries(luceneManager.get().search(searchGroup.getQuery()).getMatchedEntries());
+                }
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical

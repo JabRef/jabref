@@ -11,38 +11,43 @@ import org.jabref.model.entry.BibEntry;
 
 public class SearchResults {
 
-    private final Map<BibEntry, List<SearchResult>> searchResults = new HashMap<>();
+    private final Map<String, List<SearchResult>> searchResults = new HashMap<>();
 
     public void mergeSearchResults(SearchResults additionalResults) {
         this.searchResults.putAll(additionalResults.searchResults);
     }
 
-    public void addSearchResult(BibEntry entry, SearchResult result) {
-        searchResults.computeIfAbsent(entry, k -> new ArrayList<>()).add(result);
+    public void addSearchResult(String entryId, SearchResult result) {
+        searchResults.computeIfAbsent(entryId, k -> new ArrayList<>()).add(result);
     }
 
-    public void addSearchResult(Collection<BibEntry> entries, SearchResult result) {
+    public void addSearchResult(Collection<String> entries, SearchResult result) {
         entries.forEach(entry -> addSearchResult(entry, result));
     }
 
     public float getSearchScoreForEntry(BibEntry entry) {
-        return searchResults.containsKey(entry) ?
-                searchResults.get(entry).stream()
-                             .map(SearchResult::getLuceneScore)
-                             .reduce(0f, Float::sum) : 0f;
+        if (searchResults.containsKey(entry.getId())) {
+            return searchResults.get(entry.getId())
+                                .stream()
+                                .map(SearchResult::getSearchScore)
+                                .reduce(0f, Float::max);
+        }
+        return 0f;
     }
 
     public boolean hasFulltextResults(BibEntry entry) {
-        if (searchResults.containsKey(entry)) {
-            return searchResults.get(entry).stream().anyMatch(SearchResult::hasFulltextResults);
+        if (searchResults.containsKey(entry.getId())) {
+            return searchResults.get(entry.getId())
+                                .stream()
+                                .anyMatch(SearchResult::hasFulltextResults);
         }
         return false;
     }
 
     public Map<String, List<SearchResult>> getFileSearchResultsForEntry(BibEntry entry) {
         Map<String, List<SearchResult>> results = new HashMap<>();
-        if (searchResults.containsKey(entry)) {
-            for (SearchResult result : searchResults.get(entry)) {
+        if (searchResults.containsKey(entry.getId())) {
+            for (SearchResult result : searchResults.get(entry.getId())) {
                 if (result.hasFulltextResults()) {
                     results.computeIfAbsent(result.getPath(), k -> new ArrayList<>()).add(result);
                 }
@@ -51,11 +56,7 @@ public class SearchResults {
         return results;
     }
 
-    public Set<BibEntry> getMatchedEntries() {
+    public Set<String> getMatchedEntries() {
         return searchResults.keySet();
-    }
-
-    public int getNumberOfResults() {
-        return searchResults.size();
     }
 }

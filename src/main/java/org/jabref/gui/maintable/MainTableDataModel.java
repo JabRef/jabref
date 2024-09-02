@@ -104,7 +104,6 @@ public class MainTableDataModel {
             boolean isFloatingMode = searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FLOAT;
             if (query.isPresent()) {
                 SearchResults results = luceneManager.search(query.get());
-                stateManager.getSearchResults().put(bibDatabaseContext.getUid(), results);
                 entriesViewModel.forEach(entry -> {
                     entry.searchScoreProperty().set(results.getSearchScoreForEntry(entry.getEntry()));
                     entry.hasFullTextResultsProperty().set(results.hasFulltextResults(entry.getEntry()));

@@ -217,9 +217,11 @@ public class LuceneManager {
 
     public SearchResults search(SearchQuery query) {
         if (query.isValid()) {
-            return luceneSearcher.search(query.getParsedQuery(), query.getSearchFlags());
+            query.setSearchResults(luceneSearcher.search(query.getParsedQuery(), query.getSearchFlags()));
+        } else {
+            query.setSearchResults(new SearchResults());
         }
-        return new SearchResults();
+        return query.getSearchResults();
     }
 
     public boolean isMatched(BibEntry entry, SearchQuery query) {

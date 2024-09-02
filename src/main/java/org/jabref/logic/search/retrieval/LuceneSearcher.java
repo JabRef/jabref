@@ -98,13 +98,12 @@ public final class LuceneSearcher {
 
     private SearchResults getSearchResults(TopDocs topDocs, StoredFields storedFields, Query searchQuery) throws IOException {
         SearchResults searchResults = new SearchResults();
-        Map<String, BibEntry> entriesMap = new HashMap<>();
-        Map<String, List<BibEntry>> linkedFilesMap = new HashMap<>();
+        // fileLink to List of entry IDs
+        Map<String, List<String>> linkedFilesMap = new HashMap<>();
 
         for (BibEntry bibEntry : databaseContext.getEntries()) {
-            entriesMap.put(bibEntry.getId(), bibEntry);
             for (LinkedFile linkedFile : bibEntry.getFiles()) {
-                linkedFilesMap.computeIfAbsent(linkedFile.getLink(), k -> new ArrayList<>()).add(bibEntry);
+                linkedFilesMap.computeIfAbsent(linkedFile.getLink(), k -> new ArrayList<>()).add(bibEntry.getId());
             }
         }
 
@@ -116,7 +115,7 @@ public final class LuceneSearcher {
 
             String fileLink = getFieldContents(document, SearchFieldConstants.PATH);
             if (!fileLink.isEmpty()) {
-                List<BibEntry> entriesWithFile = linkedFilesMap.get(fileLink);
+                List<String> entriesWithFile = linkedFilesMap.get(fileLink);
                 if (!entriesWithFile.isEmpty()) {
                     SearchResult searchResult = new SearchResult(score, fileLink,
                             getFieldContents(document, SearchFieldConstants.CONTENT),
@@ -127,7 +126,7 @@ public final class LuceneSearcher {
                 }
             } else {
                 String entryId = getFieldContents(document, SearchFieldConstants.ENTRY_ID);
-                searchResults.addSearchResult(entriesMap.get(entryId), new SearchResult(score));
+                searchResults.addSearchResult(entryId, new SearchResult(score));
             }
         }
         LOGGER.debug("Mapping search results took {} ms", System.currentTimeMillis() - startTime);

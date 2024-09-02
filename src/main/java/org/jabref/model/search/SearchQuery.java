@@ -55,10 +55,12 @@ public class SearchQuery {
         abstract String format(String regex);
     }
 
-    protected final String query;
-    protected Query parsedQuery;
-    protected String parseError;
-    protected EnumSet<SearchFlags> searchFlags;
+    private final String query;
+    private final EnumSet<SearchFlags> searchFlags;
+
+    private Query parsedQuery;
+    private String parseError;
+    private SearchResults searchResults;
 
     public SearchQuery(String query, EnumSet<SearchFlags> searchFlags) {
         this.query = Objects.requireNonNull(query);
@@ -88,6 +90,14 @@ public class SearchQuery {
 
     public String getSearchExpression() {
         return query;
+    }
+
+    public SearchResults getSearchResults() {
+        return searchResults;
+    }
+
+    public void setSearchResults(SearchResults searchResults) {
+        this.searchResults = searchResults;
     }
 
     @Override

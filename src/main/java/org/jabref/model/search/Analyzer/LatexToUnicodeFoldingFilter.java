@@ -1,4 +1,4 @@
-package org.jabref.model.search;
+package org.jabref.model.search.Analyzer;
 
 import java.io.IOException;
 import java.util.Arrays;

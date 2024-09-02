@@ -18,10 +18,12 @@ import org.slf4j.LoggerFactory;
 public class DatabaseSearcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSearcher.class);
 
+    private final BibDatabaseContext databaseContext;
     private final SearchQuery query;
     private final LuceneManager luceneManager;
 
     public DatabaseSearcher(SearchQuery query, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, FilePreferences filePreferences) throws IOException {
+        this.databaseContext = databaseContext;
         this.query = Objects.requireNonNull(query);
         this.luceneManager = new LuceneManager(databaseContext, taskExecutor, filePreferences);
     }
@@ -36,7 +38,11 @@ public class DatabaseSearcher {
             LOGGER.warn("Search failed: invalid search expression");
             return Collections.emptyList();
         }
-        List<BibEntry> matchEntries = luceneManager.search(query).getMatchedEntries().stream().toList();
+        List<BibEntry> matchEntries = luceneManager.search(query)
+                                                   .getMatchedEntries()
+                                                   .stream()
+                                                   .map(entryId -> databaseContext.getDatabase().getEntryById(entryId))
+                                                   .toList();
         luceneManager.close();
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }
