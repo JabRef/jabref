@@ -262,8 +262,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     oldGroup.getGroupNode().getParent().orElse(null),
                     oldGroup.getGroupNode().getGroup(),
                     GroupDialogHeader.SUBGROUP));
-            newGroup.ifPresent(group -> {
 
+            newGroup.ifPresent(group -> {
                 AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();
                 String oldGroupName = oldGroupDef.getName();
 
@@ -396,7 +396,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         StringProperty nameProperty = new SimpleStringProperty(Localization.lang("Group %0", groupNameProperty.get()));
         groupNameProperty.addListener((obs, oldValue, newValue) -> nameProperty.setValue(Localization.lang("Group %0", groupNameProperty.get())));
 
-        ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode().getGroup());
+        ObservableList<ChatMessage> chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(group.getGroupNode());
         ObservableList<BibEntry> bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));
 
         aiService.openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);
