@@ -18,6 +18,9 @@ import org.jabref.preferences.PreferencesService;
  * If not we ask the user whether to migrate.
  */
 public class SearchGroupsMigrationAction implements GUIPostOpenAction {
+
+    // We cannot have this constant in `Version.java` because of recursion errors
+    // Thus, we keep it here, because it is (currently) used only in the context of groups migration.
     public static final Version VERSION_6_0_ALPHA = Version.parse("6.0-alpha");
 
     @Override
