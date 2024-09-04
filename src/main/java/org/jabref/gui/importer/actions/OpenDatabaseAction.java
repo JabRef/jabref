@@ -56,9 +56,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),
             // Migrate search groups from Search.g4 to Lucene syntax
-            new SearchGroupsMigrationAction(),
-            // AI chat history links BibEntry with citation key. When citation key is changed, chat history should be transferred from old citation key to new citation key
-            new ListenForCitationKeyChangeForAiAction());
+            new SearchGroupsMigrationAction());
 
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;
