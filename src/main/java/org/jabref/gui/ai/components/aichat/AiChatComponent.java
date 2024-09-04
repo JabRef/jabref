@@ -212,7 +212,7 @@ public class AiChatComponent extends VBox {
 
                             // Typically, if user has entered an invalid API base URL, we get either "401 - null" or "404 - null" strings.
                             // Since there might be other strings returned from other API endpoints, we use startsWith() here.
-                            if ("401 - null".startsWith(e.getMessage()) || "404 - null".startsWith(e.getMessage())) {
+                            if (e.getMessage().startsWith("404") || e.getMessage().startsWith("401")) {
                                 addError(Localization.lang("API base URL setting appears to be incorrect. Please check it in AI expert settings."));
                             } else {
                                 addError(e.getMessage());
