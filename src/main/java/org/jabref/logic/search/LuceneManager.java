@@ -83,6 +83,7 @@ public class LuceneManager {
                 return null;
             }
         }.showToUser(true)
+         .willBeRecoveredAutomatically(true)
          .onFinished(() -> this.databaseContext.getDatabase().postEvent(new IndexStartedEvent()))
          .executeWith(taskExecutor);
 

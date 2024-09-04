@@ -133,7 +133,6 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             return;
         }
 
-        task.willBeRecoveredAutomatically(true);
         task.setTitle(Localization.lang("Indexing PDF files for %0", libraryName));
         LOGGER.debug("Adding {} files to index", linkedFiles.size());
         int i = 1;
