@@ -39,6 +39,7 @@ public class BaseWindow extends Stage {
                 KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
                 if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
                     close();
+                    onCloseRequestProperty().get().handle(null);
                 }
             });
         });
