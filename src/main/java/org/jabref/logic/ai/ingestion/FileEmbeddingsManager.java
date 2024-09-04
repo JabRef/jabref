@@ -31,20 +31,20 @@ public class FileEmbeddingsManager {
     public static final String LINK_METADATA_KEY = "link";
 
     private final AiPreferences aiPreferences;
-    private final ReadOnlyBooleanProperty shutdownProperty;
+    private final ReadOnlyBooleanProperty shutdownSignal;
 
     private final EmbeddingStore<TextSegment> embeddingStore;
     private final FullyIngestedDocumentsTracker fullyIngestedDocumentsTracker;
     private final LowLevelIngestor lowLevelIngestor;
 
     public FileEmbeddingsManager(AiPreferences aiPreferences,
-                                 ReadOnlyBooleanProperty shutdownProperty,
+                                 ReadOnlyBooleanProperty shutdownSignal,
                                  EmbeddingModel embeddingModel,
                                  EmbeddingStore<TextSegment> embeddingStore,
                                  FullyIngestedDocumentsTracker fullyIngestedDocumentsTracker
     ) {
         this.aiPreferences = aiPreferences;
-        this.shutdownProperty = shutdownProperty;
+        this.shutdownSignal = shutdownSignal;
         this.embeddingStore = embeddingStore;
         this.fullyIngestedDocumentsTracker = fullyIngestedDocumentsTracker;
         this.lowLevelIngestor = new LowLevelIngestor(aiPreferences, embeddingStore, embeddingModel);
@@ -58,9 +58,9 @@ public class FileEmbeddingsManager {
 
     public void addDocument(String link, Document document, long modificationTimeInSeconds, IntegerProperty workDone, IntegerProperty workMax) throws InterruptedException {
         document.metadata().put(LINK_METADATA_KEY, link);
-        lowLevelIngestor.ingestDocument(document, shutdownProperty, workDone, workMax);
+        lowLevelIngestor.ingestDocument(document, shutdownSignal, workDone, workMax);
 
-        if (!shutdownProperty.get()) {
+        if (!shutdownSignal.get()) {
             fullyIngestedDocumentsTracker.markDocumentAsFullyIngested(link, modificationTimeInSeconds);
         }
     }

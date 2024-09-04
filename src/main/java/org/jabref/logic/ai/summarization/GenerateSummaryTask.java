@@ -170,7 +170,7 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
             return Optional.empty();
         }
 
-        Optional<Document> document = FileToDocument.fromFile(path.get());
+        Optional<Document> document = new FileToDocument(shutdownSignal).fromFile(path.get());
 
         if (document.isEmpty()) {
             LOGGER.warn("Could not extract text from a linked file \"{}\" of entry {}. It will be skipped when generating a summary.", linkedFile.getLink(), citationKey);

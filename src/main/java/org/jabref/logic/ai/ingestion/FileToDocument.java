@@ -4,47 +4,59 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
+
+import org.jabref.logic.pdf.InterruptablePDFTextStripper;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilReader;
 
 import dev.langchain4j.data.document.Document;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileToDocument {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileToDocument.class);
 
-    public static Optional<Document> fromFile(Path path) {
+    private final ReadOnlyBooleanProperty shutdownSignal;
+
+    public FileToDocument(ReadOnlyBooleanProperty shutdownSignal) {
+        this.shutdownSignal = shutdownSignal;
+    }
+
+    public Optional<Document> fromFile(Path path) {
         if (FileUtil.isPDFFile(path)) {
-            return FileToDocument.fromPdfFile(path);
+            return fromPdfFile(path);
         } else {
             LOGGER.info("Unsupported file type of file: {}. Currently, only PDF files are supported", path);
             return Optional.empty();
         }
     }
 
-    private static Optional<Document> fromPdfFile(Path path) {
+    private Optional<Document> fromPdfFile(Path path) {
         // This method is private to ensure that the path is really pointing to PDF file (determined by extension).
 
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(path)) {
             int lastPage = document.getNumberOfPages();
             StringWriter writer = new StringWriter();
 
-            PDFTextStripper stripper = new PDFTextStripper();
+            InterruptablePDFTextStripper stripper = new InterruptablePDFTextStripper(shutdownSignal);
             stripper.setStartPage(1);
             stripper.setEndPage(lastPage);
             stripper.writeText(document, writer);
 
-            return FileToDocument.fromString(writer.toString());
+            if (shutdownSignal.get()) {
+                return Optional.empty();
+            }
+
+            return fromString(writer.toString());
         } catch (Exception e) {
             LOGGER.error("An error occurred while reading the PDF file: {}", path, e);
             return Optional.empty();
         }
     }
 
-    public static Optional<Document> fromString(String content) {
+    public Optional<Document> fromString(String content) {
         return Optional.of(new Document(content));
     }
 }

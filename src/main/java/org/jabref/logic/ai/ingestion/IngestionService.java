@@ -34,8 +34,10 @@ public class IngestionService {
 
     private final FileEmbeddingsManager fileEmbeddingsManager;
 
+    private final ReadOnlyBooleanProperty shutdownSignal;
+
     public IngestionService(AiPreferences aiPreferences,
-                            ReadOnlyBooleanProperty shutdownProperty,
+                            ReadOnlyBooleanProperty shutdownSignal,
                             EmbeddingModel embeddingModel,
                             EmbeddingStore<TextSegment> embeddingStore,
                             FullyIngestedDocumentsTracker fullyIngestedDocumentsTracker,
@@ -47,11 +49,13 @@ public class IngestionService {
 
         this.fileEmbeddingsManager = new FileEmbeddingsManager(
                 aiPreferences,
-                shutdownProperty,
+                shutdownSignal,
                 embeddingModel,
                 embeddingStore,
                 fullyIngestedDocumentsTracker
         );
+
+        this.shutdownSignal = shutdownSignal;
     }
 
     /**
@@ -96,14 +100,14 @@ public class IngestionService {
     }
 
     private void startEmbeddingsGenerationTask(LinkedFile linkedFile, BibDatabaseContext bibDatabaseContext, ProcessingInfo<LinkedFile, Void> processingInfo) {
-        new GenerateEmbeddingsTask(linkedFile, fileEmbeddingsManager, bibDatabaseContext, filePreferences)
+        new GenerateEmbeddingsTask(linkedFile, fileEmbeddingsManager, bibDatabaseContext, filePreferences, shutdownSignal)
                 .onSuccess(v -> processingInfo.setState(ProcessingState.SUCCESS))
                 .onFailure(processingInfo::setException)
                 .executeWith(taskExecutor);
     }
 
     private void startEmbeddingsGenerationTask(StringProperty name, List<ProcessingInfo<LinkedFile, Void>> linkedFiles, BibDatabaseContext bibDatabaseContext) {
-        new GenerateEmbeddingsForSeveralTask(name, linkedFiles, fileEmbeddingsManager, bibDatabaseContext, filePreferences, taskExecutor)
+        new GenerateEmbeddingsForSeveralTask(name, linkedFiles, fileEmbeddingsManager, bibDatabaseContext, filePreferences, taskExecutor, shutdownSignal)
                 .executeWith(taskExecutor);
     }
 

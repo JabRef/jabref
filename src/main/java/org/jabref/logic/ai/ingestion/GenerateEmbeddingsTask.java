@@ -7,6 +7,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
+
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.ProgressCounter;
@@ -30,17 +32,21 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     private final FileEmbeddingsManager fileEmbeddingsManager;
     private final BibDatabaseContext bibDatabaseContext;
     private final FilePreferences filePreferences;
+    private final ReadOnlyBooleanProperty shutdownSignal;
 
     private final ProgressCounter progressCounter = new ProgressCounter();
 
     public GenerateEmbeddingsTask(LinkedFile linkedFile,
                                   FileEmbeddingsManager fileEmbeddingsManager,
                                   BibDatabaseContext bibDatabaseContext,
-                                  FilePreferences filePreferences) {
+                                  FilePreferences filePreferences,
+                                  ReadOnlyBooleanProperty shutdownSignal
+    ) {
         this.linkedFile = linkedFile;
         this.fileEmbeddingsManager = fileEmbeddingsManager;
         this.bibDatabaseContext = bibDatabaseContext;
         this.filePreferences = filePreferences;
+        this.shutdownSignal = shutdownSignal;
 
         configure(linkedFile);
     }
@@ -109,7 +115,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
             return;
         }
 
-        Optional<Document> document = FileToDocument.fromFile(path.get());
+        Optional<Document> document = new FileToDocument(shutdownSignal).fromFile(path.get());
         if (document.isPresent()) {
             fileEmbeddingsManager.addDocument(linkedFile.getLink(), document.get(), modTime.orElse(0L), progressCounter.workDoneProperty(), progressCounter.workMaxProperty());
             LOGGER.debug("Embeddings for file \"{}\" were generated successfully", linkedFile.getLink());

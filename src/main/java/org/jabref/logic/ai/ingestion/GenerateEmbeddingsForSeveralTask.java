@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.util.Pair;
 
@@ -34,6 +35,7 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
     private final BibDatabaseContext bibDatabaseContext;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
+    private final ReadOnlyBooleanProperty shutdownSignal;
 
     private final ProgressCounter progressCounter = new ProgressCounter();
 
@@ -45,7 +47,8 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
             FileEmbeddingsManager fileEmbeddingsManager,
             BibDatabaseContext bibDatabaseContext,
             FilePreferences filePreferences,
-            TaskExecutor taskExecutor
+            TaskExecutor taskExecutor,
+            ReadOnlyBooleanProperty shutdownSignal
     ) {
         this.name = name;
         this.linkedFiles = linkedFiles;
@@ -53,6 +56,7 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
         this.bibDatabaseContext = bibDatabaseContext;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
+        this.shutdownSignal = shutdownSignal;
 
         configure(name);
     }
@@ -76,11 +80,18 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
                 .stream()
                 .map(processingInfo -> {
                     processingInfo.setState(ProcessingState.PROCESSING);
-                    return new Pair<>(new GenerateEmbeddingsTask(processingInfo.getObject(), fileEmbeddingsManager, bibDatabaseContext, filePreferences)
-                            .onSuccess(v -> processingInfo.setState(ProcessingState.SUCCESS))
-                            .onFailure(processingInfo::setException)
-                            .onFinished(() -> progressCounter.increaseWorkDone(1))
-                            .executeWith(taskExecutor),
+                    return new Pair<>(
+                            new GenerateEmbeddingsTask(
+                                    processingInfo.getObject(),
+                                    fileEmbeddingsManager,
+                                    bibDatabaseContext,
+                                    filePreferences,
+                                    shutdownSignal
+                            )
+                                    .onSuccess(v -> processingInfo.setState(ProcessingState.SUCCESS))
+                                    .onFailure(processingInfo::setException)
+                                    .onFinished(() -> progressCounter.increaseWorkDone(1))
+                                    .executeWith(taskExecutor),
                             processingInfo.getObject().getLink());
                 })
                 .forEach(futures::add);
