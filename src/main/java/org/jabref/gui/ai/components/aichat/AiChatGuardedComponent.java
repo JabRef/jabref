@@ -22,7 +22,7 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
     /// This field is used for two purposes:
     /// 1. Logging
     /// 2. Title of group chat window
-    /// So, if you use {@link AiChatGuardedComponent} for one entry in {@link EntryEditor}, then you may not localize
+    /// Thus, if you use {@link AiChatGuardedComponent} for one entry in {@link EntryEditor}, then you may not localize
     /// this parameter. However, for group chat window, you should.
     private final StringProperty name;
 
