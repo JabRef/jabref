@@ -16,6 +16,12 @@ import org.jabref.logic.l10n.Localization;
 
 import ai.djl.util.Progress;
 
+/**
+ * Convenient class for managing ETA for background tasks.
+ * <p>
+ * Always call {@link ProgressCounter#stop()} when your task is done, because there is a background timer that
+ * periodically updates the ETA.
+ */
 public class ProgressCounter implements Progress {
 
     private record ProgressMessage(int maxTime, String message) { }
