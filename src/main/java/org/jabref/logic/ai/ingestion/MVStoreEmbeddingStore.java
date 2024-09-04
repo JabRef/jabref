@@ -34,6 +34,7 @@ import jakarta.annotation.Nullable;
 import org.h2.mvstore.MVStore;
 
 import static java.util.Comparator.comparingDouble;
+import static org.jabref.logic.ai.ingestion.FileEmbeddingsManager.LINK_METADATA_KEY;
 
 /**
  * A custom implementation of langchain4j's {@link EmbeddingStore} that uses a {@link MVStore} as an embedded database.
@@ -81,7 +82,7 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
     @Override
     public String add(Embedding embedding, TextSegment textSegment) {
         String id = String.valueOf(UUID.randomUUID());
-        String linkedFile = textSegment.metadata().getString(FileEmbeddingsManager.LINK_METADATA_KEY);
+        String linkedFile = textSegment.metadata().getString(LINK_METADATA_KEY);
         embeddingsMap.put(id, new EmbeddingRecord(linkedFile, textSegment.text(), embedding.vector()));
         return id;
     }
@@ -110,8 +111,8 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
     /**
      * The main function of finding most relevant text segments.
      * Note: the only filters supported are:
-     * - {@link IsIn} with key {@link FileEmbeddingsManager.LINK_METADATA_KEY}
-     * - {@link IsEqualTo} with key {@link FileEmbeddingsManager.LINK_METADATA_KEY}
+     * - {@link IsIn} with key {@link LINK_METADATA_KEY}
+     * - {@link IsEqualTo} with key {@link LINK_METADATA_KEY}
      *
      * @param request embedding search request
      *
@@ -131,7 +132,15 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
             double score = RelevanceScore.fromCosineSimilarity(cosineSimilarity);
 
             if (score >= request.minScore()) {
-                matches.add(new EmbeddingMatch<>(score, id, Embedding.from(eRecord.embeddingVector), new TextSegment(eRecord.content, new Metadata())));
+                matches.add(
+                        new EmbeddingMatch<>(
+                                score,
+                                id,
+                                Embedding.from(eRecord.embeddingVector),
+                                new TextSegment(
+                                        eRecord.content,
+                                        new Metadata(
+                                                eRecord.file == null ? Map.of() : Map.of(LINK_METADATA_KEY, eRecord.file)))));
 
                 if (matches.size() > request.maxResults()) {
                     matches.poll();
@@ -154,10 +163,10 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         return switch (filter) {
             case null -> embeddingsMap.keySet().stream();
 
-            case IsIn isInFilter when Objects.equals(isInFilter.key(), FileEmbeddingsManager.LINK_METADATA_KEY) ->
+            case IsIn isInFilter when Objects.equals(isInFilter.key(), LINK_METADATA_KEY) ->
                     filterEntries(entry -> isInFilter.comparisonValues().contains(entry.getValue().file));
 
-            case IsEqualTo isEqualToFilter when Objects.equals(isEqualToFilter.key(), FileEmbeddingsManager.LINK_METADATA_KEY) ->
+            case IsEqualTo isEqualToFilter when Objects.equals(isEqualToFilter.key(), LINK_METADATA_KEY) ->
                     filterEntries(entry -> isEqualToFilter.comparisonValue().equals(entry.getValue().file));
 
             default -> throw new IllegalArgumentException("Wrong filter passed to MVStoreEmbeddingStore");

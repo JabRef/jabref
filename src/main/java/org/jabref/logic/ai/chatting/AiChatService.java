@@ -5,6 +5,7 @@ import java.util.concurrent.Executor;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.ai.AiPreferences;
 
@@ -34,7 +35,12 @@ public class AiChatService {
         this.cachedThreadPool = cachedThreadPool;
     }
 
-    public AiChatLogic makeChat(StringProperty name, ObservableList<ChatMessage> chatHistory, ObservableList<BibEntry> entries) {
+    public AiChatLogic makeChat(
+            StringProperty name,
+            ObservableList<ChatMessage> chatHistory,
+            ObservableList<BibEntry> entries,
+            BibDatabaseContext bibDatabaseContext
+    ) {
         return new AiChatLogic(
                 aiPreferences,
                 chatLanguageModel,
@@ -43,7 +49,8 @@ public class AiChatService {
                 cachedThreadPool,
                 name,
                 chatHistory,
-                entries
+                entries,
+                bibDatabaseContext
         );
     }
 }

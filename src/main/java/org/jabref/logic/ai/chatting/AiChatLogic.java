@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.ingestion.FileEmbeddingsManager;
 import org.jabref.logic.ai.util.ErrorMessage;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.CanonicalBibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -52,6 +53,7 @@ public class AiChatLogic {
     private final ObservableList<ChatMessage> chatHistory;
     private final ObservableList<BibEntry> entries;
     private final StringProperty name;
+    private final BibDatabaseContext bibDatabaseContext;
 
     private ChatMemory chatMemory;
     private Chain<String, String> chain;
@@ -63,7 +65,8 @@ public class AiChatLogic {
                        Executor cachedThreadPool,
                        StringProperty name,
                        ObservableList<ChatMessage> chatHistory,
-                       ObservableList<BibEntry> entries
+                       ObservableList<BibEntry> entries,
+                       BibDatabaseContext bibDatabaseContext
     ) {
         this.aiPreferences = aiPreferences;
         this.chatLanguageModel = chatLanguageModel;
@@ -73,6 +76,7 @@ public class AiChatLogic {
         this.chatHistory = chatHistory;
         this.entries = entries;
         this.name = name;
+        this.bibDatabaseContext = bibDatabaseContext;
 
         this.entries.addListener((ListChangeListener<BibEntry>) change -> rebuildChain());
 
@@ -130,6 +134,7 @@ public class AiChatLogic {
         RetrievalAugmentor retrievalAugmentor = DefaultRetrievalAugmentor
                 .builder()
                 .contentRetriever(contentRetriever)
+                .contentInjector(new JabRefContentInjector(bibDatabaseContext))
                 .executor(cachedThreadPool)
                 .build();
 
