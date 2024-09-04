@@ -12,14 +12,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.aichat.chathistory.ChatHistoryComponent;
 import org.jabref.gui.ai.components.aichat.chatprompt.ChatPromptComponent;
 import org.jabref.gui.ai.components.util.Loadable;
 import org.jabref.gui.ai.components.util.notifications.Notification;
-import org.jabref.gui.ai.components.util.notifications.NotificationType;
 import org.jabref.gui.ai.components.util.notifications.NotificationsComponent;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -139,7 +140,7 @@ public class AiChatComponent extends VBox {
         notificationsButton.setManaged(!notifications.isEmpty());
 
         if (!notifications.isEmpty()) {
-            notificationsButton.setGraphic(NotificationsComponent.findSuitableIcon(notifications).getGraphicNode());
+            notificationsButton.setGraphic(IconTheme.JabRefIcons.WARNING.withColor(Color.YELLOW).getGraphicNode());
         }
     }
 
@@ -149,31 +150,20 @@ public class AiChatComponent extends VBox {
         if (entries.size() == 1) {
             if (entry.getCitationKey().isEmpty()) {
                 notifications.add(new Notification(
-                        NotificationType.ERROR,
                         Localization.lang("No citation key for %0", entry.getAuthorTitleYear()),
                         Localization.lang("The chat history will not be stored in next sessions")
                 ));
             } else if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {
                 notifications.add(new Notification(
-                        NotificationType.ERROR,
                         Localization.lang("Invalid citation key for %0 (%1)", entry.getCitationKey().get(), entry.getAuthorTitleYear()),
                         Localization.lang("The chat history will not be stored in next sessions")
                 ));
             }
         }
 
-        if (entry.getFiles().isEmpty()) {
-            notifications.add(new Notification(
-                    NotificationType.ERROR,
-                    Localization.lang("No files attached to %0", entry.getCitationKey().orElse(entry.getAuthorTitleYear())),
-                    Localization.lang("The AI will not be able to find information in this entry")
-            ));
-        }
-
         entry.getFiles().forEach(file -> {
             if (!FileUtil.isPDFFile(Path.of(file.getLink()))) {
                 notifications.add(new Notification(
-                        NotificationType.WARNING,
                         Localization.lang("File %0 is not a PDF file", file.getLink()),
                         Localization.lang("Only PDF files can be used for chatting")
                 ));
@@ -183,7 +173,6 @@ public class AiChatComponent extends VBox {
         entry.getFiles().stream().map(file -> aiService.getIngestionService().ingest(file, bibDatabaseContext)).forEach(ingestionStatus -> {
             switch (ingestionStatus.getState()) {
                 case PROCESSING -> notifications.add(new Notification(
-                    NotificationType.WARNING,
                     Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
                     Localization.lang("After the file will be ingested, you will be able to chat with it.")
                 ));
@@ -192,7 +181,6 @@ public class AiChatComponent extends VBox {
                     assert ingestionStatus.getException().isPresent(); // When the state is ERROR, the exception must be present.
 
                     notifications.add(new Notification(
-                            NotificationType.ERROR,
                             Localization.lang("File %0 could not be ingested", ingestionStatus.getObject().getLink()),
                             ingestionStatus.getException().get().getLocalizedMessage()
                     ));
@@ -203,10 +191,6 @@ public class AiChatComponent extends VBox {
         });
 
         return notifications;
-    }
-
-    private void deleteMessage(int index) {
-        aiChatLogic.getChatHistory().remove(index);
     }
 
     private void onSendMessage(String userPrompt) {

@@ -1,9 +1,11 @@
 package org.jabref.logic.ai.ingestion;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
 import javafx.beans.property.StringProperty;
+import javafx.util.Pair;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -34,6 +36,8 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
     private final TaskExecutor taskExecutor;
 
     private final ProgressCounter progressCounter = new ProgressCounter();
+
+    private String currentFile = "";
 
     public GenerateEmbeddingsForSeveralTask(
             StringProperty name,
@@ -67,20 +71,23 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
     protected Void call() throws Exception {
         LOGGER.debug("Starting embeddings generation of several files for {}", name.get());
 
-        List<? extends Future<?>> futures = linkedFiles
+        List<Pair<? extends Future<?>, String>> futures = new ArrayList<>();
+        linkedFiles
                 .stream()
                 .map(processingInfo -> {
                     processingInfo.setState(ProcessingState.PROCESSING);
-                    return new GenerateEmbeddingsTask(processingInfo.getObject(), fileEmbeddingsManager, bibDatabaseContext, filePreferences)
+                    return new Pair<>(new GenerateEmbeddingsTask(processingInfo.getObject(), fileEmbeddingsManager, bibDatabaseContext, filePreferences)
                             .onSuccess(v -> processingInfo.setState(ProcessingState.SUCCESS))
                             .onFailure(processingInfo::setException)
                             .onFinished(() -> progressCounter.increaseWorkDone(1))
-                            .executeWith(taskExecutor);
+                            .executeWith(taskExecutor),
+                            processingInfo.getObject().getLink());
                 })
-                .toList();
+                .forEach(futures::add);
 
-        for (Future<?> future : futures) {
-            future.get();
+        for (Pair<? extends Future<?>, String> pair : futures) {
+            currentFile = pair.getValue();
+            pair.getKey().get();
         }
 
         LOGGER.debug("Finished embeddings generation task of several files for {}", name.get());
@@ -90,6 +97,6 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
 
     private void updateProgress() {
         updateProgress(progressCounter.getWorkDone(), progressCounter.getWorkMax());
-        updateMessage(progressCounter.getMessage());
+        updateMessage(progressCounter.getMessage() + " - " + currentFile + ", ...");
     }
 }

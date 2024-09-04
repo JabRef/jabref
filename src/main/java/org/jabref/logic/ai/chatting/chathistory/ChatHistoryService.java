@@ -1,10 +1,12 @@
 package org.jabref.logic.ai.chatting.chathistory;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -56,31 +58,17 @@ public class ChatHistoryService implements AutoCloseable {
 
     private record ChatHistoryManagementRecord(Optional<BibDatabaseContext> bibDatabaseContext, ObservableList<ChatMessage> chatHistory) { }
 
-    // This class is needed because the `equals` and `hashCode` methods of {@link BibEntry} are overridden.
-    // That means when you compare {@link BibEntry} instances, they are compared by value, not by reference.
+    // We use a {@link TreeMap} here to store {@link BibEntry} chat histories by their id.
+    // When you compare {@link BibEntry} instances, they are compared by value, not by reference.
     // And when you store {@link BibEntry} instances in a {@link HashMap}, an old hash may be stored when the {@link BibEntry} is changed.
-    // See also ADR-38
-    private record BibEntryWrapper(BibEntry entry) {
+    // See also ADR-38.
+    private final TreeMap<BibEntry, ChatHistoryManagementRecord> bibEntriesChatHistory = new TreeMap<>(new Comparator<BibEntry>() {
         @Override
-            public boolean equals(Object obj) {
-                if (obj == null) {
-                    return false;
-                }
-
-                if (getClass() != obj.getClass()) {
-                    return false;
-                }
-
-                return entry == ((BibEntryWrapper) obj).entry;
-            }
-
-            @Override
-            public int hashCode() {
-                return System.identityHashCode(entry);
-            }
+        public int compare(BibEntry o1, BibEntry o2) {
+            return o1.getId().compareTo(o2.getId());
         }
+    });
 
-    private final Map<BibEntryWrapper, ChatHistoryManagementRecord> bibEntriesChatHistory = new HashMap<>();
     private final Map<AbstractGroup, ChatHistoryManagementRecord> groupsChatHistory = new HashMap<>();
 
     public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences,
@@ -117,7 +105,7 @@ public class ChatHistoryService implements AutoCloseable {
     }
 
     public ObservableList<ChatMessage> getChatHistoryForEntry(BibEntry entry) {
-        return bibEntriesChatHistory.computeIfAbsent(new BibEntryWrapper(entry), entryArg -> {
+        return bibEntriesChatHistory.computeIfAbsent(entry, entryArg -> {
             Optional<BibDatabaseContext> bibDatabaseContext = findBibDatabaseForEntry(entry);
 
             ObservableList<ChatMessage> chatHistory;
@@ -143,7 +131,7 @@ public class ChatHistoryService implements AutoCloseable {
      * but it's best to call it when the chat history {@link AbstractGroup} is no longer needed.
      */
     public void closeChatHistoryForEntry(BibEntry entry) {
-        ChatHistoryManagementRecord chatHistoryManagementRecord = bibEntriesChatHistory.get(new BibEntryWrapper(entry));
+        ChatHistoryManagementRecord chatHistoryManagementRecord = bibEntriesChatHistory.get(entry);
         if (chatHistoryManagementRecord == null) {
             return;
         }
@@ -161,7 +149,7 @@ public class ChatHistoryService implements AutoCloseable {
         }
 
         // TODO: What if there is two AI chats for the same entry? And one is closed and one is not?
-        bibEntriesChatHistory.remove(new BibEntryWrapper(entry));
+        bibEntriesChatHistory.remove(entry);
     }
 
     public ObservableList<ChatMessage> getChatHistoryForGroup(AbstractGroup group) {
@@ -249,7 +237,7 @@ public class ChatHistoryService implements AutoCloseable {
     @Override
     public void close() {
         // We need to clone `bibEntriesChatHistory.keySet()` because closeChatHistoryForEntry() modifies the `bibEntriesChatHistory` map.
-        new HashSet<>(bibEntriesChatHistory.keySet()).stream().map(BibEntryWrapper::entry).forEach(this::closeChatHistoryForEntry);
+        new HashSet<>(bibEntriesChatHistory.keySet()).forEach(this::closeChatHistoryForEntry);
 
         // Clone is for the same reason, as written above.
         new HashSet<>(groupsChatHistory.keySet()).forEach(this::closeChatHistoryForGroup);
