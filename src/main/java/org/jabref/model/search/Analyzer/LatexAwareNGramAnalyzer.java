@@ -8,7 +8,7 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
-import org.apache.lucene.analysis.ngram.NGramTokenFilter;
+import org.apache.lucene.analysis.ngram.EdgeNGramTokenFilter;
 
 public class LatexAwareNGramAnalyzer extends Analyzer {
     private final int minGram;
@@ -26,7 +26,7 @@ public class LatexAwareNGramAnalyzer extends Analyzer {
         result = new StopFilter(result, EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
         result = new ASCIIFoldingFilter(result);
         result = new LowerCaseFilter(result);
-        result = new NGramTokenFilter(result, minGram, maxGram, true);
+         result = new EdgeNGramTokenFilter(result, minGram, maxGram, true);
         return new TokenStreamComponents(source, result);
     }
 }

@@ -71,12 +71,14 @@ public class SearchQuery {
         Map<String, Float> boosts = new HashMap<>();
         Map<String, Analyzer> fieldAnalyzers = new HashMap<>();
 
-        boosts.put(SearchFieldConstants.DEFAULT_FIELD.toString(), 4F);
         if (searchFlags.contains(SearchFlags.FULLTEXT)) {
+            boosts.put(SearchFieldConstants.DEFAULT_FIELD.toString(), 4F);
             SearchFieldConstants.PDF_FIELDS.forEach(field -> {
                 boosts.put(field, 1F);
                 fieldAnalyzers.put(field, SearchFieldConstants.LINKED_FILES_ANALYZER);
             });
+        } else {
+            boosts.put(SearchFieldConstants.DEFAULT_FIELD.toString(), 1F);
         }
 
         String[] fieldsToSearchArray = new String[boosts.size()];
