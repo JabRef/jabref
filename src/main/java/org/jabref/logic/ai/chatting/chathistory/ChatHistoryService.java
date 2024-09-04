@@ -1,10 +1,8 @@
 package org.jabref.logic.ai.chatting.chathistory;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -18,7 +16,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.groups.AbstractGroup;
@@ -26,7 +23,6 @@ import org.jabref.model.groups.GroupTreeNode;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
-import com.tobiasdiez.easybind.EasyBind;
 import dev.langchain4j.data.message.ChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,14 +63,14 @@ public class ChatHistoryService implements AutoCloseable {
     // When you compare {@link BibEntry} instances, they are compared by value, not by reference.
     // And when you store {@link BibEntry} instances in a {@link HashMap}, an old hash may be stored when the {@link BibEntry} is changed.
     // See also ADR-38.
-    private final TreeMap<BibEntry, ChatHistoryManagementRecord> bibEntriesChatHistory = new TreeMap<>(new Comparator<BibEntry>() {
-        @Override
-        public int compare(BibEntry o1, BibEntry o2) {
-            return o1.getId().compareTo(o2.getId());
-        }
-    });
+    private final TreeMap<BibEntry, ChatHistoryManagementRecord> bibEntriesChatHistory = new TreeMap<>(Comparator.comparing(BibEntry::getId));
 
-    private final Map<GroupTreeNode, ChatHistoryManagementRecord> groupsChatHistory = new HashMap<>();
+    // We use {@link TreeMap} for group chat history for the same reason as for {@link BibEntry}ies.
+    private final TreeMap<GroupTreeNode, ChatHistoryManagementRecord> groupsChatHistory = new TreeMap<>((o1, o2) -> {
+        // The most important thing is to catch equality/non-equality.
+        // For "less" or "bigger" comparison, we will fall back to group names.
+        return o1 == o2 ? 0 : o1.getGroup().getName().compareTo(o2.getGroup().getName());
+    });
 
     public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences,
                               ChatHistoryStorage implementation) {
@@ -95,11 +91,17 @@ public class ChatHistoryService implements AutoCloseable {
     }
 
     private void configureHistoryTransfer(BibDatabaseContext bibDatabaseContext) {
-        bibDatabaseContext.getMetaData().getGroups().ifPresent(groupTreeNode -> {
-            groupTreeNode.iterateOverTree().forEach(groupNode -> {
+        bibDatabaseContext.getMetaData().getGroups().ifPresent(rootGroupTreeNode -> {
+            rootGroupTreeNode.iterateOverTree().forEach(groupNode -> {
                 groupNode.getGroup().nameProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue != null && oldValue != null) {
-                        transferGroupHistory(bibDatabaseContext, oldValue, newValue);
+                        transferGroupHistory(bibDatabaseContext, groupNode, oldValue, newValue);
+                    }
+                });
+
+                groupNode.getGroupProperty().addListener((obs, oldValue, newValue) -> {
+                    if (oldValue != null && newValue != null) {
+                        transferGroupHistory(bibDatabaseContext, groupNode, oldValue.getName(), newValue.getName());
                     }
                 });
             });
@@ -251,18 +253,19 @@ public class ChatHistoryService implements AutoCloseable {
         implementation.commit();
     }
 
-    private void transferGroupHistory(BibDatabaseContext bibDatabaseContext, String oldName, String newName) {
+    private void transferGroupHistory(BibDatabaseContext bibDatabaseContext, GroupTreeNode groupTreeNode, String oldName, String newName) {
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
             LOGGER.warn("Could not transfer chat history of group {} (old name: {}): database path is empty.", newName, oldName);
             return;
         }
 
-        List<ChatMessage> chatMessages = implementation.loadMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldName);
+        List<ChatMessage> chatMessages = groupsChatHistory.computeIfAbsent(groupTreeNode,
+                e -> new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), FXCollections.observableArrayList())).chatHistory;
         implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldName, List.of());
         implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), newName, chatMessages);
     }
 
-    private void transferEntryHistory(BibDatabaseContext bibDatabaseContext, String oldCitationKey, String newCitationKey) {
+    private void transferEntryHistory(BibDatabaseContext bibDatabaseContext, BibEntry entry, String oldCitationKey, String newCitationKey) {
         // TODO: This method does not check if the citation key is valid.
 
         if (bibDatabaseContext.getDatabasePath().isEmpty()) {
@@ -270,7 +273,8 @@ public class ChatHistoryService implements AutoCloseable {
             return;
         }
 
-        List<ChatMessage> chatMessages = implementation.loadMessagesForEntry(bibDatabaseContext.getDatabasePath().get(), oldCitationKey);
+        List<ChatMessage> chatMessages = bibEntriesChatHistory.computeIfAbsent(entry,
+                e -> new ChatHistoryManagementRecord(Optional.of(bibDatabaseContext), FXCollections.observableArrayList())).chatHistory;
         implementation.storeMessagesForGroup(bibDatabaseContext.getDatabasePath().get(), oldCitationKey, List.of());
         implementation.storeMessagesForEntry(bibDatabaseContext.getDatabasePath().get(), newCitationKey, chatMessages);
     }
@@ -288,7 +292,7 @@ public class ChatHistoryService implements AutoCloseable {
                 return;
             }
 
-            transferEntryHistory(bibDatabaseContext, e.getOldValue(), e.getNewValue());
+            transferEntryHistory(bibDatabaseContext, e.getBibEntry(), e.getOldValue(), e.getNewValue());
         }
     }
 }
