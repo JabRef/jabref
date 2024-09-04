@@ -23,6 +23,9 @@ public class AiChatWindow extends BaseWindow {
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
 
+    // This field is used for finding an existing AI chat window when user wants to chat with the same group again.
+    private String chatName;
+
     public AiChatWindow(AiService aiService,
                         DialogService dialogService,
                         AiPreferences aiPreferences,
@@ -38,6 +41,7 @@ public class AiChatWindow extends BaseWindow {
 
     public void setChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
         setTitle(Localization.lang("AI chat with %0", name.getValue()));
+        chatName = name.getValue();
         setScene(
                 new Scene(
                         new AiChatGuardedComponent(
@@ -55,5 +59,9 @@ public class AiChatWindow extends BaseWindow {
                         600
                 )
         );
+    }
+
+    public String getChatName() {
+        return chatName;
     }
 }

@@ -71,7 +71,7 @@ public class StateManager {
     private final ObservableList<SidePaneType> visibleSidePanes = FXCollections.observableArrayList();
     private final ObjectProperty<LastAutomaticFieldEditorEdit> lastAutomaticFieldEditorEdit = new SimpleObjectProperty<>();
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
-    private final OptionalObjectProperty<AiChatWindow> aiChatWindow = OptionalObjectProperty.empty();
+    private final List<AiChatWindow> aiChatWindows = new ArrayList<>();
 
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
         return visibleSidePanes;
@@ -211,7 +211,7 @@ public class StateManager {
         searchHistory.clear();
     }
 
-    public OptionalObjectProperty<AiChatWindow> getAiChatWindow() {
-        return aiChatWindow;
+    public List<AiChatWindow> getAiChatWindows() {
+        return aiChatWindows;
     }
 }

@@ -135,7 +135,11 @@ public class AiService implements AutoCloseable {
     }
 
     public void openAiChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
-        if (stateManager.getAiChatWindow().get().isEmpty()) {
+        Optional<AiChatWindow> existingWindow = stateManager.getAiChatWindows().stream().filter(window -> window.getChatName().equals(name.get())).findFirst();
+
+        if (existingWindow.isPresent()) {
+            existingWindow.get().requestFocus();
+        } else {
             AiChatWindow aiChatWindow = new AiChatWindow(
                     this,
                     dialogService,
@@ -144,16 +148,15 @@ public class AiService implements AutoCloseable {
                     taskExecutor
             );
 
-            aiChatWindow.setOnCloseRequest(event -> {
-                stateManager.getAiChatWindow().set(Optional.empty());
-            });
+            aiChatWindow.setOnCloseRequest(event ->
+                stateManager.getAiChatWindows().remove(aiChatWindow)
+            );
 
-            stateManager.getAiChatWindow().set(Optional.of(aiChatWindow));
+            stateManager.getAiChatWindows().add(aiChatWindow);
             dialogService.showCustomWindow(aiChatWindow);
+            aiChatWindow.setChat(name, chatHistory, bibDatabaseContext, entries);
+            aiChatWindow.requestFocus();
         }
-
-        stateManager.getAiChatWindow().get().get().setChat(name, chatHistory, bibDatabaseContext, entries);
-        stateManager.getAiChatWindow().get().get().requestFocus();
     }
 
     @Override
