@@ -4,11 +4,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+
+import com.airhacks.afterburner.injection.Injector;
 
 /**
  * A base class for non-modal windows of JabRef.
@@ -29,7 +35,15 @@ public class BaseWindow extends Stage {
         setScene(new Scene(new Pane()));
 
         stylesheets.addListener((ListChangeListener<String>) c -> getScene().getStylesheets().setAll(stylesheets));
-        sceneProperty().addListener((obs, oldValue, newValue) -> newValue.getStylesheets().setAll(stylesheets));
+        sceneProperty().addListener((obs, oldValue, newValue) -> {
+            newValue.getStylesheets().setAll(stylesheets);
+            newValue.setOnKeyPressed(event -> {
+                KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+                if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {
+                    close();
+                }
+            });
+        });
     }
 
     public void applyStylesheets(ObservableList<String> stylesheets) {
