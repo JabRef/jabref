@@ -68,11 +68,8 @@ public class OOBibBase {
 
     private final DialogService dialogService;
 
-    // After inserting a citation, if ooPrefs.getSyncWhenCiting() returns true, shall we also update the bibliography?
-    private final boolean refreshBibliographyDuringSyncWhenCiting;
-
     // Shall we add "Cited on pages: ..." to resolved bibliography entries?
-    private final boolean alwaysAddCitedOnPages;
+    private final boolean alwaysAddCitedOnPages; // TODO (see comment above)
 
     private final OOBibBaseConnect connection;
 
@@ -86,7 +83,6 @@ public class OOBibBase {
         this.dialogService = dialogService;
         this.connection = new OOBibBaseConnect(loPath, dialogService);
 
-        this.refreshBibliographyDuringSyncWhenCiting = false;
         this.alwaysAddCitedOnPages = false;
     }
 
@@ -576,26 +572,18 @@ public class OOBibBase {
         }
 
         /*
-         * For sync we need a FunctionalTextViewCursor.
+         * For sync we need a FunctionalTextViewCursor and an open database.
          */
         OOResult<FunctionalTextViewCursor, OOError> fcursor = null;
         if (syncOptions.isPresent()) {
             fcursor = getFunctionalTextViewCursor(doc, errorTitle);
-            if (testDialog(errorTitle, fcursor.asVoidResult())) {
-                return;
-            }
-        }
-
-        syncOptions
-                .map(e -> e.setUpdateBibliography(this.refreshBibliographyDuringSyncWhenCiting))
-                .map(e -> e.setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages));
-
-        if (syncOptions.isPresent()) {
-            if (testDialog(databaseIsRequired(syncOptions.get().databases,
+            if (testDialog(errorTitle, fcursor.asVoidResult()) || testDialog(databaseIsRequired(syncOptions.get().databases,
                     OOError::noDataBaseIsOpenForSyncingAfterCitation))) {
                 return;
             }
         }
+
+        syncOptions.map(e -> e.setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages)); // TODO: Provide option to user: this is always false
 
         try {
 
@@ -615,6 +603,9 @@ public class OOBibBase {
                     // "Insert empty citation"
                     this.cslCitationOOAdapter.insertEmpty(cursor.get(), entries);
                 }
+
+                // If "Automatically sync bibliography when inserting citations" is enabled
+                syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
             } else if (style instanceof JStyle jStyle) {
                 // Handle insertion of JStyle citations
 
@@ -870,7 +861,7 @@ public class OOBibBase {
                     Update.SyncOptions syncOptions = new Update.SyncOptions(databases);
                     syncOptions
                             .setUpdateBibliography(true)
-                            .setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages);
+                            .setAlwaysAddCitedOnPages(this.alwaysAddCitedOnPages); // TODO: Provide option to user: this is always false
 
                     unresolvedKeys = Update.synchronizeDocument(doc, frontend, jStyle, fcursor.get(), syncOptions);
                 } finally {
@@ -939,7 +930,7 @@ public class OOBibBase {
                         return;
                     }
 
-                    // A separate database and database
+                    // A separate database and database context
                     BibDatabase bibDatabase = new BibDatabase(citedEntries);
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
 

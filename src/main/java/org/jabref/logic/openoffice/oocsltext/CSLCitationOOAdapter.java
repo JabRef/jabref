@@ -148,34 +148,40 @@ public class CSLCitationOOAdapter {
 
         OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_TITLE), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
-        OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), "Body Text");
+        OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, ooBreak);
 
         String style = selectedStyle.getSource();
 
-        // Sort entries based on their order of appearance in the document
-        entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
-        for (BibEntry entry : entries) {
-            String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
-            String citationKey = entry.getCitationKey().orElse("");
-            int currentNumber = markManager.getCitationNumber(citationKey);
+        if (selectedStyle.isNumericStyle()) {
+            // Sort entries based on their order of appearance in the document
+            entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
 
-            String formattedCitation;
-            if (selectedStyle.isNumericStyle()) {
-                formattedCitation = CSLFormatUtils.updateSingleBibliographyNumber(CSLFormatUtils.transformHTML(citation), currentNumber);
-            } else {
-                formattedCitation = CSLFormatUtils.transformHTML(citation);
+            for (BibEntry entry : entries) {
+                String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
+                String citationKey = entry.getCitationKey().orElse("");
+                int currentNumber = markManager.getCitationNumber(citationKey);
+
+                String formattedCitation = CSLFormatUtils.updateSingleBibliographyNumber(CSLFormatUtils.transformHTML(citation), currentNumber);
+                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+
+                OOTextIntoOO.write(document, cursor, ooText);
+                    // Select the paragraph break
+                    cursor.goLeft((short) 1, true);
+
+                    // Delete the selected content (paragraph break)
+                    cursor.setString("");
             }
-            OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+        } else {
+            // Ordering will be according to citeproc item data provider (default)
+            List<String> citations = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
 
-            OOTextIntoOO.write(document, cursor, ooText);
-            if (selectedStyle.isNumericStyle()) {
-                // Select the paragraph break
-                cursor.goLeft((short) 1, true);
-
-                // Delete the selected content (paragraph break)
-                cursor.setString("");
+            for (String citation : citations) {
+                String formattedCitation = CSLFormatUtils.transformHTML(citation);
+                OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
+                OOTextIntoOO.write(document, cursor, ooText);
             }
+            cursor.collapseToEnd();
         }
     }
 
