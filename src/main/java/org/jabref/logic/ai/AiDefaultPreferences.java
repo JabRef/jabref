@@ -50,7 +50,7 @@ public class AiDefaultPreferences {
     public static final boolean CUSTOMIZE_SETTINGS = false;
 
     public static final EmbeddingModel EMBEDDING_MODEL = EmbeddingModel.SENTENCE_TRANSFORMERS_ALL_MINILM_L12_V2;
-    public static final String SYSTEM_MESSAGE = "You are an AI assistant that analyses research papers. You answer questions over papers. You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'. Whenever you refer to a paper, use its citation key in the same form with @ symbol. Whenever you find relevant information, always use the citation key. Here are the papers you are analyzing:\n";
+    public static final String SYSTEM_MESSAGE = "You are an AI assistant that analyses research papers. You answer questions about papers. You will be supplied with the necessary information. The supplied information will contain mentions of papers in form '@citationKey'. Whenever you refer to a paper, use its citation key in the same form with @ symbol. Whenever you find relevant information, always use the citation key. Here are the papers you are analyzing:\n";
     public static final double TEMPERATURE = 0.7;
     public static final int DOCUMENT_SPLITTER_CHUNK_SIZE = 300;
     public static final int DOCUMENT_SPLITTER_OVERLAP = 100;
