@@ -75,19 +75,10 @@ import org.slf4j.LoggerFactory;
 public class GroupTreeView extends BorderPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeView.class);
-
     private static final PseudoClass PSEUDOCLASS_ANYSELECTED = PseudoClass.getPseudoClass("any-selected");
     private static final PseudoClass PSEUDOCLASS_ALLSELECTED = PseudoClass.getPseudoClass("all-selected");
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
-
-    private static final double SCROLL_SPEED_UP = 3.0;
-
-    private TreeTableView<GroupNodeViewModel> groupTree;
-    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
-    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
-    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
-    private CustomTextField searchField;
 
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -95,11 +86,14 @@ public class GroupTreeView extends BorderPane {
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
 
+    private TreeTableView<GroupNodeViewModel> groupTree;
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
+    private CustomTextField searchField;
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
-
     private DragExpansionHandler dragExpansionHandler;
-
     private Timer scrollTimer;
     private double scrollVelocity = 0;
     private double scrollableAreaHeight;

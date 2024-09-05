@@ -54,7 +54,9 @@ public class OpenDatabaseAction extends SimpleCommand {
             // Warning for migrating the Review into the Comment field
             new MergeReviewIntoCommentAction(),
             // Check for new custom entry types loaded from the BIB file:
-            new CheckForNewEntryTypesAction());
+            new CheckForNewEntryTypesAction(),
+            // Migrate search groups from Search.g4 to Lucene syntax
+            new SearchGroupsMigrationAction());
 
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;
@@ -89,11 +91,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
     }
 
-    /**
-     * Go through the list of post open actions, and perform those that need to be performed.
-     *
-     * @param result     The result of the BIB file parse operation.
-     */
     public static void performPostOpenActions(ParserResult result, DialogService dialogService, PreferencesService preferencesService) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result, preferencesService)) {

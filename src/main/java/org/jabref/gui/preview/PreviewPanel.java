@@ -25,11 +25,11 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PreviewPreferences;
 
@@ -52,8 +52,8 @@ public class PreviewPanel extends VBox {
                         KeyBindingRepository keyBindingRepository,
                         PreferencesService preferencesService,
                         ThemeManager themeManager,
-                        IndexingTaskManager indexingTaskManager,
                         TaskExecutor taskExecutor,
+                        LuceneManager luceneManager,
                         OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
@@ -89,7 +89,7 @@ public class PreviewPanel extends VBox {
 
                 if (event.getTransferMode() == TransferMode.MOVE) {
                     LOGGER.debug("Mode MOVE"); // shift on win or no modifier
-                    fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, files, indexingTaskManager);
+                    fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, files, luceneManager);
                 }
                 if (event.getTransferMode() == TransferMode.LINK) {
                     LOGGER.debug("Node LINK"); // alt on win
@@ -97,7 +97,7 @@ public class PreviewPanel extends VBox {
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
                     LOGGER.debug("Mode Copy"); // ctrl on win, no modifier on Xubuntu
-                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files, indexingTaskManager);
+                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files, luceneManager);
                 }
                 success = true;
             }

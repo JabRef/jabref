@@ -7,10 +7,10 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
-import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 public class PreviewTab extends EntryEditorTab implements OffersPreview {
@@ -19,8 +19,8 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferences;
     private final ThemeManager themeManager;
-    private final IndexingTaskManager indexingTaskManager;
     private final TaskExecutor taskExecutor;
+    private final LuceneManager luceneManager;
     private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private PreviewPanel previewPanel;
 
@@ -28,15 +28,15 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
                       DialogService dialogService,
                       PreferencesService preferences,
                       ThemeManager themeManager,
-                      IndexingTaskManager indexingTaskManager,
                       TaskExecutor taskExecutor,
+                      LuceneManager luceneManager,
                       OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.themeManager = themeManager;
-        this.indexingTaskManager = indexingTaskManager;
         this.taskExecutor = taskExecutor;
+        this.luceneManager = luceneManager;
         this.searchQueryProperty = searchQueryProperty;
 
         setGraphic(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getGraphicNode());
@@ -65,7 +65,7 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (previewPanel == null) {
-            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, themeManager, indexingTaskManager, taskExecutor, searchQueryProperty);
+            previewPanel = new PreviewPanel(databaseContext, dialogService, preferences.getKeyBindingRepository(), preferences, themeManager, taskExecutor, luceneManager, searchQueryProperty);
             setContent(previewPanel);
         }
 

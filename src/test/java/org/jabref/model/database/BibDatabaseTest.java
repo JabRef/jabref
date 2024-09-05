@@ -228,7 +228,7 @@ class BibDatabaseTest {
 
     @Test
     void setSingleStringAsCollection() {
-        List<BibtexString> strings = Arrays.asList(bibtexString);
+        List<BibtexString> strings = List.of(bibtexString);
         database.setStrings(strings);
         assertEquals(Optional.of(bibtexString), database.getStringByName("DSP"));
     }
@@ -406,7 +406,7 @@ class BibDatabaseTest {
         database.addString(tripleC);
         database.insertEntry(entry);
 
-        Set<BibtexString> usedStrings = new HashSet<>(database.getUsedStrings(Arrays.asList(entry)));
+        Set<BibtexString> usedStrings = new HashSet<>(database.getUsedStrings(Collections.singletonList(entry)));
         assertEquals(stringSet, usedStrings);
     }
 
@@ -423,7 +423,7 @@ class BibDatabaseTest {
         database.addString(tripleB);
         database.insertEntry(entry);
 
-        List<BibtexString> usedStrings = (List<BibtexString>) database.getUsedStrings(Arrays.asList(entry));
+        List<BibtexString> usedStrings = (List<BibtexString>) database.getUsedStrings(Collections.singletonList(entry));
         assertEquals(strings, usedStrings);
     }
 
@@ -434,7 +434,7 @@ class BibDatabaseTest {
         BibtexString string = new BibtexString("AAA", "Some other text");
         database.addString(string);
         database.insertEntry(entry);
-        Collection<BibtexString> usedStrings = database.getUsedStrings(Arrays.asList(entry));
+        Collection<BibtexString> usedStrings = database.getUsedStrings(Collections.singletonList(entry));
         assertEquals(Collections.emptyList(), usedStrings);
     }
 
@@ -457,5 +457,34 @@ class BibDatabaseTest {
     void setPreambleWorks() {
         database.setPreamble("Oh yeah!");
         assertEquals(Optional.of("Oh yeah!"), database.getPreamble());
+    }
+
+    @Test
+    void getIndex() {
+        BibEntry entryA = new BibEntry(StandardEntryType.Article);
+        BibEntry entryB = new BibEntry(StandardEntryType.Article);
+        BibEntry entryC = new BibEntry(StandardEntryType.Article);
+
+        database.insertEntries(entryA, entryB, entryC);
+        assertEquals(0, database.indexOf(entryA));
+        assertEquals(1, database.indexOf(entryB));
+        assertEquals(2, database.indexOf(entryC));
+        assertEquals(-1, database.indexOf(new BibEntry()));
+
+        database.removeEntry(entryB);
+        assertEquals(-1, database.indexOf(entryB));
+        assertEquals(0, database.indexOf(entryA));
+        assertEquals(1, database.indexOf(entryC));
+
+        database.removeEntry(entryA);
+        assertEquals(-1, database.indexOf(entryA));
+        assertEquals(0, database.indexOf(entryC));
+
+        BibEntry entryD = new BibEntry(StandardEntryType.Article);
+        database.insertEntry(entryD);
+
+        assertEquals(0, database.indexOf(entryC));
+        assertEquals(1, database.indexOf(entryD));
+        assertEquals(-1, database.indexOf(entryA));
     }
 }

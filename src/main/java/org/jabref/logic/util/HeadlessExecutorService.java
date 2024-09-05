@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.FallbackExceptionHandler;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.pdf.search.PdfIndexerManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,9 +160,6 @@ public class HeadlessExecutorService implements Executor {
 
         LOGGER.trace("Gracefully shut down low priority executor service");
         gracefullyShutdown(this.lowPriorityExecutorService);
-
-        LOGGER.trace("Shutting down PdfIndexer");
-        PdfIndexerManager.shutdownAllIndexers();
 
         LOGGER.trace("Canceling timer");
         timer.cancel();

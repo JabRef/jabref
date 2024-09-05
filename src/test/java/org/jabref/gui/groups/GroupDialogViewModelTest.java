@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -31,6 +32,7 @@ class GroupDialogViewModelTest {
     private Path temporaryFolder;
     private BibDatabaseContext bibDatabaseContext;
     private final MetaData metaData = mock(MetaData.class);
+    private final StateManager stateManager = mock(StateManager.class);
     private final GroupsPreferences groupsPreferences = mock(GroupsPreferences.class);
     private final DialogService dialogService = mock(DialogService.class);
     private final AbstractGroup group = mock(AbstractGroup.class);
@@ -51,7 +53,7 @@ class GroupDialogViewModelTest {
 
         bibDatabaseContext.setMetaData(metaData);
 
-        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, group, null, new DummyFileUpdateMonitor());
+        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, group, null, new DummyFileUpdateMonitor(), stateManager);
     }
 
     @Test
@@ -88,7 +90,7 @@ class GroupDialogViewModelTest {
     void hierarchicalContextFromGroup() throws Exception {
         GroupHierarchyType groupHierarchyType = GroupHierarchyType.INCLUDING;
         when(group.getHierarchicalContext()).thenReturn(groupHierarchyType);
-        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, group, null, new DummyFileUpdateMonitor());
+        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, group, null, new DummyFileUpdateMonitor(), stateManager);
 
         assertEquals(groupHierarchyType, viewModel.groupHierarchySelectedProperty().getValue());
     }
@@ -97,7 +99,7 @@ class GroupDialogViewModelTest {
     void defaultHierarchicalContext() throws Exception {
         GroupHierarchyType defaultHierarchicalContext = GroupHierarchyType.REFINING;
         when(preferencesService.getGroupsPreferences().getDefaultHierarchicalContext()).thenReturn(defaultHierarchicalContext);
-        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, null, null, new DummyFileUpdateMonitor());
+        viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferencesService, null, null, new DummyFileUpdateMonitor(), stateManager);
 
         assertEquals(defaultHierarchicalContext, viewModel.groupHierarchySelectedProperty().getValue());
     }
