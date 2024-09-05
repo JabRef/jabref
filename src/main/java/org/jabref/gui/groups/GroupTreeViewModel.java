@@ -385,7 +385,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     public void chatWithGroup(GroupNodeViewModel group) {
         // This should probably be done some other way. Please don't blame, it's just a thing to make it quick and fast.
         if (currentDatabase.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Unable to chat with group"), Localization.lang("No database is set."));
+            dialogService.showErrorDialogAndWait(Localization.lang("Unable to chat with group"), Localization.lang("No library is selected."));
             return;
         }
 
