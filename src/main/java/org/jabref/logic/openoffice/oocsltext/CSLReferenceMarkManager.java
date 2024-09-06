@@ -86,7 +86,7 @@ public class CSLReferenceMarkManager {
         try {
             return textRangeCompare.compareRegionStarts(r1, r2);
         } catch (IllegalArgumentException e) {
-            System.err.println("Error comparing text ranges: " + e.getMessage());
+            LOGGER.warn("Error comparing text ranges: {}", e.getMessage());
             return 0;
         }
     }
