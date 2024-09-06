@@ -1,3 +1,13 @@
+## TEST CASE PROJECT MAHIDOL UNIVERSITY ITCS473
+Project members
+6488177 Jedsada Meenoi
+6488005 Sirawich Anantapong
+6488154 Zishun Gao
+6488096 Peerapong Tantasilp
+6488112 Napatara Wangthongthana
+6488188 Supitsara Sareecam
+This project readme document the documentation of test cases, edit, changelog of open-source project. The commit will be all documented into pull request and managed by the group members
+
 # JabRef Bibliography Management
 
 JabRef is an open-source, cross-platform citation and reference management tool.
