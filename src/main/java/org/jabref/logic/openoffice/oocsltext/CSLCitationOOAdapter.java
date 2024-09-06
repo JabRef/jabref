@@ -127,7 +127,8 @@ public class CSLCitationOOAdapter {
      * Inserts "empty" citations for a list of entries at the cursor to the document.
      * Adds the entries to the list for which bibliography is to be generated.
      */
-    public void insertEmpty(XTextCursor cursor, List<BibEntry> entries) throws Exception, CreationException {
+    public void insertEmpty(XTextCursor cursor, List<BibEntry> entries)
+            throws Exception, CreationException {
         for (BibEntry entry : entries) {
             CSLReferenceMark mark = markManager.createReferenceMark(entry);
             OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
@@ -192,7 +193,8 @@ public class CSLCitationOOAdapter {
      * Furthermore, it is also difficult to generate a "single" reference mark for a group of entries.
      * Thus, in case of citations for a group of entries, we first insert the citation (text), then insert the invisible reference marks for each entry separately after it.
      */
-    private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText) throws Exception, CreationException {
+    private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText)
+            throws Exception, CreationException {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
 
