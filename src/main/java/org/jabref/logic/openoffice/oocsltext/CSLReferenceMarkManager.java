@@ -18,9 +18,9 @@ import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XReferenceMarksSupplier;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextContent;
-import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import com.sun.star.text.XTextRangeCompare;
 import com.sun.star.uno.UnoRuntime;
 import io.github.thibaultmeyer.cuid.CUID;
 
@@ -31,10 +31,12 @@ public class CSLReferenceMarkManager {
     private final Map<String, CSLReferenceMark> marksByName = new HashMap<>();
     private final List<CSLReferenceMark> marksInOrder = new ArrayList<>();
     private Map<String, Integer> citationKeyToNumber = new HashMap<>();
+    private XTextRangeCompare textRangeCompare;
 
     public CSLReferenceMarkManager(XTextDocument document) {
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
+        this.textRangeCompare = UnoRuntime.queryInterface(XTextRangeCompare.class, document.getText());
     }
 
     public CSLReferenceMark createReferenceMark(BibEntry entry) throws Exception {
@@ -69,27 +71,13 @@ public class CSLReferenceMarkManager {
     }
 
     private void sortMarksInOrder() {
-        Collections.sort(marksInOrder, this::compareTextRanges);
+        Collections.sort(marksInOrder, (m1, m2) -> compareTextRanges(m1.getTextContent().getAnchor(), m2.getTextContent().getAnchor()));
     }
 
-    private int compareTextRanges(CSLReferenceMark m1, CSLReferenceMark m2) {
-        XTextRange r1 = m1.getTextContent().getAnchor();
-        XTextRange r2 = m2.getTextContent().getAnchor();
-
-        if (r1 == null || r2 == null) {
-            return 0;
-        }
-
-        XText text = r1.getText();
-        if (text == null) {
-            return 0;
-        }
-
+    private int compareTextRanges(XTextRange r1, XTextRange r2) {
         try {
-            XTextCursor cursor = text.createTextCursorByRange(r1);
-            cursor.gotoRange(r2, false);
-            return cursor.goLeft((short) 1, true) ? 1 : -1;
-        } catch (Exception e) {
+            return textRangeCompare.compareRegionStarts(r1, r2);
+        } catch (com.sun.star.lang.IllegalArgumentException e) {
             System.err.println("Error comparing text ranges: " + e.getMessage());
             return 0;
         }
