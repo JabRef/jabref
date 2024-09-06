@@ -166,8 +166,6 @@ public class CSLReferenceMarkManager {
                 String citationKey = parts[0].substring(7);
                 int citationNumber = Integer.parseInt(parts[1].substring(4));
                 String uniqueId = parts[2];
-                System.out.println(citationNumber);
-                System.out.println(uniqueId);
                 CSLReferenceMark mark = new CSLReferenceMark(named, new ReferenceMark(name, citationKey, citationNumber, uniqueId));
                 marksByName.put(name, mark);
                 marksInOrder.add(mark);
