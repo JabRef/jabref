@@ -176,7 +176,7 @@ public class CSLReferenceMarkManager {
                     marksInOrder.add(mark);
                     highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
                 } else {
-                    LOGGER.error("Invalid reference mark: {}", name);
+                    LOGGER.error("Cannot parse reference mark - invalid format: {}", name);
                 }
             }
         }
