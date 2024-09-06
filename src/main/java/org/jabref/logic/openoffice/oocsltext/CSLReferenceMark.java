@@ -49,10 +49,6 @@ public class CSLReferenceMark {
         return citationKey;
     }
 
-    public int getCitationNumber() {
-        return citationNumber;
-    }
-
     public void setCitationNumber(int number) {
         this.citationNumber = number;
     }
