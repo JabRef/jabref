@@ -55,6 +55,7 @@ import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import com.sun.star.uno.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,12 +86,12 @@ public class OOBibBase {
         this.alwaysAddCitedOnPages = false;
     }
 
-    private void initializeCitationAdapter(XTextDocument doc) throws Exception {
-            this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
-            this.cslCitationOOAdapter.readExistingMarks();
+    private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
+        this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
+        this.cslCitationOOAdapter.readExistingMarks();
     }
 
-    public void guiActionSelectDocument(boolean autoSelectForSingle) throws Exception {
+    public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {
         final String errorTitle = Localization.lang("Problem connecting");
 
         try {
@@ -160,9 +161,9 @@ public class OOBibBase {
 
     OOVoidResult<OOError> collectResults(String errorTitle, List<OOVoidResult<OOError>> results) {
         String msg = results.stream()
-                             .filter(OOVoidResult::isError)
-                             .map(e -> e.getError().getLocalizedMessage())
-                             .collect(Collectors.joining("\n\n"));
+                            .filter(OOVoidResult::isError)
+                            .map(e -> e.getError().getLocalizedMessage())
+                            .collect(Collectors.joining("\n\n"));
         if (msg.isEmpty()) {
             return OOVoidResult.ok();
         } else {
@@ -232,10 +233,10 @@ public class OOBibBase {
         int maxReportedOverlaps = 10;
         try {
             return frontend.checkRangeOverlaps(doc,
-                                    new ArrayList<>(),
-                                    requireSeparation,
-                                    maxReportedOverlaps)
-                            .mapError(OOError::from);
+                                   new ArrayList<>(),
+                                   requireSeparation,
+                                   maxReportedOverlaps)
+                           .mapError(OOError::from);
         } catch (NoDocumentException ex) {
             return OOVoidResult.error(OOError.from(ex).setTitle(errorTitle));
         } catch (WrappedTargetException ex) {
@@ -321,7 +322,7 @@ public class OOBibBase {
         } catch (NoDocumentException ex) {
             return OOResult.error(OOError.from(ex).setTitle(errorTitle));
         } catch (WrappedTargetException
-                | RuntimeException ex) {
+                 | RuntimeException ex) {
             return OOResult.error(OOError.fromMisc(ex).setTitle(errorTitle));
         }
     }
@@ -633,8 +634,7 @@ public class OOBibBase {
                  | NotRemoveableException ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             UnoUndo.leaveUndoContext(doc);
@@ -813,7 +813,7 @@ public class OOBibBase {
         } catch (DisposedException ex) {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (WrappedTargetException
-                | com.sun.star.lang.IllegalArgumentException ex) {
+                 | com.sun.star.lang.IllegalArgumentException ex) {
             LOGGER.warn("Problem generating new database.", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         }
@@ -881,8 +881,8 @@ public class OOBibBase {
             } catch (DisposedException ex) {
                 OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             } catch (CreationException
-                    | WrappedTargetException
-                    | com.sun.star.lang.IllegalArgumentException ex) {
+                     | WrappedTargetException
+                     | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not update JStyle bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
@@ -938,15 +938,13 @@ public class OOBibBase {
                 } catch (NoDocumentException
                          | NoSuchElementException e) {
                     throw new RuntimeException(e);
-                } catch (
-                        Exception e) {
-                    throw new RuntimeException(e);
                 } finally {
                     UnoUndo.leaveUndoContext(doc);
                     fcursor.get().restore(doc);
                 }
-            } catch (
-                    com.sun.star.lang.IllegalArgumentException ex) {
+            } catch (CreationException
+                     | WrappedTargetException
+                     | com.sun.star.lang.IllegalArgumentException ex) {
                 LOGGER.warn("Could not update CSL bibliography", ex);
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }

@@ -21,6 +21,7 @@ import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
+import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import io.github.thibaultmeyer.cuid.CUID;
 
