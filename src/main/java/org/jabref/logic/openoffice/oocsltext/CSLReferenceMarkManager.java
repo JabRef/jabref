@@ -42,7 +42,8 @@ public class CSLReferenceMarkManager {
 
     public CSLReferenceMark createReferenceMark(BibEntry entry) throws Exception {
         String citationKey = entry.getCitationKey().orElse(CUID.randomCUID2(8).toString());
-        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKey, 1, factory);
+        int citationNumber = getCitationNumber(citationKey);
+        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKey, citationNumber, factory);
         marksByName.put(referenceMark.getName(), referenceMark);
         marksInOrder.add(referenceMark);
         updateAllCitationNumbers();
