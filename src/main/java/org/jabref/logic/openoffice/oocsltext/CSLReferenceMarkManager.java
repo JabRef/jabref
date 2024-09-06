@@ -36,6 +36,7 @@ public class CSLReferenceMarkManager {
     private final List<CSLReferenceMark> marksInOrder = new ArrayList<>();
     private Map<String, Integer> citationKeyToNumber = new HashMap<>();
     private XTextRangeCompare textRangeCompare;
+    private int highestCitationNumber = 0;
 
     public CSLReferenceMarkManager(XTextDocument document) {
         this.document = document;
@@ -148,7 +149,7 @@ public class CSLReferenceMarkManager {
     }
 
     public int getCitationNumber(String citationKey) {
-        return citationKeyToNumber.getOrDefault(citationKey, 1);
+        return citationKeyToNumber.computeIfAbsent(citationKey, k -> ++highestCitationNumber);
     }
 
     public void readExistingMarks() throws WrappedTargetException, com.sun.star.container.NoSuchElementException {
@@ -169,6 +170,7 @@ public class CSLReferenceMarkManager {
                 CSLReferenceMark mark = new CSLReferenceMark(named, new ReferenceMark(name, citationKey, citationNumber, uniqueId));
                 marksByName.put(name, mark);
                 marksInOrder.add(mark);
+                highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
             }
         }
 
