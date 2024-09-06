@@ -71,7 +71,7 @@ public class CSLReferenceMarkManager {
     }
 
     private void sortMarksInOrder() {
-        Collections.sort(marksInOrder, (m1, m2) -> compareTextRanges(m1.getTextContent().getAnchor(), m2.getTextContent().getAnchor()));
+        Collections.sort(marksInOrder, (m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
     }
 
     private int compareTextRanges(XTextRange r1, XTextRange r2) {
