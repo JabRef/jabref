@@ -1,7 +1,6 @@
 package org.jabref.logic.openoffice.oocsltext;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +71,7 @@ public class CSLReferenceMarkManager {
     }
 
     private void sortMarksInOrder() {
-        Collections.sort(marksInOrder, (m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
+        marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
     }
 
     private int compareTextRanges(XTextRange r1, XTextRange r2) {
@@ -144,7 +143,7 @@ public class CSLReferenceMarkManager {
     }
 
     public int getCitationNumber(String citationKey) {
-        return citationKeyToNumber.getOrDefault(citationKey, 0);
+        return citationKeyToNumber.getOrDefault(citationKey, 1);
     }
 
     public void readExistingMarks() throws WrappedTargetException, com.sun.star.container.NoSuchElementException {
