@@ -88,6 +88,7 @@ public class ChatPromptComponent extends HBox {
                     // will be true (this is important).
                 }
             } else if (keyEvent.getCode() == KeyCode.UP) {
+                // [impl->req~ai.chat.new-message-based-on-previous~1]
                 if ((currentUserMessageScroll.get() < history.get().size() - 1) && (userPromptTextArea.getText().isEmpty() || showingHistoryMessage.get())) {
                     // 1. We should not go up the maximum number of user messages.
                     // 2. We can scroll history only on two conditions:
