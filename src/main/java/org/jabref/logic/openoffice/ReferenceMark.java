@@ -9,6 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ReferenceMark {
+    public static final String[] PREFIXES = {"JABREF_", "CID_"};
+    public static final int CITATION_KEY_BEGIN_POSITION = 7;
+    public static final int CITATION_ID_BEGIN_POSITION = 4;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMark.class);
 
     private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile("^JABREF_(\\w+) CID_(\\w+) (\\w+)$");

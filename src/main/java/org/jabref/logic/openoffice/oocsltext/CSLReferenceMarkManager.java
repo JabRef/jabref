@@ -132,8 +132,8 @@ public class CSLReferenceMarkManager {
 
     private String updateReferenceName(String oldName, int newNumber) {
         String[] parts = oldName.split(" ");
-        if (parts.length >= 2) {
-            parts[1] = "CID_" + newNumber;
+        if (parts.length == 3) {
+            parts[1] = ReferenceMark.PREFIXES[1] + newNumber;
             return String.join(" ", parts);
         }
         return oldName;
@@ -163,16 +163,19 @@ public class CSLReferenceMarkManager {
         XNameAccess marks = supplier.getReferenceMarks();
 
         for (String name : marks.getElementNames()) {
-            if (name.startsWith("JABREF_")) {
+            if (name.startsWith(ReferenceMark.PREFIXES[0]) && name.contains(ReferenceMark.PREFIXES[1])) {
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
+
                 String[] parts = name.split(" ");
-                String citationKey = parts[0].substring(7);
-                int citationNumber = Integer.parseInt(parts[1].substring(4));
-                String uniqueId = parts[2];
-                CSLReferenceMark mark = new CSLReferenceMark(named, new ReferenceMark(name, citationKey, citationNumber, uniqueId));
-                marksByName.put(name, mark);
-                marksInOrder.add(mark);
-                highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
+                if (parts.length == 3 && parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1])) {
+                    String citationKey = parts[0].substring(ReferenceMark.CITATION_KEY_BEGIN_POSITION);
+                    int citationNumber = Integer.parseInt(parts[1].substring(ReferenceMark.CITATION_ID_BEGIN_POSITION));
+                    String uniqueId = parts[2];
+                    CSLReferenceMark mark = new CSLReferenceMark(named, new ReferenceMark(name, citationKey, citationNumber, uniqueId));
+                    marksByName.put(name, mark);
+                    marksInOrder.add(mark);
+                    highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
+                }
             }
         }
 

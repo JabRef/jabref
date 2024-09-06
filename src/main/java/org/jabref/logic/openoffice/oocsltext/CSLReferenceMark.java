@@ -38,7 +38,7 @@ public class CSLReferenceMark {
 
     public static CSLReferenceMark of(String citationKey, int citationNumber, XMultiServiceFactory factory) throws Exception {
         String uniqueId = CUID.randomCUID2(8).toString();
-        String name = "JABREF_" + citationKey + " CID_" + citationNumber + " " + uniqueId;
+        String name = ReferenceMark.PREFIXES[0] + citationKey + " " + ReferenceMark.PREFIXES[1] + citationNumber + " " + uniqueId;
         XNamed named = UnoRuntime.queryInterface(XNamed.class, factory.createInstance("com.sun.star.text.ReferenceMark"));
         named.setName(name);
         ReferenceMark referenceMark = new ReferenceMark(name, citationKey, citationNumber, uniqueId);
