@@ -128,7 +128,7 @@ public class CSLCitationOOAdapter {
      * Adds the entries to the list for which bibliography is to be generated.
      */
     public void insertEmpty(XTextCursor cursor, List<BibEntry> entries)
-            throws Exception, CreationException {
+            throws CreationException, Exception {
         for (BibEntry entry : entries) {
             CSLReferenceMark mark = markManager.createReferenceMark(entry);
             OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
@@ -194,7 +194,7 @@ public class CSLCitationOOAdapter {
      * Thus, in case of citations for a group of entries, we first insert the citation (text), then insert the invisible reference marks for each entry separately after it.
      */
     private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText)
-            throws Exception, CreationException {
+            throws CreationException, Exception {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
 
