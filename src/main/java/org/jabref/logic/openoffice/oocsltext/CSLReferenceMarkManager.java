@@ -179,7 +179,7 @@ public class CSLReferenceMarkManager {
         try {
             updateAllCitationNumbers();
         } catch (Exception e) {
-            LOGGER.warn("Error updating citation numbers: {}", e.getMessage(), e);
+            LOGGER.warn("Error updating citation numbers", e);
         }
     }
 
