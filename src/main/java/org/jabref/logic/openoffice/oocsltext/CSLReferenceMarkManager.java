@@ -10,8 +10,10 @@ import java.util.regex.Pattern;
 import org.jabref.logic.openoffice.ReferenceMark;
 import org.jabref.model.entry.BibEntry;
 
+import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
+import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XReferenceMarksSupplier;
@@ -83,7 +85,7 @@ public class CSLReferenceMarkManager {
     private int compareTextRanges(XTextRange r1, XTextRange r2) {
         try {
             return textRangeCompare.compareRegionStarts(r1, r2);
-        } catch (com.sun.star.lang.IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.err.println("Error comparing text ranges: " + e.getMessage());
             return 0;
         }
@@ -152,7 +154,7 @@ public class CSLReferenceMarkManager {
         return citationKeyToNumber.computeIfAbsent(citationKey, k -> ++highestCitationNumber);
     }
 
-    public void readExistingMarks() throws WrappedTargetException, com.sun.star.container.NoSuchElementException {
+    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
         marksByName.clear();
         marksInOrder.clear();
         citationKeyToNumber.clear();
