@@ -24,8 +24,11 @@ import com.sun.star.text.XTextRangeCompare;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import io.github.thibaultmeyer.cuid.CUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CSLReferenceMarkManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CSLReferenceMarkManager.class);
 
     private final XTextDocument document;
     private final XMultiServiceFactory factory;
@@ -169,7 +172,7 @@ public class CSLReferenceMarkManager {
         try {
             updateAllCitationNumbers();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Error updating citation numbers: {}", e.getMessage(), e);
         }
     }
 
