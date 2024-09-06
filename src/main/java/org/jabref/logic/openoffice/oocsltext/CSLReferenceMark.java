@@ -20,6 +20,9 @@ import io.github.thibaultmeyer.cuid.CUID;
 
 import static org.jabref.logic.openoffice.backend.NamedRangeReferenceMark.safeInsertSpacesBetweenReferenceMarks;
 
+/**
+ * Class to handle a reference mark. See {@link CSLReferenceMarkManager} for the management of all reference marks.
+ */
 public class CSLReferenceMark {
     private ReferenceMark referenceMark;
     private XTextContent textContent;
