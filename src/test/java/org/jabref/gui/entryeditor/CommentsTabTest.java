@@ -9,14 +9,13 @@ import javax.swing.undo.UndoManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.OwnerPreferences;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -40,6 +39,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -74,36 +74,38 @@ class CommentsTabTest {
     private JournalAbbreviationRepository journalAbbreviationRepository;
     @Mock
     private OwnerPreferences ownerPreferences;
+    @Mock
+    private PreviewPanel previewPanel;
 
     @Mock
     private EntryEditorPreferences entryEditorPreferences;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        try(AutoCloseable mocks = MockitoAnnotations.openMocks(CommentsTabTest.class)) {
 
-        when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
-        when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
-        when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
-        when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(true);
-        when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
-        BibEntryType entryTypeMock = mock(BibEntryType.class);
-        when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
+            when(preferences.getOwnerPreferences()).thenReturn(ownerPreferences);
+            when(ownerPreferences.getDefaultOwner()).thenReturn(ownerName);
+            when(preferences.getEntryEditorPreferences()).thenReturn(entryEditorPreferences);
+            when(entryEditorPreferences.shouldShowUserCommentsFields()).thenReturn(true);
+            when(databaseContext.getMode()).thenReturn(BibDatabaseMode.BIBLATEX);
+            BibEntryType entryTypeMock = mock(BibEntryType.class);
+            when(entryTypesManager.enrich(any(), any())).thenReturn(Optional.of(entryTypeMock));
 
-        commentsTab = new CommentsTab(
-                preferences,
-                databaseContext,
-                suggestionProviders,
-                undoManager,
-                mock(UndoAction.class),
-                mock(RedoAction.class),
-                dialogService,
-                themeManager,
-                taskExecutor,
-                journalAbbreviationRepository,
-                mock(LuceneManager.class),
-                OptionalObjectProperty.empty()
-        );
+            commentsTab = new CommentsTab(
+                    preferences,
+                    databaseContext,
+                    suggestionProviders,
+                    undoManager,
+                    mock(UndoAction.class),
+                    mock(RedoAction.class),
+                    dialogService,
+                    taskExecutor,
+                    journalAbbreviationRepository,
+                    previewPanel);
+        } catch (Exception e) {
+            fail(e);
+        }
     }
 
     @Test

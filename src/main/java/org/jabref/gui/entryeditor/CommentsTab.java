@@ -21,20 +21,17 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
-import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 public class CommentsTab extends FieldsEditorTab {
@@ -52,13 +49,10 @@ public class CommentsTab extends FieldsEditorTab {
                        UndoAction undoAction,
                        RedoAction redoAction,
                        DialogService dialogService,
-                       ThemeManager themeManager,
                        TaskExecutor taskExecutor,
                        JournalAbbreviationRepository journalAbbreviationRepository,
-                       LuceneManager luceneManager,
-                       OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        super(
-                false,
+                       PreviewPanel previewPanel) {
+        super(false,
                 databaseContext,
                 suggestionProviders,
                 undoManager,
@@ -66,12 +60,9 @@ public class CommentsTab extends FieldsEditorTab {
                 redoAction,
                 dialogService,
                 preferences,
-                themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                luceneManager,
-                searchQueryProperty
-        );
+                previewPanel);
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
         setText(Localization.lang("Comments"));
         setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());

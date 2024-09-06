@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
@@ -31,21 +33,21 @@ public class ExternalFilesEntryLinker {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFilesEntryLinker.class);
 
     private final FilePreferences filePreferences;
-    private final BibDatabaseContext bibDatabaseContext;
+    private final Supplier<BibDatabaseContext> bibDatabaseContextSupplier;
     private final MoveFilesCleanup moveFilesCleanup;
     private final RenamePdfCleanup renameFilesCleanup;
     private final DialogService dialogService;
 
-    public ExternalFilesEntryLinker(FilePreferences filePreferences, BibDatabaseContext bibDatabaseContext, DialogService dialogService) {
+    public ExternalFilesEntryLinker(FilePreferences filePreferences, DialogService dialogService, StateManager stateManager) {
         this.filePreferences = filePreferences;
-        this.bibDatabaseContext = bibDatabaseContext;
-        this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContext, filePreferences);
-        this.renameFilesCleanup = new RenamePdfCleanup(false, bibDatabaseContext, filePreferences);
+        this.bibDatabaseContextSupplier = () -> stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
+        this.moveFilesCleanup = new MoveFilesCleanup(bibDatabaseContextSupplier, filePreferences);
+        this.renameFilesCleanup = new RenamePdfCleanup(false, bibDatabaseContextSupplier, filePreferences);
         this.dialogService = dialogService;
     }
 
     public Optional<Path> copyFileToFileDir(Path file) {
-        Optional<Path> firstExistingFileDir = bibDatabaseContext.getFirstExistingFileDir(filePreferences);
+        Optional<Path> firstExistingFileDir = bibDatabaseContextSupplier.get().getFirstExistingFileDir(filePreferences);
         if (firstExistingFileDir.isPresent()) {
             Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
             if (FileUtil.copyFile(file, targetFile, false)) {
@@ -69,7 +71,7 @@ public class ExternalFilesEntryLinker {
             FileUtil.getFileExtension(file).ifPresent(ext -> {
                 ExternalFileType type = ExternalFileTypes.getExternalFileTypeByExt(ext, filePreferences)
                                                          .orElse(new UnknownExternalFileType(ext));
-                Path relativePath = FileUtil.relativize(file, bibDatabaseContext, filePreferences);
+                Path relativePath = FileUtil.relativize(file, bibDatabaseContextSupplier.get(), filePreferences);
                 LinkedFile linkedfile = new LinkedFile("", relativePath, type.getName());
                 entry.addFile(linkedfile);
             });

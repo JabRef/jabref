@@ -65,8 +65,9 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         searchBarContainer.getChildren().addFirst(searchBar);
         HBox.setHgrow(searchBar, Priority.ALWAYS);
 
-        PreviewViewer previewViewer = new PreviewViewer(viewModel.getSearchDatabaseContext(), dialogService, preferencesService, themeManager, taskExecutor, stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH));
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferencesService, themeManager, taskExecutor, stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH));
         previewViewer.setLayout(preferencesService.getPreviewPreferences().getSelectedPreviewLayout());
+        previewViewer.setDatabaseContext(viewModel.getSearchDatabaseContext());
 
         SearchResultsTableDataModel model = new SearchResultsTableDataModel(viewModel.getSearchDatabaseContext(), preferencesService, stateManager, taskExecutor);
         SearchResultsTable resultsTable = new SearchResultsTable(model, viewModel.getSearchDatabaseContext(), preferencesService, undoManager, dialogService, stateManager, taskExecutor);

@@ -99,7 +99,8 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        PreviewViewer previewViewer = new PreviewViewer(database, dialogService, preferencesService, themeManager, taskExecutor);
+        PreviewViewer previewViewer = new PreviewViewer(dialogService, preferencesService, themeManager, taskExecutor);
+        previewViewer.setDatabaseContext(database);
         DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, themeManager, preferencesService, entryTypesManager, previewViewer, taskExecutor);
 
         viewModel = new ExternalChangesResolverViewModel(changes, undoManager);

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.model.FieldChange;
@@ -21,10 +22,10 @@ public class MoveFilesCleanup implements CleanupJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MoveFilesCleanup.class);
 
-    private final BibDatabaseContext databaseContext;
+    private final Supplier<BibDatabaseContext> databaseContext;
     private final FilePreferences filePreferences;
 
-    public MoveFilesCleanup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    public MoveFilesCleanup(Supplier<BibDatabaseContext> databaseContext, FilePreferences filePreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.filePreferences = Objects.requireNonNull(filePreferences);
     }
@@ -35,7 +36,7 @@ public class MoveFilesCleanup implements CleanupJob {
 
         boolean changed = false;
         for (LinkedFile file : files) {
-            LinkedFileHandler fileHandler = new LinkedFileHandler(file, entry, databaseContext, filePreferences);
+            LinkedFileHandler fileHandler = new LinkedFileHandler(file, entry, databaseContext.get(), filePreferences);
             try {
                 boolean fileChanged = fileHandler.moveToDefaultDirectory();
                 if (fileChanged) {

@@ -30,17 +30,13 @@ import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.preview.PreviewPanel;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -59,13 +55,10 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     private final RedoAction redoAction;
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final ThemeManager themeManager;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private PreviewPanel previewPanel;
+    private final PreviewPanel previewPanel;
     private final UndoManager undoManager;
-    private final LuceneManager luceneManager;
-    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private Collection<Field> fields = new ArrayList<>();
     @SuppressWarnings("FieldCanBeLocal")
     private Subscription dividerPositionSubscription;
@@ -78,11 +71,9 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                            RedoAction redoAction,
                            DialogService dialogService,
                            PreferencesService preferences,
-                           ThemeManager themeManager,
                            TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository,
-                           LuceneManager luceneManager,
-                           OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+                           PreviewPanel previewPanel) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
@@ -91,11 +82,9 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
         this.redoAction = redoAction;
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
-        this.themeManager = themeManager;
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
-        this.luceneManager = luceneManager;
-        this.searchQueryProperty = searchQueryProperty;
+        this.previewPanel = previewPanel;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -219,23 +208,18 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     protected void bindToEntry(BibEntry entry) {
         initPanel();
         setupPanel(entry, isCompressed);
-        if (previewPanel != null) {
-            previewPanel.setEntry(entry);
-        }
+        previewPanel.setDatabase(databaseContext);
+        previewPanel.setEntry(entry);
     }
 
     @Override
     public void nextPreviewStyle() {
-        if (previewPanel != null) {
-            previewPanel.nextPreviewStyle();
-        }
+        previewPanel.nextPreviewStyle();
     }
 
     @Override
     public void previousPreviewStyle() {
-        if (previewPanel != null) {
-            previewPanel.previousPreviewStyle();
-        }
+        previewPanel.previousPreviewStyle();
     }
 
     protected abstract SequencedSet<Field> determineFieldsToShow(BibEntry entry);
@@ -258,15 +242,6 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
             scrollPane.setFitToHeight(true);
 
             SplitPane container = new SplitPane(scrollPane);
-            previewPanel = new PreviewPanel(
-                    databaseContext,
-                    dialogService,
-                    preferences.getKeyBindingRepository(),
-                    preferences,
-                    themeManager,
-                    taskExecutor,
-                    luceneManager,
-                    searchQueryProperty);
             EasyBind.subscribe(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(), show -> {
                 if (show) {
                     container.getItems().remove(previewPanel);
