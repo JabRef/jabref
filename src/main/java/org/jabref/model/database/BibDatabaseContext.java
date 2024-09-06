@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
@@ -40,7 +39,7 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseContext.class);
 
     private final BibDatabase database;
     private MetaData metaData;
@@ -254,7 +253,7 @@ public class BibDatabaseContext {
     }
 
     /**
-     * @return The path to store the lucene index files and embeddings. One directory for each library.
+     * @return The path to store the lucene index files. One directory for each library.
      */
     @NonNull
     public Path getFulltextIndexPath() {
@@ -263,6 +262,7 @@ public class BibDatabaseContext {
 
         if (getDatabasePath().isPresent()) {
             Path databasePath = getDatabasePath().get();
+            // Eventually, this leads to filenames as "40daf3b0--fuu.bib--2022-09-04--01.36.25.bib" --> "--" is used as separator between "groups"
             String fileName = BackupFileUtil.getUniqueFilePrefix(databasePath) + "--" + databasePath.getFileName();
             indexPath = appData.resolve(fileName);
             LOGGER.debug("Index path for {} is {}", getDatabasePath().get(), indexPath);

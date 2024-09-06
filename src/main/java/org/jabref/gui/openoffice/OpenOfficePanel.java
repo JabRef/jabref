@@ -556,6 +556,10 @@ public class OpenOfficePanel {
                         ? Optional.of(new Update.SyncOptions(getBaseList()))
                         : Optional.empty();
 
+        // Sync options are non-null only when "Automatically sync bibliography when inserting citations" is enabled
+        if (syncOptions.isPresent() && preferencesService.getOpenOfficePreferences().getSyncWhenCiting()) {
+            syncOptions.get().setUpdateBibliography(true);
+        }
         ooBase.guiActionInsertEntry(entries,
                 bibDatabaseContext,
                 entryTypesManager,

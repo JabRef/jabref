@@ -219,7 +219,7 @@ public class DuplicateSearch extends SimpleCommand {
      */
     static class DuplicateSearchResult {
 
-        private final Map<Integer, BibEntry> toRemove = new HashMap<>();
+        private final Map<String, BibEntry> toRemove = new HashMap<>();
         private final List<BibEntry> toAdd = new ArrayList<>();
 
         private int duplicates = 0;
@@ -233,7 +233,8 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         public synchronized void remove(BibEntry entry) {
-            toRemove.put(System.identityHashCode(entry), entry);
+            // ADR-0038
+            toRemove.put(entry.getId(), entry);
             duplicates++;
         }
 
@@ -250,7 +251,8 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         public synchronized boolean isToRemove(BibEntry entry) {
-            return toRemove.containsKey(System.identityHashCode(entry));
+            // ADR-0038
+            return toRemove.containsKey(entry.getId());
         }
 
         public synchronized int getDuplicateCount() {

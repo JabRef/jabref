@@ -11,6 +11,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added probable search hits instead of exact matches. Sorting by hit score can be done by the new score table column. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- We added support finding LaTeX-encoded special characters based on plain Unicode and vice versa. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- When a search hits a file, the file icon of that entry is changed accordingly. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We added an AI-based chat for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
 - We added an AI-based summarization possibility for entries with linked PDF files. [#11430](https://github.com/JabRef/jabref/pull/11430)
 - We added support for selecting and using CSL Styles in JabRef's OpenOffice/LibreOffice integration for inserting bibliographic and in-text citations into a document. [#2146](https://github.com/JabRef/jabref/issues/2146), [#8893](https://github.com/JabRef/jabref/issues/8893)
@@ -28,6 +31,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- The search syntax is changed to [Apache Lucene syntax](https://lucene.apache.org/core/9_11_1/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#Overview) (also to be similar to the [online search syntax](https://docs.jabref.org/collect/import-using-online-bibliographic-database#search-syntax)). [#11542](https://github.com/JabRef/jabref/pull/11542/)
+- When searching using a regular expression, one needs to enclose the search string in `/`. [#11542](https://github.com/JabRef/jabref/pull/11542/)
+- A search in "any" fields ignores the [groups](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups). [#7996](https://github.com/JabRef/jabref/issues/7996)
 - When a communication error with an [online service](https://docs.jabref.org/collect/import-using-online-bibliographic-database) occurs, JabRef displays the HTTP error. [#11223](https://github.com/JabRef/jabref/issues/11223)
 - The Pubmed/Medline Plain importer now imports the PMID field as well [#11488](https://github.com/JabRef/jabref/issues/11488)
 - The 'Check for updates' menu bar button is now always enabled. [#11485](https://github.com/JabRef/jabref/pull/11485)
@@ -51,9 +57,18 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the entry preview highlight was not working when searching before opening the entry editor. [#11659](https://github.com/JabRef/jabref/pull/11659)
 - We fixed an issue where text in Dark mode inside "Citation information" was not readable. [#11512](https://github.com/JabRef/jabref/issues/11512)
 - We fixed an issue where the selection of an entry in the table lost after searching for a group. [#3176](https://github.com/JabRef/jabref/issues/3176)
+- We fixed the non-functionality of the option "Automatically sync bibliography when inserting citations" in the OpenOffice panel, when enabled in case of JStyles. [#11684](https://github.com/JabRef/jabref/issues/11684)
+- We fixed an issue where the library was not marked changed after a migration. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- We fixed an issue where rebuilding the full-text search index was not working. [#11374](https://github.com/JabRef/jabref/issues/11374)
+- We fixed an issue where the progress of indexing linked files showed an incorrect number of files. [#11378](https://github.com/JabRef/jabref/issues/11378)
+- We fixed an issue where the full-text search results were incomplete. [#8626](https://github.com/JabRef/jabref/issues/8626)
+- We fixed an issue where search result highlighting was incorrectly highlighting the boolean operators. [#11595](https://github.com/JabRef/jabref/issues/11595)
+- We fixed an issue where search result highlighting was broken at complex searches. [#8067](https://github.com/JabRef/jabref/issues/8067)
 
 ### Removed
 
+- We removed support for case-sensitive and exact search. [#11542](https://github.com/JabRef/jabref/pull/11542)
+- We removed the description of search strings. [#11542](https://github.com/JabRef/jabref/pull/11542)
 - We removed support for importing using the SilverPlatterImporter (`Record INSPEC`). [#11576](https://github.com/JabRef/jabref/pull/11576)
 
 

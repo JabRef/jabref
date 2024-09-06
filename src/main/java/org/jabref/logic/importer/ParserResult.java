@@ -153,7 +153,7 @@ public class ParserResult {
                 this.getMetaData().isEmpty();
     }
 
-    public boolean wasChangedOnMigration() {
+    public boolean getChangedOnMigration() {
         return changedOnMigration;
     }
 

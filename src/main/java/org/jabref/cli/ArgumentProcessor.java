@@ -15,6 +15,7 @@ import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -42,7 +43,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.search.DatabaseSearcher;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
@@ -52,6 +52,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -454,11 +455,17 @@ public class ArgumentProcessor {
         // $ stands for a blank
         ParserResult pr = loaded.getLast();
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
-        BibDatabase dataBase = pr.getDatabase();
 
         SearchPreferences searchPreferences = preferencesService.getSearchPreferences();
         SearchQuery query = new SearchQuery(searchTerm, searchPreferences.getSearchFlags());
-        List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
+
+        List<BibEntry> matches;
+        try {
+            matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), preferencesService.getFilePreferences()).getMatches();
+        } catch (IOException e) {
+            LOGGER.error("Error occurred when searching", e);
+            return false;
+        }
 
         // export matches
         if (!matches.isEmpty()) {

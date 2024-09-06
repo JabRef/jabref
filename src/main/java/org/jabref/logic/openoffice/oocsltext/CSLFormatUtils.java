@@ -29,6 +29,8 @@ public class CSLFormatUtils {
     public static final String DEFAULT_BIBLIOGRAPHY_TITLE = "References";
     public static final String DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = "Heading 2";
 
+    public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
+
     public static final CitationStyleOutputFormat OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 

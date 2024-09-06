@@ -34,7 +34,6 @@ import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.PdfIndexerManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
@@ -140,10 +139,10 @@ public class SaveDatabaseAction {
 
         Optional<Path> databasePath = context.getDatabasePath();
         if (databasePath.isPresent()) {
-            // Close AutosaveManager, BackupManager, and PdfIndexer for original library
+            // Close AutosaveManager, BackupManager, and LuceneManager for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());
-            PdfIndexerManager.shutdownIndexer(context);
+            libraryTab.closeLuceneManger();
         }
 
         // Set new location
@@ -161,14 +160,13 @@ public class SaveDatabaseAction {
             context.setDatabasePath(file);
             libraryTab.updateTabTitle(false);
 
-            // Reset (here: uninstall and install again) AutosaveManager and BackupManager for the new file name
+            // Reset (here: uninstall and install again) AutosaveManager, BackupManager and LuceneManager for the new file name
             libraryTab.resetChangeMonitor();
             libraryTab.installAutosaveManagerAndBackupManager();
-            // PdfIndexerManager does not need to be called; the method {@link org.jabref.logic.pdf.search.PdfIndexerManager.get()} is called if a new indexer is needed
+            libraryTab.createLuceneManager();
 
             preferences.getGuiPreferences().getFileHistory().newFile(file);
         }
-
         return saveResult;
     }
 

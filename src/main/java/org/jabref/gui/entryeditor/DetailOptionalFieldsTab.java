@@ -11,10 +11,10 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
-import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
@@ -29,10 +29,10 @@ public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
                                    DialogService dialogService,
                                    PreferencesService preferences,
                                    ThemeManager themeManager,
-                                   IndexingTaskManager indexingTaskManager,
                                    BibEntryTypesManager entryTypesManager,
                                    TaskExecutor taskExecutor,
                                    JournalAbbreviationRepository journalAbbreviationRepository,
+                                   LuceneManager luceneManager,
                                    OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(
                 Localization.lang("Optional fields 2"),
@@ -45,10 +45,10 @@ public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
                 dialogService,
                 preferences,
                 themeManager,
-                indexingTaskManager,
                 entryTypesManager,
                 taskExecutor,
                 journalAbbreviationRepository,
+                luceneManager,
                 searchQueryProperty
         );
     }

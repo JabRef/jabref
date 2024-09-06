@@ -73,6 +73,9 @@ public class MetaDataSerializer {
         metaData.getGroups().filter(root -> root.getNumberOfChildren() > 0).ifPresent(
                 root -> serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root)));
 
+        metaData.getGroupSearchSyntaxVersion().ifPresent(
+                version -> serializedMetaData.put(MetaData.GROUPS_SEARCH_SYNTAX_VERSION, version.toString()));
+
         // finally add all unknown meta data items to the serialization map
         Map<String, List<String>> unknownMetaData = metaData.getUnknownMetaData();
         for (Map.Entry<String, List<String>> entry : unknownMetaData.entrySet()) {

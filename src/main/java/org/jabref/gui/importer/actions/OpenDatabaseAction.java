@@ -55,8 +55,8 @@ public class OpenDatabaseAction extends SimpleCommand {
             new MergeReviewIntoCommentAction(),
             // Check for new custom entry types loaded from the BIB file:
             new CheckForNewEntryTypesAction(),
-            // AI chat history links BibEntry with citation key. When citation key is changed, chat history should be transferred from old citation key to new citation key
-            new ListenForCitationKeyChangeForAiAction());
+            // Migrate search groups from Search.g4 to Lucene syntax
+            new SearchGroupsMigrationAction());
 
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferencesService;
@@ -91,11 +91,6 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
     }
 
-    /**
-     * Go through the list of post open actions, and perform those that need to be performed.
-     *
-     * @param result     The result of the BIB file parse operation.
-     */
     public static void performPostOpenActions(ParserResult result, DialogService dialogService, PreferencesService preferencesService) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result, preferencesService)) {

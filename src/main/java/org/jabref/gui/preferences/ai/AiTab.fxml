@@ -183,7 +183,7 @@
                     <Button fx:id="temperatureHelp"
                             prefWidth="20.0"/>
                 </HBox>
-                <DoubleInputField
+                <TextField
                         fx:id="temperatureTextField"
                         HBox.hgrow="ALWAYS"/>
             </VBox>
@@ -211,7 +211,7 @@
                     <Button fx:id="ragMinScoreHelp"
                             prefWidth="20.0"/>
                 </HBox>
-                <DoubleInputField
+                <TextField
                         fx:id="ragMinScoreTextField"
                         HBox.hgrow="ALWAYS"/>
             </VBox>

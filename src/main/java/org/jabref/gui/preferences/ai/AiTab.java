@@ -21,7 +21,6 @@ import org.jabref.preferences.ai.EmbeddingModel;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.ResizableTextArea;
-import com.dlsc.unitfx.DoubleInputField;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
@@ -44,12 +43,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private TextField apiBaseUrlTextField;
     @FXML private SearchableComboBox<EmbeddingModel> embeddingModelComboBox;
     @FXML private ResizableTextArea instructionTextArea;
-    @FXML private DoubleInputField temperatureTextField;
+    @FXML private TextField temperatureTextField;
     @FXML private IntegerInputField contextWindowSizeTextField;
     @FXML private IntegerInputField documentSplitterChunkSizeTextField;
     @FXML private IntegerInputField documentSplitterOverlapSizeTextField;
     @FXML private IntegerInputField ragMaxResultsCountTextField;
-    @FXML private DoubleInputField ragMinScoreTextField;
+    @FXML private TextField ragMinScoreTextField;
 
     @FXML private Button enableAiHelp;
     @FXML private Button aiProviderHelp;
@@ -124,9 +123,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         instructionTextArea.textProperty().bindBidirectional(viewModel.instructionProperty());
         instructionTextArea.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        temperatureTextField.valueProperty().bindBidirectional(viewModel.temperatureProperty().asObject());
-        temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
-
         // bindBidirectional doesn't work well with number input fields ({@link IntegerInputField}, {@link DoubleInputField}),
         // so they are expanded into `addListener` calls.
 
@@ -138,17 +134,10 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             contextWindowSizeTextField.valueProperty().set(newValue == null ? 0 : newValue.intValue());
         });
 
-        temperatureTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
-            viewModel.temperatureProperty().set(newValue == null ? 0 : newValue);
-        });
-
-        viewModel.temperatureProperty().addListener((observable, oldValue, newValue) -> {
-            temperatureTextField.valueProperty().set(newValue == null ? 0 : newValue.doubleValue());
-        });
-
-        temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
-
         contextWindowSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
+
+        temperatureTextField.textProperty().bindBidirectional(viewModel.temperatureProperty());
+        temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         documentSplitterChunkSizeTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.documentSplitterChunkSizeProperty().set(newValue == null ? 0 : newValue);
@@ -180,14 +169,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         ragMaxResultsCountTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
-        ragMinScoreTextField.valueProperty().addListener((observable, oldValue, newValue) -> {
-            viewModel.ragMinScoreProperty().set(newValue == null ? 0.0 : newValue);
-        });
-
-        viewModel.ragMinScoreProperty().addListener((observable, oldValue, newValue) -> {
-            ragMinScoreTextField.valueProperty().set(newValue == null ? 0.0 : newValue.doubleValue());
-        });
-
+        ragMinScoreTextField.textProperty().bindBidirectional(viewModel.ragMinScoreProperty());
         ragMinScoreTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         Platform.runLater(() -> {
@@ -196,12 +178,14 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             visualizer.initVisualization(viewModel.getApiBaseUrlValidationStatus(), apiBaseUrlTextField);
             visualizer.initVisualization(viewModel.getEmbeddingModelValidationStatus(), embeddingModelComboBox);
             visualizer.initVisualization(viewModel.getSystemMessageValidationStatus(), instructionTextArea);
-            visualizer.initVisualization(viewModel.getTemperatureValidationStatus(), temperatureTextField);
+            visualizer.initVisualization(viewModel.getTemperatureTypeValidationStatus(), temperatureTextField);
+            visualizer.initVisualization(viewModel.getTemperatureRangeValidationStatus(), temperatureTextField);
             visualizer.initVisualization(viewModel.getMessageWindowSizeValidationStatus(), contextWindowSizeTextField);
             visualizer.initVisualization(viewModel.getDocumentSplitterChunkSizeValidationStatus(), documentSplitterChunkSizeTextField);
             visualizer.initVisualization(viewModel.getDocumentSplitterOverlapSizeValidationStatus(), documentSplitterOverlapSizeTextField);
             visualizer.initVisualization(viewModel.getRagMaxResultsCountValidationStatus(), ragMaxResultsCountTextField);
-            visualizer.initVisualization(viewModel.getRagMinScoreValidationStatus(), ragMinScoreTextField);
+            visualizer.initVisualization(viewModel.getRagMinScoreTypeValidationStatus(), ragMinScoreTextField);
+            visualizer.initVisualization(viewModel.getRagMinScoreRangeValidationStatus(), ragMinScoreTextField);
         });
 
         ActionFactory actionFactory = new ActionFactory();

@@ -177,11 +177,11 @@ public class EntryEditor extends BorderPane {
                 switch (event.getTransferMode()) {
                     case COPY -> {
                         LOGGER.debug("Mode COPY");
-                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, draggedFiles, libraryTab.getIndexingTaskManager());
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, draggedFiles, libraryTab.getLuceneManager());
                     }
                     case MOVE -> {
                         LOGGER.debug("Mode MOVE");
-                        fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, draggedFiles, libraryTab.getIndexingTaskManager());
+                        fileLinker.moveFilesToFileDirRenameAndAddToEntry(entry, draggedFiles, libraryTab.getLuceneManager());
                     }
                     case LINK -> {
                         LOGGER.debug("Mode LINK");
@@ -278,21 +278,21 @@ public class EntryEditor extends BorderPane {
     private List<EntryEditorTab> createTabs() {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
-        tabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, libraryTab.searchQueryProperty()));
+        tabs.add(new PreviewTab(databaseContext, dialogService, preferencesService, themeManager, taskExecutor, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
 
         // Required, optional (important+detail), deprecated, and "other" fields
-        tabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
-        tabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
-        tabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
-        tabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
-        tabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, libraryTab.getIndexingTaskManager(), bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
+        tabs.add(new RequiredFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+        tabs.add(new ImportantOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+        tabs.add(new DetailOptionalFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+        tabs.add(new DeprecatedFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
+        tabs.add(new OtherFieldsTab(databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, bibEntryTypesManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
 
         // Comment Tab: Tab for general and user-specific comments
-        tabs.add(new CommentsTab(preferencesService, databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
+        tabs.add(new CommentsTab(preferencesService, databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, themeManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
 
         Map<String, Set<Field>> entryEditorTabList = getAdditionalUserConfiguredTabs();
         for (Map.Entry<String, Set<Field>> tab : entryEditorTabList.entrySet()) {
-            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, libraryTab.getIndexingTaskManager(), taskExecutor, journalAbbreviationRepository, libraryTab.searchQueryProperty()));
+            tabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, libraryTab.getSuggestionProviders(), undoManager, undoAction, redoAction, dialogService, preferencesService, themeManager, taskExecutor, journalAbbreviationRepository, libraryTab.getLuceneManager(), libraryTab.searchQueryProperty()));
         }
 
         tabs.add(new MathSciNetTab());
@@ -313,9 +313,9 @@ public class EntryEditor extends BorderPane {
                 libraryTab.searchQueryProperty());
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(databaseContext, preferencesService, dialogService, directoryMonitorManager));
-        tabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, taskExecutor, libraryTab.searchQueryProperty()));
-        tabs.add(new AiSummaryTab(libraryTab.getLibraryTabContainer(), dialogService, preferencesService, aiApiKeyProvider, aiService, libraryTab.getBibDatabaseContext(), taskExecutor));
-        tabs.add(new AiChatTab(libraryTab.getLibraryTabContainer(), dialogService, preferencesService, aiApiKeyProvider, aiService, libraryTab.getBibDatabaseContext(), taskExecutor));
+        tabs.add(new FulltextSearchResultsTab(stateManager, preferencesService, dialogService, databaseContext, taskExecutor, libraryTab.searchQueryProperty()));
+        tabs.add(new AiSummaryTab(libraryTab.getBibDatabaseContext(), aiService, dialogService, preferencesService));
+        tabs.add(new AiChatTab(libraryTab.getBibDatabaseContext(), aiService, dialogService, preferencesService, taskExecutor));
 
         return tabs;
     }
