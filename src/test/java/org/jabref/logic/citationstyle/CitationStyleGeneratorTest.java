@@ -1,6 +1,8 @@
 package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -73,6 +75,14 @@ class CitationStyleGeneratorTest {
         String inTextCitationText = citation.getText();
 
         assertEquals("[Smit2016]", inTextCitationText);
+    }
+
+    @Test
+    void testMultiNumeric() throws  Exception {
+        context.setMode(BibDatabaseMode.BIBLATEX);
+        CitationStyle style = CitationStyle.getDefault();
+        List<String> citations = CitationStyleGenerator.generateInTextMulti(List.of(testEntry, TestEntry.getTestEntryBook() ), style.getSource(), CitationStyleOutputFormat.HTML, context, bibEntryTypesManager).stream().map(Citation::getText).toList();
+        assertEquals(List.of("[1], [2]"), citations );
     }
 
     @Test

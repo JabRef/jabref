@@ -57,6 +57,10 @@ public class CitationStyleGenerator {
         return CSL_ADAPTER.makeInText(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
     }
 
+    public static List<Citation> generateInTextMulti(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
+        return CSL_ADAPTER.makeInTextMulti(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
+    }
+
     /**
      * Generates the citation for multiple entries at once.
      *
