@@ -41,7 +41,7 @@ public class CSLUpdateBibliography {
                                        CitationStyle citationStyle,
                                        BibDatabaseContext bibDatabaseContext,
                                        BibEntryTypesManager bibEntryTypesManager)
-            throws Exception {
+            throws WrappedTargetException, NoDocumentException, CreationException {
         LOGGER.debug("Starting to rebuild CSL bibliography");
 
         // Ensure the bibliography section exists
@@ -87,7 +87,7 @@ public class CSLUpdateBibliography {
                                            CitationStyle citationStyle,
                                            BibDatabaseContext bibDatabaseContext,
                                            BibEntryTypesManager bibEntryTypesManager)
-            throws Exception {
+            throws WrappedTargetException, NoDocumentException, CreationException {
         LOGGER.debug("Populating CSL bibliography section");
 
         Optional<XTextRange> sectionRange = getBibliographyRange(doc);
