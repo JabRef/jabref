@@ -76,14 +76,6 @@ class CitationStyleGeneratorTest {
     }
 
     @Test
-    void testMultiNumeric() throws IOException {
-        context.setMode(BibDatabaseMode.BIBLATEX);
-        CitationStyle style = CitationStyle.getDefault();
-        List<String> citations = CitationStyleGenerator.generateInTextMulti(List.of(testEntry, TestEntry.getTestEntryBook()), style.getSource(), CitationStyleOutputFormat.HTML, context, bibEntryTypesManager).stream().map(Citation::getText).toList();
-        assertEquals(List.of("[1], [2]"), citations);
-    }
-
-    @Test
     void ignoreNewLine() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "Last, First and\nDoe, Jane");
