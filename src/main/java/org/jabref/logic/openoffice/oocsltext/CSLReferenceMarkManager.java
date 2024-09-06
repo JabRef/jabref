@@ -153,8 +153,4 @@ public class CSLReferenceMarkManager {
     public boolean hasCitationForKey(String citationKey) {
         return citationKeyToNumber.containsKey(citationKey);
     }
-
-    public List<CSLReferenceMark> getAllMarks() {
-        return new ArrayList<>(marksInOrder);
-    }
 }
