@@ -65,7 +65,7 @@ public class CSLReferenceMark {
         return referenceMark.getName();
     }
 
-    public void insertReferenceIntoOO(XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter, boolean withoutBrackets)
+    public void insertReferenceIntoOO(XTextDocument doc, XTextCursor position, OOText ooText, boolean insertSpaceBefore, boolean insertSpaceAfter)
             throws CreationException, WrappedTargetException {
         // Ensure the cursor is at the end of its range
         position.collapseToEnd();
@@ -113,32 +113,6 @@ public class CSLReferenceMark {
 
         // Move the original position cursor to the end of the inserted content
         position.gotoRange(cursorAfter.getEnd(), false);
-    }
-
-    public void delete() throws Exception {
-        XTextRange range = textContent.getAnchor();
-        range.setString("");
-        XTextContent xTextContent = UnoRuntime.queryInterface(XTextContent.class, textContent);
-        range.getText().removeTextContent(xTextContent);
-    }
-
-    public void select() throws Exception {
-        XTextRange range = textContent.getAnchor();
-        XTextCursor cursor = range.getText().createTextCursorByRange(range);
-        cursor.gotoRange(range, true);
-    }
-
-    public void setText(String textString, boolean isRich) throws Exception, CreationException {
-        XTextRange range = textContent.getAnchor();
-        XTextCursor cursor = range.getText().createTextCursorByRange(range);
-        cursor.setString("");
-        if (isRich) {
-            // Get the XTextDocument from the cursor's text
-            XTextDocument xTextDocument = UnoRuntime.queryInterface(XTextDocument.class, cursor.getText());
-            OOTextIntoOO.write(xTextDocument, cursor, OOText.fromString(textString));
-        } else {
-            cursor.setString(textString);
-        }
     }
 
     public void updateTextContent(XTextContent newTextContent) {

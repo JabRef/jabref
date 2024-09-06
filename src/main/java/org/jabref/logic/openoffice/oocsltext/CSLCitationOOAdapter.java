@@ -132,7 +132,7 @@ public class CSLCitationOOAdapter {
         for (BibEntry entry : entries) {
             CSLReferenceMark mark = markManager.createReferenceMark(entry);
             OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-            mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false, true);
+            mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false);
         }
 
         // Move the cursor to the end of the inserted text - although no need as we don't insert any text, but a good practice
@@ -213,7 +213,7 @@ public class CSLCitationOOAdapter {
 
         if (entries.size() == 1) {
             CSLReferenceMark mark = markManager.createReferenceMark(entries.getFirst());
-            mark.insertReferenceIntoOO(document, cursor, ooText, !preceedingSpaceExists, false, true);
+            mark.insertReferenceIntoOO(document, cursor, ooText, !preceedingSpaceExists, false);
         } else {
             if (!preceedingSpaceExists) {
                 cursor.getText().insertString(cursor, " ", false);
@@ -222,7 +222,7 @@ public class CSLCitationOOAdapter {
             for (BibEntry entry : entries) {
                 CSLReferenceMark mark = markManager.createReferenceMark(entry);
                 OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-                mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false, true);
+                mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false);
             }
         }
 
