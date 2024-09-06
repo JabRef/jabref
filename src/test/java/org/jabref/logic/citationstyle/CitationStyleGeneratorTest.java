@@ -76,7 +76,7 @@ class CitationStyleGeneratorTest {
     }
 
     @Test
-    void testMultiNumeric() throws IOException {
+    void multiNumeric() throws IOException {
         context.setMode(BibDatabaseMode.BIBLATEX);
         CitationStyle style = CitationStyle.getDefault();
         List<String> citations = CitationStyleGenerator.generateInTextMulti(List.of(testEntry, TestEntry.getTestEntryBook()), style.getSource(), CitationStyleOutputFormat.HTML, context, bibEntryTypesManager).stream().map(Citation::getText).toList();
