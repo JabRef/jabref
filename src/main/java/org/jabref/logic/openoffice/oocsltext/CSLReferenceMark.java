@@ -21,7 +21,7 @@ import io.github.thibaultmeyer.cuid.CUID;
 import static org.jabref.logic.openoffice.backend.NamedRangeReferenceMark.safeInsertSpacesBetweenReferenceMarks;
 
 public class CSLReferenceMark {
-    private final ReferenceMark referenceMark;
+    private ReferenceMark referenceMark;
     private XTextContent textContent;
     private final String citationKey;
     private int citationNumber;
@@ -140,5 +140,9 @@ public class CSLReferenceMark {
 
     public void updateTextContent(XTextContent newTextContent) {
         this.textContent = newTextContent;
+    }
+
+    public void updateName(String newName) {
+        this.referenceMark = new ReferenceMark(newName, this.citationKey, this.citationNumber, this.referenceMark.getUniqueId());
     }
 }

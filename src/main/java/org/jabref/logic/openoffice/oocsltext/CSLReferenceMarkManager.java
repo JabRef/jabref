@@ -18,6 +18,7 @@ import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XReferenceMarksSupplier;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextContent;
+import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextRangeCompare;
@@ -88,26 +89,47 @@ public class CSLReferenceMarkManager {
         XTextRange range = oldContent.getAnchor();
 
         if (range != null) {
+            XText text = range.getText();
+
+            // Store the position of the mark
+            XTextCursor cursor = text.createTextCursorByRange(range);
+
+            // Get the current text content
             String currentText = range.getString();
+
+            // Update the citation number in the text
             String updatedText = updateCitationText(currentText, newNumber);
 
-            // Remove the old reference mark
-            XText text = range.getText();
+            // Remove the old reference mark without removing the text
             text.removeTextContent(oldContent);
 
-            // Insert new text
-            range.setString(updatedText);
+            // Update the text
+            cursor.setString(updatedText);
 
-            // Create and insert a new reference mark
+            // Create a new reference mark with updated name
+            String updatedName = updateReferenceName(mark.getName(), newNumber);
             XNamed newNamed = UnoRuntime.queryInterface(XNamed.class,
                     factory.createInstance("com.sun.star.text.ReferenceMark"));
-            newNamed.setName(mark.getName());
+            newNamed.setName(updatedName);
             XTextContent newContent = UnoRuntime.queryInterface(XTextContent.class, newNamed);
-            newContent.attach(range);
 
-            // Update our internal reference to the new text content
+            // Attach the new reference mark to the cursor range
+            newContent.attach(cursor);
+
+            // Update our internal reference to the new text content and name
             mark.updateTextContent(newContent);
+            mark.updateName(updatedName);
+            mark.setCitationNumber(newNumber);
         }
+    }
+
+    private String updateReferenceName(String oldName, int newNumber) {
+        String[] parts = oldName.split(" ");
+        if (parts.length >= 2) {
+            parts[1] = "CID_" + newNumber;
+            return String.join(" ", parts);
+        }
+        return oldName;
     }
 
     private String updateCitationText(String currentText, int newNumber) {
