@@ -106,7 +106,7 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
         // Find non-covered special characters with alphabetic codes
         m = ESCAPED_PATTERN4.matcher(result);
         while (m.find()) {
-            LOGGER.warn("HTML escaped char not converted: " + m.group(1));
+            LOGGER.warn("HTML escaped char not converted: {}", m.group(1));
         }
 
         return result.trim();

@@ -366,7 +366,7 @@ public class FileUtil {
                              .filter(f -> f.getFileName().toString().equals(filename))
                              .findFirst();
         } catch (UncheckedIOException | IOException ex) {
-            LOGGER.error("Error trying to locate the file " + filename + " inside the directory " + rootDirectory);
+            LOGGER.error("Error trying to locate the file {} inside the directory {}", filename, rootDirectory);
         }
         return Optional.empty();
     }

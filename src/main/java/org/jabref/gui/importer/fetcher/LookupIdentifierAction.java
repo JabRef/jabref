@@ -82,7 +82,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
             try {
                 identifier = fetcher.findIdentifier(bibEntry);
             } catch (FetcherException e) {
-                LOGGER.error("Could not fetch " + fetcher.getIdentifierName(), e);
+                LOGGER.error("Could not fetch {}", fetcher.getIdentifierName(), e);
             }
             if (identifier.isPresent() && !bibEntry.hasField(identifier.get().getDefaultField())) {
                 Optional<FieldChange> fieldChange = bibEntry.setField(identifier.get().getDefaultField(), identifier.get().getNormalized());

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * And it also will store the embeddings.
  */
 public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEmbeddingsForSeveralTask.class);
 
     private final StringProperty name;
     private final List<ProcessingInfo<LinkedFile, Void>> linkedFiles;
