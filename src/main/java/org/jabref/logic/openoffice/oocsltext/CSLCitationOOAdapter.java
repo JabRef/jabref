@@ -208,6 +208,7 @@ public class CSLCitationOOAdapter {
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
+
         markManager.setUpdateRequired(isNumericStyle);
         readAndUpdateExistingMarks();
         cursor.collapseToEnd();
