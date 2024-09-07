@@ -858,7 +858,9 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when closing directory monitor", e);
         }
         try {
-            luceneManager.close();
+            if (luceneManager != null) {
+                luceneManager.close();
+            }
         } catch (RuntimeException e) {
             LOGGER.error("Problem when closing lucene indexer", e);
         }
