@@ -176,7 +176,6 @@ public class SharedDatabaseUIManager {
                 tabContainer,
                 dialogService,
                 preferencesService,
-                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,

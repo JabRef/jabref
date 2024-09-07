@@ -1,7 +1,6 @@
 package org.jabref.gui.maintable;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -54,7 +53,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.BibtexString;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
@@ -81,8 +79,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
-    private final ClipBoardManager clipBoardManager;
-    private final BibEntryTypesManager entryTypesManager;
     private final TaskExecutor taskExecutor;
     private final UndoManager undoManager;
     private final FilePreferences filePreferences;
@@ -108,8 +104,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.stateManager = stateManager;
         this.database = Objects.requireNonNull(database);
         this.model = model;
-        this.clipBoardManager = clipBoardManager;
-        this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
         this.undoManager = libraryTab.getUndoManager();
         this.filePreferences = preferencesService.getFilePreferences();
@@ -270,29 +264,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             getSelectionModel().select(entry);
             scrollTo(entry);
         });
-    }
-
-    public void copy() {
-        List<BibEntry> selectedEntries = getSelectedEntries();
-
-        if (!selectedEntries.isEmpty()) {
-            List<BibtexString> stringConstants = getUsedStringValues(selectedEntries);
-            try {
-                if (stringConstants.isEmpty()) {
-                    clipBoardManager.setContent(selectedEntries, entryTypesManager);
-                } else {
-                    clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);
-                }
-                dialogService.notify(Localization.lang("Copied %0 entry(ies)", selectedEntries.size()));
-            } catch (IOException e) {
-                LOGGER.error("Error while copying selected entries to clipboard.", e);
-            }
-        }
-    }
-
-    public void cut() {
-        copy();
-        libraryTab.delete(StandardActions.CUT);
     }
 
     private void scrollToNextMatchCategory() {
@@ -557,9 +528,5 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .stream()
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
-    }
-
-    private List<BibtexString> getUsedStringValues(List<BibEntry> entries) {
-        return database.getDatabase().getUsedStrings(entries);
     }
 }
