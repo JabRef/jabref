@@ -51,7 +51,7 @@ public class CSLAdapter {
         return Arrays.asList(bibliography.getEntries());
     }
 
-    public synchronized Citation makeInText(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
+    public synchronized Citation makeCitation(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
         dataProvider.setData(bibEntries, databaseContext, entryTypesManager);
         initialize(style, outputFormat);
         cslInstance.registerCitationItems(dataProvider.getIds());

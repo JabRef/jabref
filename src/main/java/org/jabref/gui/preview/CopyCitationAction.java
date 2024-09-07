@@ -88,7 +88,7 @@ public class CopyCitationAction extends SimpleCommand {
         }
 
         if (styleSource != null) {
-            return CitationStyleGenerator.generateCitations(
+            return CitationStyleGenerator.generateBibliographies(
                     selectedEntries,
                     styleSource,
                     outputFormat,

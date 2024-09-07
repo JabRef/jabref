@@ -58,7 +58,7 @@ public class CSLCitationOOAdapter {
         if (isAlphanumeric) {
             inTextCitation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
         } else {
-            inTextCitation = CitationStyleGenerator.generateInText(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
+            inTextCitation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
         }
 
         String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
@@ -68,7 +68,7 @@ public class CSLCitationOOAdapter {
         }
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-        insertMultipleReferenceMarks(cursor, entries, ooText);
+        insertReferences(cursor, entries, ooText);
         cursor.collapseToEnd();
     }
 
@@ -98,7 +98,7 @@ public class CSLCitationOOAdapter {
                 // Combine author name with the citation
                 inTextCitation = authorName + " " + inTextCitation;
             } else {
-                inTextCitation = CitationStyleGenerator.generateInText(List.of(currentEntry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
+                inTextCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
             }
             String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
             String finalText;
@@ -118,7 +118,7 @@ public class CSLCitationOOAdapter {
                 finalText += ",";
             }
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
-            insertMultipleReferenceMarks(cursor, List.of(currentEntry), ooText);
+            insertReferences(cursor, List.of(currentEntry), ooText);
             cursor.collapseToEnd();
         }
     }
@@ -156,7 +156,7 @@ public class CSLCitationOOAdapter {
             entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
 
             for (BibEntry entry : entries) {
-                String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
+                String citation = CitationStyleGenerator.generateBibliography(List.of(entry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
                 String citationKey = entry.getCitationKey().orElse("");
                 int currentNumber = markManager.getCitationNumber(citationKey);
 
@@ -172,7 +172,7 @@ public class CSLCitationOOAdapter {
             }
         } else {
             // Ordering will be according to citeproc item data provider (default)
-            List<String> citations = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            List<String> citations = CitationStyleGenerator.generateBibliography(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
 
             for (String citation : citations) {
                 String formattedCitation = CSLFormatUtils.transformHTML(citation);
@@ -184,9 +184,9 @@ public class CSLCitationOOAdapter {
     }
 
     /**
-     * Inserts multiple references and also adds a space before the citation if not already present ("smart space").
+     * Inserts references and also adds a space before the citation if not already present ("smart space").
      */
-    private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText)
+    private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText)
             throws CreationException, Exception {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
