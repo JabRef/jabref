@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.TaskExecutor;
@@ -21,7 +20,7 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class RedownloadMissingFilesAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedownloadMissingFilesAction.class);
 
     private final StateManager stateManager;
     private final DialogService dialogService;

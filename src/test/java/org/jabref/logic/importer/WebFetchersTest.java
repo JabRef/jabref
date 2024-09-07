@@ -35,7 +35,10 @@ import static org.mockito.Mockito.mock;
 class WebFetchersTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebFetchersTest.class);
-    private static final Set<String> IGNORED_INACCESSIBLE_FETCHERS = Set.of("ArXivFetcher$ArXiv");
+
+    private static final Set<String> IGNORED_INACCESSIBLE_FETCHERS = Set.of(
+            "org.jabref.logic.importer.fetcher.ArXivFetcher$ArXiv",
+            "org.jabref.logic.importer.FulltextFetchersTest$FulltextFetcherWithTrustLevel");
 
     private ImportFormatPreferences importFormatPreferences;
     private ImporterPreferences importerPreferences;
@@ -49,7 +52,7 @@ class WebFetchersTest {
 
     private Set<Class<?>> getIgnoredInaccessibleClasses() {
         return IGNORED_INACCESSIBLE_FETCHERS.stream()
-                     .map(className -> "org.jabref.logic.importer.fetcher." + className)
+                     .map(className -> "" + className)
                      .map(classPath -> {
                          try {
                              return Class.forName(classPath);

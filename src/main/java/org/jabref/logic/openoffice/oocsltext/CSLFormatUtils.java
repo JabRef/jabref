@@ -36,7 +36,7 @@ public class CSLFormatUtils {
 
     /**
      * Transforms provided HTML into a format that can be fully parsed and inserted into an OO document.
-     * Context: The HTML produced by {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation} or {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateInText(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateInText} is not directly (completely) parsable by by {@link OOTextIntoOO#write(XTextDocument, XTextCursor, OOText) write}.
+     * Context: The HTML produced by {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} or {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation} is not directly (completely) parsable by by {@link OOTextIntoOO#write(XTextDocument, XTextCursor, OOText) write}.
      * For more details, read the documentation for the {@link OOTextIntoOO} class.
      * <a href="https://devdocs.jabref.org/code-howtos/openoffice/code-reorganization.html">Additional Information</a>.
      *
@@ -76,7 +76,7 @@ public class CSLFormatUtils {
     }
 
     /**
-     * Alphanumeric citations are not natively supported by citeproc-java (see {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateInText(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateInText}).
+     * Alphanumeric citations are not natively supported by citeproc-java (see {@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation}).
      * Thus, we manually format a citation to produce its alphanumeric form.
      *
      * @param entries the list of entries for which the alphanumeric citation is to be generated.
@@ -113,7 +113,7 @@ public class CSLFormatUtils {
 
     /**
      * Method to update citation number of a bibliographic entry (to be inserted in the list of references).
-     * By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateCitation(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateCitation} always start the numbering of a list of citations with "1".
+     * By default, citeproc-java ({@link org.jabref.logic.citationstyle.CitationStyleGenerator#generateBibliography(List, String, CitationStyleOutputFormat, BibDatabaseContext, BibEntryTypesManager) generateBibliography} always start the numbering of a list of citations with "1".
      * If a citation doesn't correspond to the first cited entry, the number should be changed to the relevant current citation number.
      * If an entries has been cited before, the colder number should be reused.
      * The number can be enclosed in different formats, such as "1", "1.", "1)", "(1)" or "[1]".

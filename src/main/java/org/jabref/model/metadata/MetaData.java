@@ -19,6 +19,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.field.Field;
@@ -46,6 +47,7 @@ public class MetaData {
     public static final String VERSION_DB_STRUCT = "VersionDBStructure";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
+    public static final String GROUPS_SEARCH_SYNTAX_VERSION = "groups-search-syntax-version";
     public static final String FILE_DIRECTORY = "fileDirectory";
     public static final String FILE_DIRECTORY_LATEX = "fileDirectoryLatex";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
@@ -62,8 +64,11 @@ public class MetaData {
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
     private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
+
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
     private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
+    private Optional<Version> groupSearchSyntaxVersion = Optional.empty();
+
     private Charset encoding;
     private SaveOrder saveOrder;
     private String defaultCiteKeyPattern;
@@ -111,6 +116,15 @@ public class MetaData {
         root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
         eventBus.post(new GroupUpdatedEvent(this));
         postChange();
+    }
+
+    public void setGroupSearchSyntaxVersion(Version version) {
+        groupSearchSyntaxVersion = Optional.of(version);
+        postChange();
+    }
+
+    public Optional<Version> getGroupSearchSyntaxVersion() {
+        return this.groupSearchSyntaxVersion;
     }
 
     /**

@@ -28,13 +28,13 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
-import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 public class CommentsTab extends FieldsEditorTab {
@@ -53,9 +53,9 @@ public class CommentsTab extends FieldsEditorTab {
                        RedoAction redoAction,
                        DialogService dialogService,
                        ThemeManager themeManager,
-                       IndexingTaskManager indexingTaskManager,
                        TaskExecutor taskExecutor,
                        JournalAbbreviationRepository journalAbbreviationRepository,
+                       LuceneManager luceneManager,
                        OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(
                 false,
@@ -69,7 +69,7 @@ public class CommentsTab extends FieldsEditorTab {
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                indexingTaskManager,
+                luceneManager,
                 searchQueryProperty
         );
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");

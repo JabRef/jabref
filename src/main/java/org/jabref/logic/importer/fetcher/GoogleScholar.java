@@ -106,7 +106,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
                 if (!target.isEmpty() && new URLDownload(target).isPdf()) {
                     // TODO: check title inside pdf + length?
                     // TODO: report error function needed?! query -> result
-                    LOGGER.info("Fulltext PDF found @ Google: " + target);
+                    LOGGER.info("Fulltext PDF found @ Google: {}", target);
                     pdfLink = Optional.of(new URL(target));
                     break;
                 }

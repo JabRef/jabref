@@ -3,10 +3,8 @@ package org.jabref.benchmarks;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -18,7 +16,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -32,7 +29,6 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -105,16 +101,14 @@ public class Benchmarks {
 
     @Benchmark
     public List<BibEntry> search() {
-        // FIXME: Reuse SearchWorker here
-        SearchQuery searchQuery = new SearchQuery("Journal Title 500", EnumSet.noneOf(SearchFlags.class));
-        return database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList());
+        // TODO: Create Benchmark for LuceneSearch
+        return List.of();
     }
 
     @Benchmark
-    public List<BibEntry> parallelSearch() {
-        // FIXME: Reuse SearchWorker here
-        SearchQuery searchQuery = new SearchQuery("Journal Title 500", EnumSet.noneOf(SearchFlags.class));
-        return database.getEntries().parallelStream().filter(searchQuery::isMatch).collect(Collectors.toList());
+    public List<BibEntry> index() {
+        // TODO: Create Benchmark for LuceneIndexer
+        return List.of();
     }
 
     @Benchmark

@@ -46,7 +46,7 @@ public class ClearEmbeddingsAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Clearing embeddings cache..."));
 
-        List<LinkedFile> linkedFile = stateManager
+        List<LinkedFile> linkedFiles = stateManager
                 .getActiveDatabase()
                 .get()
                 .getDatabase()
@@ -55,7 +55,7 @@ public class ClearEmbeddingsAction extends SimpleCommand {
                 .flatMap(entry -> entry.getFiles().stream())
                 .toList();
 
-        BackgroundTask.wrap(() -> aiService.getEmbeddingsManager().clearEmbeddingsFor(linkedFile))
+        BackgroundTask.wrap(() -> aiService.getIngestionService().clearEmbeddingsFor(linkedFiles))
                       .executeWith(taskExecutor);
     }
 }

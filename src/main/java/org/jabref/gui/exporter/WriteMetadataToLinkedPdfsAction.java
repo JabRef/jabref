@@ -198,7 +198,7 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
                     String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
 
             if (!failedWrittenFiles.isEmpty()) {
-                LOGGER.error("Failed to write XMP data to PDFs:\n" + failedWrittenFiles);
+                LOGGER.error("Failed to write XMP data to PDFs:\n{}", failedWrittenFiles);
             }
 
             return null;

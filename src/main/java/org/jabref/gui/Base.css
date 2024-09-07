@@ -1496,3 +1496,24 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 0.5em 2em;
     -fx-min-width: 10em;
 }
+
+.chat-message-text-area {
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+/* region: fix for making text area round corners (source: https://stackoverflow.com/a/49617953) */
+
+.chat-message-text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.chat-message-text-area .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.chat-message-text-area .scroll-pane .content {
+    -fx-background-color: transparent;
+}
+
+/* endregion */

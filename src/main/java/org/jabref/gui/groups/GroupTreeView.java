@@ -58,6 +58,7 @@ import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -74,30 +75,25 @@ import org.slf4j.LoggerFactory;
 public class GroupTreeView extends BorderPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeView.class);
-
     private static final PseudoClass PSEUDOCLASS_ANYSELECTED = PseudoClass.getPseudoClass("any-selected");
     private static final PseudoClass PSEUDOCLASS_ALLSELECTED = PseudoClass.getPseudoClass("all-selected");
     private static final PseudoClass PSEUDOCLASS_ROOTELEMENT = PseudoClass.getPseudoClass("root");
     private static final PseudoClass PSEUDOCLASS_SUBELEMENT = PseudoClass.getPseudoClass("sub"); // > 1 deep
 
-    private static final double SCROLL_SPEED_UP = 3.0;
+    private final StateManager stateManager;
+    private final DialogService dialogService;
+    private final AiService aiService;
+    private final TaskExecutor taskExecutor;
+    private final PreferencesService preferencesService;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
     private CustomTextField searchField;
-
-    private final StateManager stateManager;
-    private final DialogService dialogService;
-    private final TaskExecutor taskExecutor;
-    private final PreferencesService preferencesService;
-
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
-
     private DragExpansionHandler dragExpansionHandler;
-
     private Timer scrollTimer;
     private double scrollVelocity = 0;
     private double scrollableAreaHeight;
@@ -111,11 +107,14 @@ public class GroupTreeView extends BorderPane {
     public GroupTreeView(TaskExecutor taskExecutor,
                          StateManager stateManager,
                          PreferencesService preferencesService,
-                         DialogService dialogService) {
+                         DialogService dialogService,
+                         AiService aiService
+    ) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
+        this.aiService = aiService;
 
         createNodes();
         this.getStylesheets().add(Objects.requireNonNull(GroupTreeView.class.getResource("GroupTree.css")).toExternalForm());
@@ -165,7 +164,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferencesService, taskExecutor, localDragboard);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -550,6 +549,10 @@ public class GroupTreeView extends BorderPane {
             removeGroup = factory.createMenuItem(StandardActions.GROUP_REMOVE, new GroupTreeView.ContextAction(StandardActions.GROUP_REMOVE, group));
         }
 
+        if (preferencesService.getAiPreferences().getEnableAi()) {
+            contextMenu.getItems().add(factory.createMenuItem(StandardActions.GROUP_CHAT, new ContextAction(StandardActions.GROUP_CHAT, group)));
+        }
+
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_EDIT, new ContextAction(StandardActions.GROUP_EDIT, group)),
                 removeGroup,
@@ -665,6 +668,8 @@ public class GroupTreeView extends BorderPane {
                     viewModel.editGroup(group);
                     groupTree.refresh();
                 }
+                case GROUP_CHAT ->
+                    viewModel.chatWithGroup(group);
                 case GROUP_SUBGROUP_ADD ->
                         viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);
                 case GROUP_SUBGROUP_REMOVE ->

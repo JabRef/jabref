@@ -193,6 +193,7 @@ public enum StandardActions implements Action {
     GROUP_REMOVE(Localization.lang("Remove group")),
     GROUP_REMOVE_KEEP_SUBGROUPS(Localization.lang("Keep subgroups")),
     GROUP_REMOVE_WITH_SUBGROUPS(Localization.lang("Also remove subgroups")),
+    GROUP_CHAT(Localization.lang("Chat with group")),
     GROUP_EDIT(Localization.lang("Edit group")),
     GROUP_SUBGROUP_ADD(Localization.lang("Add subgroup")),
     GROUP_SUBGROUP_REMOVE(Localization.lang("Remove subgroups")),

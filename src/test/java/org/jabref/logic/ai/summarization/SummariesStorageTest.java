@@ -4,53 +4,51 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.jabref.preferences.ai.AiPreferences;
 import org.jabref.preferences.ai.AiProvider;
 
-import org.h2.mvstore.MVStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SummariesStorageTest {
-
+abstract class SummariesStorageTest {
     @TempDir Path tempDir;
 
-    private MVStore mvStore;
     private SummariesStorage summariesStorage;
     private Path bibPath;
 
+    abstract SummariesStorage makeSummariesStorage(Path path);
+
+    abstract void close(SummariesStorage summariesStorage);
+
     @BeforeEach
     void setUp() {
-        mvStore = MVStore.open(tempDir.resolve("test.mv").toString());
         bibPath = tempDir.resolve("test.bib");
-        summariesStorage = new SummariesStorage(Mockito.mock(AiPreferences.class), mvStore);
+        summariesStorage = makeSummariesStorage(tempDir.resolve("test.bib"));
     }
 
     private void reopen() {
-        mvStore.close();
+        close(summariesStorage);
         setUp();
     }
 
     @AfterEach
     void tearDown() {
-        mvStore.close();
+        close(summariesStorage);
     }
 
     @Test
     void set() {
-        summariesStorage.set(bibPath, "citationKey", new SummariesStorage.SummarizationRecord(LocalDateTime.now(), AiProvider.OPEN_AI, "model", "contents"));
+        summariesStorage.set(bibPath, "citationKey", new Summary(LocalDateTime.now(), AiProvider.OPEN_AI, "model", "contents"));
         reopen();
-        assertEquals(Optional.of("contents"), summariesStorage.get(bibPath, "citationKey").map(SummariesStorage.SummarizationRecord::content));
+        assertEquals(Optional.of("contents"), summariesStorage.get(bibPath, "citationKey").map(Summary::content));
     }
 
     @Test
     void clear() {
-        summariesStorage.set(bibPath, "citationKey", new SummariesStorage.SummarizationRecord(LocalDateTime.now(), AiProvider.OPEN_AI, "model", "contents"));
+        summariesStorage.set(bibPath, "citationKey", new Summary(LocalDateTime.now(), AiProvider.OPEN_AI, "model", "contents"));
         reopen();
         summariesStorage.clear(bibPath, "citationKey");
         reopen();

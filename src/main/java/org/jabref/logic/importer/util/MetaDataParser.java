@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -129,6 +130,9 @@ public class MetaDataParser {
                 metaData.setSaveOrder(SaveOrder.parse(values));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
                 metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
+            } else if (entry.getKey().equals(MetaData.GROUPS_SEARCH_SYNTAX_VERSION)) {
+                Version version = Version.parse(getSingleItem(values));
+                metaData.setGroupSearchSyntaxVersion(version);
             } else if (entry.getKey().equals(MetaData.VERSION_DB_STRUCT)) {
                 metaData.setVersionDBStructure(getSingleItem(values));
             } else {

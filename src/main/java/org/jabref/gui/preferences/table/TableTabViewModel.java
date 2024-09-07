@@ -123,6 +123,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
         availableColumnsProperty.clear();
         availableColumnsProperty.addAll(
+                new MainTableColumnModel(MainTableColumnModel.Type.MATCH_SCORE),
                 new MainTableColumnModel(MainTableColumnModel.Type.INDEX),
                 new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER),
                 new MainTableColumnModel(MainTableColumnModel.Type.GROUPS),

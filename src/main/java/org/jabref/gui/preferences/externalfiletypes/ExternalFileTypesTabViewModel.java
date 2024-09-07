@@ -8,7 +8,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.exporter.CreateModifyExporterDialogViewModel;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -20,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CreateModifyExporterDialogViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFileTypesTabViewModel.class);
     private final ObservableList<ExternalFileTypeItemViewModel> fileTypes = FXCollections.observableArrayList();
 
     private final FilePreferences filePreferences;

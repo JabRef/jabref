@@ -46,4 +46,9 @@ class BracesCorrectorTest {
     void inputWithMixedBraces() {
         assertEquals("{b{anana\\\\\\}}}", BracesCorrector.apply("{b{anana\\\\\\}"));
     }
+
+    @Test
+    void inputUnbalanced() {
+        assertEquals("{{ban}ana}", BracesCorrector.apply("ban}ana}"));
+    }
 }

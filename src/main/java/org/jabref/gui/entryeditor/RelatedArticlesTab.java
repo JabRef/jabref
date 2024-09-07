@@ -146,7 +146,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                     try {
                         JabRefDesktop.openBrowser(entry.getField(StandardField.URL).get(), preferencesService.getFilePreferences());
                     } catch (IOException e) {
-                        LOGGER.error("Error opening the browser to: " + entry.getField(StandardField.URL).get(), e);
+                        LOGGER.error("Error opening the browser to: {}", entry.getField(StandardField.URL).get(), e);
                         dialogService.showErrorDialogAndWait(e);
                     }
                 }

@@ -48,18 +48,18 @@ class MainTableDataModelTest {
         BibEntry bibEntryAuthorT = new BibEntry().withField(StandardField.AUTHOR, "T");
         entries.add(bibEntryAuthorT);
 
-        List<BibEntry> result = entriesFilteredAndSorted.stream().map(entry -> entry.getEntry()).toList();
+        List<BibEntry> result = entriesFilteredAndSorted.stream().map(BibEntryTableViewModel::getEntry).toList();
         assertEquals(List.of(bibEntryAuthorT), result);
 
         BibEntry bibEntryNothingToZ = new BibEntry();
         entries.add(bibEntryNothingToZ);
-        result = entriesFilteredAndSorted.stream().map(entry -> entry.getEntry()).toList();
+        result = entriesFilteredAndSorted.stream().map(BibEntryTableViewModel::getEntry).toList();
         assertEquals(List.of(bibEntryNothingToZ, bibEntryAuthorT), result);
 
         changed[0] = false;
         bibEntryNothingToZ.setField(StandardField.AUTHOR, "Z");
         assertTrue(changed[0]);
-        result = entriesFilteredAndSorted.stream().map(entry -> entry.getEntry()).toList();
+        result = entriesFilteredAndSorted.stream().map(BibEntryTableViewModel::getEntry).toList();
         assertEquals(List.of(bibEntryAuthorT, bibEntryNothingToZ), result);
     }
 }

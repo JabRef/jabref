@@ -343,6 +343,13 @@ License: MIT
 ```
 
 ```yaml
+Id:io.github.adr:e-adr
+Project:EmbeddedArchitecturalDecisionRecords
+URL:https://github.com/adr/e-adr/
+License:EPL-2.0
+```
+
+```yaml
 Id:      io.github.java-diff-utils:java-diff-utils
 Project: java-diff-utils
 URL:     https://github.com/java-diff-utils/java-diff-utils
