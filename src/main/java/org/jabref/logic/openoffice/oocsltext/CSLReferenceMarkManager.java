@@ -104,7 +104,7 @@ public class CSLReferenceMarkManager {
         try {
             return r1 != null && r2 != null ? textRangeCompare.compareRegionStarts(r1, r2) : 0;
         } catch (IllegalArgumentException e) {
-            LOGGER.warn("Error comparing text ranges: {}", e.getMessage());
+            LOGGER.warn("Error comparing text ranges: {}", e.getMessage(), e);
             return 0;
         }
     }
