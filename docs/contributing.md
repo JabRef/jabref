@@ -114,5 +114,3 @@ For improving developer's documentation, go on at the [docs/ subdirectory of Jab
 GitHub offers a good guide at [Editing files in another user's repository](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-another-users-repository).
 
 One can also add [callouts](https://just-the-docs.github.io/just-the-docs-tests/components/callouts/).
-
-<!-- markdownlint-disable-file MD001 -->
