@@ -83,7 +83,7 @@ public class MrDLibImporter extends Importer {
                 stringBuilder.append(line);
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("", e);
         }
         return stringBuilder.toString();
     }

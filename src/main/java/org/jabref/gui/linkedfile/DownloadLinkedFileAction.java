@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 
 public class DownloadLinkedFileAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadLinkedFileAction.class);
 
     private final DialogService dialogService;
     private final BibEntry entry;

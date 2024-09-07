@@ -21,7 +21,7 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class RedownloadMissingFilesAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedownloadMissingFilesAction.class);
 
     private final StateManager stateManager;
     private final DialogService dialogService;

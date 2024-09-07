@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  */
 public abstract class NewLibraryFromPdfAction extends SimpleCommand {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfAction .class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfAction.class);
 
     protected final PreferencesService preferencesService;
 

@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CreateModifyExporterDialogViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFileTypesTabViewModel.class);
     private final ObservableList<ExternalFileTypeItemViewModel> fileTypes = FXCollections.observableArrayList();
 
     private final FilePreferences filePreferences;

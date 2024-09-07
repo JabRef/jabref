@@ -19,7 +19,7 @@ public class FallbackExceptionHandler implements Thread.UncaughtExceptionHandler
 
     @Override
     public void uncaughtException(Thread thread, Throwable exception) {
-        LOGGER.error("Uncaught exception occurred in " + thread, exception);
+        LOGGER.error("Uncaught exception occurred in {}", thread, exception);
         UiTaskExecutor.runInJavaFXThread(() -> {
                     DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
                     dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
