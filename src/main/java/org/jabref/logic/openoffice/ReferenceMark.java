@@ -68,6 +68,9 @@ public class ReferenceMark {
         return name;
     }
 
+    /**
+     * The BibTeX citation keys
+     */
     public List<String> getCitationKeys() {
         return citationKeys;
     }
