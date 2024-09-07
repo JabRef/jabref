@@ -23,6 +23,9 @@ public class ReferenceMark {
     private List<Integer> citationNumbers;
     private String uniqueId;
 
+    /**
+     * @param name Format: <code>JABREF_{citationKey} CID_{citationNumber} {uniqueId}</code>
+     */
     public ReferenceMark(String name) {
         this.name = name;
         parse(name);
