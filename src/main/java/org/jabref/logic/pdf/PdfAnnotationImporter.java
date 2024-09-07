@@ -72,7 +72,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             return false;
         }
         if ("Link".equals(annotation.getSubtype()) || "Widget".equals(annotation.getSubtype())) {
-            LOGGER.debug(annotation.getSubtype() + " is excluded from the supported file annotations");
+            LOGGER.debug("{} is excluded from the supported file annotations", annotation.getSubtype());
             return false;
         }
         try {

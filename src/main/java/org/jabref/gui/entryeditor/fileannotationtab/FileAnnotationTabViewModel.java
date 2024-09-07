@@ -97,7 +97,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         try {
             fileMonitor.addListenerForFile(currentFile, fileListener);
         } catch (IOException e) {
-            LOGGER.error("Problem while watching file for changes " + currentFile, e);
+            LOGGER.error("Problem while watching file for changes {}", currentFile, e);
         }
     }
 

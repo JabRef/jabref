@@ -69,7 +69,7 @@ public class AbbreviateAction extends SimpleCommand {
             case ABBREVIATE_DEFAULT -> abbreviationType = AbbreviationType.DEFAULT;
             case ABBREVIATE_DOTLESS -> abbreviationType = AbbreviationType.DOTLESS;
             case ABBREVIATE_SHORTEST_UNIQUE -> abbreviationType = AbbreviationType.SHORTEST_UNIQUE;
-            default -> LOGGER.debug("Unknown action: " + action.name());
+            default -> LOGGER.debug("Unknown action: {}", action.name());
         }
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -92,7 +92,7 @@ public class AbbreviateAction extends SimpleCommand {
                                   .onSuccess(dialogService::notify)
                                   .executeWith(taskExecutor));
         } else {
-            LOGGER.debug("Unknown action: " + action.name());
+            LOGGER.debug("Unknown action: {}", action.name());
         }
     }
 

@@ -95,7 +95,7 @@ public class MarcXmlParser implements Parser {
         List<Element> datafields = getChildren("datafield", element);
         for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
-            LOGGER.debug("tag: " + tag);
+            LOGGER.debug("tag: {}", tag);
 
             if ("020".equals(tag)) {
                 putIsbn(bibEntry, datafield);
@@ -146,7 +146,7 @@ public class MarcXmlParser implements Parser {
 
         int length = isbn.length();
         if (length != 10 && length != 13) {
-            LOGGER.debug("Malformed ISBN recieved, length: " + length);
+            LOGGER.debug("Malformed ISBN recieved, length: {}", length);
             return;
         }
 

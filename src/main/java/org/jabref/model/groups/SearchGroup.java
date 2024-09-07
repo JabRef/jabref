@@ -91,8 +91,7 @@ public class SearchGroup extends AbstractGroup {
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
-            LOGGER.error("Internal error in SearchGroup.deepCopy(). "
-                    + "Please report this on https://github.com/JabRef/jabref/issues", t);
+            LOGGER.error("Internal error in SearchGroup.deepCopy(). " + "Please report this on https://github.com/JabRef/jabref/issues", t);
             return null;
         }
     }

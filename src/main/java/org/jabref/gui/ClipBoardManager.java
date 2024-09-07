@@ -110,7 +110,7 @@ public class ClipBoardManager {
                 try {
                     return (String) contents.getTransferData(DataFlavor.stringFlavor);
                 } catch (UnsupportedFlavorException | IOException e) {
-                    LOGGER.warn(e.getMessage());
+                    LOGGER.warn("", e);
                 }
             }
         }
