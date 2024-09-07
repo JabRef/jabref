@@ -186,7 +186,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .filter(column -> column.getModel().equals(columnModel))
                     .findFirst()
                     .ifPresent(column -> {
-                        LOGGER.debug("Adding sort order for col {} ", column);
+                        LOGGER.trace("Adding sort order for col {} ", column);
                         this.getSortOrder().add(column);
                     }));
 
@@ -201,7 +201,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
 
-        this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
+        this.getStylesheets().add(Objects.requireNonNull(MainTable.class.getResource("MainTable.css")).toExternalForm());
 
         // Store visual state
         new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();
