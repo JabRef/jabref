@@ -68,12 +68,8 @@ public class CSLCitationOOAdapter {
         }
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-        insertReferences(cursor, entries, ooText);
+        insertReferences(cursor, entries, ooText, selectedStyle.isNumericStyle());
         cursor.collapseToEnd();
-        if (selectedStyle.isNumericStyle()) {
-            markManager.setUpdateRequired(true);
-        }
-        readAndUpdateExistingMarks();
     }
 
     /**
@@ -122,12 +118,8 @@ public class CSLCitationOOAdapter {
                 finalText += ",";
             }
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
-            insertReferences(cursor, List.of(currentEntry), ooText);
+            insertReferences(cursor, List.of(currentEntry), ooText, selectedStyle.isNumericStyle());
             cursor.collapseToEnd();
-            if (selectedStyle.isNumericStyle()) {
-                markManager.setUpdateRequired(true);
-            }
-            readAndUpdateExistingMarks();
         }
     }
 
@@ -137,16 +129,11 @@ public class CSLCitationOOAdapter {
      */
     public void insertEmpty(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries)
             throws CreationException, Exception {
-        CSLReferenceMark mark = markManager.createReferenceMark(entries);
         OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-        mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false);
+        insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle());
 
         // Move the cursor to the end of the inserted text - although no need as we don't insert any text, but a good practice
         cursor.collapseToEnd();
-        if (selectedStyle.isNumericStyle()) {
-            markManager.setUpdateRequired(true);
-        }
-        readAndUpdateExistingMarks();
     }
 
     /**
@@ -198,7 +185,7 @@ public class CSLCitationOOAdapter {
     /**
      * Inserts references and also adds a space before the citation if not already present ("smart space").
      */
-    private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText)
+    private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText, boolean isNumericStyle)
             throws CreationException, Exception {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
@@ -220,6 +207,9 @@ public class CSLCitationOOAdapter {
         mark.insertReferenceIntoOO(document, cursor, ooText, !preceedingSpaceExists, false);
 
         // Move the cursor to the end of the inserted text
+        cursor.collapseToEnd();
+        markManager.setUpdateRequired(isNumericStyle);
+        readAndUpdateExistingMarks();
         cursor.collapseToEnd();
     }
 
