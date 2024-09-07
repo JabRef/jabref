@@ -89,11 +89,11 @@ open module org.jabref {
     // dependency injection using HK2
     requires org.glassfish.hk2.api;
 
-    // region: http clients
-    requires unirest.java.core;
-    requires unirest.modules.gson;
+    // region HTTP clients
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
+    requires unirest.java.core;
+    requires unirest.modules.gson;
     // endregion
 
     // region: SQL databases
