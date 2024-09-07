@@ -663,6 +663,18 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseRecognizesFieldsWithQuotationMarksInBrackets() throws IOException {
+        ParserResult result = parser
+                .parse(new StringReader("@article{test,title=\"Comments on {\"}Filenames and Fonts{\"}\"}"));
+
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("test")
+                .withField(StandardField.TITLE, "Comments on {\"}Filenames and Fonts{\"}");
+
+        assertEquals(List.of(expected), result.getDatabase().getEntries());
+    }
+
+    @Test
     void parseIgnoresAndWarnsAboutEntryWithFieldsThatAreNotSeperatedByComma() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author={Ed von Test} year=2005}"));
