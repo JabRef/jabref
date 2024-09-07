@@ -34,8 +34,8 @@ public class EprintCleanup implements CleanupJob {
                     normalizedEprint += "v" + version.get();
                 }
 
-                if (institution.isPresent()) {
-                    entry.setField(StandardField.INSTITUTION, "tbd")
+                if (institution.isPresent() && institution.get().equalsIgnoreCase("arxiv")) {
+                    entry.clearField(StandardField.INSTITUTION)
                          .ifPresent(changes::add);
                 }
 
