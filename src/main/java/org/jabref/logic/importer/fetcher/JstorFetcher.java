@@ -132,9 +132,4 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     public TrustLevel getTrustLevel() {
         return TrustLevel.META_SEARCH;
     }
-
-    @Override
-    public void doPostCleanup(BibEntry entry) {
-        // do nothing
-    }
 }
