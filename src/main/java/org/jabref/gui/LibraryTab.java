@@ -471,27 +471,6 @@ public class LibraryTab extends Tab {
         }
     }
 
-    public void insertEntry(final BibEntry bibEntry) {
-        if (bibEntry != null) {
-            insertEntries(Collections.singletonList(bibEntry));
-        }
-    }
-
-    public void insertEntries(final List<BibEntry> entries) {
-        if (!entries.isEmpty()) {
-            importHandler.importCleanedEntries(entries);
-
-            // Create an UndoableInsertEntries object.
-            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-
-            markBaseChanged();
-            if (preferencesService.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
-                showAndEdit(entries.getFirst());
-            }
-            clearAndSelect(entries.getFirst());
-        }
-    }
-
     public void editEntryAndFocusField(BibEntry entry, Field field) {
         showAndEdit(entry);
         Platform.runLater(() -> {
@@ -897,8 +876,27 @@ public class LibraryTab extends Tab {
                 stateManager));
     }
 
-    public void copy() {
-        int entriesCopied = doCopy(getSelectedEntries());
+    public void insertEntry(final BibEntry bibEntry) {
+        insertEntries(List.of(bibEntry));
+    }
+
+    public void insertEntries(final List<BibEntry> entries) {
+        if (!entries.isEmpty()) {
+            importHandler.importCleanedEntries(entries);
+
+            // Create an UndoableInsertEntries object.
+            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+
+            markBaseChanged();
+            if (preferencesService.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
+                showAndEdit(entries.getFirst());
+            }
+            clearAndSelect(entries.getFirst());
+        }
+    }
+
+    public void copyEntry() {
+        int entriesCopied = doCopyEntry(getSelectedEntries());
         if (entriesCopied >= 0) {
             dialogService.notify(Localization.lang("Copied %0 entry(ies)", entriesCopied));
         } else {
@@ -906,7 +904,7 @@ public class LibraryTab extends Tab {
         }
     }
 
-    private int doCopy(List<BibEntry> selectedEntries) {
+    private int doCopyEntry(List<BibEntry> selectedEntries) {
         if (!selectedEntries.isEmpty()) {
             List<BibtexString> stringConstants = bibDatabaseContext.getDatabase().getUsedStrings(selectedEntries);
             try {
@@ -925,7 +923,7 @@ public class LibraryTab extends Tab {
         return 0;
     }
 
-    public void paste() {
+    public void pasteEntry() {
         List<BibEntry> entriesToAdd;
         String content = ClipBoardManager.getContents();
         entriesToAdd = importHandler.handleBibTeXData(content);
@@ -959,8 +957,8 @@ public class LibraryTab extends Tab {
         importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
     }
 
-    public void cut() {
-        int entriesCopied = doCopy(getSelectedEntries());
+    public void cutEntry() {
+        int entriesCopied = doCopyEntry(getSelectedEntries());
         int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
 
         if (entriesCopied == entriesDeleted) {
@@ -975,7 +973,7 @@ public class LibraryTab extends Tab {
     /**
      * Removes the selected entries and files linked to selected entries from the database
      */
-    public void delete() {
+    public void deleteEntry() {
         int entriesDeleted = doDeleteEntry(StandardActions.DELETE_ENTRY, mainTable.getSelectedEntries());
         dialogService.notify(Localization.lang("Deleted %0 entry(ies)", entriesDeleted));
     }
