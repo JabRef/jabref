@@ -113,6 +113,6 @@ public class FulltextFetchers {
     private List<Callable<Optional<FetcherResult>>> getCallables(BibEntry entry, Set<FulltextFetcher> fetchers) {
         return fetchers.stream()
                        .map(f -> getCallable(entry, f))
-                       .collect(Collectors.toList());
+                       .toList();
     }
 }
