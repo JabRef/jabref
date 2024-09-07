@@ -130,7 +130,7 @@ public abstract class NativeDesktop {
             try {
                 hostName = InetAddress.getLocalHost().getHostName();
             } catch (UnknownHostException e) {
-                LoggerFactory.getLogger(OS.class).info("Hostname not found. Using \"localhost\" as fallback.", e);
+                LoggerFactory.getLogger(NativeDesktop.class).info("Hostname not found. Using \"localhost\" as fallback.", e);
                 hostName = "localhost";
             }
         }

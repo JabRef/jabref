@@ -30,7 +30,5 @@ public interface FulltextFetcher {
      *
      * @return The trust level of the fetcher, the higher the better
      */
-    default TrustLevel getTrustLevel() {
-        return TrustLevel.UNKNOWN;
-    }
+    TrustLevel getTrustLevel();
 }

@@ -110,7 +110,7 @@ public final class BstCaseChanger {
                 sb.append(c[i]);
                 i++;
                 if (braceLevel == 0) {
-                    LOGGER.warn("Too many closing braces in string: " + s);
+                    LOGGER.warn("Too many closing braces in string: {}", s);
                 } else {
                     braceLevel--;
                 }
@@ -125,7 +125,7 @@ public final class BstCaseChanger {
             i++;
         }
         if (braceLevel > 0) {
-            LOGGER.warn("No enough closing braces in string: " + s);
+            LOGGER.warn("No enough closing braces in string: {}", s);
         }
         return sb.toString();
     }
@@ -204,7 +204,7 @@ public final class BstCaseChanger {
                 }
                 break;
             default:
-                LOGGER.info("convertAccented - Unknown format: " + format);
+                LOGGER.info("convertAccented - Unknown format: {}", format);
                 break;
         }
         return pos;
@@ -222,7 +222,7 @@ public final class BstCaseChanger {
                 pos++;
             }
             default ->
-                    LOGGER.info("convertNonControl - Unknown format: " + format);
+                    LOGGER.info("convertNonControl - Unknown format: {}", format);
         }
         return pos;
     }
@@ -247,7 +247,7 @@ public final class BstCaseChanger {
             case ALL_UPPERS ->
                     sb.append(Character.toUpperCase(c[i]));
             default ->
-                    LOGGER.info("convertCharIfBraceLevelIsZero - Unknown format: " + format);
+                    LOGGER.info("convertCharIfBraceLevelIsZero - Unknown format: {}", format);
         }
         i++;
         return i;

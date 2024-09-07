@@ -66,7 +66,7 @@ public class IacrEprint implements Identifier {
             return Optional.of(uri);
         } catch (URISyntaxException e) {
             // should never happen
-            LOGGER.error(iacrEprint + " could not be encoded as URI.", e);
+            LOGGER.error("{} could not be encoded as URI.", iacrEprint, e);
             return Optional.empty();
         }
     }

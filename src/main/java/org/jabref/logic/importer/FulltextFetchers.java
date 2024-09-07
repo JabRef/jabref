@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -113,6 +112,6 @@ public class FulltextFetchers {
     private List<Callable<Optional<FetcherResult>>> getCallables(BibEntry entry, Set<FulltextFetcher> fetchers) {
         return fetchers.stream()
                        .map(f -> getCallable(entry, f))
-                       .collect(Collectors.toList());
+                       .toList();
     }
 }

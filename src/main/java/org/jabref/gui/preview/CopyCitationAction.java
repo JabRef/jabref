@@ -88,7 +88,7 @@ public class CopyCitationAction extends SimpleCommand {
         }
 
         if (styleSource != null) {
-            return CitationStyleGenerator.generateCitations(
+            return CitationStyleGenerator.generateBibliographies(
                     selectedEntries,
                     styleSource,
                     outputFormat,
@@ -170,7 +170,7 @@ public class CopyCitationAction extends SimpleCommand {
                 case HTML -> content = processHtml(citations);
                 case TEXT -> content = processText(citations);
                 default -> {
-                    LOGGER.warn("unknown output format: '" + outputFormat + "', processing it via the default.");
+                    LOGGER.warn("unknown output format: '{}', processing it via the default.", outputFormat);
                     content = processText(citations);
                 }
             }

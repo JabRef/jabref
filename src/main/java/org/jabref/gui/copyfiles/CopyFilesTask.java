@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CopyFilesAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CopyFilesTask.class);
     private static final String LOGFILE_PREFIX = "copyFileslog_";
     private static final String LOGFILE_EXT = ".log";
     private final BibDatabaseContext databaseContext;

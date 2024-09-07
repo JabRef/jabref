@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * API is documented at http://unpaywall.org/api/v2
  */
 public class OpenAccessDoi implements FulltextFetcher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenAccessDoi.class);
 
     private static final String API_URL = "https://api.oadoi.org/v2/";
 

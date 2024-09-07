@@ -113,4 +113,9 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
 
         return Optional.empty();
     }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
+    }
 }
