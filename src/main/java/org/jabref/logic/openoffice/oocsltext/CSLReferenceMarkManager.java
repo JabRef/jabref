@@ -92,34 +92,12 @@ public class CSLReferenceMarkManager {
     }
 
     private void sortMarksInOrder() {
-        List<CSLReferenceMark> validMarks = new ArrayList<>();
-        for (CSLReferenceMark mark : marksInOrder) {
-            if (isValidMark(mark)) {
-                validMarks.add(mark);
-            }
-        }
-
-        validMarks.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
-
-        marksInOrder.clear();
-        marksInOrder.addAll(validMarks);
-    }
-
-    private boolean isValidMark(CSLReferenceMark mark) {
-        XTextContent content = mark.getTextContent();
-        if (content == null) {
-            return false;
-        }
-        XTextRange range = content.getAnchor();
-        return range != null && range.getText() != null;
+        marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
     }
 
     private int compareTextRanges(XTextRange r1, XTextRange r2) {
         try {
-            if (r1 == null || r2 == null) {
-                throw new IllegalArgumentException("One of the text ranges is null");
-            }
-            return textRangeCompare.compareRegionStarts(r1, r2);
+            return r1 != null && r2 != null ? textRangeCompare.compareRegionStarts(r1, r2) : 0;
         } catch (IllegalArgumentException e) {
             LOGGER.warn("Error comparing text ranges: {}", e.getMessage());
             return 0;
