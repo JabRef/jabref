@@ -44,16 +44,11 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
-import org.jabref.logic.importer.FetcherClientException;
-import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -72,16 +67,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private static final PseudoClass NOT_MATCHING_SEARCH_AND_GROUPS = PseudoClass.getPseudoClass("not-matching-search-and-groups");
 
     private final LibraryTab libraryTab;
-    private final DialogService dialogService;
     private final StateManager stateManager;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
-
-    private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
     private final TaskExecutor taskExecutor;
     private final UndoManager undoManager;
     private final FilePreferences filePreferences;
+    private final ImportHandler importHandler;
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
@@ -96,28 +89,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      ClipBoardManager clipBoardManager,
                      BibEntryTypesManager entryTypesManager,
                      TaskExecutor taskExecutor,
-                     FileUpdateMonitor fileUpdateMonitor) {
+                     ImportHandler importHandler) {
         super();
 
         this.libraryTab = libraryTab;
-        this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.database = Objects.requireNonNull(database);
         this.model = model;
         this.taskExecutor = taskExecutor;
         this.undoManager = libraryTab.getUndoManager();
         this.filePreferences = preferencesService.getFilePreferences();
+        this.importHandler = importHandler;
 
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
-
-        importHandler = new ImportHandler(
-                database,
-                preferencesService,
-                fileUpdateMonitor,
-                undoManager,
-                stateManager,
-                dialogService,
-                taskExecutor);
 
         localDragboard = stateManager.getLocalDragboard();
 
@@ -372,39 +356,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         getSelectionModel().clearSelection();
         getSelectionModel().selectLast();
         scrollTo(getItems().size() - 1);
-    }
-
-    public void paste() {
-        List<BibEntry> entriesToAdd;
-        String content = ClipBoardManager.getContents();
-        entriesToAdd = importHandler.handleBibTeXData(content);
-        if (entriesToAdd.isEmpty()) {
-            entriesToAdd = handleNonBibTeXStringData(content);
-        }
-        if (entriesToAdd.isEmpty()) {
-            return;
-        }
-
-        importHandler.importEntriesWithDuplicateCheck(database, entriesToAdd);
-    }
-
-    private List<BibEntry> handleNonBibTeXStringData(String data) {
-        try {
-            return this.importHandler.handleStringData(data);
-        } catch (FetcherException exception) {
-            if (exception instanceof FetcherClientException) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Look up identifier"), Localization.lang("No data was found for the identifier"));
-            } else if (exception instanceof FetcherServerException) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Look up identifier"), Localization.lang("Server not available"));
-            } else {
-                dialogService.showErrorDialogAndWait(exception);
-            }
-            return List.of();
-        }
-    }
-
-    public void dropEntry(List<BibEntry> entriesToAdd) {
-        importHandler.importEntriesWithDuplicateCheck(database, entriesToAdd);
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {
