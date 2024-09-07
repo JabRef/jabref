@@ -12,3 +12,5 @@ To enable simple editing and resending of previous messages, <kbd>Cursor Up</kbd
 This should only happen if the current text field is empty.
 
 Needs: impl
+
+<!-- markdownlint-disable-file MD022 -->
