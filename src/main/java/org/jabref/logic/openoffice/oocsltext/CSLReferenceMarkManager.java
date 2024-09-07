@@ -38,7 +38,7 @@ public class CSLReferenceMarkManager {
     private final Map<String, CSLReferenceMark> marksByName = new HashMap<>();
     private final List<CSLReferenceMark> marksInOrder = new ArrayList<>();
     private Map<String, Integer> citationKeyToNumber = new HashMap<>();
-    private XTextRangeCompare textRangeCompare;
+    private final XTextRangeCompare textRangeCompare;
     private int highestCitationNumber = 0;
 
     public CSLReferenceMarkManager(XTextDocument document) {
