@@ -17,31 +17,25 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
-import org.jabref.logic.importer.fileformat.medline.ArticleId;
-import org.jabref.logic.importer.fileformat.medline.OtherId;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
@@ -105,8 +99,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
             String str;
             int i = 0;
-            while (((str = reader.readLine()) != null)) {
-                if (str.toLowerCase(Locale.ROOT).contains("CitaviExchangeData")){
+            while ((str = reader.readLine()) != null) {
+                if (str.toLowerCase(Locale.ROOT).contains("citaviexchangedata")) {
                     return true;
                 }
                 i++;
@@ -139,7 +133,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             } else {
                 return ParserResult.fromErrorMessage("File does not start with xml tag.");
             }
-        } catch(XMLStreamException e) {
+        } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
