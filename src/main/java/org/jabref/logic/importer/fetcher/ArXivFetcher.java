@@ -380,7 +380,6 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         return arXiv.getIdentifierName();
     }
 
-
     /**
      * Fetcher for the arXiv.
      *
