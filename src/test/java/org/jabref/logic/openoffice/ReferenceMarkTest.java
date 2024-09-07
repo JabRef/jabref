@@ -17,8 +17,8 @@ class ReferenceMarkTest {
     void validParsing(String name, String expectedCitationKey, String expectedCitationNumber, String expectedUniqueId) {
         ReferenceMark referenceMark = new ReferenceMark(name);
 
-        assertEquals(expectedCitationKey, referenceMark.getCitationKey());
-        assertEquals(expectedCitationNumber, String.valueOf(referenceMark.getCitationNumber()));
+        assertEquals(expectedCitationKey, referenceMark.getCitationKeys());
+        assertEquals(expectedCitationNumber, String.valueOf(referenceMark.getCitationNumbers()));
         assertEquals(expectedUniqueId, referenceMark.getUniqueId());
     }
 

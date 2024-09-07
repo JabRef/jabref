@@ -129,11 +129,9 @@ public class CSLCitationOOAdapter {
      */
     public void insertEmpty(XTextCursor cursor, List<BibEntry> entries)
             throws CreationException, Exception {
-        for (BibEntry entry : entries) {
-            CSLReferenceMark mark = markManager.createReferenceMark(entry);
-            OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-            mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false);
-        }
+        CSLReferenceMark mark = markManager.createReferenceMark(entries);
+        OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
+        mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false);
 
         // Move the cursor to the end of the inserted text - although no need as we don't insert any text, but a good practice
         cursor.collapseToEnd();
@@ -212,18 +210,14 @@ public class CSLCitationOOAdapter {
         }
 
         if (entries.size() == 1) {
-            CSLReferenceMark mark = markManager.createReferenceMark(entries.getFirst());
+            CSLReferenceMark mark = markManager.createReferenceMark(entries);
             mark.insertReferenceIntoOO(document, cursor, ooText, !preceedingSpaceExists, false);
         } else {
             if (!preceedingSpaceExists) {
                 cursor.getText().insertString(cursor, " ", false);
             }
-            OOTextIntoOO.write(document, cursor, ooText);
-            for (BibEntry entry : entries) {
-                CSLReferenceMark mark = markManager.createReferenceMark(entry);
-                OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-                mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false);
-            }
+            CSLReferenceMark mark = markManager.createReferenceMark(entries);
+            mark.insertReferenceIntoOO(document, cursor, ooText, false, false);
         }
 
         // Move the cursor to the end of the inserted text

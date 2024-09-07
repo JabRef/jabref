@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.openoffice.ReferenceMark;
 import org.jabref.model.entry.BibEntry;
@@ -46,10 +47,16 @@ public class CSLReferenceMarkManager {
         this.textRangeCompare = UnoRuntime.queryInterface(XTextRangeCompare.class, document.getText());
     }
 
-    public CSLReferenceMark createReferenceMark(BibEntry entry) throws Exception {
-        String citationKey = entry.getCitationKey().orElse(CUID.randomCUID2(8).toString());
-        int citationNumber = getCitationNumber(citationKey);
-        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKey, citationNumber, factory);
+    public CSLReferenceMark createReferenceMark(List<BibEntry> entries) throws Exception {
+        List<String> citationKeys = entries.stream()
+                                           .map(entry -> entry.getCitationKey().orElse(CUID.randomCUID2(8).toString()))
+                                           .collect(Collectors.toList());
+
+        List<Integer> citationNumbers = citationKeys.stream()
+                                                    .map(this::getCitationNumber)
+                                                    .collect(Collectors.toList());
+
+        CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKeys, citationNumbers, factory);
         marksByName.put(referenceMark.getName(), referenceMark);
         marksInOrder.add(referenceMark);
         updateAllCitationNumbers();
@@ -62,28 +69,56 @@ public class CSLReferenceMarkManager {
         int currentNumber = 1;
 
         for (CSLReferenceMark mark : marksInOrder) {
-            String citationKey = mark.getCitationKey();
-            int assignedNumber;
-            if (newCitationKeyToNumber.containsKey(citationKey)) {
-                assignedNumber = newCitationKeyToNumber.get(citationKey);
-            } else {
-                assignedNumber = currentNumber;
-                newCitationKeyToNumber.put(citationKey, assignedNumber);
-                currentNumber++;
+            List<String> citationKeys = mark.getCitationKeys();
+            List<Integer> assignedNumbers = new ArrayList<>();
+
+            for (String citationKey : citationKeys) {
+                int assignedNumber;
+                if (newCitationKeyToNumber.containsKey(citationKey)) {
+                    assignedNumber = newCitationKeyToNumber.get(citationKey);
+                } else {
+                    assignedNumber = currentNumber;
+                    newCitationKeyToNumber.put(citationKey, assignedNumber);
+                    currentNumber++;
+                }
+                assignedNumbers.add(assignedNumber);
             }
-            mark.setCitationNumber(assignedNumber);
-            updateMarkText(mark, assignedNumber);
+
+            mark.setCitationNumbers(assignedNumbers);
+            updateMarkText(mark, assignedNumbers);
         }
 
         citationKeyToNumber = newCitationKeyToNumber;
     }
 
     private void sortMarksInOrder() {
-        marksInOrder.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
+        List<CSLReferenceMark> validMarks = new ArrayList<>();
+        for (CSLReferenceMark mark : marksInOrder) {
+            if (isValidMark(mark)) {
+                validMarks.add(mark);
+            }
+        }
+
+        validMarks.sort((m1, m2) -> compareTextRanges(m2.getTextContent().getAnchor(), m1.getTextContent().getAnchor()));
+
+        marksInOrder.clear();
+        marksInOrder.addAll(validMarks);
+    }
+
+    private boolean isValidMark(CSLReferenceMark mark) {
+        XTextContent content = mark.getTextContent();
+        if (content == null) {
+            return false;
+        }
+        XTextRange range = content.getAnchor();
+        return range != null && range.getText() != null;
     }
 
     private int compareTextRanges(XTextRange r1, XTextRange r2) {
         try {
+            if (r1 == null || r2 == null) {
+                throw new IllegalArgumentException("One of the text ranges is null");
+            }
             return textRangeCompare.compareRegionStarts(r1, r2);
         } catch (IllegalArgumentException e) {
             LOGGER.warn("Error comparing text ranges: {}", e.getMessage());
@@ -91,7 +126,7 @@ public class CSLReferenceMarkManager {
         }
     }
 
-    private void updateMarkText(CSLReferenceMark mark, int newNumber) throws Exception {
+    private void updateMarkText(CSLReferenceMark mark, List<Integer> newNumbers) throws Exception {
         XTextContent oldContent = mark.getTextContent();
         XTextRange range = oldContent.getAnchor();
 
@@ -104,8 +139,8 @@ public class CSLReferenceMarkManager {
             // Get the current text content
             String currentText = range.getString();
 
-            // Update the citation number in the text
-            String updatedText = updateCitationText(currentText, newNumber);
+            // Update the citation numbers in the text
+            String updatedText = updateCitationText(currentText, newNumbers);
 
             // Remove the old reference mark without removing the text
             text.removeTextContent(oldContent);
@@ -114,7 +149,7 @@ public class CSLReferenceMarkManager {
             cursor.setString(updatedText);
 
             // Create a new reference mark with updated name
-            String updatedName = updateReferenceName(mark.getName(), newNumber);
+            String updatedName = updateReferenceName(mark.getName(), newNumbers);
             XNamed newNamed = UnoRuntime.queryInterface(XNamed.class,
                     factory.createInstance("com.sun.star.text.ReferenceMark"));
             newNamed.setName(updatedName);
@@ -126,28 +161,42 @@ public class CSLReferenceMarkManager {
             // Update our internal reference to the new text content and name
             mark.updateTextContent(newContent);
             mark.updateName(updatedName);
-            mark.setCitationNumber(newNumber);
+            mark.setCitationNumbers(newNumbers);
         }
     }
 
-    private String updateReferenceName(String oldName, int newNumber) {
+    private String updateReferenceName(String oldName, List<Integer> newNumbers) {
         String[] parts = oldName.split(" ");
-        if (parts.length == 3) {
-            parts[1] = ReferenceMark.PREFIXES[1] + newNumber;
-            return String.join(" ", parts);
+        if (parts.length >= 3) {
+            StringBuilder newName = new StringBuilder();
+            for (int i = 0; i < parts.length - 1; i += 2) {
+                if (i > 0) {
+                    newName.append(", ");
+                }
+                newName.append(parts[i]).append(" ");
+                newName.append(ReferenceMark.PREFIXES[1]).append(newNumbers.get(i / 2));
+            }
+            newName.append(" ").append(parts[parts.length - 1]);
+            return newName.toString();
         }
         return oldName;
     }
 
-    private String updateCitationText(String currentText, int newNumber) {
+    private String updateCitationText(String currentText, List<Integer> newNumbers) {
         Pattern pattern = Pattern.compile("(\\D*)(\\d+)(\\D*)");
         Matcher matcher = pattern.matcher(currentText);
-        if (matcher.find()) {
-            String prefix = matcher.group(1);
-            String suffix = matcher.group(3);
-            return prefix + newNumber + suffix;
+        StringBuilder result = new StringBuilder();
+        int lastEnd = 0;
+        int numberIndex = 0;
+
+        while (matcher.find()) {
+            result.append(currentText, lastEnd, matcher.start(2));
+            result.append(newNumbers.get(numberIndex++));
+            lastEnd = matcher.end(2);
         }
-        return currentText;
+        result.append(currentText.substring(lastEnd));
+
+        return result.toString();
     }
 
     public int getCitationNumber(String citationKey) {
@@ -166,20 +215,28 @@ public class CSLReferenceMarkManager {
             if (name.startsWith(ReferenceMark.PREFIXES[0]) && name.contains(ReferenceMark.PREFIXES[1])) {
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
 
-                String[] parts = name.split(" ");
-                if (parts.length == 3 && parts[0].startsWith(ReferenceMark.PREFIXES[0]) && parts[1].startsWith(ReferenceMark.PREFIXES[1])) {
-                    String citationKey = parts[0].substring(ReferenceMark.CITATION_KEY_BEGIN_POSITION);
-                    int citationNumber = Integer.parseInt(parts[1].substring(ReferenceMark.CITATION_ID_BEGIN_POSITION));
-                    String uniqueId = parts[2];
-                    CSLReferenceMark mark = new CSLReferenceMark(named, new ReferenceMark(name, citationKey, citationNumber, uniqueId));
+                ReferenceMark referenceMark = new ReferenceMark(name);
+                List<String> citationKeys = referenceMark.getCitationKeys();
+                List<Integer> citationNumbers = referenceMark.getCitationNumbers();
+
+                if (!citationKeys.isEmpty() && !citationNumbers.isEmpty()) {
+                    CSLReferenceMark mark = new CSLReferenceMark(named, referenceMark);
                     marksByName.put(name, mark);
                     marksInOrder.add(mark);
-                    highestCitationNumber = Math.max(highestCitationNumber, citationNumber);
+
+                    for (int i = 0; i < citationKeys.size(); i++) {
+                        String key = citationKeys.get(i);
+                        int number = citationNumbers.get(i);
+                        citationKeyToNumber.put(key, number);
+                        highestCitationNumber = Math.max(highestCitationNumber, number);
+                    }
                 } else {
-                    LOGGER.warn("Cannot parse reference mark - invalid format: {}", name);
+                    LOGGER.warn("Unable to parse - invalid format of reference mark: {}", name);
                 }
             }
         }
+
+        LOGGER.debug("Read {} existing marks", marksByName.size());
 
         try {
             updateAllCitationNumbers();

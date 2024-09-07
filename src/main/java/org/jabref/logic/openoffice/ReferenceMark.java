@@ -1,5 +1,7 @@
 package org.jabref.logic.openoffice;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,68 +12,68 @@ import org.slf4j.LoggerFactory;
 
 public class ReferenceMark {
     public static final String[] PREFIXES = {"JABREF_", "CID_"};
-    public static final int CITATION_KEY_BEGIN_POSITION = 7;
-    public static final int CITATION_ID_BEGIN_POSITION = 4;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMark.class);
 
-    private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile("^JABREF_(\\w+) CID_(\\w+) (\\w+)$");
-    private final String name;
+    private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile("^((?:JABREF_\\w+ CID_\\w+(?:,\\s*)?)+)(\\s*\\w+)?$");
+    private static final Pattern ENTRY_PATTERN = Pattern.compile("JABREF_(\\w+) CID_(\\w+)");
 
-    private String citationKey;
-    private Integer citationNumber;
+    private final String name;
+    private List<String> citationKeys;
+    private List<Integer> citationNumbers;
     private String uniqueId;
 
-    /**
-     * @param name Format: <code>JABREF_{citationKey} CID_{citationNumber} {uniqueId}</code>
-     */
     public ReferenceMark(String name) {
         this.name = name;
-
-        Matcher matcher = getMatcher(name);
-        if (!matcher.matches()) {
-            LOGGER.warn("CSLReferenceMark: name={} does not match pattern. Assuming random values", name);
-            this.citationKey = CUID.randomCUID2(8).toString();
-            this.citationNumber = 0;
-            this.uniqueId = this.citationKey;
-            return;
-        }
-
-        this.citationKey = matcher.group(1);
-        this.citationNumber = Integer.parseInt(matcher.group(2));
-        this.uniqueId = matcher.group(3);
-
-        LOGGER.debug("CSLReferenceMark: citationKey={} citationNumber={} uniqueId={}", getCitationKey(), getCitationNumber(), getUniqueId());
+        parse(name);
     }
 
-    public ReferenceMark(String name, String citationKey, Integer citationNumber, String uniqueId) {
+    public ReferenceMark(String name, List<String> citationKeys, List<Integer> citationNumbers, String uniqueId) {
         this.name = name;
-        this.citationKey = citationKey;
-        this.citationNumber = citationNumber;
+        this.citationKeys = citationKeys;
+        this.citationNumbers = citationNumbers;
         this.uniqueId = uniqueId;
     }
 
-    private ReferenceMark(String name, String citationKey, String citationNumber, String uniqueId) {
-        this(name, citationKey, Integer.parseInt(citationNumber), uniqueId);
-    }
+    private void parse(String name) {
+        Matcher matcher = REFERENCE_MARK_FORMAT.matcher(name);
+        if (!matcher.matches()) {
+            LOGGER.warn("CSLReferenceMark: name={} does not match pattern. Unable to parse.", name);
+            this.citationKeys = new ArrayList<>();
+            this.citationNumbers = new ArrayList<>();
+            this.uniqueId = CUID.randomCUID2(8).toString();
+            return;
+        }
 
-    private static Matcher getMatcher(String name) {
-        return REFERENCE_MARK_FORMAT.matcher(name);
+        String entriesString = matcher.group(1).trim();
+        this.uniqueId = matcher.group(2) != null ? matcher.group(2).trim() : CUID.randomCUID2(8).toString();
+
+        this.citationKeys = new ArrayList<>();
+        this.citationNumbers = new ArrayList<>();
+
+        Matcher entryMatcher = ENTRY_PATTERN.matcher(entriesString);
+        while (entryMatcher.find()) {
+            this.citationKeys.add(entryMatcher.group(1));
+            this.citationNumbers.add(Integer.parseInt(entryMatcher.group(2)));
+        }
+
+        if (this.citationKeys.isEmpty() || this.citationNumbers.isEmpty()) {
+            LOGGER.warn("CSLReferenceMark: Failed to parse any entries from name={}. Reference mark is empty.", name);
+        }
+
+        LOGGER.debug("CSLReferenceMark: citationKeys={} citationNumbers={} uniqueId={}", getCitationKeys(), getCitationNumbers(), getUniqueId());
     }
 
     public String getName() {
         return name;
     }
 
-    /**
-     * The BibTeX citation key
-     */
-    public String getCitationKey() {
-        return citationKey;
+    public List<String> getCitationKeys() {
+        return citationKeys;
     }
 
-    public int getCitationNumber() {
-        return citationNumber;
+    public List<Integer> getCitationNumbers() {
+        return citationNumbers;
     }
 
     public String getUniqueId() {
@@ -79,11 +81,7 @@ public class ReferenceMark {
     }
 
     public static Optional<ReferenceMark> of(String name) {
-        Matcher matcher = getMatcher(name);
-        if (!matcher.matches()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(new ReferenceMark(name, matcher.group(1), matcher.group(2), matcher.group(3)));
+        ReferenceMark mark = new ReferenceMark(name);
+        return mark.citationKeys.isEmpty() ? Optional.empty() : Optional.of(mark);
     }
 }
