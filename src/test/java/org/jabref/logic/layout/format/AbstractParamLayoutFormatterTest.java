@@ -25,7 +25,7 @@ public class AbstractParamLayoutFormatterTest {
     }
 
     @Test
-    void testSimpleArguments() {
+    void simpleArguments() {
         String input = "arg1,arg2,arg3";
         List<String> result = ParseArgumentTester.callParseArgument(input);
         assertEquals(List.of("arg1", "arg2", "arg3"), result,
@@ -33,7 +33,7 @@ public class AbstractParamLayoutFormatterTest {
     }
 
     @Test
-    void testEscapedCommas() {
+    void escapedCommas() {
         String input = "arg1\\,arg2,arg3";
         List<String> result = ParseArgumentTester.callParseArgument(input);
         assertEquals(List.of("arg1,arg2", "arg3"), result,
@@ -41,21 +41,21 @@ public class AbstractParamLayoutFormatterTest {
     }
 
     @Test
-    void testEscapedBackslash() {
+    void escapedBackslash() {
         String input = "arg1\\\\,arg2";
         List<String> result = ParseArgumentTester.callParseArgument(input);
         assertEquals(List.of("arg1\\", "arg2"), result, "Escaped backslashes should be treated correctly");
     }
 
     @Test
-    void testEmptyArgument() {
+    void emptyArgument() {
         String input = "";
         List<String> result = ParseArgumentTester.callParseArgument(input);
         assertEquals(List.of(""), result, "Empty string should return a list with an empty string");
     }
 
     @Test
-    void testSingleArgument() {
+    void singleArgument() {
         String input = "singleArg";
         List<String> result = ParseArgumentTester.callParseArgument(input);
         assertEquals(List.of("singleArg"), result,
@@ -63,7 +63,7 @@ public class AbstractParamLayoutFormatterTest {
     }
 
     @Test
-    void testNewlineAndTabEscapeSequences() {
+    void newlineAndTabEscapeSequences() {
         String input = "arg1\\narg2\\targ3";
         List<String> result = ParseArgumentTester.callParseArgument(input);
         assertEquals(List.of("arg1\narg2\targ3"), result,
@@ -71,7 +71,7 @@ public class AbstractParamLayoutFormatterTest {
     }
 
     @Test
-    void testMultipleEscapedCharacters() {
+    void multipleEscapedCharacters() {
         String input = "arg1\\n,arg2\\t,arg3\\,arg4";
         List<String> result = ParseArgumentTester.callParseArgument(input);
         assertEquals(List.of("arg1\n", "arg2\t", "arg3,arg4"), result,
@@ -79,7 +79,7 @@ public class AbstractParamLayoutFormatterTest {
     }
 
     @Test
-    void testMixedCases() {
+    void mixedCases() {
         String input = "arg1,arg2\\,withComma,arg3\\nnewline,arg4\\\\backslash";
         List<String> result = ParseArgumentTester.callParseArgument(input);
         assertEquals(List.of("arg1", "arg2,withComma", "arg3\nnewline", "arg4\\backslash"), result,
