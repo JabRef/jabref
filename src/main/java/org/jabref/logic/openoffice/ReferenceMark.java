@@ -41,10 +41,10 @@ public class ReferenceMark {
     private void parse(String name) {
         Matcher matcher = REFERENCE_MARK_FORMAT.matcher(name);
         if (!matcher.matches()) {
-            LOGGER.warn("CSLReferenceMark: name={} does not match pattern. Unable to parse.", name);
-            this.citationKeys = new ArrayList<>();
-            this.citationNumbers = new ArrayList<>();
-            this.uniqueId = CUID.randomCUID2(8).toString();
+            LOGGER.warn("CSLReferenceMark: name={} does not match pattern. Assuming random values", name);
+            this.citationKeys = List.of(CUID.randomCUID2(8).toString());
+            this.citationNumbers = List.of(0);
+            this.uniqueId = this.citationKeys.getFirst();
             return;
         }
 
@@ -61,7 +61,9 @@ public class ReferenceMark {
         }
 
         if (this.citationKeys.isEmpty() || this.citationNumbers.isEmpty()) {
-            LOGGER.warn("CSLReferenceMark: Failed to parse any entries from name={}. Reference mark is empty.", name);
+            LOGGER.warn("CSLReferenceMark: Failed to parse any entries from name={}. Assuming random values", name);
+            this.citationKeys = List.of(CUID.randomCUID2(8).toString());
+            this.citationNumbers = List.of(0);
         }
 
         LOGGER.debug("CSLReferenceMark: citationKeys={} citationNumbers={} uniqueId={}", getCitationKeys(), getCitationNumbers(), getUniqueId());
