@@ -41,8 +41,8 @@ public class CSLCitationOOAdapter {
         this.markManager = new CSLReferenceMarkManager(doc);
     }
 
-    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
-        markManager.readExistingMarks();
+    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+        markManager.readAndUpdateExistingMarks();
     }
 
     /**
@@ -58,7 +58,7 @@ public class CSLCitationOOAdapter {
         if (isAlphanumeric) {
             inTextCitation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
         } else {
-            inTextCitation = CitationStyleGenerator.generateInText(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
+            inTextCitation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
         }
 
         String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
@@ -68,7 +68,7 @@ public class CSLCitationOOAdapter {
         }
 
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
-        insertMultipleReferenceMarks(cursor, entries, ooText);
+        insertReferences(cursor, entries, ooText, selectedStyle.isNumericStyle());
         cursor.collapseToEnd();
     }
 
@@ -98,7 +98,7 @@ public class CSLCitationOOAdapter {
                 // Combine author name with the citation
                 inTextCitation = authorName + " " + inTextCitation;
             } else {
-                inTextCitation = CitationStyleGenerator.generateInText(List.of(currentEntry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
+                inTextCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
             }
             String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
             String finalText;
@@ -118,7 +118,7 @@ public class CSLCitationOOAdapter {
                 finalText += ",";
             }
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
-            insertMultipleReferenceMarks(cursor, List.of(currentEntry), ooText);
+            insertReferences(cursor, List.of(currentEntry), ooText, selectedStyle.isNumericStyle());
             cursor.collapseToEnd();
         }
     }
@@ -127,13 +127,10 @@ public class CSLCitationOOAdapter {
      * Inserts "empty" citations for a list of entries at the cursor to the document.
      * Adds the entries to the list for which bibliography is to be generated.
      */
-    public void insertEmpty(XTextCursor cursor, List<BibEntry> entries)
+    public void insertEmpty(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries)
             throws CreationException, Exception {
-        for (BibEntry entry : entries) {
-            CSLReferenceMark mark = markManager.createReferenceMark(entry);
-            OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-            mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false, true);
-        }
+        OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
+        insertReferences(cursor, entries, emptyOOText, selectedStyle.isNumericStyle());
 
         // Move the cursor to the end of the inserted text - although no need as we don't insert any text, but a good practice
         cursor.collapseToEnd();
@@ -144,7 +141,9 @@ public class CSLCitationOOAdapter {
      * The list is generated based on the existing citations, in-text citations and empty citations in the document.
      */
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws WrappedTargetException, CreationException {
+            throws WrappedTargetException, CreationException, NoSuchElementException {
+        markManager.setUpdateRequired(selectedStyle.isNumericStyle());
+        readAndUpdateExistingMarks();
 
         OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_TITLE), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
@@ -158,7 +157,7 @@ public class CSLCitationOOAdapter {
             entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
 
             for (BibEntry entry : entries) {
-                String citation = CitationStyleGenerator.generateCitation(List.of(entry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
+                String citation = CitationStyleGenerator.generateBibliography(List.of(entry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
                 String citationKey = entry.getCitationKey().orElse("");
                 int currentNumber = markManager.getCitationNumber(citationKey);
 
@@ -174,7 +173,7 @@ public class CSLCitationOOAdapter {
             }
         } else {
             // Ordering will be according to citeproc item data provider (default)
-            List<String> citations = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            List<String> citations = CitationStyleGenerator.generateBibliography(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
 
             for (String citation : citations) {
                 String formattedCitation = CSLFormatUtils.transformHTML(citation);
@@ -186,14 +185,9 @@ public class CSLCitationOOAdapter {
     }
 
     /**
-     * Inserts multiple references and also adds a space before the citation if not already present ("smart space").
-     *
-     * @implNote It is difficult to "segment" a single citation generated for a group of entries into distinct parts based on the entries such that each entry can be draped with its corresponding reference mark.
-     * This is because of the sheer variety in the styles of citations and the separators between them (when grouped) in case of Citation Style Language.
-     * Furthermore, it is also difficult to generate a "single" reference mark for a group of entries.
-     * Thus, in case of citations for a group of entries, we first insert the citation (text), then insert the invisible reference marks for each entry separately after it.
+     * Inserts references and also adds a space before the citation if not already present ("smart space").
      */
-    private void insertMultipleReferenceMarks(XTextCursor cursor, List<BibEntry> entries, OOText ooText)
+    private void insertReferences(XTextCursor cursor, List<BibEntry> entries, OOText ooText, boolean isNumericStyle)
             throws CreationException, Exception {
         boolean preceedingSpaceExists;
         XTextCursor checkCursor = cursor.getText().createTextCursorByRange(cursor.getStart());
@@ -211,22 +205,14 @@ public class CSLCitationOOAdapter {
             }
         }
 
-        if (entries.size() == 1) {
-            CSLReferenceMark mark = markManager.createReferenceMark(entries.getFirst());
-            mark.insertReferenceIntoOO(document, cursor, ooText, !preceedingSpaceExists, false, true);
-        } else {
-            if (!preceedingSpaceExists) {
-                cursor.getText().insertString(cursor, " ", false);
-            }
-            OOTextIntoOO.write(document, cursor, ooText);
-            for (BibEntry entry : entries) {
-                CSLReferenceMark mark = markManager.createReferenceMark(entry);
-                OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
-                mark.insertReferenceIntoOO(document, cursor, emptyOOText, false, false, true);
-            }
-        }
+        CSLReferenceMark mark = markManager.createReferenceMark(entries);
+        mark.insertReferenceIntoOO(document, cursor, ooText, !preceedingSpaceExists, false);
 
         // Move the cursor to the end of the inserted text
+        cursor.collapseToEnd();
+
+        markManager.setUpdateRequired(isNumericStyle);
+        readAndUpdateExistingMarks();
         cursor.collapseToEnd();
     }
 
