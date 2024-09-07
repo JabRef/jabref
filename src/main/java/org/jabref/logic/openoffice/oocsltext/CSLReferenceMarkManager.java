@@ -170,6 +170,7 @@ public class CSLReferenceMarkManager {
         if (parts.length >= 3) {
             StringBuilder newName = new StringBuilder();
             for (int i = 0; i < parts.length - 1; i += 2) {
+                // Each iteration of the loop (incrementing by 2) represents one full citation (key + number)
                 if (i > 0) {
                     newName.append(", ");
                 }
