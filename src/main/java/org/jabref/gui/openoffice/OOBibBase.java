@@ -88,7 +88,7 @@ public class OOBibBase {
 
     private void initializeCitationAdapter(XTextDocument doc) throws WrappedTargetException, NoSuchElementException {
         this.cslCitationOOAdapter = new CSLCitationOOAdapter(doc);
-        this.cslCitationOOAdapter.readExistingMarks();
+        this.cslCitationOOAdapter.readAndUpdateExistingMarks();
     }
 
     public void guiActionSelectDocument(boolean autoSelectForSingle) throws WrappedTargetException, NoSuchElementException {
@@ -601,7 +601,7 @@ public class OOBibBase {
                     this.cslCitationOOAdapter.insertInTextCitation(cursor.get(), citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
                 } else if (citationType == CitationType.INVISIBLE_CIT) {
                     // "Insert empty citation"
-                    this.cslCitationOOAdapter.insertEmpty(cursor.get(), entries);
+                    this.cslCitationOOAdapter.insertEmpty(cursor.get(), citationStyle, entries);
                 }
 
                 // If "Automatically sync bibliography when inserting citations" is enabled

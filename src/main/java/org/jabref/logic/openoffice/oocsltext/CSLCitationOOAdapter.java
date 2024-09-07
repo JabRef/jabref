@@ -41,8 +41,8 @@ public class CSLCitationOOAdapter {
         this.markManager = new CSLReferenceMarkManager(doc);
     }
 
-    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
-        markManager.readExistingMarks();
+    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
+        markManager.readAndUpdateExistingMarks();
     }
 
     /**
@@ -70,6 +70,10 @@ public class CSLCitationOOAdapter {
         OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedCitation));
         insertReferences(cursor, entries, ooText);
         cursor.collapseToEnd();
+        if (selectedStyle.isNumericStyle()) {
+            markManager.setUpdateRequired(true);
+        }
+        readAndUpdateExistingMarks();
     }
 
     /**
@@ -120,6 +124,10 @@ public class CSLCitationOOAdapter {
             OOText ooText = OOFormat.setLocaleNone(OOText.fromString(finalText));
             insertReferences(cursor, List.of(currentEntry), ooText);
             cursor.collapseToEnd();
+            if (selectedStyle.isNumericStyle()) {
+                markManager.setUpdateRequired(true);
+            }
+            readAndUpdateExistingMarks();
         }
     }
 
@@ -127,7 +135,7 @@ public class CSLCitationOOAdapter {
      * Inserts "empty" citations for a list of entries at the cursor to the document.
      * Adds the entries to the list for which bibliography is to be generated.
      */
-    public void insertEmpty(XTextCursor cursor, List<BibEntry> entries)
+    public void insertEmpty(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries)
             throws CreationException, Exception {
         CSLReferenceMark mark = markManager.createReferenceMark(entries);
         OOText emptyOOText = OOFormat.setLocaleNone(OOText.fromString(""));
@@ -135,6 +143,10 @@ public class CSLCitationOOAdapter {
 
         // Move the cursor to the end of the inserted text - although no need as we don't insert any text, but a good practice
         cursor.collapseToEnd();
+        if (selectedStyle.isNumericStyle()) {
+            markManager.setUpdateRequired(true);
+        }
+        readAndUpdateExistingMarks();
     }
 
     /**

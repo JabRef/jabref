@@ -40,11 +40,13 @@ public class CSLReferenceMarkManager {
     private Map<String, Integer> citationKeyToNumber = new HashMap<>();
     private final XTextRangeCompare textRangeCompare;
     private int highestCitationNumber = 0;
+    private boolean isUpdateRequired;
 
     public CSLReferenceMarkManager(XTextDocument document) {
         this.document = document;
         this.factory = UnoRuntime.queryInterface(XMultiServiceFactory.class, document);
         this.textRangeCompare = UnoRuntime.queryInterface(XTextRangeCompare.class, document.getText());
+        this.isUpdateRequired = false;
     }
 
     public CSLReferenceMark createReferenceMark(List<BibEntry> entries) throws Exception {
@@ -59,8 +61,11 @@ public class CSLReferenceMarkManager {
         CSLReferenceMark referenceMark = CSLReferenceMark.of(citationKeys, citationNumbers, factory);
         marksByName.put(referenceMark.getName(), referenceMark);
         marksInOrder.add(referenceMark);
-        updateAllCitationNumbers();
         return referenceMark;
+    }
+
+    public void setUpdateRequired(boolean isNumeric) {
+        this.isUpdateRequired = isNumeric;
     }
 
     public void updateAllCitationNumbers() throws Exception {
@@ -85,7 +90,7 @@ public class CSLReferenceMarkManager {
             }
 
             mark.setCitationNumbers(assignedNumbers);
-            updateMarkText(mark, assignedNumbers);
+            updateMarkAndText(mark, assignedNumbers);
         }
 
         citationKeyToNumber = newCitationKeyToNumber;
@@ -104,7 +109,7 @@ public class CSLReferenceMarkManager {
         }
     }
 
-    private void updateMarkText(CSLReferenceMark mark, List<Integer> newNumbers) throws Exception {
+    private void updateMarkAndText(CSLReferenceMark mark, List<Integer> newNumbers) throws Exception {
         XTextContent oldContent = mark.getTextContent();
         XTextRange range = oldContent.getAnchor();
 
@@ -120,7 +125,7 @@ public class CSLReferenceMarkManager {
             // Update the citation numbers in the text
             String updatedText = updateCitationText(currentText, newNumbers);
 
-            // Remove the old reference mark without removing the text
+            // Remove the old reference mark without removing the text (The only way to edit a reference mark is to remove it and add a new one)
             text.removeTextContent(oldContent);
 
             // Update the text
@@ -182,7 +187,7 @@ public class CSLReferenceMarkManager {
         return citationKeyToNumber.computeIfAbsent(citationKey, k -> ++highestCitationNumber);
     }
 
-    public void readExistingMarks() throws WrappedTargetException, NoSuchElementException {
+    public void readAndUpdateExistingMarks() throws WrappedTargetException, NoSuchElementException {
         marksByName.clear();
         marksInOrder.clear();
         citationKeyToNumber.clear();
@@ -217,10 +222,12 @@ public class CSLReferenceMarkManager {
 
         LOGGER.debug("Read {} existing marks", marksByName.size());
 
-        try {
-            updateAllCitationNumbers();
-        } catch (Exception e) {
-            LOGGER.warn("Error updating citation numbers", e);
+        if (isUpdateRequired) {
+            try {
+                updateAllCitationNumbers();
+            } catch (Exception e) {
+                LOGGER.warn("Error updating citation numbers", e);
+            }
         }
     }
 
