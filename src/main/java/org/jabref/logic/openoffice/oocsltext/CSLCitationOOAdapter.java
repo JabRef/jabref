@@ -141,7 +141,9 @@ public class CSLCitationOOAdapter {
      * The list is generated based on the existing citations, in-text citations and empty citations in the document.
      */
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws WrappedTargetException, CreationException {
+            throws WrappedTargetException, CreationException, NoSuchElementException {
+        markManager.setUpdateRequired(selectedStyle.isNumericStyle());
+        readAndUpdateExistingMarks();
 
         OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_TITLE), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
