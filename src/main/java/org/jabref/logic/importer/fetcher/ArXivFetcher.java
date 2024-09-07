@@ -686,7 +686,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 publishedDate = XMLUtil.getNodeContent(item, "published");
 
                 // Abstract of the article
-                abstractText =  XMLUtil.getNodeContent(item, "summary").map(ArXivEntry::correctLineBreaks)
+                abstractText = XMLUtil.getNodeContent(item, "summary").map(ArXivEntry::correctLineBreaks)
                                       .map(String::trim).map(BracesCorrector::apply);
 
                 // Authors of the article
