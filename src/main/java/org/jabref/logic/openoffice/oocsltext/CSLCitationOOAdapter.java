@@ -204,16 +204,8 @@ public class CSLCitationOOAdapter {
             }
         }
 
-        if (entries.size() == 1) {
-            CSLReferenceMark mark = markManager.createReferenceMark(entries);
-            mark.insertReferenceIntoOO(document, cursor, ooText, !preceedingSpaceExists, false);
-        } else {
-            if (!preceedingSpaceExists) {
-                cursor.getText().insertString(cursor, " ", false);
-            }
-            CSLReferenceMark mark = markManager.createReferenceMark(entries);
-            mark.insertReferenceIntoOO(document, cursor, ooText, false, false);
-        }
+        CSLReferenceMark mark = markManager.createReferenceMark(entries);
+        mark.insertReferenceIntoOO(document, cursor, ooText, !preceedingSpaceExists, false);
 
         // Move the cursor to the end of the inserted text
         cursor.collapseToEnd();
