@@ -155,7 +155,7 @@ open module org.jabref {
 
     // region: Lucene
     /**
-     * In case the version is updated, please also adapt {@link org.jabref.model.search.SearchFieldConstants#VERSION} to the newly used version.
+     * In case the version is updated, please also increment {@link org.jabref.model.search.SearchFieldConstants#VERSION} to trigger reindexing.
      */
     uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
     requires org.apache.lucene.analysis.common;
