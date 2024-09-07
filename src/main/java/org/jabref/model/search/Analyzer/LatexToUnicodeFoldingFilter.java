@@ -83,7 +83,7 @@ public final class LatexToUnicodeFoldingFilter extends TokenFilter {
         char[] subArray = Arrays.copyOfRange(input, inputPos, inputPos + length);
         String s = new String(subArray);
         String result = FORMATTER.format(s);
-        LOGGER.debug("Folding {} to {}", s, result);
+        LOGGER.trace("Folding {} to {}", s, result);
         return new FoldingResult(result.toCharArray(), result.length());
     }
 }
