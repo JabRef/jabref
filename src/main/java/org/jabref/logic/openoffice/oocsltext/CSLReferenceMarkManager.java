@@ -213,7 +213,7 @@ public class CSLReferenceMarkManager {
         XNameAccess marks = supplier.getReferenceMarks();
 
         for (String name : marks.getElementNames()) {
-            if (name.startsWith(ReferenceMark.PREFIXES[0]) && name.contains(ReferenceMark.PREFIXES[1])) {
+            if (name.startsWith(ReferenceMark.PREFIXES[0]) && name.contains(ReferenceMark.PREFIXES[1]) && name.split(" ").length >= 3) {
                 XNamed named = UnoRuntime.queryInterface(XNamed.class, marks.getByName(name));
 
                 ReferenceMark referenceMark = new ReferenceMark(name);
