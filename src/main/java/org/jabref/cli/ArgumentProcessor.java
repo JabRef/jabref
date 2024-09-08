@@ -99,16 +99,13 @@ public class ArgumentProcessor {
     }
 
     /**
-     * Will open a file (like importFile), but will also request JabRef to focus on this database
+     * Will open a file (like {@link #importFile(String)}, but will also request JabRef to focus on this database.
      *
-     * @param argument See importFile.
      * @return ParserResult with setToOpenTab(true)
      */
-    private Optional<ParserResult> importToOpenBase(String argument) {
-        Optional<ParserResult> result = importFile(argument);
-
+    private Optional<ParserResult> importToOpenBase(String importArguments) {
+        Optional<ParserResult> result = importFile(importArguments);
         result.ifPresent(ParserResult::setToOpenTab);
-
         return result;
     }
 
@@ -125,9 +122,12 @@ public class ArgumentProcessor {
         }
     }
 
-    private Optional<ParserResult> importFile(String argument) {
-        LOGGER.debug("Importing file {}", argument);
-        String[] data = argument.split(",");
+    /**
+     * @param importArguments: <code>fileName[,format]</code>
+     */
+    private Optional<ParserResult> importFile(String importArguments) {
+        LOGGER.debug("Importing file {}", importArguments);
+        String[] data = importArguments.split(",");
 
         String address = data[0];
         Path file;
