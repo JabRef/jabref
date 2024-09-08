@@ -23,7 +23,6 @@ import org.jabref.preferences.PreferencesService;
 
 public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
 
-    private final BibDatabaseContext database;
     private final StateManager stateManager;
 
     public enum DuplicateResolverType {
@@ -72,7 +71,6 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                                    DialogService dialogService,
                                    PreferencesService preferencesService) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
-        this.database = database;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
