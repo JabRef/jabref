@@ -35,7 +35,7 @@ import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;

@@ -30,7 +30,7 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;

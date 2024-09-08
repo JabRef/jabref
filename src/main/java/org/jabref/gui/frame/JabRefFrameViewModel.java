@@ -25,7 +25,7 @@ import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;

@@ -8,12 +8,12 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.SimpleBooleanProperty;
 
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;

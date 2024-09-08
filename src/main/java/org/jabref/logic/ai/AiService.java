@@ -13,7 +13,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.components.aichat.AiChatWindow;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.chatting.AiChatService;
 import org.jabref.logic.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage;
@@ -25,6 +24,7 @@ import org.jabref.logic.ai.ingestion.storages.MVStoreFullyIngestedDocumentsTrack
 import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;

@@ -6,8 +6,8 @@ import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.util.EmbeddingModelGuardedComponent;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;

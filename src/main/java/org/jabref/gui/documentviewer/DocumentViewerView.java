@@ -18,9 +18,9 @@ import javafx.stage.Stage;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.OnlyIntegerFormatter;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
 

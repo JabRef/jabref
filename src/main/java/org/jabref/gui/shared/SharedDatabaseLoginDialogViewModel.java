@@ -31,7 +31,7 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;

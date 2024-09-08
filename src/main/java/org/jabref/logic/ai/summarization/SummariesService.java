@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
 import org.jabref.logic.ai.util.CitationKeyCheck;

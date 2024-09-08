@@ -7,8 +7,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.jabref.gui.util.TaskExecutor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

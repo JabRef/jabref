@@ -6,7 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.preferences.PreferencesService;
 
 import jakarta.inject.Inject;

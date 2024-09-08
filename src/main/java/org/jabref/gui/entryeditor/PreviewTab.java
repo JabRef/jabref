@@ -5,7 +5,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;

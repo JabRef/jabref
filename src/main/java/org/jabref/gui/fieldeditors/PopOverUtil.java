@@ -7,7 +7,7 @@ import javafx.scene.control.ProgressIndicator;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.journalinfo.JournalInfoView;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.entry.BibEntry;

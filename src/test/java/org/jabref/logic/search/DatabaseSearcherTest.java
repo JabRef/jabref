@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;

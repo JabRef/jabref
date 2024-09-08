@@ -16,7 +16,7 @@ import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;

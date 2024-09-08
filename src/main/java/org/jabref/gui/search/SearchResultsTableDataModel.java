@@ -16,7 +16,7 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTableFieldValueFormatter;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.util.FilteredListProxy;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

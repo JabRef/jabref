@@ -20,6 +20,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
