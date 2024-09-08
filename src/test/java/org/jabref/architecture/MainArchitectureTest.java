@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import org.jabref.logic.importer.fileformat.ImporterTestEngine;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.library.GeneralCodingRules;
@@ -13,9 +14,11 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 /**
- * This class checks JabRef's shipped classes for architecture quality
+ * This class checks JabRef's shipped classes for architecture quality.
+ *
+ * Does not analyze test classes. Hint from <a href="https://stackoverflow.com/a/44681895/873282">StackOverflow</a>
  */
-@AnalyzeClasses(packages = "org.jabref")
+@AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.DoNotIncludeTests.class)
 class MainArchitectureTest {
 
     public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.gui.Globals";
