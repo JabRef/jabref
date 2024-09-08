@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
-import org.jabref.gui.StateManager;
 import org.jabref.logic.ai.chatting.AiChatService;
 import org.jabref.logic.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage;
@@ -24,7 +23,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.ai.AiPreferences;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
@@ -39,13 +37,6 @@ public class AiService implements AutoCloseable {
     private static final String EMBEDDINGS_FILE_NAME = "embeddings.mv";
     private static final String FULLY_INGESTED_FILE_NAME = "fully-ingested.mv";
     private static final String SUMMARIES_FILE_NAME = "summaries.mv";
-
-    private final StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
-
-    private final AiPreferences aiPreferences;
-    private final FilePreferences filePreferences;
-    private final NotificationService notificationService;
-    private final TaskExecutor taskExecutor;
 
     // This field is used to shut down AI-related background tasks.
     // If a background task processes a big document and has a loop, then the task should check the status
@@ -74,11 +65,6 @@ public class AiService implements AutoCloseable {
                      NotificationService notificationService,
                      TaskExecutor taskExecutor
     ) {
-        this.aiPreferences = aiPreferences;
-        this.filePreferences = filePreferences;
-        this.notificationService = notificationService;
-        this.taskExecutor = taskExecutor;
-
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
 
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(Directories.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), notificationService);
