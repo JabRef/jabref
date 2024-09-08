@@ -105,7 +105,7 @@ public class GenerateSummaryTask extends BackgroundTask<String> {
     }
 
     @Override
-    protected String call() throws Exception {
+    public String call() throws Exception {
         LOGGER.debug("Starting summarization task for entry {}", citationKey);
 
         String result = null;

@@ -104,7 +104,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
     private BackgroundTask<Optional<BibEntry>> searchAndImportEntryInBackground() {
         return new BackgroundTask<>() {
             @Override
-            protected Optional<BibEntry> call() throws FetcherException {
+            public Optional<BibEntry> call() throws FetcherException {
                 if (isCanceled()) {
                     return Optional.empty();
                 }

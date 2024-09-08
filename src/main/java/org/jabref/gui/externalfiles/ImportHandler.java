@@ -106,7 +106,7 @@ public class ImportHandler {
             private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
             @Override
-            protected List<ImportFilesResultItemViewModel> call() {
+            public List<ImportFilesResultItemViewModel> call() {
                 counter = 1;
                 CompoundEdit ce = new CompoundEdit();
                 for (final Path file : files) {

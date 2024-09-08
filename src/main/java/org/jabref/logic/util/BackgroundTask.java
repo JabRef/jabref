@@ -71,7 +71,7 @@ public abstract class BackgroundTask<V> {
     public static <V> BackgroundTask<V> wrap(Callable<V> callable) {
         return new BackgroundTask<>() {
             @Override
-            protected V call() throws Exception {
+            public V call() throws Exception {
                 return callable.call();
             }
         };
@@ -80,7 +80,7 @@ public abstract class BackgroundTask<V> {
     public static BackgroundTask<Void> wrap(Runnable runnable) {
         return new BackgroundTask<>() {
             @Override
-            protected Void call() {
+            public Void call() {
                 runnable.run();
                 return null;
             }
@@ -179,17 +179,17 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
-    protected abstract V call() throws Exception;
+    public abstract V call() throws Exception;
 
-    Runnable getOnRunning() {
+    public Runnable getOnRunning() {
         return onRunning;
     }
 
-    Consumer<V> getOnSuccess() {
+    public Consumer<V> getOnSuccess() {
         return chain(onFinished, onSuccess);
     }
 
-    Consumer<Exception> getOnException() {
+    public Consumer<Exception> getOnException() {
         return chain(onFinished, onException);
     }
 
@@ -228,7 +228,7 @@ public abstract class BackgroundTask<V> {
     public <T> BackgroundTask<T> then(Function<V, BackgroundTask<T>> nextTaskFactory) {
         return new BackgroundTask<>() {
             @Override
-            protected T call() throws Exception {
+            public T call() throws Exception {
                 V result = BackgroundTask.this.call();
                 BackgroundTask<T> nextTask = nextTaskFactory.apply(result);
                 EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);
@@ -246,7 +246,7 @@ public abstract class BackgroundTask<V> {
     public <T> BackgroundTask<T> thenRun(Function<V, T> nextOperation) {
         return new BackgroundTask<>() {
             @Override
-            protected T call() throws Exception {
+            public T call() throws Exception {
                 V result = BackgroundTask.this.call();
                 BackgroundTask<T> nextTask = BackgroundTask.wrap(() -> nextOperation.apply(result));
                 EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);
@@ -263,7 +263,7 @@ public abstract class BackgroundTask<V> {
     public BackgroundTask<Void> thenRun(Consumer<V> nextOperation) {
         return new BackgroundTask<>() {
             @Override
-            protected Void call() throws Exception {
+            public Void call() throws Exception {
                 V result = BackgroundTask.this.call();
                 BackgroundTask<Void> nextTask = BackgroundTask.wrap(() -> nextOperation.accept(result));
                 EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);

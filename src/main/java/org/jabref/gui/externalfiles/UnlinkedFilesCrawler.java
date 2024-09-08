@@ -47,7 +47,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
     }
 
     @Override
-    protected FileNodeViewModel call() throws IOException {
+    public FileNodeViewModel call() throws IOException {
         UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(fileFilter, databaseContext, filePreferences);
         return searchDirectory(directory, unlinkedPDFFileFilter);
     }

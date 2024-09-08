@@ -108,7 +108,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             private NamedCompound compound;
 
             @Override
-            protected Void call() {
+            public Void call() {
                     if (isCanceled) {
                         return null;
                     }

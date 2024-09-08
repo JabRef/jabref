@@ -72,7 +72,7 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
     }
 
     @Override
-    protected Void call() throws Exception {
+    public Void call() throws Exception {
         LOGGER.debug("Starting embeddings generation of several files for {}", name.get());
 
         List<Pair<? extends Future<?>, String>> futures = new ArrayList<>();
