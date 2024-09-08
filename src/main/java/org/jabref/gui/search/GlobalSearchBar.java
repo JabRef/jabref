@@ -58,6 +58,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.model.entry.Author;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
