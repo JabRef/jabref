@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.util.BackupFileType;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.util.Directories;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,8 +34,8 @@ class BackupFileUtilTest {
 
     @Test
     void getPathOfBackupFileAndCreateDirectoryReturnsAppDirectoryInCaseOfNoError() {
-        String start = OS.getNativeDesktop().getBackupDirectory().toString();
-        backupDir = OS.getNativeDesktop().getBackupDirectory();
+        String start = Directories.getBackupDirectory().toString();
+        backupDir = Directories.getBackupDirectory();
         String result = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(Path.of("test.bib"), BackupFileType.BACKUP, backupDir).toString();
         // We just check the prefix
         assertEquals(start, result.substring(0, start.length()));
@@ -43,9 +43,9 @@ class BackupFileUtilTest {
 
     @Test
     void getPathOfBackupFileAndCreateDirectoryReturnsSameDirectoryInCaseOfException() {
-        backupDir = OS.getNativeDesktop().getBackupDirectory();
+        backupDir = Directories.getBackupDirectory();
         try (MockedStatic<Files> files = Mockito.mockStatic(Files.class, Answers.RETURNS_DEEP_STUBS)) {
-            files.when(() -> Files.createDirectories(OS.getNativeDesktop().getBackupDirectory()))
+            files.when(() -> Files.createDirectories(Directories.getBackupDirectory()))
                  .thenThrow(new IOException());
             Path testPath = Path.of("tmp", "test.bib");
             Path result = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(testPath, BackupFileType.BACKUP, backupDir);

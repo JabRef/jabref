@@ -28,8 +28,8 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DirectoryMonitor;
@@ -137,7 +137,7 @@ public class Launcher {
         }
 
         // addLogToDisk
-        Path directory = OS.getNativeDesktop().getLogDirectory();
+        Path directory = Directories.getLogDirectory();
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
@@ -204,7 +204,7 @@ public class Launcher {
     }
 
     private static void clearOldSearchIndices() {
-        Path currentIndexPath = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
+        Path currentIndexPath = Directories.getFulltextIndexBaseDirectory();
         Path appData = currentIndexPath.getParent();
 
         try {

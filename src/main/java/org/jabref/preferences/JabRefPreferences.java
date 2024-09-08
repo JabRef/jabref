@@ -107,6 +107,7 @@ import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.Version;
@@ -636,7 +637,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_PERSIST_PASSWORD, Boolean.FALSE);
 
         // SSL
-        defaults.put(TRUSTSTORE_PATH, OS.getNativeDesktop()
+        defaults.put(TRUSTSTORE_PATH, Directories
                                         .getSslDirectory()
                                         .resolve("truststore.jks").toString());
 
@@ -2254,7 +2255,7 @@ public class JabRefPreferences implements PreferencesService {
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES)),
                 getBoolean(CREATE_BACKUP),
                 // We choose the data directory, because a ".bak" file should survive cache cleanups
-                getPath(BACKUP_DIRECTORY, OS.getNativeDesktop().getBackupDirectory()),
+                getPath(BACKUP_DIRECTORY, Directories.getBackupDirectory()),
                 getBoolean(CONFIRM_LINKED_FILE_DELETE),
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
                 getBoolean(TRASH_INSTEAD_OF_DELETE, OS.getNativeDesktop().moveToTrashSupported()));

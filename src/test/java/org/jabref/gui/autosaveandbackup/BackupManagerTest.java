@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.util.BackupFileType;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -45,7 +45,7 @@ class BackupManagerTest {
     @Test
     void backupFileNameIsCorrectlyGeneratedInAppDataDirectory() {
         Path bibPath = Path.of("tmp", "test.bib");
-        backupDir = OS.getNativeDesktop().getBackupDirectory();
+        backupDir = Directories.getBackupDirectory();
         Path bakPath = BackupManager.getBackupPathForNewBackup(bibPath, backupDir);
 
         // Pattern is "27182d3c--test.bib--", but the hashing is implemented differently on Linux than on Windows
