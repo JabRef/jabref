@@ -167,7 +167,7 @@ public class UiTaskExecutor implements TaskExecutor {
                 BindingsHelper.subscribeFuture(task.progressProperty(), progress -> updateProgress(progress.workDone(), progress.max()));
                 BindingsHelper.subscribeFuture(task.messageProperty(), this::updateMessage);
                 BindingsHelper.subscribeFuture(task.titleProperty(), this::updateTitle);
-                BindingsHelper.subscribeFuture(task.isCanceledProperty(), cancelled -> {
+                BindingsHelper.subscribeFuture(task.isCancelledProperty(), cancelled -> {
                     if (cancelled) {
                         cancel();
                     }

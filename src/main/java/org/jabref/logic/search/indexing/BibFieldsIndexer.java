@@ -61,7 +61,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
         long startTime = System.currentTimeMillis();
         LOGGER.debug("Adding {} entries to index", entries.size());
         for (BibEntry entry : entries) {
-            if (task.isCanceled()) {
+            if (task.isCancelled()) {
                 LOGGER.debug("Indexing canceled");
                 return;
             }
@@ -102,7 +102,7 @@ public class BibFieldsIndexer implements LuceneIndexer {
         task.setTitle(Localization.lang("Removing entries from index for %0", libraryName));
         int i = 1;
         for (BibEntry entry : entries) {
-            if (task.isCanceled()) {
+            if (task.isCancelled()) {
                 LOGGER.debug("Removing entries canceled");
                 return;
             }

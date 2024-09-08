@@ -112,7 +112,7 @@ public class ImportHandler {
                 for (final Path file : files) {
                     final List<BibEntry> entriesToAdd = new ArrayList<>();
 
-                    if (isCanceled()) {
+                    if (isCancelled()) {
                         break;
                     }
 

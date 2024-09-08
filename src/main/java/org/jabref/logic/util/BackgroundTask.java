@@ -56,7 +56,7 @@ public abstract class BackgroundTask<V> {
     private Consumer<V> onSuccess;
     private Consumer<Exception> onException;
     private Runnable onFinished;
-    private final BooleanProperty isCanceled = new SimpleBooleanProperty(false);
+    private final BooleanProperty isCancelled = new SimpleBooleanProperty(false);
     private final ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
     private final StringProperty message = new SimpleStringProperty("");
     private final StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());
@@ -102,17 +102,17 @@ public abstract class BackgroundTask<V> {
         }
     }
 
-    public boolean isCanceled() {
-        return isCanceled.get();
+    public boolean isCancelled() {
+        return isCancelled.get();
     }
 
     public void cancel() {
         LOGGER.debug("Canceling task");
-        this.isCanceled.set(true);
+        this.isCancelled.set(true);
     }
 
-    public BooleanProperty isCanceledProperty() {
-        return isCanceled;
+    public BooleanProperty isCancelledProperty() {
+        return isCancelled;
     }
 
     public StringProperty messageProperty() {

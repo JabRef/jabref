@@ -137,7 +137,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         LOGGER.debug("Adding {} files to index", linkedFiles.size());
         int i = 1;
         for (Map.Entry<String, Pair<Long, Path>> entry : linkedFiles.entrySet()) {
-            if (task.isCanceled()) {
+            if (task.isCancelled()) {
                 LOGGER.debug("Adding files to index canceled");
                 return;
             }

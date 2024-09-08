@@ -105,7 +105,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
         return new BackgroundTask<>() {
             @Override
             public Optional<BibEntry> call() throws FetcherException {
-                if (isCanceled()) {
+                if (isCancelled()) {
                     return Optional.empty();
                 }
                 updateMessage(Localization.lang("Searching..."));

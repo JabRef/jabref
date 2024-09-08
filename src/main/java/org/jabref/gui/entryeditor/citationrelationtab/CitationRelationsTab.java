@@ -337,9 +337,9 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         listView.setItems(observableList);
 
-        if (citingTask != null && !citingTask.isCanceled() && searchType == CitationFetcher.SearchType.CITES) {
+        if (citingTask != null && !citingTask.isCancelled() && searchType == CitationFetcher.SearchType.CITES) {
             citingTask.cancel();
-        } else if (citedByTask != null && !citedByTask.isCanceled() && searchType == CitationFetcher.SearchType.CITED_BY) {
+        } else if (citedByTask != null && !citedByTask.isCancelled() && searchType == CitationFetcher.SearchType.CITED_BY) {
             citedByTask.cancel();
         }
 
