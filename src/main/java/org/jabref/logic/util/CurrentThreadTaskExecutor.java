@@ -1,4 +1,4 @@
-package org.jabref.gui.util;
+package org.jabref.logic.util;
 
 import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
@@ -9,8 +9,7 @@ import java.util.function.Consumer;
 
 import javafx.concurrent.Task;
 
-import org.jabref.logic.util.BackgroundTask;
-import org.jabref.logic.util.DelayTaskThrottler;
+import org.jabref.gui.util.TaskExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

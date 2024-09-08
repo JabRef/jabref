@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
-import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -43,6 +42,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
