@@ -10,4 +10,6 @@ public sealed interface UiCommand {
     record JumpToEntryKey(String citationKey) implements UiCommand { }
 
     record OpenDatabases(List<ParserResult> parserResults) implements UiCommand { }
+
+    record AutoSetFileLinks(List<ParserResult> parserResults) implements UiCommand { }
 }

@@ -22,6 +22,7 @@ public class DatabaseSearcher {
     private final SearchQuery query;
     private final LuceneManager luceneManager;
 
+    // get rid of task executor here or add a constuctor overload?
     public DatabaseSearcher(SearchQuery query, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, FilePreferences filePreferences) throws IOException {
         this.databaseContext = databaseContext;
         this.query = Objects.requireNonNull(query);

@@ -175,7 +175,13 @@ public class CSLReferenceMarkManager {
 
         while (matcher.find()) {
             result.append(currentText, lastEnd, matcher.start(2));
-            result.append(newNumbers.get(numberIndex++));
+            if (numberIndex < newNumbers.size()) {
+                result.append(newNumbers.get(numberIndex));
+            } else {
+                // If we've run out of new numbers, increment the last used number
+                result.append(newNumbers.getLast() + (numberIndex - newNumbers.size() + 1));
+            }
+            numberIndex++;
             lastEnd = matcher.end(2);
         }
         result.append(currentText.substring(lastEnd));
