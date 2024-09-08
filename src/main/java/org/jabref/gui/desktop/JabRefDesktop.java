@@ -329,16 +329,4 @@ public class JabRefDesktop {
     public static boolean moveToTrashSupported() {
         return NATIVE_DESKTOP.moveToTrashSupported();
     }
-
-    public static Path getApplicationDirectory() {
-        return NATIVE_DESKTOP.getApplicationDirectory();
-    }
-
-    public static Path getFulltextIndexBaseDirectory() {
-        return NATIVE_DESKTOP.getFulltextIndexBaseDirectory();
-    }
-
-    public static Path getAiFilesDirectory() {
-        return NATIVE_DESKTOP.getAiFilesDirectory();
-    }
 }
