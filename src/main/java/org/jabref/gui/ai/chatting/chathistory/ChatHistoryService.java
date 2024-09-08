@@ -1,4 +1,4 @@
-package org.jabref.logic.ai.chatting.chathistory;
+package org.jabref.gui.ai.chatting.chathistory;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -11,9 +11,13 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
+import org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage;
+import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -29,7 +33,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Main class for getting and storing chat history for entries and groups.
- * Use this class in the logic and UI.
+ * Use this class <s>in logic and</s> UI.
+ * It currently resides in the UI package because it relies on the {@link StateManager} to get the open databases and to find the correct {@link BibDatabaseContext} based on an entry.
  * <p>
  * The returned chat history is a {@link ObservableList}. So chat history exists for every possible
  * {@link BibEntry} and {@link AbstractGroup}. The chat history is stored in runtime.
@@ -51,6 +56,8 @@ import org.slf4j.LoggerFactory;
 public class ChatHistoryService implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatHistoryService.class);
 
+    private static final String CHAT_HISTORY_FILE_NAME = "chat-histories.mv";
+
     private final StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
 
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
@@ -71,6 +78,12 @@ public class ChatHistoryService implements AutoCloseable {
         // For "less" or "bigger" comparison, we will fall back to group names.
         return o1 == o2 ? 0 : o1.getGroup().getName().compareTo(o2.getGroup().getName());
     });
+
+    public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences, NotificationService notificationService) {
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+        this.implementation = new MVStoreChatHistoryStorage(Directories.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);
+        configureHistoryTransfer();
+    }
 
     public ChatHistoryService(CitationKeyPatternPreferences citationKeyPatternPreferences,
                               ChatHistoryStorage implementation) {
