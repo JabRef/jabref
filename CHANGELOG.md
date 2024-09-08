@@ -65,7 +65,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the full-text search results were incomplete. [#8626](https://github.com/JabRef/jabref/issues/8626)
 - We fixed an issue where search result highlighting was incorrectly highlighting the boolean operators. [#11595](https://github.com/JabRef/jabref/issues/11595)
 - We fixed an issue where search result highlighting was broken at complex searches. [#8067](https://github.com/JabRef/jabref/issues/8067)
-- We fixed an exception when searching for unlinked files.
+- We fixed an exception when searching for unlinked files. [#11731](https://github.com/JabRef/jabref/issues/11731)
 - We fixed an issue where unescaped braces in the arXiv fetcher were not treated [#11704](https://github.com/JabRef/jabref/issues/11704)
 
 ### Removed
