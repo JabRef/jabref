@@ -3,7 +3,6 @@ package org.jabref.preferences.ai;
 import java.util.List;
 import java.util.Objects;
 
-import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -18,7 +17,6 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
 
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;

@@ -22,7 +22,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.ResizableTextArea;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import jakarta.inject.Inject;
 import org.controlsfx.control.SearchableComboBox;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
