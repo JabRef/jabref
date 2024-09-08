@@ -20,12 +20,12 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;

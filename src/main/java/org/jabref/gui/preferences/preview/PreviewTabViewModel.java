@@ -31,7 +31,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.NoSelectionModel;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -39,6 +38,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreviewPreferences;
 

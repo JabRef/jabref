@@ -23,7 +23,6 @@ import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.OpenDatabase;
@@ -34,6 +33,7 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;

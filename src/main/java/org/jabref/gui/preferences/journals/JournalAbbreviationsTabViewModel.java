@@ -16,7 +16,6 @@ import javafx.collections.ListChangeListener;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
@@ -24,6 +23,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;

@@ -9,8 +9,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.preferences.ai.AiPreferences;
 
 import com.google.common.eventbus.EventBus;

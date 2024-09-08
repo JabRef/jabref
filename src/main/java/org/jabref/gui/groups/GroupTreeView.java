@@ -55,11 +55,11 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
