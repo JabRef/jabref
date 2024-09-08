@@ -13,7 +13,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,9 +35,9 @@ public class AutoLinkFilesAction extends SimpleCommand {
     private final PreferencesService preferences;
     private final StateManager stateManager;
     private final UndoManager undoManager;
-    private final TaskExecutor taskExecutor;
+    private final UiTaskExecutor taskExecutor;
 
-    public AutoLinkFilesAction(DialogService dialogService, PreferencesService preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
+    public AutoLinkFilesAction(DialogService dialogService, PreferencesService preferences, StateManager stateManager, UndoManager undoManager, UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;

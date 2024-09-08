@@ -25,6 +25,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
@@ -135,7 +136,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                 libraryTab,
                 dialogService,
                 stateManager,
-                taskExecutor,
+                (UiTaskExecutor) taskExecutor,
                 fileUpdateMonitor);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());

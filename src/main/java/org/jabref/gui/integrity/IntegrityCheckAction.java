@@ -11,7 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -24,7 +24,7 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class IntegrityCheckAction extends SimpleCommand {
 
-    private final TaskExecutor taskExecutor;
+    private final UiTaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final Supplier<LibraryTab> tabSupplier;
     private final PreferencesService preferencesService;
@@ -35,7 +35,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                                 PreferencesService preferencesService,
                                 DialogService dialogService,
                                 StateManager stateManager,
-                                TaskExecutor taskExecutor,
+                                UiTaskExecutor taskExecutor,
                                 JournalAbbreviationRepository abbreviationRepository) {
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;

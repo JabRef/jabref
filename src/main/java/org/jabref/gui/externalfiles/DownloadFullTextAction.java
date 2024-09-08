@@ -13,7 +13,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -36,12 +36,12 @@ public class DownloadFullTextAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final PreferencesService preferences;
-    private final TaskExecutor taskExecutor;
+    private final UiTaskExecutor taskExecutor;
 
     public DownloadFullTextAction(DialogService dialogService,
                                   StateManager stateManager,
                                   PreferencesService preferences,
-                                  TaskExecutor taskExecutor) {
+                                  UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;

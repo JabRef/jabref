@@ -72,6 +72,7 @@ import org.jabref.gui.texparser.ParseLatexAction;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
@@ -247,12 +248,12 @@ public class MainMenu extends MenuBar {
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame::getCurrentLibraryTab, dialogService, stateManager, preferencesService, entryTypesManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferencesService)),
-                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferencesService, dialogService, stateManager, taskExecutor, undoManager)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, preferencesService, stateManager, undoManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, preferencesService, stateManager, undoManager, (UiTaskExecutor) taskExecutor)),
 
                 new SeparatorMenuItem(),
 
@@ -272,7 +273,7 @@ public class MainMenu extends MenuBar {
 
         lookup.getItems().addAll(
                 lookupIdentifiers,
-                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferencesService, taskExecutor)),
+                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferencesService, (UiTaskExecutor) taskExecutor)),
 
                 new SeparatorMenuItem(),
 
@@ -292,7 +293,7 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF,
                         new WriteMetadataToLinkedPdfsAction(dialogService, preferencesService.getFieldPreferences(), preferencesService.getFilePreferences(), preferencesService.getXmpPreferences(), entryTypesManager, abbreviationRepository, taskExecutor, stateManager)),
-                factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, preferencesService, stateManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, preferencesService, stateManager, (UiTaskExecutor) taskExecutor)), // we know at this point that this is a UITaskExecutor
 
                 new SeparatorMenuItem(),
 

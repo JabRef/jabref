@@ -19,7 +19,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.importer.NewEntryAction;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -56,14 +56,14 @@ public class EntryTypeViewModel {
     private final DialogService dialogService;
     private final Validator idFieldValidator;
     private final StateManager stateManager;
-    private final TaskExecutor taskExecutor;
+    private final UiTaskExecutor taskExecutor;
     private final FileUpdateMonitor fileUpdateMonitor;
 
     public EntryTypeViewModel(PreferencesService preferences,
                               LibraryTab libraryTab,
                               DialogService dialogService,
                               StateManager stateManager,
-                              TaskExecutor taskExecutor,
+                              UiTaskExecutor taskExecutor,
                               FileUpdateMonitor fileUpdateMonitor) {
         this.libraryTab = libraryTab;
         this.preferencesService = preferences;

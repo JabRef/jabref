@@ -120,7 +120,13 @@ public class UiTaskExecutor implements TaskExecutor {
         return execute(javafxTask);
     }
 
-    @Override
+    /**
+     * Runs the given task and returns a Future representing that task. Usually, you want to use the other method {@link
+     * #execute(BackgroundTask)}.
+     *
+     * @param <V>  type of return value of the task
+     * @param task the task to run
+     */
     public <V> Future<V> execute(Task<V> task) {
         executor.submit(task);
         return task;
@@ -159,7 +165,7 @@ public class UiTaskExecutor implements TaskExecutor {
      * @param task the BackgroundTask to wrap
      * @return a new Javafx Task object
      */
-    private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
+    public static <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<>() {
             {
                 this.updateMessage(task.messageProperty().get());
@@ -200,7 +206,7 @@ public class UiTaskExecutor implements TaskExecutor {
         return javaTask;
     }
 
-    private Exception convertToException(Throwable throwable) {
+    private static Exception convertToException(Throwable throwable) {
         if (throwable instanceof Exception exception) {
             return exception;
         } else {

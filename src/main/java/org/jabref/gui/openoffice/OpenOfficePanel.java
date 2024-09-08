@@ -39,7 +39,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -99,7 +99,7 @@ public class OpenOfficePanel {
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
-    private final TaskExecutor taskExecutor;
+    private final UiTaskExecutor taskExecutor;
     private final StyleLoader loader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -112,7 +112,7 @@ public class OpenOfficePanel {
                            AiService aiService,
                            KeyBindingRepository keyBindingRepository,
                            JournalAbbreviationRepository abbreviationRepository,
-                           TaskExecutor taskExecutor,
+                           UiTaskExecutor taskExecutor,
                            DialogService dialogService,
                            StateManager stateManager,
                            FileUpdateMonitor fileUpdateMonitor,

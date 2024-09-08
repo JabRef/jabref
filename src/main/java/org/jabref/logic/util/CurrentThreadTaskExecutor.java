@@ -7,8 +7,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import javafx.concurrent.Task;
-
 import org.jabref.gui.util.TaskExecutor;
 
 import org.slf4j.Logger;
@@ -50,11 +48,6 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
             }
             return new FailedFuture<>(exception);
         }
-    }
-
-    @Override
-    public <V> Future<V> execute(Task<V> task) {
-        return task;
     }
 
     @Override

@@ -26,6 +26,7 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportCleanup;
@@ -407,7 +408,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
     void autoSetFileLinks(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
-            new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, taskExecutor).execute();
+            new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, (UiTaskExecutor) taskExecutor).execute();
         }
     }
 }
