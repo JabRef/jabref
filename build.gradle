@@ -30,6 +30,8 @@ plugins {
     id 'idea'
 
     id 'org.openrewrite.rewrite' version '6.20.0'
+
+    id "org.itsallcode.openfasttrace" version "3.0.0"
 }
 
 // Enable following for debugging
@@ -897,4 +899,8 @@ jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
+}
+
+requirementTracing {
+    inputDirectories = files('docs', 'src/main/java', 'src/test/java')
 }
