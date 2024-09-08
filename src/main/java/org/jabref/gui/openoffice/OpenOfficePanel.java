@@ -618,12 +618,17 @@ public class OpenOfficePanel {
     }
 
     private ContextMenu createSettingsPopup() {
-        OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
 
         ContextMenu contextMenu = new ContextMenu();
 
+        if (currentStyle instanceof JStyle) {
+            addAlwaysCitedOnPagesTextOption(contextMenu);
+        }
+
+        OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
+
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
-        autoSync.selectedProperty().set(preferencesService.getOpenOfficePreferences().getSyncWhenCiting());
+        autoSync.selectedProperty().set(openOfficePreferences.getSyncWhenCiting());
 
         ToggleGroup toggleGroup = new ToggleGroup();
         RadioMenuItem useActiveBase = new RadioMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
@@ -656,5 +661,16 @@ public class OpenOfficePanel {
                 clearConnectionSettings);
 
         return contextMenu;
+    }
+
+    private void addAlwaysCitedOnPagesTextOption(ContextMenu contextMenu) {
+        OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
+
+        CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add Cited on pages"));
+
+        alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
+        alwaysAddCitedOnPagesText.setOnAction(e -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
+
+        contextMenu.getItems().add(alwaysAddCitedOnPagesText);
     }
 }
