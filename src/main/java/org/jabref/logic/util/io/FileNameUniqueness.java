@@ -65,7 +65,7 @@ public class FileNameUniqueness {
      *         false when there is no "similar" file name or the content is different from that of files with "similar" name
      * @throws IOException Fail when the file is not exist or something wrong when reading the file
      */
-    public static boolean isDuplicatedFile(Path directory, Path fileName, Consumer<String> messageOnDeletion ) throws IOException {
+    public static boolean isDuplicatedFile(Path directory, Path fileName, Consumer<String> messageOnDeletion) throws IOException {
         Objects.requireNonNull(directory);
         Objects.requireNonNull(fileName);
 

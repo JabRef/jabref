@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.push.PushToTexShop;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
@@ -15,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 class FileNameUniquenessTest {
 
@@ -56,7 +52,6 @@ class FileNameUniquenessTest {
 
     @Test
     void isDuplicatedFileWithNoSimilarNames() throws IOException {
-        DialogService dialogService = mock(DialogService.class);
         String filename1 = "file1.txt";
         Path filePath1 = tempDir.resolve(filename1);
         Files.createFile(filePath1);
