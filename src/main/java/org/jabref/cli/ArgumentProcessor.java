@@ -461,6 +461,7 @@ public class ArgumentProcessor {
 
         List<BibEntry> matches;
         try {
+            // extract current thread task executor from luceneManager
             matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), preferencesService.getFilePreferences()).getMatches();
         } catch (IOException e) {
             LOGGER.error("Error occurred when searching", e);
@@ -730,6 +731,9 @@ public class ArgumentProcessor {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
             LOGGER.info(Localization.lang("Automatically setting file links"));
+
+            // this needs the named compound and it will execute stuff on the javafx thread
+
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                     parserResult.getDatabaseContext(),
                     preferencesService.getFilePreferences(),
