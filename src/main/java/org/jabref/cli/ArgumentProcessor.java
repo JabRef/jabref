@@ -734,7 +734,7 @@ public class ArgumentProcessor {
                     parserResult.getDatabaseContext().getDatabasePath()
                                 .map(Path::getFileName)
                                 .map(Path::toString).orElse("UNKNOWN"));
- 
+
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                     parserResult.getDatabaseContext(),
                     preferencesService.getFilePreferences(),

@@ -14,24 +14,19 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.concurrent.Task;
-import javafx.scene.Node;
 
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.logic.l10n.Localization;
-
-import com.google.common.collect.ImmutableMap;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is essentially a wrapper around {@link Task}.
- * We cannot use {@link Task} directly since it runs certain update notifications on the JavaFX thread,
+ * This class is essentially a wrapper around {@link javafx.concurrent.Task}.
+ * We cannot use {@link javafx.concurrent.Task} directly since it runs certain update notifications on the JavaFX thread,
  * and so makes testing harder.
  * We take the opportunity and implement a fluid interface.
  * <p>
- * A task created here is to be submitted to {@link org.jabref.gui.Globals#TASK_EXECUTOR}: Use {@link TaskExecutor#execute(BackgroundTask)} to submit.
+ * A task created here is to be submitted to {@link TaskExecutor#execute(BackgroundTask)} to submit.
+ * This class is injected at <code>@Inject TaskExecutor</code>
  * <p>
  * Example (for using the fluent interface)
  * <pre>{@code
@@ -52,10 +47,6 @@ import org.slf4j.LoggerFactory;
  * @param <V> type of the return value of the task
  */
 public abstract class BackgroundTask<V> {
-
-    public static ImmutableMap<String, Node> iconMap = ImmutableMap.of(
-            Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
-    );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundTask.class);
 
@@ -294,10 +285,6 @@ public abstract class BackgroundTask<V> {
     public BackgroundTask<V> withInitialMessage(String message) {
         updateMessage(message);
         return this;
-    }
-
-    public static Node getIcon(Task<?> task) {
-        return BackgroundTask.iconMap.getOrDefault(task.getTitle(), null);
     }
 
     protected record BackgroundProgress(

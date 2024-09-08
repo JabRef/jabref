@@ -33,10 +33,10 @@ import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
@@ -234,7 +234,7 @@ public class MainToolBar extends ToolBar {
             TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
             taskProgressSubscription = EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getRunningBackgroundTasks());
             taskProgressView.setRetainTasks(false);
-            taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
+            taskProgressView.setGraphicFactory(task -> ThemeManager.getDownloadIconTitleMap.getOrDefault(task.getTitle(), null));
 
             if (progressViewPopOver == null) {
                 progressViewPopOver = new PopOver(taskProgressView);

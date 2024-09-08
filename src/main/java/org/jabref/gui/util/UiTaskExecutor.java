@@ -96,6 +96,15 @@ public class UiTaskExecutor implements TaskExecutor {
         Platform.runLater(runnable);
     }
 
+    /**
+     * This will convert the given {@link BackgroundTask} to a JavaFX {@link Task}
+     * The JavaFX task executes the call method a background thread and the onFailed onSucceed on the FX UI thread
+     *
+     * @param task the BackgroundTask to run
+     * @param <V> The background task type
+     *
+     * @return Future of a JavaFX Task which will execute the call method a background thread
+     */
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
@@ -128,7 +137,7 @@ public class UiTaskExecutor implements TaskExecutor {
     public void shutdown() {
         StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
         if (stateManager != null) {
-            stateManager.getRunningBackgroundTasks().stream().forEach(Task::cancel);
+            stateManager.getRunningBackgroundTasks().forEach(Task::cancel);
         }
         executor.shutdownNow();
         scheduledExecutor.shutdownNow();
@@ -143,11 +152,11 @@ public class UiTaskExecutor implements TaskExecutor {
     }
 
     /**
-     * Generates a wrapper JavaFX {@link Task} monitoring the progress based on the data given from the task.
+     * Generates a wrapper with a JavaFX {@link Task} for our BackgroundTask monitoring the progress based on the data given from the task.
      * <code>call</code> is routed to the given task object.
      *
      * @param task the BackgroundTask to wrap
-     * @return a new Task object
+     * @return a new Javafx Task object
      */
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<>() {

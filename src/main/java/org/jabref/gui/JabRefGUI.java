@@ -148,6 +148,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(UndoManager.class, countingUndoManager);
         Injector.setModelOrService(CountingUndoManager.class, countingUndoManager);
 
+        // our Default task executor is the UITaskExecutor which can use the fx thread
         JabRefGUI.taskExecutor = new UiTaskExecutor();
         Injector.setModelOrService(TaskExecutor.class, taskExecutor);
 
