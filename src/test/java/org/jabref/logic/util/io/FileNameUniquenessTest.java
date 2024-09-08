@@ -56,7 +56,6 @@ class FileNameUniquenessTest {
 
     @Test
     void isDuplicatedFileWithNoSimilarNames() throws IOException {
-        DialogService dialogService = mock(DialogService.class);
         String filename1 = "file1.txt";
         Path filePath1 = tempDir.resolve(filename1);
         Files.createFile(filePath1);
