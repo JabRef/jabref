@@ -11,13 +11,16 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabase;
@@ -27,10 +30,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.logic.exporter.ExportPreferences;
-import org.jabref.gui.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.logic.LibraryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

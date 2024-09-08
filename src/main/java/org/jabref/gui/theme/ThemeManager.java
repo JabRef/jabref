@@ -17,13 +17,13 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.gui.WorkspacePreferences;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;

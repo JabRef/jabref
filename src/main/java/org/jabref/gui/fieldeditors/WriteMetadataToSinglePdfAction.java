@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
@@ -20,7 +21,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.gui.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

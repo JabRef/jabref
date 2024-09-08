@@ -25,6 +25,7 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.preview.CopyCitationAction;
+import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -33,7 +34,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.gui.preview.PreviewPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 

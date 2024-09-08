@@ -11,9 +11,9 @@ import java.nio.file.Path;
 import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.logic.util.Directories;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.gui.FilePreferences;
 
 import org.slf4j.LoggerFactory;
 

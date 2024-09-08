@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.gui.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -22,6 +22,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -36,7 +37,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.OS;
-import org.jabref.gui.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.core.UnirestException;

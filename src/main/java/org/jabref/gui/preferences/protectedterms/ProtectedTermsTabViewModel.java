@@ -15,6 +15,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -27,7 +28,6 @@ import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.gui.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;

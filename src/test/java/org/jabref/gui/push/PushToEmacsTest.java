@@ -7,8 +7,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.util.OS;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.util.OS;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;

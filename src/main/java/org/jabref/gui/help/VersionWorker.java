@@ -7,12 +7,12 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.Version;
-import org.jabref.gui.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;

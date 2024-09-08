@@ -20,12 +20,12 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.gui.frame.SidePanePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

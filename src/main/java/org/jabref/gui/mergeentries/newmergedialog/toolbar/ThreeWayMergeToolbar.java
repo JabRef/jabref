@@ -14,10 +14,10 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;

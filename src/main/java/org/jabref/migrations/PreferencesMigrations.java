@@ -21,6 +21,7 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.OS;
@@ -29,7 +30,6 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.github.javakeyring.Keyring;

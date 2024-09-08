@@ -20,6 +20,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -36,7 +37,6 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.gui.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class StyleSelectDialogViewModel {

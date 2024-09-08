@@ -2,7 +2,6 @@ package org.jabref.logic.ai.chatting.chathistory;
 
 import java.nio.file.Path;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage;
 import org.jabref.logic.util.NotificationService;
 

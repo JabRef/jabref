@@ -5,13 +5,13 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.gui.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
