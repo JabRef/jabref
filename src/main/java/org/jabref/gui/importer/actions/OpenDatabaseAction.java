@@ -200,7 +200,6 @@ public class OpenDatabaseAction extends SimpleCommand {
                 file,
                 dialogService,
                 preferencesService,
-                aiService,
                 stateManager,
                 tabContainer,
                 fileUpdateMonitor,

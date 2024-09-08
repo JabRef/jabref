@@ -127,7 +127,6 @@ import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.ai.AiApiKeyProvider;
 import org.jabref.preferences.ai.AiPreferences;
 import org.jabref.preferences.ai.AiProvider;
 import org.jabref.preferences.ai.EmbeddingModel;
@@ -155,7 +154,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Service
-public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
+public class JabRefPreferences implements PreferencesService {
 
     // Push to application preferences
     public static final String PUSH_EMACS_PATH = "emacsPath";
@@ -484,9 +483,6 @@ public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
     private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = "aiDocumentSplitterOverlapSize";
     private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
-
-    private static final String KEYRING_AI_SERVICE = "org.jabref.ai";
-    private static final String KEYRING_AI_SERVICE_ACCOUNT = "apiKey";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
@@ -2793,7 +2789,6 @@ public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
         boolean aiEnabled = getBoolean(AI_ENABLED);
 
         aiPreferences = new AiPreferences(
-                this,
                 aiEnabled,
                 AiProvider.valueOf(get(AI_PROVIDER)),
                 get(AI_OPEN_AI_CHAT_MODEL),
@@ -2836,34 +2831,6 @@ public class JabRefPreferences implements PreferencesService, AiApiKeyProvider {
         EasyBind.listen(aiPreferences.ragMinScoreProperty(), (obs, oldValue, newValue) -> putDouble(AI_RAG_MIN_SCORE, newValue.doubleValue()));
 
         return aiPreferences;
-    }
-
-    public String getApiKeyForAiProvider(AiProvider aiProvider) {
-        try (final Keyring keyring = Keyring.create()) {
-            return keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
-        } catch (PasswordAccessException e) {
-            LOGGER.debug("No API key stored for provider {}. Returning an empty string", aiProvider.getLabel());
-            return "";
-        } catch (Exception e) {
-            LOGGER.warn("JabRef could not open keyring for retrieving {} API token", aiProvider.getLabel(), e);
-            return "";
-        }
-    }
-
-    public void storeAiApiKeyInKeyring(AiProvider aiProvider, String newKey) {
-        try (final Keyring keyring = Keyring.create()) {
-            if (StringUtil.isNullOrEmpty(newKey)) {
-                try {
-                    keyring.deletePassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
-                } catch (PasswordAccessException ex) {
-                    LOGGER.debug("API key for provider {} not stored in keyring. JabRef does not store an empty key.", aiProvider.getLabel());
-                }
-            } else {
-                keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name(), newKey);
-            }
-        } catch (Exception e) {
-            LOGGER.warn("JabRef could not open keyring for storing {} API token", aiProvider.getLabel(), e);
-        }
     }
 
     //*************************************************************************************************************

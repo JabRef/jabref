@@ -1,11 +1,13 @@
 package org.jabref.preferences.ai;
 
+import java.util.List;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -14,10 +16,18 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.ai.AiDefaultPreferences;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.model.strings.StringUtil;
+
+import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AiPreferences {
-    private final PreferencesService preferencesService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiPreferences.class);
+
+    private static final String KEYRING_AI_SERVICE = "org.jabref.ai";
+    private static final String KEYRING_AI_SERVICE_ACCOUNT = "apiKey";
 
     private final BooleanProperty enableAi;
 
@@ -44,8 +54,7 @@ public class AiPreferences {
 
     private Runnable apiKeyChangeListener;
 
-    public AiPreferences(PreferencesService preferencesService,
-                         boolean enableAi,
+    public AiPreferences(boolean enableAi,
                          AiProvider aiProvider,
                          String openAiChatModel,
                          String mistralAiChatModel,
@@ -63,8 +72,6 @@ public class AiPreferences {
                          int ragMaxResultsCount,
                          double ragMinScore
     ) {
-        this.preferencesService = preferencesService;
-
         this.enableAi = new SimpleBooleanProperty(enableAi);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);
@@ -87,6 +94,35 @@ public class AiPreferences {
         this.documentSplitterOverlapSize = new SimpleIntegerProperty(documentSplitterOverlapSize);
         this.ragMaxResultsCount = new SimpleIntegerProperty(ragMaxResultsCount);
         this.ragMinScore = new SimpleDoubleProperty(ragMinScore);
+    }
+
+    public String getApiKeyForAiProvider(AiProvider aiProvider) {
+        try (final Keyring keyring = Keyring.create()) {
+            return keyring.getPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
+        } catch (
+                PasswordAccessException e) {
+            LOGGER.debug("No API key stored for provider {}. Returning an empty string", aiProvider.getLabel());
+            return "";
+        } catch (Exception e) {
+            LOGGER.warn("JabRef could not open keyring for retrieving {} API token", aiProvider.getLabel(), e);
+            return "";
+        }
+    }
+
+    public void storeAiApiKeyInKeyring(AiProvider aiProvider, String newKey) {
+        try (final Keyring keyring = Keyring.create()) {
+            if (StringUtil.isNullOrEmpty(newKey)) {
+                try {
+                    keyring.deletePassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name());
+                } catch (PasswordAccessException ex) {
+                    LOGGER.debug("API key for provider {} not stored in keyring. JabRef does not store an empty key.", aiProvider.getLabel());
+                }
+            } else {
+                keyring.setPassword(KEYRING_AI_SERVICE, KEYRING_AI_SERVICE_ACCOUNT + "-" + aiProvider.name(), newKey);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("JabRef could not open keyring for storing {} API token", aiProvider.getLabel(), e);
+        }
     }
 
     public BooleanProperty enableAiProperty() {
@@ -355,43 +391,23 @@ public class AiPreferences {
     }
 
     public void addListenerToChatModels(Runnable runnable) {
-        openAiChatModel.addListener((observableValue, oldValue, newValue) -> {
-            if (!newValue.equals(oldValue)) {
-                runnable.run();
-            }
-        });
+        List<Property<?>> observables = List.of(openAiChatModel, mistralAiChatModel, huggingFaceChatModel);
 
-        mistralAiChatModel.addListener((observableValue, oldValue, newValue) -> {
+        observables.forEach(obs -> obs.addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.equals(oldValue)) {
                 runnable.run();
             }
-        });
-
-        huggingFaceChatModel.addListener((observableValue, oldValue, newValue) -> {
-            if (!newValue.equals(oldValue)) {
-                runnable.run();
-            }
-        });
+        }));
     }
 
     public void addListenerToApiBaseUrls(Runnable runnable) {
-        openAiApiBaseUrl.addListener((observableValue, oldValue, newValue) -> {
-            if (!newValue.equals(oldValue)) {
-                runnable.run();
-            }
-        });
+        List<Property<?>> observables = List.of(openAiApiBaseUrl, mistralAiApiBaseUrl, huggingFaceApiBaseUrl);
 
-        mistralAiApiBaseUrl.addListener((observableValue, oldValue, newValue) -> {
+        observables.forEach(obs -> obs.addListener((observableValue, oldValue, newValue) -> {
             if (!newValue.equals(oldValue)) {
                 runnable.run();
             }
-        });
-
-        huggingFaceApiBaseUrl.addListener((observableValue, oldValue, newValue) -> {
-            if (!newValue.equals(oldValue)) {
-                runnable.run();
-            }
-        });
+        }));
     }
 
     public String getSelectedChatModel() {

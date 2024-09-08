@@ -310,7 +310,6 @@ public class OpenOfficePanel {
                     tabContainer,
                     dialogService,
                     preferencesService,
-                    aiService,
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,
