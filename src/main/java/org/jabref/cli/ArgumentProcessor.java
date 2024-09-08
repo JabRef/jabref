@@ -730,11 +730,11 @@ public class ArgumentProcessor {
     private void automaticallySetFileLinks(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
-            LOGGER.info(Localization.lang("Automatically setting file links for {}", parserResult.getDatabaseContext().getDatabasePath()
-                                                                                                 .map(Path::getFileName)
-                                                                                                 .map(Path::toString)
-                                                                                                 .orElse("UNKNOWN")));
-
+            LOGGER.info("Automatically setting file links for {}",
+                    parserResult.getDatabaseContext().getDatabasePath()
+                                .map(Path::getFileName)
+                                .map(Path::toString).orElse("UNKNOWN"));
+ 
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                     parserResult.getDatabaseContext(),
                     preferencesService.getFilePreferences(),
