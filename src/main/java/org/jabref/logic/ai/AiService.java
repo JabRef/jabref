@@ -7,8 +7,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.logic.ai.chatting.AiChatService;
-import org.jabref.logic.ai.chatting.chathistory.ChatHistoryService;
-import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage;
 import org.jabref.logic.ai.chatting.model.JabRefChatLanguageModel;
 import org.jabref.logic.ai.ingestion.IngestionService;
 import org.jabref.logic.ai.ingestion.MVStoreEmbeddingStore;
@@ -33,7 +31,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 public class AiService implements AutoCloseable {
     public static final String VERSION = "1";
 
-    private static final String CHAT_HISTORY_FILE_NAME = "chat-histories.mv";
     private static final String EMBEDDINGS_FILE_NAME = "embeddings.mv";
     private static final String FULLY_INGESTED_FILE_NAME = "fully-ingested.mv";
     private static final String SUMMARIES_FILE_NAME = "summaries.mv";
@@ -49,11 +46,9 @@ public class AiService implements AutoCloseable {
 
     private final MVStoreEmbeddingStore mvStoreEmbeddingStore;
     private final MVStoreFullyIngestedDocumentsTracker mvStoreFullyIngestedDocumentsTracker;
-    private final MVStoreChatHistoryStorage mvStoreChatHistoryStorage;
     private final MVStoreSummariesStorage mvStoreSummariesStorage;
 
     private final JabRefChatLanguageModel jabRefChatLanguageModel;
-    private final ChatHistoryService chatHistoryService;
     private final JabRefEmbeddingModel jabRefEmbeddingModel;
     private final AiChatService aiChatService;
     private final IngestionService ingestionService;
@@ -70,9 +65,7 @@ public class AiService implements AutoCloseable {
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(Directories.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), notificationService);
         this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(Directories.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), notificationService);
         this.mvStoreSummariesStorage = new MVStoreSummariesStorage(Directories.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), notificationService);
-        this.mvStoreChatHistoryStorage = new MVStoreChatHistoryStorage(Directories.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);
 
-        this.chatHistoryService = new ChatHistoryService(citationKeyPatternPreferences, mvStoreChatHistoryStorage);
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, notificationService, taskExecutor);
         this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, cachedThreadPool);
         this.ingestionService = new IngestionService(
@@ -99,10 +92,6 @@ public class AiService implements AutoCloseable {
         return aiChatService;
     }
 
-    public ChatHistoryService getChatHistoryService() {
-        return chatHistoryService;
-    }
-
     public IngestionService getIngestionService() {
         return ingestionService;
     }
@@ -118,11 +107,9 @@ public class AiService implements AutoCloseable {
         cachedThreadPool.shutdownNow();
         jabRefChatLanguageModel.close();
         jabRefEmbeddingModel.close();
-        chatHistoryService.close();
 
         mvStoreFullyIngestedDocumentsTracker.close();
         mvStoreEmbeddingStore.close();
-        mvStoreChatHistoryStorage.close();
         mvStoreSummariesStorage.close();
     }
 }

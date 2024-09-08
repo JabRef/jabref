@@ -8,11 +8,11 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -22,7 +22,7 @@ import org.jabref.preferences.PreferencesService;
 public class SidePaneContentFactory {
     private final LibraryTabContainer tabContainer;
     private final PreferencesService preferences;
-    private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
@@ -34,7 +34,7 @@ public class SidePaneContentFactory {
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
                                   PreferencesService preferences,
-                                  AiService aiService,
+                                  ChatHistoryService chatHistoryService,
                                   JournalAbbreviationRepository abbreviationRepository,
                                   TaskExecutor taskExecutor,
                                   DialogService dialogService,
@@ -45,7 +45,7 @@ public class SidePaneContentFactory {
                                   UndoManager undoManager) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
-        this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
         this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
@@ -63,12 +63,10 @@ public class SidePaneContentFactory {
                     stateManager,
                     preferences,
                     dialogService,
-                    aiService);
+                    chatHistoryService);
             case OPEN_OFFICE -> new OpenOfficePanel(
                     tabContainer,
                     preferences,
-                    aiService,
-                    preferences.getKeyBindingRepository(),
                     abbreviationRepository,
                     (UiTaskExecutor) taskExecutor,
                     dialogService,

@@ -14,6 +14,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -60,6 +61,7 @@ public class JabRefGUI extends Application {
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
     private static AiService aiService;
+    private static ChatHistoryService chatHistoryService;
 
     private static StateManager stateManager;
     private static ThemeManager themeManager;
@@ -95,6 +97,7 @@ public class JabRefGUI extends Application {
                 fileUpdateMonitor,
                 preferencesService,
                 aiService,
+                chatHistoryService,
                 stateManager,
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
@@ -164,6 +167,11 @@ public class JabRefGUI extends Application {
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
+
+        JabRefGUI.chatHistoryService = new ChatHistoryService(
+                preferencesService.getCitationKeyPatternPreferences(),
+                dialogService);
+        Injector.setModelOrService(ChatHistoryService.class, chatHistoryService);
     }
 
     private void setupProxy() {

@@ -33,6 +33,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -76,6 +77,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final SplitPane splitPane = new SplitPane();
     private final PreferencesService prefs;
     private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final GlobalSearchBar globalSearchBar;
 
     private final FileHistoryMenu fileHistory;
@@ -104,6 +106,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        FileUpdateMonitor fileUpdateMonitor,
                        PreferencesService preferencesService,
                        AiService aiService,
+                       ChatHistoryService chatHistoryService,
                        StateManager stateManager,
                        CountingUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
@@ -114,6 +117,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.prefs = preferencesService;
         this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
         this.entryTypesManager = entryTypesManager;
@@ -153,7 +157,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.sidePane = new SidePane(
                 this,
                 prefs,
-                aiService,
+                chatHistoryService,
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 taskExecutor,
                 dialogService,

@@ -50,6 +50,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
@@ -57,7 +58,6 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.gui.util.ViewModelTreeTableRowFactory;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -82,7 +82,7 @@ public class GroupTreeView extends BorderPane {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
 
@@ -108,13 +108,13 @@ public class GroupTreeView extends BorderPane {
                          StateManager stateManager,
                          PreferencesService preferencesService,
                          DialogService dialogService,
-                         AiService aiService
+                         ChatHistoryService chatHistoryService
     ) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
         this.dialogService = dialogService;
-        this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
 
         createNodes();
         this.getStylesheets().add(Objects.requireNonNull(GroupTreeView.class.getResource("GroupTree.css")).toExternalForm());
@@ -164,7 +164,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferencesService, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, chatHistoryService, preferencesService, taskExecutor, localDragboard);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

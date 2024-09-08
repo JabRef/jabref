@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
@@ -30,6 +31,7 @@ import org.jabref.preferences.ai.AiPreferences;
 public class AiChatTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
     private final AiService aiService;
+    private final ChatHistoryService chatHistoryService;
     private final DialogService dialogService;
     private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
@@ -41,6 +43,7 @@ public class AiChatTab extends EntryEditorTab {
 
     public AiChatTab(BibDatabaseContext bibDatabaseContext,
                      AiService aiService,
+                     ChatHistoryService chatHistoryService,
                      DialogService dialogService,
                      PreferencesService preferencesService,
                      TaskExecutor taskExecutor
@@ -48,6 +51,7 @@ public class AiChatTab extends EntryEditorTab {
         this.bibDatabaseContext = bibDatabaseContext;
 
         this.aiService = aiService;
+        this.chatHistoryService = chatHistoryService;
         this.dialogService = dialogService;
 
         this.aiPreferences = preferencesService.getAiPreferences();
@@ -72,9 +76,7 @@ public class AiChatTab extends EntryEditorTab {
      */
     @Override
     protected void bindToEntry(BibEntry entry) {
-        previousBibEntry.ifPresent(previousBibEntry ->
-                aiService.getChatHistoryService().closeChatHistoryForEntry(previousBibEntry));
-
+        previousBibEntry.ifPresent(previousBibEntry -> chatHistoryService.closeChatHistoryForEntry(previousBibEntry));
         previousBibEntry = Optional.of(entry);
 
         if (!aiPreferences.getEnableAi()) {
@@ -133,7 +135,7 @@ public class AiChatTab extends EntryEditorTab {
 
         setContent(new AiChatGuardedComponent(
                 chatName,
-                aiService.getChatHistoryService().getChatHistoryForEntry(entry),
+                chatHistoryService.getChatHistoryForEntry(entry),
                 bibDatabaseContext,
                 FXCollections.observableArrayList(new ArrayList<>(List.of(entry))),
                 aiService,
