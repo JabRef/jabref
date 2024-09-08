@@ -5,8 +5,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.gui.externalfiles.DateRange;
-import org.jabref.gui.externalfiles.ExternalFileSorter;
+import org.jabref.logic.externalfiles.DateRange;
+import org.jabref.logic.externalfiles.ExternalFileSorter;
 
 public class UnlinkedFilesDialogPreferences {
     private final StringProperty unlinkedFilesSelectedExtension;
