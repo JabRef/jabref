@@ -183,7 +183,8 @@ public class UiTaskExecutor implements TaskExecutor {
             }
 
             @Override
-            public V call() throws Exception {
+            protected V call() throws Exception {
+                // this requires that background task call is public as it's in another package
                 return task.call();
             }
         };

@@ -31,6 +31,7 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.WebViewStore;
@@ -85,7 +86,12 @@ public class JabRefGUI extends Application {
     public void start(Stage stage) {
         this.mainStage = stage;
 
-        FallbackExceptionHandler.installExceptionHandler();
+        FallbackExceptionHandler.installExceptionHandler((exception, thread) -> {
+            UiTaskExecutor.runInJavaFXThread(() -> {
+                DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+                dialogService.showErrorDialogAndWait("Uncaught exception occurred in " + thread, exception);
+            });
+        });
 
         initialize();
 
