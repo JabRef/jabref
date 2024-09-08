@@ -12,10 +12,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.logic.util.OS;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -34,7 +34,7 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     @FXML private Label icon;
     @Inject private DialogService dialogService;
 
-    private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(JabRefDesktop.getApplicationDirectory()).build();
+    private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().withInitialDirectory(OS.getNativeDesktop().getApplicationDirectory()).build();
     private final ExternalFileTypeItemViewModel item;
 
     private final ObservableList<ExternalFileTypeItemViewModel> fileTypes;

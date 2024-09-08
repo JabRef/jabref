@@ -7,7 +7,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.gui.StateManager;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.ai.chatting.AiChatService;
 import org.jabref.logic.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.logic.ai.chatting.chathistory.storages.MVStoreChatHistoryStorage;
@@ -20,6 +19,7 @@ import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.ai.AiPreferences;
@@ -81,10 +81,10 @@ public class AiService implements AutoCloseable {
 
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
 
-        this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(JabRefDesktop.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), notificationService);
-        this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(JabRefDesktop.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), notificationService);
-        this.mvStoreSummariesStorage = new MVStoreSummariesStorage(JabRefDesktop.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), notificationService);
-        this.mvStoreChatHistoryStorage = new MVStoreChatHistoryStorage(JabRefDesktop.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);
+        this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(OS.getNativeDesktop().getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), notificationService);
+        this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(OS.getNativeDesktop().getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), notificationService);
+        this.mvStoreSummariesStorage = new MVStoreSummariesStorage(OS.getNativeDesktop().getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), notificationService);
+        this.mvStoreChatHistoryStorage = new MVStoreChatHistoryStorage(OS.getNativeDesktop().getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);
 
         this.chatHistoryService = new ChatHistoryService(citationKeyPatternPreferences, mvStoreChatHistoryStorage);
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, notificationService, taskExecutor);
