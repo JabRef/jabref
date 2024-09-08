@@ -21,6 +21,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -158,7 +159,14 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                     .forEach(command -> openDatabases(command.parserResults()));
         }
 
+        // Handle automatically setting file links
+        uiCommands.stream()
+                  .filter(UiCommand.AutoSetFileLinks.class::isInstance).findAny()
+                  .map(UiCommand.AutoSetFileLinks.class::cast)
+                  .ifPresent(autoSetFileLinks -> autoSetFileLinks(autoSetFileLinks.parserResults()));
+
         // Handle jumpToEntry
+        // Needs to go last, because it requires all libraries opened
         uiCommands.stream()
                   .filter(UiCommand.JumpToEntryKey.class::isInstance)
                   .map(UiCommand.JumpToEntryKey.class::cast)
@@ -172,14 +180,13 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     }
 
     private void openDatabases(List<ParserResult> parserResults) {
-        final List<ParserResult> failed = new ArrayList<>();
         final List<ParserResult> toOpenTab = new ArrayList<>();
 
         // Remove invalid databases
         List<ParserResult> invalidDatabases = parserResults.stream()
                                                            .filter(ParserResult::isInvalid)
                                                            .toList();
-        failed.addAll(invalidDatabases);
+        final List<ParserResult> failed = new ArrayList<>(invalidDatabases);
         parserResults.removeAll(invalidDatabases);
 
         // passed file (we take the first one) should be focused
@@ -396,5 +403,11 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));
         dialogService.showCustomDialogAndWait(dialog);
+    }
+
+    void autoSetFileLinks(List<ParserResult> loaded) {
+        for (ParserResult parserResult : loaded) {
+            new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, taskExecutor).execute();
+        }
     }
 }
