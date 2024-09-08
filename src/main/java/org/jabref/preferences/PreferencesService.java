@@ -152,12 +152,4 @@ public interface PreferencesService {
     UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferences();
 
     AiPreferences getAiPreferences();
-
-    /**
-     * Retrieves the API key for the specified AI provider.
-     *
-     * @param  provider  the AI provider for which the API key is requested
-     * @return           the API key for the specified AI provider, or empty string if no key is found
-     */
-    String getApiKeyForAiProvider(AiProvider provider);
 }
