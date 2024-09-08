@@ -7,12 +7,12 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
 import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.LuceneSearcher;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.LuceneIndexer;

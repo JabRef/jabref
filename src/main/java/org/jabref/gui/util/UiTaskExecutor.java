@@ -17,6 +17,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.StateManager;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.HeadlessExecutorService;
 

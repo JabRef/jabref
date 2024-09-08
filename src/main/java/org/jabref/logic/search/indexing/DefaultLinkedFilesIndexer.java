@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;

@@ -29,7 +29,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
@@ -39,6 +38,7 @@ import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreviewPreferences;
 

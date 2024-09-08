@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 import javafx.concurrent.Task;
 
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DelayTaskThrottler;
 
 import org.slf4j.Logger;

@@ -10,9 +10,9 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.ai.ingestion.FileToDocument;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;

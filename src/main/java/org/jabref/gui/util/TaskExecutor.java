@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.concurrent.Task;
 
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DelayTaskThrottler;
 
 /**

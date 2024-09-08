@@ -2,7 +2,7 @@ package org.jabref.model.search;
 
 import java.util.Collection;
 
-import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.search.SearcherManager;

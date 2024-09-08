@@ -14,8 +14,8 @@ import java.util.stream.StreamSupport;
 
 import javafx.scene.control.CheckBoxTreeItem;
 
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileNodeViewModel;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;

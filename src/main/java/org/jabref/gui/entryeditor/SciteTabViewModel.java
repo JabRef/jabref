@@ -13,11 +13,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
