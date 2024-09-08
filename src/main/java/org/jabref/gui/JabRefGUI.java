@@ -40,7 +40,6 @@ import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.GuiPreferences;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.ai.AiApiKeyProvider;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -162,7 +161,6 @@ public class JabRefGUI extends Application {
                 preferencesService.getAiPreferences(),
                 preferencesService.getFilePreferences(),
                 preferencesService.getCitationKeyPatternPreferences(),
-                Injector.instantiateModelOrService(AiApiKeyProvider.class),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);

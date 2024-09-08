@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.linkedfile.DeleteFileAction;
@@ -62,8 +64,10 @@ import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -71,7 +75,6 @@ import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.BackgroundTask;
-import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -82,6 +85,7 @@ import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -118,7 +122,6 @@ public class LibraryTab extends Tab {
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -162,6 +165,8 @@ public class LibraryTab extends Tab {
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
     private final DirectoryMonitorManager directoryMonitorManager;
+
+    private ImportHandler importHandler;
     private LuceneManager luceneManager;
 
     /**
@@ -174,7 +179,6 @@ public class LibraryTab extends Tab {
                        LibraryTabContainer tabContainer,
                        DialogService dialogService,
                        PreferencesService preferencesService,
-                       AiService aiService,
                        StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
@@ -187,7 +191,6 @@ public class LibraryTab extends Tab {
         this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.preferencesService = Objects.requireNonNull(preferencesService);
-        this.aiService = Objects.requireNonNull(aiService);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -222,6 +225,14 @@ public class LibraryTab extends Tab {
 
         new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
+        importHandler = new ImportHandler(
+                bibDatabaseContext,
+                preferencesService,
+                fileUpdateMonitor,
+                undoManager,
+                stateManager,
+                dialogService,
+                taskExecutor);
 
         setupMainPanel();
         setupAutoCompletion();
@@ -449,63 +460,6 @@ public class LibraryTab extends Tab {
         return suggestionProviders;
     }
 
-    /**
-     * Removes the selected entries and files linked to selected entries from the database
-     *
-     * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
-     */
-    public void delete(StandardActions mode) {
-        delete(mode, mainTable.getSelectedEntries());
-    }
-
-    /**
-     * Removes the selected entries and files linked to selected entries from the database
-     *
-     * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
-     */
-    private void delete(StandardActions mode, List<BibEntry> entries) {
-        if (entries.isEmpty()) {
-            return;
-        }
-        if (mode == StandardActions.DELETE_ENTRY && !showDeleteConfirmationDialog(entries.size())) {
-            return;
-        }
-
-        // Delete selected entries
-        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, mode == StandardActions.CUT));
-        bibDatabaseContext.getDatabase().removeEntries(entries);
-
-        if (mode != StandardActions.CUT) {
-            List<LinkedFile> linkedFileList = entries.stream()
-                                                     .flatMap(entry -> entry.getFiles().stream())
-                                                     .distinct()
-                                                     .toList();
-
-            if (!linkedFileList.isEmpty()) {
-                List<LinkedFileViewModel> viewModels = linkedFileList.stream()
-                                                                     .map(linkedFile -> linkedFile.toModel(null, bibDatabaseContext, null, null, preferencesService))
-                                                                     .collect(Collectors.toList());
-
-                new DeleteFileAction(dialogService, preferencesService.getFilePreferences(), bibDatabaseContext, viewModels).execute();
-            }
-        }
-
-        ensureNotShowingBottomPanel(entries);
-
-        this.changedProperty.setValue(true);
-        switch (mode) {
-            case StandardActions.CUT -> dialogService.notify(Localization.lang("Cut %0 entry(ies)", entries.size()));
-            case StandardActions.DELETE_ENTRY -> dialogService.notify(Localization.lang("Deleted %0 entry(ies)", entries.size()));
-        }
-
-        // prevent the main table from loosing focus
-        mainTable.requestFocus();
-    }
-
-    public void delete(BibEntry entry) {
-        delete(StandardActions.DELETE_ENTRY, Collections.singletonList(entry));
-    }
-
     public void registerUndoableChanges(List<FieldChange> changes) {
         NamedCompound ce = new NamedCompound(Localization.lang("Save actions"));
         for (FieldChange change : changes) {
@@ -514,31 +468,6 @@ public class LibraryTab extends Tab {
         ce.end();
         if (ce.hasEdits()) {
             getUndoManager().addEdit(ce);
-        }
-    }
-
-    public void insertEntry(final BibEntry bibEntry) {
-        if (bibEntry != null) {
-            insertEntries(Collections.singletonList(bibEntry));
-        }
-    }
-
-    public void insertEntries(final List<BibEntry> entries) {
-        if (!entries.isEmpty()) {
-            bibDatabaseContext.getDatabase().insertEntries(entries);
-
-            // Set owner and timestamp
-            UpdateField.setAutomaticFields(entries,
-                    preferencesService.getOwnerPreferences(),
-                    preferencesService.getTimestampPreferences());
-            // Create an UndoableInsertEntries object.
-            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-
-            this.changedProperty.setValue(true); // The database just changed.
-            if (preferencesService.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
-                showAndEdit(entries.getFirst());
-            }
-            clearAndSelect(entries.getFirst());
         }
     }
 
@@ -563,7 +492,7 @@ public class LibraryTab extends Tab {
                 clipBoardManager,
                 entryTypesManager,
                 taskExecutor,
-                fileUpdateMonitor);
+                importHandler);
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         // content binding between StateManager#getselectedEntries and mainTable#getSelectedEntries does not work here as it does not trigger the ActionHelper#needsEntriesSelected checker for the menubar
         mainTable.addSelectionListener(event -> {
@@ -949,20 +878,151 @@ public class LibraryTab extends Tab {
                 stateManager));
     }
 
-    public void copy() {
-        mainTable.copy();
+    public void insertEntry(final BibEntry bibEntry) {
+        insertEntries(List.of(bibEntry));
     }
 
-    public void paste() {
-        mainTable.paste();
+    public void insertEntries(final List<BibEntry> entries) {
+        if (!entries.isEmpty()) {
+            importHandler.importCleanedEntries(entries);
+
+            // Create an UndoableInsertEntries object.
+            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+
+            markBaseChanged();
+            if (preferencesService.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
+                showAndEdit(entries.getFirst());
+            }
+            clearAndSelect(entries.getFirst());
+        }
+    }
+
+    public void copyEntry() {
+        int entriesCopied = doCopyEntry(getSelectedEntries());
+        if (entriesCopied >= 0) {
+            dialogService.notify(Localization.lang("Copied %0 entry(ies)", entriesCopied));
+        } else {
+            dialogService.notify(Localization.lang("Copy failed", entriesCopied));
+        }
+    }
+
+    private int doCopyEntry(List<BibEntry> selectedEntries) {
+        if (!selectedEntries.isEmpty()) {
+            List<BibtexString> stringConstants = bibDatabaseContext.getDatabase().getUsedStrings(selectedEntries);
+            try {
+                if (stringConstants.isEmpty()) {
+                    clipBoardManager.setContent(selectedEntries, entryTypesManager);
+                } else {
+                    clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);
+                }
+                return selectedEntries.size();
+            } catch (IOException e) {
+                LOGGER.error("Error while copying selected entries to clipboard.", e);
+                return -1;
+            }
+        }
+
+        return 0;
+    }
+
+    public void pasteEntry() {
+        List<BibEntry> entriesToAdd;
+        String content = ClipBoardManager.getContents();
+        entriesToAdd = importHandler.handleBibTeXData(content);
+        if (entriesToAdd.isEmpty()) {
+            entriesToAdd = handleNonBibTeXStringData(content);
+        }
+        if (entriesToAdd.isEmpty()) {
+            return;
+        }
+
+        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
+    }
+
+    private List<BibEntry> handleNonBibTeXStringData(String data) {
+        try {
+            return this.importHandler.handleStringData(data);
+        } catch (
+                FetcherException exception) {
+            if (exception instanceof FetcherClientException) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Look up identifier"), Localization.lang("No data was found for the identifier"));
+            } else if (exception instanceof FetcherServerException) {
+                dialogService.showInformationDialogAndWait(Localization.lang("Look up identifier"), Localization.lang("Server not available"));
+            } else {
+                dialogService.showErrorDialogAndWait(exception);
+            }
+            return List.of();
+        }
     }
 
     public void dropEntry(List<BibEntry> entriesToAdd) {
-        mainTable.dropEntry(entriesToAdd);
+        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
     }
 
-    public void cut() {
-        mainTable.cut();
+    public void cutEntry() {
+        int entriesCopied = doCopyEntry(getSelectedEntries());
+        int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
+
+        if (entriesCopied == entriesDeleted) {
+            dialogService.notify(Localization.lang("Cut %0 entry(ies)", entriesCopied));
+        } else {
+            dialogService.notify(Localization.lang("Cut failed", entriesCopied));
+            undoManager.undo();
+            clipBoardManager.setContent("");
+        }
+    }
+
+    /**
+     * Removes the selected entries and files linked to selected entries from the database
+     */
+    public void deleteEntry() {
+        int entriesDeleted = doDeleteEntry(StandardActions.DELETE_ENTRY, mainTable.getSelectedEntries());
+        dialogService.notify(Localization.lang("Deleted %0 entry(ies)", entriesDeleted));
+    }
+
+    public void deleteEntry(BibEntry entry) {
+        doDeleteEntry(StandardActions.DELETE_ENTRY, Collections.singletonList(entry));
+    }
+
+    /**
+     * Removes the selected entries and files linked to selected entries from the database
+     *
+     * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
+     */
+    private int doDeleteEntry(StandardActions mode, List<BibEntry> entries) {
+        if (entries.isEmpty()) {
+            return 0;
+        }
+        if (mode == StandardActions.DELETE_ENTRY && !showDeleteConfirmationDialog(entries.size())) {
+            return -1;
+        }
+
+        // Delete selected entries
+        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, mode == StandardActions.CUT));
+        bibDatabaseContext.getDatabase().removeEntries(entries);
+
+        if (mode != StandardActions.CUT) {
+            List<LinkedFile> linkedFileList = entries.stream()
+                                                     .flatMap(entry -> entry.getFiles().stream())
+                                                     .distinct()
+                                                     .toList();
+
+            if (!linkedFileList.isEmpty()) {
+                List<LinkedFileViewModel> viewModels = linkedFileList.stream()
+                                                                     .map(linkedFile -> linkedFile.toModel(null, bibDatabaseContext, null, null, preferencesService))
+                                                                     .collect(Collectors.toList());
+
+                new DeleteFileAction(dialogService, preferencesService.getFilePreferences(), bibDatabaseContext, viewModels).execute();
+            }
+        }
+
+        ensureNotShowingBottomPanel(entries);
+        markBaseChanged();
+
+        // prevent the main table from loosing focus
+        mainTable.requestFocus();
+
+        return entries.size();
     }
 
     public boolean isModified() {
@@ -993,7 +1053,6 @@ public class LibraryTab extends Tab {
                                               Path file,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
-                                              AiService aiService,
                                               StateManager stateManager,
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -1009,7 +1068,6 @@ public class LibraryTab extends Tab {
                 tabContainer,
                 dialogService,
                 preferencesService,
-                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -1031,7 +1089,6 @@ public class LibraryTab extends Tab {
                                               LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               PreferencesService preferencesService,
-                                              AiService aiService,
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,
@@ -1045,7 +1102,6 @@ public class LibraryTab extends Tab {
                 tabContainer,
                 dialogService,
                 preferencesService,
-                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,

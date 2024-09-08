@@ -9,7 +9,6 @@ import java.util.concurrent.Executors;
 
 import org.jabref.logic.ai.chatting.AiChatLogic;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.ai.AiApiKeyProvider;
 import org.jabref.preferences.ai.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -24,13 +23,13 @@ import dev.langchain4j.model.output.Response;
 /**
  * Wrapper around langchain4j chat language model.
  * <p>
- * This class listens to preferences changes.
+ * Notice, that the real chat model is created lazily, when it's needed. This is done, so API key is fetched only,
+ * when user wants to chat with AI.
  */
 public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable {
     private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(5);
 
     private final AiPreferences aiPreferences;
-    private final AiApiKeyProvider apiKeyProvider;
 
     private final HttpClient httpClient;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor(
@@ -39,9 +38,8 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
 
     private Optional<ChatLanguageModel> langchainChatModel = Optional.empty();
 
-    public JabRefChatLanguageModel(AiPreferences aiPreferences, AiApiKeyProvider apiKeyProvider) {
+    public JabRefChatLanguageModel(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
-        this.apiKeyProvider = apiKeyProvider;
         this.httpClient = HttpClient.newBuilder().connectTimeout(CONNECTION_TIMEOUT).executor(executorService).build();
 
         setupListeningToPreferencesChanges();
@@ -54,7 +52,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
      * and see {@link org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage}.
      */
     private void rebuild() {
-        String apiKey = apiKeyProvider.getApiKeyForAiProvider(aiPreferences.getAiProvider());
+        String apiKey = aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider());
         if (!aiPreferences.getEnableAi() || apiKey.isEmpty()) {
             langchainChatModel = Optional.empty();
             return;
@@ -62,7 +60,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
 
         switch (aiPreferences.getAiProvider()) {
             case OPEN_AI -> {
-                langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, apiKeyProvider, httpClient));
+                langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
             }
 
             case MISTRAL_AI -> {
@@ -118,7 +116,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
         if (langchainChatModel.isEmpty()) {
             if (!aiPreferences.getEnableAi()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, you need to enable chatting with attached PDF files in JabRef preferences (AI tab)."));
-            } else if (apiKeyProvider.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty()) {
+            } else if (aiPreferences.getApiKeyForAiProvider(aiPreferences.getAiProvider()).isEmpty()) {
                 throw new RuntimeException(Localization.lang("In order to use AI chat, set an API key inside JabRef preferences (AI tab)."));
             } else {
                 rebuild();
