@@ -5,9 +5,9 @@ import java.util.concurrent.Executor;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.segment.TextSegment;

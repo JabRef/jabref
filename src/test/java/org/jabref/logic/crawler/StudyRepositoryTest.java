@@ -27,7 +27,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.LibraryPreferences;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;

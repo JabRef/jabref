@@ -22,7 +22,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.CleanupPreferences;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class SavingPropertiesViewModel implements PropertiesTabViewModel {

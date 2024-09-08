@@ -5,13 +5,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
-import org.jabref.preferences.FilePreferences;
 
 public class FileExtensionViewModel {
 

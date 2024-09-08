@@ -10,7 +10,9 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.StateManager;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -24,8 +26,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;

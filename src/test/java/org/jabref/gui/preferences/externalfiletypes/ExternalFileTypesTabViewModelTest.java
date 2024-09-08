@@ -3,7 +3,7 @@ package org.jabref.gui.preferences.externalfiletypes;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

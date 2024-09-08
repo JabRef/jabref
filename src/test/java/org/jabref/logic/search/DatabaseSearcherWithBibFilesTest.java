@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.SimpleBooleanProperty;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -22,7 +23,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.FilePreferences;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.io.TempDir;

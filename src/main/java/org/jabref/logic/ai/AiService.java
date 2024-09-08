@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.logic.ai.chatting.AiChatService;
 import org.jabref.logic.ai.chatting.model.JabRefChatLanguageModel;
 import org.jabref.logic.ai.ingestion.IngestionService;
@@ -18,8 +19,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiPreferences;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 

@@ -27,10 +27,10 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.ExportPreferences;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.logic.exporter.ExportPreferences;
+import org.jabref.gui.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.LibraryPreferences;
+import org.jabref.logic.LibraryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

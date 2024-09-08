@@ -10,8 +10,8 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.gui.FilePreferences;
+import org.jabref.logic.ai.AiPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.slf4j.Logger;

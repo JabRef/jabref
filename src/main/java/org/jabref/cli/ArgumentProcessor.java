@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
@@ -41,6 +42,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.search.DatabaseSearcher;
+import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.OS;
@@ -55,9 +57,7 @@ import org.jabref.model.search.SearchQuery;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.SearchPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.base.Throwables;

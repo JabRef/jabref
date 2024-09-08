@@ -6,7 +6,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.util.Version;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.MrDlibPreferences;
+import org.jabref.gui.entryeditor.MrDlibPreferences;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;

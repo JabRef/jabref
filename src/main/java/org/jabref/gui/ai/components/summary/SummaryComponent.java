@@ -18,8 +18,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.gui.FilePreferences;
+import org.jabref.logic.ai.AiPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

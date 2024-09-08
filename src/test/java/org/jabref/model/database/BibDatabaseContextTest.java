@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.gui.FilePreferences;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

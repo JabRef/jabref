@@ -11,7 +11,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

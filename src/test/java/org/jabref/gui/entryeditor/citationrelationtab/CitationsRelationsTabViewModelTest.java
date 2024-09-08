@@ -8,6 +8,7 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.externalfiles.ImportHandler;
@@ -26,7 +27,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;

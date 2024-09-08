@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -15,7 +16,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;

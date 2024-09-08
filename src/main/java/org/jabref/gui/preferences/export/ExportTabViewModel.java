@@ -11,11 +11,11 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.ExportPreferences;
 
 public class ExportTabViewModel implements PreferenceTabViewModel {
 

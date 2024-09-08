@@ -15,13 +15,13 @@ import java.util.Optional;
 import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.LoggerFactory;
 

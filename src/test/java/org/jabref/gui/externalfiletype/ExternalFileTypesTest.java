@@ -7,9 +7,9 @@ import java.util.Set;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

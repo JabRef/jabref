@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.logic;
 
 import java.nio.file.Path;
 

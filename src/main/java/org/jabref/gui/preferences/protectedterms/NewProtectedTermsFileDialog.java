@@ -16,7 +16,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 
 public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
 

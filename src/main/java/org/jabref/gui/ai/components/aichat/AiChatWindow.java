@@ -5,14 +5,14 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.util.BaseWindow;
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiPreferences;
 
 import dev.langchain4j.data.message.ChatMessage;
 

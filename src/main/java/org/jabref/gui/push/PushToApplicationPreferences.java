@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.gui.push;
 
 import java.util.Map;
 

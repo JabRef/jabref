@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.Directories;
@@ -18,7 +19,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;

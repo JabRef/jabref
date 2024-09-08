@@ -36,7 +36,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.util.OS;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.core.UnirestException;

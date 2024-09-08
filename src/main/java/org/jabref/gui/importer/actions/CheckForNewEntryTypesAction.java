@@ -5,11 +5,11 @@ import java.util.stream.Collectors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;

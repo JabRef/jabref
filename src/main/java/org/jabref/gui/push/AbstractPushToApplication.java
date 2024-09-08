@@ -15,7 +15,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PushToApplicationPreferences;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;

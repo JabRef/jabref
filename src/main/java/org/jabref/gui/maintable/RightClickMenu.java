@@ -33,7 +33,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PreviewPreferences;
+import org.jabref.gui.preview.PreviewPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 

@@ -12,6 +12,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
@@ -20,7 +21,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;

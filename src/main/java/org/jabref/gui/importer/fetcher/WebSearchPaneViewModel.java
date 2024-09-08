@@ -23,7 +23,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.SidePanePreferences;
+import org.jabref.gui.frame.SidePanePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;

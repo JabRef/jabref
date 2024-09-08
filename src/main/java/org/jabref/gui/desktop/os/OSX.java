@@ -9,7 +9,7 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 
 /**
  * This class contains macOS (OSX) specific implementations for file directories and file/application open handling methods <br>

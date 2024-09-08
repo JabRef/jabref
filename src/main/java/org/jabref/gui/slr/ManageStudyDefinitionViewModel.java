@@ -32,7 +32,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
-import org.jabref.preferences.WorkspacePreferences;
+import org.jabref.gui.WorkspacePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -11,10 +11,12 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -24,9 +26,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.ai.AiPreferences;
 
 public class AiChatTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;

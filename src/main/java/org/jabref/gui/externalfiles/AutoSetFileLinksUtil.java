@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
@@ -18,7 +19,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

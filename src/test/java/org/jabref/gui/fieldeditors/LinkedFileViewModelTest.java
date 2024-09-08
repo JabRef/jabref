@@ -17,17 +17,17 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
 

@@ -12,7 +12,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 
 public class RelativePathsCleanup implements CleanupJob {
 

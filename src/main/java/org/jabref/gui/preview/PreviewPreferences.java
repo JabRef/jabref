@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.gui.preview;
 
 import java.nio.file.Path;
 import java.util.List;

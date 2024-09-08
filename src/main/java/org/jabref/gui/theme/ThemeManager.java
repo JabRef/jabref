@@ -23,7 +23,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.WorkspacePreferences;
+import org.jabref.gui.WorkspacePreferences;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;

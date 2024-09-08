@@ -40,7 +40,7 @@ import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreviewPreferences;
+import org.jabref.gui.preview.PreviewPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;

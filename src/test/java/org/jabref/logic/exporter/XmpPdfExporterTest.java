@@ -23,7 +23,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;

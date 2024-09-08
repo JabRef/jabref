@@ -20,6 +20,8 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -28,6 +30,7 @@ import org.jabref.gui.theme.Theme;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -39,10 +42,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.LibraryPreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.WorkspacePreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;

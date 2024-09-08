@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.gui.mergeentries;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
-import org.jabref.gui.mergeentries.DiffMode;
 
 public class MergeDialogPreferences {
     private final ObjectProperty<DiffMode> mergeDiffMode;
@@ -17,13 +16,13 @@ public class MergeDialogPreferences {
     private final BooleanProperty mergeApplyToAllEntries;
     private final ObjectProperty<DuplicateResolverDialog.DuplicateResolverResult> allEntriesDuplicateResolverDecision;
 
-    MergeDialogPreferences(DiffMode mergeDiffMode,
-                           boolean mergeShouldShowDiff,
-                           boolean mergeShouldShowUnifiedDiff,
-                           boolean mergeHighlightWords,
-                           boolean mergeShowChangedFieldsOnly,
-                           boolean mergeApplyToAllEntries,
-                           DuplicateResolverDialog.DuplicateResolverResult allEntriesDuplicateResolverDecision) {
+    public MergeDialogPreferences(DiffMode mergeDiffMode,
+                                  boolean mergeShouldShowDiff,
+                                  boolean mergeShouldShowUnifiedDiff,
+                                  boolean mergeHighlightWords,
+                                  boolean mergeShowChangedFieldsOnly,
+                                  boolean mergeApplyToAllEntries,
+                                  DuplicateResolverDialog.DuplicateResolverResult allEntriesDuplicateResolverDecision) {
         this.mergeDiffMode = new SimpleObjectProperty<>(mergeDiffMode);
         this.mergeShouldShowDiff = new SimpleBooleanProperty(mergeShouldShowDiff);
         this.mergeShouldShowUnifiedDiff = new SimpleBooleanProperty(mergeShouldShowUnifiedDiff);

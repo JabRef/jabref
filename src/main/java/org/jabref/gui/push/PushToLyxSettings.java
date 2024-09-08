@@ -2,8 +2,7 @@ package org.jabref.gui.push;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.PushToApplicationPreferences;
+import org.jabref.gui.FilePreferences;
 
 public class PushToLyxSettings extends PushToApplicationSettings {
 

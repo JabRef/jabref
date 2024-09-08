@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -17,7 +18,6 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResult;
 import org.jabref.model.search.SearchResults;
-import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.MultiReader;

@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

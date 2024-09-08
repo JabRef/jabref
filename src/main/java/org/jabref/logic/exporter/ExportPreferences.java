@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.logic.exporter;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -10,7 +10,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.model.metadata.SaveOrder;
 
 public class ExportPreferences {

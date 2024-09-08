@@ -12,7 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 
 public class RemoveLinksToNotExistentFiles implements CleanupJob {
     private final BibDatabaseContext databaseContext;

@@ -12,7 +12,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 
 public class NewVersionDialog extends BaseDialog<Boolean> {
 

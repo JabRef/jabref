@@ -18,7 +18,7 @@ import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsb
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.OpenLibraryIsbnFetcher;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.FilePreferences;
+import org.jabref.gui.FilePreferences;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
