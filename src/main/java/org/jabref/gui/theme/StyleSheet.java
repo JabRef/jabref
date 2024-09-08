@@ -33,6 +33,7 @@ abstract class StyleSheet {
 
     abstract void reload();
 
+    // TODO: How to solve this? without jabref gui
     static Optional<StyleSheet> create(String name) {
         Optional<URL> styleSheetUrl = Optional.ofNullable(JabRefGUI.class.getResource(name));
 

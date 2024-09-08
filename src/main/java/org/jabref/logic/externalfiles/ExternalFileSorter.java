@@ -1,4 +1,4 @@
-package org.jabref.gui.externalfiles;
+package org.jabref.logic.externalfiles;
 
 import org.jabref.logic.l10n.Localization;
 
