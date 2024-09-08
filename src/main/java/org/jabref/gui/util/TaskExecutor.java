@@ -9,7 +9,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.DelayTaskThrottler;
 
 /**
- * An object that executes submitted {@link Task}s. This
+ * An object that executes submitted {@link javafx.concurrent.Task}s. This
  * interface provides a way of decoupling task submission from the
  * mechanics of how each task will be run, including details of thread
  * use, scheduling, thread pooling, etc.
