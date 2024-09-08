@@ -3,8 +3,8 @@ package org.jabref.logic.util;
 import java.io.File;
 import java.nio.file.Path;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.os.OS;
 import org.jabref.model.search.SearchFieldConstants;
 
 import net.harawata.appdirs.AppDirsFactory;
@@ -28,38 +28,38 @@ public class Directories {
     public static Path getLogDirectory() {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(
-                                             NativeDesktop.APP_DIR_APP_NAME,
+                                             OS.APP_DIR_APP_NAME,
                                              "logs",
-                                             NativeDesktop.APP_DIR_APP_AUTHOR))
+                                             OS.APP_DIR_APP_AUTHOR))
                    .resolve(new BuildInfo().version.toString());
     }
 
     public static Path getBackupDirectory() {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(
-                                             NativeDesktop.APP_DIR_APP_NAME,
+                                             OS.APP_DIR_APP_NAME,
                                              "backups",
-                                             NativeDesktop.APP_DIR_APP_AUTHOR));
+                                             OS.APP_DIR_APP_AUTHOR));
     }
 
     public static Path getFulltextIndexBaseDirectory() {
         return Path.of(AppDirsFactory.getInstance()
-                                     .getUserDataDir(NativeDesktop.APP_DIR_APP_NAME,
+                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
                                              "lucene" + File.separator + SearchFieldConstants.VERSION,
-                                             NativeDesktop.APP_DIR_APP_AUTHOR));
+                                             OS.APP_DIR_APP_AUTHOR));
     }
 
     public static Path getAiFilesDirectory() {
         return Path.of(AppDirsFactory.getInstance()
-                .getUserDataDir(NativeDesktop.APP_DIR_APP_NAME,
+                .getUserDataDir(OS.APP_DIR_APP_NAME,
                         "ai" + File.separator + AiService.VERSION,
-                        NativeDesktop.APP_DIR_APP_AUTHOR));
+                        OS.APP_DIR_APP_AUTHOR));
     }
 
     public static Path getSslDirectory() {
         return Path.of(AppDirsFactory.getInstance()
-                                     .getUserDataDir(NativeDesktop.APP_DIR_APP_NAME,
+                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
                                              "ssl",
-                                             NativeDesktop.APP_DIR_APP_AUTHOR));
+                                             OS.APP_DIR_APP_AUTHOR));
     }
 }

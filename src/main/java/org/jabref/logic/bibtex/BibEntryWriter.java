@@ -14,8 +14,8 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -43,7 +43,7 @@ public class BibEntryWriter {
 
     public String serializeAll(List<BibEntry> entries, BibDatabaseMode databaseMode) throws IOException {
         StringWriter writer = new StringWriter();
-        BibWriter bibWriter = new BibWriter(writer, NativeDesktop.NEWLINE);
+        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         for (BibEntry entry : entries) {
             write(entry, bibWriter, databaseMode);
         }

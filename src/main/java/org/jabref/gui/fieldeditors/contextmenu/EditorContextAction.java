@@ -13,14 +13,14 @@ import javafx.scene.input.Clipboard;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.logic.os.OS;
 
 import com.sun.javafx.scene.control.Properties;
 
 public class EditorContextAction extends SimpleCommand {
 
-    private static final boolean SHOW_HANDLES = Properties.IS_TOUCH_SUPPORTED && !NativeDesktop.OS_X;
+    private static final boolean SHOW_HANDLES = Properties.IS_TOUCH_SUPPORTED && !OS.OS_X;
 
     private final StandardActions command;
     private final TextInputControl textInputControl;

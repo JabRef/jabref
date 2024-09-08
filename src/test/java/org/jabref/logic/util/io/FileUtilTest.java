@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.FilePreferences;
-import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -424,7 +424,7 @@ class FileUtilTest {
 
     public void testCTemp() {
         String fileName = "c:\\temp.pdf";
-        if (NativeDesktop.WINDOWS) {
+        if (OS.WINDOWS) {
             assertFalse(FileUtil.detectBadFileName(fileName));
         } else {
             assertTrue(FileUtil.detectBadFileName(fileName));

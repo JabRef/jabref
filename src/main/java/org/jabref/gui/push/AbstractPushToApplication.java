@@ -6,11 +6,11 @@ import java.util.Optional;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.Action;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
@@ -76,7 +76,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
         // Execute command
         try {
-            if (NativeDesktop.OS_X) {
+            if (OS.OS_X) {
                 String[] commands = getCommandLine(keyString);
                 if (commands.length < 3) {
                     LOGGER.error("Commandline does not contain enough parameters to \"push to application\"");

@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
@@ -225,8 +225,8 @@ public class DuplicateCheck {
     }
 
     private static int compareField(final String stringOne, final String stringTwo) {
-        final String processedStringOne = StringUtil.unifyLineBreaks(stringOne.toLowerCase(Locale.ROOT).trim(), NativeDesktop.NEWLINE);
-        final String processedStringTwo = StringUtil.unifyLineBreaks(stringTwo.toLowerCase(Locale.ROOT).trim(), NativeDesktop.NEWLINE);
+        final String processedStringOne = StringUtil.unifyLineBreaks(stringOne.toLowerCase(Locale.ROOT).trim(), OS.NEWLINE);
+        final String processedStringTwo = StringUtil.unifyLineBreaks(stringTwo.toLowerCase(Locale.ROOT).trim(), OS.NEWLINE);
         final double similarity = DuplicateCheck.correlateByWords(processedStringOne, processedStringTwo);
         if (similarity > 0.8) {
             return EQUAL;
@@ -260,8 +260,8 @@ public class DuplicateCheck {
         if (stringOne.isEmpty() || stringTwo.isEmpty()) {
             return false;
         }
-        return StringUtil.unifyLineBreaks(stringOne.get(), NativeDesktop.NEWLINE).equals(
-                StringUtil.unifyLineBreaks(stringTwo.get(), NativeDesktop.NEWLINE));
+        return StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
+                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE));
     }
 
     /**

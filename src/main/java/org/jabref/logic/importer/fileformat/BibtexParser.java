@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
@@ -37,6 +36,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
@@ -175,7 +175,7 @@ public class BibtexParser implements Parser {
     }
 
     private String determineNewLineSeparator() throws IOException {
-        String newLineSeparator = NativeDesktop.NEWLINE;
+        String newLineSeparator = OS.NEWLINE;
         StringWriter stringWriter = new StringWriter(BibtexParser.LOOKAHEAD);
         int i = 0;
         int currentChar;
@@ -1062,7 +1062,7 @@ public class BibtexParser implements Parser {
                     //   This is already done
                     //
                     // 2. Treat `}` as closing bracket
-                    isClosingBracket = (nextTwoCharacters[0] == ',') && ((nextTwoCharacters[1] == NativeDesktop.NEWLINE.charAt(0)) || (nextTwoCharacters[1] == '\n'));
+                    isClosingBracket = (nextTwoCharacters[0] == ',') && ((nextTwoCharacters[1] == OS.NEWLINE.charAt(0)) || (nextTwoCharacters[1] == '\n'));
                 } else {
                     isClosingBracket = true;
                 }

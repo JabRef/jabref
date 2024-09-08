@@ -111,6 +111,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
 import org.jabref.logic.preferences.OwnerPreferences;
@@ -120,7 +121,6 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
@@ -626,10 +626,10 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
         defaults.put(BASE_DOI_URI, "https://doi.org");
 
-        if (NativeDesktop.OS_X) {
+        if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
             defaults.put(PUSH_EMACS_PATH, "emacsclient");
-        } else if (NativeDesktop.WINDOWS) {
+        } else if (OS.WINDOWS) {
             defaults.put(PUSH_EMACS_PATH, "emacsclient.exe");
         } else {
             // Linux
@@ -765,9 +765,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(UNLINKED_FILES_SELECTED_SORT, ExternalFileSorter.DEFAULT.name());
 
         // OpenOffice/LibreOffice
-        if (NativeDesktop.WINDOWS) {
+        if (OS.WINDOWS) {
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);
-        } else if (NativeDesktop.OS_X) {
+        } else if (OS.OS_X) {
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_EXEC_PATH);
         } else { // Linux
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
@@ -831,7 +831,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(KINDLE_EMAIL, "");
 
-        if (NativeDesktop.WINDOWS) {
+        if (OS.WINDOWS) {
             defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.TRUE);
         } else {
             defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
@@ -845,7 +845,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
         defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
-        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, NativeDesktop.NEWLINE));
+        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
 
         // use citation key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, FilePreferences.DEFAULT_FILENAME_PATTERNS[1]);
@@ -862,7 +862,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
         defaults.put(USE_DEFAULT_FILE_BROWSER_APPLICATION, Boolean.TRUE);
-        if (NativeDesktop.WINDOWS) {
+        if (OS.WINDOWS) {
             defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
             defaults.put(FILE_BROWSER_COMMAND, "explorer.exe /select, \"%DIR\"");
         } else {
@@ -2171,7 +2171,7 @@ public class JabRefPreferences implements PreferencesService {
         if (StringUtil.isNotBlank(userAndHost)) {
             return userAndHost;
         }
-        userAndHost = get(DEFAULT_OWNER) + '-' + NativeDesktop.get().getHostName();
+        userAndHost = get(DEFAULT_OWNER) + '-' + OS.getHostName();
         return userAndHost;
     }
 
@@ -2659,7 +2659,7 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (fieldFormatters, oldValue, newValue) -> {
             putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
-            put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(newValue.getConfiguredActions(), NativeDesktop.NEWLINE));
+            put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(newValue.getConfiguredActions(), OS.NEWLINE));
         });
 
         return cleanupPreferences;

@@ -5,10 +5,10 @@ import java.util.Objects;
 
 import javafx.util.Pair;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
@@ -366,7 +366,7 @@ public class JabRefCLI {
 
             sb.append(STRING_TABLE_DELIMITER);
             sb.append(pair.getValue());
-            sb.append(NativeDesktop.NEWLINE);
+            sb.append(OS.NEWLINE);
         }
 
         return sb.toString();

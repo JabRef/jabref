@@ -7,9 +7,9 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.keybindings.KeyBindingViewModel;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTabViewModel;
+import org.jabref.logic.os.OS;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -95,7 +95,7 @@ class KeyBindingsTabModelTest {
 
     @Test
     void saveNewKeyBindingsToPreferences() {
-        assumeFalse(NativeDesktop.OS_X);
+        assumeFalse(OS.OS_X);
 
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "J", "J", KeyCode.J, true, true, true, false);
@@ -122,7 +122,7 @@ class KeyBindingsTabModelTest {
 
     @Test
     void setAllKeyBindingsToDefault() {
-        assumeFalse(NativeDesktop.OS_X);
+        assumeFalse(OS.OS_X);
 
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "C", "C", KeyCode.C, true, true, true, false);
@@ -155,7 +155,7 @@ class KeyBindingsTabModelTest {
 
     @Test
     void setSingleKeyBindingToDefault() {
-        assumeFalse(NativeDesktop.OS_X);
+        assumeFalse(OS.OS_X);
 
         KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "C", "C", KeyCode.C, true, true, true, false);

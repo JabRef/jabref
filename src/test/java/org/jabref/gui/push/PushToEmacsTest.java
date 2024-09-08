@@ -7,8 +7,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.logic.os.OS;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,7 @@ class PushToEmacsTest {
 
         PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);
 
-        String emacsClient = NativeDesktop.WINDOWS ? "\"C:\\tools\\emacs\\bin\\emacsclientw.exe\"" : "emacsclient";
+        String emacsClient = OS.WINDOWS ? "\"C:\\tools\\emacs\\bin\\emacsclientw.exe\"" : "emacsclient";
         Map<String, String> emacsConfig = Map.of("Emacs", emacsClient);
         ObservableMap<String, String> emacsConfigObservableMap = FXCollections.observableMap(emacsConfig);
         when(pushToApplicationPreferences.getCommandPaths()).thenReturn(new SimpleMapProperty<>(emacsConfigObservableMap));

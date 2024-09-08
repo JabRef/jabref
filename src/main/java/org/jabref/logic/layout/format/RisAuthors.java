@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.layout.ParamLayoutFormatter;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.AuthorList;
 
 public class RisAuthors implements ParamLayoutFormatter {
@@ -20,7 +20,7 @@ public class RisAuthors implements ParamLayoutFormatter {
             sb.append("  - ");
             sb.append(authors[i]);
             if (i < authors.length - 1) {
-                sb.append(NativeDesktop.NEWLINE);
+                sb.append(OS.NEWLINE);
             }
         }
         return sb.toString();

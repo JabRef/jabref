@@ -18,7 +18,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.logic.os.OS;
 
 /**
  * Handles keyboard shortcuts. Including checking whether a keybinding matches.
@@ -157,7 +157,7 @@ public class KeyBindingRepository {
         if (binding.isEmpty()) {
             return Optional.empty();
         }
-        if (NativeDesktop.OS_X) {
+        if (OS.OS_X) {
             binding = binding.replace("ctrl", "meta");
         }
         return Optional.of(KeyCombination.valueOf(binding));

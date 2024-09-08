@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 
@@ -19,7 +19,7 @@ public class RisKeywords implements LayoutFormatter {
             sb.append("KW  - ");
             sb.append(keyword.toString());
             if (i < (keywords.size() - 1)) {
-                sb.append(NativeDesktop.NEWLINE);
+                sb.append(OS.NEWLINE);
             }
             i++;
         }

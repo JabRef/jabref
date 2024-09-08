@@ -22,7 +22,6 @@ import org.jabref.gui.bibtexextractor.ExtractBibtexActionOnline;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
 import org.jabref.gui.edit.CopyMoreAction;
@@ -80,6 +79,7 @@ import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
@@ -228,7 +228,7 @@ public class MainMenu extends MenuBar {
         edit.addEventHandler(ActionEvent.ACTION, event -> {
             // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
             // If the mainscreen is not focused, the actions captured by menu are consumed.
-            if (NativeDesktop.OS_X && !frame.getMainStage().focusedProperty().get()) {
+            if (OS.OS_X && !frame.getMainStage().focusedProperty().get()) {
                 event.consume();
             }
         });

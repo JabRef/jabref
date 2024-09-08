@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.StreamGobbler;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -79,7 +79,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
             citeCommand = "\"\\" + getCitePrefix();
         }
 
-        if (NativeDesktop.WINDOWS) {
+        if (OS.WINDOWS) {
             // TODO we might need to escape the inner double quotes with """ """
             return new String[] {"cmd.exe", "/c", "\"" + commandPath + "\"" + "--command \"insert {\\\"characters\\\": \"\\" + getCitePrefix() + keyString + getCiteSuffix() + "\"}\""};
         } else {

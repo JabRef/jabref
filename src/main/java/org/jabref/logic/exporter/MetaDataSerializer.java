@@ -9,11 +9,11 @@ import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldFactory;
@@ -46,7 +46,7 @@ public class MetaDataSerializer {
         metaData.getSaveOrder().ifPresent(
                 saveOrderConfig -> stringyMetaData.put(MetaData.SAVE_ORDER_CONFIG, saveOrderConfig.getAsStringList()));
         metaData.getSaveActions().ifPresent(
-                saveActions -> stringyMetaData.put(MetaData.SAVE_ACTIONS, saveActions.getAsStringList(NativeDesktop.NEWLINE)));
+                saveActions -> stringyMetaData.put(MetaData.SAVE_ACTIONS, saveActions.getAsStringList(OS.NEWLINE)));
         if (metaData.isProtected()) {
             stringyMetaData.put(MetaData.PROTECTED_FLAG_META, Collections.singletonList("true"));
         }
@@ -80,7 +80,7 @@ public class MetaDataSerializer {
         Map<String, List<String>> unknownMetaData = metaData.getUnknownMetaData();
         for (Map.Entry<String, List<String>> entry : unknownMetaData.entrySet()) {
             // The last "MetaData.SEPARATOR_STRING" adds compatibility to JabRef v5.9 and earlier
-            StringJoiner value = new StringJoiner(MetaData.SEPARATOR_STRING + NativeDesktop.NEWLINE, NativeDesktop.NEWLINE, MetaData.SEPARATOR_STRING + NativeDesktop.NEWLINE);
+            StringJoiner value = new StringJoiner(MetaData.SEPARATOR_STRING + OS.NEWLINE, OS.NEWLINE, MetaData.SEPARATOR_STRING + OS.NEWLINE);
             for (String line : entry.getValue()) {
                 value.add(line.replace(MetaData.SEPARATOR_STRING, "\\" + MetaData.SEPARATOR_STRING));
             }
@@ -106,7 +106,7 @@ public class MetaDataSerializer {
             for (String dataItem : itemList) {
                 String string;
                 if (lastWasSaveActionsEnablement) {
-                    string = NativeDesktop.NEWLINE;
+                    string = OS.NEWLINE;
                 } else {
                     string = "";
                 }
@@ -147,12 +147,12 @@ public class MetaDataSerializer {
 
     private static String serializeGroups(GroupTreeNode root) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(NativeDesktop.NEWLINE);
+        stringBuilder.append(OS.NEWLINE);
 
         for (String groupNode : new GroupSerializer().serializeTree(root)) {
             stringBuilder.append(StringUtil.quote(groupNode, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER));
             stringBuilder.append(MetaData.SEPARATOR_STRING);
-            stringBuilder.append(NativeDesktop.NEWLINE);
+            stringBuilder.append(OS.NEWLINE);
         }
         return stringBuilder.toString();
     }

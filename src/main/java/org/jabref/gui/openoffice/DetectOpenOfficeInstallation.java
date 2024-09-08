@@ -10,6 +10,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.strings.StringUtil;
 
@@ -45,7 +46,7 @@ public class DetectOpenOfficeInstallation {
     private boolean checkAutoDetectedPaths(OpenOfficePreferences openOfficePreferences) {
         String executablePath = openOfficePreferences.getExecutablePath();
 
-        if (NativeDesktop.LINUX && (System.getenv("FLATPAK_SANDBOX_DIR") != null)) {
+        if (OS.LINUX && (System.getenv("FLATPAK_SANDBOX_DIR") != null)) {
             executablePath = OpenOfficePreferences.DEFAULT_LINUX_FLATPAK_EXEC_PATH;
         }
         return !StringUtil.isNullOrEmpty(executablePath) && Files.isRegularFile(Path.of(executablePath));
@@ -54,11 +55,11 @@ public class DetectOpenOfficeInstallation {
     public boolean setOpenOfficePreferences(Path installDir) {
         Optional<Path> execPath = Optional.empty();
 
-        if (NativeDesktop.WINDOWS) {
+        if (OS.WINDOWS) {
             execPath = FileUtil.find(OpenOfficePreferences.WINDOWS_EXECUTABLE, installDir);
-        } else if (NativeDesktop.OS_X) {
+        } else if (OS.OS_X) {
             execPath = FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE, installDir);
-        } else if (NativeDesktop.LINUX) {
+        } else if (OS.LINUX) {
             execPath = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, installDir);
         }
 

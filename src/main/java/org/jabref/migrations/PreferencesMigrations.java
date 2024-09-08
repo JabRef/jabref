@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.CommentsTab;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.maintable.ColumnPreferences;
@@ -24,6 +23,7 @@ import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
@@ -521,7 +521,7 @@ public class PreferencesMigrations {
                     ? Boolean.TRUE
                     : Boolean.FALSE);
 
-            prefs.put(V6_0_CLEANUP_FIELD_FORMATTERS, String.join(NativeDesktop.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
+            prefs.put(V6_0_CLEANUP_FIELD_FORMATTERS, String.join(OS.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
         }
     }
 

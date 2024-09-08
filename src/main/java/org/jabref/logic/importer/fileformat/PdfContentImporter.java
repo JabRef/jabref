@@ -12,10 +12,10 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
@@ -194,7 +194,7 @@ public class PdfContentImporter extends Importer {
         List<BibEntry> result = new ArrayList<>(1);
         try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
-            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, NativeDesktop.NEWLINE);
+            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));

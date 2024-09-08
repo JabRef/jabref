@@ -17,7 +17,6 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
@@ -26,6 +25,7 @@ import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -122,7 +122,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     public String getSourceString(BibEntry entry) {
         StringWriter writer = new StringWriter();
-        BibWriter bibWriter = new BibWriter(writer, NativeDesktop.NEWLINE);
+        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(preferences.getFieldPreferences());
         try {
             new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode());

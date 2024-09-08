@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
@@ -77,7 +77,7 @@ class RemoteSetupTest {
 
     @Test
     void portAlreadyInUse() throws IOException {
-        assumeFalse(NativeDesktop.OS_X);
+        assumeFalse(OS.OS_X);
 
         final int port = 34567;
 

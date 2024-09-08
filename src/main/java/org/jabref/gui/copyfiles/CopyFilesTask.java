@@ -14,8 +14,8 @@ import java.util.function.BiFunction;
 
 import javafx.concurrent.Task;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -123,7 +123,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     private void writeLogMessage(Path newFile, BufferedWriter bw, String logMessage) {
         try {
             bw.write(logMessage + ": " + newFile);
-            bw.write(NativeDesktop.NEWLINE);
+            bw.write(OS.NEWLINE);
         } catch (IOException e) {
             LOGGER.error("error writing log file", e);
         }

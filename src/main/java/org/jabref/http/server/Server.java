@@ -12,7 +12,7 @@ import javax.net.ssl.SSLContext;
 import javafx.collections.ObservableList;
 
 import org.jabref.architecture.AllowedToUseStandardStreams;
-import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.logic.os.OS;
 import org.jabref.preferences.JabRefPreferences;
 
 import jakarta.ws.rs.SeBootstrap;
@@ -100,9 +100,9 @@ public class Server {
         SSLContextConfigurator sslContextConfig = new SSLContextConfigurator();
         Path serverKeyStore = Path.of(AppDirsFactory.getInstance()
                                          .getUserDataDir(
-                                                 NativeDesktop.APP_DIR_APP_NAME,
+                                                 OS.APP_DIR_APP_NAME,
                                                  "ssl",
-                                                 NativeDesktop.APP_DIR_APP_AUTHOR))
+                                                 OS.APP_DIR_APP_AUTHOR))
                        .resolve("server.p12");
         if (Files.exists(serverKeyStore)) {
             sslContextConfig.setKeyStoreFile(serverKeyStore.toString());

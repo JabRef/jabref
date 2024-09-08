@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -68,7 +68,7 @@ public class PushToEmacs extends AbstractPushToApplication {
             String prefix = "(with-current-buffer (window-buffer (selected-window)) (insert ";
             String suffix = "))";
 
-            if (NativeDesktop.WINDOWS) {
+            if (OS.WINDOWS) {
                 // Windows gnuclient/emacsclient escaping:
                 // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
                 // so cmd receives: (insert \"\\cite{Blah2001}\")

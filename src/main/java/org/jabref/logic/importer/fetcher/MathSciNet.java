@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
@@ -28,6 +27,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
 import org.jabref.model.entry.field.StandardField;
@@ -117,7 +117,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     @Override
     public Parser getParser() {
         return inputStream -> {
-            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(NativeDesktop.NEWLINE));
+            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
             List<BibEntry> entries = new ArrayList<>();
             BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
 

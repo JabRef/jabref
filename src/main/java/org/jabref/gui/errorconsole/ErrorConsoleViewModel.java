@@ -17,6 +17,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.preferences.PreferencesService;
 
@@ -56,7 +57,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     private String getLogMessagesAsString(List<LogEventViewModel> messages) {
         return messages.stream()
                        .map(LogEventViewModel::getDetailedText)
-                       .collect(Collectors.joining(NativeDesktop.NEWLINE));
+                       .collect(Collectors.joining(OS.NEWLINE));
     }
 
     /**

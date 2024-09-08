@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.layout.format.Number;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
@@ -286,7 +286,7 @@ public class TemplateExporter extends Exporter {
                         String[] lines = layout.doLayout(entry, databaseContext.getDatabase()).split(BLANK_LINE_PATTERN);
                         for (String line : lines) {
                             if (!line.isBlank() && !line.isEmpty()) {
-                                ps.write(line + NativeDesktop.NEWLINE);
+                                ps.write(line + OS.NEWLINE);
                             }
                         }
                     } else {
