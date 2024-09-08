@@ -118,7 +118,6 @@ public class LibraryTab extends Tab {
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
-    private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -174,7 +173,6 @@ public class LibraryTab extends Tab {
                        LibraryTabContainer tabContainer,
                        DialogService dialogService,
                        PreferencesService preferencesService,
-                       AiService aiService,
                        StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
@@ -187,7 +185,6 @@ public class LibraryTab extends Tab {
         this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.preferencesService = Objects.requireNonNull(preferencesService);
-        this.aiService = Objects.requireNonNull(aiService);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
@@ -1007,7 +1004,6 @@ public class LibraryTab extends Tab {
                 tabContainer,
                 dialogService,
                 preferencesService,
-                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,
@@ -1043,7 +1039,6 @@ public class LibraryTab extends Tab {
                 tabContainer,
                 dialogService,
                 preferencesService,
-                aiService,
                 stateManager,
                 fileUpdateMonitor,
                 entryTypesManager,

@@ -17,8 +17,6 @@ import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class AiPreferences {
-    private final PreferencesService preferencesService;
-
     private final BooleanProperty enableAi;
 
     private final ObjectProperty<AiProvider> aiProvider;
@@ -63,8 +61,6 @@ public class AiPreferences {
                          int ragMaxResultsCount,
                          double ragMinScore
     ) {
-        this.preferencesService = preferencesService;
-
         this.enableAi = new SimpleBooleanProperty(enableAi);
 
         this.aiProvider = new SimpleObjectProperty<>(aiProvider);

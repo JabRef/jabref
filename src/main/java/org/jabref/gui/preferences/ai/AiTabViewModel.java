@@ -389,10 +389,6 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         return enableAi;
     }
 
-    public boolean getEnableAi() {
-        return enableAi.get();
-    }
-
     public ReadOnlyListProperty<AiProvider> aiProvidersProperty() {
         return aiProvidersList;
     }
