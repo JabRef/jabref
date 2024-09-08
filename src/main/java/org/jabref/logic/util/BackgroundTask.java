@@ -140,7 +140,7 @@ public abstract class BackgroundTask<V> {
         return progress.get();
     }
 
-    protected ObjectProperty<BackgroundProgress> progressProperty() {
+    public ObjectProperty<BackgroundProgress> progressProperty() {
         return progress;
     }
 
@@ -289,16 +289,16 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
-    protected record BackgroundProgress(
+    public record BackgroundProgress(
             double workDone,
             double max) {
 
         public double getWorkDonePercentage() {
-                if (max == 0) {
-                    return 0;
-                } else {
-                    return workDone / max;
-                }
+            if (max == 0) {
+                return 0;
+            } else {
+                return workDone / max;
             }
         }
+    }
 }
