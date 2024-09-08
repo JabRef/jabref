@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
-import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
@@ -123,7 +122,8 @@ public class ArgumentProcessor {
     }
 
     /**
-     * @param importArguments: <code>fileName[,format]</code>
+     *
+     * @param importArguments Format: <code>fileName[,format]</code>
      */
     private Optional<ParserResult> importFile(String importArguments) {
         LOGGER.debug("Importing file {}", importArguments);
@@ -730,15 +730,17 @@ public class ArgumentProcessor {
     private void automaticallySetFileLinks(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
-            LOGGER.info(Localization.lang("Automatically setting file links"));
-
-            // this needs the named compound and it will execute stuff on the javafx thread
+            LOGGER.info(Localization.lang("Automatically setting file links for {}", parserResult.getDatabaseContext().getDatabasePath()
+                                                                                                 .map(Path::getFileName)
+                                                                                                 .map(Path::toString)
+                                                                                                 .orElse("UNKNOWN")));
 
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                     parserResult.getDatabaseContext(),
                     preferencesService.getFilePreferences(),
                     preferencesService.getAutoLinkPreferences());
-            util.linkAssociatedFiles(database.getEntries(), new NamedCompound(""));
+
+            util.linkAssociatedFiles(database.getEntries(), (linkedFile, bibEntry) -> bibEntry.addFile(linkedFile));
         }
     }
 
