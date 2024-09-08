@@ -11,9 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.FilePreferences;
-import org.jabref.logic.util.OS;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
