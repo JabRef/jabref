@@ -40,14 +40,14 @@ class MainArchitectureTest {
         noClasses().that().areNotAnnotatedWith(AllowedToUseSwing.class)
                    .should().accessClassesThat()
                    .resideInAnyPackage("javax.swing",
-                                       "javax.swing.border..",
-                                       "javax.swing.colorchooser..",
-                                       "javax.swing.event..",
-                                       "javax.swing.filechooser..",
-                                       "javax.swing.plaf..",
-                                       "javax.swing.table..",
-                                       "javax.swing.text..",
-                                       "javax.swing.tree..")
+                           "javax.swing.border..",
+                           "javax.swing.colorchooser..",
+                           "javax.swing.event..",
+                           "javax.swing.filechooser..",
+                           "javax.swing.plaf..",
+                           "javax.swing.table..",
+                           "javax.swing.text..",
+                           "javax.swing.tree..")
                    .check(classes);
     }
 
