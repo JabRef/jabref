@@ -6,7 +6,6 @@ import org.jabref.logic.importer.fileformat.ImporterTestEngine;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.junit.AnalyzeClasses;
-import com.tngtech.archunit.junit.ArchIgnore;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.library.GeneralCodingRules;
 
@@ -86,8 +85,6 @@ class MainArchitectureTest {
     }
 
     @ArchTest
-    @ArchIgnore
-    // Fails currently
     public void respectLayeredArchitecture(JavaClasses classes) {
         layeredArchitecture().consideringOnlyDependenciesInLayers()
                              .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
@@ -96,14 +93,13 @@ class MainArchitectureTest {
                              .layer("Cli").definedBy(PACKAGE_ORG_JABREF_CLI)
                              .layer("Migrations").definedBy("org.jabref.migrations..") // TODO: Move to logic
                              .layer("Preferences").definedBy("org.jabref.preferences..")
-                             .layer("Styletester").definedBy("org.jabref.styletester..")
 
-                             .whereLayer("Gui").mayOnlyBeAccessedByLayers("Preferences", "Cli") // TODO: Remove preferences here
+                             .whereLayer("Gui").mayOnlyBeAccessedByLayers("Cli")
                              .whereLayer("Logic").mayOnlyBeAccessedByLayers("Gui", "Cli", "Model", "Migrations", "Preferences")
                              .whereLayer("Model").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Cli", "Preferences")
                              .whereLayer("Cli").mayNotBeAccessedByAnyLayer()
                              .whereLayer("Migrations").mayOnlyBeAccessedByLayers("Logic")
-                             .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Styletester", "Cli") // TODO: Remove logic here
+                             .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Cli")
 
                              .check(classes);
     }
