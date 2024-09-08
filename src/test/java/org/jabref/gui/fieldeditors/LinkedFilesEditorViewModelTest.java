@@ -9,6 +9,7 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.autocompleter.EmptySuggestionProvider;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -16,7 +17,6 @@ import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 

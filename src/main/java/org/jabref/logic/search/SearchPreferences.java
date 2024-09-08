@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.logic.search;
 
 import java.util.EnumSet;
 
@@ -11,7 +11,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
-import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
 import com.google.common.annotations.VisibleForTesting;

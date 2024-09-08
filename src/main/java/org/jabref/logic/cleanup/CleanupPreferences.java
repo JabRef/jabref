@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -8,8 +8,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
 
 public class CleanupPreferences {
 
@@ -49,7 +47,7 @@ public class CleanupPreferences {
         }
     }
 
-    protected ObservableSet<CleanupStep> getObservableActiveJobs() {
+    public ObservableSet<CleanupStep> getObservableActiveJobs() {
         return activeJobs;
     }
 
@@ -66,7 +64,7 @@ public class CleanupPreferences {
         return fieldFormatterCleanups.get();
     }
 
-    protected ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanupsProperty() {
+    public ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanupsProperty() {
         return fieldFormatterCleanups;
     }
 

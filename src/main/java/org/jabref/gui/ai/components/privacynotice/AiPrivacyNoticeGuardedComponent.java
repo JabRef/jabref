@@ -3,10 +3,10 @@ package org.jabref.gui.ai.components.privacynotice;
 import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
 import org.jabref.gui.util.DynamicallyChangeableNode;
-import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.logic.ai.AiPreferences;
 
 /**
  * A class that guards a component, before AI privacy policy is accepted.

@@ -31,7 +31,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.PreviewPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

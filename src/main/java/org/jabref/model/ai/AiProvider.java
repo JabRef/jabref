@@ -1,4 +1,4 @@
-package org.jabref.preferences.ai;
+package org.jabref.model.ai;
 
 import java.io.Serializable;
 

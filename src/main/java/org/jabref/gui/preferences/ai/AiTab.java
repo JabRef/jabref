@@ -15,8 +15,8 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.ai.AiProvider;
-import org.jabref.preferences.ai.EmbeddingModel;
+import org.jabref.model.ai.AiProvider;
+import org.jabref.model.ai.EmbeddingModel;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.ResizableTextArea;

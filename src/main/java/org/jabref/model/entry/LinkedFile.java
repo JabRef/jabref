@@ -19,13 +19,13 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.jspecify.annotations.NullMarked;

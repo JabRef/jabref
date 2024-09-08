@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.gui.entryeditor.MrDlibPreferences;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
@@ -19,7 +20,6 @@ import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.MrDlibPreferences;
 
 import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;

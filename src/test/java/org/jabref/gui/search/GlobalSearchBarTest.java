@@ -15,10 +15,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.SearchPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.Test;

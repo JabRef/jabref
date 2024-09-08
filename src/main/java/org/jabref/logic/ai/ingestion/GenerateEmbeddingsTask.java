@@ -9,12 +9,12 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 
 import dev.langchain4j.data.document.Document;
 import org.slf4j.Logger;

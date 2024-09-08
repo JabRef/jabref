@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.frame.SidePanePreferences;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
@@ -23,7 +24,6 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.SidePanePreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;

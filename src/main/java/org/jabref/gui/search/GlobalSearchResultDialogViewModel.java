@@ -3,8 +3,8 @@ package org.jabref.gui.search;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
+import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.SearchPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 

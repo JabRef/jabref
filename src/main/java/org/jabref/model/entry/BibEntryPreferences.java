@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.model.entry;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

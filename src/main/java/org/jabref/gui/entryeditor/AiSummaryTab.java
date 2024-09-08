@@ -3,15 +3,15 @@ package org.jabref.gui.entryeditor;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.FilePreferences;
 import org.jabref.gui.ai.components.summary.SummaryComponent;
+import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.ai.AiPreferences;
 
 public class AiSummaryTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;

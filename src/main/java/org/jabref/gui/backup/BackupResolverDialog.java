@@ -10,10 +10,10 @@ import javafx.scene.control.Hyperlink;
 
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
-import org.jabref.preferences.ExternalApplicationsPreferences;
 
 import org.controlsfx.control.HyperlinkLabel;
 import org.slf4j.Logger;

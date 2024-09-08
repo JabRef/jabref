@@ -10,11 +10,11 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.gui.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.FilePreferences;
 
 // Do not make this class final, as it otherwise can't be mocked for tests
 public class ExternalFileTypes {

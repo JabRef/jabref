@@ -3,8 +3,8 @@ package org.jabref.logic.ai;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.preferences.ai.AiProvider;
-import org.jabref.preferences.ai.EmbeddingModel;
+import org.jabref.model.ai.AiProvider;
+import org.jabref.model.ai.EmbeddingModel;
 
 public class AiDefaultPreferences {
     public static final Map<AiProvider, List<String>> AVAILABLE_CHAT_MODELS = Map.of(
