@@ -11,7 +11,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
-import org.jabref.gui.search.SearchDisplayMode;
+import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
 import com.google.common.annotations.VisibleForTesting;
