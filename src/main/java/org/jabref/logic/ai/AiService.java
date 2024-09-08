@@ -1,17 +1,12 @@
 package org.jabref.logic.ai;
 
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.StringProperty;
-import javafx.collections.ObservableList;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.ai.components.aichat.AiChatWindow;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.ai.chatting.AiChatService;
 import org.jabref.logic.ai.chatting.chathistory.ChatHistoryService;
@@ -24,15 +19,13 @@ import org.jabref.logic.ai.ingestion.storages.MVStoreFullyIngestedDocumentsTrack
 import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.ai.AiPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import dev.langchain4j.data.message.ChatMessage;
 
 /**
  *  The main class for the AI functionality.
@@ -51,7 +44,7 @@ public class AiService implements AutoCloseable {
 
     private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
-    private final DialogService dialogService;
+    private final NotificationService notificationService;
     private final TaskExecutor taskExecutor;
 
     // This field is used to shut down AI-related background tasks.
@@ -78,23 +71,23 @@ public class AiService implements AutoCloseable {
     public AiService(AiPreferences aiPreferences,
                      FilePreferences filePreferences,
                      CitationKeyPatternPreferences citationKeyPatternPreferences,
-                     DialogService dialogService,
+                     NotificationService notificationService,
                      TaskExecutor taskExecutor
     ) {
         this.aiPreferences = aiPreferences;
         this.filePreferences = filePreferences;
-        this.dialogService = dialogService;
+        this.notificationService = notificationService;
         this.taskExecutor = taskExecutor;
 
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
 
-        this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(JabRefDesktop.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), dialogService);
-        this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(JabRefDesktop.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), dialogService);
-        this.mvStoreSummariesStorage = new MVStoreSummariesStorage(JabRefDesktop.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), dialogService);
-        this.mvStoreChatHistoryStorage = new MVStoreChatHistoryStorage(JabRefDesktop.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), dialogService);
+        this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(JabRefDesktop.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), notificationService);
+        this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(JabRefDesktop.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), notificationService);
+        this.mvStoreSummariesStorage = new MVStoreSummariesStorage(JabRefDesktop.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), notificationService);
+        this.mvStoreChatHistoryStorage = new MVStoreChatHistoryStorage(JabRefDesktop.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);
 
         this.chatHistoryService = new ChatHistoryService(citationKeyPatternPreferences, mvStoreChatHistoryStorage);
-        this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, dialogService, taskExecutor);
+        this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, notificationService, taskExecutor);
         this.aiChatService = new AiChatService(aiPreferences, jabRefChatLanguageModel, jabRefEmbeddingModel, mvStoreEmbeddingStore, cachedThreadPool);
         this.ingestionService = new IngestionService(
                 aiPreferences,
@@ -130,31 +123,6 @@ public class AiService implements AutoCloseable {
 
     public SummariesService getSummariesService() {
         return summariesService;
-    }
-
-    public void openAiChat(StringProperty name, ObservableList<ChatMessage> chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList<BibEntry> entries) {
-        Optional<AiChatWindow> existingWindow = stateManager.getAiChatWindows().stream().filter(window -> window.getChatName().equals(name.get())).findFirst();
-
-        if (existingWindow.isPresent()) {
-            existingWindow.get().requestFocus();
-        } else {
-            AiChatWindow aiChatWindow = new AiChatWindow(
-                    this,
-                    dialogService,
-                    aiPreferences,
-                    filePreferences,
-                    taskExecutor
-            );
-
-            aiChatWindow.setOnCloseRequest(event ->
-                stateManager.getAiChatWindows().remove(aiChatWindow)
-            );
-
-            stateManager.getAiChatWindows().add(aiChatWindow);
-            dialogService.showCustomWindow(aiChatWindow);
-            aiChatWindow.setChat(name, chatHistory, bibDatabaseContext, entries);
-            aiChatWindow.requestFocus();
-        }
     }
 
     @Override

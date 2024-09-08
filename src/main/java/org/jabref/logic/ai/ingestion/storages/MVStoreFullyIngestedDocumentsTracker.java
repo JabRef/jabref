@@ -4,10 +4,10 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.ingestion.FullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.util.MVStoreBase;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.NotificationService;
 
 /**
  * This class is responsible for recording the information about which documents (or documents) have been fully ingested.
@@ -24,7 +24,7 @@ public class MVStoreFullyIngestedDocumentsTracker extends MVStoreBase implements
     // it doesn't mean the document is fully ingested.
     private final Map<String, Long> ingestedMap;
 
-    public MVStoreFullyIngestedDocumentsTracker(Path path, DialogService dialogService) {
+    public MVStoreFullyIngestedDocumentsTracker(Path path, NotificationService dialogService) {
         super(path, dialogService);
 
         this.ingestedMap = this.mvStore.openMap(INGESTED_MAP_NAME);
