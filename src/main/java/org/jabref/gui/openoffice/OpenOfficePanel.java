@@ -618,7 +618,6 @@ public class OpenOfficePanel {
     }
 
     private ContextMenu createSettingsPopup() {
-
         ContextMenu contextMenu = new ContextMenu();
 
         if (currentStyle instanceof JStyle) {
@@ -666,7 +665,7 @@ public class OpenOfficePanel {
     private void addAlwaysCitedOnPagesTextOption(ContextMenu contextMenu) {
         OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
 
-        CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add Cited on pages"));
+        CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at beginning of citation"));
 
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
         alwaysAddCitedOnPagesText.setOnAction(e -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
