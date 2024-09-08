@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -116,7 +116,7 @@ public class SciteTab extends EntryEditorTab {
             if (event.getSource() instanceof Hyperlink) {
                 var filePreferences = preferencesService.getFilePreferences();
                 try {
-                    JabRefDesktop.openBrowser(url, filePreferences);
+                    NativeDesktop.openBrowser(url, filePreferences);
                 } catch (IOException ioex) {
                     // Can't throw a checked exception from here, so display a message to the user instead.
                     dialogService.showErrorDialogAndWait(

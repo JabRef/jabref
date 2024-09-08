@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.AtomicFileWriter;
@@ -22,7 +23,6 @@ import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileNameCleaner;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -430,7 +430,7 @@ public class StudyRepository {
             SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                     .withSaveOrder(context.getMetaData().getSaveOrder().map(so -> SelfContainedSaveOrder.of(so)).orElse(SaveOrder.getDefaultSaveOrder()))
                     .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
-            BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+            BibWriter bibWriter = new BibWriter(fileWriter, NativeDesktop.NEWLINE);
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                     bibWriter,
                     saveConfiguration,

@@ -7,12 +7,12 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.util.MetaDataParser;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.BibField;
@@ -64,7 +64,7 @@ public class MetaDataSerializerTest {
 
         Map<String, String> expectedSerialization = new TreeMap<>();
         expectedSerialization.put("saveActions",
-                "enabled;" + OS.NEWLINE + "title[lower_case]" + OS.NEWLINE + ";");
+                "enabled;" + NativeDesktop.NEWLINE + "title[lower_case]" + NativeDesktop.NEWLINE + ";");
         assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 

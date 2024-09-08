@@ -12,7 +12,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.AbstractEditorViewModel;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -132,7 +132,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     public void openExternalLink() {
         identifier.get().flatMap(Identifier::getExternalURI).ifPresent(url -> {
                     try {
-                        JabRefDesktop.openBrowser(url, preferences.getFilePreferences());
+                        NativeDesktop.openBrowser(url, preferences.getFilePreferences());
                     } catch (IOException ex) {
                         dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), ex);
                     }

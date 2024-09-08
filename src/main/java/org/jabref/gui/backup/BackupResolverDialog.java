@@ -9,7 +9,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
 
 import org.jabref.gui.FXDialog;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -49,7 +49,7 @@ public class BackupResolverDialog extends FXDialog {
                 String clickedLinkText = ((Hyperlink) (e.getSource())).getText();
                 if (backupFilename.equals(clickedLinkText)) {
                     try {
-                        JabRefDesktop.openFolderAndSelectFile(backupPathOpt.get(), externalApplicationsPreferences, null);
+                        NativeDesktop.openFolderAndSelectFile(backupPathOpt.get(), externalApplicationsPreferences, null);
                     } catch (IOException ex) {
                         LOGGER.error("Could not open backup folder", ex);
                     }

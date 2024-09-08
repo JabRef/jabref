@@ -6,10 +6,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
-import org.jabref.logic.util.OS;
 import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -77,7 +77,7 @@ class RemoteSetupTest {
 
     @Test
     void portAlreadyInUse() throws IOException {
-        assumeFalse(OS.OS_X);
+        assumeFalse(NativeDesktop.OS_X);
 
         final int port = 34567;
 

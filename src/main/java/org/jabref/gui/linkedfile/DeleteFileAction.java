@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.icon.IconTheme;
@@ -191,7 +191,7 @@ public class DeleteFileAction extends SimpleCommand {
             LOGGER.debug("filePreferences.moveToTrash() = {}", preferencesMoveToTrash);
             if (preferencesMoveToTrash) {
                 LOGGER.debug("Moving to trash: {}", theFile);
-                JabRefDesktop.moveToTrash(theFile);
+                NativeDesktop.get().moveToTrash(theFile);
             } else {
                 LOGGER.debug("Deleting: {}", theFile);
                 Files.delete(theFile);

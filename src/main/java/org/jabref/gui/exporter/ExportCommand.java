@@ -16,7 +16,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
@@ -141,7 +141,7 @@ public class ExportCommand extends SimpleCommand {
                             Localization.lang("Export operation finished successfully."),
                             List.of(new Action(Localization.lang("Reveal in File Explorer"), event -> {
                                 try {
-                                    JabRefDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
+                                    NativeDesktop.openFolderAndSelectFile(file, preferences.getExternalApplicationsPreferences(), dialogService);
                                 } catch (IOException e) {
                                     LOGGER.error("Could not open export folder.", e);
                                 }

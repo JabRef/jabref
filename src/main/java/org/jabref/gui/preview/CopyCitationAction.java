@@ -13,6 +13,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -23,7 +24,6 @@ import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.BackgroundTask;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -139,17 +139,17 @@ public class CopyCitationAction extends SimpleCommand {
      * Inserts each citation into a HTML body and copies it to the clipboard
      */
     protected static ClipboardContent processHtml(List<String> citations) {
-        String result = "<!DOCTYPE html>" + OS.NEWLINE +
-                "<html>" + OS.NEWLINE +
-                "   <head>" + OS.NEWLINE +
-                "      <meta charset=\"utf-8\">" + OS.NEWLINE +
-                "   </head>" + OS.NEWLINE +
-                "   <body>" + OS.NEWLINE + OS.NEWLINE;
+        String result = "<!DOCTYPE html>" + NativeDesktop.NEWLINE +
+                "<html>" + NativeDesktop.NEWLINE +
+                "   <head>" + NativeDesktop.NEWLINE +
+                "      <meta charset=\"utf-8\">" + NativeDesktop.NEWLINE +
+                "   </head>" + NativeDesktop.NEWLINE +
+                "   <body>" + NativeDesktop.NEWLINE + NativeDesktop.NEWLINE;
 
         result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
-        result += OS.NEWLINE +
-                "   </body>" + OS.NEWLINE +
-                "</html>" + OS.NEWLINE;
+        result += NativeDesktop.NEWLINE +
+                "   </body>" + NativeDesktop.NEWLINE +
+                "</html>" + NativeDesktop.NEWLINE;
 
         ClipboardContent content = new ClipboardContent();
         content.putString(result);

@@ -19,7 +19,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -144,7 +144,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
             titleLink.setOnAction(event -> {
                 if (entry.getField(StandardField.URL).isPresent()) {
                     try {
-                        JabRefDesktop.openBrowser(entry.getField(StandardField.URL).get(), preferencesService.getFilePreferences());
+                        NativeDesktop.openBrowser(entry.getField(StandardField.URL).get(), preferencesService.getFilePreferences());
                     } catch (IOException e) {
                         LOGGER.error("Error opening the browser to: {}", entry.getField(StandardField.URL).get(), e);
                         dialogService.showErrorDialogAndWait(e);
@@ -208,7 +208,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr. DLib for JabRef users."));
         mdlLink.setOnAction(event -> {
             try {
-                JabRefDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/", preferencesService.getFilePreferences());
+                NativeDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/", preferencesService.getFilePreferences());
             } catch (IOException e) {
                 LOGGER.error("Error opening the browser to Mr. DLib information page.", e);
                 dialogService.showErrorDialogAndWait(e);

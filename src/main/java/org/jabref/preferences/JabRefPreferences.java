@@ -37,6 +37,7 @@ import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -52,7 +53,6 @@ import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.push.PushToApplications;
-import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
@@ -105,10 +105,10 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.search.SearchDisplayMode;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.Directories;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -591,11 +591,11 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(JOURNAL_POPUP, EntryEditorPreferences.JournalPopupEnabled.FIRST_START.toString());
 
-        defaults.put(PUSH_TEXMAKER_PATH, OS.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
-        defaults.put(PUSH_WINEDT_PATH, OS.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(PUSH_TEXSTUDIO_PATH, OS.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
-        defaults.put(PUSH_TEXWORKS_PATH, OS.getNativeDesktop().detectProgramPath("texworks", "TeXworks"));
-        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.getNativeDesktop().detectProgramPath("subl", "Sublime"));
+        defaults.put(PUSH_TEXMAKER_PATH, NativeDesktop.get().detectProgramPath("texmaker", "Texmaker"));
+        defaults.put(PUSH_WINEDT_PATH, NativeDesktop.get().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        defaults.put(PUSH_TEXSTUDIO_PATH, NativeDesktop.get().detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_TEXWORKS_PATH, NativeDesktop.get().detectProgramPath("texworks", "TeXworks"));
+        defaults.put(PUSH_SUBLIME_TEXT_PATH, NativeDesktop.get().detectProgramPath("subl", "Sublime"));
         defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(PUSH_VIM, "vim");
         defaults.put(PUSH_VIM_SERVER, "vim");
@@ -609,10 +609,10 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
         defaults.put(BASE_DOI_URI, "https://doi.org");
 
-        if (OS.OS_X) {
+        if (NativeDesktop.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
             defaults.put(PUSH_EMACS_PATH, "emacsclient");
-        } else if (OS.WINDOWS) {
+        } else if (NativeDesktop.WINDOWS) {
             defaults.put(PUSH_EMACS_PATH, "emacsclient.exe");
         } else {
             // Linux
@@ -748,9 +748,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(UNLINKED_FILES_SELECTED_SORT, ExternalFileSorter.DEFAULT.name());
 
         // OpenOffice/LibreOffice
-        if (OS.WINDOWS) {
+        if (NativeDesktop.WINDOWS) {
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);
-        } else if (OS.OS_X) {
+        } else if (NativeDesktop.OS_X) {
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_EXEC_PATH);
         } else { // Linux
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
@@ -814,7 +814,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(KINDLE_EMAIL, "");
 
-        if (OS.WINDOWS) {
+        if (NativeDesktop.WINDOWS) {
             defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.TRUE);
         } else {
             defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
@@ -828,7 +828,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
         defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
-        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
+        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, NativeDesktop.NEWLINE));
 
         // use citation key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, FilePreferences.DEFAULT_FILENAME_PATTERNS[1]);
@@ -845,7 +845,7 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
         defaults.put(USE_DEFAULT_FILE_BROWSER_APPLICATION, Boolean.TRUE);
-        if (OS.WINDOWS) {
+        if (NativeDesktop.WINDOWS) {
             defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
             defaults.put(FILE_BROWSER_COMMAND, "explorer.exe /select, \"%DIR\"");
         } else {
@@ -2125,7 +2125,7 @@ public class JabRefPreferences implements PreferencesService {
         internalPreferences = new InternalPreferences(
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
-                getPath(PREFS_EXPORT_PATH, OS.getNativeDesktop().getDefaultFileChooserDirectory()),
+                getPath(PREFS_EXPORT_PATH, NativeDesktop.get().getDefaultFileChooserDirectory()),
                 getUserAndHost(),
                 getBoolean(MEMORY_STICK_MODE));
 
@@ -2154,7 +2154,7 @@ public class JabRefPreferences implements PreferencesService {
         if (StringUtil.isNotBlank(userAndHost)) {
             return userAndHost;
         }
-        userAndHost = get(DEFAULT_OWNER) + '-' + OS.getNativeDesktop().getHostName();
+        userAndHost = get(DEFAULT_OWNER) + '-' + NativeDesktop.get().getHostName();
         return userAndHost;
     }
 
@@ -2245,7 +2245,7 @@ public class JabRefPreferences implements PreferencesService {
 
         filePreferences = new FilePreferences(
                 getInternalPreferences().getUserAndHost(),
-                getPath(MAIN_FILE_DIRECTORY, OS.getNativeDesktop().getDefaultFileChooserDirectory()).toString(),
+                getPath(MAIN_FILE_DIRECTORY, NativeDesktop.get().getDefaultFileChooserDirectory()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
@@ -2258,7 +2258,7 @@ public class JabRefPreferences implements PreferencesService {
                 getPath(BACKUP_DIRECTORY, Directories.getBackupDirectory()),
                 getBoolean(CONFIRM_LINKED_FILE_DELETE),
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
-                getBoolean(TRASH_INSTEAD_OF_DELETE, OS.getNativeDesktop().moveToTrashSupported()));
+                getBoolean(TRASH_INSTEAD_OF_DELETE, NativeDesktop.get().moveToTrashSupported()));
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
@@ -2642,7 +2642,7 @@ public class JabRefPreferences implements PreferencesService {
 
         EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (fieldFormatters, oldValue, newValue) -> {
             putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
-            put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(newValue.getConfiguredActions(), OS.NEWLINE));
+            put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(newValue.getConfiguredActions(), NativeDesktop.NEWLINE));
         });
 
         return cleanupPreferences;

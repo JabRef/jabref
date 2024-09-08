@@ -18,10 +18,10 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.util.FileUpdateListener;
@@ -121,7 +121,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         if (null == getCurrentAnnotation()) {
             return;
         }
-        StringJoiner sj = new StringJoiner("," + OS.NEWLINE);
+        StringJoiner sj = new StringJoiner("," + NativeDesktop.NEWLINE);
         sj.add(Localization.lang("Author") + ": " + getCurrentAnnotation().getAuthor());
         sj.add(Localization.lang("Date") + ": " + getCurrentAnnotation().getDate());
         sj.add(Localization.lang("Page") + ": " + getCurrentAnnotation().getPage());

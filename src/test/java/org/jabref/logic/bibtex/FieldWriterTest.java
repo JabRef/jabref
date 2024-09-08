@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.logic.util.OS;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.strings.StringUtil;
@@ -65,7 +65,7 @@ class FieldWriterTest {
 
     @Test
     void noNormalizationOfNewlinesInAbstractField() throws Exception {
-        String text = "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
+        String text = "lorem" + NativeDesktop.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
         String result = writer.write(StandardField.ABSTRACT, text);
         // The normalization is done at org.jabref.logic.exporter.BibWriter, so no need to normalize here
         String expected = "{" + text + "}";
@@ -74,7 +74,7 @@ class FieldWriterTest {
 
     @Test
     void preserveNewlineInAbstractField() throws Exception {
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
+        String text = "lorem ipsum lorem ipsum" + NativeDesktop.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = writer.write(StandardField.ABSTRACT, text);
         String expected = "{" + text + "}";
@@ -84,7 +84,7 @@ class FieldWriterTest {
 
     @Test
     void preserveMultipleNewlinesInAbstractField() throws Exception {
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + OS.NEWLINE + "lorem ipsum lorem ipsum";
+        String text = "lorem ipsum lorem ipsum" + NativeDesktop.NEWLINE + NativeDesktop.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = writer.write(StandardField.ABSTRACT, text);
         String expected = "{" + text + "}";
@@ -94,7 +94,7 @@ class FieldWriterTest {
 
     @Test
     void preserveNewlineInReviewField() throws Exception {
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
+        String text = "lorem ipsum lorem ipsum" + NativeDesktop.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = writer.write(StandardField.REVIEW, text);
         String expected = "{" + text + "}";
@@ -198,7 +198,7 @@ class FieldWriterTest {
 
     @Test
     void finalNewLineIsKeptAtMultilineField() throws Exception {
-        String text = "  text      " + OS.NEWLINE;
+        String text = "  text      " + NativeDesktop.NEWLINE;
         assertEquals("{" + text + "}", writer.write(StandardField.COMMENT, text));
         // Note: Spaces are trimmed at BibDatabaseWriter#applySaveActions
     }

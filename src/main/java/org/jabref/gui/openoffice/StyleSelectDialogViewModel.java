@@ -20,7 +20,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -130,7 +130,7 @@ public class StyleSelectDialogViewModel {
         JStyle jStyle = selectedItem.getValue().getJStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", filePreferences);
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, jStyle.getPath(), type);
+            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, jStyle.getPath(), type);
         } catch (
                 IOException e) {
             dialogService.showErrorDialogAndWait(e);

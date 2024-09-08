@@ -19,7 +19,7 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
@@ -181,7 +181,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     String href = anchorElement.getHref();
                     if (href != null) {
                         try {
-                            JabRefDesktop.openBrowser(href, preferencesService.getFilePreferences());
+                            NativeDesktop.openBrowser(href, preferencesService.getFilePreferences());
                         } catch (MalformedURLException exception) {
                             LOGGER.error("Invalid URL", exception);
                         } catch (IOException exception) {

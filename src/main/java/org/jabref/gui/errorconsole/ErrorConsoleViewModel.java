@@ -13,12 +13,11 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.util.OS;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -57,7 +56,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     private String getLogMessagesAsString(List<LogEventViewModel> messages) {
         return messages.stream()
                        .map(LogEventViewModel::getDetailedText)
-                       .collect(Collectors.joining(OS.NEWLINE));
+                       .collect(Collectors.joining(NativeDesktop.NEWLINE));
     }
 
     /**
@@ -120,7 +119,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                     .setScheme("https").setHost("github.com")
                     .setPath("/JabRef/jabref/issues/new")
                     .setParameter("body", issueBody);
-            JabRefDesktop.openBrowser(uriBuilder.build().toString(), preferencesService.getFilePreferences());
+            NativeDesktop.openBrowser(uriBuilder.build().toString(), preferencesService.getFilePreferences());
         } catch (IOException | URISyntaxException e) {
             LOGGER.error("Problem opening url", e);
         }

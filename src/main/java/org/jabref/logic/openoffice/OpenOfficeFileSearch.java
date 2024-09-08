@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
-import org.jabref.logic.util.OS;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.Logger;
@@ -27,13 +27,13 @@ public class OpenOfficeFileSearch {
      * @return a list of detected installation paths
      */
     public static List<Path> detectInstallations() {
-        if (OS.WINDOWS) {
+        if (NativeDesktop.WINDOWS) {
             List<Path> programDirs = findWindowsOpenOfficeDirs();
             return programDirs.stream().filter(dir -> FileUtil.find(OpenOfficePreferences.WINDOWS_EXECUTABLE, dir).isPresent()).toList();
-        } else if (OS.OS_X) {
+        } else if (NativeDesktop.OS_X) {
             List<Path> programDirs = findOSXOpenOfficeDirs();
             return programDirs.stream().filter(dir -> FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE, dir).isPresent()).toList();
-        } else if (OS.LINUX) {
+        } else if (NativeDesktop.LINUX) {
             List<Path> programDirs = findLinuxOpenOfficeDirs();
             return programDirs.stream().filter(dir -> FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, dir).isPresent()).toList();
         } else {

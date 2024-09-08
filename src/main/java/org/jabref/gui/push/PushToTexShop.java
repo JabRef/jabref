@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -79,7 +79,7 @@ public class PushToTexShop extends AbstractPushToApplication {
                 "set content of selection of front document to TheString\n" +
                 "end tell'";
 
-        if (OS.OS_X) {
+        if (NativeDesktop.OS_X) {
             return new String[] {"sh", "-c", osascriptTexShop};
         } else {
             dialogService.showInformationDialogAndWait(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));

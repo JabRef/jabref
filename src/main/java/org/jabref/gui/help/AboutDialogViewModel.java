@@ -13,7 +13,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.preferences.PreferencesService;
@@ -152,7 +152,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private void openWebsite(String url) {
         try {
-            JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
+            NativeDesktop.openBrowser(url, preferencesService.getFilePreferences());
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
             logger.error("Could not open default browser.", e);

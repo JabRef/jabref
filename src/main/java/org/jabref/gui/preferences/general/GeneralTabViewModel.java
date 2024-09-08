@@ -20,7 +20,7 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.remote.CLIMessageHandler;
@@ -413,7 +413,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     public void openBrowser() {
         String url = "https://themes.jabref.org";
         try {
-            JabRefDesktop.openBrowser(url, preferences.getFilePreferences());
+            NativeDesktop.openBrowser(url, preferences.getFilePreferences());
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
         }

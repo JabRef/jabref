@@ -13,12 +13,12 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.push.CitationCommandString;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -248,9 +248,9 @@ public class CopyMoreAction extends SimpleCommand {
             }
             String url = entry.getField(StandardField.URL).orElse("");
             keyAndLink.append(url.isEmpty() ? key : "<a href=\"%s\">%s</a>".formatted(url, key));
-            keyAndLink.append(OS.NEWLINE);
+            keyAndLink.append(NativeDesktop.NEWLINE);
             fallbackString.append(url.isEmpty() ? key : "%s - %s".formatted(key, url));
-            fallbackString.append(OS.NEWLINE);
+            fallbackString.append(NativeDesktop.NEWLINE);
         }
 
         clipBoardManager.setHtmlContent(keyAndLink.toString(), fallbackString.toString());

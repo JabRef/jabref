@@ -11,7 +11,7 @@ import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.CellFactory;
@@ -97,7 +97,7 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
                     cellFactory.getTableIcon(field));
             menuItem.setOnAction(event -> {
                 try {
-                    JabRefDesktop.openExternalViewer(database, preferences, values.get(field), field, dialogService, entry.getEntry());
+                    NativeDesktop.openExternalViewer(database, preferences, values.get(field), field, dialogService, entry.getEntry());
                 } catch (IOException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
                 }

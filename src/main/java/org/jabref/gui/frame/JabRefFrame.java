@@ -34,7 +34,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -48,7 +48,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -311,7 +310,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InProceedings, dialogService, prefs, stateManager).execute();
                         break;
                     case PASTE:
-                        if (OS.OS_X) { // Workaround for a jdk issue that executes paste twice when using cmd+v in a TextField
+                        if (NativeDesktop.OS_X) { // Workaround for a jdk issue that executes paste twice when using cmd+v in a TextField
                             // Extra workaround for CodeArea, which does not inherit from TextInputControl
                             if (!(stateManager.getFocusOwner().isPresent() && (stateManager.getFocusOwner().get() instanceof CodeArea))) {
                                 event.consume();
@@ -646,7 +645,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         public void execute() {
             Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(path, prefs.getExternalApplicationsPreferences(), dialogService);
+                    NativeDesktop.openFolderAndSelectFile(path, prefs.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }

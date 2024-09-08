@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Random;
 
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.BibWriter;
@@ -16,7 +17,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -76,7 +76,7 @@ public class Benchmarks {
 
     private StringWriter getOutputWriter() throws IOException {
         StringWriter outputWriter = new StringWriter();
-        BibWriter bibWriter = new BibWriter(outputWriter, OS.NEWLINE);
+        BibWriter bibWriter = new BibWriter(outputWriter, NativeDesktop.NEWLINE);
         BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                 bibWriter,
                 mock(SelfContainedSaveConfiguration.class),

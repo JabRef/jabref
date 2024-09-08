@@ -12,7 +12,7 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -112,7 +112,7 @@ public abstract class SendAsEMailAction extends SimpleCommand {
             attachments.add(path.toAbsolutePath().toString());
             if (openFolders) {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(path.toAbsolutePath(), preferencesService.getExternalApplicationsPreferences(), dialogService);
+                    NativeDesktop.openFolderAndSelectFile(path.toAbsolutePath(), preferencesService.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
                     LOGGER.debug("Cannot open file", e);
                 }

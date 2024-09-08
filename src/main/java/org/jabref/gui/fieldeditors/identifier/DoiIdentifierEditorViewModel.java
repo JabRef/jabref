@@ -5,7 +5,7 @@ import javax.swing.undo.UndoManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -67,6 +67,6 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
     @Override
     public void openExternalLink() {
         identifier.get().map(DOI::getDOI)
-                  .ifPresent(s -> JabRefDesktop.openCustomDoi(s, preferences, dialogService));
+                  .ifPresent(s -> NativeDesktop.openCustomDoi(s, preferences, dialogService));
     }
 }

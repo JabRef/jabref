@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilWriter;
@@ -160,7 +160,7 @@ public class EmbeddedBibFilePdfExporter extends Exporter {
 
     private String getBibString(List<BibEntry> entries) throws IOException {
         StringWriter stringWriter = new StringWriter();
-        BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
+        BibWriter bibWriter = new BibWriter(stringWriter, NativeDesktop.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);
         BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, bibEntryTypesManager);
         for (BibEntry entry : entries) {

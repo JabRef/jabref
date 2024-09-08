@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
@@ -51,7 +51,7 @@ public class UrlEditorViewModel extends AbstractEditorViewModel {
         }
 
         try {
-            JabRefDesktop.openBrowser(text.get(), preferencesService.getFilePreferences());
+            NativeDesktop.openBrowser(text.get(), preferencesService.getFilePreferences());
         } catch (IOException ex) {
             dialogService.notify(Localization.lang("Unable to open link."));
         }

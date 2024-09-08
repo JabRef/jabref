@@ -19,7 +19,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenExternalFileAction;
@@ -142,7 +142,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         fileLinkText.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {
                 try {
-                    JabRefDesktop.openBrowser(resolvedPath.toUri(), preferencesService.getFilePreferences());
+                    NativeDesktop.openBrowser(resolvedPath.toUri(), preferencesService.getFilePreferences());
                 } catch (IOException e) {
                     LOGGER.error("Cannot open {}.", resolvedPath, e);
                 }

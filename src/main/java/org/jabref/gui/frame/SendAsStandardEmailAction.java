@@ -7,10 +7,10 @@ import java.util.List;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -57,7 +57,7 @@ public class SendAsStandardEmailAction extends SendAsEMailAction {
         List<BibEntry> entries = stateManager.getSelectedEntries();
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         StringWriter rawEntries = new StringWriter();
-        BibWriter bibWriter = new BibWriter(rawEntries, OS.NEWLINE);
+        BibWriter bibWriter = new BibWriter(rawEntries, NativeDesktop.NEWLINE);
 
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferencesService.getFieldPreferences()), entryTypesManager);
 

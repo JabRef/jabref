@@ -1,6 +1,6 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.util.OS;
+import org.jabref.gui.desktop.os.NativeDesktop;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,12 +25,12 @@ class RisKeywordsTest {
 
     @Test
     void twoKeywords() {
-        assertEquals("KW  - abcd" + OS.NEWLINE + "KW  - efg", new RisKeywords().format("abcd, efg"));
+        assertEquals("KW  - abcd" + NativeDesktop.NEWLINE + "KW  - efg", new RisKeywords().format("abcd, efg"));
     }
 
     @Test
     void multipleKeywords() {
-        assertEquals("KW  - abcd" + OS.NEWLINE + "KW  - efg" + OS.NEWLINE + "KW  - hij" + OS.NEWLINE
+        assertEquals("KW  - abcd" + NativeDesktop.NEWLINE + "KW  - efg" + NativeDesktop.NEWLINE + "KW  - hij" + NativeDesktop.NEWLINE
                 + "KW  - klm", new RisKeywords().format("abcd, efg, hij, klm"));
     }
 }

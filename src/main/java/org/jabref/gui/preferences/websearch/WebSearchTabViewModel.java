@@ -22,6 +22,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -35,7 +36,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
-import org.jabref.logic.util.OS;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
@@ -91,7 +91,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
         apiKeys.setValue(FXCollections.observableArrayList(preferencesService.getImporterPreferences().getApiKeys()));
-        apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
+        apikeyPersistAvailableProperty.setValue(NativeDesktop.isKeyringAvailable());
         apikeyPersistProperty.setValue(preferencesService.getImporterPreferences().shouldPersistCustomKeys());
         catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                    .stream()

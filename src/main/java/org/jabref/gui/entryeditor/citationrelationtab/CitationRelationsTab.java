@@ -28,7 +28,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
@@ -246,7 +246,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 return;
                             }
                             try {
-                                JabRefDesktop.openBrowser(url, preferencesService.getFilePreferences());
+                                NativeDesktop.openBrowser(url, preferencesService.getFilePreferences());
                             } catch (IOException ex) {
                                 dialogService.notify(Localization.lang("Unable to open link."));
                             }

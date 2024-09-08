@@ -10,7 +10,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -63,7 +63,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         useMainFileDirectory.selectedProperty().bindBidirectional(viewModel.useMainFileDirectoryProperty());
 
         moveToTrash.selectedProperty().bindBidirectional(viewModel.moveToTrashProperty());
-        moveToTrash.setDisable(!JabRefDesktop.moveToTrashSupported());
+        moveToTrash.setDisable(!NativeDesktop.get().moveToTrashSupported());
 
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
         autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());

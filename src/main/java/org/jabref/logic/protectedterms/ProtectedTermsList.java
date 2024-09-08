@@ -9,7 +9,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.util.OS;
+import org.jabref.gui.desktop.os.NativeDesktop;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +85,7 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
         }
 
         Path p = Path.of(location);
-        String s = OS.NEWLINE + term;
+        String s = NativeDesktop.NEWLINE + term;
         try (BufferedWriter writer = Files.newBufferedWriter(p, StandardCharsets.UTF_8,
                 create ? StandardOpenOption.CREATE : StandardOpenOption.APPEND)) {
             writer.write(s);

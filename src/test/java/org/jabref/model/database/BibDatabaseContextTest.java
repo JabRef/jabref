@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.util.Directories;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.metadata.MetaData;
@@ -110,7 +110,7 @@ class BibDatabaseContextTest {
     @Test
     void getUserFileDirectoryIfAllAreEmpty() {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
-        Path userDirJabRef = OS.getNativeDesktop().getDefaultFileChooserDirectory();
+        Path userDirJabRef = NativeDesktop.get().getDefaultFileChooserDirectory();
 
         when(fileDirPrefs.getMainFileDirectory()).thenReturn(Optional.of(userDirJabRef));
         BibDatabaseContext database = new BibDatabaseContext();

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.FilePreferences;
 
@@ -30,7 +30,7 @@ public class OpenExternalLinkAction extends SimpleCommand {
     public void execute() {
         try {
             if (DOI.isValid(urlOrDoi)) {
-                JabRefDesktop.openBrowser(
+                NativeDesktop.openBrowser(
                         DOI.parse(urlOrDoi)
                            .flatMap(DOI::getExternalURI)
                            .map(URI::toString)
@@ -38,7 +38,7 @@ public class OpenExternalLinkAction extends SimpleCommand {
                         filePreferences
                 );
             } else {
-                JabRefDesktop.openBrowser(urlOrDoi, filePreferences);
+                NativeDesktop.openBrowser(urlOrDoi, filePreferences);
             }
         } catch (IOException e) {
             LOGGER.warn("Cannot open the given external link '{}'", urlOrDoi, e);

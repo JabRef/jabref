@@ -8,7 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
@@ -27,7 +27,7 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
             if (button == btnIgnoreUpdate) {
                 return false;
             } else if (button == btnDownloadUpdate) {
-                JabRefDesktop.openBrowserShowPopup(Version.JABREF_DOWNLOAD_URL, dialogService, filePreferences);
+                NativeDesktop.openBrowserShowPopup(Version.JABREF_DOWNLOAD_URL, dialogService, filePreferences);
             }
             return true;
         });
@@ -36,7 +36,7 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
 
         Hyperlink lblMoreInformation = new Hyperlink(Localization.lang("To see what is new view the changelog."));
         lblMoreInformation.setOnAction(event ->
-                JabRefDesktop.openBrowserShowPopup(latestVersion.getChangelogUrl(), dialogService, filePreferences)
+                NativeDesktop.openBrowserShowPopup(latestVersion.getChangelogUrl(), dialogService, filePreferences)
         );
 
         VBox container = new VBox(

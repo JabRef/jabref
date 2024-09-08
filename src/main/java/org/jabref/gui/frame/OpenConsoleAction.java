@@ -8,7 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
 
@@ -49,7 +49,7 @@ public class OpenConsoleAction extends SimpleCommand {
     public void execute() {
         Optional.ofNullable(databaseContext.get()).or(stateManager::getActiveDatabase).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
             try {
-                JabRefDesktop.openConsole(path, preferencesService, dialogService);
+                NativeDesktop.openConsole(path, preferencesService, dialogService);
             } catch (IOException e) {
                 LOGGER.info("Could not open console", e);
             }

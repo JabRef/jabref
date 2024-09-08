@@ -3,9 +3,9 @@ package org.jabref.gui.errorconsole;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.logic.util.OS;
 
 import com.google.common.base.Throwables;
 import org.tinylog.core.LogEntry;
@@ -51,6 +51,6 @@ public class LogEventViewModel {
     }
 
     public String getDetailedText() {
-        return getDisplayText() + getStackTrace().map(stacktrace -> OS.NEWLINE + stacktrace).orElse("");
+        return getDisplayText() + getStackTrace().map(stacktrace -> NativeDesktop.NEWLINE + stacktrace).orElse("");
     }
 }

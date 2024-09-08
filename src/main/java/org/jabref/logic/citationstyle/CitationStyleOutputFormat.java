@@ -1,10 +1,10 @@
 package org.jabref.logic.citationstyle;
 
-import org.jabref.logic.util.OS;
+import org.jabref.gui.desktop.os.NativeDesktop;
 
 public enum CitationStyleOutputFormat {
 
-    HTML("html", OS.NEWLINE + "<br>" + OS.NEWLINE),
+    HTML("html", NativeDesktop.NEWLINE + "<br>" + NativeDesktop.NEWLINE),
     TEXT("text", "");
 
     private final String format;

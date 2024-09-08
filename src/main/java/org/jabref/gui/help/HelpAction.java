@@ -2,7 +2,7 @@ package org.jabref.gui.help;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.preferences.FilePreferences;
 
@@ -25,7 +25,7 @@ public class HelpAction extends SimpleCommand {
     void openHelpPage(HelpFile helpPage) {
         StringBuilder sb = new StringBuilder("https://docs.jabref.org/");
         sb.append(helpPage.getPageName());
-        JabRefDesktop.openBrowserShowPopup(sb.toString(), dialogService, filePreferences);
+        NativeDesktop.openBrowserShowPopup(sb.toString(), dialogService, filePreferences);
     }
 
     @Override

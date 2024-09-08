@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
@@ -43,7 +44,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -140,7 +140,7 @@ public class ArgumentProcessor {
                 return Optional.empty();
             }
         } else {
-            if (OS.WINDOWS) {
+            if (NativeDesktop.WINDOWS) {
                 file = Path.of(address);
             } else {
                 file = Path.of(address.replace("~", System.getProperty("user.home")));
@@ -628,7 +628,7 @@ public class ArgumentProcessor {
         try {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8)) {
-                BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+                BibWriter bibWriter = new BibWriter(fileWriter, NativeDesktop.NEWLINE);
                 SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
                         .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(

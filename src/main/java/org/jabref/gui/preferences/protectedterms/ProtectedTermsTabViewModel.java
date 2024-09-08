@@ -15,7 +15,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -128,7 +128,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
         String fileName = file.getTermsList().getLocation();
         try {
-            JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, fileName, termsFileType);
+            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, fileName, termsFileType);
         } catch (IOException e) {
             LOGGER.warn("Problem open protected terms file editor", e);
         }

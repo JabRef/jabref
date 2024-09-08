@@ -8,7 +8,7 @@ import javafx.beans.binding.BooleanExpression;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
@@ -43,7 +43,7 @@ public class SearchShortScienceAction extends SimpleCommand {
             }
             ExternalLinkCreator.getShortScienceSearchURL(bibEntries.getFirst()).ifPresent(url -> {
                 try {
-                    JabRefDesktop.openExternalViewer(databaseContext, preferencesService, url, StandardField.URL, dialogService, bibEntries.getFirst());
+                    NativeDesktop.openExternalViewer(databaseContext, preferencesService, url, StandardField.URL, dialogService, bibEntries.getFirst());
                 } catch (IOException ex) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open ShortScience."), ex);
                 }

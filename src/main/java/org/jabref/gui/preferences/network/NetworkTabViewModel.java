@@ -19,6 +19,7 @@ import javafx.collections.ListChangeListener;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -27,7 +28,6 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.net.ssl.SSLCertificate;
 import org.jabref.logic.net.ssl.TrustStoreManager;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.InternalPreferences;
@@ -136,7 +136,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         proxyUsernameProperty.setValue(proxyPreferences.getUsername());
         proxyPasswordProperty.setValue(proxyPreferences.getPassword());
         proxyPersistPasswordProperty.setValue(proxyPreferences.shouldPersistPassword());
-        passwordPersistAvailable.setValue(OS.isKeyringAvailable());
+        passwordPersistAvailable.setValue(NativeDesktop.isKeyringAvailable());
     }
 
     private void setSSLValues() {

@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -41,7 +41,7 @@ class BibEntryWriterTest {
 
     private static ImportFormatPreferences importFormatPreferences;
     private final StringWriter stringWriter = new StringWriter();
-    private BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
+    private BibWriter bibWriter = new BibWriter(stringWriter, NativeDesktop.NEWLINE);
     private BibEntryWriter bibEntryWriter;
 
     @BeforeEach
@@ -71,7 +71,7 @@ class BibEntryWriterTest {
                   note    = {some note},
                   number  = {1},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -88,7 +88,7 @@ class BibEntryWriterTest {
                 @Article{,
                   author = {  two spaces before and after (before)  },
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -112,7 +112,7 @@ class BibEntryWriterTest {
                 @Other{test,
                   comment = {testentry},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         BibEntry entry = new BibEntry(new UnknownEntryType("other"))
                 .withField(StandardField.COMMENT, "testentry")
@@ -135,7 +135,7 @@ class BibEntryWriterTest {
                 @Article{,
                   file = {test:/home/uers/test.pdf:PDF},
                 }
-                """.replace("\n", OS.NEWLINE), stringWriter.toString());
+                """.replace("\n", NativeDesktop.NEWLINE), stringWriter.toString());
     }
 
     @Test
@@ -158,7 +158,7 @@ class BibEntryWriterTest {
                   number  = {1},
                   journal = {International Journal of Something},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -185,7 +185,7 @@ class BibEntryWriterTest {
                   number  = {1},
                   journal = {International Journal of Something},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -196,7 +196,7 @@ class BibEntryWriterTest {
                 @Reallyunknowntype{test,
                   comment = {testentry},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         BibEntry entry = new BibEntry();
         entry.setType(new UnknownEntryType("ReallyUnknownType"));
@@ -216,7 +216,7 @@ class BibEntryWriterTest {
                   Note                     = {some note},
                   Number                   = {1}
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         // read in bibtex string
         ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
@@ -234,7 +234,7 @@ class BibEntryWriterTest {
                 @Article{,
                   file = {Tagungen\\2013\\KWTK45},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         // read in bibtex string
         ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
@@ -252,7 +252,7 @@ class BibEntryWriterTest {
                 @Article{,
                   demofield = {Tagungen\\2013\\KWTK45},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         // read in bibtex string
         ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
@@ -270,7 +270,7 @@ class BibEntryWriterTest {
                 @Article{,
                   file = {dir\\},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         // read in bibtex string
         ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
@@ -285,12 +285,12 @@ class BibEntryWriterTest {
     @Test
     void roundTripWithPrependingNewlines() throws IOException {
         // @formatter:off
-        String bibtexEntry = "\r\n@Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo Bar}," + OS.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "}" + OS.NEWLINE;
+        String bibtexEntry = "\r\n@Article{test," + NativeDesktop.NEWLINE +
+                "  Author                   = {Foo Bar}," + NativeDesktop.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + NativeDesktop.NEWLINE +
+                "  Note                     = {some note}," + NativeDesktop.NEWLINE +
+                "  Number                   = {1}" + NativeDesktop.NEWLINE +
+                "}" + NativeDesktop.NEWLINE;
         // @formatter:on
 
         // read in bibtex string
@@ -359,7 +359,7 @@ class BibEntryWriterTest {
                   Note                     = {some note},
                   Number                   = {1},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
         // @formatter:on
 
         // read in bibtex string
@@ -380,7 +380,7 @@ class BibEntryWriterTest {
                   note    = {some note},
                   number  = {1},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
         // @formatter:on
         assertEquals(expected, stringWriter.toString());
     }
@@ -396,7 +396,7 @@ class BibEntryWriterTest {
                   Note                     = {some note},
                   HowPublished             = {asdf},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
         // @formatter:on
 
         // read in bibtex string
@@ -418,7 +418,7 @@ class BibEntryWriterTest {
                   number       = {1},
                   howpublished = {asdf},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
         // @formatter:on
         assertEquals(expected, stringWriter.toString());
     }
@@ -435,7 +435,7 @@ class BibEntryWriterTest {
                   note         = {some note},
                   howpublished = {asdf},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
         // @formatter:on
 
         // read in bibtex string
@@ -457,7 +457,7 @@ class BibEntryWriterTest {
                   howpublished = {asdf},
                   journal      = {International Journal of Something},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
         // @formatter:on
         assertEquals(expectedNewEntry, stringWriter.toString());
     }
@@ -465,11 +465,11 @@ class BibEntryWriterTest {
     @Test
     void roundTripWithAppendedNewlines() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo Bar}," + OS.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Number                   = {1}," + OS.NEWLINE +
-                "  Note                     = {some note}" + OS.NEWLINE +
+        String bibtexEntry = "@Article{test," + NativeDesktop.NEWLINE +
+                "  Author                   = {Foo Bar}," + NativeDesktop.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + NativeDesktop.NEWLINE +
+                "  Number                   = {1}," + NativeDesktop.NEWLINE +
+                "  Note                     = {some note}" + NativeDesktop.NEWLINE +
                 "}\n\n";
         // @formatter:on
 
@@ -483,7 +483,7 @@ class BibEntryWriterTest {
 
         // Only one appending newline is written by the writer
         // OS.NEWLINE is used, not the given one
-        assertEquals(bibtexEntry.substring(0, bibtexEntry.length() - 2) + OS.NEWLINE, actual);
+        assertEquals(bibtexEntry.substring(0, bibtexEntry.length() - 2) + NativeDesktop.NEWLINE, actual);
     }
 
     @Test
@@ -505,12 +505,12 @@ class BibEntryWriterTest {
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
-        String expected = "@Article{test," + OS.NEWLINE +
-                "  Author                   = {Foo Bar}," + OS.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Number                   = {1}," + OS.NEWLINE +
-                "  Note                     = {some note}" + OS.NEWLINE +
-                "}" + OS.NEWLINE;
+        String expected = "@Article{test," + NativeDesktop.NEWLINE +
+                "  Author                   = {Foo Bar}," + NativeDesktop.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + NativeDesktop.NEWLINE +
+                "  Number                   = {1}," + NativeDesktop.NEWLINE +
+                "  Note                     = {some note}" + NativeDesktop.NEWLINE +
+                "}" + NativeDesktop.NEWLINE;
         assertEquals(expected, actual);
     }
 
@@ -524,7 +524,7 @@ class BibEntryWriterTest {
                   Note                     = {some note},
                   Number                   = {1}
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
         // @formatter:on
 
         String result = testSingleWrite(bibtexEntry);
@@ -541,7 +541,7 @@ class BibEntryWriterTest {
 
         // write out bibtex string
         StringWriter writer = new StringWriter();
-        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+        BibWriter bibWriter = new BibWriter(writer, NativeDesktop.NEWLINE);
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         String actual = writer.toString();
@@ -558,7 +558,7 @@ class BibEntryWriterTest {
                   Month                    = mar,
                   Number                   = {1}
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
         // @formatter:on
 
         // read in bibtex string
@@ -619,7 +619,7 @@ class BibEntryWriterTest {
                   subtitle   = {Encyclopedia of Photography},
                   title      = {International Center of Photography},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -637,7 +637,7 @@ class BibEntryWriterTest {
                         @Misc{,
                           month = apr,
                         }
-                        """.replace("\n", OS.NEWLINE),
+                        """.replace("\n", NativeDesktop.NEWLINE),
                 stringWriter.toString());
     }
 
@@ -654,7 +654,7 @@ class BibEntryWriterTest {
                         @Misc{,
                           month = {apr},
                         }
-                        """.replace("\n", OS.NEWLINE),
+                        """.replace("\n", NativeDesktop.NEWLINE),
                 stringWriter.toString());
     }
 
@@ -671,7 +671,7 @@ class BibEntryWriterTest {
                       file      = {:Hue17 - Leiter # Halbleiter # Supraleiter.pdf:PDF},
                       timestamp = {2020.10.13},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         // read in bibtex string
         ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
@@ -686,11 +686,11 @@ class BibEntryWriterTest {
     @Test
     void addFieldWithLongerLength() throws IOException {
         // @formatter:off
-        String bibtexEntry = OS.NEWLINE + OS.NEWLINE + "@Article{test," + OS.NEWLINE +
-                "  author =  {BlaBla}," + OS.NEWLINE +
-                "  journal = {International Journal of Something}," + OS.NEWLINE +
-                "  number =  {1}," + OS.NEWLINE +
-                "  note =    {some note}," + OS.NEWLINE +
+        String bibtexEntry = NativeDesktop.NEWLINE + NativeDesktop.NEWLINE + "@Article{test," + NativeDesktop.NEWLINE +
+                "  author =  {BlaBla}," + NativeDesktop.NEWLINE +
+                "  journal = {International Journal of Something}," + NativeDesktop.NEWLINE +
+                "  number =  {1}," + NativeDesktop.NEWLINE +
+                "  note =    {some note}," + NativeDesktop.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -705,13 +705,13 @@ class BibEntryWriterTest {
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         // @formatter:off
-        String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
-                "  author       = {BlaBla}," + OS.NEWLINE +
-                "  journal      = {International Journal of Something}," + OS.NEWLINE +
-                "  note         = {some note}," + OS.NEWLINE +
-                "  number       = {1}," + OS.NEWLINE +
-                "  howpublished = {asdf}," + OS.NEWLINE +
-                "}" + OS.NEWLINE;
+        String expected = NativeDesktop.NEWLINE + "@Article{test," + NativeDesktop.NEWLINE +
+                "  author       = {BlaBla}," + NativeDesktop.NEWLINE +
+                "  journal      = {International Journal of Something}," + NativeDesktop.NEWLINE +
+                "  note         = {some note}," + NativeDesktop.NEWLINE +
+                "  number       = {1}," + NativeDesktop.NEWLINE +
+                "  howpublished = {asdf}," + NativeDesktop.NEWLINE +
+                "}" + NativeDesktop.NEWLINE;
         // @formatter:on
         assertEquals(expected, stringWriter.toString());
     }
@@ -724,9 +724,9 @@ class BibEntryWriterTest {
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
-        String expected = "@Article{," + OS.NEWLINE +
-                "  note   = {some note}," + OS.NEWLINE +
-                "}" + OS.NEWLINE;
+        String expected = "@Article{," + NativeDesktop.NEWLINE +
+                "  note   = {some note}," + NativeDesktop.NEWLINE +
+                "}" + NativeDesktop.NEWLINE;
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -750,7 +750,7 @@ class BibEntryWriterTest {
                   Note                     = {some note},
                   Number                   = {1}
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
         // @formatter:on
 
         // read in bibtex string
@@ -774,7 +774,7 @@ class BibEntryWriterTest {
                   Number                   = {1},
                   Note                     = {some note}
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
         // @formatter:on
 
         // read in bibtex string
@@ -795,7 +795,7 @@ class BibEntryWriterTest {
                   note    = {some note},
                   number  = {1},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -828,7 +828,7 @@ class BibEntryWriterTest {
                   chapter      = {chapter},
                   year         = {2019},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         assertEquals(expected, stringWriter.toString());
     }
@@ -876,7 +876,7 @@ class BibEntryWriterTest {
                   chapter      = {chapter},
                   year         = {2019},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         String expected2 = """
                 @Book{,
@@ -889,9 +889,9 @@ class BibEntryWriterTest {
                   booktitle = {The Big Book of Books},
                   year      = {2020},
                 }
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
-        assertEquals(expected1 + OS.NEWLINE + expected2, output);
+        assertEquals(expected1 + NativeDesktop.NEWLINE + expected2, output);
     }
 
     static Stream<Arguments> getFormattedFieldName() {

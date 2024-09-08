@@ -5,7 +5,7 @@ import java.util.List;
 
 import javafx.util.Pair;
 
-import org.jabref.logic.util.OS;
+import org.jabref.gui.desktop.os.NativeDesktop;
 
 import org.junit.jupiter.api.Test;
 
@@ -148,7 +148,7 @@ class JabRefCLITest {
                 Bread   : Loaf
                 Paper   : Sheet
                 Country : County
-                """.replace("\n", OS.NEWLINE);
+                """.replace("\n", NativeDesktop.NEWLINE);
 
         assertEquals(expected, JabRefCLI.alignStringTable(given));
     }

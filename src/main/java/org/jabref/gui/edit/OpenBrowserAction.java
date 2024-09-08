@@ -2,7 +2,7 @@ package org.jabref.gui.edit;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.preferences.FilePreferences;
 
 public class OpenBrowserAction extends SimpleCommand {
@@ -19,6 +19,6 @@ public class OpenBrowserAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        JabRefDesktop.openBrowserShowPopup(urlToOpen, dialogService, filePreferences);
+        NativeDesktop.openBrowserShowPopup(urlToOpen, dialogService, filePreferences);
     }
 }

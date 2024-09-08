@@ -9,7 +9,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.ai.AiPreferences;
 
@@ -99,7 +99,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
 
     private void openBrowser(String link) {
         try {
-            JabRefDesktop.openBrowser(link, filePreferences);
+            NativeDesktop.openBrowser(link, filePreferences);
         } catch (IOException e) {
             LOGGER.error("Error opening the browser to the Privacy Policy page of the AI provider.", e);
             dialogService.showErrorDialogAndWait(e);
