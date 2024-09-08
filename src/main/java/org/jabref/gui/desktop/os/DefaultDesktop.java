@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.logic.util.Directories;
 import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,6 @@ public class DefaultDesktop extends NativeDesktop {
 
     @Override
     public Path getApplicationDirectory() {
-        return getUserDirectory();
+        return Directories.getUserDirectory();
     }
 }

@@ -11,14 +11,10 @@ import java.nio.file.Path;
 import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
-import org.jabref.logic.ai.AiService;
-import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.util.OS;
-import org.jabref.model.search.SearchFieldConstants;
+import org.jabref.logic.util.Directories;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.FilePreferences;
 
-import net.harawata.appdirs.AppDirsFactory;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -63,60 +59,13 @@ public abstract class NativeDesktop {
      * @return the path
      */
     public Path getDefaultFileChooserDirectory() {
-         Path userDirectory = getUserDirectory();
+         Path userDirectory = Directories.getUserDirectory();
          Path documents = userDirectory.resolve("Documents");
          if (!Files.exists(documents)) {
              return userDirectory;
          }
          return documents;
      }
-
-    /**
-     * Returns the path to the system's user directory.
-     *
-     * @return the path
-     */
-    public Path getUserDirectory() {
-        return Path.of(System.getProperty("user.home"));
-    }
-
-    public Path getLogDirectory() {
-        return Path.of(AppDirsFactory.getInstance()
-                                     .getUserDataDir(
-                                             OS.APP_DIR_APP_NAME,
-                                             "logs",
-                                             OS.APP_DIR_APP_AUTHOR))
-                   .resolve(new BuildInfo().version.toString());
-    }
-
-    public Path getBackupDirectory() {
-        return Path.of(AppDirsFactory.getInstance()
-                                     .getUserDataDir(
-                                             OS.APP_DIR_APP_NAME,
-                                             "backups",
-                                             OS.APP_DIR_APP_AUTHOR));
-    }
-
-    public Path getFulltextIndexBaseDirectory() {
-        return Path.of(AppDirsFactory.getInstance()
-                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
-                                             "lucene" + File.separator + SearchFieldConstants.VERSION,
-                                             OS.APP_DIR_APP_AUTHOR));
-    }
-
-    public Path getAiFilesDirectory() {
-        return Path.of(AppDirsFactory.getInstance()
-                .getUserDataDir(OS.APP_DIR_APP_NAME,
-                        "ai" + File.separator + AiService.VERSION,
-                        OS.APP_DIR_APP_AUTHOR));
-    }
-
-    public Path getSslDirectory() {
-        return Path.of(AppDirsFactory.getInstance()
-                                     .getUserDataDir(OS.APP_DIR_APP_NAME,
-                                             "ssl",
-                                             OS.APP_DIR_APP_AUTHOR));
-    }
 
     public String getHostName() {
         String hostName;

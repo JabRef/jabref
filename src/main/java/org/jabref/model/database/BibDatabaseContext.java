@@ -15,7 +15,7 @@ import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
-import org.jabref.logic.util.OS;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
@@ -257,7 +257,7 @@ public class BibDatabaseContext {
      */
     @NonNull
     public Path getFulltextIndexPath() {
-        Path appData = OS.getNativeDesktop().getFulltextIndexBaseDirectory();
+        Path appData = Directories.getFulltextIndexBaseDirectory();
         Path indexPath;
 
         if (getDatabasePath().isPresent()) {
