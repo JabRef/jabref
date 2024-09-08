@@ -295,7 +295,7 @@ public class ArgumentProcessor {
     }
 
     private void writeMetadataToPdf(List<ParserResult> loaded,
-                                    String filesAndCitekeys,
+                                    String filesAndCiteKeys,
                                     XmpPreferences xmpPreferences,
                                     FilePreferences filePreferences,
                                     BibDatabaseMode databaseMode,
@@ -314,7 +314,7 @@ public class ArgumentProcessor {
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
         EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldPreferences);
 
-        if ("all".equals(filesAndCitekeys)) {
+        if ("all".equals(filesAndCiteKeys)) {
             for (BibEntry entry : databaseContext.getEntries()) {
                 writeMetadataToPDFsOfEntry(
                         databaseContext,
@@ -332,7 +332,7 @@ public class ArgumentProcessor {
 
         List<String> citeKeys = new ArrayList<>();
         List<String> pdfs = new ArrayList<>();
-        for (String fileOrCiteKey : filesAndCitekeys.split(",")) {
+        for (String fileOrCiteKey : filesAndCiteKeys.split(",")) {
             if (fileOrCiteKey.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
                 pdfs.add(fileOrCiteKey);
             } else {
@@ -368,7 +368,7 @@ public class ArgumentProcessor {
                                             EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter,
                                             JournalAbbreviationRepository abbreviationRepository,
                                             boolean writeXMP,
-                                            boolean embeddBibfile) {
+                                            boolean embedBibfile) {
         try {
             if (writeXMP) {
                 if (xmpPdfExporter.exportToAllFilesOfEntry(databaseContext, filePreferences, entry, List.of(entry), abbreviationRepository)) {
@@ -377,7 +377,7 @@ public class ArgumentProcessor {
                     System.err.printf("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey);
                 }
             }
-            if (embeddBibfile) {
+            if (embedBibfile) {
                 if (embeddedBibFilePdfExporter.exportToAllFilesOfEntry(databaseContext, filePreferences, entry, List.of(entry), abbreviationRepository)) {
                     System.out.printf("Successfully embedded metadata on at least one linked file of %s%n", citeKey);
                 } else {
