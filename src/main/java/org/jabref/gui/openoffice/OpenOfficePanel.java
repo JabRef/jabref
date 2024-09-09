@@ -95,7 +95,6 @@ public class OpenOfficePanel {
     private final VBox vbox = new VBox();
 
     private final PreferencesService preferencesService;
-    private final AiService aiService;
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
@@ -109,7 +108,6 @@ public class OpenOfficePanel {
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            PreferencesService preferencesService,
-                           AiService aiService,
                            KeyBindingRepository keyBindingRepository,
                            JournalAbbreviationRepository abbreviationRepository,
                            TaskExecutor taskExecutor,
@@ -123,7 +121,6 @@ public class OpenOfficePanel {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.preferencesService = preferencesService;
-        this.aiService = aiService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
