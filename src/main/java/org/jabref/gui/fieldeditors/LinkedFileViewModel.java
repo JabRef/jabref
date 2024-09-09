@@ -108,6 +108,23 @@ public class LinkedFileViewModel extends AbstractViewModel {
         isOfflinePdf.setValue(!linkedFile.isOnlineLink() && "pdf".equalsIgnoreCase(linkedFile.getFileType()));
     }
 
+    public static LinkedFileViewModel fromLinkedFile(
+            LinkedFile linkedFile,
+            BibEntry entry,
+            BibDatabaseContext databaseContext,
+            TaskExecutor taskExecutor,
+            DialogService dialogService,
+            GuiPreferences preferences) {
+        return new LinkedFileViewModel(
+                linkedFile,
+                entry,
+                databaseContext,
+                taskExecutor,
+                dialogService,
+                preferences);
+    }
+
+
     public BooleanProperty isOfflinePdfProperty() {
         return isOfflinePdf;
     }
