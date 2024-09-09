@@ -13,7 +13,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -23,7 +23,7 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
     @FXML private Button keyPatternHelp;
     @FXML private CitationKeyPatternsPanel bibtexKeyPatternTable;
 
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
 
     public KeyPatternPropertiesView(BibDatabaseContext databaseContext) {

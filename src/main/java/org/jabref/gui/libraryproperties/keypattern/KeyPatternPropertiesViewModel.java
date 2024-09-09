@@ -11,7 +11,7 @@ import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
 
@@ -21,11 +21,11 @@ public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
     private final ObjectProperty<CitationKeyPatternsPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
             new CitationKeyPatternsPanelItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), ""));
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     private final BibDatabaseContext databaseContext;
 
-    public KeyPatternPropertiesViewModel(BibDatabaseContext databaseContext, Preferences preferences) {
+    public KeyPatternPropertiesViewModel(BibDatabaseContext databaseContext, CliPreferences preferences) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
     }

@@ -12,7 +12,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class OpenExternalFileAction extends SimpleCommand {
 
@@ -20,7 +20,7 @@ public class OpenExternalFileAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     private final BibEntry entry;
     private final LinkedFile linkedFile;
@@ -28,14 +28,14 @@ public class OpenExternalFileAction extends SimpleCommand {
 
     public OpenExternalFileAction(DialogService dialogService,
                                   StateManager stateManager,
-                                  Preferences preferences,
+                                  CliPreferences preferences,
                                   TaskExecutor taskExecutor) {
         this(dialogService, stateManager, preferences, null, null, taskExecutor);
     }
 
     public OpenExternalFileAction(DialogService dialogService,
                                   StateManager stateManager,
-                                  Preferences preferences,
+                                  CliPreferences preferences,
                                   BibEntry entry,
                                   LinkedFile linkedFile,
                                   TaskExecutor taskExecutor) {

@@ -34,7 +34,7 @@ import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -64,7 +64,7 @@ public class MainTableDataModel {
     private Optional<MatcherSet> groupsMatcher;
 
     public MainTableDataModel(BibDatabaseContext context,
-                              Preferences preferences,
+                              CliPreferences preferences,
                               TaskExecutor taskExecutor,
                               StateManager stateManager,
                               @Nullable LuceneManager luceneManager,

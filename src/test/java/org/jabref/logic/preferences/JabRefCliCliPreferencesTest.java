@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class JabRefPreferencesTest {
+class JabRefCliCliPreferencesTest {
     private static Stream<Arguments> provideTestData() {
         return Stream.of(
                 Arguments.of(List.of("A", "B", "C", "D"), "A;B;C;D"),
@@ -20,12 +20,12 @@ class JabRefPreferencesTest {
     @ParameterizedTest
     @MethodSource("provideTestData")
     void convertStringToList(List<String> sampleList, String sampleString) {
-        assertEquals(sampleList, JabRefPreferences.convertStringToList(sampleString));
+        assertEquals(sampleList, JabRefCliCliPreferences.convertStringToList(sampleString));
     }
 
     @ParameterizedTest
     @MethodSource("provideTestData")
     void convertListToString(List<String> sampleList, String sampleString) {
-        assertEquals(sampleString, JabRefPreferences.convertListToString(sampleList));
+        assertEquals(sampleString, JabRefCliCliPreferences.convertListToString(sampleList));
     }
 }

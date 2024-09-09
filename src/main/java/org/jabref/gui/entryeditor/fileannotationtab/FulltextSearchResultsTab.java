@@ -36,7 +36,7 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResult;
 import org.jabref.model.search.SearchResults;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
 
     private final StateManager stateManager;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final BibDatabaseContext databaseContext;
@@ -58,7 +58,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private DocumentViewerView documentViewerView;
 
     public FulltextSearchResultsTab(StateManager stateManager,
-                                    Preferences preferences,
+                                    CliPreferences preferences,
                                     DialogService dialogService,
                                     BibDatabaseContext databaseContext,
                                     TaskExecutor taskExecutor,

@@ -19,7 +19,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final List<DatabaseChangeListener> listeners;
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final LibraryTab.DatabaseNotification notificationPane;
     private final UndoManager undoManager;
     private final StateManager stateManager;
@@ -44,7 +44,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                                  FileUpdateMonitor fileMonitor,
                                  TaskExecutor taskExecutor,
                                  DialogService dialogService,
-                                 Preferences preferences,
+                                 CliPreferences preferences,
                                  LibraryTab.DatabaseNotification notificationPane,
                                  UndoManager undoManager,
                                  StateManager stateManager) {

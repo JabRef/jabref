@@ -1,17 +1,17 @@
 package org.jabref.http.server;
 
-import org.jabref.logic.preferences.JabRefPreferences;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.JabRefCliCliPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.glassfish.hk2.api.Factory;
 
-public class PreferencesFactory implements Factory<Preferences> {
+public class PreferencesFactory implements Factory<CliPreferences> {
     @Override
-    public Preferences provide() {
-        return JabRefPreferences.getInstance();
+    public CliPreferences provide() {
+        return JabRefCliCliPreferences.getInstance();
     }
 
     @Override
-    public void dispose(Preferences instance) {
+    public void dispose(CliPreferences instance) {
     }
 }

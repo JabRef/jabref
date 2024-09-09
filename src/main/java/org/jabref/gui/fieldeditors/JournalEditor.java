@@ -19,7 +19,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -31,7 +31,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML private Button journalInfoButton;
 
     @Inject private DialogService dialogService;
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;

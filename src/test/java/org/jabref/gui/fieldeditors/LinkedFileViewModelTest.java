@@ -29,7 +29,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.AfterEach;
@@ -68,7 +68,7 @@ class LinkedFileViewModelTest {
     private DialogService dialogService;
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-    private final Preferences preferences = mock(Preferences.class);
+    private final CliPreferences preferences = mock(CliPreferences.class);
     private CookieManager cookieManager;
 
     @BeforeEach

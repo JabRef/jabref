@@ -14,7 +14,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -24,7 +24,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
     @FXML private OwnerEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private UndoManager undoManager;
 

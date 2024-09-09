@@ -15,13 +15,13 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class CellFactory {
 
     private final Map<Field, JabRefIcon> TABLE_ICONS = new HashMap<>();
 
-    public CellFactory(Preferences preferences, UndoManager undoManager) {
+    public CellFactory(CliPreferences preferences, UndoManager undoManager) {
         JabRefIcon icon;
         icon = IconTheme.JabRefIcons.PDF_FILE;
         // icon.setToo(Localization.lang("Open") + " PDF");

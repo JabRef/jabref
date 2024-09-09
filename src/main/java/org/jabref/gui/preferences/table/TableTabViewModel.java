@@ -28,7 +28,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -72,14 +72,14 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private final Validator columnsNotEmptyValidator;
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     private ColumnPreferences initialColumnPreferences;
     private final SpecialFieldsPreferences specialFieldsPreferences;
     private final NameDisplayPreferences nameDisplayPreferences;
     private final MainTablePreferences mainTablePreferences;
 
-    public TableTabViewModel(DialogService dialogService, Preferences preferences) {
+    public TableTabViewModel(DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();

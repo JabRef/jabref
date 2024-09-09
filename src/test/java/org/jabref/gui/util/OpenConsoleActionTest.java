@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.frame.OpenConsoleAction;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 class OpenConsoleActionTest {
 
     private final StateManager stateManager = mock(StateManager.class);
-    private final Preferences preferences = mock(Preferences.class);
+    private final CliPreferences preferences = mock(CliPreferences.class);
     private final BibDatabaseContext current = mock(BibDatabaseContext.class);
     private final BibDatabaseContext other = mock(BibDatabaseContext.class);
 

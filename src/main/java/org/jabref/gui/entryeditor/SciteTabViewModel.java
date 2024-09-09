@@ -20,7 +20,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import kong.unirest.core.json.JSONObject;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class SciteTabViewModel extends AbstractViewModel {
     }
 
     private static final String BASE_URL = "https://api.scite.ai/";
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final ObjectProperty<SciteStatus> status;
     private final StringProperty searchError;
@@ -45,7 +45,7 @@ public class SciteTabViewModel extends AbstractViewModel {
 
     private Future<?> searchTask;
 
-    public SciteTabViewModel(Preferences preferences, TaskExecutor taskExecutor) {
+    public SciteTabViewModel(CliPreferences preferences, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.status = new SimpleObjectProperty<>(SciteStatus.IN_PROGRESS);

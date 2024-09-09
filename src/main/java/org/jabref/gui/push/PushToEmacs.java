@@ -13,7 +13,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class PushToEmacs extends AbstractPushToApplication {
     /**
      * @param preferences getPushToApplicationPreferences(), getExternalApplicationsPreferences(), and getFilePreferences() are used
      */
-    public PushToEmacs(DialogService dialogService, Preferences preferences) {
+    public PushToEmacs(DialogService dialogService, CliPreferences preferences) {
         super(dialogService, preferences);
     }
 

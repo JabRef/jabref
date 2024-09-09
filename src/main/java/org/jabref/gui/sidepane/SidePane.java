@@ -20,11 +20,11 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class SidePane extends VBox {
     private final SidePaneViewModel viewModel;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final StateManager stateManager;
 
     // These bindings need to be stored, otherwise they are garbage collected
@@ -32,7 +32,7 @@ public class SidePane extends VBox {
     private final Map<SidePaneType, BooleanBinding> visibleBindings = new HashMap<>();
 
     public SidePane(LibraryTabContainer tabContainer,
-                    Preferences preferences,
+                    CliPreferences preferences,
                     ChatHistoryService chatHistoryService,
                     JournalAbbreviationRepository abbreviationRepository,
                     TaskExecutor taskExecutor,

@@ -27,7 +27,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -42,14 +42,14 @@ public class FromAuxDialogViewModel {
 
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final StateManager stateManager;
 
     private AuxParserResult auxParserResult;
 
     public FromAuxDialogViewModel(LibraryTabContainer tabContainer,
                                   DialogService dialogService,
-                                  Preferences preferences,
+                                  CliPreferences preferences,
                                   StateManager stateManager) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;

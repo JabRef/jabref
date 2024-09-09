@@ -7,13 +7,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class PreferencesFilter {
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
-    public PreferencesFilter(Preferences preferences) {
+    public PreferencesFilter(CliPreferences preferences) {
         this.preferences = preferences;
     }
 

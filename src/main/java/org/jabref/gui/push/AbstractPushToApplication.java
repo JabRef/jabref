@@ -14,7 +14,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
@@ -33,9 +33,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected String commandPath;
 
     protected final DialogService dialogService;
-    protected final Preferences preferences;
+    protected final CliPreferences preferences;
 
-    public AbstractPushToApplication(DialogService dialogService, Preferences preferences) {
+    public AbstractPushToApplication(DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
     }

@@ -20,7 +20,7 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class SpecialFieldAction extends SimpleCommand {
     private final boolean nullFieldIfValueIsTheSame;
     private final String undoText;
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final UndoManager undoManager;
     private final StateManager stateManager;
 
@@ -47,7 +47,7 @@ public class SpecialFieldAction extends SimpleCommand {
                               boolean nullFieldIfValueIsTheSame,
                               String undoText,
                               DialogService dialogService,
-                              Preferences preferences,
+                              CliPreferences preferences,
                               UndoManager undoManager,
                               StateManager stateManager) {
         this.tabSupplier = tabSupplier;

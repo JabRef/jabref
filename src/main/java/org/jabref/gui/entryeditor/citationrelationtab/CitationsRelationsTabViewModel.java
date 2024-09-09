@@ -17,19 +17,19 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class CitationsRelationsTabViewModel {
 
     private final BibDatabaseContext databaseContext;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
-    public CitationsRelationsTabViewModel(BibDatabaseContext databaseContext, Preferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
+    public CitationsRelationsTabViewModel(BibDatabaseContext databaseContext, CliPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.undoManager = undoManager;

@@ -10,7 +10,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
@@ -18,7 +18,7 @@ public class MarkdownEditor extends SimpleEditor {
 
     private final FlexmarkHtmlConverter flexmarkHtmlConverter = FlexmarkHtmlConverter.builder().build();
 
-    public MarkdownEditor(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, Preferences preferences, UndoManager undoManager, UndoAction undoAction, RedoAction redoAction) {
+    public MarkdownEditor(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, CliPreferences preferences, UndoManager undoManager, UndoAction undoAction, RedoAction redoAction) {
         super(field, suggestionProvider, fieldCheckers, preferences, true, undoManager, undoAction, redoAction);
     }
 

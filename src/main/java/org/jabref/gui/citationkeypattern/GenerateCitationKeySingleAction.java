@@ -8,17 +8,17 @@ import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class GenerateCitationKeySingleAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final BibEntry entry;
     private final UndoManager undoManager;
 
-    public GenerateCitationKeySingleAction(BibEntry entry, BibDatabaseContext databaseContext, DialogService dialogService, Preferences preferences, UndoManager undoManager) {
+    public GenerateCitationKeySingleAction(BibEntry entry, BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences, UndoManager undoManager) {
         this.entry = entry;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;

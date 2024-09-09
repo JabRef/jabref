@@ -37,7 +37,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             new SearchGroupsMigrationAction());
 
     private final LibraryTabContainer tabContainer;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final AiService aiService;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -70,7 +70,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
 
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
-                              Preferences preferences,
+                              CliPreferences preferences,
                               AiService aiService,
                               DialogService dialogService,
                               StateManager stateManager,
@@ -91,7 +91,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
     }
 
-    public static void performPostOpenActions(ParserResult result, DialogService dialogService, Preferences preferences) {
+    public static void performPostOpenActions(ParserResult result, DialogService dialogService, CliPreferences preferences) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result, preferences)) {
                 action.performAction(result, dialogService, preferences);
@@ -265,7 +265,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     public static void openSharedDatabase(ParserResult parserResult,
                                           LibraryTabContainer tabContainer,
                                           DialogService dialogService,
-                                          Preferences preferences,
+                                          CliPreferences preferences,
                                           AiService aiService,
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,

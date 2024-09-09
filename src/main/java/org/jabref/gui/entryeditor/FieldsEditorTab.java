@@ -41,7 +41,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -58,7 +58,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     private final UndoAction undoAction;
     private final RedoAction redoAction;
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final ThemeManager themeManager;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
@@ -77,7 +77,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                            UndoAction undoAction,
                            RedoAction redoAction,
                            DialogService dialogService,
-                           Preferences preferences,
+                           CliPreferences preferences,
                            ThemeManager themeManager,
                            TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository,

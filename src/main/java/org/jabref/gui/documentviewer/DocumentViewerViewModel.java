@@ -24,7 +24,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.pdfbox.Loader;
@@ -37,14 +37,14 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
 
     private final StateManager stateManager;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
     private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
     private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
     private final IntegerProperty maxPages = new SimpleIntegerProperty();
 
-    public DocumentViewerViewModel(StateManager stateManager, Preferences preferences) {
+    public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.preferences = Objects.requireNonNull(preferences);
 

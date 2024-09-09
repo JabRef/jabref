@@ -12,7 +12,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -22,7 +22,7 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
 
     private final List<BibEntryType> customEntryTypes;
 
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @FXML private VBox boxDifferentCustomization;
 
     @FXML private CheckListView<BibEntryType> unknownEntryTypesCheckList;

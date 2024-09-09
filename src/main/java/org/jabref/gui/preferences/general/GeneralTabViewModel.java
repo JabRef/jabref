@@ -42,7 +42,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
@@ -87,7 +87,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final StringProperty backupDirectoryProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final WorkspacePreferences workspacePreferences;
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
@@ -104,7 +104,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BibEntryTypesManager entryTypesManager;
     private final TrustStoreManager trustStoreManager;
 
-    public GeneralTabViewModel(DialogService dialogService, Preferences preferences, FileUpdateMonitor fileUpdateMonitor, BibEntryTypesManager entryTypesManager) {
+    public GeneralTabViewModel(DialogService dialogService, CliPreferences preferences, FileUpdateMonitor fileUpdateMonitor, BibEntryTypesManager entryTypesManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.workspacePreferences = preferences.getWorkspacePreferences();

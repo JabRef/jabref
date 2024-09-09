@@ -23,7 +23,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -43,13 +43,13 @@ public class WebSearchPaneViewModel {
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final StateManager stateManager;
 
     private final Validator searchQueryValidator;
     private final SyntaxParser parser = new StandardSyntaxParser();
 
-    public WebSearchPaneViewModel(Preferences preferences, DialogService dialogService, StateManager stateManager) {
+    public WebSearchPaneViewModel(CliPreferences preferences, DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;

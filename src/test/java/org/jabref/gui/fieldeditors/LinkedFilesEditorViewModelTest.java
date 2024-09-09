@@ -14,7 +14,7 @@ import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 @FetcherTest("Downloads a PDF file")
 class LinkedFilesEditorViewModelTest {
     private LinkedFilesEditorViewModel viewModel;
-    private final Preferences preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
+    private final CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
     private final UndoManager undoManager = mock(UndoManager.class);

@@ -29,7 +29,7 @@ import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.texparser.LatexParserResults;
 import org.jabref.model.util.DirectoryMonitorManager;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -51,7 +51,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private static final String TEX_EXT = ".tex";
     private static final IOFileFilter FILE_FILTER = FileFilterUtils.or(FileFilterUtils.suffixFileFilter(TEX_EXT), FileFilterUtils.directoryFileFilter());
     private final BibDatabaseContext databaseContext;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final DialogService dialogService;
     private final ObjectProperty<Path> directory;
     private final ObservableList<Citation> citationList;
@@ -66,7 +66,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private BibEntry currentEntry;
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext,
-                                      Preferences preferences,
+                                      CliPreferences preferences,
                                       DialogService dialogService,
                                       DirectoryMonitorManager directoryMonitorManager) {
 

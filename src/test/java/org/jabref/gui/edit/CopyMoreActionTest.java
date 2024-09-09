@@ -21,7 +21,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class CopyMoreActionTest {
 
     private final DialogService dialogService = spy(DialogService.class);
     private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
-    private final Preferences preferences = mock(Preferences.class);
+    private final CliPreferences preferences = mock(CliPreferences.class);
     private final JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     private final StateManager stateManager = mock(StateManager.class);
     private final List<String> titles = new ArrayList<>();

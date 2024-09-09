@@ -11,7 +11,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.entrytype.EntryTypeView;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +29,9 @@ public class NewEntryAction extends SimpleCommand {
 
     private final DialogService dialogService;
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
-    public NewEntryAction(Supplier<LibraryTab> tabSupplier, DialogService dialogService, Preferences preferences, StateManager stateManager) {
+    public NewEntryAction(Supplier<LibraryTab> tabSupplier, DialogService dialogService, CliPreferences preferences, StateManager stateManager) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -41,7 +41,7 @@ public class NewEntryAction extends SimpleCommand {
         this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
-    public NewEntryAction(Supplier<LibraryTab> tabSupplier, EntryType type, DialogService dialogService, Preferences preferences, StateManager stateManager) {
+    public NewEntryAction(Supplier<LibraryTab> tabSupplier, EntryType type, DialogService dialogService, CliPreferences preferences, StateManager stateManager) {
         this(tabSupplier, dialogService, preferences, stateManager);
         this.type = Optional.ofNullable(type);
     }

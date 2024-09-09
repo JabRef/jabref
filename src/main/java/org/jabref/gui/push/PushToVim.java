@@ -12,7 +12,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class PushToVim extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 
-    public PushToVim(DialogService dialogService, Preferences preferences) {
+    public PushToVim(DialogService dialogService, CliPreferences preferences) {
         super(dialogService, preferences);
     }
 

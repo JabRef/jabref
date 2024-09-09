@@ -14,7 +14,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,11 +31,11 @@ class CustomEntryTypesTabViewModelTest {
 
     private BibEntryTypesManager entryTypesManager;
     private FieldPreferences fieldPreferences;
-    private Preferences preferences;
+    private CliPreferences preferences;
 
     @BeforeEach
     void setup() {
-        preferences = mock(Preferences.class);
+        preferences = mock(CliPreferences.class);
         fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);

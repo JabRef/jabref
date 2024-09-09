@@ -12,7 +12,7 @@ import org.jabref.model.entry.field.IEEEField;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class FieldsUtil {
 
@@ -32,7 +32,7 @@ public class FieldsUtil {
         }
     };
 
-    public static String getNameWithType(Field field, Preferences preferences, UndoManager undoManager) {
+    public static String getNameWithType(Field field, CliPreferences preferences, UndoManager undoManager) {
         if (field instanceof SpecialField specialField) {
             return new SpecialFieldViewModel(specialField, preferences, undoManager).getLocalization()
                     + " (" + Localization.lang("Special") + ")";

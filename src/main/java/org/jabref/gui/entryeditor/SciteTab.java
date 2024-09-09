@@ -19,7 +19,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.HyperlinkLabel;
@@ -35,10 +35,10 @@ public class SciteTab extends EntryEditorTab {
     private final GridPane sciteResultsPane;
     private final ProgressIndicator progressIndicator;
     private final SciteTabViewModel viewModel;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final DialogService dialogService;
 
-    public SciteTab(Preferences preferences, TaskExecutor taskExecutor, DialogService dialogService) {
+    public SciteTab(CliPreferences preferences, TaskExecutor taskExecutor, DialogService dialogService) {
         this.preferences = preferences;
         this.viewModel = new SciteTabViewModel(preferences, taskExecutor);
         this.dialogService = dialogService;

@@ -18,7 +18,7 @@ import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.google.common.base.Enums;
@@ -55,7 +55,7 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     private CheckBox applyToAllEntriesCheck;
 
     @Inject
-    private Preferences preferences;
+    private CliPreferences preferences;
 
     private final ObjectProperty<DiffMethod> diffHighlightingMethod = new SimpleObjectProperty<>();
     private final BooleanProperty onlyShowChangedFields = new SimpleBooleanProperty();

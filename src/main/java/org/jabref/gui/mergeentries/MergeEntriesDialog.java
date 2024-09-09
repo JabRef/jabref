@@ -8,14 +8,14 @@ import org.jabref.gui.mergeentries.newmergedialog.ThreeWayMergeView;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class MergeEntriesDialog extends BaseDialog<EntriesMergeResult> {
     private final ThreeWayMergeView threeWayMergeView;
     private final BibEntry one;
     private final BibEntry two;
 
-    public MergeEntriesDialog(BibEntry one, BibEntry two, Preferences preferences) {
+    public MergeEntriesDialog(BibEntry one, BibEntry two, CliPreferences preferences) {
         threeWayMergeView = new ThreeWayMergeView(one, two, preferences);
         this.one = one;
         this.two = two;

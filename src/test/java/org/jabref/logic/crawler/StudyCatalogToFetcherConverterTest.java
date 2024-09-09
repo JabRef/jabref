@@ -16,7 +16,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 class StudyCatalogToFetcherConverterTest {
     SaveConfiguration saveConfiguration;
-    Preferences preferences;
+    CliPreferences preferences;
     BibEntryTypesManager entryTypesManager;
     SlrGitHandler gitHandler;
     @TempDir
@@ -37,7 +37,7 @@ class StudyCatalogToFetcherConverterTest {
 
     @BeforeEach
     void setUpMocks() {
-        preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
+        preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');

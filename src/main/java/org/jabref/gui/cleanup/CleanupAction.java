@@ -21,12 +21,12 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class CleanupAction extends SimpleCommand {
 
     private final Supplier<LibraryTab> tabSupplier;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
@@ -36,7 +36,7 @@ public class CleanupAction extends SimpleCommand {
     private int modifiedEntriesCount;
 
     public CleanupAction(Supplier<LibraryTab> tabSupplier,
-                         Preferences preferences,
+                         CliPreferences preferences,
                          DialogService dialogService,
                          StateManager stateManager,
                          TaskExecutor taskExecutor,

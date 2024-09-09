@@ -30,7 +30,7 @@ import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class BackupUIManager {
 
     public static Optional<ParserResult> showRestoreBackupDialog(DialogService dialogService,
                                                                  Path originalPath,
-                                                                 Preferences preferences,
+                                                                 CliPreferences preferences,
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  UndoManager undoManager,
                                                                  StateManager stateManager) {
@@ -77,7 +77,7 @@ public class BackupUIManager {
     private static Optional<ParserResult> showReviewBackupDialog(
             DialogService dialogService,
             Path originalPath,
-            Preferences preferences,
+            CliPreferences preferences,
             FileUpdateMonitor fileUpdateMonitor,
             UndoManager undoManager,
             StateManager stateManager) {

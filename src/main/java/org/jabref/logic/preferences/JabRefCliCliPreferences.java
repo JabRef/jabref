@@ -166,7 +166,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Service
-public class JabRefPreferences implements Preferences {
+public class JabRefCliCliPreferences implements CliPreferences {
 
     // Push to application preferences
     public static final String PUSH_EMACS_PATH = "emacsPath";
@@ -496,14 +496,14 @@ public class JabRefPreferences implements Preferences {
     private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliCliPreferences.class);
     private static final java.util.prefs.Preferences PREFS_NODE = java.util.prefs.Preferences.userRoot().node("/org/jabref");
 
     // SLR
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
 
     // The only instance of this class:
-    private static JabRefPreferences singleton;
+    private static JabRefCliCliPreferences singleton;
     /**
      * HashMap that contains all preferences which are set by default
      */
@@ -563,7 +563,7 @@ public class JabRefPreferences implements Preferences {
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:
      */
-    protected JabRefPreferences() {
+    protected JabRefCliCliPreferences() {
         try {
             if (new File("jabref.xml").exists()) {
                 importPreferences(Path.of("jabref.xml"));
@@ -937,14 +937,14 @@ public class JabRefPreferences implements Preferences {
 
     /**
      * @return Instance of JaRefPreferences
-     * @deprecated Use {@link Preferences} instead
+     * @deprecated Use {@link CliPreferences} instead
      */
     @Deprecated
-    public static JabRefPreferences getInstance() {
-        if (JabRefPreferences.singleton == null) {
-            JabRefPreferences.singleton = new JabRefPreferences();
+    public static JabRefCliCliPreferences getInstance() {
+        if (JabRefCliCliPreferences.singleton == null) {
+            JabRefCliCliPreferences.singleton = new JabRefCliCliPreferences();
         }
-        return JabRefPreferences.singleton;
+        return JabRefCliCliPreferences.singleton;
     }
 
     //*************************************************************************************************************

@@ -26,7 +26,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class AiChatTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
@@ -45,7 +45,7 @@ public class AiChatTab extends EntryEditorTab {
                      AiService aiService,
                      ChatHistoryService chatHistoryService,
                      DialogService dialogService,
-                     Preferences preferences,
+                     CliPreferences preferences,
                      TaskExecutor taskExecutor
     ) {
         this.bibDatabaseContext = bibDatabaseContext;

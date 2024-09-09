@@ -63,7 +63,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -110,7 +110,7 @@ public class EntryEditor extends BorderPane {
     @Inject private BuildInfo buildInfo;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;

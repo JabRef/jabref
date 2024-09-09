@@ -27,7 +27,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -42,7 +42,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
                                UndoAction undoAction,
                                RedoAction redoAction,
                                DialogService dialogService,
-                               Preferences preferences,
+                               CliPreferences preferences,
                                ThemeManager themeManager,
                                BibEntryTypesManager entryTypesManager,
                                TaskExecutor taskExecutor,

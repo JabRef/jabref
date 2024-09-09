@@ -40,7 +40,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -67,7 +67,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private TabPane tabPane;
     @FXML private Label currentStyleNameLabel;
 
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private ThemeManager themeManager;
     @Inject private TaskExecutor taskExecutor;

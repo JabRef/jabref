@@ -9,7 +9,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import org.jabref.gui.maintable.columns.MainTableColumn;
-import org.jabref.logic.preferences.JabRefPreferences;
+import org.jabref.logic.preferences.JabRefCliCliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class PersistenceVisualStateTable {
     /**
      * Stores shown columns, their width and their {@link TableColumn.SortType} in preferences.
      * The conversion to the "real" string in the preferences is made at
-     * {@link JabRefPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
+     * {@link JabRefCliCliPreferences#getColumnSortTypesAsStringList(ColumnPreferences)}
      */
     private void updateColumns() {
         List<MainTableColumnModel> list = toList(table.getColumns());

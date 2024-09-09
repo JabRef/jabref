@@ -21,7 +21,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
     private static final String LOGFILE_PREFIX = "copyFileslog_";
     private static final String LOGFILE_EXT = ".log";
     private final BibDatabaseContext databaseContext;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final Path exportPath;
     private final String localizedSuccessMessage = Localization.lang("Copied file successfully");
     private final String localizedErrorMessage = Localization.lang("Could not copy file") + ": " + Localization.lang("File exists");
@@ -45,7 +45,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
 
     private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> path.resolve(file.getFileName());
 
-    public CopyFilesTask(BibDatabaseContext databaseContext, List<BibEntry> entries, Path path, Preferences preferences) {
+    public CopyFilesTask(BibDatabaseContext databaseContext, List<BibEntry> entries, Path path, CliPreferences preferences) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.entries = entries;

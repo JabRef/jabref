@@ -24,7 +24,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 /**
  * A column that draws a clickable symbol for either all the files of a defined file type
@@ -34,7 +34,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
 
     private final DialogService dialogService;
     private final BibDatabaseContext database;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final TaskExecutor taskExecutor;
 
     /**
@@ -43,7 +43,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     public FileColumn(MainTableColumnModel model,
                       BibDatabaseContext database,
                       DialogService dialogService,
-                      Preferences preferences,
+                      CliPreferences preferences,
                       TaskExecutor taskExecutor) {
         super(model);
         this.database = Objects.requireNonNull(database);
@@ -82,7 +82,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
     public FileColumn(MainTableColumnModel model,
                       BibDatabaseContext database,
                       DialogService dialogService,
-                      Preferences preferences,
+                      CliPreferences preferences,
                       String fileType,
                       TaskExecutor taskExecutor) {
         super(model);

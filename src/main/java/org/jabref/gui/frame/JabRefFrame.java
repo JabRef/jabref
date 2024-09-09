@@ -54,7 +54,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -75,7 +75,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
     private final SplitPane splitPane = new SplitPane();
-    private final Preferences prefs;
+    private final CliPreferences prefs;
     private final AiService aiService;
     private final ChatHistoryService chatHistoryService;
     private final GlobalSearchBar globalSearchBar;
@@ -104,7 +104,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
-                       Preferences preferences,
+                       CliPreferences preferences,
                        AiService aiService,
                        ChatHistoryService chatHistoryService,
                        StateManager stateManager,

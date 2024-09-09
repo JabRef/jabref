@@ -22,7 +22,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -42,7 +42,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
 
     private DocumentViewerControl viewer;
     private DocumentViewerViewModel viewModel;

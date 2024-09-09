@@ -18,7 +18,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,8 +38,8 @@ class ClipBoardManagerTest {
     @BeforeEach
     void setUp() {
         // create preference service mock
-        Preferences preferences = mock(Preferences.class);
-        Injector.setModelOrService(Preferences.class, preferences);
+        CliPreferences preferences = mock(CliPreferences.class);
+        Injector.setModelOrService(CliPreferences.class, preferences);
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         List<Field> fields = List.of(StandardField.URL);
         ObservableList<Field> nonWrappableFields = FXCollections.observableArrayList(fields);

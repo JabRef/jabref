@@ -14,7 +14,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
 
@@ -23,7 +23,7 @@ public class SpecialFieldMenuItemFactory {
                                                      ActionFactory factory,
                                                      Supplier<LibraryTab> tabSupplier,
                                                      DialogService dialogService,
-                                                     Preferences preferences,
+                                                     CliPreferences preferences,
                                                      UndoManager undoManager,
                                                      StateManager stateManager) {
         SpecialFieldValueViewModel specialField = new SpecialFieldValueViewModel(field.getValues().getFirst());
@@ -38,7 +38,7 @@ public class SpecialFieldMenuItemFactory {
                                               ActionFactory factory,
                                               Supplier<LibraryTab> tabSupplier,
                                               DialogService dialogService,
-                                              Preferences preferences,
+                                              CliPreferences preferences,
                                               UndoManager undoManager,
                                               StateManager stateManager) {
 
@@ -49,7 +49,7 @@ public class SpecialFieldMenuItemFactory {
 
     public static Menu createSpecialFieldMenu(SpecialField field,
                                               ActionFactory factory,
-                                              Preferences preferences,
+                                              CliPreferences preferences,
                                               UndoManager undoManager,
                                               Function<SpecialFieldValueViewModel, Command> commandFactory) {
         SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, preferences, undoManager);

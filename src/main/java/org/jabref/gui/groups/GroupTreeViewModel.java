@@ -42,7 +42,7 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -55,7 +55,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final ChatHistoryService chatHistoryService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
@@ -78,7 +78,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, ChatHistoryService chatHistoryService, Preferences preferences, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, ChatHistoryService chatHistoryService, CliPreferences preferences, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.chatHistoryService = Objects.requireNonNull(chatHistoryService);

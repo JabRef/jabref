@@ -33,7 +33,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -44,7 +44,7 @@ public class RightClickMenu {
                                      LibraryTab libraryTab,
                                      DialogService dialogService,
                                      StateManager stateManager,
-                                     Preferences preferences,
+                                     CliPreferences preferences,
                                      UndoManager undoManager,
                                      ClipBoardManager clipBoardManager,
                                      TaskExecutor taskExecutor,
@@ -106,7 +106,7 @@ public class RightClickMenu {
     private static Menu createCopySubMenu(ActionFactory factory,
                                           DialogService dialogService,
                                           StateManager stateManager,
-                                          Preferences preferences,
+                                          CliPreferences preferences,
                                           ClipBoardManager clipBoardManager,
                                           JournalAbbreviationRepository abbreviationRepository,
                                           TaskExecutor taskExecutor) {
@@ -143,7 +143,7 @@ public class RightClickMenu {
     private static Menu createSendSubMenu(ActionFactory factory,
                                           DialogService dialogService,
                                           StateManager stateManager,
-                                          Preferences preferences,
+                                          CliPreferences preferences,
                                           BibEntryTypesManager entryTypesManager,
                                           TaskExecutor taskExecutor) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);

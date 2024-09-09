@@ -46,7 +46,7 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -111,7 +111,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private DialogService dialogService;
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private StateManager stateManager;
 
     public GroupDialogView(BibDatabaseContext currentDatabase,

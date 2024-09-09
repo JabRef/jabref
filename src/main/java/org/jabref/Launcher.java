@@ -14,8 +14,8 @@ import java.util.Map;
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
 import org.jabref.gui.JabRefGUI;
-import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.preferences.JabRefGuiPreferences;
+import org.jabref.gui.preferences.GuiCliPreferences;
+import org.jabref.gui.preferences.JabRefGuiCliCliPreferences;
 import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
@@ -26,7 +26,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
@@ -62,9 +62,9 @@ public class Launcher {
             Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
             // Initialize preferences
-            final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
-            Injector.setModelOrService(Preferences.class, preferences);
-            Injector.setModelOrService(GuiPreferences.class, preferences);
+            final JabRefGuiCliCliPreferences preferences = JabRefGuiCliCliPreferences.getInstance();
+            Injector.setModelOrService(CliPreferences.class, preferences);
+            Injector.setModelOrService(GuiCliPreferences.class, preferences);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {

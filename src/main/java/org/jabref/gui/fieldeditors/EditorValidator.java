@@ -3,16 +3,16 @@ package org.jabref.gui.fieldeditors;
 import javafx.scene.control.TextInputControl;
 
 import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class EditorValidator {
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
-    public EditorValidator(Preferences preferences) {
+    public EditorValidator(CliPreferences preferences) {
         this.preferences = preferences;
     }
 

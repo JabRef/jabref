@@ -8,12 +8,12 @@ import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
 
 public class CitationKeyEditorViewModel extends AbstractEditorViewModel {
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final BibDatabaseContext databaseContext;
     private final UndoManager undoManager;
     private final DialogService dialogService;
@@ -21,7 +21,7 @@ public class CitationKeyEditorViewModel extends AbstractEditorViewModel {
     public CitationKeyEditorViewModel(Field field,
                                       SuggestionProvider<?> suggestionProvider,
                                       FieldCheckers fieldCheckers,
-                                      Preferences preferences,
+                                      CliPreferences preferences,
                                       BibDatabaseContext databaseContext,
                                       UndoManager undoManager,
                                       DialogService dialogService) {

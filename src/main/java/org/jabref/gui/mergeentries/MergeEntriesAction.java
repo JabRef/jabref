@@ -13,16 +13,16 @@ import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class MergeEntriesAction extends SimpleCommand {
     private static final int NUMBER_OF_ENTRIES_NEEDED = 2;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final UndoManager undoManager;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
-    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, UndoManager undoManager, Preferences preferences) {
+    public MergeEntriesAction(DialogService dialogService, StateManager stateManager, UndoManager undoManager, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;

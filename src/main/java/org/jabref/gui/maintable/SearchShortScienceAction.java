@@ -13,7 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.isFieldSetForSelectedEntry;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -21,9 +21,9 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 public class SearchShortScienceAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
-    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, Preferences preferences) {
+    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;

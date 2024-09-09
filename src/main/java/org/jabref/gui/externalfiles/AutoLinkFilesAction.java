@@ -20,7 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -32,12 +32,12 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 public class AutoLinkFilesAction extends SimpleCommand {
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final StateManager stateManager;
     private final UndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
 
-    public AutoLinkFilesAction(DialogService dialogService, Preferences preferences, StateManager stateManager, UndoManager undoManager, UiTaskExecutor taskExecutor) {
+    public AutoLinkFilesAction(DialogService dialogService, CliPreferences preferences, StateManager stateManager, UndoManager undoManager, UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;

@@ -52,7 +52,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -107,7 +107,7 @@ public class GroupDialogViewModel {
     private CompositeValidator validator;
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
     private final GroupTreeNode parentNode;
@@ -116,7 +116,7 @@ public class GroupDialogViewModel {
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
-                                Preferences preferences,
+                                CliPreferences preferences,
                                 @Nullable AbstractGroup editedGroup,
                                 @Nullable GroupTreeNode parentNode,
                                 FileUpdateMonitor fileUpdateMonitor,

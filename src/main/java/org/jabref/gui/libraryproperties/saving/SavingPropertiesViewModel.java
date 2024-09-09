@@ -23,7 +23,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class SavingPropertiesViewModel implements PropertiesTabViewModel {
 
@@ -52,9 +52,9 @@ public class SavingPropertiesViewModel implements PropertiesTabViewModel {
     private final BibDatabaseContext databaseContext;
     private final MetaData initialMetaData;
     private final SaveOrder saveOrder;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
-    public SavingPropertiesViewModel(BibDatabaseContext databaseContext, Preferences preferences) {
+    public SavingPropertiesViewModel(BibDatabaseContext databaseContext, CliPreferences preferences) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.initialMetaData = databaseContext.getMetaData();

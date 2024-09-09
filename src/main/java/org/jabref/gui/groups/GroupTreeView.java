@@ -61,7 +61,7 @@ import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -84,7 +84,7 @@ public class GroupTreeView extends BorderPane {
     private final DialogService dialogService;
     private final ChatHistoryService chatHistoryService;
     private final TaskExecutor taskExecutor;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -106,7 +106,7 @@ public class GroupTreeView extends BorderPane {
      */
     public GroupTreeView(TaskExecutor taskExecutor,
                          StateManager stateManager,
-                         Preferences preferences,
+                         CliPreferences preferences,
                          DialogService dialogService,
                          ChatHistoryService chatHistoryService
     ) {

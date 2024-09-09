@@ -25,7 +25,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 
 class ArgumentProcessorTest {
 
-    private final Preferences preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
+    private final CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);

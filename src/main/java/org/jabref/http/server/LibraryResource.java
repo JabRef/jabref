@@ -13,7 +13,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
@@ -34,7 +34,7 @@ public class LibraryResource {
     public static final Logger LOGGER = LoggerFactory.getLogger(LibraryResource.class);
 
     @Inject
-    Preferences preferences;
+    CliPreferences preferences;
 
     @Inject
     Gson gson;

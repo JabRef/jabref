@@ -14,7 +14,7 @@ import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);
 
-    public PushToSublimeText(DialogService dialogService, Preferences preferences) {
+    public PushToSublimeText(DialogService dialogService, CliPreferences preferences) {
         super(dialogService, preferences);
     }
 

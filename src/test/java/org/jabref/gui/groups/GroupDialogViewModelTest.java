@@ -13,7 +13,7 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class GroupDialogViewModelTest {
     private final GroupsPreferences groupsPreferences = mock(GroupsPreferences.class);
     private final DialogService dialogService = mock(DialogService.class);
     private final AbstractGroup group = mock(AbstractGroup.class);
-    private final Preferences preferences = mock(Preferences.class);
+    private final CliPreferences preferences = mock(CliPreferences.class);
 
     @BeforeEach
     void setUp(@TempDir Path temporaryFolder) {

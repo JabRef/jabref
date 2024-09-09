@@ -22,7 +22,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -37,7 +37,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
     @FXML private ComboBox<Field> addFieldName;
     @FXML private Button addField;
 
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private UndoManager undoManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();

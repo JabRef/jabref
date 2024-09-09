@@ -18,7 +18,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class BibtexExtractorViewModel {
 
     private final boolean onlineMode;
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final TaskExecutor taskExecutor;
 
     private final ImportHandler importHandler;
@@ -44,7 +44,7 @@ public class BibtexExtractorViewModel {
     public BibtexExtractorViewModel(boolean onlineMode,
                                           BibDatabaseContext bibdatabaseContext,
                                           DialogService dialogService,
-                                          Preferences preferences,
+                                          CliPreferences preferences,
                                           FileUpdateMonitor fileUpdateMonitor,
                                           TaskExecutor taskExecutor,
                                           UndoManager undoManager,

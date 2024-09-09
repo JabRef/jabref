@@ -10,7 +10,7 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class NewEntryActionTest {
     private final LibraryTab libraryTab = mock(LibraryTab.class);
     private final LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
     private final DialogService dialogService = spy(DialogService.class);
-    private final Preferences preferences = mock(Preferences.class);
+    private final CliPreferences preferences = mock(CliPreferences.class);
     private final StateManager stateManager = mock(StateManager.class);
 
     @BeforeEach

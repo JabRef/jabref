@@ -21,7 +21,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -57,7 +57,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     @Inject private UndoManager undoManager;
     @Inject private DialogService dialogService;
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private ThemeManager themeManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private TaskExecutor taskExecutor;

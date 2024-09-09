@@ -11,7 +11,7 @@ import org.jabref.http.dto.GsonFactory;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.gson.Gson;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
  */
 abstract class ServerTest extends JerseyTest {
 
-    private static Preferences preferences;
+    private static CliPreferences preferences;
     private static GuiPreferences guiPreferences;
 
     @BeforeAll
@@ -58,7 +58,7 @@ abstract class ServerTest extends JerseyTest {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(preferences).to(Preferences.class).ranked(2);
+                bind(preferences).to(CliPreferences.class).ranked(2);
             }
         });
     }
@@ -72,7 +72,7 @@ abstract class ServerTest extends JerseyTest {
     }
 
     private static void initializePreferencesService() {
-        preferences = mock(Preferences.class);
+        preferences = mock(CliPreferences.class);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);

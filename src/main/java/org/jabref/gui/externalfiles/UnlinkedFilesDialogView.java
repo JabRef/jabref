@@ -49,7 +49,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -80,7 +80,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML private TitledPane filePane;
     @FXML private TitledPane resultPane;
 
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private UndoManager undoManager;

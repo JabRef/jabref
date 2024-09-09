@@ -5,16 +5,16 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 /**
  * Sends attachments for selected entries to the
  * configured Kindle email
  */
 public class SendAsKindleEmailAction extends SendAsEMailAction {
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
-    public SendAsKindleEmailAction(DialogService dialogService, Preferences preferences, StateManager stateManager, TaskExecutor taskExecutor) {
+    public SendAsKindleEmailAction(DialogService dialogService, CliPreferences preferences, StateManager stateManager, TaskExecutor taskExecutor) {
         super(dialogService, preferences, stateManager, taskExecutor);
         this.preferences = preferences;
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager).and(ActionHelper.hasLinkedFileForSelectedEntries(stateManager)));

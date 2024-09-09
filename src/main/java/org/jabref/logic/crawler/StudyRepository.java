@@ -35,7 +35,7 @@ import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ public class StudyRepository {
     private final Path studyDefinitionFile;
     private final SlrGitHandler gitHandler;
     private final Study study;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager bibEntryTypesManager;
 
@@ -82,7 +82,7 @@ public class StudyRepository {
      */
     public StudyRepository(Path pathToRepository,
                            SlrGitHandler gitHandler,
-                           Preferences preferences,
+                           CliPreferences preferences,
                            FileUpdateMonitor fileUpdateMonitor,
                            BibEntryTypesManager bibEntryTypesManager) throws IOException {
         this.repositoryPath = pathToRepository;

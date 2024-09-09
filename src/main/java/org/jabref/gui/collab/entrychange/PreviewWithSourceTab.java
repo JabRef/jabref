@@ -18,7 +18,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -28,11 +28,11 @@ public class PreviewWithSourceTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewWithSourceTab.class);
 
-    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, Preferences preferences, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
+    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, CliPreferences preferences, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
         return getPreviewWithSourceTab(entry, bibDatabaseContext, preferences, entryTypesManager, previewViewer, "");
     }
 
-    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, Preferences preferences, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer, String label) {
+    public TabPane getPreviewWithSourceTab(BibEntry entry, BibDatabaseContext bibDatabaseContext, CliPreferences preferences, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer, String label) {
         previewViewer.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
         previewViewer.setEntry(entry);
 

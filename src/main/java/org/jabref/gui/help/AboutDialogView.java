@@ -10,7 +10,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -21,7 +21,7 @@ public class AboutDialogView extends BaseDialog<Void> {
     @FXML private TextArea textAreaVersions;
 
     @Inject private DialogService dialogService;
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
 

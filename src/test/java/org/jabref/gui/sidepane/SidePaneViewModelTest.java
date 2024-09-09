@@ -21,7 +21,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 class SidePaneViewModelTest {
 
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
-    Preferences preferences = mock(Preferences.class);
+    CliPreferences preferences = mock(CliPreferences.class);
     ChatHistoryService chatHistoryService = mock(ChatHistoryService.class);
     JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     StateManager stateManager = mock(StateManager.class);

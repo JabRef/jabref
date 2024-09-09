@@ -32,7 +32,7 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,13 +51,13 @@ public class ImportCommand extends SimpleCommand {
     private final ImportMethod importMethod;
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
     public ImportCommand(LibraryTabContainer tabContainer,
                          ImportMethod importMethod,
-                         Preferences preferences,
+                         CliPreferences preferences,
                          StateManager stateManager,
                          FileUpdateMonitor fileUpdateMonitor,
                          TaskExecutor taskExecutor,

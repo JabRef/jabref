@@ -10,7 +10,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -34,7 +34,7 @@ public class Crawler {
      */
     public Crawler(Path studyRepositoryRoot,
                    SlrGitHandler gitHandler,
-                   Preferences preferences,
+                   CliPreferences preferences,
                    BibEntryTypesManager bibEntryTypesManager,
                    FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException {
         this.studyRepository = new StudyRepository(

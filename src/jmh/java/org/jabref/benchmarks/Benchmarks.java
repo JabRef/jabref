@@ -17,6 +17,8 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.JabRefCliCliPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -29,8 +31,6 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.logic.preferences.JabRefPreferences;
-import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.openjdk.jmh.Main;
@@ -52,7 +52,7 @@ public class Benchmarks {
 
     @Setup
     public void init() throws Exception {
-        Injector.setModelOrService(Preferences.class, JabRefPreferences.getInstance());
+        Injector.setModelOrService(CliPreferences.class, JabRefCliCliPreferences.getInstance());
 
         Random randomizer = new Random();
         for (int i = 0; i < 1000; i++) {
@@ -89,7 +89,7 @@ public class Benchmarks {
 
     @Benchmark
     public ParserResult parse() throws IOException {
-        Preferences preferences = Injector.instantiateModelOrService(Preferences.class);
+        CliPreferences preferences = Injector.instantiateModelOrService(CliPreferences.class);
         BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());
         return parser.parse(new StringReader(bibtexString));
     }

@@ -15,7 +15,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class ImportantOptionalFieldsTab extends OptionalFieldsTabBase {
 
@@ -27,7 +27,7 @@ public class ImportantOptionalFieldsTab extends OptionalFieldsTabBase {
                                       UndoAction undoAction,
                                       RedoAction redoAction,
                                       DialogService dialogService,
-                                      Preferences preferences,
+                                      CliPreferences preferences,
                                       ThemeManager themeManager,
                                       BibEntryTypesManager entryTypesManager,
                                       TaskExecutor taskExecutor,

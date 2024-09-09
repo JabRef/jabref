@@ -19,7 +19,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -137,7 +137,7 @@ class BackupManagerTest {
         var database = new BibDatabaseContext(new BibDatabase());
         database.setDatabasePath(customDir.resolve("Bibfile.bib"));
 
-        var preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
+        var preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
         var filePreferences = mock(FilePreferences.class);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
@@ -164,7 +164,7 @@ class BackupManagerTest {
         var database = new BibDatabaseContext(new BibDatabase());
         database.setDatabasePath(customDir.resolve("Bibfile.bib"));
 
-        var preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
+        var preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
         var filePreferences = mock(FilePreferences.class);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getBackupDirectory()).thenReturn(backupDir);

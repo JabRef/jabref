@@ -8,7 +8,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 
@@ -23,12 +23,12 @@ public class SaveAction extends SimpleCommand {
     private final Supplier<LibraryTab> tabSupplier;
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     public SaveAction(SaveMethod saveMethod,
                       Supplier<LibraryTab> tabSupplier,
                       DialogService dialogService,
-                      Preferences preferences,
+                      CliPreferences preferences,
                       StateManager stateManager) {
         this.saveMethod = saveMethod;
         this.tabSupplier = tabSupplier;

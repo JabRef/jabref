@@ -21,7 +21,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -43,7 +43,7 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
     @FXML private ButtonType parseButtonType;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private FileUpdateMonitor fileMonitor;
     @Inject private ThemeManager themeManager;
     private ParseLatexDialogViewModel viewModel;

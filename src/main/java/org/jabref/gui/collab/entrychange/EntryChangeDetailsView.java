@@ -18,7 +18,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -30,7 +30,7 @@ public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
                                   BibDatabaseContext databaseContext,
                                   DialogService dialogService,
                                   ThemeManager themeManager,
-                                  Preferences preferences,
+                                  CliPreferences preferences,
                                   BibEntryTypesManager entryTypesManager,
                                   PreviewViewer previewViewer,
                                   TaskExecutor taskExecutor) {

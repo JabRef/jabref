@@ -17,7 +17,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.eclipse.jgit.api.Git;
@@ -47,7 +47,7 @@ class CrawlerTest {
     String hashCodeQuantum = String.valueOf("Quantum".hashCode());
     String hashCodeCloudComputing = String.valueOf("Cloud Computing".hashCode());
 
-    Preferences preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
+    CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
     /**
      * Set up mocks and copies the study definition file into the test repository

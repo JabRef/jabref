@@ -13,7 +13,7 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.CommandLine;
@@ -309,7 +309,7 @@ public class JabRefCLI {
         System.out.println(getVersionInfo());
     }
 
-    public static void printUsage(Preferences preferences) {
+    public static void printUsage(CliPreferences preferences) {
         String header = "";
 
         ImportFormatReader importFormatReader = new ImportFormatReader(

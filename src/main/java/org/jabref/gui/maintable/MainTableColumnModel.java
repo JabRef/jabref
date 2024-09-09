@@ -19,7 +19,7 @@ import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -87,7 +87,7 @@ public class MainTableColumnModel {
     private final DoubleProperty widthProperty = new SimpleDoubleProperty();
     private final ObjectProperty<TableColumn.SortType> sortTypeProperty = new SimpleObjectProperty<>();
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final UndoManager undoManager;
 
     /**
@@ -103,7 +103,7 @@ public class MainTableColumnModel {
         this.typeProperty.setValue(type);
         this.qualifierProperty.setValue(qualifier);
         this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);
-        this.preferences = Injector.instantiateModelOrService(Preferences.class);
+        this.preferences = Injector.instantiateModelOrService(CliPreferences.class);
         this.undoManager = Injector.instantiateModelOrService(UndoManager.class);
 
         if (Type.ICON_COLUMNS.contains(type)) {

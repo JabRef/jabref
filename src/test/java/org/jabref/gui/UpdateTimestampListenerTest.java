@@ -7,7 +7,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class UpdateTimestampListenerTest {
     private BibDatabase database;
     private BibEntry bibEntry;
 
-    private Preferences preferencesMock;
+    private CliPreferences preferencesMock;
     private TimestampPreferences timestampPreferencesMock;
 
     private final String baseDate = "2000-1-1";
@@ -34,7 +34,7 @@ class UpdateTimestampListenerTest {
 
         database.insertEntry(bibEntry);
 
-        preferencesMock = mock(Preferences.class);
+        preferencesMock = mock(CliPreferences.class);
         timestampPreferencesMock = mock(TimestampPreferences.class);
 
         when(preferencesMock.getTimestampPreferences()).thenReturn(timestampPreferencesMock);

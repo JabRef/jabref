@@ -20,7 +20,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -38,14 +38,14 @@ public class PushToApplicationCommand extends SimpleCommand {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     private final List<Object> reconfigurableControls = new ArrayList<>();
     private final TaskExecutor taskExecutor;
 
     private PushToApplication application;
 
-    public PushToApplicationCommand(StateManager stateManager, DialogService dialogService, Preferences preferences, TaskExecutor taskExecutor) {
+    public PushToApplicationCommand(StateManager stateManager, DialogService dialogService, CliPreferences preferences, TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferences = preferences;

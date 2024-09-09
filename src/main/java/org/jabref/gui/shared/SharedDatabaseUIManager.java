@@ -39,7 +39,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -48,7 +48,7 @@ public class SharedDatabaseUIManager {
     private final LibraryTabContainer tabContainer;
     private DatabaseSynchronizer dbmsSynchronizer;
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final AiService aiService;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -59,7 +59,7 @@ public class SharedDatabaseUIManager {
 
     public SharedDatabaseUIManager(LibraryTabContainer tabContainer,
                                    DialogService dialogService,
-                                   Preferences preferences,
+                                   CliPreferences preferences,
                                    AiService aiService,
                                    StateManager stateManager,
                                    BibEntryTypesManager entryTypesManager,

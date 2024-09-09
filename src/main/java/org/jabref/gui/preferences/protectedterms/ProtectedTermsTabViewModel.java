@@ -29,7 +29,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     public ProtectedTermsTabViewModel(ProtectedTermsLoader termsLoader,
                                       DialogService dialogService,
-                                      Preferences preferences) {
+                                      CliPreferences preferences) {
         this.termsLoader = termsLoader;
         this.dialogService = dialogService;
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();

@@ -17,7 +17,7 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -28,7 +28,7 @@ public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsPanel
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, String> patternColumn;
     @FXML public TableColumn<CitationKeyPatternsPanelItemModel, EntryType> actionsColumn;
 
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
 
     private CitationKeyPatternsPanelViewModel viewModel;
 

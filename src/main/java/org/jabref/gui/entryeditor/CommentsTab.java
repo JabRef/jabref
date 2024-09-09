@@ -35,7 +35,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class CommentsTab extends FieldsEditorTab {
     public static final String NAME = "Comments";
@@ -45,7 +45,7 @@ public class CommentsTab extends FieldsEditorTab {
 
     private final EntryEditorPreferences entryEditorPreferences;
 
-    public CommentsTab(Preferences preferences,
+    public CommentsTab(CliPreferences preferences,
                        BibDatabaseContext databaseContext,
                        SuggestionProviders suggestionProviders,
                        UndoManager undoManager,

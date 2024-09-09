@@ -24,7 +24,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -44,7 +44,7 @@ public class ExtractReferencesAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final BibEntry entry;
     private final LinkedFile linkedFile;
 
@@ -52,7 +52,7 @@ public class ExtractReferencesAction extends SimpleCommand {
 
     public ExtractReferencesAction(DialogService dialogService,
                                    StateManager stateManager,
-                                   Preferences preferences) {
+                                   CliPreferences preferences) {
         this(dialogService, stateManager, preferences, null, null);
     }
 
@@ -64,7 +64,7 @@ public class ExtractReferencesAction extends SimpleCommand {
      */
     private ExtractReferencesAction(@NonNull DialogService dialogService,
                                     @NonNull StateManager stateManager,
-                                    @NonNull Preferences preferences,
+                                    @NonNull CliPreferences preferences,
                                     @Nullable BibEntry entry,
                                     @Nullable LinkedFile linkedFile) {
         this.dialogService = dialogService;

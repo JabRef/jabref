@@ -20,7 +20,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class GroupNodeViewModelTest {
     private BibDatabaseContext databaseContext;
     private GroupNodeViewModel viewModel;
     private TaskExecutor taskExecutor;
-    private Preferences preferences;
+    private CliPreferences preferences;
 
     @BeforeEach
     void setUp() {
@@ -44,7 +44,7 @@ class GroupNodeViewModelTest {
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         databaseContext = new BibDatabaseContext();
         taskExecutor = new CurrentThreadTaskExecutor();
-        preferences = mock(Preferences.class);
+        preferences = mock(CliPreferences.class);
         when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(
                 EnumSet.noneOf(GroupViewMode.class),
                 true,

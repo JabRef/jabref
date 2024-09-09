@@ -18,7 +18,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class ThreeWayMergeView extends VBox {
@@ -39,12 +39,12 @@ public class ThreeWayMergeView extends VBox {
     private final ThreeWayMergeViewModel viewModel;
     private final List<FieldRowView> fieldRows = new ArrayList<>();
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     private final FieldMergerFactory fieldMergerFactory;
     private final String keywordSeparator;
 
-    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader, Preferences preferences) {
+    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, String leftHeader, String rightHeader, CliPreferences preferences) {
         this.preferences = preferences;
 
         getStylesheets().add(ThreeWayMergeView.class.getResource("ThreeWayMergeView.css").toExternalForm());
@@ -69,7 +69,7 @@ public class ThreeWayMergeView extends VBox {
         getChildren().addAll(toolbar, headerView, scrollPane);
     }
 
-    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, Preferences preferences) {
+    public ThreeWayMergeView(BibEntry leftEntry, BibEntry rightEntry, CliPreferences preferences) {
         this(leftEntry, rightEntry, LEFT_DEFAULT_HEADER, RIGHT_DEFAULT_HEADER, preferences);
     }
 

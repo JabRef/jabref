@@ -26,7 +26,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -51,7 +51,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final Validator fileBrowserCommandValidator;
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().build();
 
@@ -59,7 +59,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     private final PushToApplicationPreferences initialPushToApplicationPreferences;
     private final PushToApplicationPreferences workingPushToApplicationPreferences;
 
-    public ExternalTabViewModel(DialogService dialogService, Preferences preferences) {
+    public ExternalTabViewModel(DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.initialExternalApplicationPreferences = this.preferences.getExternalApplicationsPreferences();

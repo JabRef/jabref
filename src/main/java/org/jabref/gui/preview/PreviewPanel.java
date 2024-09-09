@@ -30,7 +30,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class PreviewPanel extends VBox {
     public PreviewPanel(BibDatabaseContext database,
                         DialogService dialogService,
                         KeyBindingRepository keyBindingRepository,
-                        Preferences preferences,
+                        CliPreferences preferences,
                         ThemeManager themeManager,
                         TaskExecutor taskExecutor,
                         LuceneManager luceneManager,

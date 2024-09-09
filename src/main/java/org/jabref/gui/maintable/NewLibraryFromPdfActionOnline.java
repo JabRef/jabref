@@ -9,11 +9,11 @@ import org.jabref.gui.StateManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class NewLibraryFromPdfActionOnline extends NewLibraryFromPdfAction {
 
-    public NewLibraryFromPdfActionOnline(LibraryTabContainer libraryTabContainer, StateManager stateManager, DialogService dialogService, Preferences preferences, TaskExecutor taskExecutor) {
+    public NewLibraryFromPdfActionOnline(LibraryTabContainer libraryTabContainer, StateManager stateManager, DialogService dialogService, CliPreferences preferences, TaskExecutor taskExecutor) {
         super(libraryTabContainer, stateManager, dialogService, preferences, taskExecutor);
     }
 

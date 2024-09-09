@@ -19,7 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class GenerateCitationKeyAction extends SimpleCommand {
 
@@ -31,14 +31,14 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     private boolean isCanceled;
 
     private final TaskExecutor taskExecutor;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final UndoManager undoManager;
 
     public GenerateCitationKeyAction(Supplier<LibraryTab> tabSupplier,
                                      DialogService dialogService,
                                      StateManager stateManager,
                                      TaskExecutor taskExecutor,
-                                     Preferences preferences,
+                                     CliPreferences preferences,
                                      UndoManager undoManager) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
@@ -73,7 +73,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
     }
 
-    public static boolean confirmOverwriteKeys(DialogService dialogService, Preferences preferences) {
+    public static boolean confirmOverwriteKeys(DialogService dialogService, CliPreferences preferences) {
         if (preferences.getCitationKeyPatternPreferences().shouldWarnBeforeOverwriteCiteKey()) {
             return dialogService.showConfirmationDialogWithOptOutAndWait(
                     Localization.lang("Overwrite keys"),

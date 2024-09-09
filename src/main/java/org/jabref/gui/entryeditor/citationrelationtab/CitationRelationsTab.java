@@ -47,7 +47,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
@@ -68,7 +68,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private static BackgroundTask<List<BibEntry>> citedByTask;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final LibraryTab libraryTab;
     private final TaskExecutor taskExecutor;
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
@@ -80,7 +80,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 UndoManager undoManager,
                                 StateManager stateManager,
                                 FileUpdateMonitor fileUpdateMonitor,
-                                Preferences preferences,
+                                CliPreferences preferences,
                                 LibraryTab libraryTab,
                                 TaskExecutor taskExecutor) {
         this.dialogService = dialogService;

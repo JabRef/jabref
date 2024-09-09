@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;
@@ -36,10 +36,10 @@ import org.controlsfx.control.Rating;
  */
 public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldValueViewModel>> {
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final UndoManager undoManager;
 
-    public SpecialFieldColumn(MainTableColumnModel model, Preferences preferences, UndoManager undoManager) {
+    public SpecialFieldColumn(MainTableColumnModel model, CliPreferences preferences, UndoManager undoManager) {
         super(model);
         this.preferences = preferences;
         this.undoManager = undoManager;

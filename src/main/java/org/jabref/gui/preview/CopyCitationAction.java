@@ -27,7 +27,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class CopyCitationAction extends SimpleCommand {
     private final DialogService dialogService;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final JournalAbbreviationRepository abbreviationRepository;
 
     public CopyCitationAction(CitationStyleOutputFormat outputFormat,
@@ -55,7 +55,7 @@ public class CopyCitationAction extends SimpleCommand {
                               StateManager stateManager,
                               ClipBoardManager clipBoardManager,
                               TaskExecutor taskExecutor,
-                              Preferences preferences,
+                              CliPreferences preferences,
                               JournalAbbreviationRepository abbreviationRepository) {
         this.outputFormat = outputFormat;
         this.dialogService = dialogService;

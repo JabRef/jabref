@@ -84,14 +84,14 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class MainMenu extends MenuBar {
     private final JabRefFrame frame;
     private final FileHistoryMenu fileHistoryMenu;
     private final SidePane sidePane;
     private final PushToApplicationCommand pushToApplicationCommand;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
@@ -107,7 +107,7 @@ public class MainMenu extends MenuBar {
                     FileHistoryMenu fileHistoryMenu,
                     SidePane sidePane,
                     PushToApplicationCommand pushToApplicationCommand,
-                    Preferences preferences,
+                    CliPreferences preferences,
                     StateManager stateManager,
                     FileUpdateMonitor fileUpdateMonitor,
                     TaskExecutor taskExecutor,
@@ -381,7 +381,7 @@ public class MainMenu extends MenuBar {
     private Menu createSendSubMenu(ActionFactory factory,
                                    DialogService dialogService,
                                    StateManager stateManager,
-                                   Preferences preferences) {
+                                   CliPreferences preferences) {
         Menu sendMenu = factory.createMenu(StandardActions.SEND);
         sendMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor)),

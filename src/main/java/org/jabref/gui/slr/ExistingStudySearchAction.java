@@ -19,7 +19,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
     protected final DialogService dialogService;
 
     protected Path studyDirectory;
-    protected final Preferences preferences;
+    protected final CliPreferences preferences;
     protected final StateManager stateManager;
 
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -49,7 +49,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
             DialogService dialogService,
             FileUpdateMonitor fileUpdateMonitor,
             TaskExecutor taskExecutor,
-            Preferences preferences,
+            CliPreferences preferences,
             StateManager stateManager) {
         this(tabContainer,
                 openDatabaseActionSupplier,
@@ -67,7 +67,7 @@ public class ExistingStudySearchAction extends SimpleCommand {
             DialogService dialogService,
             FileUpdateMonitor fileUpdateMonitor,
             TaskExecutor taskExecutor,
-            Preferences preferences,
+            CliPreferences preferences,
             StateManager stateManager,
             boolean isNew) {
         this.tabContainer = tabContainer;

@@ -13,17 +13,17 @@ import org.jabref.gui.exporter.CreateModifyExporterDialogView;
 import org.jabref.gui.exporter.ExporterViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class CustomExporterTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<ExporterViewModel> exporters = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ExporterViewModel> selectedExporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final DialogService dialogService;
 
-    public CustomExporterTabViewModel(Preferences preferences, DialogService dialogService) {
+    public CustomExporterTabViewModel(CliPreferences preferences, DialogService dialogService) {
         this.preferences = preferences;
         this.dialogService = dialogService;
     }

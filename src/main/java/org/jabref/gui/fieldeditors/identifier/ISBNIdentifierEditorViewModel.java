@@ -12,7 +12,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class ISBNIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<ISBN> {
     private final UndoManager undoManager;
@@ -22,7 +22,7 @@ public class ISBNIdentifierEditorViewModel extends BaseIdentifierEditorViewModel
                                          FieldCheckers fieldCheckers,
                                          DialogService dialogService,
                                          TaskExecutor taskExecutor,
-                                         Preferences preferences,
+                                         CliPreferences preferences,
                                          UndoManager undoManager,
                                          StateManager stateManager) {
         super(StandardField.ISBN, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);

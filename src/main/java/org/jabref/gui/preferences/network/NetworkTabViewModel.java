@@ -31,7 +31,7 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -58,7 +58,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final Validator proxyPasswordValidator;
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
 
     private final ProxyPreferences proxyPreferences;
@@ -70,7 +70,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
 
     public NetworkTabViewModel(DialogService dialogService,
-                               Preferences preferences) {
+                               CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.proxyPreferences = preferences.getProxyPreferences();

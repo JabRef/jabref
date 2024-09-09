@@ -4,7 +4,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ public class SciteTabTest {
     public static final String SAMPLE_DOI = "10.1109/ICECS.2010.5724443";
 
     @Mock
-    private Preferences preferences;
+    private CliPreferences preferences;
     @Mock
     private TaskExecutor taskExecutor;
     @Mock

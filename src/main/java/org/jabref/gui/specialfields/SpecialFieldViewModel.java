@@ -20,15 +20,15 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class SpecialFieldViewModel {
 
     private final SpecialField field;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final UndoManager undoManager;
 
-    public SpecialFieldViewModel(SpecialField field, Preferences preferences, UndoManager undoManager) {
+    public SpecialFieldViewModel(SpecialField field, CliPreferences preferences, UndoManager undoManager) {
         this.field = Objects.requireNonNull(field);
         this.preferences = Objects.requireNonNull(preferences);
         this.undoManager = Objects.requireNonNull(undoManager);

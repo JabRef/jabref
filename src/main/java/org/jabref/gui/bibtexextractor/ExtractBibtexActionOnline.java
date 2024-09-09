@@ -6,16 +6,16 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.GrobidOptInDialogHelper;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class ExtractBibtexActionOnline extends SimpleCommand {
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final DialogService dialogService;
 
-    public ExtractBibtexActionOnline(DialogService dialogService, Preferences preferences, StateManager stateManager, boolean requiresGrobid) {
+    public ExtractBibtexActionOnline(DialogService dialogService, CliPreferences preferences, StateManager stateManager, boolean requiresGrobid) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         if (requiresGrobid) {

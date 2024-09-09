@@ -27,7 +27,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class RequiredFieldsTab extends FieldsEditorTab {
 
@@ -40,7 +40,7 @@ public class RequiredFieldsTab extends FieldsEditorTab {
                              UndoAction undoAction,
                              RedoAction redoAction,
                              DialogService dialogService,
-                             Preferences preferences,
+                             CliPreferences preferences,
                              ThemeManager themeManager,
                              BibEntryTypesManager entryTypesManager,
                              TaskExecutor taskExecutor,

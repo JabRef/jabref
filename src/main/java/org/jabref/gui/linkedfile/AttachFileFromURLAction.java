@@ -16,19 +16,19 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class AttachFileFromURLAction extends SimpleCommand {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final TaskExecutor taskExecutor;
 
     public AttachFileFromURLAction(DialogService dialogService,
                                    StateManager stateManager,
                                    TaskExecutor taskExecutor,
-                                   Preferences preferences) {
+                                   CliPreferences preferences) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;

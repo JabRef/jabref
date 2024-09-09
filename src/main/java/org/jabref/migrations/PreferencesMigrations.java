@@ -24,13 +24,13 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.JabRefCliCliPreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.JabRefPreferences;
 
 import com.github.javakeyring.Keyring;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class PreferencesMigrations {
     /**
      * Perform checks and changes for users with a preference set from an older JabRef version.
      */
-    public static void runMigrations(JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
+    public static void runMigrations(JabRefCliCliPreferences preferences, BibEntryTypesManager entryTypesManager) {
         Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
@@ -107,8 +107,8 @@ public class PreferencesMigrations {
     /**
      * Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
      */
-    private static void upgradeFaultyEncodingStrings(JabRefPreferences prefs) {
-        String defaultEncoding = prefs.get(JabRefPreferences.DEFAULT_ENCODING);
+    private static void upgradeFaultyEncodingStrings(JabRefCliCliPreferences prefs) {
+        String defaultEncoding = prefs.get(JabRefCliCliPreferences.DEFAULT_ENCODING);
         if (defaultEncoding == null) {
             return;
         }
@@ -137,7 +137,7 @@ public class PreferencesMigrations {
         encodingMap.put("EUC_JP", "EUC-JP");
 
         if (encodingMap.containsKey(defaultEncoding)) {
-            prefs.put(JabRefPreferences.DEFAULT_ENCODING, encodingMap.get(defaultEncoding));
+            prefs.put(JabRefCliCliPreferences.DEFAULT_ENCODING, encodingMap.get(defaultEncoding));
         }
     }
 
@@ -147,25 +147,25 @@ public class PreferencesMigrations {
      * these preferences, but it is only used when the new preference does not
      * exist
      */
-    private static void upgradeSortOrder(JabRefPreferences prefs) {
-        if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
+    private static void upgradeSortOrder(JabRefCliCliPreferences prefs) {
+        if (prefs.get(JabRefCliCliPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
             if (prefs.getBoolean("exportInStandardOrder", false)) {
-                prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
-                prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, StandardField.AUTHOR.getName());
-                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, StandardField.EDITOR.getName());
-                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, StandardField.YEAR.getName());
-                prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
-                prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
-                prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefCliCliPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
+                prefs.put(JabRefCliCliPreferences.EXPORT_PRIMARY_SORT_FIELD, StandardField.AUTHOR.getName());
+                prefs.put(JabRefCliCliPreferences.EXPORT_SECONDARY_SORT_FIELD, StandardField.EDITOR.getName());
+                prefs.put(JabRefCliCliPreferences.EXPORT_TERTIARY_SORT_FIELD, StandardField.YEAR.getName());
+                prefs.putBoolean(JabRefCliCliPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefCliCliPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefCliCliPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
             } else if (prefs.getBoolean("exportInTitleOrder", false)) {
                 // exportInTitleOrder => title, author, editor
-                prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
-                prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, StandardField.TITLE.getName());
-                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, StandardField.AUTHOR.getName());
-                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, StandardField.EDITOR.getName());
-                prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
-                prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
-                prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefCliCliPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
+                prefs.put(JabRefCliCliPreferences.EXPORT_PRIMARY_SORT_FIELD, StandardField.TITLE.getName());
+                prefs.put(JabRefCliCliPreferences.EXPORT_SECONDARY_SORT_FIELD, StandardField.AUTHOR.getName());
+                prefs.put(JabRefCliCliPreferences.EXPORT_TERTIARY_SORT_FIELD, StandardField.EDITOR.getName());
+                prefs.putBoolean(JabRefCliCliPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefCliCliPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
+                prefs.putBoolean(JabRefCliCliPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
             }
         }
     }
@@ -173,10 +173,10 @@ public class PreferencesMigrations {
     /**
      * Migrate all customized entry types from versions <=3.7
      */
-    private static void upgradeStoredBibEntryTypes(JabRefPreferences prefs, Preferences mainPrefsNode, BibEntryTypesManager entryTypesManager) {
+    private static void upgradeStoredBibEntryTypes(JabRefCliCliPreferences prefs, Preferences mainPrefsNode, BibEntryTypesManager entryTypesManager) {
         try {
-            if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
-                    mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES)) {
+            if (mainPrefsNode.nodeExists(JabRefCliCliPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
+                    mainPrefsNode.nodeExists(JabRefCliCliPreferences.CUSTOMIZED_BIBLATEX_TYPES)) {
                 // skip further processing as prefs already have been migrated
             } else {
                 LOGGER.info("Migrating old custom entry types.");
@@ -195,7 +195,7 @@ public class PreferencesMigrations {
      * <p>
      * Introduced in <a href="https://github.com/JabRef/jabref/pull/1704">#1704</a>
      */
-    private static void upgradeLabelPatternToCitationKeyPattern(JabRefPreferences prefs, Preferences mainPrefsNode) {
+    private static void upgradeLabelPatternToCitationKeyPattern(JabRefCliCliPreferences prefs, Preferences mainPrefsNode) {
         final String V3_6_DEFAULT_BIBTEX_KEYPATTERN = "defaultBibtexKeyPattern";
         final String V3_6_BIBTEX_KEYPATTERN_NODE = "bibtexkeypatterns";
         final String V3_3_DEFAULT_LABELPATTERN = "defaultLabelPattern";
@@ -235,30 +235,30 @@ public class PreferencesMigrations {
      * Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
      */
     private static void migrateFileImportPattern(String oldStylePattern, String newStylePattern,
-                                                 JabRefPreferences prefs, Preferences mainPrefsNode) {
-        String preferenceFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
+                                                 JabRefCliCliPreferences prefs, Preferences mainPrefsNode) {
+        String preferenceFileNamePattern = mainPrefsNode.get(JabRefCliCliPreferences.IMPORT_FILENAMEPATTERN, null);
 
         if ((preferenceFileNamePattern != null) &&
                 oldStylePattern.equals(preferenceFileNamePattern)) {
             // Upgrade the old-style File Name pattern to new one:
-            mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
-            LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the preference file", JabRefPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
+            mainPrefsNode.put(JabRefCliCliPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
+            LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the preference file", JabRefCliCliPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
 
-            if (prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
+            if (prefs.hasKey(JabRefCliCliPreferences.IMPORT_FILENAMEPATTERN)) {
                 // Update also the key in the current application settings, if necessary:
-                String fileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
+                String fileNamePattern = prefs.get(JabRefCliCliPreferences.IMPORT_FILENAMEPATTERN);
                 if (oldStylePattern.equals(fileNamePattern)) {
-                    prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
-                    LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the running application", JabRefPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
+                    prefs.put(JabRefCliCliPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
+                    LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the running application", JabRefCliCliPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
                 }
             }
         }
     }
 
-    static void upgradeImportFileAndDirePatterns(JabRefPreferences prefs, Preferences mainPrefsNode) {
+    static void upgradeImportFileAndDirePatterns(JabRefCliCliPreferences prefs, Preferences mainPrefsNode) {
         // Migrate Import patterns
         // Check for prefs node for Version <= 4.0
-        if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
+        if (mainPrefsNode.get(JabRefCliCliPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
             String[] oldStylePatterns = new String[]{
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
@@ -278,7 +278,7 @@ public class PreferencesMigrations {
         // the user defined old-style patterns, and the default pattern is "".
     }
 
-    private static void upgradeKeyBindingsToJavaFX(JabRefPreferences prefs) {
+    private static void upgradeKeyBindingsToJavaFX(JabRefCliCliPreferences prefs) {
         UnaryOperator<String> replaceKeys = str -> {
             String result = str.replace("ctrl ", "ctrl+");
             result = result.replace("shift ", "shift+");
@@ -288,26 +288,26 @@ public class PreferencesMigrations {
             return result;
         };
 
-        List<String> keys = new ArrayList<>(prefs.getStringList(JabRefPreferences.BINDINGS));
+        List<String> keys = new ArrayList<>(prefs.getStringList(JabRefCliCliPreferences.BINDINGS));
         keys.replaceAll(replaceKeys);
-        prefs.putStringList(JabRefPreferences.BINDINGS, keys);
+        prefs.putStringList(JabRefCliCliPreferences.BINDINGS, keys);
     }
 
-    private static void addCrossRefRelatedFieldsForAutoComplete(JabRefPreferences prefs) {
+    private static void addCrossRefRelatedFieldsForAutoComplete(JabRefCliCliPreferences prefs) {
         // LinkedHashSet because we want to retain the order and add new fields to the end
-        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
+        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefCliCliPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
         keys.add("crossref");
         keys.add("related");
         keys.add("entryset");
-        prefs.putStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, new ArrayList<>(keys));
+        prefs.putStringList(JabRefCliCliPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, new ArrayList<>(keys));
     }
 
-    private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)
+    private static void migrateTypedKeyPrefs(JabRefCliCliPreferences prefs, Preferences oldPatternPrefs)
             throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(
-                prefs.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN));
+                prefs.get(JabRefCliCliPreferences.DEFAULT_CITATION_KEY_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addCitationKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
         }
@@ -323,14 +323,14 @@ public class PreferencesMigrations {
      *     <li> Since v5.2 'bibtexkey' is rebranded as citationkey (<a href="https://github.com/JabRef/jabref/pull/6875">#6875</a>).</li>
      * </ul>
      */
-    protected static void upgradePreviewStyle(JabRefPreferences prefs) {
-        String currentPreviewStyle = prefs.get(JabRefPreferences.PREVIEW_STYLE);
+    protected static void upgradePreviewStyle(JabRefCliCliPreferences prefs) {
+        String currentPreviewStyle = prefs.get(JabRefCliCliPreferences.PREVIEW_STYLE);
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}")
                                                   .replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
                                                   .replace("\\format[Markdown,HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}")
                                                   .replace("<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>", "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>")
                                                   .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__");
-        prefs.put(JabRefPreferences.PREVIEW_STYLE, migratedStyle);
+        prefs.put(JabRefCliCliPreferences.PREVIEW_STYLE, migratedStyle);
     }
 
     /**
@@ -346,9 +346,9 @@ public class PreferencesMigrations {
      * Pre 5.1: columnNames, columnWidths, columnSortTypes, columnSortOrder
      * Since 5.1: mainTableColumnNames, mainTableColumnWidths, mainTableColumnSortTypes, mainTableColumnSortOrder
      */
-    static void upgradeColumnPreferences(JabRefPreferences preferences) {
-        List<String> columnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
-        List<Double> columnWidths = preferences.getStringList(JabRefPreferences.COLUMN_WIDTHS)
+    static void upgradeColumnPreferences(JabRefCliCliPreferences preferences) {
+        List<String> columnNames = preferences.getStringList(JabRefCliCliPreferences.COLUMN_NAMES);
+        List<Double> columnWidths = preferences.getStringList(JabRefCliCliPreferences.COLUMN_WIDTHS)
                                                .stream()
                                                .map(string -> {
                                                    try {
@@ -382,12 +382,12 @@ public class PreferencesMigrations {
                 columns.add(new MainTableColumnModel(type, name, columnWidth));
             }
 
-            preferences.putStringList(JabRefPreferences.COLUMN_NAMES,
+            preferences.putStringList(JabRefCliCliPreferences.COLUMN_NAMES,
                     columns.stream()
                            .map(MainTableColumnModel::getName)
                            .collect(Collectors.toList()));
 
-            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS,
+            preferences.putStringList(JabRefCliCliPreferences.COLUMN_WIDTHS,
                     columns.stream()
                            .map(MainTableColumnModel::getWidth)
                            .map(Double::intValue)
@@ -395,7 +395,7 @@ public class PreferencesMigrations {
                            .collect(Collectors.toList()));
 
             // ASCENDING by default
-            preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES,
+            preferences.putStringList(JabRefCliCliPreferences.COLUMN_SORT_TYPES,
                     columns.stream()
                            .map(MainTableColumnModel::getSortType)
                            .map(TableColumn.SortType::toString)
@@ -403,7 +403,7 @@ public class PreferencesMigrations {
         }
     }
 
-    static void changeColumnVariableNamesFor51(JabRefPreferences preferences) {
+    static void changeColumnVariableNamesFor51(JabRefCliCliPreferences preferences) {
         // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
         final String V5_0_COLUMN_NAMES = "columnNames";
         final String V5_0_COLUMN_WIDTHS = "columnWidths";
@@ -431,7 +431,7 @@ public class PreferencesMigrations {
      * variable contents if they are unreadable, so former versions of JabRef would automatically create preferences
      * they can deal with.
      */
-    static void restoreVariablesForBackwardCompatibility(JabRefPreferences preferences) {
+    static void restoreVariablesForBackwardCompatibility(JabRefCliCliPreferences preferences) {
         // 5.0 preference name "columnNames". The new one is {@link JabRefPreferences#COLUMN_NAMES}
         List<String> oldColumnNames = preferences.getStringList("columnNames");
         List<String> fieldColumnNames = oldColumnNames.stream()
@@ -461,9 +461,9 @@ public class PreferencesMigrations {
         try {
             // some versions stored the font size as double to the **same** key
             // since the preference store is type-safe, we need to add this workaround
-            String fontSizeAsString = preferences.get(JabRefPreferences.MAIN_FONT_SIZE);
+            String fontSizeAsString = preferences.get(JabRefCliCliPreferences.MAIN_FONT_SIZE);
             int fontSizeAsInt = (int) Math.round(Double.parseDouble(fontSizeAsString));
-            preferences.putInt(JabRefPreferences.MAIN_FONT_SIZE, fontSizeAsInt);
+            preferences.putInt(JabRefCliCliPreferences.MAIN_FONT_SIZE, fontSizeAsInt);
         } catch (ClassCastException e) {
             // already an integer
         }
@@ -492,7 +492,7 @@ public class PreferencesMigrations {
      * <tr> <td> CleanUpFormatters        </td> <td> field[formatter,formatter...]\nfield[...]\nfield[...]... </td> </tr>
      * </table>
      */
-    private static void upgradeCleanups(JabRefPreferences prefs) {
+    private static void upgradeCleanups(JabRefCliCliPreferences prefs) {
         final String V5_8_CLEANUP = "CleanUp";
         final String V6_0_CLEANUP_JOBS = "CleanUpJobs";
 
@@ -525,7 +525,7 @@ public class PreferencesMigrations {
         }
     }
 
-    static void moveApiKeysToKeyring(JabRefPreferences preferences) {
+    static void moveApiKeysToKeyring(JabRefCliCliPreferences preferences) {
         final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
         final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
 
@@ -551,7 +551,7 @@ public class PreferencesMigrations {
      * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link EntryEditor#createTabs()}.
      * Thus, the configuration ih the preferences is obsolete
      */
-    static void removeCommentsFromCustomEditorTabs(JabRefPreferences preferences) {
+    static void removeCommentsFromCustomEditorTabs(JabRefCliCliPreferences preferences) {
         preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
     }
 }

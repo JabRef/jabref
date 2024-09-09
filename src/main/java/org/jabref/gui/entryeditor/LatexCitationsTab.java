@@ -21,7 +21,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DirectoryMonitorManager;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -34,7 +34,7 @@ public class LatexCitationsTab extends EntryEditorTab {
     private final CitationsDisplay citationsDisplay;
 
     public LatexCitationsTab(BibDatabaseContext databaseContext,
-                             Preferences preferences,
+                             CliPreferences preferences,
                              DialogService dialogService,
                              DirectoryMonitorManager directoryMonitorManager) {
 

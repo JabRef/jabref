@@ -18,7 +18,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTextFieldTableCellVisualizationFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -32,7 +32,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
     @FXML private Button addStringButton;
     @FXML private ButtonType saveButton;
 
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private DialogService dialogService;
 
     public ConstantsPropertiesView(BibDatabaseContext databaseContext) {

@@ -14,7 +14,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -39,7 +39,7 @@ public class ExporterTest {
     }
 
     private static Stream<Object[]> exportFormats() {
-        Preferences preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(preferences.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(preferences.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
 

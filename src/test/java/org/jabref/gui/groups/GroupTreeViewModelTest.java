@@ -17,7 +17,7 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.WordKeywordGroup;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class GroupTreeViewModelTest {
     private GroupTreeViewModel groupTree;
     private BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
-    private Preferences preferences;
+    private CliPreferences preferences;
     private DialogService dialogService;
 
     @BeforeEach
@@ -44,7 +44,7 @@ class GroupTreeViewModelTest {
         stateManager = new StateManager();
         stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
         taskExecutor = new CurrentThreadTaskExecutor();
-        preferences = mock(Preferences.class);
+        preferences = mock(CliPreferences.class);
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
 
         when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(

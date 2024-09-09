@@ -26,7 +26,7 @@ import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -39,7 +39,7 @@ public class SaveOrderConfigPanel extends VBox {
     @FXML private GridPane sortCriterionList;
     @FXML private Button addButton;
 
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private UndoManager undoManager;
 
     private SaveOrderConfigPanelViewModel viewModel;

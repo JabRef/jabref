@@ -18,7 +18,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -37,7 +37,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @Inject protected FileUpdateMonitor fileUpdateMonitor;
     @Inject protected TaskExecutor taskExecutor;
     @Inject protected UndoManager undoManager;
-    @Inject protected Preferences preferences;
+    @Inject protected CliPreferences preferences;
 
     @FXML protected TextArea input;
     private final boolean onlineMode;

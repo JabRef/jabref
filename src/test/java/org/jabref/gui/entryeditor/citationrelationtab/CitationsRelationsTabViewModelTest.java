@@ -27,7 +27,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class CitationsRelationsTabViewModelTest {
     private BibEntry testEntry;
 
     @Mock
-    private Preferences preferences;
+    private CliPreferences preferences;
     @Mock
     private DuplicateCheck duplicateCheck;
     private BibEntry existingEntry;

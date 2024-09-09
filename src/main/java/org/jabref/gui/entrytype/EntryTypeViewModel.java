@@ -31,7 +31,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -44,7 +44,7 @@ public class EntryTypeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeViewModel.class);
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final BooleanProperty searchingProperty = new SimpleBooleanProperty();
     private final BooleanProperty searchSuccesfulProperty = new SimpleBooleanProperty();
     private final ObjectProperty<IdBasedFetcher> selectedItemProperty = new SimpleObjectProperty<>();
@@ -59,7 +59,7 @@ public class EntryTypeViewModel {
     private final UiTaskExecutor taskExecutor;
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    public EntryTypeViewModel(Preferences preferences,
+    public EntryTypeViewModel(CliPreferences preferences,
                               LibraryTab libraryTab,
                               DialogService dialogService,
                               StateManager stateManager,

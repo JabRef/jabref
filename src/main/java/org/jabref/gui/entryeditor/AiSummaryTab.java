@@ -11,7 +11,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class AiSummaryTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
@@ -25,7 +25,7 @@ public class AiSummaryTab extends EntryEditorTab {
     public AiSummaryTab(BibDatabaseContext bibDatabaseContext,
                         AiService aiService,
                         DialogService dialogService,
-                        Preferences preferences
+                        CliPreferences preferences
     ) {
         this.bibDatabaseContext = bibDatabaseContext;
 

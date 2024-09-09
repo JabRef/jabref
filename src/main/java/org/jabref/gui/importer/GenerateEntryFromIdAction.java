@@ -17,7 +17,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final String identifier;
     private final TaskExecutor taskExecutor;
     private final PopOver entryFromIdPopOver;
@@ -37,7 +37,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     public GenerateEntryFromIdAction(LibraryTab libraryTab,
                                      DialogService dialogService,
-                                     Preferences preferences,
+                                     CliPreferences preferences,
                                      TaskExecutor taskExecutor,
                                      PopOver entryFromIdPopOver,
                                      String identifier,

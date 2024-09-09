@@ -51,7 +51,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jvnet.hk2.annotations.Contract;
 
 @Contract
-public interface Preferences {
+public interface CliPreferences {
     void clear() throws BackingStoreException;
 
     void deleteKey(String key) throws IllegalArgumentException;

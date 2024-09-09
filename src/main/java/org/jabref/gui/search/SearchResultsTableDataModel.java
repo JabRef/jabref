@@ -22,7 +22,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResults;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -35,7 +35,7 @@ public class SearchResultsTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final TaskExecutor taskExecutor;
 
-    public SearchResultsTableDataModel(BibDatabaseContext bibDatabaseContext, Preferences preferences, StateManager stateManager, TaskExecutor taskExecutor) {
+    public SearchResultsTableDataModel(BibDatabaseContext bibDatabaseContext, CliPreferences preferences, StateManager stateManager, TaskExecutor taskExecutor) {
         NameDisplayPreferences nameDisplayPreferences = preferences.getNameDisplayPreferences();
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;

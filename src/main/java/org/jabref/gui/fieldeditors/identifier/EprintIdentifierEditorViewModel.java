@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ARK;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.EprintIdentifier;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -35,7 +35,7 @@ public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewMod
                                            FieldCheckers fieldCheckers,
                                            DialogService dialogService,
                                            TaskExecutor taskExecutor,
-                                           Preferences preferences,
+                                           CliPreferences preferences,
                                            UndoManager undoManager) {
         super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
         configure(false, false);

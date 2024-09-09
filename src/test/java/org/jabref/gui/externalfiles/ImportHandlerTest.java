@@ -21,7 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class ImportHandlerTest {
     private BibEntry testEntry;
 
     @Mock
-    private Preferences preferences;
+    private CliPreferences preferences;
     @Mock
     private DuplicateCheck duplicateCheck;
 
@@ -85,7 +85,7 @@ class ImportHandlerTest {
     void handleBibTeXData() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
-        Preferences preferences = mock(Preferences.class);
+        CliPreferences preferences = mock(CliPreferences.class);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
 

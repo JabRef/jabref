@@ -25,7 +25,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +35,13 @@ public class SidePaneViewModel extends AbstractViewModel {
 
     private final Map<SidePaneType, SidePaneComponent> sidePaneComponentLookup = new HashMap<>();
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final StateManager stateManager;
     private final SidePaneContentFactory sidePaneContentFactory;
     private final DialogService dialogService;
 
     public SidePaneViewModel(LibraryTabContainer tabContainer,
-                             Preferences preferences,
+                             CliPreferences preferences,
                              ChatHistoryService chatHistoryService,
                              JournalAbbreviationRepository abbreviationRepository,
                              StateManager stateManager,

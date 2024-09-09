@@ -3,7 +3,7 @@ package org.jabref.gui.push;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class PushToTeXworks extends AbstractPushToApplication {
 
@@ -15,7 +15,7 @@ public class PushToTeXworks extends AbstractPushToApplication {
      * @param dialogService The dialog service for displaying messages to the user.
      * @param preferences The service for accessing user preferences.
      */
-    public PushToTeXworks(DialogService dialogService, Preferences preferences) {
+    public PushToTeXworks(DialogService dialogService, CliPreferences preferences) {
         super(dialogService, preferences);
     }
 

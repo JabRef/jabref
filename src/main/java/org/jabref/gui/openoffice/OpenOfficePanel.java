@@ -59,7 +59,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
@@ -92,7 +92,7 @@ public class OpenOfficePanel {
     private final Button help;
     private final VBox vbox = new VBox();
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
@@ -105,7 +105,7 @@ public class OpenOfficePanel {
     private OOStyle currentStyle;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
-                           Preferences preferences,
+                           CliPreferences preferences,
                            JournalAbbreviationRepository abbreviationRepository,
                            UiTaskExecutor taskExecutor,
                            DialogService dialogService,

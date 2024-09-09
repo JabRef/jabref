@@ -3,7 +3,7 @@ package org.jabref.http.server;
 import java.util.List;
 
 import org.jabref.logic.util.io.BackupFileUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
@@ -15,7 +15,7 @@ import jakarta.ws.rs.core.MediaType;
 @Path("libraries")
 public class LibrariesResource {
     @Inject
-    Preferences preferences;
+    CliPreferences preferences;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

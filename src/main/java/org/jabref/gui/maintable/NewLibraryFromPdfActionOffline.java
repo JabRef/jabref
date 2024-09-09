@@ -9,13 +9,13 @@ import org.jabref.gui.StateManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class NewLibraryFromPdfActionOffline extends NewLibraryFromPdfAction {
 
     private final BibliographyFromPdfImporter bibliographyFromPdfImporter;
 
-    public NewLibraryFromPdfActionOffline(LibraryTabContainer libraryTabContainer, StateManager stateManager, DialogService dialogService, Preferences preferences, TaskExecutor taskExecutor) {
+    public NewLibraryFromPdfActionOffline(LibraryTabContainer libraryTabContainer, StateManager stateManager, DialogService dialogService, CliPreferences preferences, TaskExecutor taskExecutor) {
         super(libraryTabContainer, stateManager, dialogService, preferences, taskExecutor);
 
         // Use the importer keeping the numbers (instead of generating keys; which is the other constructor)

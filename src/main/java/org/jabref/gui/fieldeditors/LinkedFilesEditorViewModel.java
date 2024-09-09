@@ -45,7 +45,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,14 +58,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     public LinkedFilesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider,
                                       DialogService dialogService,
                                       BibDatabaseContext databaseContext,
                                       TaskExecutor taskExecutor,
                                       FieldCheckers fieldCheckers,
-                                      Preferences preferences,
+                                      CliPreferences preferences,
                                       UndoManager undoManager) {
 
         super(field, suggestionProvider, fieldCheckers, undoManager);

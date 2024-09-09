@@ -18,7 +18,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class BackupManagerDiscardedTest {
     private BackupManager backupManager;
     private Path testBib;
     private SelfContainedSaveConfiguration saveConfiguration;
-    private Preferences preferences;
+    private CliPreferences preferences;
     private BibEntryTypesManager bibEntryTypesManager;
     private Path backupDir;
 
@@ -54,7 +54,7 @@ class BackupManagerDiscardedTest {
 
         bibEntryTypesManager = new BibEntryTypesManager();
         saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
-        preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
+        preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
         saveDatabase();
 

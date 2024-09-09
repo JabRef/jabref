@@ -13,7 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.Version;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ public class VersionWorker {
     public VersionWorker(Version installedVersion,
                          DialogService dialogService,
                          TaskExecutor taskExecutor,
-                         Preferences preferences) {
+                         CliPreferences preferences) {
         this.installedVersion = Objects.requireNonNull(installedVersion);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);

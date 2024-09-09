@@ -42,7 +42,7 @@ import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class SaveDatabaseAction {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
 
     public enum SaveDatabaseMode {
@@ -68,7 +68,7 @@ public class SaveDatabaseAction {
 
     public SaveDatabaseAction(LibraryTab libraryTab,
                               DialogService dialogService,
-                              Preferences preferences,
+                              CliPreferences preferences,
                               BibEntryTypesManager entryTypesManager) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;

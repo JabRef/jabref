@@ -14,7 +14,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -22,12 +22,12 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 public class CopyFilesAction extends SimpleCommand {
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final StateManager stateManager;
     private final UiTaskExecutor uiTaskExecutor;
 
     public CopyFilesAction(DialogService dialogService,
-                           Preferences preferences,
+                           CliPreferences preferences,
                            StateManager stateManager,
                            UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;

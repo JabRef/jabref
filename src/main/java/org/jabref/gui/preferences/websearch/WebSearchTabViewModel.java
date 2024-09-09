@@ -37,7 +37,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import kong.unirest.core.UnirestException;
 
@@ -60,14 +60,14 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty apikeyPersistAvailableProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final DOIPreferences doiPreferences;
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
     private final FilePreferences filePreferences;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public WebSearchTabViewModel(Preferences preferences, DialogService dialogService) {
+    public WebSearchTabViewModel(CliPreferences preferences, DialogService dialogService) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.importerPreferences = preferences.getImporterPreferences();

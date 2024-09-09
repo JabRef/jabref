@@ -23,7 +23,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -42,7 +42,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private Preferences preferences;
+    @Inject private CliPreferences preferences;
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
 

@@ -10,7 +10,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -21,12 +21,12 @@ public class ImportCustomEntryTypesDialogViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomEntryTypesDialogViewModel.class);
 
     private final BibDatabaseMode mode;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     private final ObservableList<BibEntryType> newTypes = FXCollections.observableArrayList();
     private final ObservableList<BibEntryTypePrefsAndFileViewModel> differentCustomizationTypes = FXCollections.observableArrayList();
 
-    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode, List<BibEntryType> entryTypes, Preferences preferences) {
+    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode, List<BibEntryType> entryTypes, CliPreferences preferences) {
         this.mode = mode;
         this.preferences = preferences;
 

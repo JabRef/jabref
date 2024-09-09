@@ -17,7 +17,7 @@ import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
@@ -39,11 +39,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final MrDlibPreferences mrDlibPreferences;
 
-    public EntryEditorTabViewModel(DialogService dialogService, Preferences preferences) {
+    public EntryEditorTabViewModel(DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();

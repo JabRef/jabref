@@ -19,7 +19,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
 
@@ -61,7 +61,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     private ThreeWayMergeView threeWayMerge;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     public DuplicateResolverDialog(BibEntry one,
                                    BibEntry two,
@@ -69,7 +69,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                                    BibDatabaseContext database,
                                    StateManager stateManager,
                                    DialogService dialogService,
-                                   Preferences preferences) {
+                                   CliPreferences preferences) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
         this.stateManager = stateManager;
         this.dialogService = dialogService;

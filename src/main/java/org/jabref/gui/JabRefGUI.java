@@ -29,6 +29,7 @@ import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.preferences.JabRefCliCliPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
@@ -40,7 +41,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -56,7 +56,7 @@ public class JabRefGUI extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
     private static List<UiCommand> uiCommands;
-    private static JabRefPreferences preferencesService;
+    private static JabRefCliCliPreferences preferencesService;
     private static FileUpdateMonitor fileUpdateMonitor;
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
@@ -76,7 +76,7 @@ public class JabRefGUI extends Application {
     private Stage mainStage;
 
     public static void setup(List<UiCommand> uiCommands,
-                             JabRefPreferences preferencesService,
+                             JabRefCliCliPreferences preferencesService,
                              FileUpdateMonitor fileUpdateMonitor) {
         JabRefGUI.uiCommands = uiCommands;
         JabRefGUI.preferencesService = preferencesService;

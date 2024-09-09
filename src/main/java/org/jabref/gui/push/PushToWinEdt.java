@@ -3,13 +3,13 @@ package org.jabref.gui.push;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class PushToWinEdt extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.WIN_EDT;
 
-    public PushToWinEdt(DialogService dialogService, Preferences preferences) {
+    public PushToWinEdt(DialogService dialogService, CliPreferences preferences) {
         super(dialogService, preferences);
     }
 

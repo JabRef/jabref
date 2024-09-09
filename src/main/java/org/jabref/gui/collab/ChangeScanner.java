@@ -10,7 +10,7 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +19,13 @@ public class ChangeScanner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
     private final BibDatabaseContext database;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     private final DatabaseChangeResolverFactory databaseChangeResolverFactory;
 
     public ChangeScanner(BibDatabaseContext database,
                          DialogService dialogService,
-                         Preferences preferences) {
+                         CliPreferences preferences) {
         this.database = database;
         this.preferences = preferences;
         this.databaseChangeResolverFactory = new DatabaseChangeResolverFactory(dialogService, database, preferences);

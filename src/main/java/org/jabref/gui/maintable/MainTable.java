@@ -50,7 +50,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
@@ -82,7 +82,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
                      BibDatabaseContext database,
-                     Preferences preferences,
+                     CliPreferences preferences,
                      DialogService dialogService,
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,

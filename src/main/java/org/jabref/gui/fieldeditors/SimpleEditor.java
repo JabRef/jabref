@@ -16,7 +16,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class SimpleEditor extends HBox implements FieldEditorFX {
 
@@ -27,7 +27,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     public SimpleEditor(final Field field,
                         final SuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
-                        final Preferences preferences,
+                        final CliPreferences preferences,
                         final boolean isMultiLine,
                         final UndoManager undoManager,
                         UndoAction undoAction,

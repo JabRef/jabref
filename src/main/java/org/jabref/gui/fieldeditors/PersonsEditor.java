@@ -16,7 +16,7 @@ import org.jabref.gui.util.uithreadaware.UiThreadStringProperty;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 
@@ -33,7 +33,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
                          final UndoManager undoManager,
                          UndoAction undoAction,
                          RedoAction redoAction) {
-        Preferences preferences = Injector.instantiateModelOrService(Preferences.class);
+        CliPreferences preferences = Injector.instantiateModelOrService(CliPreferences.class);
         KeyBindingRepository keyBindingRepository = preferences.getKeyBindingRepository();
 
         this.viewModel = new PersonsEditorViewModel(field, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers, undoManager);

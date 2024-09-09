@@ -14,14 +14,14 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class ISSNEditorViewModel extends AbstractEditorViewModel {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final UndoManager undoManager;
     private final StateManager stateManager;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     public ISSNEditorViewModel(
             Field field,
@@ -31,7 +31,7 @@ public class ISSNEditorViewModel extends AbstractEditorViewModel {
             DialogService dialogService,
             UndoManager undoManager,
             StateManager stateManager,
-            Preferences preferences) {
+            CliPreferences preferences) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;

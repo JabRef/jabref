@@ -17,11 +17,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class CleanupSingleAction extends SimpleCommand {
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final BibEntry entry;
@@ -30,7 +30,7 @@ public class CleanupSingleAction extends SimpleCommand {
     private boolean isCanceled;
     private int modifiedEntriesCount;
 
-    public CleanupSingleAction(BibEntry entry, Preferences preferences, DialogService dialogService, StateManager stateManager, UndoManager undoManager) {
+    public CleanupSingleAction(BibEntry entry, CliPreferences preferences, DialogService dialogService, StateManager stateManager, UndoManager undoManager) {
         this.entry = entry;
         this.preferences = preferences;
         this.dialogService = dialogService;

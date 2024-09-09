@@ -41,7 +41,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesFilter;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -54,10 +54,10 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final SimpleBooleanProperty memoryStickProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
 
-    public PreferencesDialogViewModel(DialogService dialogService, Preferences preferences) {
+    public PreferencesDialogViewModel(DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
 

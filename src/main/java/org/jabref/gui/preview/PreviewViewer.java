@@ -31,7 +31,7 @@ import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -143,7 +143,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      */
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
-                         Preferences preferences,
+                         CliPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor,
                          OptionalObjectProperty<SearchQuery> searchQueryProperty) {
@@ -198,7 +198,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
-                         Preferences preferences,
+                         CliPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor) {
         this(database, dialogService, preferences, themeManager, taskExecutor, OptionalObjectProperty.empty());

@@ -3,7 +3,7 @@ package org.jabref.gui;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -11,9 +11,9 @@ import com.google.common.eventbus.Subscribe;
  * Updates the timestamp of changed entries if the feature is enabled
  */
 class UpdateTimestampListener {
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
-    UpdateTimestampListener(Preferences preferences) {
+    UpdateTimestampListener(CliPreferences preferences) {
         this.preferences = preferences;
     }
 

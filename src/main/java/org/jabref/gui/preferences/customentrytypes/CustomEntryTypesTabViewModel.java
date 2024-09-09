@@ -32,7 +32,7 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -48,7 +48,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[]{extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final DialogService dialogService;
     private final BibDatabaseMode bibDatabaseMode;
@@ -62,7 +62,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     public CustomEntryTypesTabViewModel(BibDatabaseMode mode,
                                         BibEntryTypesManager entryTypesManager,
                                         DialogService dialogService,
-                                        Preferences preferences) {
+                                        CliPreferences preferences) {
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.dialogService = dialogService;

@@ -14,7 +14,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class ExporterFactory {
 
@@ -24,7 +24,7 @@ public class ExporterFactory {
         this.exporters = Objects.requireNonNull(exporters);
     }
 
-    public static ExporterFactory create(Preferences preferences,
+    public static ExporterFactory create(CliPreferences preferences,
                                          BibEntryTypesManager entryTypesManager) {
 
         List<TemplateExporter> customFormats = preferences.getExportPreferences().getCustomExporters();

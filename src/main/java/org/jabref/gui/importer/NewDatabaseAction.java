@@ -3,7 +3,7 @@ package org.jabref.gui.importer;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 /**
  * Create a new, empty, database.
@@ -11,7 +11,7 @@ import org.jabref.logic.preferences.Preferences;
 public class NewDatabaseAction extends SimpleCommand {
 
     private final LibraryTabContainer tabContainer;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     /**
      * Constructs a command to create a new library of the default type
@@ -19,7 +19,7 @@ public class NewDatabaseAction extends SimpleCommand {
      * @param tabContainer       the ui container for libraries
      * @param preferences the preferencesService of JabRef
      */
-    public NewDatabaseAction(LibraryTabContainer tabContainer, Preferences preferences) {
+    public NewDatabaseAction(LibraryTabContainer tabContainer, CliPreferences preferences) {
         this.tabContainer = tabContainer;
         this.preferences = preferences;
     }

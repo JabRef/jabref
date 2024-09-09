@@ -33,7 +33,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -49,7 +49,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final FileUpdateMonitor fileMonitor;
     private final StringProperty latexFileDirectory;
     private final Validator latexDirectoryValidator;
@@ -62,7 +62,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     public ParseLatexDialogViewModel(BibDatabaseContext databaseContext,
                                      DialogService dialogService,
                                      TaskExecutor taskExecutor,
-                                     Preferences preferences,
+                                     CliPreferences preferences,
                                      FileUpdateMonitor fileMonitor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;

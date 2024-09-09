@@ -25,13 +25,13 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class DatabaseChangeDetailsViewFactory {
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final ThemeManager themeManager;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final PreviewViewer previewViewer;
     private final TaskExecutor taskExecutor;
@@ -39,7 +39,7 @@ public class DatabaseChangeDetailsViewFactory {
     public DatabaseChangeDetailsViewFactory(BibDatabaseContext databaseContext,
                                             DialogService dialogService,
                                             ThemeManager themeManager,
-                                            Preferences preferences,
+                                            CliPreferences preferences,
                                             BibEntryTypesManager entryTypesManager,
                                             PreviewViewer previewViewer,
                                             TaskExecutor taskExecutor) {

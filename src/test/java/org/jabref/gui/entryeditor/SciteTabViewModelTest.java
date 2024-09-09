@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import kong.unirest.core.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 class SciteTabViewModelTest {
 
     @Mock
-    private Preferences preferences;
+    private CliPreferences preferences;
     @Mock
     private TaskExecutor taskExecutor;
 

@@ -22,7 +22,7 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.logic.preferences.Preferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
@@ -36,13 +36,13 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
-    private final Preferences preferences;
+    private final CliPreferences preferences;
 
     private final BibDatabaseContext databaseContext;
     private final MetaData metaData;
     private final DirectoryDialogConfiguration directoryDialogConfiguration;
 
-    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, Preferences preferences) {
+    GeneralPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.databaseContext = databaseContext;
