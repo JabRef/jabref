@@ -11,9 +11,9 @@ import java.util.logging.Logger;
 
 import org.jabref.Launcher;
 import org.jabref.gui.DialogService;
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.Directories;
 
 import com.sun.jna.platform.win32.KnownFolders;

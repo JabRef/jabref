@@ -7,8 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.logic.FilePreferences;
 
 public class URLUtil {
     private static final String URL_EXP = "^(https?|ftp)://.+";

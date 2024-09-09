@@ -7,9 +7,9 @@ import java.util.Optional;
 import org.jabref.Launcher;
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.logic.FilePreferences;
 
 /**
  * This class contains macOS (OSX) specific implementations for file directories and file/application open handling methods <br>

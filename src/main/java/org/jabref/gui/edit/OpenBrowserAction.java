@@ -1,9 +1,9 @@
 package org.jabref.gui.edit;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.logic.FilePreferences;
 
 public class OpenBrowserAction extends SimpleCommand {
 
