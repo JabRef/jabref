@@ -35,7 +35,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.GuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
@@ -66,6 +65,7 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
