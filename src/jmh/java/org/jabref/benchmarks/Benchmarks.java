@@ -17,8 +17,8 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.JabRefCliCliPreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -52,7 +52,7 @@ public class Benchmarks {
 
     @Setup
     public void init() throws Exception {
-        Injector.setModelOrService(CliPreferences.class, JabRefCliCliPreferences.getInstance());
+        Injector.setModelOrService(CliPreferences.class, JabRefCliPreferences.getInstance());
 
         Random randomizer = new Random();
         for (int i = 0; i < 1000; i++) {

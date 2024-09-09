@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.preferences.JabRefCliCliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -26,7 +26,7 @@ class CustomEntryTypePreferenceMigration {
     }
 
     static void upgradeStoredBibEntryTypes(BibDatabaseMode defaultBibDatabaseMode,
-                                           JabRefCliCliPreferences preferences,
+                                           JabRefCliPreferences preferences,
                                            BibEntryTypesManager entryTypesManager) {
         List<BibEntryType> storedOldTypes = new ArrayList<>();
 
@@ -46,7 +46,7 @@ class CustomEntryTypePreferenceMigration {
      * <p>
      * (old implementation which has been copied)
      */
-    private static Optional<BibEntryType> getBibEntryType(int number, JabRefCliCliPreferences preferences) {
+    private static Optional<BibEntryType> getBibEntryType(int number, JabRefCliPreferences preferences) {
         String nr = String.valueOf(number);
         String name = preferences.get(CUSTOM_TYPE_NAME + nr);
         if (name == null) {

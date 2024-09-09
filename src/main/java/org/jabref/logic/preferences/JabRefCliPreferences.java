@@ -14,13 +14,11 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.SequencedMap;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
@@ -166,7 +164,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Service
-public class JabRefCliCliPreferences implements CliPreferences {
+public class JabRefCliPreferences implements CliPreferences {
 
     // Push to application preferences
     public static final String PUSH_EMACS_PATH = "emacsPath";
@@ -496,14 +494,14 @@ public class JabRefCliCliPreferences implements CliPreferences {
     private static final String AI_RAG_MAX_RESULTS_COUNT = "aiRagMaxResultsCount";
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliCliPreferences.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final java.util.prefs.Preferences PREFS_NODE = java.util.prefs.Preferences.userRoot().node("/org/jabref");
 
     // SLR
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
 
     // The only instance of this class:
-    private static JabRefCliCliPreferences singleton;
+    private static JabRefCliPreferences singleton;
     /**
      * HashMap that contains all preferences which are set by default
      */
@@ -528,7 +526,6 @@ public class JabRefCliCliPreferences implements CliPreferences {
     private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
     private MrDlibPreferences mrDlibPreferences;
-    private EntryEditorPreferences entryEditorPreferences;
     private FilePreferences filePreferences;
     private GuiPreferences guiPreferences;
     private RemotePreferences remotePreferences;
@@ -563,7 +560,7 @@ public class JabRefCliCliPreferences implements CliPreferences {
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:
      */
-    protected JabRefCliCliPreferences() {
+    protected JabRefCliPreferences() {
         try {
             if (new File("jabref.xml").exists()) {
                 importPreferences(Path.of("jabref.xml"));
@@ -940,11 +937,11 @@ public class JabRefCliCliPreferences implements CliPreferences {
      * @deprecated Use {@link CliPreferences} instead
      */
     @Deprecated
-    public static JabRefCliCliPreferences getInstance() {
-        if (JabRefCliCliPreferences.singleton == null) {
-            JabRefCliCliPreferences.singleton = new JabRefCliCliPreferences();
+    public static JabRefCliPreferences getInstance() {
+        if (JabRefCliPreferences.singleton == null) {
+            JabRefCliPreferences.singleton = new JabRefCliPreferences();
         }
-        return JabRefCliCliPreferences.singleton;
+        return JabRefCliPreferences.singleton;
     }
 
     //*************************************************************************************************************
@@ -1178,7 +1175,7 @@ public class JabRefCliCliPreferences implements CliPreferences {
     /**
      * Returns a list of Strings stored by key+N with N being an incrementing number
      */
-    private List<String> getSeries(String key) {
+    protected List<String> getSeries(String key) {
         int i = 0;
         List<String> series = new ArrayList<>();
         String item;
@@ -1194,7 +1191,7 @@ public class JabRefCliCliPreferences implements CliPreferences {
      *
      * @param number or higher.
      */
-    private void purgeSeries(String prefix, int number) {
+    protected void purgeSeries(String prefix, int number) {
         int n = number;
         while (get(prefix + n) != null) {
             remove(prefix + n);
@@ -1508,118 +1505,6 @@ public class JabRefCliCliPreferences implements CliPreferences {
         EasyBind.listen(groupsPreferences.defaultHierarchicalContextProperty(), (obs, oldValue, newValue) -> put(DEFAULT_HIERARCHICAL_CONTEXT, newValue.name()));
 
         return groupsPreferences;
-    }
-
-    //*************************************************************************************************************
-    // EntryEditorPreferences
-    //*************************************************************************************************************
-
-    @Override
-    public EntryEditorPreferences getEntryEditorPreferences() {
-        if (entryEditorPreferences != null) {
-            return entryEditorPreferences;
-        }
-
-        entryEditorPreferences = new EntryEditorPreferences(
-                getEntryEditorTabs(),
-                getDefaultEntryEditorTabs(),
-                getBoolean(AUTO_OPEN_FORM),
-                getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(SHOW_AI_SUMMARY),
-                getBoolean(SHOW_AI_CHAT),
-                getBoolean(SHOW_LATEX_CITATIONS),
-                getBoolean(DEFAULT_SHOW_SOURCE),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
-                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
-                getDouble(ENTRY_EDITOR_HEIGHT),
-                getBoolean(AUTOLINK_FILES_ENABLED),
-                EntryEditorPreferences.JournalPopupEnabled.fromString(get(JOURNAL_POPUP)),
-                getBoolean(SHOW_SCITE_TAB),
-                getBoolean(SHOW_USER_COMMENTS_FIELDS),
-                getDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS));
-
-        EasyBind.listen(entryEditorPreferences.entryEditorTabs(), (obs, oldValue, newValue) -> storeEntryEditorTabs(newValue));
-        // defaultEntryEditorTabs are read-only
-        EasyBind.listen(entryEditorPreferences.shouldOpenOnNewEntryProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_OPEN_FORM, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowRecommendationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_RECOMMENDATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowAiSummaryTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_AI_SUMMARY, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowAiChatTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_AI_CHAT, newValue));
-        EasyBind.listen(entryEditorPreferences.shouldShowLatexCitationsTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_LATEX_CITATIONS, newValue));
-        EasyBind.listen(entryEditorPreferences.showSourceTabByDefaultProperty(), (obs, oldValue, newValue) -> putBoolean(DEFAULT_SHOW_SOURCE, newValue));
-        EasyBind.listen(entryEditorPreferences.enableValidationProperty(), (obs, oldValue, newValue) -> putBoolean(VALIDATE_IN_ENTRY_EDITOR, newValue));
-        EasyBind.listen(entryEditorPreferences.allowIntegerEditionBibtexProperty(), (obs, oldValue, newValue) -> putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, newValue));
-        EasyBind.listen(entryEditorPreferences.dividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
-        EasyBind.listen(entryEditorPreferences.autoLinkEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(AUTOLINK_FILES_ENABLED, newValue));
-        EasyBind.listen(entryEditorPreferences.enableJournalPopupProperty(), (obs, oldValue, newValue) -> put(JOURNAL_POPUP, newValue.toString()));
-        EasyBind.listen(entryEditorPreferences.shouldShowLSciteTabProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_SCITE_TAB, newValue));
-        EasyBind.listen(entryEditorPreferences.showUserCommentsFieldsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_USER_COMMENTS_FIELDS, newValue));
-        EasyBind.listen(entryEditorPreferences.previewWidthDividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, newValue.doubleValue()));
-        return entryEditorPreferences;
-    }
-
-    /**
-     * Get a Map of defined tab names to default tab fields.
-     *
-     * @return A map of the currently defined tabs in the entry editor from scratch to cache
-     */
-    private Map<String, Set<Field>> getEntryEditorTabs() {
-        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
-        List<String> tabNames = getSeries(CUSTOM_TAB_NAME);
-        List<String> tabFields = getSeries(CUSTOM_TAB_FIELDS);
-
-        if (tabNames.isEmpty() || (tabNames.size() != tabFields.size())) {
-            // Nothing set (or wrong configuration), then we use default values
-            tabNames = getSeries(CUSTOM_TAB_NAME + "_def");
-            tabFields = getSeries(CUSTOM_TAB_FIELDS + "_def");
-        }
-
-        for (int i = 0; i < tabNames.size(); i++) {
-            tabs.put(tabNames.get(i), FieldFactory.parseFieldList(tabFields.get(i)));
-        }
-        return tabs;
-    }
-
-    /**
-     * Stores the defined tabs and corresponding fields in the preferences.
-     *
-     * @param customTabs a map of tab names and the corresponding set of fields to be displayed in
-     */
-    private void storeEntryEditorTabs(Map<String, Set<Field>> customTabs) {
-        String[] names = customTabs.keySet().toArray(String[]::new);
-        String[] fields = customTabs.values().stream()
-                                    .map(set -> set.stream()
-                                                   .map(Field::getName)
-                                                   .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())))
-                                    .toArray(String[]::new);
-
-        for (int i = 0; i < customTabs.size(); i++) {
-            put(CUSTOM_TAB_NAME + i, names[i]);
-            put(CUSTOM_TAB_FIELDS + i, fields[i]);
-        }
-
-        purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
-        purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
-
-        getEntryEditorTabs();
-    }
-
-    private SequencedMap<String, Set<Field>> getDefaultEntryEditorTabs() {
-        SequencedMap<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
-
-        int defNumber = 0;
-        while (true) {
-            // Saved as 'CUSTOMTABNAME_def{number}' and seperated by ';'
-            String name = (String) defaults.get(CUSTOM_TAB_NAME + "_def" + defNumber);
-            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
-
-            if (StringUtil.isNullOrEmpty(name) || StringUtil.isNullOrEmpty(fields)) {
-                break;
-            }
-
-            customTabsMap.put(name, FieldFactory.parseFieldList((String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber)));
-            defNumber++;
-        }
-        return customTabsMap;
     }
 
     //*************************************************************************************************************

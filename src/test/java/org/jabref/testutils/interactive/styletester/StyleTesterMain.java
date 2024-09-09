@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.preferences.JabRefCliCliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.util.HeadlessExecutorService;
 
 /**
@@ -25,7 +25,7 @@ public class StyleTesterMain extends Application {
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
         ThemeManager themeManager = new ThemeManager(
-                JabRefCliCliPreferences.getInstance().getWorkspacePreferences(),
+                JabRefCliPreferences.getInstance().getWorkspacePreferences(),
                 fileUpdateMonitor,
                 Runnable::run);
 

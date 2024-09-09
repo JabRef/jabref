@@ -22,7 +22,7 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SaveConfiguration;
-import org.jabref.logic.preferences.JabRefCliCliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,7 +51,7 @@ class SaveDatabaseActionTest {
     private Path file = Path.of(TEST_BIBTEX_LIBRARY_LOCATION);
     private final DialogService dialogService = mock(DialogService.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-    private final JabRefCliCliPreferences preferences = mock(JabRefCliCliPreferences.class);
+    private final JabRefCliPreferences preferences = mock(JabRefCliPreferences.class);
     private LibraryTab libraryTab = mock(LibraryTab.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
@@ -89,7 +89,7 @@ class SaveDatabaseActionTest {
     void saveShouldShowSaveAsIfDatabaseNotSelected() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
-        when(preferences.getBoolean(JabRefCliCliPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
+        when(preferences.getBoolean(JabRefCliPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(file));
         doReturn(true).when(saveDatabaseAction).saveAs(any(), any());
 
@@ -117,7 +117,7 @@ class SaveDatabaseActionTest {
         when(dbContext.getDatabase()).thenReturn(database);
         when(dbContext.getMetaData()).thenReturn(metaData);
         when(dbContext.getEntries()).thenReturn(database.getEntries());
-        when(preferences.getBoolean(JabRefCliCliPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
+        when(preferences.getBoolean(JabRefCliPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
         when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class));
         when(preferences.getCitationKeyPatternPreferences().getKeyPatterns()).thenReturn(emptyGlobalCitationKeyPatterns);

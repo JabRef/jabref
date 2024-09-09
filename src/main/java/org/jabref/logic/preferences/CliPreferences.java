@@ -7,7 +7,6 @@ import java.util.prefs.BackingStoreException;
 import org.jabref.gui.GuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
@@ -106,8 +105,6 @@ public interface CliPreferences {
     TimestampPreferences getTimestampPreferences();
 
     GroupsPreferences getGroupsPreferences();
-
-    EntryEditorPreferences getEntryEditorPreferences();
 
     RemotePreferences getRemotePreferences();
 

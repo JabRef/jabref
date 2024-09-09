@@ -29,7 +29,7 @@ import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
-import org.jabref.logic.preferences.JabRefCliCliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
@@ -56,7 +56,7 @@ public class JabRefGUI extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
     private static List<UiCommand> uiCommands;
-    private static JabRefCliCliPreferences preferencesService;
+    private static JabRefCliPreferences preferencesService;
     private static FileUpdateMonitor fileUpdateMonitor;
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
@@ -76,7 +76,7 @@ public class JabRefGUI extends Application {
     private Stage mainStage;
 
     public static void setup(List<UiCommand> uiCommands,
-                             JabRefCliCliPreferences preferencesService,
+                             JabRefCliPreferences preferencesService,
                              FileUpdateMonitor fileUpdateMonitor) {
         JabRefGUI.uiCommands = uiCommands;
         JabRefGUI.preferencesService = preferencesService;
