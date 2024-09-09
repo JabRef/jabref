@@ -17,9 +17,27 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPreferences {
 
+    private static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
+
+    /**
+     * Holds the horizontal divider position of the preview view when it is shown inside the entry editor
+     */
+    private static final String ENTRY_EDITOR_PREVIEW_DIVIDER_POS = "entryEditorPreviewDividerPos";
+
+    private static final String JOURNAL_POPUP = "journalPopup";
+
     private static JabRefGuiPreferences singleton;
 
     private EntryEditorPreferences entryEditorPreferences;
+
+    private JabRefGuiPreferences() {
+        super();
+
+        defaults.put(JOURNAL_POPUP, EntryEditorPreferences.JournalPopupEnabled.FIRST_START.toString());
+
+        defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
+        defaults.put(ENTRY_EDITOR_PREVIEW_DIVIDER_POS, 0.5);
+    }
 
     @Deprecated
     public static JabRefGuiPreferences getInstance() {
