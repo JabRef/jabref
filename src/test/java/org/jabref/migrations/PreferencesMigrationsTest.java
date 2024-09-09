@@ -3,10 +3,9 @@ package org.jabref.migrations;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.when;
 class PreferencesMigrationsTest {
 
     private JabRefPreferences prefs;
-    private Preferences mainPrefsNode;
+    private java.util.prefs.Preferences mainPrefsNode;
 
     private final String[] oldStylePatterns = new String[]{"\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
@@ -36,8 +35,8 @@ class PreferencesMigrationsTest {
     @BeforeEach
     void setUp() {
         prefs = mock(JabRefPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        Injector.setModelOrService(PreferencesService.class, prefs);
-        mainPrefsNode = mock(Preferences.class);
+        Injector.setModelOrService(Preferences.class, prefs);
+        mainPrefsNode = mock(java.util.prefs.Preferences.class);
     }
 
     @Test

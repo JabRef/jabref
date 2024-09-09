@@ -34,7 +34,7 @@ import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -64,16 +64,16 @@ public class MainTableDataModel {
     private Optional<MatcherSet> groupsMatcher;
 
     public MainTableDataModel(BibDatabaseContext context,
-                              PreferencesService preferencesService,
+                              Preferences preferences,
                               TaskExecutor taskExecutor,
                               StateManager stateManager,
                               @Nullable LuceneManager luceneManager,
                               ListProperty<GroupTreeNode> selectedGroupsProperty,
                               OptionalObjectProperty<SearchQuery> searchQueryProperty,
                               IntegerProperty resultSizeProperty) {
-        this.groupsPreferences = preferencesService.getGroupsPreferences();
-        this.searchPreferences = preferencesService.getSearchPreferences();
-        this.nameDisplayPreferences = preferencesService.getNameDisplayPreferences();
+        this.groupsPreferences = preferences.getGroupsPreferences();
+        this.searchPreferences = preferences.getSearchPreferences();
+        this.nameDisplayPreferences = preferences.getNameDisplayPreferences();
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
         this.luceneManager = luceneManager;
@@ -92,7 +92,7 @@ public class MainTableDataModel {
         searchQuerySubscription = EasyBind.listen(searchQueryProperty, (observable, oldValue, newValue) -> updateSearchMatches(newValue));
         searchDisplayModeSubscription = EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (observable, oldValue, newValue) -> updateSearchDisplayMode(newValue));
         selectedGroupsSubscription = EasyBind.listen(selectedGroupsProperty, (observable, oldValue, newValue) -> updateGroupMatches(newValue));
-        groupViewModeSubscription = EasyBind.listen(preferencesService.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(selectedGroupsProperty.get()));
+        groupViewModeSubscription = EasyBind.listen(preferences.getGroupsPreferences().groupViewModeProperty(), observable -> updateGroupMatches(selectedGroupsProperty.get()));
 
         resultSizeProperty.bind(Bindings.size(entriesFiltered.filtered(entry -> entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS).get())));
         // We need to wrap the list since otherwise sorting in the table does not work

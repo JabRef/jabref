@@ -20,7 +20,7 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -31,7 +31,7 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
     @FXML private Button generateCitationKeyButton;
     @FXML private EditorTextField textField;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private Preferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
@@ -51,14 +51,14 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
                 field,
                 suggestionProvider,
                 fieldCheckers,
-                preferencesService,
+                preferences,
                 databaseContext,
                 undoManager,
                 dialogService);
 
         establishBinding(textField, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
         textField.initContextMenu(Collections::emptyList, keyBindingRepository);
-        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public CitationKeyEditorViewModel getViewModel() {

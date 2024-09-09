@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
-import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -172,7 +171,7 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 @Service
-public class JabRefPreferences implements PreferencesService {
+public class JabRefPreferences implements Preferences {
 
     // Push to application preferences
     public static final String PUSH_EMACS_PATH = "emacsPath";
@@ -503,7 +502,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String AI_RAG_MIN_SCORE = "aiRagMinScore";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
-    private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
+    private static final java.util.prefs.Preferences PREFS_NODE = java.util.prefs.Preferences.userRoot().node("/org/jabref");
 
     // SLR
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
@@ -515,7 +514,7 @@ public class JabRefPreferences implements PreferencesService {
      */
     public final Map<String, Object> defaults = new HashMap<>();
 
-    private final Preferences prefs;
+    private final java.util.prefs.Preferences prefs;
 
     /**
      * Cache variables
@@ -941,7 +940,7 @@ public class JabRefPreferences implements PreferencesService {
 
     /**
      * @return Instance of JaRefPreferences
-     * @deprecated Use {@link PreferencesService} instead
+     * @deprecated Use {@link Preferences} instead
      */
     @Deprecated
     public static JabRefPreferences getInstance() {
@@ -1154,7 +1153,7 @@ public class JabRefPreferences implements PreferencesService {
         return defaults;
     }
 
-    private void addPrefsRecursively(Preferences prefs, Map<String, Object> result) throws BackingStoreException {
+    private void addPrefsRecursively(java.util.prefs.Preferences prefs, Map<String, Object> result) throws BackingStoreException {
         for (String key : prefs.keys()) {
             result.put(key, getObject(prefs, key));
         }
@@ -1163,7 +1162,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private Object getObject(Preferences prefs, String key) {
+    private Object getObject(java.util.prefs.Preferences prefs, String key) {
         try {
             return prefs.get(key, (String) defaults.get(key));
         } catch (ClassCastException e) {
@@ -1234,7 +1233,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
-            Preferences.importPreferences(is);
+            java.util.prefs.Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException
                  | IOException ex) {
             throw new JabRefException(
@@ -1304,7 +1303,7 @@ public class JabRefPreferences implements PreferencesService {
 
     private List<BibEntryType> getBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
         List<BibEntryType> storedEntryTypes = new ArrayList<>();
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        java.util.prefs.Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
         try {
             Arrays.stream(prefsNode.keys())
                   .map(key -> prefsNode.get(key, null))
@@ -1324,7 +1323,7 @@ public class JabRefPreferences implements PreferencesService {
 
     private void clearBibEntryTypes(BibDatabaseMode mode) {
         try {
-            Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
+            java.util.prefs.Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
             prefsNode.clear();
             prefsNode.flush();
         } catch (BackingStoreException e) {
@@ -1340,7 +1339,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        java.util.prefs.Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
 
         try {
             // clear old custom types
@@ -1355,7 +1354,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
+    private static java.util.prefs.Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBTEX
                 ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)
                 : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
@@ -1733,7 +1732,7 @@ public class JabRefPreferences implements PreferencesService {
 
     private GlobalCitationKeyPatterns getGlobalCitationKeyPattern() {
         GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
-        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
+        java.util.prefs.Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
             for (String key : keys) {
@@ -1758,7 +1757,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         // Store overridden definitions to Preferences.
-        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
+        java.util.prefs.Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
@@ -1774,7 +1773,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private void clearCitationKeyPatterns() throws BackingStoreException {
-        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
+        java.util.prefs.Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
         getCitationKeyPatternPreferences().setKeyPatterns(getGlobalCitationKeyPattern());
     }

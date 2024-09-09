@@ -26,7 +26,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -63,7 +63,7 @@ class CommentsTabTest {
     @Mock
     private DialogService dialogService;
     @Mock
-    private PreferencesService preferences;
+    private Preferences preferences;
     @Mock
     private StateManager stateManager;
     @Mock

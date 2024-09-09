@@ -18,7 +18,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -66,7 +66,7 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(fieldsAreSet);
     }
 
-    public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, PreferencesService preferencesService) {
+    public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, Preferences preferences) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         Binding<Boolean> fileIsPresent = EasyBind.valueAt(selectedEntries, 0).mapOpt(entry -> {
             List<LinkedFile> files = entry.getFiles();
@@ -79,7 +79,7 @@ public class ActionHelper {
                 Optional<Path> filename = FileUtil.find(
                         stateManager.getActiveDatabase().get(),
                         files.getFirst().getLink(),
-                        preferencesService.getFilePreferences());
+                        preferences.getFilePreferences());
                 return filename.isPresent();
             } else {
                 return false;

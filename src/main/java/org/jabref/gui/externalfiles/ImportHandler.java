@@ -54,7 +54,7 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
@@ -67,7 +67,7 @@ public class ImportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
     private final BibDatabaseContext bibDatabaseContext;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final ExternalFilesEntryLinker linker;
     private final ExternalFilesContentImporter contentImporter;
@@ -77,7 +77,7 @@ public class ImportHandler {
     private final TaskExecutor taskExecutor;
 
     public ImportHandler(BibDatabaseContext database,
-                         PreferencesService preferences,
+                         Preferences preferences,
                          FileUpdateMonitor fileupdateMonitor,
                          UndoManager undoManager,
                          StateManager stateManager,

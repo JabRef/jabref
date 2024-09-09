@@ -14,14 +14,14 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class ISSNEditorViewModel extends AbstractEditorViewModel {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final UndoManager undoManager;
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
 
     public ISSNEditorViewModel(
             Field field,
@@ -31,13 +31,13 @@ public class ISSNEditorViewModel extends AbstractEditorViewModel {
             DialogService dialogService,
             UndoManager undoManager,
             StateManager stateManager,
-            PreferencesService preferencesService) {
+            Preferences preferences) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
     }
 
     public void showJournalInfo(Button journalInfoButton) {
@@ -46,7 +46,7 @@ public class ISSNEditorViewModel extends AbstractEditorViewModel {
 
     public void fetchBibliographyInformation(BibEntry bibEntry) {
         stateManager.getActiveDatabase().ifPresentOrElse(
-                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferencesService, dialogService, undoManager)
+                databaseContext -> new FetchAndMergeEntry(databaseContext, taskExecutor, preferences, dialogService, undoManager)
                         .fetchAndMerge(bibEntry, StandardField.ISSN),
                 () -> dialogService.notify(Localization.lang("No library selected"))
         );

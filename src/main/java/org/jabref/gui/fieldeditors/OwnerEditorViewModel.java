@@ -5,14 +5,14 @@ import javax.swing.undo.UndoManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class OwnerEditorViewModel extends AbstractEditorViewModel {
-    private final PreferencesService preferences;
+    private final Preferences preferences;
 
     public OwnerEditorViewModel(Field field,
                                 SuggestionProvider<?> suggestionProvider,
-                                PreferencesService preferences,
+                                Preferences preferences,
                                 FieldCheckers fieldCheckers,
                                 UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);

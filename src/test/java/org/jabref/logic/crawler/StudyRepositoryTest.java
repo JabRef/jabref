@@ -28,7 +28,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 class StudyRepositoryTest {
     private static final String NON_EXISTING_DIRECTORY = "nonExistingTestRepositoryDirectory";
     CitationKeyPatternPreferences citationKeyPatternPreferences;
-    PreferencesService preferencesService;
+    Preferences preferences;
     LibraryPreferences libraryPreferences;
     ImportFormatPreferences importFormatPreferences;
     SaveConfiguration saveConfiguration;
@@ -67,7 +67,7 @@ class StudyRepositoryTest {
         libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -79,11 +79,11 @@ class StudyRepositoryTest {
                 GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
                 "",
                 ',');
-        when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
-        when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(preferences.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferencesService.getTimestampPreferences().getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getTimestampPreferences().getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
         getTestStudyRepository();
     }
@@ -95,7 +95,7 @@ class StudyRepositoryTest {
         assertThrows(IOException.class, () -> new StudyRepository(
                 nonExistingRepositoryDirectory,
                 gitHandler,
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 entryTypesManager));
     }
@@ -168,7 +168,7 @@ class StudyRepositoryTest {
         studyRepository = new StudyRepository(
                 tempRepositoryDirectory,
                 gitHandler,
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 entryTypesManager);
         return studyRepository;

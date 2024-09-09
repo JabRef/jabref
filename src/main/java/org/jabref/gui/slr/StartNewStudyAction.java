@@ -16,7 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.study.Study;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
                                Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
                                FileUpdateMonitor fileUpdateMonitor,
                                TaskExecutor taskExecutor,
-                               PreferencesService preferencesService,
+                               Preferences preferences,
                                StateManager stateManager,
                                DialogService dialogService) {
         super(tabContainer,
@@ -50,7 +50,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
                 dialogService,
                 fileUpdateMonitor,
                 taskExecutor,
-                preferencesService,
+                preferences,
                 stateManager,
                 true);
     }
@@ -70,7 +70,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
     @Override
     public void execute() {
         Optional<SlrStudyAndDirectory> studyAndDirectory = dialogService.showCustomDialogAndWait(
-                new ManageStudyDefinitionView(preferencesService.getFilePreferences().getWorkingDirectory()));
+                new ManageStudyDefinitionView(preferences.getFilePreferences().getWorkingDirectory()));
         if (studyAndDirectory.isEmpty()) {
             return;
         }

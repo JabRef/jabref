@@ -33,7 +33,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -76,7 +76,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private Label directoryWarning;
 
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService prefs;
+    @Inject private Preferences prefs;
     @Inject private ThemeManager themeManager;
 
     private ManageStudyDefinitionViewModel viewModel;

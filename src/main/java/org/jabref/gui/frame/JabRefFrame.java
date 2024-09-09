@@ -54,7 +54,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -75,7 +75,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
     private final SplitPane splitPane = new SplitPane();
-    private final PreferencesService prefs;
+    private final Preferences prefs;
     private final AiService aiService;
     private final ChatHistoryService chatHistoryService;
     private final GlobalSearchBar globalSearchBar;
@@ -104,7 +104,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     public JabRefFrame(Stage mainStage,
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
-                       PreferencesService preferencesService,
+                       Preferences preferences,
                        AiService aiService,
                        ChatHistoryService chatHistoryService,
                        StateManager stateManager,
@@ -115,7 +115,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.prefs = preferencesService;
+        this.prefs = preferences;
         this.aiService = aiService;
         this.chatHistoryService = chatHistoryService;
         this.stateManager = stateManager;
@@ -128,7 +128,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         // Create components
         this.viewModel = new JabRefFrameViewModel(
-                preferencesService,
+                preferences,
                 aiService,
                 stateManager,
                 dialogService,

@@ -14,7 +14,7 @@ import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
@@ -29,20 +29,20 @@ import static org.mockito.Mockito.when;
 @FetcherTest("Downloads a PDF file")
 class LinkedFilesEditorViewModelTest {
     private LinkedFilesEditorViewModel viewModel;
-    private final PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+    private final Preferences preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
     private final FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
     private final UndoManager undoManager = mock(UndoManager.class);
 
     @Test
     void urlFieldShouldDownloadFile(@TempDir Path tempDir) {
-        when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempDir));
 
         viewModel = new LinkedFilesEditorViewModel(StandardField.FILE, new EmptySuggestionProvider(), mock(DialogService.class), bibDatabaseContext,
-                           new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferencesService, undoManager);
+                           new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferences, undoManager);
 
         BibEntry entry = new BibEntry().withCitationKey("test")
             .withField(StandardField.URL, "https://ceur-ws.org/Vol-847/paper6.pdf");

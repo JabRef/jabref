@@ -31,7 +31,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -44,7 +44,7 @@ public class EntryTypeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeViewModel.class);
 
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final BooleanProperty searchingProperty = new SimpleBooleanProperty();
     private final BooleanProperty searchSuccesfulProperty = new SimpleBooleanProperty();
     private final ObjectProperty<IdBasedFetcher> selectedItemProperty = new SimpleObjectProperty<>();
@@ -59,14 +59,14 @@ public class EntryTypeViewModel {
     private final UiTaskExecutor taskExecutor;
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    public EntryTypeViewModel(PreferencesService preferences,
+    public EntryTypeViewModel(Preferences preferences,
                               LibraryTab libraryTab,
                               DialogService dialogService,
                               StateManager stateManager,
                               UiTaskExecutor taskExecutor,
                               FileUpdateMonitor fileUpdateMonitor) {
         this.libraryTab = libraryTab;
-        this.preferencesService = preferences;
+        this.preferences = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
@@ -107,15 +107,15 @@ public class EntryTypeViewModel {
     }
 
     public void storeSelectedFetcher() {
-        preferencesService.getGuiPreferences().setLastSelectedIdBasedFetcher(selectedItemProperty.getValue().getName());
+        preferences.getGuiPreferences().setLastSelectedIdBasedFetcher(selectedItemProperty.getValue().getName());
     }
 
     private IdBasedFetcher getLastSelectedFetcher() {
         return fetchers.stream().filter(fetcher -> fetcher.getName()
-                                                          .equals(preferencesService.getGuiPreferences()
-                                                                                    .getLastSelectedIdBasedFetcher()))
+                                                          .equals(preferences.getGuiPreferences()
+                                                                             .getLastSelectedIdBasedFetcher()))
                        .findFirst()
-                       .orElse(new DoiFetcher(preferencesService.getImportFormatPreferences()));
+                       .orElse(new DoiFetcher(preferences.getImportFormatPreferences()));
     }
 
     public ListProperty<IdBasedFetcher> fetcherItemsProperty() {
@@ -175,7 +175,7 @@ public class EntryTypeViewModel {
 
                 ImportHandler handler = new ImportHandler(
                         libraryTab.getBibDatabaseContext(),
-                        preferencesService,
+                        preferences,
                         fileUpdateMonitor,
                         libraryTab.getUndoManager(),
                         stateManager,
@@ -202,7 +202,7 @@ public class EntryTypeViewModel {
                             () -> libraryTab,
                             StandardEntryType.Article,
                             dialogService,
-                            preferencesService,
+                            preferences,
                             stateManager).execute();
                     searchSuccesfulProperty.set(true);
                 }

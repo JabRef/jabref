@@ -22,7 +22,7 @@ import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -33,7 +33,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextArea textArea;
 
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferencesService;
+    @Inject private Preferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private UndoManager undoManager;
 
@@ -46,17 +46,17 @@ public class UrlEditor extends HBox implements FieldEditorFX {
                   .root(this)
                   .load();
 
-        this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, preferencesService, fieldCheckers, undoManager);
+        this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, preferences, fieldCheckers, undoManager);
 
         establishBinding(textArea, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
 
         Supplier<List<MenuItem>> contextMenuSupplier = EditorMenus.getCleanupUrlMenu(textArea);
-        textArea.initContextMenu(contextMenuSupplier, preferencesService.getKeyBindingRepository());
+        textArea.initContextMenu(contextMenuSupplier, preferences.getKeyBindingRepository());
 
         // init paste handler for UrlEditor to format pasted url link in textArea
         textArea.setPasteActionHandler(() -> textArea.setText(new CleanupUrlFormatter().format(new TrimWhitespaceFormatter().format(textArea.getText()))));
 
-        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public UrlEditorViewModel getViewModel() {

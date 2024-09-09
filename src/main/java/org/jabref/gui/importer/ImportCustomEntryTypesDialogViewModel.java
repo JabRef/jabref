@@ -10,7 +10,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -21,14 +21,14 @@ public class ImportCustomEntryTypesDialogViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomEntryTypesDialogViewModel.class);
 
     private final BibDatabaseMode mode;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
 
     private final ObservableList<BibEntryType> newTypes = FXCollections.observableArrayList();
     private final ObservableList<BibEntryTypePrefsAndFileViewModel> differentCustomizationTypes = FXCollections.observableArrayList();
 
-    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode, List<BibEntryType> entryTypes, PreferencesService preferencesService) {
+    public ImportCustomEntryTypesDialogViewModel(BibDatabaseMode mode, List<BibEntryType> entryTypes, Preferences preferences) {
         this.mode = mode;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
 
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         for (BibEntryType customType : entryTypes) {
@@ -57,11 +57,11 @@ public class ImportCustomEntryTypesDialogViewModel {
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         if (!checkedUnknownEntryTypes.isEmpty()) {
             checkedUnknownEntryTypes.forEach(type -> entryTypesManager.addCustomOrModifiedType(type, mode));
-            preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
+            preferences.storeCustomEntryTypesRepository(entryTypesManager);
         }
         if (!checkedDifferentEntryTypes.isEmpty()) {
             checkedUnknownEntryTypes.forEach(type -> entryTypesManager.addCustomOrModifiedType(type, mode));
-            preferencesService.storeCustomEntryTypesRepository(entryTypesManager);
+            preferences.storeCustomEntryTypesRepository(entryTypesManager);
         }
     }
 }

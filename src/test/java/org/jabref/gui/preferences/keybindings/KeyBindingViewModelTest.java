@@ -8,7 +8,7 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;
@@ -24,11 +24,11 @@ class KeyBindingViewModelTest {
     void resetToDefault() {
         // Set new key binding
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
-        PreferencesService preferencesService = mock(PreferencesService.class);
-        when(preferencesService.getKeyBindingRepository()).thenReturn(keyBindingRepository);
-        Injector.setModelOrService(PreferencesService.class, preferencesService);
+        Preferences preferences = mock(Preferences.class);
+        when(preferences.getKeyBindingRepository()).thenReturn(keyBindingRepository);
+        Injector.setModelOrService(Preferences.class, preferences);
 
-        KeyBindingsTabViewModel keyBindingsTabViewModel = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), preferencesService);
+        KeyBindingsTabViewModel keyBindingsTabViewModel = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), preferences);
         KeyBinding binding = KeyBinding.ABBREVIATE;
 
         KeyBindingViewModel viewModel = new KeyBindingViewModel(keyBindingRepository, binding, binding.getDefaultKeyBinding());

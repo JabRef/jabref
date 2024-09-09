@@ -32,7 +32,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private ParserResult parserResult = null;
     private final ObservableList<BibEntry> entries;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final ObjectProperty<BibDatabaseContext> selectedDb;
 
@@ -63,7 +63,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                   BibDatabaseContext databaseContext,
                                   DialogService dialogService,
                                   UndoManager undoManager,
-                                  PreferencesService preferences,
+                                  Preferences preferences,
                                   StateManager stateManager,
                                   BibEntryTypesManager entryTypesManager,
                                   FileUpdateMonitor fileUpdateMonitor) {

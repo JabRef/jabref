@@ -14,7 +14,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,14 +31,14 @@ class CustomEntryTypesTabViewModelTest {
 
     private BibEntryTypesManager entryTypesManager;
     private FieldPreferences fieldPreferences;
-    private PreferencesService preferencesService;
+    private Preferences preferences;
 
     @BeforeEach
     void setup() {
-        preferencesService = mock(PreferencesService.class);
+        preferences = mock(Preferences.class);
         fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
-        when(preferencesService.getFieldPreferences()).thenReturn(fieldPreferences);
+        when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
         entryTypesManager = new BibEntryTypesManager();
         online = BiblatexEntryTypeDefinitions.ALL.stream().filter(type -> type.getType().equals(StandardEntryType.Online)).findAny().get();
     }
@@ -46,7 +46,7 @@ class CustomEntryTypesTabViewModelTest {
     @ParameterizedTest
     @EnumSource(BibDatabaseMode.class)
     void storeSettingsKeepsStandardTypes(BibDatabaseMode mode) {
-        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(mode, entryTypesManager, mock(DialogService.class), preferencesService);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(mode, entryTypesManager, mock(DialogService.class), preferences);
         model.setValues();
         model.storeSettings();
         assertEquals(new TreeSet<>(), entryTypesManager.getAllCustomizedTypes(mode));
@@ -54,7 +54,7 @@ class CustomEntryTypesTabViewModelTest {
 
     @Test
     void storeSettingsKeepsTypeWhenOrFieldsDiffersOnly() {
-        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferencesService);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
         model.setValues();
 
         // This is similar ot the standard online type, but has no OR fields
@@ -75,7 +75,7 @@ class CustomEntryTypesTabViewModelTest {
 
     @Test
     void storeSettingsUpdatesType() {
-        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferencesService);
+        CustomEntryTypesTabViewModel model = new CustomEntryTypesTabViewModel(BibDatabaseMode.BIBLATEX, entryTypesManager, mock(DialogService.class), preferences);
         model.setValues();
 
         // No important optional fields anymore (they are required now)

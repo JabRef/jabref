@@ -35,7 +35,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.ParseException;
@@ -62,7 +62,7 @@ public class Launcher {
 
             // Initialize preferences
             final JabRefPreferences preferences = JabRefPreferences.getInstance();
-            Injector.setModelOrService(PreferencesService.class, preferences);
+            Injector.setModelOrService(Preferences.class, preferences);
 
             // Early exit in case another instance is already running
             if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {

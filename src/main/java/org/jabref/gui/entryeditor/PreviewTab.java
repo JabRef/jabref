@@ -11,13 +11,13 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class PreviewTab extends EntryEditorTab implements OffersPreview {
     public static final String NAME = "Preview";
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final ThemeManager themeManager;
     private final TaskExecutor taskExecutor;
     private final LuceneManager luceneManager;
@@ -26,7 +26,7 @@ public class PreviewTab extends EntryEditorTab implements OffersPreview {
 
     public PreviewTab(BibDatabaseContext databaseContext,
                       DialogService dialogService,
-                      PreferencesService preferences,
+                      Preferences preferences,
                       ThemeManager themeManager,
                       TaskExecutor taskExecutor,
                       LuceneManager luceneManager,

@@ -20,11 +20,11 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class SidePane extends VBox {
     private final SidePaneViewModel viewModel;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final StateManager stateManager;
 
     // These bindings need to be stored, otherwise they are garbage collected
@@ -32,7 +32,7 @@ public class SidePane extends VBox {
     private final Map<SidePaneType, BooleanBinding> visibleBindings = new HashMap<>();
 
     public SidePane(LibraryTabContainer tabContainer,
-                    PreferencesService preferencesService,
+                    Preferences preferences,
                     ChatHistoryService chatHistoryService,
                     JournalAbbreviationRepository abbreviationRepository,
                     TaskExecutor taskExecutor,
@@ -43,10 +43,10 @@ public class SidePane extends VBox {
                     ClipBoardManager clipBoardManager,
                     UndoManager undoManager) {
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.viewModel = new SidePaneViewModel(
                 tabContainer,
-                preferencesService,
+                preferences,
                 chatHistoryService,
                 abbreviationRepository,
                 stateManager,
@@ -78,7 +78,7 @@ public class SidePane extends VBox {
     }
 
     public SimpleCommand getToggleCommandFor(SidePaneType sidePane) {
-        return new TogglePaneAction(stateManager, sidePane, preferencesService.getSidePanePreferences());
+        return new TogglePaneAction(stateManager, sidePane, preferences.getSidePanePreferences());
     }
 
     public SidePaneComponent getSidePaneComponent(SidePaneType type) {

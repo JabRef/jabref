@@ -27,7 +27,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -51,18 +51,18 @@ public class ExportToClipboardAction extends SimpleCommand {
     private final List<BibEntry> entries = new ArrayList<>();
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final StateManager stateManager;
 
     public ExportToClipboardAction(DialogService dialogService,
                                    StateManager stateManager,
                                    ClipBoardManager clipBoardManager,
                                    TaskExecutor taskExecutor,
-                                   PreferencesService preferencesService) {
+                                   Preferences preferences) {
         this.dialogService = dialogService;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
-        this.preferences = preferencesService;
+        this.preferences = preferences;
         this.stateManager = stateManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));

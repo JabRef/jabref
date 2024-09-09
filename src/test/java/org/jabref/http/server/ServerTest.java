@@ -11,7 +11,7 @@ import org.jabref.http.dto.GsonFactory;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.google.gson.Gson;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
  */
 abstract class ServerTest extends JerseyTest {
 
-    private static PreferencesService preferencesService;
+    private static Preferences preferences;
     private static GuiPreferences guiPreferences;
 
     @BeforeAll
@@ -58,7 +58,7 @@ abstract class ServerTest extends JerseyTest {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(preferencesService).to(PreferencesService.class).ranked(2);
+                bind(preferences).to(Preferences.class).ranked(2);
             }
         });
     }
@@ -72,17 +72,17 @@ abstract class ServerTest extends JerseyTest {
     }
 
     private static void initializePreferencesService() {
-        preferencesService = mock(PreferencesService.class);
+        preferences = mock(Preferences.class);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
 
         BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(bibEntryPreferences);
         when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
 
         FieldPreferences fieldWriterPreferences = mock(FieldPreferences.class);
-        when(preferencesService.getFieldPreferences()).thenReturn(fieldWriterPreferences);
+        when(preferences.getFieldPreferences()).thenReturn(fieldWriterPreferences);
         when(fieldWriterPreferences.shouldResolveStrings()).thenReturn(false);
 
         // defaults are in {@link org.jabref.preferences.JabRefPreferences.NON_WRAPPABLE_FIELDS}
@@ -91,7 +91,7 @@ abstract class ServerTest extends JerseyTest {
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);
 
         guiPreferences = mock(GuiPreferences.class);
-        when(preferencesService.getGuiPreferences()).thenReturn(guiPreferences);
+        when(preferences.getGuiPreferences()).thenReturn(guiPreferences);
 
         when(guiPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path));
     }

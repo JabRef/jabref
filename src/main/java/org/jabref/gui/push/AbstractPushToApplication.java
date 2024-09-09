@@ -14,7 +14,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
@@ -33,11 +33,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected String commandPath;
 
     protected final DialogService dialogService;
-    protected final PreferencesService preferencesService;
+    protected final Preferences preferences;
 
-    public AbstractPushToApplication(DialogService dialogService, PreferencesService preferencesService) {
+    public AbstractPushToApplication(DialogService dialogService, Preferences preferences) {
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
     }
 
     @Override
@@ -66,7 +66,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
         if (StringUtil.isNullOrEmpty(commandPath)) {
@@ -149,20 +149,20 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     protected String getCitePrefix() {
-        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().prefix();
+        return preferences.getExternalApplicationsPreferences().getCiteCommand().prefix();
     }
 
     public String getDelimiter() {
-        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().delimiter();
+        return preferences.getExternalApplicationsPreferences().getCiteCommand().delimiter();
     }
 
     protected String getCiteSuffix() {
-        return preferencesService.getExternalApplicationsPreferences().getCiteCommand().suffix();
+        return preferences.getExternalApplicationsPreferences().getCiteCommand().suffix();
     }
 
     @Override
     public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToApplicationSettings(application, dialogService, preferencesService.getFilePreferences(), preferences);
+        return new PushToApplicationSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
     }
 
     protected class PushToApplicationAction implements Action {

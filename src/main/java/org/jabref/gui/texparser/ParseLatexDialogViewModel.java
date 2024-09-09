@@ -33,7 +33,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -49,7 +49,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final FileUpdateMonitor fileMonitor;
     private final StringProperty latexFileDirectory;
     private final Validator latexDirectoryValidator;
@@ -62,15 +62,15 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     public ParseLatexDialogViewModel(BibDatabaseContext databaseContext,
                                      DialogService dialogService,
                                      TaskExecutor taskExecutor,
-                                     PreferencesService preferencesService,
+                                     Preferences preferences,
                                      FileUpdateMonitor fileMonitor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.fileMonitor = fileMonitor;
-        this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
-                                                                          .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()))
+        this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                                                          .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()))
                                                                           .toAbsolutePath().toString());
         this.root = new SimpleObjectProperty<>();
         this.checkedFileList = FXCollections.observableArrayList();
@@ -117,7 +117,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
             latexFileDirectory.set(selectedDirectory.toAbsolutePath().toString());
-            preferencesService.getFilePreferences().setWorkingDirectory(selectedDirectory.toAbsolutePath());
+            preferences.getFilePreferences().setWorkingDirectory(selectedDirectory.toAbsolutePath());
         });
     }
 
@@ -204,7 +204,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(
                 databaseContext.getDatabase(),
-                preferencesService.getImportFormatPreferences(),
+                preferences.getImportFormatPreferences(),
                 fileMonitor);
 
         BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))

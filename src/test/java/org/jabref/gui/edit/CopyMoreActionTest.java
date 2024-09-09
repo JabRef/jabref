@@ -21,7 +21,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class CopyMoreActionTest {
 
     private final DialogService dialogService = spy(DialogService.class);
     private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
-    private final PreferencesService preferencesService = mock(PreferencesService.class);
+    private final Preferences preferences = mock(Preferences.class);
     private final JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     private final StateManager stateManager = mock(StateManager.class);
     private final List<String> titles = new ArrayList<>();
@@ -63,14 +63,14 @@ class CopyMoreActionTest {
 
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
         when(externalApplicationsPreferences.getCiteCommand()).thenReturn(new CitationCommandString("\\cite{", ",", "}"));
-        when(preferencesService.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
     }
 
     @Test
     void executeOnFail() {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
@@ -86,7 +86,7 @@ class CopyMoreActionTest {
 
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoTitles);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
@@ -102,7 +102,7 @@ class CopyMoreActionTest {
 
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         String copiedTitles = String.join("\n", titles);
@@ -118,7 +118,7 @@ class CopyMoreActionTest {
 
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithTitles);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         String copiedTitles = String.join("\n", titles);
@@ -136,7 +136,7 @@ class CopyMoreActionTest {
 
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoKeys);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
@@ -152,7 +152,7 @@ class CopyMoreActionTest {
 
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         String copiedKeys = String.join("\n", keys);
@@ -168,7 +168,7 @@ class CopyMoreActionTest {
 
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithKeys);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         String copiedKeys = String.join("\n", keys);
@@ -186,7 +186,7 @@ class CopyMoreActionTest {
 
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoDois);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
@@ -202,7 +202,7 @@ class CopyMoreActionTest {
 
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         String copiedDois = String.join("\n", dois);
@@ -218,7 +218,7 @@ class CopyMoreActionTest {
 
         when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(entriesWithDois);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferencesService, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         String copiedDois = String.join("\n", dois);

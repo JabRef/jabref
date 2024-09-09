@@ -33,7 +33,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class OtherFieldsTab extends FieldsEditorTab {
 
@@ -47,7 +47,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                           UndoAction undoAction,
                           RedoAction redoAction,
                           DialogService dialogService,
-                          PreferencesService preferences,
+                          Preferences preferences,
                           ThemeManager themeManager,
                           BibEntryTypesManager entryTypesManager,
                           TaskExecutor taskExecutor,

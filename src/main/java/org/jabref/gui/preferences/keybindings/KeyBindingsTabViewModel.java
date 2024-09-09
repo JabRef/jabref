@@ -24,12 +24,12 @@ import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.NewEntryBindingPreset;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private final KeyBindingRepository keyBindingRepository;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final OptionalObjectProperty<KeyBindingViewModel> selectedKeyBinding = OptionalObjectProperty.empty();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
     private final ListProperty<KeyBindingPreset> keyBindingPresets = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -38,7 +38,7 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarning = new ArrayList<>();
 
-    public KeyBindingsTabViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, PreferencesService preferences) {
+    public KeyBindingsTabViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, Preferences preferences) {
         this.keyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);

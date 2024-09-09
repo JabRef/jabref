@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 public class PreferencesFilter {
 
-    private final PreferencesService preferences;
+    private final Preferences preferences;
 
-    public PreferencesFilter(PreferencesService preferences) {
+    public PreferencesFilter(Preferences preferences) {
         this.preferences = preferences;
     }
 

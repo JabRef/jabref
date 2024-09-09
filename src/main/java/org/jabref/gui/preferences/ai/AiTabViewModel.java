@@ -26,7 +26,7 @@ import org.jabref.logic.util.LocalizedNumbers;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -97,10 +97,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Validator ragMinScoreTypeValidator;
     private final Validator ragMinScoreRangeValidator;
 
-    public AiTabViewModel(PreferencesService preferencesService) {
+    public AiTabViewModel(Preferences preferences) {
         this.oldLocale = Locale.getDefault();
 
-        this.aiPreferences = preferencesService.getAiPreferences();
+        this.aiPreferences = preferences.getAiPreferences();
 
         this.enableAi.addListener((observable, oldValue, newValue) -> {
             disableBasicSettings.set(!newValue);

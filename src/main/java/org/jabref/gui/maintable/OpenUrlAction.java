@@ -15,15 +15,15 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class OpenUrlAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
 
-    public OpenUrlAction(DialogService dialogService, StateManager stateManager, PreferencesService preferences) {
+    public OpenUrlAction(DialogService dialogService, StateManager stateManager, Preferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;

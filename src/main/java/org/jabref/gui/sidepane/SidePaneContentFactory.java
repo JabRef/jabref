@@ -17,11 +17,11 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class SidePaneContentFactory {
     private final LibraryTabContainer tabContainer;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final ChatHistoryService chatHistoryService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
@@ -33,7 +33,7 @@ public class SidePaneContentFactory {
     private final UndoManager undoManager;
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
-                                  PreferencesService preferences,
+                                  Preferences preferences,
                                   ChatHistoryService chatHistoryService,
                                   JournalAbbreviationRepository abbreviationRepository,
                                   TaskExecutor taskExecutor,

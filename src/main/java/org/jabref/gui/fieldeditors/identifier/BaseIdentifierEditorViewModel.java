@@ -24,7 +24,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.identifier.Identifier;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
@@ -40,14 +40,14 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     protected final ObjectProperty<Optional<T>> identifier = new SimpleObjectProperty<>(Optional.empty());
     protected DialogService dialogService;
     protected TaskExecutor taskExecutor;
-    protected PreferencesService preferences;
+    protected Preferences preferences;
 
     public BaseIdentifierEditorViewModel(Field field,
                                          SuggestionProvider<?> suggestionProvider,
                                          FieldCheckers fieldCheckers,
                                          DialogService dialogService,
                                          TaskExecutor taskExecutor,
-                                         PreferencesService preferences,
+                                         Preferences preferences,
                                          UndoManager undoManager) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
         this.dialogService = dialogService;

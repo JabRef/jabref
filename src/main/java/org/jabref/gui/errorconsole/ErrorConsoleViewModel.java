@@ -19,7 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.hc.core5.net.URIBuilder;
@@ -31,14 +31,14 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorConsoleViewModel.class);
 
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final ClipBoardManager clipBoardManager;
     private final BuildInfo buildInfo;
     private final ListProperty<LogEventViewModel> allMessagesData;
 
-    public ErrorConsoleViewModel(DialogService dialogService, PreferencesService preferencesService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
+    public ErrorConsoleViewModel(DialogService dialogService, Preferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
         this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
         this.buildInfo = Objects.requireNonNull(buildInfo);
         ObservableList<LogEventViewModel> eventViewModels = EasyBind.map(BindingsHelper.forUI(LogMessages.getInstance().getMessages()), LogEventViewModel::new);
@@ -120,7 +120,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                     .setScheme("https").setHost("github.com")
                     .setPath("/JabRef/jabref/issues/new")
                     .setParameter("body", issueBody);
-            NativeDesktop.openBrowser(uriBuilder.build().toString(), preferencesService.getExternalApplicationsPreferences());
+            NativeDesktop.openBrowser(uriBuilder.build().toString(), preferences.getExternalApplicationsPreferences());
         } catch (IOException | URISyntaxException e) {
             LOGGER.error("Problem opening url", e);
         }

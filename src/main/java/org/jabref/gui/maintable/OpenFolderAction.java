@@ -8,13 +8,13 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class OpenFolderAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
 
     private final BibEntry entry;
     private final LinkedFile linkedFile;
@@ -22,26 +22,26 @@ public class OpenFolderAction extends SimpleCommand {
 
     public OpenFolderAction(DialogService dialogService,
                             StateManager stateManager,
-                            PreferencesService preferencesService,
+                            Preferences preferences,
                             TaskExecutor taskExecutor) {
-        this(dialogService, stateManager, preferencesService, null, null, taskExecutor);
+        this(dialogService, stateManager, preferences, null, null, taskExecutor);
     }
 
     public OpenFolderAction(DialogService dialogService,
                             StateManager stateManager,
-                            PreferencesService preferencesService,
+                            Preferences preferences,
                             BibEntry entry,
                             LinkedFile linkedFile,
                             TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.entry = entry;
         this.linkedFile = linkedFile;
         this.taskExecutor = taskExecutor;
 
         if (this.linkedFile == null) {
-            this.executable.bind(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferencesService));
+            this.executable.bind(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferences));
         } else {
             this.setExecutable(true);
         }
@@ -58,7 +58,7 @@ public class OpenFolderAction extends SimpleCommand {
                                 databaseContext,
                                 taskExecutor,
                                 dialogService,
-                                preferencesService);
+                                preferences);
                         linkedFileViewModel.openFolder();
                     });
                 } else {
@@ -68,7 +68,7 @@ public class OpenFolderAction extends SimpleCommand {
                             databaseContext,
                             taskExecutor,
                             dialogService,
-                            preferencesService);
+                            preferences);
                     linkedFileViewModel.openFolder();
                 }
             });

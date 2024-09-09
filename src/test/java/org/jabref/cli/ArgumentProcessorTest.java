@@ -25,7 +25,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 
 class ArgumentProcessorTest {
 
-    private final PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+    private final Preferences preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
     private final BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -47,9 +47,9 @@ class ArgumentProcessorTest {
     void setup() {
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
 
-        when(preferencesService.getImporterPreferences()).thenReturn(importerPreferences);
-        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferencesService.getSearchPreferences()).thenReturn(new SearchPreferences(
+        when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(
                 SearchDisplayMode.FILTER,
                 EnumSet.noneOf(SearchFlags.class),
                 false,
@@ -72,7 +72,7 @@ class ArgumentProcessorTest {
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
-                preferencesService,
+                preferences,
                 mock(FileUpdateMonitor.class),
                 entryTypesManager);
         processor.processArguments();
@@ -101,7 +101,7 @@ class ArgumentProcessorTest {
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
-                preferencesService,
+                preferences,
                 mock(FileUpdateMonitor.class),
                 entryTypesManager);
         processor.processArguments();
@@ -122,18 +122,18 @@ class ArgumentProcessorTest {
 
         SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.TABLE, List.of());
         ExportPreferences exportPreferences = new ExportPreferences(".html", tempDir, saveOrder, List.of());
-        when(preferencesService.getExportPreferences()).thenReturn(exportPreferences);
+        when(preferences.getExportPreferences()).thenReturn(exportPreferences);
 
         SelfContainedSaveOrder selfContainedSaveOrder = new SelfContainedSaveOrder(SaveOrder.OrderType.ORIGINAL, List.of());
         SelfContainedSaveConfiguration selfContainedSaveConfiguration = new SelfContainedSaveConfiguration(selfContainedSaveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
-        when(preferencesService.getSelfContainedExportConfiguration()).thenReturn(selfContainedSaveConfiguration);
+        when(preferences.getSelfContainedExportConfiguration()).thenReturn(selfContainedSaveConfiguration);
 
         List<String> args = List.of("-n", "-i", originBibFile + ",bibtex", "-o", outputHtmlFile + ",tablerefsabsbib");
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
                 Mode.INITIAL_START,
-                preferencesService,
+                preferences,
                 mock(FileUpdateMonitor.class),
                 entryTypesManager);
         processor.processArguments();

@@ -15,7 +15,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
                                         FieldCheckers fieldCheckers,
                                         DialogService dialogService,
                                         TaskExecutor taskExecutor,
-                                        PreferencesService preferences,
+                                        Preferences preferences,
                                         UndoManager undoManager,
                                         StateManager stateManager) {
         super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);

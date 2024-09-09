@@ -22,7 +22,7 @@ import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -31,10 +31,10 @@ public class WebSearchPaneView extends VBox {
     private static final PseudoClass QUERY_INVALID = PseudoClass.getPseudoClass("invalid");
 
     private final WebSearchPaneViewModel viewModel;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final DialogService dialogService;
 
-    public WebSearchPaneView(PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
+    public WebSearchPaneView(Preferences preferences, DialogService dialogService, StateManager stateManager) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);

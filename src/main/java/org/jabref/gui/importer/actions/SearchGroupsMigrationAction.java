@@ -11,7 +11,7 @@ import org.jabref.migrations.SearchToLuceneMigration;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 /**
  * This action checks whether the syntax for SearchGroups is the new one.
@@ -24,7 +24,7 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
     public static final Version VERSION_6_0_ALPHA = Version.parse("6.0-alpha");
 
     @Override
-    public boolean isActionNecessary(ParserResult parserResult, PreferencesService preferencesService) {
+    public boolean isActionNecessary(ParserResult parserResult, Preferences preferences) {
         if (parserResult.getMetaData().getGroupSearchSyntaxVersion().isPresent()) {
             // Currently the presence of any version is enough to know that no migration is necessary
             return false;
@@ -47,7 +47,7 @@ public class SearchGroupsMigrationAction implements GUIPostOpenAction {
     }
 
     @Override
-    public void performAction(ParserResult parserResult, DialogService dialogService, PreferencesService preferencesService) {
+    public void performAction(ParserResult parserResult, DialogService dialogService, Preferences preferences) {
         if (!dialogService.showConfirmationDialogAndWait(Localization.lang("Search groups migration of %0", parserResult.getPath().map(Path::toString).orElse("")),
                 Localization.lang("The search groups syntax is outdated. Do you want to migrate to the new syntax?"),
                 Localization.lang("Migrate"), Localization.lang("Keep as is"))) {

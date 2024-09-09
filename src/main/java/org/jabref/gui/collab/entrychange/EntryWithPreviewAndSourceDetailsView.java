@@ -7,14 +7,14 @@ import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public final class EntryWithPreviewAndSourceDetailsView extends DatabaseChangeDetailsView {
 
     private final PreviewWithSourceTab previewWithSourceTab = new PreviewWithSourceTab();
 
-    public EntryWithPreviewAndSourceDetailsView(BibEntry entry, BibDatabaseContext bibDatabaseContext, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
-        TabPane tabPanePreviewCode = previewWithSourceTab.getPreviewWithSourceTab(entry, bibDatabaseContext, preferencesService, entryTypesManager, previewViewer);
+    public EntryWithPreviewAndSourceDetailsView(BibEntry entry, BibDatabaseContext bibDatabaseContext, Preferences preferences, BibEntryTypesManager entryTypesManager, PreviewViewer previewViewer) {
+        TabPane tabPanePreviewCode = previewWithSourceTab.getPreviewWithSourceTab(entry, bibDatabaseContext, preferences, entryTypesManager, previewViewer);
         setLeftAnchor(tabPanePreviewCode, 8d);
         setTopAnchor(tabPanePreviewCode, 8d);
         setRightAnchor(tabPanePreviewCode, 8d);

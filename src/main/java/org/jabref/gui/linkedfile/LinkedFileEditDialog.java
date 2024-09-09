@@ -14,7 +14,7 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -31,7 +31,7 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
 
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
-    @Inject private PreferencesService preferences;
+    @Inject private Preferences preferences;
 
     private LinkedFileEditDialogViewModel viewModel;
     private final LinkedFile linkedFile;

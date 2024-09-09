@@ -20,17 +20,17 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class SpecialFieldViewModel {
 
     private final SpecialField field;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final UndoManager undoManager;
 
-    public SpecialFieldViewModel(SpecialField field, PreferencesService preferencesService, UndoManager undoManager) {
+    public SpecialFieldViewModel(SpecialField field, Preferences preferences, UndoManager undoManager) {
         this.field = Objects.requireNonNull(field);
-        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.undoManager = Objects.requireNonNull(undoManager);
     }
 
@@ -50,7 +50,7 @@ public class SpecialFieldViewModel {
                 field.getValues().size() == 1,
                 getLocalization(),
                 dialogService,
-                preferencesService,
+                preferences,
                 undoManager,
                 stateManager);
     }

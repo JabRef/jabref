@@ -9,14 +9,14 @@ import org.jabref.gui.StateManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibliographyFromPdfImporter;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class NewLibraryFromPdfActionOffline extends NewLibraryFromPdfAction {
 
     private final BibliographyFromPdfImporter bibliographyFromPdfImporter;
 
-    public NewLibraryFromPdfActionOffline(LibraryTabContainer libraryTabContainer, StateManager stateManager, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor) {
-        super(libraryTabContainer, stateManager, dialogService, preferencesService, taskExecutor);
+    public NewLibraryFromPdfActionOffline(LibraryTabContainer libraryTabContainer, StateManager stateManager, DialogService dialogService, Preferences preferences, TaskExecutor taskExecutor) {
+        super(libraryTabContainer, stateManager, dialogService, preferences, taskExecutor);
 
         // Use the importer keeping the numbers (instead of generating keys; which is the other constructor)
         this.bibliographyFromPdfImporter = new BibliographyFromPdfImporter();

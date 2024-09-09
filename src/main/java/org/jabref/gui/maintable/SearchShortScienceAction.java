@@ -13,7 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import static org.jabref.gui.actions.ActionHelper.isFieldSetForSelectedEntry;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -21,12 +21,12 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 public class SearchShortScienceAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
 
-    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, PreferencesService preferencesService) {
+    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, Preferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
 
         BooleanExpression fieldIsSet = isFieldSetForSelectedEntry(StandardField.TITLE, stateManager);
         this.executable.bind(needsEntriesSelected(1, stateManager).and(fieldIsSet));
@@ -43,7 +43,7 @@ public class SearchShortScienceAction extends SimpleCommand {
             }
             ExternalLinkCreator.getShortScienceSearchURL(bibEntries.getFirst()).ifPresent(url -> {
                 try {
-                    NativeDesktop.openExternalViewer(databaseContext, preferencesService, url, StandardField.URL, dialogService, bibEntries.getFirst());
+                    NativeDesktop.openExternalViewer(databaseContext, preferences, url, StandardField.URL, dialogService, bibEntries.getFirst());
                 } catch (IOException ex) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open ShortScience."), ex);
                 }

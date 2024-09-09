@@ -12,7 +12,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +23,8 @@ public class PushToTexShop extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToTexShop.class);
 
-    public PushToTexShop(DialogService dialogService, PreferencesService preferencesService) {
-        super(dialogService, preferencesService);
+    public PushToTexShop(DialogService dialogService, Preferences preferences) {
+        super(dialogService, preferences);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class PushToTexShop extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferencesService.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
 
         try {
             LOGGER.debug("TexShop string: {}", String.join(" ", getCommandLine(keyString)));

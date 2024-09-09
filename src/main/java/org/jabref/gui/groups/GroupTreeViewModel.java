@@ -42,7 +42,7 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -55,7 +55,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final ChatHistoryService chatHistoryService;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
@@ -78,11 +78,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
     };
     private Optional<BibDatabaseContext> currentDatabase = Optional.empty();
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, ChatHistoryService chatHistoryService, PreferencesService preferencesService, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
+    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, ChatHistoryService chatHistoryService, Preferences preferences, TaskExecutor taskExecutor, CustomLocalDragboard localDragboard) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.chatHistoryService = Objects.requireNonNull(chatHistoryService);
-        this.preferences = Objects.requireNonNull(preferencesService);
+        this.preferences = Objects.requireNonNull(preferences);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
 

@@ -54,7 +54,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     }
 
     public void initialize() {
-        this.viewModel = new LinkedFilesTabViewModel(dialogService, preferencesService);
+        this.viewModel = new LinkedFilesTabViewModel(dialogService, preferences);
 
         mainFileDirectory.textProperty().bindBidirectional(viewModel.mainFileDirectoryProperty());
         mainFileDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());
@@ -77,7 +77,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferencesService.getExternalApplicationsPreferences()), autolinkRegexHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDirectory));

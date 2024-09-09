@@ -35,7 +35,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -53,14 +53,14 @@ public class DuplicateSearch extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    private final PreferencesService prefs;
+    private final Preferences prefs;
     private final BibEntryTypesManager entryTypesManager;
     private final TaskExecutor taskExecutor;
 
     public DuplicateSearch(Supplier<LibraryTab> tabSupplier,
                            DialogService dialogService,
                            StateManager stateManager,
-                           PreferencesService prefs,
+                           Preferences prefs,
                            BibEntryTypesManager entryTypesManager,
                            TaskExecutor taskExecutor) {
         this.tabSupplier = tabSupplier;

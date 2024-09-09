@@ -15,7 +15,7 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class GroupEditor extends SimpleEditor {
 
@@ -24,7 +24,7 @@ public class GroupEditor extends SimpleEditor {
     public GroupEditor(final Field field,
                        final SuggestionProvider<?> suggestionProvider,
                        final FieldCheckers fieldCheckers,
-                       final PreferencesService preferences,
+                       final Preferences preferences,
                        final boolean isMultiLine,
                        final UndoManager undoManager,
                        final UndoAction undoAction,

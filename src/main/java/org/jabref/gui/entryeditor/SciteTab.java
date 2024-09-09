@@ -19,7 +19,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.HyperlinkLabel;
@@ -35,12 +35,12 @@ public class SciteTab extends EntryEditorTab {
     private final GridPane sciteResultsPane;
     private final ProgressIndicator progressIndicator;
     private final SciteTabViewModel viewModel;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final DialogService dialogService;
 
-    public SciteTab(PreferencesService preferencesService, TaskExecutor taskExecutor, DialogService dialogService) {
-        this.preferencesService = preferencesService;
-        this.viewModel = new SciteTabViewModel(preferencesService, taskExecutor);
+    public SciteTab(Preferences preferences, TaskExecutor taskExecutor, DialogService dialogService) {
+        this.preferences = preferences;
+        this.viewModel = new SciteTabViewModel(preferences, taskExecutor);
         this.dialogService = dialogService;
         this.sciteResultsPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
@@ -115,7 +115,7 @@ public class SciteTab extends EntryEditorTab {
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
                 try {
-                    NativeDesktop.openBrowser(url, preferencesService.getExternalApplicationsPreferences());
+                    NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
                 } catch (IOException ioex) {
                     // Can't throw a checked exception from here, so display a message to the user instead.
                     dialogService.showErrorDialogAndWait(

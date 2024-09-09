@@ -63,7 +63,7 @@ import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.Author;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.AutoCompletePopup;
@@ -89,7 +89,7 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton filterModeButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final UndoManager undoManager;
     private final LibraryTabContainer tabContainer;
     private final SearchPreferences searchPreferences;
@@ -101,20 +101,20 @@ public class GlobalSearchBar extends HBox {
 
     public GlobalSearchBar(LibraryTabContainer tabContainer,
                            StateManager stateManager,
-                           PreferencesService preferencesService,
+                           Preferences preferences,
                            UndoManager undoManager,
                            DialogService dialogService,
                            SearchType searchType) {
         super();
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
-        this.searchPreferences = preferencesService.getSearchPreferences();
+        this.preferences = preferences;
+        this.searchPreferences = preferences.getSearchPreferences();
         this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.tabContainer = tabContainer;
         this.searchType = searchType;
 
-        KeyBindingRepository keyBindingRepository = preferencesService.getKeyBindingRepository();
+        KeyBindingRepository keyBindingRepository = preferences.getKeyBindingRepository();
 
         searchField = SearchTextField.create(keyBindingRepository);
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
@@ -328,7 +328,7 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
-        if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
+        if (preferences.getAutoCompletePreferences().shouldAutoComplete()) {
             AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
                     searchCompleter::provideSuggestions,
                     new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
@@ -355,7 +355,7 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void updateHintVisibility() {
-        if (preferencesService.getWorkspacePreferences().shouldShowAdvancedHints()) {
+        if (preferences.getWorkspacePreferences().shouldShowAdvancedHints()) {
             String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author:Smith AND title:electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 

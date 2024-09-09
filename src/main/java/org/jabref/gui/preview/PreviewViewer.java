@@ -31,7 +31,7 @@ import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -143,7 +143,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      */
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
-                         PreferencesService preferencesService,
+                         Preferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor,
                          OptionalObjectProperty<SearchQuery> searchQueryProperty) {
@@ -181,7 +181,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     String href = anchorElement.getHref();
                     if (href != null) {
                         try {
-                            NativeDesktop.openBrowser(href, preferencesService.getExternalApplicationsPreferences());
+                            NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
                         } catch (MalformedURLException exception) {
                             LOGGER.error("Invalid URL", exception);
                         } catch (IOException exception) {
@@ -198,10 +198,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public PreviewViewer(BibDatabaseContext database,
                          DialogService dialogService,
-                         PreferencesService preferencesService,
+                         Preferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor) {
-        this(database, dialogService, preferencesService, themeManager, taskExecutor, OptionalObjectProperty.empty());
+        this(database, dialogService, preferences, themeManager, taskExecutor, OptionalObjectProperty.empty());
     }
 
     private void highlightSearchPattern() {

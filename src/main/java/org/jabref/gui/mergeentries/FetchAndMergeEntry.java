@@ -30,7 +30,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +47,11 @@ public class FetchAndMergeEntry {
     private final UndoManager undoManager;
     private final BibDatabaseContext bibDatabaseContext;
     private final TaskExecutor taskExecutor;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
 
     public FetchAndMergeEntry(BibDatabaseContext bibDatabaseContext,
                               TaskExecutor taskExecutor,
-                              PreferencesService preferences,
+                              Preferences preferences,
                               DialogService dialogService,
                               UndoManager undoManager) {
         this.bibDatabaseContext = bibDatabaseContext;

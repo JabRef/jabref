@@ -21,7 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class ImportHandlerTest {
     private BibEntry testEntry;
 
     @Mock
-    private PreferencesService preferencesService;
+    private Preferences preferences;
     @Mock
     private DuplicateCheck duplicateCheck;
 
@@ -54,12 +54,12 @@ class ImportHandlerTest {
         MockitoAnnotations.initMocks(this);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
-        when(preferencesService.getFieldPreferences()).thenReturn(fieldPreferences);
+        when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
 
         bibDatabaseContext = mock(BibDatabaseContext.class);
         BibDatabase bibDatabase = new BibDatabase();
@@ -68,7 +68,7 @@ class ImportHandlerTest {
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
         importHandler = new ImportHandler(
                 bibDatabaseContext,
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
@@ -85,13 +85,13 @@ class ImportHandlerTest {
     void handleBibTeXData() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
-        PreferencesService preferencesService = mock(PreferencesService.class);
-        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        Preferences preferences = mock(Preferences.class);
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
 
         ImportHandler importHandler = new ImportHandler(
                 mock(BibDatabaseContext.class),
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
@@ -137,7 +137,7 @@ class ImportHandlerTest {
         DuplicateDecisionResult decisionResult = new DuplicateDecisionResult(DuplicateResolverDialog.DuplicateResolverResult.KEEP_RIGHT, null);
         importHandler = Mockito.spy(new ImportHandler(
                 bibDatabaseContext,
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
@@ -169,7 +169,7 @@ class ImportHandlerTest {
         DuplicateDecisionResult decisionResult = new DuplicateDecisionResult(DuplicateResolverDialog.DuplicateResolverResult.KEEP_BOTH, null);
         importHandler = Mockito.spy(new ImportHandler(
                 bibDatabaseContext,
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 mock(UndoManager.class),
                 mock(StateManager.class),
@@ -204,7 +204,7 @@ class ImportHandlerTest {
         DuplicateDecisionResult decisionResult = new DuplicateDecisionResult(DuplicateResolverDialog.DuplicateResolverResult.KEEP_MERGE, mergedEntry);
         importHandler = Mockito.spy(new ImportHandler(
                 bibDatabaseContext,
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 mock(UndoManager.class),
                 mock(StateManager.class),

@@ -42,7 +42,7 @@ import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -71,16 +71,16 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
 
     private EntryType type;
     private EntryTypeViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public EntryTypeView(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferences) {
+    public EntryTypeView(LibraryTab libraryTab, DialogService dialogService, Preferences preferences) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
-        this.preferencesService = preferences;
+        this.preferences = preferences;
 
         this.setTitle(Localization.lang("Select entry type"));
         ViewLoader.view(this)
@@ -132,7 +132,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     public void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
         viewModel = new EntryTypeViewModel(
-                preferencesService,
+                preferences,
                 libraryTab,
                 dialogService,
                 stateManager,

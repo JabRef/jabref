@@ -25,7 +25,7 @@ import org.jabref.logic.shared.DBMSType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -57,7 +57,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private CheckBox expertMode;
 
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferencesService;
+    @Inject private Preferences preferences;
     @Inject private AiService aiService;
     @Inject private StateManager stateManager;
     @Inject private BibEntryTypesManager entryTypesManager;
@@ -101,7 +101,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         viewModel = new SharedDatabaseLoginDialogViewModel(
                 tabContainer,
                 dialogService,
-                preferencesService,
+                preferences,
                 aiService,
                 stateManager,
                 entryTypesManager,

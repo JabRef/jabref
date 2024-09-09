@@ -40,7 +40,7 @@ public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionT
     }
 
     public void initialize() {
-        viewModel = new AutoCompletionTabViewModel(preferencesService.getAutoCompletePreferences());
+        viewModel = new AutoCompletionTabViewModel(preferences.getAutoCompletePreferences());
         setupTagsFiled();
         enableAutoComplete.selectedProperty().bindBidirectional(viewModel.enableAutoCompleteProperty());
         autoCompleteFirstLast.selectedProperty().bindBidirectional(viewModel.autoCompleteFirstLastProperty());

@@ -18,7 +18,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,14 +38,14 @@ class ClipBoardManagerTest {
     @BeforeEach
     void setUp() {
         // create preference service mock
-        PreferencesService preferencesService = mock(PreferencesService.class);
-        Injector.setModelOrService(PreferencesService.class, preferencesService);
+        Preferences preferences = mock(Preferences.class);
+        Injector.setModelOrService(Preferences.class, preferences);
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         List<Field> fields = List.of(StandardField.URL);
         ObservableList<Field> nonWrappableFields = FXCollections.observableArrayList(fields);
         // set up mock behaviours for preferences service
         when(fieldPreferences.getNonWrappableFields()).thenReturn(nonWrappableFields);
-        when(preferencesService.getFieldPreferences()).thenReturn(fieldPreferences);
+        when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
 
         // create mock clipboard
         Clipboard clipboard = mock(Clipboard.class);

@@ -74,7 +74,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML
     private void initialize() {
         viewModel = new JournalAbbreviationsTabViewModel(
-                preferencesService.getJournalAbbreviationPreferences(),
+                preferences.getJournalAbbreviationPreferences(),
                 dialogService,
                 taskExecutor,
                 abbreviationRepository);

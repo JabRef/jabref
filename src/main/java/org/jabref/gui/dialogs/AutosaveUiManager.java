@@ -5,7 +5,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -20,8 +20,8 @@ public class AutosaveUiManager {
 
     private final SaveDatabaseAction saveDatabaseAction;
 
-    public AutosaveUiManager(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
-        this.saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferencesService, entryTypesManager);
+    public AutosaveUiManager(LibraryTab libraryTab, DialogService dialogService, Preferences preferences, BibEntryTypesManager entryTypesManager) {
+        this.saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, entryTypesManager);
     }
 
     @Subscribe

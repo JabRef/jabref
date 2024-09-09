@@ -50,7 +50,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
@@ -82,7 +82,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
                      BibDatabaseContext database,
-                     PreferencesService preferencesService,
+                     Preferences preferences,
                      DialogService dialogService,
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,
@@ -98,10 +98,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.model = model;
         this.taskExecutor = taskExecutor;
         this.undoManager = libraryTab.getUndoManager();
-        this.filePreferences = preferencesService.getFilePreferences();
+        this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
 
-        MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
+        MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
         localDragboard = stateManager.getLocalDragboard();
 
@@ -110,8 +110,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         MainTableColumnFactory mainTableColumnFactory = new MainTableColumnFactory(
                 database,
-                preferencesService,
-                preferencesService.getMainTableColumnPreferences(),
+                preferences,
+                preferences.getMainTableColumnPreferences(),
                 undoManager,
                 dialogService,
                 stateManager,
@@ -131,7 +131,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         libraryTab,
                         dialogService,
                         stateManager,
-                        preferencesService,
+                        preferences,
                         undoManager,
                         clipBoardManager,
                         taskExecutor,

@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -21,7 +21,7 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
     @FXML private TextField extension;
     @FXML private ButtonType saveExporter;
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferences;
+    @Inject private Preferences preferences;
     private CreateModifyExporterDialogViewModel viewModel;
 
     public CreateModifyExporterDialogView(ExporterViewModel exporter) {

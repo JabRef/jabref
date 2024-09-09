@@ -34,7 +34,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class FieldEditors {
                                             final TaskExecutor taskExecutor,
                                             final DialogService dialogService,
                                             final JournalAbbreviationRepository journalAbbreviationRepository,
-                                            final PreferencesService preferences,
+                                            final Preferences preferences,
                                             final BibDatabaseContext databaseContext,
                                             final EntryType entryType,
                                             final SuggestionProviders suggestionProviders,

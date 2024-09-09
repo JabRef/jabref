@@ -37,7 +37,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.FetcherApiKey;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import kong.unirest.core.UnirestException;
 
@@ -60,21 +60,21 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty apikeyPersistAvailableProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final DOIPreferences doiPreferences;
     private final GrobidPreferences grobidPreferences;
     private final ImporterPreferences importerPreferences;
     private final FilePreferences filePreferences;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public WebSearchTabViewModel(PreferencesService preferencesService, DialogService dialogService) {
+    public WebSearchTabViewModel(Preferences preferences, DialogService dialogService) {
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
-        this.importerPreferences = preferencesService.getImporterPreferences();
-        this.grobidPreferences = preferencesService.getGrobidPreferences();
-        this.doiPreferences = preferencesService.getDOIPreferences();
-        this.filePreferences = preferencesService.getFilePreferences();
-        this.importFormatPreferences = preferencesService.getImportFormatPreferences();
+        this.preferences = preferences;
+        this.importerPreferences = preferences.getImporterPreferences();
+        this.grobidPreferences = preferences.getGrobidPreferences();
+        this.doiPreferences = preferences.getDOIPreferences();
+        this.filePreferences = preferences.getFilePreferences();
+        this.importFormatPreferences = preferences.getImportFormatPreferences();
     }
 
     @Override
@@ -90,9 +90,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         grobidEnabledProperty.setValue(grobidPreferences.isGrobidEnabled());
         grobidURLProperty.setValue(grobidPreferences.getGrobidURL());
 
-        apiKeys.setValue(FXCollections.observableArrayList(preferencesService.getImporterPreferences().getApiKeys()));
+        apiKeys.setValue(FXCollections.observableArrayList(preferences.getImporterPreferences().getApiKeys()));
         apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
-        apikeyPersistProperty.setValue(preferencesService.getImporterPreferences().shouldPersistCustomKeys());
+        apikeyPersistProperty.setValue(preferences.getImporterPreferences().shouldPersistCustomKeys());
         catalogs.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                    .stream()
                                    .map(SearchBasedFetcher::getName)
@@ -122,9 +122,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                                      .map(StudyCatalogItem::getName)
                                                      .collect(Collectors.toList())));
         importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
-        preferencesService.getImporterPreferences().getApiKeys().clear();
+        preferences.getImporterPreferences().getApiKeys().clear();
         if (apikeyPersistAvailableProperty.get()) {
-            preferencesService.getImporterPreferences().getApiKeys().addAll(apiKeys);
+            preferences.getImporterPreferences().getApiKeys().addAll(apiKeys);
         }
     }
 
@@ -185,8 +185,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
         final Optional<CustomizableKeyFetcher> fetcherOpt =
                 WebFetchers.getCustomizableKeyFetchers(
-                                   preferencesService.getImportFormatPreferences(),
-                                   preferencesService.getImporterPreferences())
+                                   preferences.getImportFormatPreferences(),
+                                   preferences.getImporterPreferences())
                            .stream()
                            .filter(fetcher -> fetcher.getName().equals(apiKeyName))
                            .findFirst();

@@ -19,7 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,12 +35,12 @@ public class DownloadFullTextAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final UiTaskExecutor taskExecutor;
 
     public DownloadFullTextAction(DialogService dialogService,
                                   StateManager stateManager,
-                                  PreferencesService preferences,
+                                  Preferences preferences,
                                   UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;

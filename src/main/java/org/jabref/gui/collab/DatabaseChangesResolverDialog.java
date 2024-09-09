@@ -21,7 +21,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -57,7 +57,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     @Inject private UndoManager undoManager;
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferencesService;
+    @Inject private Preferences preferences;
     @Inject private ThemeManager themeManager;
     @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private TaskExecutor taskExecutor;
@@ -99,8 +99,8 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        PreviewViewer previewViewer = new PreviewViewer(database, dialogService, preferencesService, themeManager, taskExecutor);
-        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, themeManager, preferencesService, entryTypesManager, previewViewer, taskExecutor);
+        PreviewViewer previewViewer = new PreviewViewer(database, dialogService, preferences, themeManager, taskExecutor);
+        DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, themeManager, preferences, entryTypesManager, previewViewer, taskExecutor);
 
         viewModel = new ExternalChangesResolverViewModel(changes, undoManager);
 

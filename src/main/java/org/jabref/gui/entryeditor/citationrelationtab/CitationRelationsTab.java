@@ -47,7 +47,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
@@ -68,7 +68,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private static BackgroundTask<List<BibEntry>> citedByTask;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final LibraryTab libraryTab;
     private final TaskExecutor taskExecutor;
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
@@ -80,21 +80,21 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 UndoManager undoManager,
                                 StateManager stateManager,
                                 FileUpdateMonitor fileUpdateMonitor,
-                                PreferencesService preferencesService,
+                                Preferences preferences,
                                 LibraryTab libraryTab,
                                 TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.libraryTab = libraryTab;
         this.taskExecutor = taskExecutor;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
 
         this.duplicateCheck = new DuplicateCheck(new BibEntryTypesManager());
-        this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferencesService.getImporterPreferences()),
+        this.bibEntryRelationsRepository = new BibEntryRelationsRepository(new SemanticScholarFetcher(preferences.getImporterPreferences()),
                 new BibEntryRelationsCache());
-        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferencesService, undoManager, stateManager, dialogService, fileUpdateMonitor, taskExecutor);
+        citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(databaseContext, preferences, undoManager, stateManager, dialogService, fileUpdateMonitor, taskExecutor);
     }
 
     /**
@@ -246,7 +246,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 return;
                             }
                             try {
-                                NativeDesktop.openBrowser(url, preferencesService.getExternalApplicationsPreferences());
+                                NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
                             } catch (IOException ex) {
                                 dialogService.notify(Localization.lang("Unable to open link."));
                             }

@@ -26,7 +26,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class AiChatTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
@@ -45,7 +45,7 @@ public class AiChatTab extends EntryEditorTab {
                      AiService aiService,
                      ChatHistoryService chatHistoryService,
                      DialogService dialogService,
-                     PreferencesService preferencesService,
+                     Preferences preferences,
                      TaskExecutor taskExecutor
     ) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -54,11 +54,11 @@ public class AiChatTab extends EntryEditorTab {
         this.chatHistoryService = chatHistoryService;
         this.dialogService = dialogService;
 
-        this.aiPreferences = preferencesService.getAiPreferences();
-        this.externalApplicationsPreferences = preferencesService.getExternalApplicationsPreferences();
-        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.aiPreferences = preferences.getAiPreferences();
+        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
 
-        this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
+        this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferences.getCitationKeyPatternPreferences());
 
         this.taskExecutor = taskExecutor;
 

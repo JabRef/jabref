@@ -9,17 +9,17 @@ import org.jabref.gui.StateManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class NewLibraryFromPdfActionOnline extends NewLibraryFromPdfAction {
 
-    public NewLibraryFromPdfActionOnline(LibraryTabContainer libraryTabContainer, StateManager stateManager, DialogService dialogService, PreferencesService preferencesService, TaskExecutor taskExecutor) {
-        super(libraryTabContainer, stateManager, dialogService, preferencesService, taskExecutor);
+    public NewLibraryFromPdfActionOnline(LibraryTabContainer libraryTabContainer, StateManager stateManager, DialogService dialogService, Preferences preferences, TaskExecutor taskExecutor) {
+        super(libraryTabContainer, stateManager, dialogService, preferences, taskExecutor);
     }
 
     @Override
     protected Callable<ParserResult> getParserResultCallable(Path path) {
         return () -> new ParserResult(
-                new GrobidService(this.preferencesService.getGrobidPreferences()).processReferences(path, preferencesService.getImportFormatPreferences()));
+                new GrobidService(this.preferences.getGrobidPreferences()).processReferences(path, preferences.getImportFormatPreferences()));
     }
 }

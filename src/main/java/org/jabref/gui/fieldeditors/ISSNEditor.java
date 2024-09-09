@@ -20,7 +20,7 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -32,7 +32,7 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
     @FXML private Button fetchInformationByIdentifierButton;
 
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferencesService;
+    @Inject private Preferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
@@ -58,11 +58,11 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
                 dialogService,
                 undoManager,
                 stateManager,
-                preferencesService);
+                preferences);
 
         establishBinding(textArea, viewModel.textProperty(), keyBindingRepository, undoAction, redoAction);
         textArea.initContextMenu(new DefaultMenu(textArea), keyBindingRepository);
-        new EditorValidator(preferencesService).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public ISSNEditorViewModel getViewModel() {
@@ -92,7 +92,7 @@ public class ISSNEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void showJournalInfo() {
-        if (JournalInfoOptInDialogHelper.isJournalInfoEnabled(dialogService, preferencesService.getEntryEditorPreferences())) {
+        if (JournalInfoOptInDialogHelper.isJournalInfoEnabled(dialogService, preferences.getEntryEditorPreferences())) {
             viewModel.showJournalInfo(journalInfoButton);
         }
     }

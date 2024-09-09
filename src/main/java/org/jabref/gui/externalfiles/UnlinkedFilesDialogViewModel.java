@@ -41,7 +41,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -72,7 +72,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<ExternalFileSorter> fileSortList;
 
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
@@ -84,7 +84,7 @@ public class UnlinkedFilesDialogViewModel {
     public UnlinkedFilesDialogViewModel(DialogService dialogService,
                                         UndoManager undoManager,
                                         FileUpdateMonitor fileUpdateMonitor,
-                                        PreferencesService preferences,
+                                        Preferences preferences,
                                         StateManager stateManager,
                                         TaskExecutor taskExecutor) {
         this.preferences = preferences;

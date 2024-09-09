@@ -11,25 +11,25 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class MergeWithFetchedEntryAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final UndoManager undoManager;
     private final TaskExecutor taskExecutor;
 
     public MergeWithFetchedEntryAction(DialogService dialogService,
                                        StateManager stateManager,
                                        TaskExecutor taskExecutor,
-                                       PreferencesService preferencesService,
+                                       Preferences preferences,
                                        UndoManager undoManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.undoManager = undoManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager)
@@ -49,6 +49,6 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
         }
 
         BibEntry originalEntry = stateManager.getSelectedEntries().getFirst();
-        new FetchAndMergeEntry(stateManager.getActiveDatabase().get(), taskExecutor, preferencesService, dialogService, undoManager).fetchAndMerge(originalEntry);
+        new FetchAndMergeEntry(stateManager.getActiveDatabase().get(), taskExecutor, preferences, dialogService, undoManager).fetchAndMerge(originalEntry);
     }
 }

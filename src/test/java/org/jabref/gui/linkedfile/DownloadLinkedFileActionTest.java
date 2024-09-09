@@ -22,7 +22,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class DownloadLinkedFileActionTest {
     private final DialogService dialogService = mock(DialogService.class);
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-    private final PreferencesService preferences = mock(PreferencesService.class);
+    private final Preferences preferences = mock(Preferences.class);
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws Exception {

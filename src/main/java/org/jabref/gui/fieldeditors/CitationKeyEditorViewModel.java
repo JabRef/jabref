@@ -8,12 +8,12 @@ import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
 
 public class CitationKeyEditorViewModel extends AbstractEditorViewModel {
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final BibDatabaseContext databaseContext;
     private final UndoManager undoManager;
     private final DialogService dialogService;
@@ -21,18 +21,18 @@ public class CitationKeyEditorViewModel extends AbstractEditorViewModel {
     public CitationKeyEditorViewModel(Field field,
                                       SuggestionProvider<?> suggestionProvider,
                                       FieldCheckers fieldCheckers,
-                                      PreferencesService preferencesService,
+                                      Preferences preferences,
                                       BibDatabaseContext databaseContext,
                                       UndoManager undoManager,
                                       DialogService dialogService) {
         super(field, suggestionProvider, fieldCheckers, undoManager);
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.databaseContext = databaseContext;
         this.undoManager = undoManager;
         this.dialogService = dialogService;
     }
 
     public Command getGenerateCiteKeyCommand() {
-        return new GenerateCitationKeySingleAction(entry, databaseContext, dialogService, preferencesService, undoManager);
+        return new GenerateCitationKeySingleAction(entry, databaseContext, dialogService, preferences, undoManager);
     }
 }

@@ -16,7 +16,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 class StudyCatalogToFetcherConverterTest {
     SaveConfiguration saveConfiguration;
-    PreferencesService preferencesService;
+    Preferences preferences;
     BibEntryTypesManager entryTypesManager;
     SlrGitHandler gitHandler;
     @TempDir
@@ -37,11 +37,11 @@ class StudyCatalogToFetcherConverterTest {
 
     @BeforeEach
     void setUpMocks() {
-        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         when(saveConfiguration.getSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(preferencesService.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        when(preferencesService.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(preferences.getBibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        when(preferences.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
 
         entryTypesManager = new BibEntryTypesManager();
         gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
@@ -55,7 +55,7 @@ class StudyCatalogToFetcherConverterTest {
         StudyRepository studyRepository = new StudyRepository(
                 tempRepositoryDirectory,
                 gitHandler,
-                preferencesService,
+                preferences,
                 new DummyFileUpdateMonitor(),
                 entryTypesManager);
         StudyCatalogToFetcherConverter converter = new StudyCatalogToFetcherConverter(

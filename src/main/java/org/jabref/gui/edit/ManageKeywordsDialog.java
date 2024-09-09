@@ -15,7 +15,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -28,7 +28,7 @@ public class ManageKeywordsDialog extends BaseDialog<Void> {
     @FXML private TableColumn<String, Boolean> keywordsTableDeleteColumn;
     @FXML private TableView<String> keywordsTable;
     @FXML private ToggleGroup displayType;
-    @Inject private PreferencesService preferences;
+    @Inject private Preferences preferences;
     private ManageKeywordsViewModel viewModel;
 
     public ManageKeywordsDialog(List<BibEntry> entries) {

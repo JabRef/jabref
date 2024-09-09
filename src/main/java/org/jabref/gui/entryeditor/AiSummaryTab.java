@@ -11,7 +11,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class AiSummaryTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
@@ -25,17 +25,17 @@ public class AiSummaryTab extends EntryEditorTab {
     public AiSummaryTab(BibDatabaseContext bibDatabaseContext,
                         AiService aiService,
                         DialogService dialogService,
-                        PreferencesService preferencesService
+                        Preferences preferences
     ) {
         this.bibDatabaseContext = bibDatabaseContext;
 
         this.aiService = aiService;
         this.dialogService = dialogService;
 
-        this.aiPreferences = preferencesService.getAiPreferences();
-        this.externalApplicationsPreferences = preferencesService.getExternalApplicationsPreferences();
-        this.citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
-        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.aiPreferences = preferences.getAiPreferences();
+        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
+        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
 
         setText(Localization.lang("AI summary"));
         setTooltip(new Tooltip(Localization.lang("AI-generated summary of attached file(s)")));

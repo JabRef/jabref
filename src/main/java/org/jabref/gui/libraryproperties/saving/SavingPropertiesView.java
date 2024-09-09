@@ -9,7 +9,7 @@ import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.libraryproperties.PropertiesTab;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -20,7 +20,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     @FXML private SaveOrderConfigPanel saveOrderConfigPanel;
     @FXML private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
 
-    @Inject private PreferencesService preferencesService;
+    @Inject private Preferences preferences;
 
     public SavingPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -36,7 +36,7 @@ public class SavingPropertiesView extends AbstractPropertiesTabView<SavingProper
     }
 
     public void initialize() {
-        this.viewModel = new SavingPropertiesViewModel(databaseContext, preferencesService);
+        this.viewModel = new SavingPropertiesViewModel(databaseContext, preferences);
 
         protect.disableProperty().bind(viewModel.protectDisableProperty());
         protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());

@@ -23,7 +23,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -43,23 +43,23 @@ public class WebSearchPaneViewModel {
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final StateManager stateManager;
 
     private final Validator searchQueryValidator;
     private final SyntaxParser parser = new StandardSyntaxParser();
 
-    public WebSearchPaneViewModel(PreferencesService preferencesService, DialogService dialogService, StateManager stateManager) {
+    public WebSearchPaneViewModel(Preferences preferences, DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
 
         fetchers.setAll(WebFetchers.getSearchBasedFetchers(
-                preferencesService.getImportFormatPreferences(),
-                preferencesService.getImporterPreferences()));
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences()));
 
         // Choose last-selected fetcher as default
-        SidePanePreferences sidePanePreferences = preferencesService.getSidePanePreferences();
+        SidePanePreferences sidePanePreferences = preferences.getSidePanePreferences();
         int defaultFetcherIndex = sidePanePreferences.getWebSearchFetcherSelected();
         if ((defaultFetcherIndex <= 0) || (defaultFetcherIndex >= fetchers.size())) {
             selectedFetcherProperty().setValue(fetchers.getFirst());
@@ -126,8 +126,8 @@ public class WebSearchPaneViewModel {
     }
 
     public void search() {
-        if (!preferencesService.getImporterPreferences().areImporterEnabled()) {
-            if (!preferencesService.getImporterPreferences().areImporterEnabled()) {
+        if (!preferences.getImporterPreferences().areImporterEnabled()) {
+            if (!preferences.getImporterPreferences().areImporterEnabled()) {
                 dialogService.notify(Localization.lang("Web search disabled"));
                 return;
             }
@@ -150,7 +150,7 @@ public class WebSearchPaneViewModel {
         String fetcherName = activeFetcher.getName();
 
         if (CompositeIdFetcher.containsValidId(query)) {
-            CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferencesService.getImportFormatPreferences());
+            CompositeIdFetcher compositeIdFetcher = new CompositeIdFetcher(preferences.getImportFormatPreferences());
             parserResultCallable = () -> new ParserResult(OptionalUtil.toList(compositeIdFetcher.performSearchById(query)));
             fetcherName = Localization.lang("Identifier-based Web Search");
         } else {

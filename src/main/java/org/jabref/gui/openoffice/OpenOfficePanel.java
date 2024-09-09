@@ -59,7 +59,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
@@ -92,7 +92,7 @@ public class OpenOfficePanel {
     private final Button help;
     private final VBox vbox = new VBox();
 
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
@@ -105,7 +105,7 @@ public class OpenOfficePanel {
     private OOStyle currentStyle;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
-                           PreferencesService preferencesService,
+                           Preferences preferences,
                            JournalAbbreviationRepository abbreviationRepository,
                            UiTaskExecutor taskExecutor,
                            DialogService dialogService,
@@ -117,13 +117,13 @@ public class OpenOfficePanel {
         this.tabContainer = tabContainer;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
-        this.currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
+        this.currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
 
         ActionFactory factory = new ActionFactory();
 
@@ -137,7 +137,7 @@ public class OpenOfficePanel {
         manualConnect.setTooltip(new Tooltip(Localization.lang("Manual connect")));
         manualConnect.setMaxWidth(Double.MAX_VALUE);
 
-        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE, dialogService, preferencesService.getExternalApplicationsPreferences()));
+        help = factory.createIconButton(StandardActions.HELP, new HelpAction(HelpFile.OPENOFFICE_LIBREOFFICE, dialogService, preferences.getExternalApplicationsPreferences()));
         help.setMaxWidth(Double.MAX_VALUE);
 
         selectDocument = new Button();
@@ -151,8 +151,8 @@ public class OpenOfficePanel {
         update.setMaxWidth(Double.MAX_VALUE);
 
         loader = new StyleLoader(
-                preferencesService.getOpenOfficePreferences(),
-                preferencesService.getLayoutFormatterPreferences(),
+                preferences.getOpenOfficePreferences(),
+                preferences.getLayoutFormatterPreferences(),
                 abbreviationRepository);
 
         initPanel();
@@ -303,7 +303,7 @@ public class OpenOfficePanel {
                     databaseContext,
                     tabContainer,
                     dialogService,
-                    preferencesService,
+                    preferences,
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,
@@ -316,7 +316,7 @@ public class OpenOfficePanel {
 
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
-        if (preferencesService.getOpenOfficePreferences().getUseAllDatabases()) {
+        if (preferences.getOpenOfficePreferences().getUseAllDatabases()) {
             for (BibDatabaseContext database : stateManager.getOpenDatabases()) {
                 databases.add(database.getDatabase());
             }
@@ -330,7 +330,7 @@ public class OpenOfficePanel {
     }
 
     private void connectAutomatically() {
-        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(preferencesService.getOpenOfficePreferences(), dialogService);
+        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(preferences.getOpenOfficePreferences(), dialogService);
 
         if (officeInstallation.isExecutablePathDefined()) {
             connect();
@@ -364,7 +364,7 @@ public class OpenOfficePanel {
         var fileDialogConfiguration = new DirectoryDialogConfiguration.Builder().withInitialDirectory(System.getProperty("user.home")).build();
         Optional<Path> selectedPath = dialogService.showDirectorySelectionDialog(fileDialogConfiguration);
 
-        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(preferencesService.getOpenOfficePreferences(), dialogService);
+        DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(preferences.getOpenOfficePreferences(), dialogService);
 
         if (selectedPath.isPresent()) {
             BackgroundTask.wrap(() -> officeInstallation.setOpenOfficePreferences(selectedPath.get()))
@@ -395,7 +395,7 @@ public class OpenOfficePanel {
         pushEntries.setDisable(!(isConnectedToDocument && hasStyle && hasDatabase));
 
         boolean canCite = isConnectedToDocument && hasStyle && hasSelectedBibEntry;
-        boolean cslStyleSelected = preferencesService.getOpenOfficePreferences().getCurrentStyle() instanceof CitationStyle;
+        boolean cslStyleSelected = preferences.getOpenOfficePreferences().getCurrentStyle() instanceof CitationStyle;
         pushEntriesInt.setDisable(!canCite);
         pushEntriesEmpty.setDisable(!canCite);
         pushEntriesAdvanced.setDisable(!canCite || cslStyleSelected);
@@ -416,7 +416,7 @@ public class OpenOfficePanel {
             protected OOBibBase call() throws BootstrapException, CreationException {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
-                Path path = Path.of(preferencesService.getOpenOfficePreferences().getExecutablePath());
+                Path path = Path.of(preferences.getOpenOfficePreferences().getExecutablePath());
                 return createBibBase(path);
             }
         };
@@ -542,12 +542,12 @@ public class OpenOfficePanel {
         }
 
         Optional<Update.SyncOptions> syncOptions =
-                preferencesService.getOpenOfficePreferences().getSyncWhenCiting()
+                preferences.getOpenOfficePreferences().getSyncWhenCiting()
                         ? Optional.of(new Update.SyncOptions(getBaseList()))
                         : Optional.empty();
 
         // Sync options are non-null only when "Automatically sync bibliography when inserting citations" is enabled
-        if (syncOptions.isPresent() && preferencesService.getOpenOfficePreferences().getSyncWhenCiting()) {
+        if (syncOptions.isPresent() && preferences.getOpenOfficePreferences().getSyncWhenCiting()) {
             syncOptions.get().setUpdateBibliography(true);
         }
         ooBase.guiActionInsertEntry(entries,
@@ -590,7 +590,7 @@ public class OpenOfficePanel {
         Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
         if (citePressed && databaseContext.isPresent()) {
             // Generate keys
-            CitationKeyPatternPreferences prefs = preferencesService.getCitationKeyPatternPreferences();
+            CitationKeyPatternPreferences prefs = preferences.getCitationKeyPatternPreferences();
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
                 if (entry.getCitationKey().isEmpty()) {
@@ -612,12 +612,12 @@ public class OpenOfficePanel {
     }
 
     private ContextMenu createSettingsPopup() {
-        OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
+        OpenOfficePreferences openOfficePreferences = preferences.getOpenOfficePreferences();
 
         ContextMenu contextMenu = new ContextMenu();
 
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
-        autoSync.selectedProperty().set(preferencesService.getOpenOfficePreferences().getSyncWhenCiting());
+        autoSync.selectedProperty().set(preferences.getOpenOfficePreferences().getSyncWhenCiting());
 
         ToggleGroup toggleGroup = new ToggleGroup();
         RadioMenuItem useActiveBase = new RadioMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));

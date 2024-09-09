@@ -17,7 +17,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final String identifier;
     private final TaskExecutor taskExecutor;
     private final PopOver entryFromIdPopOver;
@@ -37,7 +37,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     public GenerateEntryFromIdAction(LibraryTab libraryTab,
                                      DialogService dialogService,
-                                     PreferencesService preferencesService,
+                                     Preferences preferences,
                                      TaskExecutor taskExecutor,
                                      PopOver entryFromIdPopOver,
                                      String identifier,
@@ -45,7 +45,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                                      FileUpdateMonitor fileUpdateMonitor) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.identifier = identifier;
         this.taskExecutor = taskExecutor;
         this.entryFromIdPopOver = entryFromIdPopOver;
@@ -79,7 +79,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
             if (dialogService.showConfirmationDialogAndWait(Localization.lang("Failed to import by ID"), msg, Localization.lang("Add entry manually"))) {
                 // add entry manually
                 new NewEntryAction(() -> libraryTab, StandardEntryType.Article, dialogService,
-                                   preferencesService, stateManager).execute();
+                        preferences, stateManager).execute();
             }
         });
         backgroundTask.onSuccess(result -> {
@@ -87,7 +87,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                 final BibEntry entry = result.get();
                 ImportHandler handler = new ImportHandler(
                         libraryTab.getBibDatabaseContext(),
-                        preferencesService,
+                        preferences,
                         fileUpdateMonitor,
                         libraryTab.getUndoManager(),
                         stateManager,
@@ -109,7 +109,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
                     return Optional.empty();
                 }
                 updateMessage(Localization.lang("Searching..."));
-                return new CompositeIdFetcher(preferencesService.getImportFormatPreferences()).performSearchById(identifier);
+                return new CompositeIdFetcher(preferences.getImportFormatPreferences()).performSearchById(identifier);
             }
         };
     }

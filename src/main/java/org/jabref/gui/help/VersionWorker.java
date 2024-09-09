@@ -13,7 +13,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.Version;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,12 +43,12 @@ public class VersionWorker {
     public VersionWorker(Version installedVersion,
                          DialogService dialogService,
                          TaskExecutor taskExecutor,
-                         PreferencesService preferencesService) {
+                         Preferences preferences) {
         this.installedVersion = Objects.requireNonNull(installedVersion);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.internalPreferences = preferencesService.getInternalPreferences();
-        this.externalApplicationsPreferences = preferencesService.getExternalApplicationsPreferences();
+        this.internalPreferences = preferences.getInternalPreferences();
+        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
     }
 
     /**

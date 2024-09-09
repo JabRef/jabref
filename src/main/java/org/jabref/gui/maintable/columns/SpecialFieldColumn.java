@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;
@@ -36,16 +36,16 @@ import org.controlsfx.control.Rating;
  */
 public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldValueViewModel>> {
 
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final UndoManager undoManager;
 
-    public SpecialFieldColumn(MainTableColumnModel model, PreferencesService preferencesService, UndoManager undoManager) {
+    public SpecialFieldColumn(MainTableColumnModel model, Preferences preferences, UndoManager undoManager) {
         super(model);
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.undoManager = undoManager;
 
         SpecialField specialField = (SpecialField) FieldFactory.parseField(model.getQualifier());
-        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, preferencesService, undoManager);
+        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, preferences, undoManager);
 
         Node headerGraphic = specialFieldViewModel.getIcon().getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(specialFieldViewModel.getLocalization()));
@@ -109,7 +109,7 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
         });
 
         EasyBind.subscribe(ranking.ratingProperty(), rating ->
-                new SpecialFieldViewModel(SpecialField.RANKING, preferencesService, undoManager)
+                new SpecialFieldViewModel(SpecialField.RANKING, preferences, undoManager)
                         .setSpecialFieldValue(entry.getEntry(), SpecialFieldValue.getRating(rating.intValue())));
 
         return ranking;

@@ -16,23 +16,23 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class AttachFileFromURLAction extends SimpleCommand {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final TaskExecutor taskExecutor;
 
     public AttachFileFromURLAction(DialogService dialogService,
                                    StateManager stateManager,
                                    TaskExecutor taskExecutor,
-                                   PreferencesService preferencesService) {
+                                   Preferences preferences) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager));
     }
@@ -67,7 +67,7 @@ public class AttachFileFromURLAction extends SimpleCommand {
                              databaseContext,
                              taskExecutor,
                              dialogService,
-                             preferencesService);
+                    preferences);
             onlineFile.download(true);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);

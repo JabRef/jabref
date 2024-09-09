@@ -20,7 +20,7 @@ import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +32,10 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<ImporterViewModel> importers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ImporterViewModel> selectedImporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final DialogService dialogService;
 
-    public CustomImporterTabViewModel(PreferencesService preferences, DialogService dialogService) {
+    public CustomImporterTabViewModel(Preferences preferences, DialogService dialogService) {
         this.preferences = preferences;
         this.dialogService = dialogService;
     }

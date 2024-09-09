@@ -11,7 +11,7 @@ import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class EntryTabViewModel implements PreferenceTabViewModel {
 
@@ -32,11 +32,11 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
     private final OwnerPreferences ownerPreferences;
     private final TimestampPreferences timestampPreferences;
 
-    public EntryTabViewModel(PreferencesService preferencesService) {
-        this.bibEntryPreferences = preferencesService.getBibEntryPreferences();
-        this.fieldPreferences = preferencesService.getFieldPreferences();
-        this.ownerPreferences = preferencesService.getOwnerPreferences();
-        this.timestampPreferences = preferencesService.getTimestampPreferences();
+    public EntryTabViewModel(Preferences preferences) {
+        this.bibEntryPreferences = preferences.getBibEntryPreferences();
+        this.fieldPreferences = preferences.getFieldPreferences();
+        this.ownerPreferences = preferences.getOwnerPreferences();
+        this.timestampPreferences = preferences.getTimestampPreferences();
     }
 
     @Override

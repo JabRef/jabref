@@ -14,7 +14,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -22,16 +22,16 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 public class CopyFilesAction extends SimpleCommand {
 
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final StateManager stateManager;
     private final UiTaskExecutor uiTaskExecutor;
 
     public CopyFilesAction(DialogService dialogService,
-                           PreferencesService preferencesService,
+                           Preferences preferences,
                            StateManager stateManager,
                            UiTaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.stateManager = stateManager;
         this.uiTaskExecutor = taskExecutor;
 
@@ -52,11 +52,11 @@ public class CopyFilesAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(preferencesService.getExportPreferences().getExportWorkingDirectory())
+                .withInitialDirectory(preferences.getExportPreferences().getExportWorkingDirectory())
                 .build();
         Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
         exportPath.ifPresent(path -> {
-            Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(database, entries, path, preferencesService);
+            Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(database, entries, path, preferences);
 
             dialogService.showProgressDialog(
                     Localization.lang("Copy linked files to folder..."),

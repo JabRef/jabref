@@ -30,7 +30,7 @@ import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.openjdk.jmh.Main;
@@ -52,7 +52,7 @@ public class Benchmarks {
 
     @Setup
     public void init() throws Exception {
-        Injector.setModelOrService(PreferencesService.class, JabRefPreferences.getInstance());
+        Injector.setModelOrService(Preferences.class, JabRefPreferences.getInstance());
 
         Random randomizer = new Random();
         for (int i = 0; i < 1000; i++) {
@@ -89,8 +89,8 @@ public class Benchmarks {
 
     @Benchmark
     public ParserResult parse() throws IOException {
-        PreferencesService preferencesService = Injector.instantiateModelOrService(PreferencesService.class);
-        BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences());
+        Preferences preferences = Injector.instantiateModelOrService(Preferences.class);
+        BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());
         return parser.parse(new StringReader(bibtexString));
     }
 

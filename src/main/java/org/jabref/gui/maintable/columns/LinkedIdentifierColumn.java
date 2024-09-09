@@ -24,7 +24,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 /**
  * A clickable icons column for DOIs, URLs, URIs and EPrints.
@@ -34,13 +34,13 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
     private final DialogService dialogService;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
 
     public LinkedIdentifierColumn(MainTableColumnModel model,
                                   CellFactory cellFactory,
                                   BibDatabaseContext database,
                                   DialogService dialogService,
-                                  PreferencesService preferences,
+                                  Preferences preferences,
                                   StateManager stateManager) {
         super(model);
         this.database = database;

@@ -9,7 +9,7 @@ import javafx.collections.ObservableMap;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.os.OS;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -26,7 +26,7 @@ class PushToEmacsTest {
     @BeforeEach
     void setup() {
         DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
-        PreferencesService preferencesService = mock(PreferencesService.class);
+        Preferences preferences = mock(Preferences.class);
 
         PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);
 
@@ -37,13 +37,13 @@ class PushToEmacsTest {
 
         when(pushToApplicationPreferences.getEmacsArguments()).thenReturn("-n -e");
 
-        when(preferencesService.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
+        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
         ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
         when(externalApplicationsPreferences.getCiteCommand().toString()).thenReturn("\\cite{key1,key2}");
-        when(preferencesService.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
 
-        pushToEmacs = new PushToEmacs(dialogService, preferencesService);
+        pushToEmacs = new PushToEmacs(dialogService, preferences);
     }
 
     @Test

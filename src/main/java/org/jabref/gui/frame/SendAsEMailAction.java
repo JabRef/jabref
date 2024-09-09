@@ -19,7 +19,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,16 +39,16 @@ public abstract class SendAsEMailAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
 
     public SendAsEMailAction(DialogService dialogService,
-                             PreferencesService preferencesService,
+                             Preferences preferences,
                              StateManager stateManager,
                              TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
     }
@@ -102,17 +102,17 @@ public abstract class SendAsEMailAction extends SimpleCommand {
     private List<String> getAttachments(List<BibEntry> entries) {
         // open folders is needed to indirectly support email programs, which cannot handle
         //   the unofficial "mailto:attachment" property
-        boolean openFolders = preferencesService.getExternalApplicationsPreferences().shouldAutoOpenEmailAttachmentsFolder();
+        boolean openFolders = preferences.getExternalApplicationsPreferences().shouldAutoOpenEmailAttachmentsFolder();
 
         BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
-        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectories(preferencesService.getFilePreferences()));
+        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectories(preferences.getFilePreferences()));
 
         List<String> attachments = new ArrayList<>();
         for (Path path : fileList) {
             attachments.add(path.toAbsolutePath().toString());
             if (openFolders) {
                 try {
-                    NativeDesktop.openFolderAndSelectFile(path.toAbsolutePath(), preferencesService.getExternalApplicationsPreferences(), dialogService);
+                    NativeDesktop.openFolderAndSelectFile(path.toAbsolutePath(), preferences.getExternalApplicationsPreferences(), dialogService);
                 } catch (IOException e) {
                     LOGGER.debug("Cannot open file", e);
                 }

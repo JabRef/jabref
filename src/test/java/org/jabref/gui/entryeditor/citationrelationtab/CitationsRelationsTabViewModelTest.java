@@ -27,7 +27,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class CitationsRelationsTabViewModelTest {
     private BibEntry testEntry;
 
     @Mock
-    private PreferencesService preferencesService;
+    private Preferences preferences;
     @Mock
     private DuplicateCheck duplicateCheck;
     private BibEntry existingEntry;
@@ -59,31 +59,31 @@ class CitationsRelationsTabViewModelTest {
         MockitoAnnotations.openMocks(this);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
+        when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
 
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importerPreferences.isGenerateNewKeyOnImport()).thenReturn(false);
-        when(preferencesService.getImporterPreferences()).thenReturn(importerPreferences);
+        when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
-        when(preferencesService.getFieldPreferences()).thenReturn(fieldPreferences);
+        when(preferences.getFieldPreferences()).thenReturn(fieldPreferences);
 
-        when(preferencesService.getFilePreferences()).thenReturn(mock(FilePreferences.class));
-        when(preferencesService.getOwnerPreferences()).thenReturn(mock(OwnerPreferences.class, Answers.RETURNS_DEEP_STUBS));
-        when(preferencesService.getTimestampPreferences()).thenReturn(mock(TimestampPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
+        when(preferences.getOwnerPreferences()).thenReturn(mock(OwnerPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(preferences.getTimestampPreferences()).thenReturn(mock(TimestampPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class);
         GlobalCitationKeyPatterns patterns = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         when(citationKeyPatternPreferences.getKeyPatterns()).thenReturn(patterns);
-        when(preferencesService.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
 
         bibDatabaseContext = new BibDatabaseContext(new BibDatabase());
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
 
         viewModel = new CitationsRelationsTabViewModel(
                 bibDatabaseContext,
-                preferencesService,
+                preferences,
                 mock(UndoManager.class),
                 mock(StateManager.class, Answers.RETURNS_DEEP_STUBS),
                 mock(DialogService.class),

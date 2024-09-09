@@ -11,16 +11,16 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class MainTableTooltip extends Tooltip {
 
     private final PreviewViewer preview;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final VBox tooltipContent = new VBox();
     private final Label fieldValueLabel = new Label();
 
-    public MainTableTooltip(BibDatabaseContext databaseContext, DialogService dialogService, PreferencesService preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
+    public MainTableTooltip(BibDatabaseContext databaseContext, DialogService dialogService, Preferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.preview = new PreviewViewer(databaseContext, dialogService, preferences, themeManager, taskExecutor);
         this.setShowDelay(Duration.seconds(1));

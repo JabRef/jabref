@@ -57,7 +57,7 @@ import org.jabref.model.search.SearchQuery;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.base.Throwables;
@@ -73,7 +73,7 @@ public class ArgumentProcessor {
 
     private final Mode startupMode;
 
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
 
@@ -86,13 +86,13 @@ public class ArgumentProcessor {
      */
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
-                             PreferencesService preferencesService,
+                             Preferences preferences,
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager)
             throws org.apache.commons.cli.ParseException {
         this.cli = new JabRefCLI(args);
         this.startupMode = startupMode;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
     }
@@ -166,9 +166,9 @@ public class ArgumentProcessor {
     private Optional<ParserResult> importFile(Path file, String importFormat) {
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
-                    preferencesService.getImporterPreferences(),
-                    preferencesService.getImportFormatPreferences(),
-                    preferencesService.getCitationKeyPatternPreferences(),
+                    preferences.getImporterPreferences(),
+                    preferences.getImportFormatPreferences(),
+                    preferences.getCitationKeyPatternPreferences(),
                     fileUpdateMonitor
             );
 
@@ -200,7 +200,7 @@ public class ArgumentProcessor {
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
-            JabRefCLI.printUsage(preferencesService);
+            JabRefCLI.printUsage(preferences);
             guiNeeded = false;
             return;
         }
@@ -249,11 +249,11 @@ public class ArgumentProcessor {
             if (!loaded.isEmpty()) {
                 writeMetadataToPdf(loaded,
                         cli.getWriteMetadataToPdf(),
-                        preferencesService.getXmpPreferences(),
-                        preferencesService.getFilePreferences(),
-                        preferencesService.getLibraryPreferences().getDefaultBibDatabaseMode(),
+                        preferences.getXmpPreferences(),
+                        preferences.getFilePreferences(),
+                        preferences.getLibraryPreferences().getDefaultBibDatabaseMode(),
                         Injector.instantiateModelOrService(BibEntryTypesManager.class),
-                        preferencesService.getFieldPreferences(),
+                        preferences.getFieldPreferences(),
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                         cli.isWriteXmpToPdf() || cli.isWriteMetadataToPdf(),
                         cli.isEmbedBibFileInPdf() || cli.isWriteMetadataToPdf());
@@ -271,7 +271,7 @@ public class ArgumentProcessor {
 
         if (cli.isPreferencesExport()) {
             try {
-                preferencesService.exportPreferences(Path.of(cli.getPreferencesExport()));
+                preferences.exportPreferences(Path.of(cli.getPreferencesExport()));
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot export preferences", ex);
             }
@@ -456,13 +456,13 @@ public class ArgumentProcessor {
         ParserResult pr = loaded.getLast();
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
 
-        SearchPreferences searchPreferences = preferencesService.getSearchPreferences();
+        SearchPreferences searchPreferences = preferences.getSearchPreferences();
         SearchQuery query = new SearchQuery(searchTerm, searchPreferences.getSearchFlags());
 
         List<BibEntry> matches;
         try {
             // extract current thread task executor from luceneManager
-            matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), preferencesService.getFilePreferences()).getMatches();
+            matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), preferences.getFilePreferences()).getMatches();
         } catch (IOException e) {
             LOGGER.error("Error occurred when searching", e);
             return false;
@@ -494,7 +494,7 @@ public class ArgumentProcessor {
             } else {
                 // export new database
                 ExporterFactory exporterFactory = ExporterFactory.create(
-                        preferencesService,
+                        preferences,
                         Injector.instantiateModelOrService(BibEntryTypesManager.class));
                 Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
                 if (exporter.isEmpty()) {
@@ -554,7 +554,7 @@ public class ArgumentProcessor {
                     try {
                         pr = OpenDatabase.loadDatabase(
                                 Path.of(aLeftOver),
-                                preferencesService.getImportFormatPreferences(),
+                                preferences.getImportFormatPreferences(),
                                 fileUpdateMonitor);
                         // In contrast to org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed, we do not execute OpenDatabaseAction.performPostOpenActions(result, dialogService);
                     } catch (IOException ex) {
@@ -594,7 +594,7 @@ public class ArgumentProcessor {
         }
 
         if (!cli.isBlank() && cli.isBibtexImport()) {
-            importBibtexToOpenBase(cli.getBibtexImport(), preferencesService.getImportFormatPreferences()).ifPresent(loaded::add);
+            importBibtexToOpenBase(cli.getBibtexImport(), preferences.getImportFormatPreferences()).ifPresent(loaded::add);
         }
 
         return loaded;
@@ -630,12 +630,12 @@ public class ArgumentProcessor {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8)) {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
                 SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
-                        .withReformatOnSave(preferencesService.getLibraryPreferences().shouldAlwaysReformatOnSave());
+                        .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
                         bibWriter,
                         saveConfiguration,
-                        preferencesService.getFieldPreferences(),
-                        preferencesService.getCitationKeyPatternPreferences(),
+                        preferences.getFieldPreferences(),
+                        preferences.getCitationKeyPatternPreferences(),
                         entryTypesManager);
                 databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
@@ -671,10 +671,10 @@ public class ArgumentProcessor {
             BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
             databaseContext.setDatabasePath(path);
             List<Path> fileDirForDatabase = databaseContext
-                    .getFileDirectories(preferencesService.getFilePreferences());
+                    .getFileDirectories(preferences.getFilePreferences());
             System.out.println(Localization.lang("Exporting %0", data[0]));
             ExporterFactory exporterFactory = ExporterFactory.create(
-                    preferencesService,
+                    preferences,
                     Injector.instantiateModelOrService(BibEntryTypesManager.class));
             Optional<Exporter> exporter = exporterFactory.getExporterByName(data[1]);
             if (exporter.isEmpty()) {
@@ -697,8 +697,8 @@ public class ArgumentProcessor {
 
     private void importPreferences() {
         try {
-            preferencesService.importPreferences(Path.of(cli.getPreferencesImport()));
-            Injector.setModelOrService(BibEntryTypesManager.class, preferencesService.getCustomEntryTypesRepository());
+            preferences.importPreferences(Path.of(cli.getPreferencesImport()));
+            Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }
@@ -708,7 +708,7 @@ public class ArgumentProcessor {
         if ("all".equals(value.trim())) {
             try {
                 System.out.println(Localization.lang("Setting all preferences to default values."));
-                preferencesService.clear();
+                preferences.clear();
                 new SharedDatabasePreferences().clear();
             } catch (BackingStoreException e) {
                 System.err.println(Localization.lang("Unable to clear preferences."));
@@ -718,7 +718,7 @@ public class ArgumentProcessor {
             String[] keys = value.split(",");
             for (String key : keys) {
                 try {
-                    preferencesService.deleteKey(key.trim());
+                    preferences.deleteKey(key.trim());
                     System.out.println(Localization.lang("Resetting preference key '%0'", key.trim()));
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
@@ -737,9 +737,9 @@ public class ArgumentProcessor {
 
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                     parserResult.getDatabaseContext(),
-                    preferencesService.getExternalApplicationsPreferences(),
-                    preferencesService.getFilePreferences(),
-                    preferencesService.getAutoLinkPreferences());
+                    preferences.getExternalApplicationsPreferences(),
+                    preferences.getFilePreferences(),
+                    preferences.getAutoLinkPreferences());
 
             util.linkAssociatedFiles(database.getEntries(), (linkedFile, bibEntry) -> bibEntry.addFile(linkedFile));
         }
@@ -753,7 +753,7 @@ public class ArgumentProcessor {
 
             CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                     parserResult.getDatabaseContext(),
-                    preferencesService.getCitationKeyPatternPreferences());
+                    preferences.getCitationKeyPatternPreferences());
             for (BibEntry entry : database.getEntries()) {
                 keyGenerator.generateAndSetKey(entry);
             }
@@ -778,8 +778,8 @@ public class ArgumentProcessor {
         String query = split[1];
 
         Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(
-                preferencesService.getImportFormatPreferences(),
-                preferencesService.getImporterPreferences());
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences());
         Optional<SearchBasedFetcher> selectedFetcher = fetchers.stream()
                                                                .filter(fetcher -> fetcher.getName().equalsIgnoreCase(engine))
                                                                .findFirst();

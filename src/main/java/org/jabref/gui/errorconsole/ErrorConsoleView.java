@@ -28,7 +28,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -44,7 +44,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
     @FXML private Label descriptionLabel;
 
     @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferencesService;
+    @Inject private Preferences preferences;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
     @Inject private KeyBindingRepository keyBindingRepository;
@@ -67,7 +67,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ErrorConsoleViewModel(dialogService, preferencesService, clipBoardManager, buildInfo);
+        viewModel = new ErrorConsoleViewModel(dialogService, preferences, clipBoardManager, buildInfo);
         messagesListView.setCellFactory(createCellFactory());
         messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
         messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);

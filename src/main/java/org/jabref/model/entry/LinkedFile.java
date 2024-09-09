@@ -26,7 +26,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -259,13 +259,13 @@ public class LinkedFile implements Serializable {
                                        BibDatabaseContext databaseContext,
                                        TaskExecutor taskExecutor,
                                        DialogService dialogService,
-                                       PreferencesService preferencesService) {
+                                       Preferences preferences) {
         return new LinkedFileViewModel(
                 this,
                 entry,
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferencesService);
+                preferences);
     }
 }

@@ -30,7 +30,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.controlsfx.control.action.Action;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class ExportCommand extends SimpleCommand {
     private final ExportMethod exportMethod;
     private final Supplier<LibraryTab> tabSupplier;
     private final StateManager stateManager;
-    private final PreferencesService preferences;
+    private final Preferences preferences;
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final JournalAbbreviationRepository abbreviationRepository;
@@ -58,7 +58,7 @@ public class ExportCommand extends SimpleCommand {
                          Supplier<LibraryTab> tabSupplier,
                          StateManager stateManager,
                          DialogService dialogService,
-                         PreferencesService preferences,
+                         Preferences preferences,
                          BibEntryTypesManager entryTypesManager,
                          JournalAbbreviationRepository abbreviationRepository,
                          TaskExecutor taskExecutor) {

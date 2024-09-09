@@ -49,7 +49,7 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
 
     @FXML
     public void initialize() {
-        viewModel = new ProtectedTermsTabViewModel(termsLoader, dialogService, preferencesService);
+        viewModel = new ProtectedTermsTabViewModel(termsLoader, dialogService, preferences);
 
         new ViewModelTableRowFactory<ProtectedTermsListItemModel>()
                 .withContextMenu(this::createContextMenu)

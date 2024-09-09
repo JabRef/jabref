@@ -14,7 +14,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -39,12 +39,12 @@ public class ExporterTest {
     }
 
     private static Stream<Object[]> exportFormats() {
-        PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferencesService.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
-        when(preferencesService.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
+        Preferences preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
+        when(preferences.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
 
         ExporterFactory exporterFactory = ExporterFactory.create(
-                preferencesService,
+                preferences,
                 mock(BibEntryTypesManager.class));
 
         Collection<Object[]> result = new ArrayList<>();

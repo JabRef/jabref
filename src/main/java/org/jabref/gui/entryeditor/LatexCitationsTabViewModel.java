@@ -29,7 +29,7 @@ import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.texparser.LatexParserResults;
 import org.jabref.model.util.DirectoryMonitorManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -51,7 +51,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private static final String TEX_EXT = ".tex";
     private static final IOFileFilter FILE_FILTER = FileFilterUtils.or(FileFilterUtils.suffixFileFilter(TEX_EXT), FileFilterUtils.directoryFileFilter());
     private final BibDatabaseContext databaseContext;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final DialogService dialogService;
     private final ObjectProperty<Path> directory;
     private final ObservableList<Citation> citationList;
@@ -66,15 +66,15 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private BibEntry currentEntry;
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext,
-                                      PreferencesService preferencesService,
+                                      Preferences preferences,
                                       DialogService dialogService,
                                       DirectoryMonitorManager directoryMonitorManager) {
 
         this.databaseContext = databaseContext;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.dialogService = dialogService;
-        this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
-                                                                   .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory())));
+        this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                                                   .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory())));
 
         this.citationList = FXCollections.observableArrayList();
         this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
@@ -181,14 +181,14 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 .withInitialDirectory(directory.get()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
-                databaseContext.getMetaData().setLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath()));
+                databaseContext.getMetaData().setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath()));
 
         checkAndUpdateDirectory();
     }
 
     private void checkAndUpdateDirectory() {
-        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getFilePreferences().getUserAndHost())
-                                           .orElse(FileUtil.getInitialDirectory(databaseContext, preferencesService.getFilePreferences().getWorkingDirectory()));
+        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                           .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()));
 
         if (!newDirectory.equals(directory.get())) {
             status.set(Status.IN_PROGRESS);
@@ -233,6 +233,6 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     public boolean shouldShow() {
-        return preferencesService.getEntryEditorPreferences().shouldShowLatexCitationsTab();
+        return preferences.getEntryEditorPreferences().shouldShowLatexCitationsTab();
     }
 }

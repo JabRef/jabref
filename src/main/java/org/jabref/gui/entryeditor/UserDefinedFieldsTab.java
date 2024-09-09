@@ -20,7 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class UserDefinedFieldsTab extends FieldsEditorTab {
     private final LinkedHashSet<Field> fields;
@@ -33,7 +33,7 @@ public class UserDefinedFieldsTab extends FieldsEditorTab {
                                 UndoAction undoAction,
                                 RedoAction redoAction,
                                 DialogService dialogService,
-                                PreferencesService preferences,
+                                Preferences preferences,
                                 ThemeManager themeManager,
                                 TaskExecutor taskExecutor,
                                 JournalAbbreviationRepository journalAbbreviationRepository,

@@ -21,7 +21,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -43,7 +43,7 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
     @FXML private ButtonType parseButtonType;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private PreferencesService preferencesService;
+    @Inject private Preferences preferences;
     @Inject private FileUpdateMonitor fileMonitor;
     @Inject private ThemeManager themeManager;
     private ParseLatexDialogViewModel viewModel;
@@ -66,7 +66,7 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ParseLatexDialogViewModel(databaseContext, dialogService, taskExecutor, preferencesService, fileMonitor);
+        viewModel = new ParseLatexDialogViewModel(databaseContext, dialogService, taskExecutor, preferences, fileMonitor);
 
         fileTreeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         fileTreeView.showRootProperty().bindBidirectional(viewModel.successfulSearchProperty());

@@ -14,7 +14,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public abstract class NewLibraryFromPdfAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(NewLibraryFromPdfAction.class);
 
-    protected final PreferencesService preferencesService;
+    protected final Preferences preferences;
 
     private final LibraryTabContainer libraryTabContainer;
     private final StateManager stateManager;
@@ -41,12 +41,12 @@ public abstract class NewLibraryFromPdfAction extends SimpleCommand {
             LibraryTabContainer libraryTabContainer,
             StateManager stateManager,
             DialogService dialogService,
-            PreferencesService preferencesService,
+            Preferences preferences,
             TaskExecutor taskExecutor) {
         this.libraryTabContainer = libraryTabContainer;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
     }
 

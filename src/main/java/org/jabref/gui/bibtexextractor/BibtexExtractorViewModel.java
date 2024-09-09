@@ -18,7 +18,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class BibtexExtractorViewModel {
 
     private final boolean onlineMode;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final TaskExecutor taskExecutor;
 
     private final ImportHandler importHandler;
@@ -44,18 +44,18 @@ public class BibtexExtractorViewModel {
     public BibtexExtractorViewModel(boolean onlineMode,
                                           BibDatabaseContext bibdatabaseContext,
                                           DialogService dialogService,
-                                          PreferencesService preferencesService,
+                                          Preferences preferences,
                                           FileUpdateMonitor fileUpdateMonitor,
                                           TaskExecutor taskExecutor,
                                           UndoManager undoManager,
                                           StateManager stateManager) {
         this.onlineMode = onlineMode;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.importHandler = new ImportHandler(
                 bibdatabaseContext,
-                preferencesService,
+                preferences,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager,
@@ -77,7 +77,7 @@ public class BibtexExtractorViewModel {
     }
 
     private void startParsingOnline() {
-        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService.getGrobidPreferences(), preferencesService.getImportFormatPreferences());
+        GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
         BackgroundTask.wrap(() -> grobidCitationFetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onFailure(e -> {

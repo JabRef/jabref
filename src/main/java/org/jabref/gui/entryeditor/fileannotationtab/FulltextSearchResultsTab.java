@@ -36,7 +36,7 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResult;
 import org.jabref.model.search.SearchResults;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
 
     private final StateManager stateManager;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final BibDatabaseContext databaseContext;
@@ -58,13 +58,13 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private DocumentViewerView documentViewerView;
 
     public FulltextSearchResultsTab(StateManager stateManager,
-                                    PreferencesService preferencesService,
+                                    Preferences preferences,
                                     DialogService dialogService,
                                     BibDatabaseContext databaseContext,
                                     TaskExecutor taskExecutor,
                                     OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         this.stateManager = stateManager;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.actionFactory = new ActionFactory();
@@ -136,13 +136,13 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         fileLinkText.setStyle("-fx-font-weight: bold;");
 
         ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
-        Path resolvedPath = linkedFile.findIn(databaseContext, preferencesService.getFilePreferences()).orElse(Path.of(linkedFile.getLink()));
+        Path resolvedPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).orElse(Path.of(linkedFile.getLink()));
         Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
         Tooltip.install(fileLinkText, fileLinkTooltip);
         fileLinkText.setOnMouseClicked(event -> {
             if (MouseButton.PRIMARY == event.getButton()) {
                 try {
-                    NativeDesktop.openBrowser(resolvedPath.toUri(), preferencesService.getExternalApplicationsPreferences());
+                    NativeDesktop.openBrowser(resolvedPath.toUri(), preferences.getExternalApplicationsPreferences());
                 } catch (IOException e) {
                     LOGGER.error("Cannot open {}.", resolvedPath, e);
                 }
@@ -171,9 +171,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private ContextMenu getFileContextMenu(LinkedFile file) {
         ContextMenu fileContextMenu = new ContextMenu();
         fileContextMenu.getItems().add(actionFactory.createMenuItem(
-                StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferencesService, entry, file, taskExecutor)));
+                StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, entry, file, taskExecutor)));
         fileContextMenu.getItems().add(actionFactory.createMenuItem(
-                StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferencesService, entry, file, taskExecutor)));
+                StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferences, entry, file, taskExecutor)));
         return fileContextMenu;
     }
 

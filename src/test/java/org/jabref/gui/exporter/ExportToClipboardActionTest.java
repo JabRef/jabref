@@ -26,7 +26,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class ExportToClipboardActionTest {
     private final DialogService dialogService = spy(DialogService.class);
     private final ClipBoardManager clipBoardManager = mock(ClipBoardManager.class);
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
-    private final PreferencesService preferences = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+    private final Preferences preferences = mock(Preferences.class, Answers.RETURNS_DEEP_STUBS);
     private final StateManager stateManager = mock(StateManager.class);
 
     private TaskExecutor taskExecutor;

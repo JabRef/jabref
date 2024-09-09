@@ -47,7 +47,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -83,7 +83,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final AiService aiService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
     private final StateManager stateManager;
@@ -103,7 +103,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
                                               DialogService dialogService,
-                                              PreferencesService preferencesService,
+                                              Preferences preferences,
                                               AiService aiService,
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,
@@ -113,7 +113,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                                               TaskExecutor taskExecutor) {
         this.tabContainer = tabContainer;
         this.dialogService = dialogService;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.aiService = aiService;
         this.stateManager = stateManager;
         this.entryTypesManager = entryTypesManager;
@@ -195,7 +195,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
             SharedDatabaseUIManager manager = new SharedDatabaseUIManager(
                     tabContainer,
                     dialogService,
-                    preferencesService,
+                    preferences,
                     aiService,
                     stateManager,
                     entryTypesManager,
@@ -211,7 +211,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     new SaveDatabaseAction(
                             libraryTab,
                             dialogService,
-                            preferencesService,
+                            preferences,
                             Injector.instantiateModelOrService(BibEntryTypesManager.class)
                     ).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
@@ -234,7 +234,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             Localization.lang("However, a new database was created alongside the pre-3.6 one."),
                     ButtonType.OK, openHelp);
 
-            result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferencesService.getExternalApplicationsPreferences()).execute());
+            result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
             result.filter(btn -> btn.equals(ButtonType.OK)).ifPresent(btn -> openSharedDatabase(connectionProperties));
         }
         loading.set(false);
@@ -322,7 +322,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BIBTEX_DB)
                 .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
         Optional<Path> exportPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
         exportPath.ifPresent(path -> folder.setValue(path.toString()));
@@ -333,7 +333,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 .addExtensionFilter(FileFilterConverter.ANY_FILE)
                 .addExtensionFilter(StandardFileType.JAVA_KEYSTORE)
                 .withDefaultExtension(StandardFileType.JAVA_KEYSTORE)
-                .withInitialDirectory(preferencesService.getFilePreferences().getWorkingDirectory())
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
         Optional<Path> keystorePath = dialogService.showFileOpenDialog(fileDialogConfiguration);
         keystorePath.ifPresent(path -> keystore.setValue(path.toString()));

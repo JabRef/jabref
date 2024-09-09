@@ -38,7 +38,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class StyleSelectDialogViewModel {
 
@@ -56,13 +56,13 @@ public class StyleSelectDialogViewModel {
 
     public StyleSelectDialogViewModel(DialogService dialogService,
                                       StyleLoader styleLoader,
-                                      PreferencesService preferencesService,
+                                      Preferences preferences,
                                       TaskExecutor taskExecutor,
                                       BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
-        this.externalApplicationsPreferences = preferencesService.getExternalApplicationsPreferences();
-        this.filePreferences = preferencesService.getFilePreferences();
-        this.openOfficePreferences = preferencesService.getOpenOfficePreferences();
+        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        this.filePreferences = preferences.getFilePreferences();
+        this.openOfficePreferences = preferences.getOpenOfficePreferences();
         this.styleLoader = styleLoader;
 
         styles.addAll(loadStyles());

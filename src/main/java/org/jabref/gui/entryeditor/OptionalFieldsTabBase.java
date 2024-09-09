@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 public class OptionalFieldsTabBase extends FieldsEditorTab {
     private final BibEntryTypesManager entryTypesManager;
@@ -40,7 +40,7 @@ public class OptionalFieldsTabBase extends FieldsEditorTab {
                                  UndoAction undoAction,
                                  RedoAction redoAction,
                                  DialogService dialogService,
-                                 PreferencesService preferences,
+                                 Preferences preferences,
                                  ThemeManager themeManager,
                                  BibEntryTypesManager entryTypesManager,
                                  TaskExecutor taskExecutor,

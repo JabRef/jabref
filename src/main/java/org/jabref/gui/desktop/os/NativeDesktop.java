@@ -31,7 +31,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.LoggerFactory;
@@ -66,7 +66,7 @@ public abstract class NativeDesktop {
      * Opening a PDF file at the file field is done at {@link org.jabref.gui.fieldeditors.LinkedFileViewModel#open}
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext,
-                                          PreferencesService preferencesService,
+                                          Preferences preferences,
                                           String initialLink,
                                           Field initialField,
                                           DialogService dialogService,
@@ -76,7 +76,7 @@ public abstract class NativeDesktop {
         Field field = initialField;
         if ((PS == field) || (PDF == field)) {
             // Find the default directory for this field type:
-            List<Path> directories = databaseContext.getFileDirectories(preferencesService.getFilePreferences());
+            List<Path> directories = databaseContext.getFileDirectories(preferences.getFilePreferences());
 
             Optional<Path> file = FileUtil.find(link, directories);
 
@@ -97,10 +97,10 @@ public abstract class NativeDesktop {
                 }
             }
         } else if (StandardField.DOI == field) {
-            openDoi(link, preferencesService);
+            openDoi(link, preferences);
             return;
         } else if (StandardField.ISBN == field) {
-            openIsbn(link, preferencesService);
+            openIsbn(link, preferences);
             return;
         } else if (StandardField.EPRINT == field) {
             IdentifierParser identifierParser = new IdentifierParser(entry);
@@ -125,17 +125,17 @@ public abstract class NativeDesktop {
 
         switch (field) {
             case URL ->
-                    openBrowser(link, preferencesService.getExternalApplicationsPreferences());
+                    openBrowser(link, preferences.getExternalApplicationsPreferences());
             case PS -> {
                 try {
-                    get().openFile(link, PS.getName(), preferencesService.getExternalApplicationsPreferences());
+                    get().openFile(link, PS.getName(), preferences.getExternalApplicationsPreferences());
                 } catch (IOException e) {
                     LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
                 }
             }
             case PDF -> {
                 try {
-                    get().openFile(link, PDF.getName(), preferencesService.getExternalApplicationsPreferences());
+                    get().openFile(link, PDF.getName(), preferences.getExternalApplicationsPreferences());
                 } catch (IOException e) {
                     LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
                 }
@@ -145,12 +145,12 @@ public abstract class NativeDesktop {
         }
     }
 
-    private static void openDoi(String doi, PreferencesService preferencesService) throws IOException {
+    private static void openDoi(String doi, Preferences preferences) throws IOException {
         String link = DOI.parse(doi).map(DOI::getURIAsASCIIString).orElse(doi);
-        openBrowser(link, preferencesService.getExternalApplicationsPreferences());
+        openBrowser(link, preferences.getExternalApplicationsPreferences());
     }
 
-    public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
+    public static void openCustomDoi(String link, Preferences preferences, DialogService dialogService) {
         DOI.parse(link)
            .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
            .ifPresent(uri -> {
@@ -162,9 +162,9 @@ public abstract class NativeDesktop {
            });
     }
 
-    private static void openIsbn(String isbn, PreferencesService preferencesService) throws IOException {
+    private static void openIsbn(String isbn, Preferences preferences) throws IOException {
         String link = "https://openlibrary.org/isbn/" + isbn;
-        openBrowser(link, preferencesService.getExternalApplicationsPreferences());
+        openBrowser(link, preferences.getExternalApplicationsPreferences());
     }
 
     /**
@@ -249,19 +249,19 @@ public abstract class NativeDesktop {
      *
      * @param file Location the console should be opened at.
      */
-    public static void openConsole(Path file, PreferencesService preferencesService, DialogService dialogService) throws IOException {
+    public static void openConsole(Path file, Preferences preferences, DialogService dialogService) throws IOException {
         if (file == null) {
             return;
         }
 
         String absolutePath = file.toAbsolutePath().getParent().toString();
 
-        boolean useCustomTerminal = preferencesService.getExternalApplicationsPreferences().useCustomTerminal();
+        boolean useCustomTerminal = preferences.getExternalApplicationsPreferences().useCustomTerminal();
         if (!useCustomTerminal) {
             get().openConsole(absolutePath, dialogService);
             return;
         }
-        String command = preferencesService.getExternalApplicationsPreferences().getCustomTerminalCommand();
+        String command = preferences.getExternalApplicationsPreferences().getCustomTerminalCommand();
         command = command.trim();
         if (command.isEmpty()) {
             get().openConsole(absolutePath, dialogService);

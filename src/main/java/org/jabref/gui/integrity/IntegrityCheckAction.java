@@ -18,7 +18,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -27,12 +27,12 @@ public class IntegrityCheckAction extends SimpleCommand {
     private final UiTaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final Supplier<LibraryTab> tabSupplier;
-    private final PreferencesService preferencesService;
+    private final Preferences preferences;
     private final StateManager stateManager;
     private final JournalAbbreviationRepository abbreviationRepository;
 
     public IntegrityCheckAction(Supplier<LibraryTab> tabSupplier,
-                                PreferencesService preferencesService,
+                                Preferences preferences,
                                 DialogService dialogService,
                                 StateManager stateManager,
                                 UiTaskExecutor taskExecutor,
@@ -40,7 +40,7 @@ public class IntegrityCheckAction extends SimpleCommand {
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
-        this.preferencesService = preferencesService;
+        this.preferences = preferences;
         this.dialogService = dialogService;
         this.abbreviationRepository = abbreviationRepository;
         this.executable.bind(needsDatabase(this.stateManager));
@@ -50,10 +50,10 @@ public class IntegrityCheckAction extends SimpleCommand {
     public void execute() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         IntegrityCheck check = new IntegrityCheck(database,
-                preferencesService.getFilePreferences(),
-                preferencesService.getCitationKeyPatternPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences(),
                 abbreviationRepository,
-                preferencesService.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
+                preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());
 
         Task<List<IntegrityMessage>> task = new Task<>() {
             @Override

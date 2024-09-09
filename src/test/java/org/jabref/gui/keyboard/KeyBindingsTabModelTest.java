@@ -10,7 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.keybindings.KeyBindingViewModel;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTabViewModel;
 import org.jabref.logic.os.OS;
-import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,10 +35,10 @@ class KeyBindingsTabModelTest {
     @BeforeEach
     void setUp() {
         keyBindingRepository = new KeyBindingRepository();
-        PreferencesService preferencesService = mock(PreferencesService.class);
-        when(preferencesService.getKeyBindingRepository()).thenReturn(keyBindingRepository);
+        Preferences preferences = mock(Preferences.class);
+        when(preferences.getKeyBindingRepository()).thenReturn(keyBindingRepository);
         Injector.setModelOrService(KeyBindingRepository.class, keyBindingRepository);
-        model = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), preferencesService);
+        model = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), preferences);
     }
 
     @Test
