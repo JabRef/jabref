@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor;
+package org.jabref.logic.importer.fetcher;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

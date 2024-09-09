@@ -9,7 +9,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.entryeditor.MrDlibPreferences;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
