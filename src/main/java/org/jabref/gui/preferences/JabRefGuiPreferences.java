@@ -7,10 +7,14 @@ import java.util.SequencedMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.collections.SetChangeListener;
+
+import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -19,6 +23,9 @@ import org.jabref.model.strings.StringUtil;
 import com.tobiasdiez.easybind.EasyBind;
 
 public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPreferences {
+
+    // AutcompleteFields - public because needed for pref migration
+    public static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
 
     private static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
 
@@ -29,10 +36,18 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private static final String JOURNAL_POPUP = "journalPopup";
 
+    // region Auto completion
+    private static final String AUTO_COMPLETE = "autoComplete";
+    private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
+    private static final String AUTOCOMPLETER_LAST_FIRST = "autoCompLF";
+    private static final String AUTOCOMPLETER_FIRST_LAST = "autoCompFF";
+   // endregion
+
     private static JabRefGuiPreferences singleton;
 
     private EntryEditorPreferences entryEditorPreferences;
     private MergeDialogPreferences mergeDialogPreferences;
+    private AutoCompletePreferences autoCompletePreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -50,6 +65,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
         defaults.put(MERGE_APPLY_TO_ALL_ENTRIES, Boolean.FALSE);
         defaults.put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, DuplicateResolverDialog.DuplicateResolverResult.BREAK.name());
+        // endregion
+
+        // region autoCompletePreferences
+        defaults.put(AUTO_COMPLETE, Boolean.FALSE);
+        defaults.put(AUTOCOMPLETER_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
+        defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
+        defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
+        defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
         // endregion
     }
 
@@ -195,5 +218,47 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), (obs, oldValue, newValue) -> put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, newValue.name()));
 
         return mergeDialogPreferences;
+    }
+
+    @Override
+    public AutoCompletePreferences getAutoCompletePreferences() {
+        if (autoCompletePreferences != null) {
+            return autoCompletePreferences;
+        }
+
+        AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
+        if (getBoolean(AUTOCOMPLETER_LAST_FIRST)) {
+            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
+        } else if (getBoolean(AUTOCOMPLETER_FIRST_LAST)) {
+            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
+        }
+
+        autoCompletePreferences = new AutoCompletePreferences(
+                getBoolean(AUTO_COMPLETE),
+                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
+                nameFormat,
+                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet())
+        );
+
+        EasyBind.listen(autoCompletePreferences.autoCompleteProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_COMPLETE, newValue));
+        EasyBind.listen(autoCompletePreferences.firstNameModeProperty(), (obs, oldValue, newValue) -> put(AUTOCOMPLETER_FIRSTNAME_MODE, newValue.name()));
+        autoCompletePreferences.getCompleteFields().addListener((SetChangeListener<Field>) c ->
+                putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream()
+                                                                                    .map(Field::getName)
+                                                                                    .collect(Collectors.toList())));
+        EasyBind.listen(autoCompletePreferences.nameFormatProperty(), (obs, oldValue, newValue) -> {
+            if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.BOTH) {
+                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
+                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
+            } else if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
+                putBoolean(AUTOCOMPLETER_LAST_FIRST, true);
+                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
+            } else {
+                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
+                putBoolean(AUTOCOMPLETER_FIRST_LAST, true);
+            }
+        });
+
+        return autoCompletePreferences;
     }
 }

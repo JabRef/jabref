@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 
@@ -7,4 +8,6 @@ public interface GuiPreferences extends org.jabref.logic.preferences.CliPreferen
     EntryEditorPreferences getEntryEditorPreferences();
 
     MergeDialogPreferences getMergeDialogPreferences();
+
+    AutoCompletePreferences getAutoCompletePreferences();
 }

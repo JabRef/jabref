@@ -53,6 +53,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -63,7 +64,6 @@ import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.Author;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.AutoCompletePopup;
@@ -89,7 +89,7 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton filterModeButton;
     private final Tooltip searchFieldTooltip = new Tooltip();
     private final StateManager stateManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final LibraryTabContainer tabContainer;
     private final SearchPreferences searchPreferences;
@@ -101,7 +101,7 @@ public class GlobalSearchBar extends HBox {
 
     public GlobalSearchBar(LibraryTabContainer tabContainer,
                            StateManager stateManager,
-                           CliPreferences preferences,
+                           GuiPreferences preferences,
                            UndoManager undoManager,
                            DialogService dialogService,
                            SearchType searchType) {

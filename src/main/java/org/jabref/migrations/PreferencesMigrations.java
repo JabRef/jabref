@@ -297,11 +297,11 @@ public class PreferencesMigrations {
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefCliPreferences prefs) {
         // LinkedHashSet because we want to retain the order and add new fields to the end
-        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefCliPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
+        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
         keys.add("crossref");
         keys.add("related");
         keys.add("entryset");
-        prefs.putStringList(JabRefCliPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, new ArrayList<>(keys));
+        prefs.putStringList(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, new ArrayList<>(keys));
     }
 
     private static void migrateTypedKeyPrefs(JabRefCliPreferences prefs, Preferences oldPatternPrefs)

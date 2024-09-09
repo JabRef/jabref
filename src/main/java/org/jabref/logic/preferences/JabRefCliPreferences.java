@@ -34,7 +34,6 @@ import javafx.scene.control.TableColumn.SortType;
 
 import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
-import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -385,9 +384,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // KeyBindings - keys - public because needed for pref migration
     public static final String BINDINGS = "bindings";
 
-    // AutcompleteFields - public because needed for pref migration
-    public static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
-
     // Id Entry Generator Preferences
     public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
 
@@ -421,12 +417,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // SSL
     private static final String TRUSTSTORE_PATH = "truststorePath";
-
-    // Auto completion
-    private static final String AUTO_COMPLETE = "autoComplete";
-    private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
-    private static final String AUTOCOMPLETER_LAST_FIRST = "autoCompLF";
-    private static final String AUTOCOMPLETER_FIRST_LAST = "autoCompFF";
 
     private static final String BIND_NAMES = "bindNames";
     // User
@@ -529,7 +519,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private SpecialFieldsPreferences specialFieldsPreferences;
     private GroupsPreferences groupsPreferences;
     private XmpPreferences xmpPreferences;
-    private AutoCompletePreferences autoCompletePreferences;
     private CleanupPreferences cleanupPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
     private ExternalApplicationsPreferences externalApplicationsPreferences;
@@ -705,11 +694,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(SEND_OS_DATA, Boolean.FALSE);
         defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);
         defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);
-        defaults.put(AUTO_COMPLETE, Boolean.FALSE);
-        defaults.put(AUTOCOMPLETER_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
-        defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
-        defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(DISPLAY_GROUP_COUNT, Boolean.TRUE);
         defaults.put(GROUP_VIEW_INTERSECTION, Boolean.TRUE);
@@ -2750,48 +2734,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 putStringList(NAME_FORMATTER_VALUE, nameFormatterPreferences.getNameFormatterValue()));
 
         return nameFormatterPreferences;
-    }
-
-    @Override
-    public AutoCompletePreferences getAutoCompletePreferences() {
-        if (autoCompletePreferences != null) {
-            return autoCompletePreferences;
-        }
-
-        AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
-        if (getBoolean(AUTOCOMPLETER_LAST_FIRST)) {
-            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
-        } else if (getBoolean(AUTOCOMPLETER_FIRST_LAST)) {
-            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
-        }
-
-        autoCompletePreferences = new AutoCompletePreferences(
-                getBoolean(AUTO_COMPLETE),
-                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
-                nameFormat,
-                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet())
-        );
-
-        EasyBind.listen(autoCompletePreferences.autoCompleteProperty(), (obs, oldValue, newValue) -> putBoolean(AUTO_COMPLETE, newValue));
-        EasyBind.listen(autoCompletePreferences.firstNameModeProperty(), (obs, oldValue, newValue) -> put(AUTOCOMPLETER_FIRSTNAME_MODE, newValue.name()));
-        autoCompletePreferences.getCompleteFields().addListener((SetChangeListener<Field>) c ->
-                putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream()
-                                                                                    .map(Field::getName)
-                                                                                    .collect(Collectors.toList())));
-        EasyBind.listen(autoCompletePreferences.nameFormatProperty(), (obs, oldValue, newValue) -> {
-            if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.BOTH) {
-                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-            } else if (autoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
-                putBoolean(AUTOCOMPLETER_LAST_FIRST, true);
-                putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-            } else {
-                putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
-                putBoolean(AUTOCOMPLETER_FIRST_LAST, true);
-            }
-        });
-
-        return autoCompletePreferences;
     }
 
     @Override
