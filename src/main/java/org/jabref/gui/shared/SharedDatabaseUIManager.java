@@ -19,6 +19,7 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
@@ -39,7 +40,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -48,7 +48,7 @@ public class SharedDatabaseUIManager {
     private final LibraryTabContainer tabContainer;
     private DatabaseSynchronizer dbmsSynchronizer;
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final AiService aiService;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -59,7 +59,7 @@ public class SharedDatabaseUIManager {
 
     public SharedDatabaseUIManager(LibraryTabContainer tabContainer,
                                    DialogService dialogService,
-                                   CliPreferences preferences,
+                                   GuiPreferences preferences,
                                    AiService aiService,
                                    StateManager stateManager,
                                    BibEntryTypesManager entryTypesManager,

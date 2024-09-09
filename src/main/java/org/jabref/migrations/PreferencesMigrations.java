@@ -20,6 +20,8 @@ import org.jabref.gui.entryeditor.CommentsTab;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -46,7 +48,7 @@ public class PreferencesMigrations {
     /**
      * Perform checks and changes for users with a preference set from an older JabRef version.
      */
-    public static void runMigrations(JabRefCliPreferences preferences, BibEntryTypesManager entryTypesManager) {
+    public static void runMigrations(JabRefGuiPreferences preferences, BibEntryTypesManager entryTypesManager) {
         Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
@@ -551,7 +553,7 @@ public class PreferencesMigrations {
      * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link EntryEditor#createTabs()}.
      * Thus, the configuration ih the preferences is obsolete
      */
-    static void removeCommentsFromCustomEditorTabs(JabRefCliPreferences preferences) {
+    static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
         preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
     }
 }

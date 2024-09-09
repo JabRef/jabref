@@ -35,6 +35,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -59,7 +60,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
@@ -92,7 +92,7 @@ public class OpenOfficePanel {
     private final Button help;
     private final VBox vbox = new VBox();
 
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
@@ -105,7 +105,7 @@ public class OpenOfficePanel {
     private OOStyle currentStyle;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
-                           CliPreferences preferences,
+                           GuiPreferences preferences,
                            JournalAbbreviationRepository abbreviationRepository,
                            UiTaskExecutor taskExecutor,
                            DialogService dialogService,

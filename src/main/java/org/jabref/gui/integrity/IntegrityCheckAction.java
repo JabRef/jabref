@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
@@ -18,7 +19,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.CliPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -27,12 +27,12 @@ public class IntegrityCheckAction extends SimpleCommand {
     private final UiTaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final Supplier<LibraryTab> tabSupplier;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final JournalAbbreviationRepository abbreviationRepository;
 
     public IntegrityCheckAction(Supplier<LibraryTab> tabSupplier,
-                                CliPreferences preferences,
+                                GuiPreferences preferences,
                                 DialogService dialogService,
                                 StateManager stateManager,
                                 UiTaskExecutor taskExecutor,

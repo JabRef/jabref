@@ -29,6 +29,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.bibtex.FileFieldWriter;
@@ -45,7 +46,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,14 +58,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
     public LinkedFilesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider,
                                       DialogService dialogService,
                                       BibDatabaseContext databaseContext,
                                       TaskExecutor taskExecutor,
                                       FieldCheckers fieldCheckers,
-                                      CliPreferences preferences,
+                                      GuiPreferences preferences,
                                       UndoManager undoManager) {
 
         super(field, suggestionProvider, fieldCheckers, undoManager);

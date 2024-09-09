@@ -12,16 +12,16 @@ import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class SidePaneContentFactory {
     private final LibraryTabContainer tabContainer;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final ChatHistoryService chatHistoryService;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
@@ -33,7 +33,7 @@ public class SidePaneContentFactory {
     private final UndoManager undoManager;
 
     public SidePaneContentFactory(LibraryTabContainer tabContainer,
-                                  CliPreferences preferences,
+                                  GuiPreferences preferences,
                                   ChatHistoryService chatHistoryService,
                                   JournalAbbreviationRepository abbreviationRepository,
                                   TaskExecutor taskExecutor,

@@ -21,6 +21,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -29,7 +30,6 @@ import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
-import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.BuildInfo;
@@ -56,7 +56,7 @@ public class JabRefGUI extends Application {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGUI.class);
 
     private static List<UiCommand> uiCommands;
-    private static JabRefCliPreferences preferencesService;
+    private static GuiPreferences preferences;
     private static FileUpdateMonitor fileUpdateMonitor;
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
@@ -76,10 +76,10 @@ public class JabRefGUI extends Application {
     private Stage mainStage;
 
     public static void setup(List<UiCommand> uiCommands,
-                             JabRefCliPreferences preferencesService,
+                             GuiPreferences preferences,
                              FileUpdateMonitor fileUpdateMonitor) {
         JabRefGUI.uiCommands = uiCommands;
-        JabRefGUI.preferencesService = preferencesService;
+        JabRefGUI.preferences = preferences;
         JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
     }
 
@@ -100,7 +100,7 @@ public class JabRefGUI extends Application {
                 mainStage,
                 dialogService,
                 fileUpdateMonitor,
-                preferencesService,
+                preferences,
                 aiService,
                 chatHistoryService,
                 stateManager,
@@ -121,12 +121,12 @@ public class JabRefGUI extends Application {
         }
 
         BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
-        EasyBind.subscribe(preferencesService.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
+        EasyBind.subscribe(preferences.getInternalPreferences().versionCheckEnabledProperty(), enabled -> {
             if (enabled) {
                 new VersionWorker(buildInfo.version,
                         dialogService,
                         taskExecutor,
-                        preferencesService)
+                        preferences)
                         .checkForNewVersionDelayed();
             }
         });
@@ -143,10 +143,10 @@ public class JabRefGUI extends Application {
         JabRefGUI.stateManager = new StateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
 
-        Injector.setModelOrService(KeyBindingRepository.class, preferencesService.getKeyBindingRepository());
+        Injector.setModelOrService(KeyBindingRepository.class, preferences.getKeyBindingRepository());
 
         JabRefGUI.themeManager = new ThemeManager(
-                preferencesService.getWorkspacePreferences(),
+                preferences.getWorkspacePreferences(),
                 fileUpdateMonitor,
                 Runnable::run);
         Injector.setModelOrService(ThemeManager.class, themeManager);
@@ -166,28 +166,28 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
         JabRefGUI.aiService = new AiService(
-                preferencesService.getAiPreferences(),
-                preferencesService.getFilePreferences(),
-                preferencesService.getCitationKeyPatternPreferences(),
+                preferences.getAiPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences(),
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
 
         JabRefGUI.chatHistoryService = new ChatHistoryService(
-                preferencesService.getCitationKeyPatternPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
                 dialogService);
         Injector.setModelOrService(ChatHistoryService.class, chatHistoryService);
     }
 
     private void setupProxy() {
-        if (!preferencesService.getProxyPreferences().shouldUseProxy()
-                || !preferencesService.getProxyPreferences().shouldUseAuthentication()) {
+        if (!preferences.getProxyPreferences().shouldUseProxy()
+                || !preferences.getProxyPreferences().shouldUseAuthentication()) {
             return;
         }
 
-        if (preferencesService.getProxyPreferences().shouldPersistPassword()
-                && StringUtil.isNotBlank(preferencesService.getProxyPreferences().getPassword())) {
-            ProxyRegisterer.register(preferencesService.getProxyPreferences());
+        if (preferences.getProxyPreferences().shouldPersistPassword()
+                && StringUtil.isNotBlank(preferences.getProxyPreferences().getPassword())) {
+            ProxyRegisterer.register(preferences.getProxyPreferences());
             return;
         }
 
@@ -197,8 +197,8 @@ public class JabRefGUI extends Application {
                 Localization.lang("Password"));
 
         if (password.isPresent()) {
-            preferencesService.getProxyPreferences().setPassword(password.get());
-            ProxyRegisterer.register(preferencesService.getProxyPreferences());
+            preferences.getProxyPreferences().setPassword(password.get());
+            ProxyRegisterer.register(preferences.getProxyPreferences());
         } else {
             LOGGER.warn("No proxy password specified");
         }
@@ -207,7 +207,7 @@ public class JabRefGUI extends Application {
     private void openWindow() {
         LOGGER.debug("Initializing frame");
 
-        CoreGuiPreferences coreGuiPreferences = preferencesService.getGuiPreferences();
+        CoreGuiPreferences coreGuiPreferences = preferences.getGuiPreferences();
         LOGGER.debug("Reading from prefs: isMaximized {}", coreGuiPreferences.isWindowMaximised());
 
         mainStage.setMinWidth(580);
@@ -249,7 +249,7 @@ public class JabRefGUI extends Application {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(
                 scene,
                 event,
-                preferencesService.getKeyBindingRepository()));
+                preferences.getKeyBindingRepository()));
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
@@ -271,7 +271,7 @@ public class JabRefGUI extends Application {
 
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
-            && preferencesService.getWorkspacePreferences().shouldOpenLastEdited()) {
+            && preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             mainFrame.openLastEditedDatabases();
         }
     }
@@ -284,12 +284,12 @@ public class JabRefGUI extends Application {
 
     public void onHiding(WindowEvent event) {
         saveWindowState();
-        preferencesService.flush();
+        preferences.flush();
         Platform.exit();
     }
 
     private void saveWindowState() {
-        CoreGuiPreferences preferences = preferencesService.getGuiPreferences();
+        CoreGuiPreferences preferences = JabRefGUI.preferences.getGuiPreferences();
         if (!mainStage.isMaximized()) {
             preferences.setPositionX(mainStage.getX());
             preferences.setPositionY(mainStage.getY());
@@ -321,7 +321,7 @@ public class JabRefGUI extends Application {
      * Tests if the window coordinates are inside any screen
      */
     private boolean isWindowPositionInBounds() {
-        CoreGuiPreferences coreGuiPreferences = preferencesService.getGuiPreferences();
+        CoreGuiPreferences coreGuiPreferences = preferences.getGuiPreferences();
 
         if (LOGGER.isDebugEnabled()) {
             Screen.getScreens().forEach(screen -> LOGGER.debug("Screen bounds: {}", screen.getBounds()));
@@ -355,13 +355,13 @@ public class JabRefGUI extends Application {
 
     // Background tasks
     public void startBackgroundTasks() {
-        RemotePreferences remotePreferences = preferencesService.getRemotePreferences();
+        RemotePreferences remotePreferences = preferences.getRemotePreferences();
         BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         if (remotePreferences.useRemoteServer()) {
             remoteListenerServerManager.openAndStart(
                     new CLIMessageHandler(
                             mainFrame,
-                            preferencesService,
+                            preferences,
                             fileUpdateMonitor,
                             bibEntryTypesManager),
                     remotePreferences.getPort());

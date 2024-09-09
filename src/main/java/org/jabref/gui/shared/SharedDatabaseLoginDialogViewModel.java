@@ -29,6 +29,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.ai.AiService;
@@ -47,7 +48,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -83,7 +83,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final AiService aiService;
     private final SharedDatabasePreferences sharedDatabasePreferences = new SharedDatabasePreferences();
     private final StateManager stateManager;
@@ -103,7 +103,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
     public SharedDatabaseLoginDialogViewModel(LibraryTabContainer tabContainer,
                                               DialogService dialogService,
-                                              CliPreferences preferences,
+                                              GuiPreferences preferences,
                                               AiService aiService,
                                               StateManager stateManager,
                                               BibEntryTypesManager entryTypesManager,

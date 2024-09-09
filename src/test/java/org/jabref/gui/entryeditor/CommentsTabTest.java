@@ -7,8 +7,8 @@ import java.util.Set;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -26,7 +26,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -63,9 +62,7 @@ class CommentsTabTest {
     @Mock
     private DialogService dialogService;
     @Mock
-    private CliPreferences preferences;
-    @Mock
-    private StateManager stateManager;
+    private GuiPreferences preferences;
     @Mock
     private ThemeManager themeManager;
     @Mock

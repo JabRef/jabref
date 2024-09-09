@@ -4,6 +4,7 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -15,7 +16,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
 
@@ -27,7 +27,7 @@ public class DetailOptionalFieldsTab extends OptionalFieldsTabBase {
                                    UndoAction undoAction,
                                    RedoAction redoAction,
                                    DialogService dialogService,
-                                   CliPreferences preferences,
+                                   GuiPreferences preferences,
                                    ThemeManager themeManager,
                                    BibEntryTypesManager entryTypesManager,
                                    TaskExecutor taskExecutor,

@@ -20,6 +20,7 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
@@ -30,7 +31,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +49,11 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     private final BibDatabaseContext databaseContext;
 
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
     public RelatedArticlesTab(BuildInfo buildInfo,
                               BibDatabaseContext databaseContext,
-                              CliPreferences preferences,
+                              GuiPreferences preferences,
                               DialogService dialogService,
                               TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;

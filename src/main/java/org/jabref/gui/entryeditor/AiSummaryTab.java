@@ -5,13 +5,13 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.summary.SummaryComponent;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class AiSummaryTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
@@ -25,7 +25,7 @@ public class AiSummaryTab extends EntryEditorTab {
     public AiSummaryTab(BibDatabaseContext bibDatabaseContext,
                         AiService aiService,
                         DialogService dialogService,
-                        CliPreferences preferences
+                        GuiPreferences preferences
     ) {
         this.bibDatabaseContext = bibDatabaseContext;
 

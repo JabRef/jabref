@@ -29,6 +29,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
@@ -41,7 +42,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -58,7 +58,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
     private final UndoAction undoAction;
     private final RedoAction redoAction;
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final ThemeManager themeManager;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
@@ -77,7 +77,7 @@ abstract class FieldsEditorTab extends EntryEditorTab implements OffersPreview {
                            UndoAction undoAction,
                            RedoAction redoAction,
                            DialogService dialogService,
-                           CliPreferences preferences,
+                           GuiPreferences preferences,
                            ThemeManager themeManager,
                            TaskExecutor taskExecutor,
                            JournalAbbreviationRepository journalAbbreviationRepository,

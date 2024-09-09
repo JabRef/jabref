@@ -11,13 +11,13 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
@@ -39,11 +39,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final MrDlibPreferences mrDlibPreferences;
 
-    public EntryEditorTabViewModel(DialogService dialogService, CliPreferences preferences) {
+    public EntryEditorTabViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();

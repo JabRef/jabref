@@ -20,6 +20,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.dialogs.BackupUIManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -28,6 +29,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
@@ -37,7 +39,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             new SearchGroupsMigrationAction());
 
     private final LibraryTabContainer tabContainer;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final AiService aiService;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -70,7 +71,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
 
     public OpenDatabaseAction(LibraryTabContainer tabContainer,
-                              CliPreferences preferences,
+                              GuiPreferences preferences,
                               AiService aiService,
                               DialogService dialogService,
                               StateManager stateManager,
@@ -265,7 +266,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     public static void openSharedDatabase(ParserResult parserResult,
                                           LibraryTabContainer tabContainer,
                                           DialogService dialogService,
-                                          CliPreferences preferences,
+                                          GuiPreferences preferences,
                                           AiService aiService,
                                           StateManager stateManager,
                                           BibEntryTypesManager entryTypesManager,

@@ -7,7 +7,6 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import jakarta.inject.Inject;
 
@@ -15,7 +14,7 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
 
     @Inject protected TaskExecutor taskExecutor;
     @Inject protected DialogService dialogService;
-    @Inject protected CliPreferences preferences;
+    @Inject protected GuiPreferences preferences;
 
     protected T viewModel;
 

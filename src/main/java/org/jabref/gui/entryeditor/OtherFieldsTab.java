@@ -15,6 +15,7 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -33,7 +34,6 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class OtherFieldsTab extends FieldsEditorTab {
 
@@ -47,7 +47,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                           UndoAction undoAction,
                           RedoAction redoAction,
                           DialogService dialogService,
-                          CliPreferences preferences,
+                          GuiPreferences preferences,
                           ThemeManager themeManager,
                           BibEntryTypesManager entryTypesManager,
                           TaskExecutor taskExecutor,

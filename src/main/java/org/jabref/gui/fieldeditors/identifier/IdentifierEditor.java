@@ -18,12 +18,12 @@ import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -42,7 +42,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private CliPreferences preferences;
+    @Inject private GuiPreferences preferences;
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
 

@@ -9,12 +9,12 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -24,7 +24,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
     @FXML private OwnerEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    @Inject private CliPreferences preferences;
+    @Inject private GuiPreferences preferences;
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private UndoManager undoManager;
 

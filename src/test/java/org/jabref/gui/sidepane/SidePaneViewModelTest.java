@@ -15,13 +15,13 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.frame.SidePanePreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 class SidePaneViewModelTest {
 
     LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
-    CliPreferences preferences = mock(CliPreferences.class);
+    GuiPreferences preferences = mock(GuiPreferences.class);
     ChatHistoryService chatHistoryService = mock(ChatHistoryService.class);
     JournalAbbreviationRepository abbreviationRepository = mock(JournalAbbreviationRepository.class);
     StateManager stateManager = mock(StateManager.class);

@@ -21,6 +21,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -35,7 +36,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class CommentsTab extends FieldsEditorTab {
     public static final String NAME = "Comments";
@@ -45,7 +45,7 @@ public class CommentsTab extends FieldsEditorTab {
 
     private final EntryEditorPreferences entryEditorPreferences;
 
-    public CommentsTab(CliPreferences preferences,
+    public CommentsTab(GuiPreferences preferences,
                        BibDatabaseContext databaseContext,
                        SuggestionProviders suggestionProviders,
                        UndoManager undoManager,

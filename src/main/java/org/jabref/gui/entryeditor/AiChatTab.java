@@ -16,6 +16,7 @@ import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
@@ -26,7 +27,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class AiChatTab extends EntryEditorTab {
     private final BibDatabaseContext bibDatabaseContext;
@@ -45,7 +45,7 @@ public class AiChatTab extends EntryEditorTab {
                      AiService aiService,
                      ChatHistoryService chatHistoryService,
                      DialogService dialogService,
-                     CliPreferences preferences,
+                     GuiPreferences preferences,
                      TaskExecutor taskExecutor
     ) {
         this.bibDatabaseContext = bibDatabaseContext;

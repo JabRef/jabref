@@ -16,10 +16,11 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.HyperlinkLabel;
@@ -38,7 +39,7 @@ public class SciteTab extends EntryEditorTab {
     private final CliPreferences preferences;
     private final DialogService dialogService;
 
-    public SciteTab(CliPreferences preferences, TaskExecutor taskExecutor, DialogService dialogService) {
+    public SciteTab(GuiPreferences preferences, TaskExecutor taskExecutor, DialogService dialogService) {
         this.preferences = preferences;
         this.viewModel = new SciteTabViewModel(preferences, taskExecutor);
         this.dialogService = dialogService;

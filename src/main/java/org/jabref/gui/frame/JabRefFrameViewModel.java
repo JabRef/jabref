@@ -25,6 +25,7 @@ import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
@@ -40,7 +41,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 public class JabRefFrameViewModel implements UiMessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrameViewModel.class);
 
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final AiService aiService;
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -59,7 +59,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
 
-    public JabRefFrameViewModel(CliPreferences preferences,
+    public JabRefFrameViewModel(GuiPreferences preferences,
                                 AiService aiService,
                                 StateManager stateManager,
                                 DialogService dialogService,

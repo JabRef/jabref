@@ -31,6 +31,7 @@ import org.jabref.gui.importer.GenerateEntryFromIdDialog;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.theme.ThemeManager;
@@ -43,7 +44,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -56,7 +56,7 @@ public class MainToolBar extends ToolBar {
     private final GlobalSearchBar globalSearchBar;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final AiService aiService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
@@ -73,7 +73,7 @@ public class MainToolBar extends ToolBar {
                        GlobalSearchBar globalSearchBar,
                        DialogService dialogService,
                        StateManager stateManager,
-                       CliPreferences preferences,
+                       GuiPreferences preferences,
                        AiService aiService,
                        FileUpdateMonitor fileUpdateMonitor,
                        TaskExecutor taskExecutor,
