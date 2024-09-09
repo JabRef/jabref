@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.PdfEmbeddedBibFileImporter;

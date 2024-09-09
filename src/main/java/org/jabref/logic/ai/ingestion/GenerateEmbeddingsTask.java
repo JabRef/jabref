@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;

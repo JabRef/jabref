@@ -15,7 +15,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;

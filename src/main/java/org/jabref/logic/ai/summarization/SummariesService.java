@@ -13,7 +13,7 @@ import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;

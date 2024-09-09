@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.GuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;

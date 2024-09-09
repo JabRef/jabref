@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;

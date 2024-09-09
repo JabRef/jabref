@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 
 public class URLUtil {

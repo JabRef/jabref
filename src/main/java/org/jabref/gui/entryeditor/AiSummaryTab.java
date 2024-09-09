@@ -3,7 +3,7 @@ package org.jabref.gui.entryeditor;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.ai.components.summary.SummaryComponent;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;

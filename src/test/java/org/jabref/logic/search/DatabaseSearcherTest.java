@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;

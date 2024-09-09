@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;

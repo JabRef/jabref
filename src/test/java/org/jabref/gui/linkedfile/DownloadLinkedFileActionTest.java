@@ -14,7 +14,7 @@ import java.util.TreeSet;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.xmp.XmpPreferences;

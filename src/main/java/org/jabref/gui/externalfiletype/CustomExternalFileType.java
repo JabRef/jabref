@@ -2,7 +2,7 @@ package org.jabref.gui.externalfiletype;
 
 import java.util.Objects;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 

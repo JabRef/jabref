@@ -3,7 +3,7 @@ package org.jabref.gui.ai.components.util;
 import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
 import org.jabref.gui.util.UiTaskExecutor;

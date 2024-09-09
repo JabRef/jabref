@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
 import org.jabref.logic.shared.DatabaseLocation;

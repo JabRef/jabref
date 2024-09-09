@@ -10,7 +10,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.LinkedFile;

@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.logic;
 
 import java.nio.file.Path;
 import java.util.Comparator;

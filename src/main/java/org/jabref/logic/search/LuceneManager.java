@@ -7,7 +7,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.logic.search.indexing.DefaultLinkedFilesIndexer;
 import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;

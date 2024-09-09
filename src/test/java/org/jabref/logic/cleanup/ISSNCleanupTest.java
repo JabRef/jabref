@@ -2,7 +2,7 @@ package org.jabref.logic.cleanup;
 
 import java.util.Optional;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

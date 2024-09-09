@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.Directories;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.IEEETranEntryType;

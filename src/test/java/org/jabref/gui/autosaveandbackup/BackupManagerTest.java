@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.util.BackupFileType;
 import org.jabref.logic.util.Directories;

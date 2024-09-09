@@ -5,7 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.util.BaseWindow;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;

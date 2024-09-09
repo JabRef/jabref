@@ -7,7 +7,7 @@ import java.util.Set;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.model.entry.LinkedFile;
 

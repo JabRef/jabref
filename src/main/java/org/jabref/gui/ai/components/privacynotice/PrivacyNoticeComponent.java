@@ -9,7 +9,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.ai.AiPreferences;
 

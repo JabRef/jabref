@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.ingestion.FileToDocument;
 import org.jabref.logic.l10n.Localization;

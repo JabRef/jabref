@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;

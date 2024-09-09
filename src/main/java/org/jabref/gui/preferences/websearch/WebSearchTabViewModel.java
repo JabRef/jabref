@@ -22,7 +22,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.FilePreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.logic.importer.ImportFormatPreferences;
