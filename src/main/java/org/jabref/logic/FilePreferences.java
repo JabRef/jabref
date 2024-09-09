@@ -1,10 +1,7 @@
 package org.jabref.logic;
 
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -12,10 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
 
-import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -33,7 +27,6 @@ public class FilePreferences {
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
-    private final ObservableSet<ExternalFileType> externalFileTypes = FXCollections.observableSet(new TreeSet<>(Comparator.comparing(ExternalFileType::getName)));
     private final BooleanProperty createBackup = new SimpleBooleanProperty();
     private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
@@ -47,7 +40,6 @@ public class FilePreferences {
                            boolean downloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
                            Path workingDirectory,
-                           Set<ExternalFileType> externalFileTypes,
                            boolean createBackup,
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
@@ -60,7 +52,6 @@ public class FilePreferences {
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
         this.workingDirectory.setValue(workingDirectory);
-        this.externalFileTypes.addAll(externalFileTypes);
         this.createBackup.setValue(createBackup);
         this.backupDirectory.setValue(backupDirectory);
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
@@ -161,10 +152,6 @@ public class FilePreferences {
 
     public void setWorkingDirectory(Path workingDirectory) {
         this.workingDirectory.set(workingDirectory);
-    }
-
-    public ObservableSet<ExternalFileType> getExternalFileTypes() {
-        return this.externalFileTypes;
     }
 
     public void setCreateBackup(boolean createBackup) {
