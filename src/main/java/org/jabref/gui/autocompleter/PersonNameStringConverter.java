@@ -2,6 +2,7 @@ package org.jabref.gui.autocompleter;
 
 import javafx.util.StringConverter;
 
+import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 

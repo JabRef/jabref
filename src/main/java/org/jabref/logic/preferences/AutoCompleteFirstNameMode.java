@@ -1,4 +1,4 @@
-package org.jabref.gui.autocompleter;
+package org.jabref.logic.preferences;
 
 /**
  * <ul>
