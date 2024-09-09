@@ -349,8 +349,6 @@ public abstract class NativeDesktop {
 
     public abstract void openConsole(String absolutePath, DialogService dialogService) throws IOException;
 
-    public abstract String detectProgramPath(String programName, String directoryName);
-
     /**
      * Returns the path to the system's applications folder.
      *

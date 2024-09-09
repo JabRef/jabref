@@ -1,14 +1,23 @@
 package org.jabref.logic.os;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.jabref.gui.desktop.os.Windows;
 import org.jabref.model.strings.StringUtil;
 
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
+import mslinks.ShellLink;
+import mslinks.ShellLinkException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -27,6 +36,8 @@ public class OS {
     public static final boolean LINUX = OS_NAME.startsWith("linux");
     public static final boolean WINDOWS = OS_NAME.startsWith("win");
     public static final boolean OS_X = OS_NAME.startsWith("mac");
+
+    private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 
     public static String getHostName() {
         String hostName;
@@ -68,5 +79,56 @@ public class OS {
             return false;
         }
         return true;
+    }
+
+    public static String detectProgramPath(String programName, String directoryName) {
+        if (!OS.WINDOWS) {
+            return programName;
+        }
+        if (Objects.equals(programName, "texworks")) {
+            Path texworksLinkPath = Path.of(System.getenv("APPDATA") + "\\Microsoft\\Windows\\Start Menu\\Programs\\MiKTeX\\TeXworks.lnk");
+            if (Files.exists(texworksLinkPath)) {
+                try {
+                    ShellLink link = new ShellLink(texworksLinkPath);
+                    return link.resolveTarget();
+                } catch (
+                        IOException |
+                        ShellLinkException e) {
+                    // Static logger instance cannot be used. See the class comment.
+                    Logger logger = Logger.getLogger(Windows.class.getName());
+                    logger.log(Level.WARNING, "Had an error while reading .lnk file for TeXworks", e);
+                }
+            }
+        }
+
+        String progFiles = System.getenv("ProgramFiles(x86)");
+        String programPath;
+        if (progFiles != null) {
+            programPath = getProgramPath(programName, directoryName, progFiles);
+            if (programPath != null) {
+                return programPath;
+            }
+        }
+
+        progFiles = System.getenv("ProgramFiles");
+        programPath = getProgramPath(programName, directoryName, progFiles);
+        if (programPath != null) {
+            return programPath;
+        }
+
+        return "";
+    }
+
+    private static String getProgramPath(String programName, String directoryName, String progFiles) {
+        Path programPath;
+        if ((directoryName != null) && !directoryName.isEmpty()) {
+            programPath = Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION);
+        } else {
+            programPath = Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION);
+        }
+        if (Files.exists(programPath)) {
+            return programPath.toString();
+        }
+        return null;
     }
 }

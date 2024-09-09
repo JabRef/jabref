@@ -174,11 +174,6 @@ public class Linux extends NativeDesktop {
     }
 
     @Override
-    public String detectProgramPath(String programName, String directoryName) {
-        return programName;
-    }
-
-    @Override
     public Path getApplicationDirectory() {
         return Path.of("/usr/lib/");
     }

@@ -44,11 +44,6 @@ public class DefaultDesktop extends NativeDesktop {
     }
 
     @Override
-    public String detectProgramPath(String programName, String directoryName) {
-        return programName;
-    }
-
-    @Override
     public Path getApplicationDirectory() {
         return Directories.getUserDirectory();
     }
