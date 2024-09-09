@@ -32,7 +32,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
-import org.jabref.gui.GuiPreferences;
+import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -527,7 +527,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private ProtectedTermsPreferences protectedTermsPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private FilePreferences filePreferences;
-    private GuiPreferences guiPreferences;
+    private CoreGuiPreferences coreGuiPreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
     private SSLPreferences sslPreferences;
@@ -2571,12 +2571,12 @@ public class JabRefCliPreferences implements CliPreferences {
     //*************************************************************************************************************
 
     @Override
-    public GuiPreferences getGuiPreferences() {
-        if (guiPreferences != null) {
-            return guiPreferences;
+    public CoreGuiPreferences getGuiPreferences() {
+        if (coreGuiPreferences != null) {
+            return coreGuiPreferences;
         }
 
-        guiPreferences = new GuiPreferences(
+        coreGuiPreferences = new CoreGuiPreferences(
                 getDouble(MAIN_WINDOW_POS_X),
                 getDouble(MAIN_WINDOW_POS_Y),
                 getDouble(MAIN_WINDOW_WIDTH),
@@ -2590,34 +2590,34 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(ID_ENTRY_GENERATOR),
                 getDouble(SIDE_PANE_WIDTH));
 
-        EasyBind.listen(guiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_POS_X, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_POS_Y, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_WIDTH, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_HEIGHT, newValue.doubleValue()));
-        EasyBind.listen(guiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
-        EasyBind.listen(guiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_POS_X, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_POS_Y, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_WIDTH, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_HEIGHT, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
+        EasyBind.listen(coreGuiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
 
-        guiPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
+        coreGuiPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
             if (change.getList().isEmpty()) {
                 prefs.remove(LAST_EDITED);
             } else {
-                putStringList(LAST_EDITED, guiPreferences.getLastFilesOpened().stream()
-                                                         .map(Path::toAbsolutePath)
-                                                         .map(Path::toString)
-                                                         .collect(Collectors.toList()));
+                putStringList(LAST_EDITED, coreGuiPreferences.getLastFilesOpened().stream()
+                                                             .map(Path::toAbsolutePath)
+                                                             .map(Path::toString)
+                                                             .collect(Collectors.toList()));
             }
         });
-        EasyBind.listen(guiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(coreGuiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
             if (newValue != null) {
                 put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
             } else {
                 remove(LAST_FOCUSED);
             }
         });
-        guiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(guiPreferences.getFileHistory()));
-        EasyBind.listen(guiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
+        coreGuiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(coreGuiPreferences.getFileHistory()));
+        EasyBind.listen(coreGuiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
 
-        return guiPreferences;
+        return coreGuiPreferences;
     }
 
     private FileHistory getFileHistory() {

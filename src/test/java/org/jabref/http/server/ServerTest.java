@@ -6,12 +6,12 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.GuiPreferences;
+import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.entry.BibEntryPreferences;
 
 import com.google.gson.Gson;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 abstract class ServerTest extends JerseyTest {
 
     private static CliPreferences preferences;
-    private static GuiPreferences guiPreferences;
+    private static CoreGuiPreferences coreGuiPreferences;
 
     @BeforeAll
     static void installLoggingBridge() {
@@ -64,7 +64,7 @@ abstract class ServerTest extends JerseyTest {
     }
 
     protected void setAvailableLibraries(EnumSet<TestBibFile> files) {
-        when(guiPreferences.getLastFilesOpened()).thenReturn(
+        when(coreGuiPreferences.getLastFilesOpened()).thenReturn(
                 FXCollections.observableArrayList(
                         files.stream()
                              .map(file -> file.path)
@@ -90,9 +90,9 @@ abstract class ServerTest extends JerseyTest {
         // used twice, once for reading and once for writing
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);
 
-        guiPreferences = mock(GuiPreferences.class);
-        when(preferences.getGuiPreferences()).thenReturn(guiPreferences);
+        coreGuiPreferences = mock(CoreGuiPreferences.class);
+        when(preferences.getGuiPreferences()).thenReturn(coreGuiPreferences);
 
-        when(guiPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path));
+        when(coreGuiPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path));
     }
 }

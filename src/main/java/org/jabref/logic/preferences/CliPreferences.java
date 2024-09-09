@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.GuiPreferences;
+import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
@@ -140,7 +140,7 @@ public interface CliPreferences {
 
     SidePanePreferences getSidePanePreferences();
 
-    GuiPreferences getGuiPreferences();
+    CoreGuiPreferences getGuiPreferences();
 
     XmpPreferences getXmpPreferences();
 

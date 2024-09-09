@@ -54,6 +54,7 @@ import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.RedoAction;
@@ -71,6 +72,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.BackgroundTask;
@@ -97,7 +99,6 @@ import org.jabref.model.search.SearchQuery;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
@@ -121,7 +122,7 @@ public class LibraryTab extends Tab {
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
@@ -178,7 +179,7 @@ public class LibraryTab extends Tab {
     private LibraryTab(BibDatabaseContext bibDatabaseContext,
                        LibraryTabContainer tabContainer,
                        DialogService dialogService,
-                       CliPreferences preferences,
+                       GuiPreferences preferences,
                        StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
@@ -1052,7 +1053,7 @@ public class LibraryTab extends Tab {
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,
                                               DialogService dialogService,
-                                              CliPreferences preferences,
+                                              GuiPreferences preferences,
                                               StateManager stateManager,
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
@@ -1088,7 +1089,7 @@ public class LibraryTab extends Tab {
     public static LibraryTab createLibraryTab(BibDatabaseContext databaseContext,
                                               LibraryTabContainer tabContainer,
                                               DialogService dialogService,
-                                              CliPreferences preferences,
+                                              GuiPreferences preferences,
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
                                               BibEntryTypesManager entryTypesManager,

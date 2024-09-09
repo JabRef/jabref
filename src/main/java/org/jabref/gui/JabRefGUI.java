@@ -207,24 +207,24 @@ public class JabRefGUI extends Application {
     private void openWindow() {
         LOGGER.debug("Initializing frame");
 
-        GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
-        LOGGER.debug("Reading from prefs: isMaximized {}", guiPreferences.isWindowMaximised());
+        CoreGuiPreferences coreGuiPreferences = preferencesService.getGuiPreferences();
+        LOGGER.debug("Reading from prefs: isMaximized {}", coreGuiPreferences.isWindowMaximised());
 
         mainStage.setMinWidth(580);
         mainStage.setMinHeight(330);
 
         // maximized target state is stored, because "saveWindowState" saves x and y only if not maximized
-        boolean windowMaximised = guiPreferences.isWindowMaximised();
+        boolean windowMaximised = coreGuiPreferences.isWindowMaximised();
 
         LOGGER.debug("Screens: {}", Screen.getScreens());
         debugLogWindowState(mainStage);
 
         if (isWindowPositionInBounds()) {
             LOGGER.debug("The JabRef window is inside screen bounds.");
-            mainStage.setX(guiPreferences.getPositionX());
-            mainStage.setY(guiPreferences.getPositionY());
-            mainStage.setWidth(guiPreferences.getSizeX());
-            mainStage.setHeight(guiPreferences.getSizeY());
+            mainStage.setX(coreGuiPreferences.getPositionX());
+            mainStage.setY(coreGuiPreferences.getPositionY());
+            mainStage.setWidth(coreGuiPreferences.getSizeX());
+            mainStage.setHeight(coreGuiPreferences.getSizeY());
             LOGGER.debug("NOT saving window positions");
         } else {
             LOGGER.info("The JabRef window is outside of screen bounds. Position and size will be corrected to 1024x768. Primary screen will be used.");
@@ -289,7 +289,7 @@ public class JabRefGUI extends Application {
     }
 
     private void saveWindowState() {
-        GuiPreferences preferences = preferencesService.getGuiPreferences();
+        CoreGuiPreferences preferences = preferencesService.getGuiPreferences();
         if (!mainStage.isMaximized()) {
             preferences.setPositionX(mainStage.getX());
             preferences.setPositionY(mainStage.getY());
@@ -321,19 +321,19 @@ public class JabRefGUI extends Application {
      * Tests if the window coordinates are inside any screen
      */
     private boolean isWindowPositionInBounds() {
-        GuiPreferences guiPreferences = preferencesService.getGuiPreferences();
+        CoreGuiPreferences coreGuiPreferences = preferencesService.getGuiPreferences();
 
         if (LOGGER.isDebugEnabled()) {
             Screen.getScreens().forEach(screen -> LOGGER.debug("Screen bounds: {}", screen.getBounds()));
         }
 
-        return lowerLeftIsInBounds(guiPreferences) && upperRightIsInBounds(guiPreferences);
+        return lowerLeftIsInBounds(coreGuiPreferences) && upperRightIsInBounds(coreGuiPreferences);
     }
 
-    private boolean lowerLeftIsInBounds(GuiPreferences guiPreferences) {
+    private boolean lowerLeftIsInBounds(CoreGuiPreferences coreGuiPreferences) {
         // Windows/PowerToys somehow removes 10 pixels to the left; they are re-added
-        double leftX = guiPreferences.getPositionX() + 10.0;
-        double bottomY = guiPreferences.getPositionY() + guiPreferences.getSizeY();
+        double leftX = coreGuiPreferences.getPositionX() + 10.0;
+        double bottomY = coreGuiPreferences.getPositionY() + coreGuiPreferences.getSizeY();
         LOGGER.debug("left x: {}, bottom y: {}", leftX, bottomY);
 
         boolean inBounds = Screen.getScreens().stream().anyMatch((screen -> screen.getBounds().contains(leftX, bottomY)));
@@ -341,11 +341,11 @@ public class JabRefGUI extends Application {
         return inBounds;
     }
 
-    private boolean upperRightIsInBounds(GuiPreferences guiPreferences) {
+    private boolean upperRightIsInBounds(CoreGuiPreferences coreGuiPreferences) {
         // The upper right corner is checked as there are most probably the window controls.
         // Windows/PowerToys somehow adds 10 pixels to the right and top of the screen, they are removed
-        double rightX = guiPreferences.getPositionX() + guiPreferences.getSizeX() - 10.0;
-        double topY = guiPreferences.getPositionY();
+        double rightX = coreGuiPreferences.getPositionX() + coreGuiPreferences.getSizeX() - 10.0;
+        double topY = coreGuiPreferences.getPositionY();
         LOGGER.debug("right x: {}, top y: {}", rightX, topY);
 
         boolean inBounds = Screen.getScreens().stream().anyMatch((screen -> screen.getBounds().contains(rightX, topY)));

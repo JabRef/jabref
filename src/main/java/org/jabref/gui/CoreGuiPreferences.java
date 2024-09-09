@@ -16,7 +16,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.logic.util.io.FileHistory;
 
-public class GuiPreferences {
+public class CoreGuiPreferences {
     private final DoubleProperty positionX;
     private final DoubleProperty positionY;
     private final DoubleProperty sizeX;
@@ -36,16 +36,16 @@ public class GuiPreferences {
 
     private final StringProperty lastSelectedIdBasedFetcher;
 
-    public GuiPreferences(double positionX,
-                          double positionY,
-                          double sizeX,
-                          double sizeY,
-                          boolean windowMaximised,
-                          List<Path> lastFilesOpened,
-                          Path lastFocusedFile,
-                          FileHistory fileHistory,
-                          String lastSelectedIdBasedFetcher,
-                          double sidePaneWidth) {
+    public CoreGuiPreferences(double positionX,
+                              double positionY,
+                              double sizeX,
+                              double sizeY,
+                              boolean windowMaximised,
+                              List<Path> lastFilesOpened,
+                              Path lastFocusedFile,
+                              FileHistory fileHistory,
+                              String lastSelectedIdBasedFetcher,
+                              double sidePaneWidth) {
         this.positionX = new SimpleDoubleProperty(positionX);
         this.positionY = new SimpleDoubleProperty(positionY);
         this.sizeX = new SimpleDoubleProperty(sizeX);

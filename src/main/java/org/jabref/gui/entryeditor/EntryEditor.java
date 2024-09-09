@@ -43,6 +43,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
@@ -63,7 +64,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -110,7 +110,7 @@ public class EntryEditor extends BorderPane {
     @Inject private BuildInfo buildInfo;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private CliPreferences preferences;
+    @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
