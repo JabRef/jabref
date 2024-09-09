@@ -12,6 +12,7 @@ import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
