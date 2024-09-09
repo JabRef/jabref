@@ -35,6 +35,7 @@ class TitleFetcherTest {
                 .withField(StandardField.VOLUME, "5331")
                 .withField(StandardField.YEAR, "2009")
                 .withField(StandardField.MONTH, "#aug#")
+                .withField(StandardField.PAGES, "39--46")
                 .withField(StandardField.DOI, "10.1109/seaa.2009.21");
     }
 
