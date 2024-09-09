@@ -24,6 +24,7 @@ import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -42,7 +43,6 @@ import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class SaveDatabaseAction {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
 
     public enum SaveDatabaseMode {
@@ -68,7 +68,7 @@ public class SaveDatabaseAction {
 
     public SaveDatabaseAction(LibraryTab libraryTab,
                               DialogService dialogService,
-                              CliPreferences preferences,
+                              GuiPreferences preferences,
                               BibEntryTypesManager entryTypesManager) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;

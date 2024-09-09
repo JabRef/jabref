@@ -9,11 +9,8 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
-import javafx.collections.ObservableList;
-
 import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.JabRefCliPreferences;
 
 import jakarta.ws.rs.SeBootstrap;
 import net.harawata.appdirs.AppDirsFactory;
@@ -36,7 +33,7 @@ public class Server {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
-        final ObservableList<Path> lastFilesOpened = JabRefCliPreferences.getInstance().getGuiPreferences().getLastFilesOpened();
+        final List<Path> lastFilesOpened = List.of(); // JabRefCliPreferences.getInstance().getGuiPreferences().getLastFilesOpened();
 
         // The server serves the last opened files (see org.jabref.http.server.LibraryResource.getLibraryPath)
         // In a testing environment, this might be difficult to handle

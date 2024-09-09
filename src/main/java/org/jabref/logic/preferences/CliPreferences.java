@@ -4,8 +4,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.gui.CoreGuiPreferences;
-import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.frame.SidePanePreferences;
@@ -124,8 +122,6 @@ public interface CliPreferences {
 
     ColumnPreferences getSearchDialogColumnPreferences();
 
-    WorkspacePreferences getWorkspacePreferences();
-
     AutoLinkPreferences getAutoLinkPreferences();
 
     ExportPreferences getExportPreferences();
@@ -137,8 +133,6 @@ public interface CliPreferences {
     PreviewPreferences getPreviewPreferences();
 
     SidePanePreferences getSidePanePreferences();
-
-    CoreGuiPreferences getGuiPreferences();
 
     XmpPreferences getXmpPreferences();
 

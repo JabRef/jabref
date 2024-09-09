@@ -27,13 +27,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.beans.InvalidationListener;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn.SortType;
 
-import org.jabref.gui.CoreGuiPreferences;
-import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -54,7 +51,6 @@ import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.theme.Theme;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
@@ -81,7 +77,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
-import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.GrobidPreferences;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
@@ -116,7 +111,6 @@ import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
-import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
@@ -177,8 +171,6 @@ public class JabRefCliPreferences implements CliPreferences {
      * There are more default parameters in this map which belong to separate preference classes.
      */
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
-    public static final String THEME = "fxTheme";
-    public static final String THEME_SYNC_OS = "themeSyncOs";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
@@ -224,8 +216,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String MAIN_WINDOW_HEIGHT = "mainWindowSizeY";
 
     public static final String LAST_EDITED = "lastEdited";
-    public static final String OPEN_LAST_EDITED = "openLastEdited";
-    public static final String LAST_FOCUSED = "lastFocused";
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
@@ -238,12 +228,8 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     public static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
     public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
-    public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
-    public static final String MAIN_FONT_SIZE = "mainFontSize";
 
-    public static final String RECENT_DATABASES = "recentDatabases";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
-    public static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
 
     public static final String BASE_DOI_URI = "baseDOIURI";
@@ -261,7 +247,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String ADD_CREATION_DATE = "addCreationDate";
     public static final String ADD_MODIFICATION_DATE = "addModificationDate";
 
-    public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String RESOLVE_STRINGS_FOR_FIELDS = "resolveStringsForFields";
     public static final String DO_NOT_RESOLVE_STRINGS = "doNotResolveStrings";
@@ -306,7 +291,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
-    public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
     public static final String TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
@@ -384,9 +368,6 @@ public class JabRefCliPreferences implements CliPreferences {
     // KeyBindings - keys - public because needed for pref migration
     public static final String BINDINGS = "bindings";
 
-    // Id Entry Generator Preferences
-    public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
-
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
@@ -397,6 +378,9 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String PREVIEW_AS_TAB = "previewAsTab";
     public static final String PREVIEW_IN_ENTRY_TABLE_TOOLTIP = "previewInEntryTableTooltip";
     public static final String PREVIEW_BST_LAYOUT_PATHS = "previewBstLayoutPaths";
+
+    // TODO: USed by both importer preferences and workspace preferences
+    protected static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
 
     // UI
     private static final String FONT_FAMILY = "fontFamily";
@@ -476,9 +460,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final java.util.prefs.Preferences PREFS_NODE = java.util.prefs.Preferences.userRoot().node("/org/jabref");
 
-    // SLR
-    private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
-
     // The only instance of this class:
     private static JabRefCliPreferences singleton;
     /**
@@ -500,13 +481,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private PreviewPreferences previewPreferences;
     private OpenOfficePreferences openOfficePreferences;
     private SidePanePreferences sidePanePreferences;
-    private WorkspacePreferences workspacePreferences;
     private ImporterPreferences importerPreferences;
     private GrobidPreferences grobidPreferences;
     private ProtectedTermsPreferences protectedTermsPreferences;
     private MrDlibPreferences mrDlibPreferences;
     private FilePreferences filePreferences;
-    private CoreGuiPreferences coreGuiPreferences;
     private RemotePreferences remotePreferences;
     private ProxyPreferences proxyPreferences;
     private SSLPreferences sslPreferences;
@@ -543,7 +522,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 importPreferences(Path.of("jabref.xml"));
             }
         } catch (JabRefException e) {
-            LOGGER.warn("Could not import preferences from jabref.xml: {}", e.getMessage(), e);
+            LOGGER.warn("Could not import preferences from jabref.xml", e);
         }
 
         // load user preferences
@@ -588,9 +567,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
 
-        // Set DOI to be the default ID entry generator
-        defaults.put(ID_ENTRY_GENERATOR, DoiFetcher.NAME);
-
         defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
         defaults.put(BASE_DOI_URI, "https://doi.org");
 
@@ -607,7 +583,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 
-        defaults.put(RECENT_DATABASES, "");
         defaults.put(EXTERNAL_FILE_TYPES, "");
         defaults.put(KEY_PATTERN_REGEX, "");
         defaults.put(KEY_PATTERN_REPLACEMENT, "");
@@ -677,9 +652,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(PREFS_EXPORT_PATH, USER_HOME);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
-        defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(LAST_EDITED, "");
-        defaults.put(LAST_FOCUSED, "");
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
         defaults.put(SHOW_USER_COMMENTS_FIELDS, Boolean.TRUE);
@@ -704,7 +677,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
-        defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
 
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
 
@@ -743,7 +715,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
-        defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(CONFIRM_LINKED_FILE_DELETE, Boolean.TRUE);
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
         defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^");
@@ -769,9 +740,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(CITE_COMMAND, "\\cite{key1,key2}");
         defaults.put(LAST_USED_EXPORT, "");
         defaults.put(SIDE_PANE_WIDTH, 0.15);
-
-        defaults.put(MAIN_FONT_SIZE, 9);
-        defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
 
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(AUTOLINK_FILES_ENABLED, Boolean.TRUE);
@@ -851,10 +819,6 @@ public class JabRefCliPreferences implements CliPreferences {
                         "\\begin{owncitation}<BR><BR><b>Own citation: </b>\\format[HTMLChars]{\\owncitation} \\end{owncitation}__NEWLINE__" +
                         "\\begin{comment}<BR><BR><b>Comment: </b>\\format[Markdown,HTMLChars(keepCurlyBraces)]{\\comment}\\end{comment}__NEWLINE__" +
                         "</font>__NEWLINE__");
-
-        // set default theme
-        defaults.put(THEME, Theme.BASE_CSS);
-        defaults.put(THEME_SYNC_OS, Boolean.FALSE);
 
         setLanguageDependentDefaultValues();
 
@@ -1005,7 +969,7 @@ public class JabRefCliPreferences implements CliPreferences {
         prefs.putDouble(key, value);
     }
 
-    private void remove(String key) {
+    protected void remove(String key) {
         prefs.remove(key);
     }
 
@@ -2019,51 +1983,7 @@ public class JabRefCliPreferences implements CliPreferences {
         return userAndHost;
     }
 
-    //*************************************************************************************************************
-    // WorkspacePreferences
-    //*************************************************************************************************************
-
-    @Override
-    public WorkspacePreferences getWorkspacePreferences() {
-        if (workspacePreferences != null) {
-            return workspacePreferences;
-        }
-
-        workspacePreferences = new WorkspacePreferences(
-                getLanguage(),
-                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
-                getInt(MAIN_FONT_SIZE),
-                (Integer) defaults.get(MAIN_FONT_SIZE),
-                new Theme(get(THEME)),
-                getBoolean(THEME_SYNC_OS),
-                getBoolean(OPEN_LAST_EDITED),
-                getBoolean(SHOW_ADVANCED_HINTS),
-                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
-                getBoolean(CONFIRM_DELETE),
-                getStringList(SELECTED_SLR_CATALOGS));
-
-        EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
-            put(LANGUAGE, newValue.getId());
-            if (oldValue != newValue) {
-                setLanguageDependentDefaultValues();
-                Localization.setLanguage(newValue);
-            }
-        });
-
-        EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
-        EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
-        EasyBind.listen(workspacePreferences.themeProperty(), (obs, oldValue, newValue) -> put(THEME, newValue.getName()));
-        EasyBind.listen(workspacePreferences.themeSyncOsProperty(), (obs, oldValue, newValue) -> putBoolean(THEME_SYNC_OS, newValue));
-        EasyBind.listen(workspacePreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
-        EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
-        EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
-        EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
-        workspacePreferences.getSelectedSlrCatalogs().addListener((ListChangeListener<String>) change ->
-                putStringList(SELECTED_SLR_CATALOGS, workspacePreferences.getSelectedSlrCatalogs()));
-        return workspacePreferences;
-    }
-
-    private Language getLanguage() {
+    protected Language getLanguage() {
         return Stream.of(Language.values())
                      .filter(language -> language.getId().equalsIgnoreCase(get(LANGUAGE)))
                      .findFirst()
@@ -2524,73 +2444,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
                 CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
         return activeJobs;
-    }
-
-    //*************************************************************************************************************
-    // GUI preferences
-    //*************************************************************************************************************
-
-    @Override
-    public CoreGuiPreferences getGuiPreferences() {
-        if (coreGuiPreferences != null) {
-            return coreGuiPreferences;
-        }
-
-        coreGuiPreferences = new CoreGuiPreferences(
-                getDouble(MAIN_WINDOW_POS_X),
-                getDouble(MAIN_WINDOW_POS_Y),
-                getDouble(MAIN_WINDOW_WIDTH),
-                getDouble(MAIN_WINDOW_HEIGHT),
-                getBoolean(WINDOW_MAXIMISED),
-                getStringList(LAST_EDITED).stream()
-                                          .map(Path::of)
-                                          .collect(Collectors.toList()),
-                Path.of(get(LAST_FOCUSED)),
-                getFileHistory(),
-                get(ID_ENTRY_GENERATOR),
-                getDouble(SIDE_PANE_WIDTH));
-
-        EasyBind.listen(coreGuiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_POS_X, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_POS_Y, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_WIDTH, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_HEIGHT, newValue.doubleValue()));
-        EasyBind.listen(coreGuiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
-        EasyBind.listen(coreGuiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
-
-        coreGuiPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
-            if (change.getList().isEmpty()) {
-                prefs.remove(LAST_EDITED);
-            } else {
-                putStringList(LAST_EDITED, coreGuiPreferences.getLastFilesOpened().stream()
-                                                             .map(Path::toAbsolutePath)
-                                                             .map(Path::toString)
-                                                             .collect(Collectors.toList()));
-            }
-        });
-        EasyBind.listen(coreGuiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
-            if (newValue != null) {
-                put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
-            } else {
-                remove(LAST_FOCUSED);
-            }
-        });
-        coreGuiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(coreGuiPreferences.getFileHistory()));
-        EasyBind.listen(coreGuiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
-
-        return coreGuiPreferences;
-    }
-
-    private FileHistory getFileHistory() {
-        return FileHistory.of(getStringList(RECENT_DATABASES).stream()
-                                                             .map(Path::of)
-                                                             .toList());
-    }
-
-    private void storeFileHistory(FileHistory history) {
-        putStringList(RECENT_DATABASES, history.stream()
-                                               .map(Path::toAbsolutePath)
-                                               .map(Path::toString)
-                                               .toList());
     }
 
     @Override

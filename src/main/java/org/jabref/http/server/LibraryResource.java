@@ -89,10 +89,11 @@ public class LibraryResource {
     }
 
     private java.nio.file.Path getLibraryPath(String id) {
-        return preferences.getGuiPreferences().getLastFilesOpened()
-                          .stream()
-                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
-                          .findAny()
-                          .orElseThrow(NotFoundException::new);
+//        return preferences.getGuiPreferences().getLastFilesOpened()
+//                          .stream()
+//                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
+//                          .findAny()
+//                          .orElseThrow(NotFoundException::new);
+        throw new NotFoundException();
     }
 }

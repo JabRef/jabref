@@ -463,9 +463,9 @@ public class PreferencesMigrations {
         try {
             // some versions stored the font size as double to the **same** key
             // since the preference store is type-safe, we need to add this workaround
-            String fontSizeAsString = preferences.get(JabRefCliPreferences.MAIN_FONT_SIZE);
+            String fontSizeAsString = preferences.get(JabRefGuiPreferences.MAIN_FONT_SIZE);
             int fontSizeAsInt = (int) Math.round(Double.parseDouble(fontSizeAsString));
-            preferences.putInt(JabRefCliPreferences.MAIN_FONT_SIZE, fontSizeAsInt);
+            preferences.putInt(JabRefGuiPreferences.MAIN_FONT_SIZE, fontSizeAsInt);
         } catch (ClassCastException e) {
             // already an integer
         }

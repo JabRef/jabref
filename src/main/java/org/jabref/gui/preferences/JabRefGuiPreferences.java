@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,15 +8,23 @@ import java.util.SequencedMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 
+import org.jabref.gui.CoreGuiPreferences;
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
+import org.jabref.gui.theme.Theme;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.strings.StringUtil;
@@ -24,8 +33,20 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPreferences {
 
-    // AutcompleteFields - public because needed for pref migration
+    // Public because needed for pref migration
     public static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
+    public static final String MAIN_FONT_SIZE = "mainFontSize";
+
+    // region workspace
+    private static final String THEME = "fxTheme";
+    private static final String THEME_SYNC_OS = "themeSyncOs";
+    private static final String OPEN_LAST_EDITED = "openLastEdited";
+    private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
+    private static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
+    private static final String CONFIRM_DELETE = "confirmDelete";
+    // endregion
+
+    private static final String RECENT_DATABASES = "recentDatabases";
 
     private static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
 
@@ -41,13 +62,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
     private static final String AUTOCOMPLETER_LAST_FIRST = "autoCompLF";
     private static final String AUTOCOMPLETER_FIRST_LAST = "autoCompFF";
-   // endregion
+    // endregion
+
+    private static final String LAST_FOCUSED = "lastFocused";
+    private static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
+    // SLR
+    private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
 
     private static JabRefGuiPreferences singleton;
 
     private EntryEditorPreferences entryEditorPreferences;
     private MergeDialogPreferences mergeDialogPreferences;
     private AutoCompletePreferences autoCompletePreferences;
+    private CoreGuiPreferences coreGuiPreferences;
+    private WorkspacePreferences workspacePreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -73,6 +101,23 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
         defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
+        // endregion
+
+        // region coreGuiPreferences
+        // Set DOI to be the default ID entry generator
+        defaults.put(ID_ENTRY_GENERATOR, DoiFetcher.NAME);
+        defaults.put(RECENT_DATABASES, "");
+        defaults.put(LAST_FOCUSED, "");
+        // endregion
+
+        // region workspace
+        defaults.put(MAIN_FONT_SIZE, 9);
+        defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
+        defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
+        defaults.put(THEME, Theme.BASE_CSS);
+        defaults.put(THEME_SYNC_OS, Boolean.FALSE);
+        defaults.put(CONFIRM_DELETE, Boolean.TRUE);
+        defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
         // endregion
     }
 
@@ -261,4 +306,110 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         return autoCompletePreferences;
     }
+
+    // region (core) GUI preferences
+    public CoreGuiPreferences getGuiPreferences() {
+        if (coreGuiPreferences != null) {
+            return coreGuiPreferences;
+        }
+
+        coreGuiPreferences = new CoreGuiPreferences(
+                getDouble(MAIN_WINDOW_POS_X),
+                getDouble(MAIN_WINDOW_POS_Y),
+                getDouble(MAIN_WINDOW_WIDTH),
+                getDouble(MAIN_WINDOW_HEIGHT),
+                getBoolean(WINDOW_MAXIMISED),
+                getStringList(LAST_EDITED).stream()
+                                          .map(Path::of)
+                                          .collect(Collectors.toList()),
+                Path.of(get(LAST_FOCUSED)),
+                getFileHistory(),
+                get(ID_ENTRY_GENERATOR),
+                getDouble(SIDE_PANE_WIDTH));
+
+        EasyBind.listen(coreGuiPreferences.positionXProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_POS_X, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.positionYProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_POS_Y, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.sizeXProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_WIDTH, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.sizeYProperty(), (obs, oldValue, newValue) -> putDouble(MAIN_WINDOW_HEIGHT, newValue.doubleValue()));
+        EasyBind.listen(coreGuiPreferences.windowMaximisedProperty(), (obs, oldValue, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
+        EasyBind.listen(coreGuiPreferences.sidePaneWidthProperty(), (obs, oldValue, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
+
+        coreGuiPreferences.getLastFilesOpened().addListener((ListChangeListener<Path>) change -> {
+            if (change.getList().isEmpty()) {
+                remove(LAST_EDITED);
+            } else {
+                putStringList(LAST_EDITED, coreGuiPreferences.getLastFilesOpened().stream()
+                                                             .map(Path::toAbsolutePath)
+                                                             .map(Path::toString)
+                                                             .collect(Collectors.toList()));
+            }
+        });
+        EasyBind.listen(coreGuiPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
+            } else {
+                remove(LAST_FOCUSED);
+            }
+        });
+        coreGuiPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(coreGuiPreferences.getFileHistory()));
+        EasyBind.listen(coreGuiPreferences.lastSelectedIdBasedFetcherProperty(), (obs, oldValue, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
+
+        return coreGuiPreferences;
+    }
+
+    private FileHistory getFileHistory() {
+        return FileHistory.of(getStringList(RECENT_DATABASES).stream()
+                                                             .map(Path::of)
+                                                             .toList());
+    }
+
+    private void storeFileHistory(FileHistory history) {
+        putStringList(RECENT_DATABASES, history.stream()
+                                               .map(Path::toAbsolutePath)
+                                               .map(Path::toString)
+                                               .toList());
+    }
+    // endregion
+
+
+    @Override
+    public WorkspacePreferences getWorkspacePreferences() {
+        if (workspacePreferences != null) {
+            return workspacePreferences;
+        }
+
+        workspacePreferences = new WorkspacePreferences(
+                getLanguage(),
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
+                getInt(MAIN_FONT_SIZE),
+                (Integer) defaults.get(MAIN_FONT_SIZE),
+                new Theme(get(THEME)),
+                getBoolean(THEME_SYNC_OS),
+                getBoolean(OPEN_LAST_EDITED),
+                getBoolean(SHOW_ADVANCED_HINTS),
+                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
+                getBoolean(CONFIRM_DELETE),
+                getStringList(SELECTED_SLR_CATALOGS));
+
+        EasyBind.listen(workspacePreferences.languageProperty(), (obs, oldValue, newValue) -> {
+            put(LANGUAGE, newValue.getId());
+            if (oldValue != newValue) {
+                setLanguageDependentDefaultValues();
+                Localization.setLanguage(newValue);
+            }
+        });
+
+        EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (obs, oldValue, newValue) -> putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (obs, oldValue, newValue) -> putInt(MAIN_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.themeProperty(), (obs, oldValue, newValue) -> put(THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.themeSyncOsProperty(), (obs, oldValue, newValue) -> putBoolean(THEME_SYNC_OS, newValue));
+        EasyBind.listen(workspacePreferences.openLastEditedProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_LAST_EDITED, newValue));
+        EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (obs, oldValue, newValue) -> putBoolean(SHOW_ADVANCED_HINTS, newValue));
+        EasyBind.listen(workspacePreferences.warnAboutDuplicatesInInspectionProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_DELETE, newValue));
+        workspacePreferences.getSelectedSlrCatalogs().addListener((ListChangeListener<String>) change ->
+                putStringList(SELECTED_SLR_CATALOGS, workspacePreferences.getSelectedSlrCatalogs()));
+        return workspacePreferences;
+    }
+
 }

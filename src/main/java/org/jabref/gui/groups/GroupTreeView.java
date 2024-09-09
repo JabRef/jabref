@@ -51,6 +51,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
@@ -61,7 +62,6 @@ import org.jabref.gui.util.ViewModelTreeTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -84,7 +84,7 @@ public class GroupTreeView extends BorderPane {
     private final DialogService dialogService;
     private final ChatHistoryService chatHistoryService;
     private final TaskExecutor taskExecutor;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
     private TreeTableView<GroupNodeViewModel> groupTree;
     private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -106,7 +106,7 @@ public class GroupTreeView extends BorderPane {
      */
     public GroupTreeView(TaskExecutor taskExecutor,
                          StateManager stateManager,
-                         CliPreferences preferences,
+                         GuiPreferences preferences,
                          DialogService dialogService,
                          ChatHistoryService chatHistoryService
     ) {

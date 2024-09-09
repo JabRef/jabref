@@ -90,9 +90,11 @@ abstract class ServerTest extends JerseyTest {
         // used twice, once for reading and once for writing
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);
 
+/*
         coreGuiPreferences = mock(CoreGuiPreferences.class);
         when(preferences.getGuiPreferences()).thenReturn(coreGuiPreferences);
 
         when(coreGuiPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path));
+*/
     }
 }
