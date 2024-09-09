@@ -17,13 +17,17 @@ import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.theme.Theme;
+import org.jabref.logic.externalfiles.DateRange;
+import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -66,8 +70,10 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private static final String LAST_FOCUSED = "lastFocused";
     private static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
-    // SLR
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
+    private static final String UNLINKED_FILES_SELECTED_EXTENSION = "unlinkedFilesSelectedExtension";
+    private static final String UNLINKED_FILES_SELECTED_DATE_RANGE = "unlinkedFilesSelectedDateRange";
+    private static final String UNLINKED_FILES_SELECTED_SORT = "unlinkedFilesSelectedSort";
 
     private static JabRefGuiPreferences singleton;
 
@@ -76,6 +82,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private AutoCompletePreferences autoCompletePreferences;
     private CoreGuiPreferences coreGuiPreferences;
     private WorkspacePreferences workspacePreferences;
+    private UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -118,6 +125,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(THEME_SYNC_OS, Boolean.FALSE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
+        // endregion
+
+        // region unlinkedFilesDialogPreferences
+        defaults.put(UNLINKED_FILES_SELECTED_EXTENSION, StandardFileType.ANY_FILE.getName());
+        defaults.put(UNLINKED_FILES_SELECTED_DATE_RANGE, DateRange.ALL_TIME.name());
+        defaults.put(UNLINKED_FILES_SELECTED_SORT, ExternalFileSorter.DEFAULT.name());
         // endregion
     }
 
@@ -411,4 +424,22 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return workspacePreferences;
     }
 
+    @Override
+    public UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferences() {
+        if (unlinkedFilesDialogPreferences != null) {
+            return unlinkedFilesDialogPreferences;
+        }
+
+        unlinkedFilesDialogPreferences = new UnlinkedFilesDialogPreferences(
+                get(UNLINKED_FILES_SELECTED_EXTENSION),
+                DateRange.parse(get(UNLINKED_FILES_SELECTED_DATE_RANGE)),
+                ExternalFileSorter.parse(get(UNLINKED_FILES_SELECTED_SORT))
+        );
+
+        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedExtensionProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_EXTENSION, newValue));
+        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedDateRangeProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_DATE_RANGE, newValue.name()));
+        EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedSortProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_SORT, newValue.name()));
+
+        return unlinkedFilesDialogPreferences;
+    }
 }
