@@ -371,7 +371,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
     // endregion
 
-
     @Override
     public WorkspacePreferences getWorkspacePreferences() {
         if (workspacePreferences != null) {
