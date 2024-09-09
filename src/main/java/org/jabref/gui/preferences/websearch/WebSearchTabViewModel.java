@@ -173,6 +173,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         return shouldDownloadLinkedOnlineFiles;
     }
 
+    public BooleanProperty shouldKeepDownloadUrl() {
+        return shouldkeepDownloadUrl;
+    }
+
     public ReadOnlyBooleanProperty apiKeyPersistAvailable() {
         return apikeyPersistAvailableProperty;
     }
