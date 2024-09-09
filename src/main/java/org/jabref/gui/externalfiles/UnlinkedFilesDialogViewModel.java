@@ -30,18 +30,19 @@ import javafx.scene.control.TreeItem;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -84,7 +85,7 @@ public class UnlinkedFilesDialogViewModel {
     public UnlinkedFilesDialogViewModel(DialogService dialogService,
                                         UndoManager undoManager,
                                         FileUpdateMonitor fileUpdateMonitor,
-                                        CliPreferences preferences,
+                                        GuiPreferences preferences,
                                         StateManager stateManager,
                                         TaskExecutor taskExecutor) {
         this.preferences = preferences;

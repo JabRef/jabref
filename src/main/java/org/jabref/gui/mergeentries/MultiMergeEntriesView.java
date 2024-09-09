@@ -36,6 +36,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -48,7 +49,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -83,9 +83,9 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
     private final MultiMergeEntriesViewModel viewModel;
     private final TaskExecutor taskExecutor;
 
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
-    public MultiMergeEntriesView(CliPreferences preferences,
+    public MultiMergeEntriesView(GuiPreferences preferences,
                                  TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;

@@ -21,6 +21,7 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -29,7 +30,6 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.AfterEach;
@@ -68,7 +68,7 @@ class LinkedFileViewModelTest {
     private DialogService dialogService;
     private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-    private final CliPreferences preferences = mock(CliPreferences.class);
+    private final GuiPreferences preferences = mock(GuiPreferences.class);
     private CookieManager cookieManager;
 
     @BeforeEach

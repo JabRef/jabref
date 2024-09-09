@@ -19,16 +19,16 @@ import org.jabref.gui.maintable.PersistenceVisualStateTable;
 import org.jabref.gui.maintable.SmartConstrainedResizePolicy;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.logic.preferences.CliPreferences;
 
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class SearchResultsTable extends TableView<BibEntryTableViewModel> {
 
     public SearchResultsTable(SearchResultsTableDataModel model,
                               BibDatabaseContext database,
-                              CliPreferences preferences,
+                              GuiPreferences preferences,
                               UndoManager undoManager,
                               DialogService dialogService,
                               StateManager stateManager,

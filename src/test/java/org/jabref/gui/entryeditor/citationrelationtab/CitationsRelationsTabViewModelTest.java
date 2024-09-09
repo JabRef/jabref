@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -27,7 +28,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class CitationsRelationsTabViewModelTest {
     private BibEntry testEntry;
 
     @Mock
-    private CliPreferences preferences;
+    private GuiPreferences preferences;
     @Mock
     private DuplicateCheck duplicateCheck;
     private BibEntry existingEntry;

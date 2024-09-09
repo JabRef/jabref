@@ -38,6 +38,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -50,7 +51,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
@@ -82,7 +82,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
                      BibDatabaseContext database,
-                     CliPreferences preferences,
+                     GuiPreferences preferences,
                      DialogService dialogService,
                      StateManager stateManager,
                      KeyBindingRepository keyBindingRepository,

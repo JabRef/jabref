@@ -10,25 +10,25 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class AttachFileFromURLAction extends SimpleCommand {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
 
     public AttachFileFromURLAction(DialogService dialogService,
                                    StateManager stateManager,
                                    TaskExecutor taskExecutor,
-                                   CliPreferences preferences) {
+                                   GuiPreferences preferences) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;

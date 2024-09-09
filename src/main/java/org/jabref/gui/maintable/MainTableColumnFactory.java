@@ -31,6 +31,7 @@ import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
@@ -44,7 +45,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class MainTableColumnFactory {
     public static final String STYLE_ICON_COLUMN = "column-icon";
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnFactory.class);
 
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final ColumnPreferences columnPreferences;
     private final BibDatabaseContext database;
     private final CellFactory cellFactory;
@@ -66,7 +66,7 @@ public class MainTableColumnFactory {
     private final MainTableTooltip tooltip;
 
     public MainTableColumnFactory(BibDatabaseContext database,
-                                  CliPreferences preferences,
+                                  GuiPreferences preferences,
                                   ColumnPreferences abstractColumnPrefs,
                                   UndoManager undoManager,
                                   DialogService dialogService,

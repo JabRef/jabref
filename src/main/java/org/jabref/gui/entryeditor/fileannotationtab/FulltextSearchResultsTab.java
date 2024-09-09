@@ -24,6 +24,7 @@ import org.jabref.gui.documentviewer.DocumentViewerView;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TooltipTextUtil;
@@ -36,7 +37,6 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResult;
 import org.jabref.model.search.SearchResults;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);
 
     private final StateManager stateManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final BibDatabaseContext databaseContext;
@@ -58,7 +58,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private DocumentViewerView documentViewerView;
 
     public FulltextSearchResultsTab(StateManager stateManager,
-                                    CliPreferences preferences,
+                                    GuiPreferences preferences,
                                     DialogService dialogService,
                                     BibDatabaseContext databaseContext,
                                     TaskExecutor taskExecutor,

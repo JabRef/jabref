@@ -36,7 +36,6 @@ import org.jabref.gui.CoreGuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -51,8 +50,6 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.NameDisplayPreferences.DisplayStyle;
-import org.jabref.gui.mergeentries.DiffMode;
-import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.push.PushToApplications;
@@ -543,7 +540,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private ColumnPreferences searchDialogColumnPreferences;
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
-    private MergeDialogPreferences mergeDialogPreferences;
     private UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences;
     private AiPreferences aiPreferences;
 
@@ -696,14 +692,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(LAST_EDITED, "");
         defaults.put(LAST_FOCUSED, "");
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
-
-        defaults.put(MERGE_ENTRIES_DIFF_MODE, DiffMode.WORD.name());
-        defaults.put(MERGE_ENTRIES_SHOULD_SHOW_DIFF, Boolean.TRUE);
-        defaults.put(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, Boolean.TRUE);
-        defaults.put(MERGE_ENTRIES_HIGHLIGHT_WORDS, Boolean.TRUE);
-        defaults.put(MERGE_SHOW_ONLY_CHANGED_FIELDS, Boolean.FALSE);
-        defaults.put(MERGE_APPLY_TO_ALL_ENTRIES, Boolean.FALSE);
-        defaults.put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, DuplicateResolverDialog.DuplicateResolverResult.BREAK.name());
 
         defaults.put(SHOW_USER_COMMENTS_FIELDS, Boolean.TRUE);
 
@@ -2619,33 +2607,6 @@ public class JabRefCliPreferences implements CliPreferences {
                                                .map(Path::toAbsolutePath)
                                                .map(Path::toString)
                                                .toList());
-    }
-
-    @Override
-    public MergeDialogPreferences getMergeDialogPreferences() {
-        if (mergeDialogPreferences != null) {
-            return mergeDialogPreferences;
-        }
-
-        mergeDialogPreferences = new MergeDialogPreferences(
-                DiffMode.parse(get(MERGE_ENTRIES_DIFF_MODE)),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF),
-                getBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF),
-                getBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS),
-                getBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS),
-                getBoolean(MERGE_APPLY_TO_ALL_ENTRIES),
-                DuplicateResolverDialog.DuplicateResolverResult.parse(get(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES))
-        );
-
-        EasyBind.listen(mergeDialogPreferences.mergeDiffModeProperty(), (obs, oldValue, newValue) -> put(MERGE_ENTRIES_DIFF_MODE, newValue.name()));
-        EasyBind.listen(mergeDialogPreferences.mergeShouldShowDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_DIFF, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeShouldShowUnifiedDiffProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeHighlightWordsProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_ENTRIES_HIGHLIGHT_WORDS, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeShowChangedFieldOnlyProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SHOW_ONLY_CHANGED_FIELDS, newValue));
-        EasyBind.listen(mergeDialogPreferences.mergeApplyToAllEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_APPLY_TO_ALL_ENTRIES, newValue));
-        EasyBind.listen(mergeDialogPreferences.allEntriesDuplicateResolverDecisionProperty(), (obs, oldValue, newValue) -> put(DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES, newValue.name()));
-
-        return mergeDialogPreferences;
     }
 
     @Override

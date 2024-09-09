@@ -5,6 +5,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -14,7 +15,7 @@ public class OpenFolderAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
     private final BibEntry entry;
     private final LinkedFile linkedFile;
@@ -22,14 +23,14 @@ public class OpenFolderAction extends SimpleCommand {
 
     public OpenFolderAction(DialogService dialogService,
                             StateManager stateManager,
-                            CliPreferences preferences,
+                            GuiPreferences preferences,
                             TaskExecutor taskExecutor) {
         this(dialogService, stateManager, preferences, null, null, taskExecutor);
     }
 
     public OpenFolderAction(DialogService dialogService,
                             StateManager stateManager,
-                            CliPreferences preferences,
+                            GuiPreferences preferences,
                             BibEntry entry,
                             LinkedFile linkedFile,
                             TaskExecutor taskExecutor) {

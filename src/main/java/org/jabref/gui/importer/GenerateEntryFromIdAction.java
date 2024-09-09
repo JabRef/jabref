@@ -7,6 +7,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
@@ -17,7 +18,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.controlsfx.control.PopOver;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final String identifier;
     private final TaskExecutor taskExecutor;
     private final PopOver entryFromIdPopOver;
@@ -37,7 +37,7 @@ public class GenerateEntryFromIdAction extends SimpleCommand {
 
     public GenerateEntryFromIdAction(LibraryTab libraryTab,
                                      DialogService dialogService,
-                                     CliPreferences preferences,
+                                     GuiPreferences preferences,
                                      TaskExecutor taskExecutor,
                                      PopOver entryFromIdPopOver,
                                      String identifier,

@@ -18,6 +18,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DatabaseMerger;
@@ -32,7 +33,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private ParserResult parserResult = null;
     private final ObservableList<BibEntry> entries;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final ObjectProperty<BibDatabaseContext> selectedDb;
 
@@ -63,7 +63,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                   BibDatabaseContext databaseContext,
                                   DialogService dialogService,
                                   UndoManager undoManager,
-                                  CliPreferences preferences,
+                                  GuiPreferences preferences,
                                   StateManager stateManager,
                                   BibEntryTypesManager entryTypesManager,
                                   FileUpdateMonitor fileUpdateMonitor) {

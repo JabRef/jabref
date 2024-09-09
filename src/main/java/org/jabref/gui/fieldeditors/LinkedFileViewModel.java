@@ -31,6 +31,7 @@ import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
 import org.jabref.gui.mergeentries.MultiMergeEntriesView;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
@@ -49,7 +50,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.logic.preferences.CliPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -71,7 +71,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final BibEntry entry;
     private final TaskExecutor taskExecutor;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final LinkedFileHandler linkedFileHandler;
 
     private ObjectBinding<Node> linkedFileIconBinding;
@@ -83,7 +83,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                                BibDatabaseContext databaseContext,
                                TaskExecutor taskExecutor,
                                DialogService dialogService,
-                               CliPreferences preferences) {
+                               GuiPreferences preferences) {
         this.linkedFile = linkedFile;
         this.preferences = preferences;
         this.linkedFileHandler = new LinkedFileHandler(linkedFile, entry, databaseContext, preferences.getFilePreferences());

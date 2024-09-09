@@ -20,6 +20,7 @@ import javafx.stage.Screen;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -42,7 +43,6 @@ import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -71,13 +71,13 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
 
     private EntryType type;
     private EntryTypeViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public EntryTypeView(LibraryTab libraryTab, DialogService dialogService, CliPreferences preferences) {
+    public EntryTypeView(LibraryTab libraryTab, DialogService dialogService, GuiPreferences preferences) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferences = preferences;

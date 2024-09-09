@@ -16,12 +16,12 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.SpecialFieldColumn;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -40,7 +40,7 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
     // Reference needs to be kept, since java garbage collection would otherwise destroy the subscription
     @SuppressWarnings("FieldCanBeLocal") private Subscription keepOnTopSubscription;
 
-    @Inject private CliPreferences preferences;
+    @Inject private GuiPreferences preferences;
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private ThemeManager themeManager;

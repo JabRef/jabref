@@ -34,6 +34,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileNodeViewModel;
@@ -49,7 +50,6 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -80,7 +80,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML private TitledPane filePane;
     @FXML private TitledPane resultPane;
 
-    @Inject private CliPreferences preferences;
+    @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
     @Inject private UndoManager undoManager;

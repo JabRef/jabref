@@ -9,10 +9,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
@@ -26,7 +26,7 @@ public class GenerateEntryFromIdDialog {
 
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final LibraryTab libraryTab;
     private final TaskExecutor taskExecutor;
@@ -34,7 +34,7 @@ public class GenerateEntryFromIdDialog {
 
     private PopOver entryFromIdPopOver;
 
-    public GenerateEntryFromIdDialog(LibraryTab libraryTab, DialogService dialogService, CliPreferences preferences, TaskExecutor taskExecutor, StateManager stateManager) {
+    public GenerateEntryFromIdDialog(LibraryTab libraryTab, DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor, StateManager stateManager) {
         ViewLoader.view(this).load();
         this.preferences = preferences;
         this.dialogService = dialogService;

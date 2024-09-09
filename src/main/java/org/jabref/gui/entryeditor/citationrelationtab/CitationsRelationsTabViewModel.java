@@ -10,6 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.util.TaskExecutor;
@@ -17,19 +18,18 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class CitationsRelationsTabViewModel {
 
     private final BibDatabaseContext databaseContext;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
-    public CitationsRelationsTabViewModel(BibDatabaseContext databaseContext, CliPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
+    public CitationsRelationsTabViewModel(BibDatabaseContext databaseContext, GuiPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
         this.databaseContext = databaseContext;
         this.preferences = preferences;
         this.undoManager = undoManager;

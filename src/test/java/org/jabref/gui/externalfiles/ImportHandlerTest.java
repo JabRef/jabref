@@ -9,6 +9,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.database.DuplicateCheck;
@@ -21,7 +22,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class ImportHandlerTest {
     private BibEntry testEntry;
 
     @Mock
-    private CliPreferences preferences;
+    private GuiPreferences preferences;
     @Mock
     private DuplicateCheck duplicateCheck;
 
@@ -85,7 +85,7 @@ class ImportHandlerTest {
     void handleBibTeXData() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
-        CliPreferences preferences = mock(CliPreferences.class);
+        GuiPreferences preferences = mock(GuiPreferences.class);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getFilePreferences()).thenReturn(mock(FilePreferences.class));
 

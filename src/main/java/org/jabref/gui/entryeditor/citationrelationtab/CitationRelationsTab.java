@@ -33,6 +33,7 @@ import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.CitationFetcher;
 import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.database.DuplicateCheck;
@@ -47,7 +48,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.logic.preferences.CliPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
@@ -68,7 +68,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private static BackgroundTask<List<BibEntry>> citedByTask;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;
     private final LibraryTab libraryTab;
     private final TaskExecutor taskExecutor;
     private final BibEntryRelationsRepository bibEntryRelationsRepository;
@@ -80,7 +80,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                 UndoManager undoManager,
                                 StateManager stateManager,
                                 FileUpdateMonitor fileUpdateMonitor,
-                                CliPreferences preferences,
+                                GuiPreferences preferences,
                                 LibraryTab libraryTab,
                                 TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
