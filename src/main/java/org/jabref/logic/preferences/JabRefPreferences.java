@@ -560,8 +560,10 @@ public class JabRefPreferences implements Preferences {
 
     private KeyBindingRepository keyBindingRepository;
 
-    // The constructor is made private to enforce this as a singleton class:
-    private JabRefPreferences() {
+    /**
+     * @implNote The constructor is made protected to enforce this as a singleton class:
+     */
+    protected JabRefPreferences() {
         try {
             if (new File("jabref.xml").exists()) {
                 importPreferences(Path.of("jabref.xml"));

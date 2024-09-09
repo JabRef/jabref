@@ -1,9 +1,7 @@
-package org.jabref.preferences;
+package org.jabref.logic.preferences;
 
 import java.util.List;
 import java.util.stream.Stream;
-
-import org.jabref.logic.preferences.JabRefPreferences;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
