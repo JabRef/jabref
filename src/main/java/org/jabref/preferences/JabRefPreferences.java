@@ -454,7 +454,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
     private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
     private static final String FULLTEXT_INDEX_LINKED_FILES = "fulltextIndexLinkedFiles";
-    private static final String KEEP_DOWNLOAD_URL ="keepDownloadUrl";
+    private static final String KEEP_DOWNLOAD_URL = "keepDownloadUrl";
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
