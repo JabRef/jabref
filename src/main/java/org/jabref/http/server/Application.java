@@ -3,7 +3,7 @@ package org.jabref.http.server;
 import java.util.Set;
 
 import org.jabref.http.dto.GsonFactory;
-import org.jabref.preferences.PreferenceServiceFactory;
+import org.jabref.preferences.PreferencesFactory;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ApplicationPath;
@@ -27,6 +27,6 @@ public class Application extends jakarta.ws.rs.core.Application {
      */
     private void initialize() {
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
-        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferenceServiceFactory());
+        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory());
     }
 }
