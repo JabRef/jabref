@@ -314,7 +314,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REDOWNLOAD_MISSING_FILES, new RedownloadMissingFilesAction(stateManager, dialogService, preferencesService.getFilePreferences(), taskExecutor))
+                factory.createMenuItem(StandardActions.REDOWNLOAD_MISSING_FILES, new RedownloadMissingFilesAction(stateManager, dialogService, preferencesService.getExternalApplicationsPreferences(), preferencesService.getFilePreferences(), taskExecutor))
         );
 
         SidePaneType webSearchPane = SidePaneType.WEB_SEARCH;
@@ -338,8 +338,8 @@ public class MainMenu extends MenuBar {
         );
 
         help.getItems().addAll(
-                factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService, preferencesService.getFilePreferences())),
-                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/", dialogService, preferencesService.getFilePreferences())),
+                factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService, preferencesService.getExternalApplicationsPreferences())),
+                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction("http://discourse.jabref.org/", dialogService, preferencesService.getExternalApplicationsPreferences())),
 
                 new SeparatorMenuItem(),
 
@@ -347,19 +347,19 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org", dialogService, preferencesService.getFilePreferences())),
+                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org", dialogService, preferencesService.getExternalApplicationsPreferences())),
                 factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(preferencesService, dialogService, taskExecutor)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
-                        factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/", dialogService, preferencesService.getFilePreferences())),
-                        factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/", dialogService, preferencesService.getFilePreferences())),
-                        factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/", dialogService, preferencesService.getFilePreferences())),
-                        factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org", dialogService, preferencesService.getFilePreferences())),
-                        factory.createMenuItem(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferencesService.getFilePreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/", dialogService, preferencesService.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/", dialogService, preferencesService.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/", dialogService, preferencesService.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org", dialogService, preferencesService.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref", dialogService, preferencesService.getExternalApplicationsPreferences())),
 
                         new SeparatorMenuItem(),
 
-                        factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/", dialogService, preferencesService.getFilePreferences())),
-                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md", dialogService, preferencesService.getFilePreferences()))
+                        factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/", dialogService, preferencesService.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/main/CHANGELOG.md", dialogService, preferencesService.getExternalApplicationsPreferences()))
                 ),
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );

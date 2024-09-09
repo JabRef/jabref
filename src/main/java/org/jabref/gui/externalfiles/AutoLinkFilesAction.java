@@ -55,6 +55,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 database,
+                preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));

@@ -143,7 +143,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
             titleLink.setOnAction(event -> {
                 if (entry.getField(StandardField.URL).isPresent()) {
                     try {
-                        NativeDesktop.openBrowser(entry.getField(StandardField.URL).get(), preferencesService.getFilePreferences());
+                        NativeDesktop.openBrowser(entry.getField(StandardField.URL).get(), preferencesService.getExternalApplicationsPreferences());
                     } catch (IOException e) {
                         LOGGER.error("Error opening the browser to: {}", entry.getField(StandardField.URL).get(), e);
                         dialogService.showErrorDialogAndWait(e);
@@ -207,7 +207,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr. DLib for JabRef users."));
         mdlLink.setOnAction(event -> {
             try {
-                NativeDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/", preferencesService.getFilePreferences());
+                NativeDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/", preferencesService.getExternalApplicationsPreferences());
             } catch (IOException e) {
                 LOGGER.error("Error opening the browser to Mr. DLib information page.", e);
                 dialogService.showErrorDialogAndWait(e);

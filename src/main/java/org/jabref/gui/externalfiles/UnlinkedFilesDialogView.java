@@ -239,7 +239,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                                                                 .stream()
                                                                 .filter(item -> Objects.equals(item.getName(), unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedExtension()))
                                                                 .findFirst()
-                                                                .orElseGet(() -> new FileExtensionViewModel(StandardFileType.ANY_FILE, preferencesService.getFilePreferences()));
+                                                                .orElseGet(() -> new FileExtensionViewModel(StandardFileType.ANY_FILE, preferencesService.getExternalApplicationsPreferences()));
         fileTypeCombo.getSelectionModel().select(selectedExtension);
         fileDateCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedDateRange());
         fileSortCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedSort());

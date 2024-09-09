@@ -102,7 +102,7 @@ public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTab
         });
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP_NAME_FORMATTER, new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER, dialogService, preferencesService.getFilePreferences()), formatterHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_NAME_FORMATTER, new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER, dialogService, preferencesService.getExternalApplicationsPreferences()), formatterHelp);
     }
 
     public void addFormatter() {

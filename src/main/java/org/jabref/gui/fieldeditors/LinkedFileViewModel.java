@@ -165,7 +165,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public JabRefIcon getTypeIcon() {
-        return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, preferencesService.getFilePreferences())
+        return ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, false, preferencesService.getExternalApplicationsPreferences())
                                 .map(ExternalFileType::getIcon)
                                 .orElse(IconTheme.JabRefIcons.FILE);
     }
@@ -196,8 +196,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void open() {
         try {
-            Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferencesService.getFilePreferences());
-            boolean successful = NativeDesktop.openExternalFileAnyFormat(databaseContext, preferencesService.getFilePreferences(), linkedFile.getLink(), type);
+            Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByLinkedFile(linkedFile, true, preferencesService.getExternalApplicationsPreferences());
+            boolean successful = NativeDesktop.openExternalFileAnyFormat(databaseContext, preferencesService.getExternalApplicationsPreferences(), preferencesService.getFilePreferences(), linkedFile.getLink(), type);
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
@@ -401,6 +401,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 linkedFile,
                 linkedFile.getSourceUrl(),
                 dialogService,
+                preferencesService.getExternalApplicationsPreferences(),
                 preferencesService.getFilePreferences(),
                 taskExecutor,
                 fileName,
@@ -421,6 +422,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 linkedFile,
                 linkedFile.getLink(),
                 dialogService,
+                preferencesService.getExternalApplicationsPreferences(),
                 preferencesService.getFilePreferences(),
                 taskExecutor,
                 "",

@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -38,7 +38,7 @@ public class VersionWorker {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final InternalPreferences internalPreferences;
-    private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
     public VersionWorker(Version installedVersion,
                          DialogService dialogService,
@@ -48,7 +48,7 @@ public class VersionWorker {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.internalPreferences = preferencesService.getInternalPreferences();
-        this.filePreferences = preferencesService.getFilePreferences();
+        this.externalApplicationsPreferences = preferencesService.getExternalApplicationsPreferences();
     }
 
     /**
@@ -98,7 +98,8 @@ public class VersionWorker {
             }
         } else {
             // notify the user about a newer version
-            if (dialogService.showCustomDialogAndWait(new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, filePreferences))
+            if (dialogService.showCustomDialogAndWait(
+                    new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, externalApplicationsPreferences))
                              .orElse(true)) {
                 internalPreferences.setIgnoredVersion(newerVersion.get());
             }

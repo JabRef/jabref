@@ -10,7 +10,7 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.logic.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.ai.AiPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -28,13 +28,13 @@ public class PrivacyNoticeComponent extends ScrollPane {
     private final AiPreferences aiPreferences;
     private final Runnable onIAgreeButtonClickCallback;
     private final DialogService dialogService;
-    private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
-    public PrivacyNoticeComponent(AiPreferences aiPreferences, Runnable onIAgreeButtonClickCallback, FilePreferences filePreferences, DialogService dialogService) {
+    public PrivacyNoticeComponent(AiPreferences aiPreferences, Runnable onIAgreeButtonClickCallback, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
         this.onIAgreeButtonClickCallback = onIAgreeButtonClickCallback;
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.dialogService = dialogService;
-        this.filePreferences = filePreferences;
 
         ViewLoader.view(this)
                   .root(this)
@@ -99,7 +99,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
 
     private void openBrowser(String link) {
         try {
-            NativeDesktop.openBrowser(link, filePreferences);
+            NativeDesktop.openBrowser(link, externalApplicationsPreferences);
         } catch (IOException e) {
             LOGGER.error("Error opening the browser to the Privacy Policy page of the AI provider.", e);
             dialogService.showErrorDialogAndWait(e);

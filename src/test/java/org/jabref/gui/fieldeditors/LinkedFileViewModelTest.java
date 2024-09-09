@@ -20,6 +20,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -65,6 +66,7 @@ class LinkedFileViewModelTest {
     private BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final PreferencesService preferences = mock(PreferencesService.class);
     private CookieManager cookieManager;
@@ -78,8 +80,9 @@ class LinkedFileViewModelTest {
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
 
-        when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
         when(filePreferences.confirmDeleteLinkedFile()).thenReturn(true);
+        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         tempFile = tempFolder.resolve("temporaryFile");
@@ -261,7 +264,7 @@ class LinkedFileViewModelTest {
     // Tests if added parameters to mimeType gets parsed to correct format.
     @Test
     void mimeTypeStringWithParameterIsReturnedAsWithoutParameter() {
-        Optional<ExternalFileType> test = ExternalFileTypes.getExternalFileTypeByMimeType("text/html; charset=UTF-8", filePreferences);
+        Optional<ExternalFileType> test = ExternalFileTypes.getExternalFileTypeByMimeType("text/html; charset=UTF-8", externalApplicationsPreferences);
         String actual = test.get().toString();
         assertEquals("URL", actual);
     }

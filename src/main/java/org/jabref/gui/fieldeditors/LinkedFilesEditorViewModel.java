@@ -27,10 +27,10 @@ import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -98,18 +98,18 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
      *
      * TODO: Move this method to {@link LinkedFile} as soon as {@link CustomExternalFileType} lives in model.
      */
-    public static LinkedFile fromFile(Path file, List<Path> fileDirectories, FilePreferences filePreferences) {
+    public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalApplicationsPreferences externalApplicationsPreferences) {
         String fileExtension = FileUtil.getFileExtension(file).orElse("");
-        ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, filePreferences)
+        ExternalFileType suggestedFileType = ExternalFileTypes.getExternalFileTypeByExt(fileExtension, externalApplicationsPreferences)
                                                               .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
         return new LinkedFile("", relativePath, suggestedFileType.getName());
     }
 
-    public LinkedFileViewModel fromFile(Path file, FilePreferences filePreferences) {
+    public LinkedFileViewModel fromFile(Path file, ExternalApplicationsPreferences externalApplicationsPreferences) {
         List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
 
-        LinkedFile linkedFile = fromFile(file, fileDirectories, filePreferences);
+        LinkedFile linkedFile = fromFile(file, fileDirectories, externalApplicationsPreferences);
         return new LinkedFileViewModel(
                 linkedFile,
                 entry,
@@ -185,7 +185,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     private void addNewLinkedFile(Path correctPath, List<Path> fileDirectories) {
-        LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getFilePreferences());
+        LinkedFile newLinkedFile = fromFile(correctPath, fileDirectories, preferences.getExternalApplicationsPreferences());
         addNewLinkedFile(newLinkedFile);
     }
 
@@ -215,6 +215,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 databaseContext,
+                preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences());
         try {

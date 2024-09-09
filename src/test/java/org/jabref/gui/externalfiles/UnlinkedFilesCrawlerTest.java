@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.DateRange;
@@ -53,8 +54,9 @@ class UnlinkedFilesCrawlerTest {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         databaseContext.setDatabasePath(databasePath);
 
+        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+        Filter<Path> fileExtensionFilter = new FileExtensionViewModel(StandardFileType.ANY_FILE, externalApplicationsPreferences).dirFilter();
         FilePreferences filePreferences = mock(FilePreferences.class);
-        Filter<Path> fileExtensionFilter = new FileExtensionViewModel(StandardFileType.ANY_FILE, filePreferences).dirFilter();
         UnlinkedPDFFileFilter unlinkedPdfFileFilter = new UnlinkedPDFFileFilter(fileExtensionFilter, databaseContext, filePreferences);
 
         UnlinkedFilesCrawler unlinkedFilesCrawler = new UnlinkedFilesCrawler(testRoot, unlinkedPdfFileFilter, DateRange.ALL_TIME, ExternalFileSorter.DEFAULT, databaseContext, filePreferences);

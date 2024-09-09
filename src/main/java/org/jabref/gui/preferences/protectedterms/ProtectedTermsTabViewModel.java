@@ -18,6 +18,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
@@ -38,8 +39,9 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     private final ProtectedTermsLoader termsLoader;
     private final ListProperty<ProtectedTermsListItemModel> termsFilesProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final FilePreferences filePreferences;
     private final DialogService dialogService;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+    private final FilePreferences filePreferences;
     private final ProtectedTermsPreferences protectedTermsPreferences;
 
     public ProtectedTermsTabViewModel(ProtectedTermsLoader termsLoader,
@@ -47,6 +49,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
                                       PreferencesService preferencesService) {
         this.termsLoader = termsLoader;
         this.dialogService = dialogService;
+        this.externalApplicationsPreferences = preferencesService.getExternalApplicationsPreferences();
         this.filePreferences = preferencesService.getFilePreferences();
         this.protectedTermsPreferences = preferencesService.getProtectedTermsPreferences();
     }
@@ -122,13 +125,13 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     public void edit(ProtectedTermsListItemModel file) {
         Optional<ExternalFileType> termsFileType = OptionalUtil.<ExternalFileType>orElse(
-                ExternalFileTypes.getExternalFileTypeByExt("terms", filePreferences),
-                ExternalFileTypes.getExternalFileTypeByExt("txt", filePreferences)
+                ExternalFileTypes.getExternalFileTypeByExt("terms", externalApplicationsPreferences),
+                ExternalFileTypes.getExternalFileTypeByExt("txt", externalApplicationsPreferences)
         );
 
         String fileName = file.getTermsList().getLocation();
         try {
-            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), filePreferences, fileName, termsFileType);
+            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, fileName, termsFileType);
         } catch (IOException e) {
             LOGGER.warn("Problem open protected terms file editor", e);
         }

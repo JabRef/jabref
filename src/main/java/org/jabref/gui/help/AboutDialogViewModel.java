@@ -152,7 +152,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private void openWebsite(String url) {
         try {
-            NativeDesktop.openBrowser(url, preferencesService.getFilePreferences());
+            NativeDesktop.openBrowser(url, preferencesService.getExternalApplicationsPreferences());
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
             logger.error("Could not open default browser.", e);

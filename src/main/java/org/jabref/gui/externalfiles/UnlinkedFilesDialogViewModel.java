@@ -101,10 +101,10 @@ public class UnlinkedFilesDialogViewModel {
                 taskExecutor);
 
         this.fileFilterList = FXCollections.observableArrayList(
-                new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getFilePreferences()),
-                new FileExtensionViewModel(StandardFileType.HTML, preferences.getFilePreferences()),
-                new FileExtensionViewModel(StandardFileType.MARKDOWN, preferences.getFilePreferences()),
-                new FileExtensionViewModel(StandardFileType.PDF, preferences.getFilePreferences()));
+                new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getExternalApplicationsPreferences()),
+                new FileExtensionViewModel(StandardFileType.HTML, preferences.getExternalApplicationsPreferences()),
+                new FileExtensionViewModel(StandardFileType.MARKDOWN, preferences.getExternalApplicationsPreferences()),
+                new FileExtensionViewModel(StandardFileType.PDF, preferences.getExternalApplicationsPreferences()));
 
         this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 

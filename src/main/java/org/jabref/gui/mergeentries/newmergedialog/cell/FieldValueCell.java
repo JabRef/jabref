@@ -143,7 +143,7 @@ public class FieldValueCell extends ThreeWayMergeCell implements Toggle {
         Node openLinkIcon = IconTheme.JabRefIcons.OPEN_LINK.getGraphicNode();
         openLinkIcon.getStyleClass().add("action-icon");
 
-        Button openLinkButton = factory.createIconButton(() -> Localization.lang("Open Link"), new OpenExternalLinkAction(getText(), preferencesService.getFilePreferences()));
+        Button openLinkButton = factory.createIconButton(() -> Localization.lang("Open Link"), new OpenExternalLinkAction(getText(), preferencesService.getExternalApplicationsPreferences()));
         openLinkButton.setGraphic(openLinkIcon);
         openLinkButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         openLinkButton.setMaxHeight(Double.MAX_VALUE);

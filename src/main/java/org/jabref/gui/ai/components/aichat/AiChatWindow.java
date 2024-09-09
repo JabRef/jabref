@@ -5,8 +5,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.BaseWindow;
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
@@ -20,7 +20,7 @@ public class AiChatWindow extends BaseWindow {
     private final AiService aiService;
     private final DialogService dialogService;
     private final AiPreferences aiPreferences;
-    private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final TaskExecutor taskExecutor;
 
     // This field is used for finding an existing AI chat window when user wants to chat with the same group again.
@@ -29,13 +29,13 @@ public class AiChatWindow extends BaseWindow {
     public AiChatWindow(AiService aiService,
                         DialogService dialogService,
                         AiPreferences aiPreferences,
-                        FilePreferences filePreferences,
+                        ExternalApplicationsPreferences externalApplicationsPreferences,
                         TaskExecutor taskExecutor
     ) {
         this.aiService = aiService;
         this.dialogService = dialogService;
         this.aiPreferences = aiPreferences;
-        this.filePreferences = filePreferences;
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.taskExecutor = taskExecutor;
     }
 
@@ -52,7 +52,7 @@ public class AiChatWindow extends BaseWindow {
                                 aiService,
                                 dialogService,
                                 aiPreferences,
-                                filePreferences,
+                                externalApplicationsPreferences,
                                 taskExecutor
                         ),
                         800,

@@ -6,11 +6,8 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.collections.FXCollections;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.EmptySuggestionProvider;
-import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -40,7 +37,6 @@ class LinkedFilesEditorViewModelTest {
     @Test
     void urlFieldShouldDownloadFile(@TempDir Path tempDir) {
         when(preferencesService.getFilePreferences()).thenReturn(filePreferences);
-        when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(StandardExternalFileType.values()));
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempDir));

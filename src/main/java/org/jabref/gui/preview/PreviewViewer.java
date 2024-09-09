@@ -181,7 +181,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     String href = anchorElement.getHref();
                     if (href != null) {
                         try {
-                            NativeDesktop.openBrowser(href, preferencesService.getFilePreferences());
+                            NativeDesktop.openBrowser(href, preferencesService.getExternalApplicationsPreferences());
                         } catch (MalformedURLException exception) {
                             LOGGER.error("Invalid URL", exception);
                         } catch (IOException exception) {

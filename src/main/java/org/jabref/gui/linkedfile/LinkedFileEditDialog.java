@@ -74,7 +74,7 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
 
     @FXML
     private void initialize() {
-        viewModel = new LinkedFileEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences.getFilePreferences());
+        viewModel = new LinkedFileEditDialogViewModel(linkedFile, stateManager.getActiveDatabase().get(), dialogService, preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences());
 
         fileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
         new ViewModelListCellFactory<ExternalFileType>()

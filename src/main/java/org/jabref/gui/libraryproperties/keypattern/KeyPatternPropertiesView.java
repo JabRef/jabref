@@ -46,7 +46,7 @@ public class KeyPatternPropertiesView extends AbstractPropertiesTabView<KeyPatte
         bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferencesService.getFilePreferences()), keyPatternHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN, dialogService, preferencesService.getExternalApplicationsPreferences()), keyPatternHelp);
     }
 
     @Override

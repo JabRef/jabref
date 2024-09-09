@@ -114,9 +114,8 @@ public class SciteTab extends EntryEditorTab {
         HyperlinkLabel link = new HyperlinkLabel(Localization.lang("See full report at [%0]", url));
         link.setOnAction(event -> {
             if (event.getSource() instanceof Hyperlink) {
-                var filePreferences = preferencesService.getFilePreferences();
                 try {
-                    NativeDesktop.openBrowser(url, filePreferences);
+                    NativeDesktop.openBrowser(url, preferencesService.getExternalApplicationsPreferences());
                 } catch (IOException ioex) {
                     // Can't throw a checked exception from here, so display a message to the user instead.
                     dialogService.showErrorDialogAndWait(

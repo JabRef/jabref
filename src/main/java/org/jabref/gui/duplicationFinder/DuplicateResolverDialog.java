@@ -156,7 +156,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
             return null;
         });
 
-        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService, preferencesService.getFilePreferences());
+        HelpAction helpCommand = new HelpAction(HelpFile.FIND_DUPLICATES, dialogService, preferencesService.getExternalApplicationsPreferences());
         Button helpButton = actionFactory.createIconButton(StandardActions.HELP, helpCommand);
         borderPane.setRight(helpButton);
 

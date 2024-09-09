@@ -9,14 +9,17 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
 
 public class NewVersionDialog extends BaseDialog<Boolean> {
 
-    public NewVersionDialog(Version currentVersion, Version latestVersion, DialogService dialogService, FilePreferences filePreferences) {
+    public NewVersionDialog(Version currentVersion,
+                            Version latestVersion,
+                            DialogService dialogService,
+                            ExternalApplicationsPreferences externalApplicationsPreferences) {
         this.setTitle(Localization.lang("New version available"));
 
         ButtonType btnIgnoreUpdate = new ButtonType(Localization.lang("Ignore this update"), ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -27,7 +30,7 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
             if (button == btnIgnoreUpdate) {
                 return false;
             } else if (button == btnDownloadUpdate) {
-                NativeDesktop.openBrowserShowPopup(Version.JABREF_DOWNLOAD_URL, dialogService, filePreferences);
+                NativeDesktop.openBrowserShowPopup(Version.JABREF_DOWNLOAD_URL, dialogService, externalApplicationsPreferences);
             }
             return true;
         });
@@ -36,7 +39,7 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
 
         Hyperlink lblMoreInformation = new Hyperlink(Localization.lang("To see what is new view the changelog."));
         lblMoreInformation.setOnAction(event ->
-                NativeDesktop.openBrowserShowPopup(latestVersion.getChangelogUrl(), dialogService, filePreferences)
+                NativeDesktop.openBrowserShowPopup(latestVersion.getChangelogUrl(), dialogService, externalApplicationsPreferences)
         );
 
         VBox container = new VBox(

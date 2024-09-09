@@ -4,7 +4,7 @@ import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.summary.SummaryComponent;
-import org.jabref.logic.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -18,7 +18,7 @@ public class AiSummaryTab extends EntryEditorTab {
     private final AiService aiService;
     private final DialogService dialogService;
     private final AiPreferences aiPreferences;
-    private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final EntryEditorPreferences entryEditorPreferences;
 
@@ -33,7 +33,7 @@ public class AiSummaryTab extends EntryEditorTab {
         this.dialogService = dialogService;
 
         this.aiPreferences = preferencesService.getAiPreferences();
-        this.filePreferences = preferencesService.getFilePreferences();
+        this.externalApplicationsPreferences = preferencesService.getExternalApplicationsPreferences();
         this.citationKeyPatternPreferences = preferencesService.getCitationKeyPatternPreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
 
@@ -56,7 +56,7 @@ public class AiSummaryTab extends EntryEditorTab {
                 entry,
                 aiService,
                 aiPreferences,
-                filePreferences,
+                externalApplicationsPreferences,
                 citationKeyPatternPreferences,
                 dialogService
         ));

@@ -84,7 +84,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
         });
 
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP_PUSH_TO_APPLICATION, new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, preferencesService.getFilePreferences()), autolinkExternalHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_PUSH_TO_APPLICATION, new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, preferencesService.getExternalApplicationsPreferences()), autolinkExternalHelp);
     }
 
     @FXML

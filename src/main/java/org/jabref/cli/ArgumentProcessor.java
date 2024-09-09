@@ -737,6 +737,7 @@ public class ArgumentProcessor {
 
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                     parserResult.getDatabaseContext(),
+                    preferencesService.getExternalApplicationsPreferences(),
                     preferencesService.getFilePreferences(),
                     preferencesService.getAutoLinkPreferences());
 

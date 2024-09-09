@@ -110,7 +110,7 @@ public class WebSearchPaneView extends VBox {
         ActionFactory factory = new ActionFactory();
         EasyBind.subscribe(viewModel.selectedFetcherProperty(), fetcher -> {
             if ((fetcher != null) && fetcher.getHelpPage().isPresent()) {
-                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService, preferences.getFilePreferences()));
+                Button helpButton = factory.createIconButton(StandardActions.HELP, new HelpAction(fetcher.getHelpPage().get(), dialogService, preferences.getExternalApplicationsPreferences()));
                 helpButtonContainer.getChildren().setAll(helpButton);
             } else {
                 helpButtonContainer.getChildren().clear();

@@ -15,7 +15,7 @@ import org.jabref.gui.ai.chatting.chathistory.ChatHistoryService;
 import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
 import org.jabref.gui.ai.components.privacynotice.PrivacyNoticeComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
-import org.jabref.logic.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
@@ -34,7 +34,7 @@ public class AiChatTab extends EntryEditorTab {
     private final ChatHistoryService chatHistoryService;
     private final DialogService dialogService;
     private final AiPreferences aiPreferences;
-    private final FilePreferences filePreferences;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final EntryEditorPreferences entryEditorPreferences;
     private final CitationKeyGenerator citationKeyGenerator;
     private final TaskExecutor taskExecutor;
@@ -55,7 +55,7 @@ public class AiChatTab extends EntryEditorTab {
         this.dialogService = dialogService;
 
         this.aiPreferences = preferencesService.getAiPreferences();
-        this.filePreferences = preferencesService.getFilePreferences();
+        this.externalApplicationsPreferences = preferencesService.getExternalApplicationsPreferences();
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
 
         this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, preferencesService.getCitationKeyPatternPreferences());
@@ -93,7 +93,7 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void showPrivacyNotice(BibEntry entry) {
-        setContent(new PrivacyNoticeComponent(aiPreferences, () -> bindToEntry(entry), filePreferences, dialogService));
+        setContent(new PrivacyNoticeComponent(aiPreferences, () -> bindToEntry(entry), externalApplicationsPreferences, dialogService));
     }
 
     private void showErrorNotPdfs() {
@@ -141,7 +141,7 @@ public class AiChatTab extends EntryEditorTab {
                 aiService,
                 dialogService,
                 aiPreferences,
-                filePreferences,
+                externalApplicationsPreferences,
                 taskExecutor
         ));
     }

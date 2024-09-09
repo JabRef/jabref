@@ -143,7 +143,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         final Button helpButton = (Button) getDialogPane().lookupButton(helpButtonType);
 
         ActionFactory actionFactory = new ActionFactory();
-        HelpAction helpAction = new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getFilePreferences());
+        HelpAction helpAction = new HelpAction(HelpFile.GROUPS, dialogService, preferencesService.getExternalApplicationsPreferences());
         actionFactory.configureIconButton(
                 StandardActions.HELP_GROUPS,
                 helpAction,

@@ -13,7 +13,7 @@ import org.jabref.Launcher;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.logic.FilePreferences;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.util.Directories;
 
 import com.sun.jna.platform.win32.KnownFolders;
@@ -35,8 +35,8 @@ public class Windows extends NativeDesktop {
     private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 
     @Override
-    public void openFile(String filePath, String fileType, FilePreferences filePreferences) throws IOException {
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, filePreferences);
+    public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt(fileType, externalApplicationsPreferences);
 
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());

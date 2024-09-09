@@ -120,7 +120,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                     .setScheme("https").setHost("github.com")
                     .setPath("/JabRef/jabref/issues/new")
                     .setParameter("body", issueBody);
-            NativeDesktop.openBrowser(uriBuilder.build().toString(), preferencesService.getFilePreferences());
+            NativeDesktop.openBrowser(uriBuilder.build().toString(), preferencesService.getExternalApplicationsPreferences());
         } catch (IOException | URISyntaxException e) {
             LOGGER.error("Problem opening url", e);
         }

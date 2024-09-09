@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -44,6 +45,7 @@ class DownloadLinkedFileActionTest {
 
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final DialogService dialogService = mock(DialogService.class);
+    private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final PreferencesService preferences = mock(PreferencesService.class);
 
@@ -52,7 +54,8 @@ class DownloadLinkedFileActionTest {
         entry = new BibEntry()
                 .withCitationKey("asdf");
 
-        when(filePreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(externalApplicationsPreferences.getExternalFileTypes()).thenReturn(FXCollections.observableSet(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes())));
+        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(preferences.getXmpPreferences()).thenReturn(mock(XmpPreferences.class));
         Path tempFile = tempFolder.resolve("temporaryFile");
@@ -84,6 +87,7 @@ class DownloadLinkedFileActionTest {
                 linkedFile,
                 linkedFile.getLink(),
                 dialogService,
+                preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 new CurrentThreadTaskExecutor());
         downloadLinkedFileAction.execute();
@@ -107,6 +111,7 @@ class DownloadLinkedFileActionTest {
                 linkedFile,
                 linkedFile.getLink(),
                 dialogService,
+                preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 new CurrentThreadTaskExecutor());
         downloadLinkedFileAction.execute();
@@ -126,6 +131,7 @@ class DownloadLinkedFileActionTest {
                 linkedFile,
                 linkedFile.getSourceUrl(),
                 dialogService,
+                preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 new CurrentThreadTaskExecutor(),
                 Path.of(linkedFile.getLink()).getFileName().toString(),
@@ -154,6 +160,7 @@ class DownloadLinkedFileActionTest {
                 linkedFile,
                 linkedFile.getLink(),
                 dialogService,
+                preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 new CurrentThreadTaskExecutor());
         downloadLinkedFileAction.execute();
@@ -178,6 +185,7 @@ class DownloadLinkedFileActionTest {
                 linkedFile,
                 linkedFile.getLink(),
                 dialogService,
+                preferences.getExternalApplicationsPreferences(),
                 preferences.getFilePreferences(),
                 new CurrentThreadTaskExecutor(),
                 "",

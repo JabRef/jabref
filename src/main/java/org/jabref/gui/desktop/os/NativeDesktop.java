@@ -125,17 +125,17 @@ public abstract class NativeDesktop {
 
         switch (field) {
             case URL ->
-                    openBrowser(link, preferencesService.getFilePreferences());
+                    openBrowser(link, preferencesService.getExternalApplicationsPreferences());
             case PS -> {
                 try {
-                    get().openFile(link, PS.getName(), preferencesService.getFilePreferences());
+                    get().openFile(link, PS.getName(), preferencesService.getExternalApplicationsPreferences());
                 } catch (IOException e) {
                     LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
                 }
             }
             case PDF -> {
                 try {
-                    get().openFile(link, PDF.getName(), preferencesService.getFilePreferences());
+                    get().openFile(link, PDF.getName(), preferencesService.getExternalApplicationsPreferences());
                 } catch (IOException e) {
                     LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
                 }
@@ -147,7 +147,7 @@ public abstract class NativeDesktop {
 
     private static void openDoi(String doi, PreferencesService preferencesService) throws IOException {
         String link = DOI.parse(doi).map(DOI::getURIAsASCIIString).orElse(doi);
-        openBrowser(link, preferencesService.getFilePreferences());
+        openBrowser(link, preferencesService.getExternalApplicationsPreferences());
     }
 
     public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
@@ -155,7 +155,7 @@ public abstract class NativeDesktop {
            .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
            .ifPresent(uri -> {
                try {
-                   openBrowser(uri, preferences.getFilePreferences());
+                   openBrowser(uri, preferences.getExternalApplicationsPreferences());
                } catch (IOException e) {
                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
                }
@@ -164,7 +164,7 @@ public abstract class NativeDesktop {
 
     private static void openIsbn(String isbn, PreferencesService preferencesService) throws IOException {
         String link = "https://openlibrary.org/isbn/" + isbn;
-        openBrowser(link, preferencesService.getFilePreferences());
+        openBrowser(link, preferencesService.getExternalApplicationsPreferences());
     }
 
     /**
@@ -176,42 +176,43 @@ public abstract class NativeDesktop {
      * @return false if the link couldn't be resolved, true otherwise.
      */
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext,
+                                                    ExternalApplicationsPreferences externalApplicationsPreferences,
                                                     FilePreferences filePreferences,
                                                     String link,
                                                     final Optional<ExternalFileType> type) throws IOException {
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
-            openBrowser(link, filePreferences);
+            openBrowser(link, externalApplicationsPreferences);
             return true;
         }
         Optional<Path> file = FileUtil.find(databaseContext, link, filePreferences);
         if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
-            openExternalFilePlatformIndependent(type, filePath, filePreferences);
+            openExternalFilePlatformIndependent(type, filePath, externalApplicationsPreferences);
             return true;
         }
 
         // No file matched the name, try to open it directly using the given app
-        openExternalFilePlatformIndependent(type, link, filePreferences);
+        openExternalFilePlatformIndependent(type, link, externalApplicationsPreferences);
         return true;
     }
 
     private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType,
                                                             String filePath,
-                                                            FilePreferences filePreferences)
+                                                            ExternalApplicationsPreferences externalApplicationsPreferences)
             throws IOException {
         if (fileType.isPresent()) {
             String application = fileType.get().getOpenWithApplication();
 
             if (application.isEmpty()) {
-                get().openFile(filePath, fileType.get().getExtension(), filePreferences);
+                get().openFile(filePath, fileType.get().getExtension(), externalApplicationsPreferences);
             } else {
                 get().openFileWithApplication(filePath, application);
             }
         } else {
             // File type is not given and therefore no application specified
             // Let the OS handle the opening of the file
-            get().openFile(filePath, "", filePreferences);
+            get().openFile(filePath, "", externalApplicationsPreferences);
         }
     }
 
@@ -294,13 +295,13 @@ public abstract class NativeDesktop {
      *
      * @param url the URL to open
      */
-    public static void openBrowser(String url, FilePreferences filePreferences) throws IOException {
-        Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", filePreferences);
-        openExternalFilePlatformIndependent(fileType, url, filePreferences);
+    public static void openBrowser(String url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getExternalFileTypeByExt("html", externalApplicationsPreferences);
+        openExternalFilePlatformIndependent(fileType, url, externalApplicationsPreferences);
     }
 
-    public static void openBrowser(URI url, FilePreferences filePreferences) throws IOException {
-        openBrowser(url.toASCIIString(), filePreferences);
+    public static void openBrowser(URI url, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
+        openBrowser(url.toASCIIString(), externalApplicationsPreferences);
     }
 
     /**
@@ -308,9 +309,9 @@ public abstract class NativeDesktop {
      *
      * @param url the URL to open
      */
-    public static void openBrowserShowPopup(String url, DialogService dialogService, FilePreferences filePreferences) {
+    public static void openBrowserShowPopup(String url, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {
         try {
-            openBrowser(url, filePreferences);
+            openBrowser(url, externalApplicationsPreferences);
         } catch (IOException exception) {
             ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
             clipBoardManager.setContent(url);
@@ -334,7 +335,7 @@ public abstract class NativeDesktop {
         return new DefaultDesktop();
     }
 
-    public abstract void openFile(String filePath, String fileType, FilePreferences filePreferences) throws IOException;
+    public abstract void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException;
 
     /**
      * Opens a file on an Operating System, using the given application.

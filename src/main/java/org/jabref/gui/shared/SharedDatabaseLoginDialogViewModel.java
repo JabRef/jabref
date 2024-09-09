@@ -234,7 +234,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             Localization.lang("However, a new database was created alongside the pre-3.6 one."),
                     ButtonType.OK, openHelp);
 
-            result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferencesService.getFilePreferences()).execute());
+            result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferencesService.getExternalApplicationsPreferences()).execute());
             result.filter(btn -> btn.equals(ButtonType.OK)).ifPresent(btn -> openSharedDatabase(connectionProperties));
         }
         loading.set(false);

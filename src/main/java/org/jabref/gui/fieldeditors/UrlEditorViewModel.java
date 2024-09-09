@@ -51,7 +51,7 @@ public class UrlEditorViewModel extends AbstractEditorViewModel {
         }
 
         try {
-            NativeDesktop.openBrowser(text.get(), preferencesService.getFilePreferences());
+            NativeDesktop.openBrowser(text.get(), preferencesService.getExternalApplicationsPreferences());
         } catch (IOException ex) {
             dialogService.notify(Localization.lang("Unable to open link."));
         }

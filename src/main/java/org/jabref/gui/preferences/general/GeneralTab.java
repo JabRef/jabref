@@ -129,8 +129,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
         ActionFactory actionFactory = new ActionFactory();
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferencesService.getFilePreferences()), autosaveLocalLibrariesHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getFilePreferences()), remoteHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferencesService.getExternalApplicationsPreferences()), autosaveLocalLibrariesHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferencesService.getExternalApplicationsPreferences()), remoteHelp);
 
         createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
         backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());

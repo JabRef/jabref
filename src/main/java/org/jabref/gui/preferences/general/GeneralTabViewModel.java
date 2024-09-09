@@ -413,7 +413,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     public void openBrowser() {
         String url = "https://themes.jabref.org";
         try {
-            NativeDesktop.openBrowser(url, preferences.getFilePreferences());
+            NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
         }
