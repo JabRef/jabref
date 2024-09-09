@@ -29,6 +29,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox generateNewKeyOnImport;
     @FXML private CheckBox warnAboutDuplicatesOnImport;
     @FXML private CheckBox downloadLinkedOnlineFiles;
+    @FXML private CheckBox keepDownloadUrl;
 
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
@@ -66,6 +67,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
         downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());
+        keepDownloadUrl.selectedProperty().bindBidirectional(viewModel.shouldKeepDownloadUrl());
 
         grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
