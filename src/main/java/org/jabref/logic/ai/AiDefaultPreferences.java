@@ -11,12 +11,14 @@ public class AiDefaultPreferences {
             AiProvider.OPEN_AI, List.of("gpt-4o-mini", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"),
             // "mistral" and "mixtral" are not language mistakes.
             AiProvider.MISTRAL_AI, List.of("open-mistral-nemo", "open-mistral-7b", "open-mixtral-8x7b", "open-mixtral-8x22b", "mistral-large-latest"),
+            AiProvider.GEMINI, List.of("gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro"),
             AiProvider.HUGGING_FACE, List.of()
     );
 
     public static final Map<AiProvider, String> PROVIDERS_API_URLS = Map.of(
             AiProvider.OPEN_AI, "https://api.openai.com/v1",
             AiProvider.MISTRAL_AI, "https://api.mistral.ai/v1",
+            AiProvider.GEMINI, "https://generativelanguage.googleapis.com/v1beta/",
             AiProvider.HUGGING_FACE, "https://huggingface.co/api"
     );
 
@@ -34,6 +36,11 @@ public class AiDefaultPreferences {
                     "open-mistral-7b", 32000,
                     "open-mixtral-8x7b", 32000,
                     "open-mixtral-8x22b", 64000
+            ),
+            AiProvider.GEMINI, Map.of(
+                    "gemini-1.5-flash", 1048576,
+                    "gemini-1.5-pro", 2097152,
+                    "gemini-1.0-pro", 32000
             )
     );
 
@@ -44,6 +51,7 @@ public class AiDefaultPreferences {
     public static final Map<AiProvider, String> CHAT_MODELS = Map.of(
             AiProvider.OPEN_AI, "gpt-4o-mini",
             AiProvider.MISTRAL_AI, "open-mixtral-8x22b",
+            AiProvider.GEMINI, "gemini-1.5-flash",
             AiProvider.HUGGING_FACE, ""
     );
 
