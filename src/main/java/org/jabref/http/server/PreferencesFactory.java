@@ -1,4 +1,7 @@
-package org.jabref.preferences;
+package org.jabref.http.server;
+
+import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.Preferences;
 
 import org.glassfish.hk2.api.Factory;
 

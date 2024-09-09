@@ -3,7 +3,6 @@ package org.jabref.http.server;
 import java.util.Set;
 
 import org.jabref.http.dto.GsonFactory;
-import org.jabref.preferences.PreferencesFactory;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.ApplicationPath;
