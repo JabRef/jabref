@@ -26,7 +26,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.BeforeEach;

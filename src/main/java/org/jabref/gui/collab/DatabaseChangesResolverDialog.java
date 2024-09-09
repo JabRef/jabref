@@ -21,7 +21,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;

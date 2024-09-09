@@ -11,7 +11,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class PreviewTab extends EntryEditorTab implements OffersPreview {
     public static final String NAME = "Preview";

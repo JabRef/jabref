@@ -11,7 +11,7 @@ import org.jabref.migrations.SearchToLuceneMigration;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 /**
  * This action checks whether the syntax for SearchGroups is the new one.

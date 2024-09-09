@@ -8,7 +8,7 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.Test;

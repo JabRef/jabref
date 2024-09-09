@@ -3,7 +3,7 @@ package org.jabref.gui.importer;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 /**
  * Create a new, empty, database.

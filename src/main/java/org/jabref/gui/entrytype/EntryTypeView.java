@@ -42,7 +42,7 @@ import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;

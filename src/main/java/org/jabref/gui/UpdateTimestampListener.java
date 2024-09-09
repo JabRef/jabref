@@ -3,7 +3,7 @@ package org.jabref.gui;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.google.common.eventbus.Subscribe;
 

@@ -13,7 +13,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.jabref.logic.os.OS;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.preferences.JabRefPreferences;
 
 import jakarta.ws.rs.SeBootstrap;
 import net.harawata.appdirs.AppDirsFactory;

@@ -30,7 +30,7 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.preferences.JabRefPreferences;
 
 import com.github.javakeyring.Keyring;
 import org.slf4j.Logger;

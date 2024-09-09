@@ -1,4 +1,4 @@
-package org.jabref.preferences;
+package org.jabref.logic.preferences;
 
 import java.io.File;
 import java.io.IOException;
@@ -110,11 +110,6 @@ import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
-import org.jabref.logic.preferences.DOIPreferences;
-import org.jabref.logic.preferences.FetcherApiKey;
-import org.jabref.logic.preferences.OwnerPreferences;
-import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;

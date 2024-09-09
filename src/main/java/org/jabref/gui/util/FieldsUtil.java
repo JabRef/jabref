@@ -12,7 +12,7 @@ import org.jabref.model.entry.field.IEEEField;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class FieldsUtil {
 

@@ -21,7 +21,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class CleanupAction extends SimpleCommand {
 

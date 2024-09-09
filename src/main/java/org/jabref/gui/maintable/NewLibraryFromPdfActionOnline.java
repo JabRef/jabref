@@ -9,7 +9,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class NewLibraryFromPdfActionOnline extends NewLibraryFromPdfAction {
 

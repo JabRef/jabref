@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.preferences.Preferences;
+
 public class PreferencesFilter {
 
     private final Preferences preferences;

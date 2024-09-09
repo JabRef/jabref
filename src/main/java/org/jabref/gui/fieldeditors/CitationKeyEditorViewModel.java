@@ -8,7 +8,7 @@ import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
 

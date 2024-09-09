@@ -15,7 +15,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class ImportantOptionalFieldsTab extends OptionalFieldsTabBase {
 

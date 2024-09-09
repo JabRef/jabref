@@ -18,7 +18,7 @@ import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.mergeentries.newmergedialog.DiffMethod;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter.BasicDiffMethod;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.google.common.base.Enums;

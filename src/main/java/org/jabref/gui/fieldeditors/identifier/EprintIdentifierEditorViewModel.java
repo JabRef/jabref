@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ARK;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.EprintIdentifier;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 

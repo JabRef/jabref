@@ -14,7 +14,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class ExporterFactory {
 

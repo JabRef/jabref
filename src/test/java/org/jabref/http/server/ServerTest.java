@@ -11,7 +11,7 @@ import org.jabref.http.dto.GsonFactory;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.google.gson.Gson;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -85,7 +85,7 @@ abstract class ServerTest extends JerseyTest {
         when(preferences.getFieldPreferences()).thenReturn(fieldWriterPreferences);
         when(fieldWriterPreferences.shouldResolveStrings()).thenReturn(false);
 
-        // defaults are in {@link org.jabref.preferences.JabRefPreferences.NON_WRAPPABLE_FIELDS}
+        // defaults are in {@link org.jabref.logic.preferences.JabRefPreferences.NON_WRAPPABLE_FIELDS}
         FieldPreferences fieldContentFormatterPreferences = new FieldPreferences(false, List.of(), List.of());
         // used twice, once for reading and once for writing
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);

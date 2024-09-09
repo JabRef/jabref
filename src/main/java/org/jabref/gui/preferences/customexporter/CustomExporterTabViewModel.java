@@ -13,7 +13,7 @@ import org.jabref.gui.exporter.CreateModifyExporterDialogView;
 import org.jabref.gui.exporter.ExporterViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class CustomExporterTabViewModel implements PreferenceTabViewModel {
 

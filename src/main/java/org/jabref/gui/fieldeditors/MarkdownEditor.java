@@ -10,7 +10,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 

@@ -11,7 +11,7 @@ import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class EntryTabViewModel implements PreferenceTabViewModel {
 

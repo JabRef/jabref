@@ -5,7 +5,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;

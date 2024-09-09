@@ -21,7 +21,7 @@ import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class SearchResultsTable extends TableView<BibEntryTableViewModel> {

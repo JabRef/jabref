@@ -1,6 +1,6 @@
 package org.jabref.gui.maintable;
 
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeAll;

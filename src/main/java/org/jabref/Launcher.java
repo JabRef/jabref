@@ -34,8 +34,8 @@ import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.JabRefPreferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.apache.commons.cli.ParseException;

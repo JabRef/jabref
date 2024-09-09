@@ -29,7 +29,7 @@ import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.texparser.LatexParserResults;
 import org.jabref.model.util.DirectoryMonitorManager;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;

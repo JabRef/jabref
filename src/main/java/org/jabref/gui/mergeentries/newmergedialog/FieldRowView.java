@@ -18,7 +18,7 @@ import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.richtext.StyleClassedTextArea;

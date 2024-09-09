@@ -18,7 +18,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class ThreeWayMergeView extends VBox {

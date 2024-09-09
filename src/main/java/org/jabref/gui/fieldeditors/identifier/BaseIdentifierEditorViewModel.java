@@ -24,7 +24,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.identifier.Identifier;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;

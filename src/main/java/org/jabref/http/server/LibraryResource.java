@@ -13,7 +13,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;

@@ -29,8 +29,8 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.JabRefPreferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.openjdk.jmh.Main;

@@ -5,7 +5,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 /**
  * Sends attachments for selected entries to the

@@ -15,7 +15,7 @@ import static org.jabref.architecture.MainArchitectureTest.CLASS_ORG_JABREF_GLOB
 @AnalyzeClasses(packages = "org.jabref", importOptions = ImportOption.OnlyIncludeTests.class)
 public class ArchitectureTest {
 
-    private static final String CLASS_ORG_JABREF_PREFERENCES = "org.jabref.preferences.JabRefPreferences";
+    private static final String CLASS_ORG_JABREF_PREFERENCES = "org.jabref.logic.preferences.JabRefPreferences";
 
     @ArchTest
     public void testsAreIndependent(JavaClasses classes) {

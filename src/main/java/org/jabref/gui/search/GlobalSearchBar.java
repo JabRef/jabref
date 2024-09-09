@@ -63,7 +63,7 @@ import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.entry.Author;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import impl.org.controlsfx.skin.AutoCompletePopup;

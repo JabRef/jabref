@@ -6,7 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.migrations.MergeReviewIntoCommentMigration;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class MergeReviewIntoCommentAction implements GUIPostOpenAction {
 

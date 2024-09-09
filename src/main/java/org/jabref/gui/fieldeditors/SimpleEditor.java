@@ -16,7 +16,7 @@ import org.jabref.gui.undo.UndoAction;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class SimpleEditor extends HBox implements FieldEditorFX {
 

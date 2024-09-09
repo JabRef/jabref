@@ -12,7 +12,7 @@ import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.preferences.JabRefPreferences;
 
 class CustomEntryTypePreferenceMigration {
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class PushToApplications {
 

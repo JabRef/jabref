@@ -3,7 +3,7 @@ package org.jabref.http.server;
 import java.util.List;
 
 import org.jabref.logic.util.io.BackupFileUtil;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.google.gson.Gson;
 import jakarta.inject.Inject;

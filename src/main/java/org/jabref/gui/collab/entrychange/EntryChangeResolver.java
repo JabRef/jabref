@@ -12,7 +12,7 @@ import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighte
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public final class EntryChangeResolver extends DatabaseChangeResolver {
     private final EntryChange entryChange;

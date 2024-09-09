@@ -11,7 +11,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.entrytype.EntryTypeView;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

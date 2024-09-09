@@ -16,7 +16,7 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import org.tinylog.Logger;
 

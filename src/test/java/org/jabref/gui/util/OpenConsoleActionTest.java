@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.frame.OpenConsoleAction;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -24,7 +24,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 /**
  * A column that draws a clickable symbol for either all the files of a defined file type

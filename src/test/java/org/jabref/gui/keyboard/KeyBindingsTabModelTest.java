@@ -10,7 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.keybindings.KeyBindingViewModel;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTabViewModel;
 import org.jabref.logic.os.OS;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.junit.jupiter.api.BeforeEach;

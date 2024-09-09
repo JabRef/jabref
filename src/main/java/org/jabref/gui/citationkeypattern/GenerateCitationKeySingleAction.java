@@ -8,7 +8,7 @@ import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class GenerateCitationKeySingleAction extends SimpleCommand {
 

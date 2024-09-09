@@ -13,7 +13,7 @@ import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class MergeEntriesAction extends SimpleCommand {
     private static final int NUMBER_OF_ENTRIES_NEEDED = 2;

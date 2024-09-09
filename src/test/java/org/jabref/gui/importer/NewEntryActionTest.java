@@ -10,7 +10,7 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

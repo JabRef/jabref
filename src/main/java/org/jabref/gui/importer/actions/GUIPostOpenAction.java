@@ -2,7 +2,7 @@ package org.jabref.gui.importer.actions;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 /**
  * This interface defines potential actions that may need to be taken after

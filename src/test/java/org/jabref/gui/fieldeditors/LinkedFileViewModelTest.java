@@ -29,7 +29,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.AfterEach;

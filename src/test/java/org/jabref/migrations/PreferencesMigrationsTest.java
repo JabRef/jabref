@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.JabRefPreferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;

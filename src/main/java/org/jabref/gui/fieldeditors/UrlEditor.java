@@ -22,7 +22,7 @@ import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;

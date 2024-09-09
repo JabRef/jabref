@@ -50,7 +50,7 @@ import org.jabref.model.search.event.IndexClosedEvent;
 import org.jabref.model.search.event.IndexRemovedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;

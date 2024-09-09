@@ -19,7 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.hc.core5.net.URIBuilder;

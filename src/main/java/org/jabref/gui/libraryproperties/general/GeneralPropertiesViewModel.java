@@ -22,7 +22,7 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 

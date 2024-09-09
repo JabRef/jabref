@@ -10,7 +10,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

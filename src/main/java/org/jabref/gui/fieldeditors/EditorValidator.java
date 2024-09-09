@@ -3,7 +3,7 @@ package org.jabref.gui.fieldeditors;
 import javafx.scene.control.TextInputControl;
 
 import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;

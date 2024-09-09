@@ -18,7 +18,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.Test;

@@ -22,7 +22,7 @@ import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 

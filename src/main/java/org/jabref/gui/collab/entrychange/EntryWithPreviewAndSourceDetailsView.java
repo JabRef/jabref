@@ -7,7 +7,7 @@ import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public final class EntryWithPreviewAndSourceDetailsView extends DatabaseChangeDetailsView {
 

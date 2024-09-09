@@ -8,7 +8,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.preferences.JabRefPreferences;
 
 /**
  * Useful for checking the display of different controls. Not needed inside of JabRef.

@@ -26,7 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;

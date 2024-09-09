@@ -7,7 +7,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import jakarta.inject.Inject;
 

@@ -11,7 +11,7 @@ import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 public class KeyPatternPropertiesViewModel implements PropertiesTabViewModel {
 

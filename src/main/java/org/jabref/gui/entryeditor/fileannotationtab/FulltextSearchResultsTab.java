@@ -36,7 +36,7 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.SearchQuery;
 import org.jabref.model.search.SearchResult;
 import org.jabref.model.search.SearchResults;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

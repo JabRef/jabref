@@ -16,7 +16,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.preferences.Preferences;
+import org.jabref.logic.preferences.Preferences;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
