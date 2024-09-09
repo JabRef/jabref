@@ -20,6 +20,7 @@
     <CheckBox fx:id="generateNewKeyOnImport" text="%Generate a new key for imported entries (overwriting their default)"/>
     <CheckBox fx:id="warnAboutDuplicatesOnImport" text="%Warn about duplicates on import"/>
     <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download linked online files"/>
+    <CheckBox fx:id="keepDownloadUrl" text="%Store url for downloaded file" />
 
     <Label styleClass="sectionHeader" text="%Custom DOI URI"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
