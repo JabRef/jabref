@@ -5,8 +5,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.StateManager;
+import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.groups.AbstractGroup;

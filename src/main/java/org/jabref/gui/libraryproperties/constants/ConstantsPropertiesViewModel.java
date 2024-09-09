@@ -14,9 +14,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.model.database.BibDatabaseContext;

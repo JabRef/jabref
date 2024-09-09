@@ -8,8 +8,8 @@ import java.util.TreeSet;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

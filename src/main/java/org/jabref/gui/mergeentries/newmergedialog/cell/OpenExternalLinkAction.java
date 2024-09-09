@@ -3,9 +3,9 @@ package org.jabref.gui.mergeentries.newmergedialog.cell;
 import java.io.IOException;
 import java.net.URI;
 
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.logic.FilePreferences;
 import org.jabref.model.entry.identifier.DOI;
 
 import org.slf4j.Logger;

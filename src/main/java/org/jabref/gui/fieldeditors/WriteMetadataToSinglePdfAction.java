@@ -7,8 +7,8 @@ import java.util.Optional;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
 import org.jabref.logic.journals.JournalAbbreviationRepository;

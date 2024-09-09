@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
+import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseContext;
@@ -22,7 +23,6 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class SavingPropertiesViewModel implements PropertiesTabViewModel {

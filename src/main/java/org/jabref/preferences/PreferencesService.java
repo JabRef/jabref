@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.logic.FilePreferences;
 import org.jabref.gui.GuiPreferences;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -22,6 +21,7 @@ import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.InternalPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
