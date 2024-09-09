@@ -169,10 +169,9 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
             newLinkedFile.setDescription((linkedFile.getDescription()));
         }
-        if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink())) {
+        if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink()) && filePreferences.shouldKeepDownloadUrl()) {
             newLinkedFile.setSourceURL(linkedFile.getLink());
         } else if (filePreferences.shouldKeepDownloadUrl()) {
-            // Add pref check to not store source URL
             newLinkedFile.setSourceURL(linkedFile.getSourceUrl());
         }
 
