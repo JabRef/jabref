@@ -279,26 +279,26 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        enableAi.setValue(aiPreferences.getEnableAi());
+        openAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.OPEN_AI));
+        mistralAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
+        geminiAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.GEMINI));
+        huggingFaceApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
 
-        selectedAiProvider.setValue(aiPreferences.getAiProvider());
+        openAiApiBaseUrl.setValue(aiPreferences.getOpenAiApiBaseUrl());
+        mistralAiApiBaseUrl.setValue(aiPreferences.getMistralAiApiBaseUrl());
+        geminiApiBaseUrl.setValue(aiPreferences.getGeminiApiBaseUrl());
+        huggingFaceApiBaseUrl.setValue(aiPreferences.getHuggingFaceApiBaseUrl());
 
         openAiChatModel.setValue(aiPreferences.getOpenAiChatModel());
         mistralAiChatModel.setValue(aiPreferences.getMistralAiChatModel());
         geminiChatModel.setValue(aiPreferences.getGeminiChatModel());
         huggingFaceChatModel.setValue(aiPreferences.getHuggingFaceChatModel());
 
-        openAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.OPEN_AI));
-        mistralAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.MISTRAL_AI));
-        geminiAiApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.GEMINI));
-        huggingFaceApiKey.setValue(aiPreferences.getApiKeyForAiProvider(AiProvider.HUGGING_FACE));
+        enableAi.setValue(aiPreferences.getEnableAi());
+
+        selectedAiProvider.setValue(aiPreferences.getAiProvider());
 
         customizeExpertSettings.setValue(aiPreferences.getCustomizeExpertSettings());
-
-        openAiApiBaseUrl.setValue(aiPreferences.getOpenAiApiBaseUrl());
-        mistralAiApiBaseUrl.setValue(aiPreferences.getMistralAiApiBaseUrl());
-        geminiApiBaseUrl.setValue(aiPreferences.getGeminiApiBaseUrl());
-        huggingFaceApiBaseUrl.setValue(aiPreferences.getHuggingFaceApiBaseUrl());
 
         selectedEmbeddingModel.setValue(aiPreferences.getEmbeddingModel());
         instruction.setValue(aiPreferences.getInstruction());

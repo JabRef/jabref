@@ -10,8 +10,10 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.ai.AiPreferences;
+import org.jabref.preferences.ai.AiProvider;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ public class PrivacyNoticeComponent extends ScrollPane {
 
     @FXML private TextFlow openAiPrivacyTextFlow;
     @FXML private TextFlow mistralAiPrivacyTextFlow;
+    @FXML private TextFlow geminiPrivacyTextFlow;
     @FXML private TextFlow huggingFacePrivacyTextFlow;
     @FXML private Text embeddingModelText;
 
@@ -43,9 +46,10 @@ public class PrivacyNoticeComponent extends ScrollPane {
 
     @FXML
     private void initialize() {
-        initPrivacyHyperlink(openAiPrivacyTextFlow, "https://openai.com/policies/privacy-policy/");
-        initPrivacyHyperlink(mistralAiPrivacyTextFlow, "https://mistral.ai/terms/#privacy-policy");
-        initPrivacyHyperlink(huggingFacePrivacyTextFlow, "https://huggingface.co/privacy");
+        initPrivacyHyperlink(openAiPrivacyTextFlow, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.OPEN_AI));
+        initPrivacyHyperlink(mistralAiPrivacyTextFlow, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.MISTRAL_AI));
+        initPrivacyHyperlink(geminiPrivacyTextFlow, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.GEMINI));
+        initPrivacyHyperlink(huggingFacePrivacyTextFlow, AiDefaultPreferences.PROVIDERS_API_URLS.get(AiProvider.HUGGING_FACE));
 
         String newEmbeddingModelText = embeddingModelText.getText().replaceAll("%0", aiPreferences.getEmbeddingModel().sizeInfo());
         embeddingModelText.setText(newEmbeddingModelText);

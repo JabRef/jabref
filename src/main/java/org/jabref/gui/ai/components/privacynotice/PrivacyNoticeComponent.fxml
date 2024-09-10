@@ -44,6 +44,15 @@
                   </Text>
                </children>
             </TextFlow>
+             <TextFlow fx:id="geminiPrivacyTextFlow">
+                 <children>
+                     <Text text="%If you have chosen the Google Gemini as AI provider, the privacy policy of Google Gemini applies. You find it at %0.">
+                         <font>
+                             <Font size="14.0" />
+                         </font>
+                     </Text>
+                 </children>
+             </TextFlow>
             <TextFlow fx:id="huggingFacePrivacyTextFlow">
                <children>
                   <Text text="%If you have chosen the Hugging Face as AI provider, the privacy policy of Hugging Face applies. You find it at %0.">
