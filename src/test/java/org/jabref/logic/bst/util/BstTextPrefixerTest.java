@@ -17,6 +17,13 @@ class BstTextPrefixerTest {
         assertPrefix("{\\'e}", "{\\'e}");
         assertPrefix("{\\'{E}}doua", "{\\'{E}}douard Masterly");
         assertPrefix("Ulric", "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot");
+        assertPrefix("abcd{e}", "abcd{efg}hi");
+        assertPrefix("ab{cd}e", "ab{cd}efghi");
+        assertPrefix("ab{cd}e", "ab{cd}efghi{}");
+        assertPrefix("Hi {{\\o}}", "Hi {{\\oe   }}Hi ");
+        assertPrefix("Hi {\\{oe   }}H", "Hi {\\{oe   }}Hi ");
+        assertPrefix("Hi {\\\"oe   }H", "Hi {\\\"oe   }Hi ");
+        assertPrefix("Hi {\\{\\oe   }}H", "Hi {\\{\\oe   }}Hi ");
     }
 
     private static void assertPrefix(final String string, final String string2) {
