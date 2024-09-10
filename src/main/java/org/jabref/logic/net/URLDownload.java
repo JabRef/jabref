@@ -23,8 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,10 +32,7 @@ import java.util.Map.Entry;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherClientException;
@@ -89,54 +84,6 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
-    }
-
-    /**
-     * Older java VMs does not automatically trust the zbMATH certificate. In this case the following exception is
-     * thrown: sun.security.validator.ValidatorException: PKIX path building failed:
-     * sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested
-     * target JM > 8u101 may trust the certificate by default according to http://stackoverflow.com/a/34111150/873661
-     * <p>
-     * We will fix this issue by accepting all (!) certificates. This is ugly; but as JabRef does not rely on
-     * security-relevant information this is kind of OK (no, actually it is not...).
-     * <p>
-     * Taken from http://stackoverflow.com/a/6055903/873661 and https://stackoverflow.com/a/19542614/873661
-     *
-     * @deprecated
-     */
-    @Deprecated
-    public static void bypassSSLVerification() {
-        LOGGER.warn("Fix SSL exceptions by accepting ALL certificates");
-
-        // Create a trust manager that does not validate certificate chains
-        TrustManager[] trustAllCerts = {new X509TrustManager() {
-            @Override
-            public void checkClientTrusted(X509Certificate[] chain, String authType) {
-            }
-
-            @Override
-            public void checkServerTrusted(X509Certificate[] chain, String authType) {
-            }
-
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                return new X509Certificate[0];
-            }
-        }};
-
-        try {
-            // Install all-trusting trust manager
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, trustAllCerts, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
-
-            // Install all-trusting host verifier
-            HostnameVerifier allHostsValid = (hostname, session) -> true;
-            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-        } catch (
-                Exception e) {
-            LOGGER.error("A problem occurred when bypassing SSL verification", e);
-        }
     }
 
     /**

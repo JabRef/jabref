@@ -20,7 +20,6 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -48,7 +47,7 @@ import org.slf4j.LoggerFactory;
 
 public class DownloadLinkedFileAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadLinkedFileAction.class);
 
     private final DialogService dialogService;
     private final BibEntry entry;
@@ -170,9 +169,9 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         if (newLinkedFile.getDescription().isEmpty() && !linkedFile.getDescription().isEmpty()) {
             newLinkedFile.setDescription((linkedFile.getDescription()));
         }
-        if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink())) {
+        if (linkedFile.getSourceUrl().isEmpty() && LinkedFile.isOnlineLink(linkedFile.getLink()) && filePreferences.shouldKeepDownloadUrl()) {
             newLinkedFile.setSourceURL(linkedFile.getLink());
-        } else {
+        } else if (filePreferences.shouldKeepDownloadUrl()) {
             newLinkedFile.setSourceURL(linkedFile.getSourceUrl());
         }
 

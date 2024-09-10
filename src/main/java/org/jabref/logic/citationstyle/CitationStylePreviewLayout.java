@@ -18,7 +18,7 @@ public final class CitationStylePreviewLayout implements PreviewLayout {
 
     @Override
     public String generatePreview(BibEntry entry, BibDatabaseContext databaseContext) {
-        return CitationStyleGenerator.generateCitation(List.of(entry), citationStyle.getSource(), CitationStyleOutputFormat.HTML, databaseContext, bibEntryTypesManager).getFirst();
+        return CitationStyleGenerator.generateBibliography(List.of(entry), citationStyle.getSource(), CitationStyleOutputFormat.HTML, databaseContext, bibEntryTypesManager).getFirst();
     }
 
     @Override

@@ -32,8 +32,10 @@ class TitleFetcherTest {
                 .withField(StandardField.BOOKTITLE, "2009 35th Euromicro Conference on Software Engineering and Advanced Applications")
                 .withField(StandardField.PUBLISHER, "IEEE")
                 .withField(StandardField.TITLE, "BPELscript: A Simplified Script Syntax for WS-BPEL 2.0")
+                .withField(StandardField.VOLUME, "5331")
                 .withField(StandardField.YEAR, "2009")
                 .withField(StandardField.MONTH, "#aug#")
+                .withField(StandardField.PAGES, "39--46")
                 .withField(StandardField.DOI, "10.1109/seaa.2009.21");
     }
 

@@ -41,7 +41,6 @@ import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -95,7 +94,6 @@ public class OpenOfficePanel {
     private final VBox vbox = new VBox();
 
     private final PreferencesService preferencesService;
-    private final AiService aiService;
     private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
     private final UndoManager undoManager;
@@ -109,7 +107,6 @@ public class OpenOfficePanel {
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            PreferencesService preferencesService,
-                           AiService aiService,
                            KeyBindingRepository keyBindingRepository,
                            JournalAbbreviationRepository abbreviationRepository,
                            TaskExecutor taskExecutor,
@@ -123,7 +120,6 @@ public class OpenOfficePanel {
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.preferencesService = preferencesService;
-        this.aiService = aiService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -310,7 +306,6 @@ public class OpenOfficePanel {
                     tabContainer,
                     dialogService,
                     preferencesService,
-                    aiService,
                     stateManager,
                     fileUpdateMonitor,
                     entryTypesManager,

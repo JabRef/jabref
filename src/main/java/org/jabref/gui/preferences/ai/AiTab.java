@@ -15,7 +15,6 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.ai.AiApiKeyProvider;
 import org.jabref.preferences.ai.AiProvider;
 import org.jabref.preferences.ai.EmbeddingModel;
 
@@ -23,14 +22,11 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.ResizableTextArea;
 import com.dlsc.unitfx.IntegerInputField;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import jakarta.inject.Inject;
 import org.controlsfx.control.SearchableComboBox;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
 public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements PreferencesTab {
     private static final String HUGGING_FACE_CHAT_MODEL_PROMPT = "TinyLlama/TinyLlama_v1.1 (or any other model name)";
-
-    @Inject private AiApiKeyProvider aiApiKeyProvider;
 
     @FXML private CheckBox enableAi;
 
@@ -73,7 +69,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     }
 
     public void initialize() {
-        this.viewModel = new AiTabViewModel(preferencesService, aiApiKeyProvider);
+        this.viewModel = new AiTabViewModel(preferencesService);
 
         enableAi.selectedProperty().bindBidirectional(viewModel.enableAi());
 

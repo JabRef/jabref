@@ -43,7 +43,7 @@ public class NewEntryAction extends SimpleCommand {
 
     public NewEntryAction(Supplier<LibraryTab> tabSupplier, EntryType type, DialogService dialogService, PreferencesService preferences, StateManager stateManager) {
         this(tabSupplier, dialogService, preferences, stateManager);
-        this.type = Optional.of(type);
+        this.type = Optional.ofNullable(type);
     }
 
     @Override

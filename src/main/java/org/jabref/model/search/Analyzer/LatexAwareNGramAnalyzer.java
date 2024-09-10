@@ -26,7 +26,7 @@ public class LatexAwareNGramAnalyzer extends Analyzer {
         result = new StopFilter(result, EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
         result = new ASCIIFoldingFilter(result);
         result = new LowerCaseFilter(result);
-         result = new EdgeNGramTokenFilter(result, minGram, maxGram, true);
+        result = new EdgeNGramTokenFilter(result, minGram, maxGram, true);
         return new TokenStreamComponents(source, result);
     }
 }

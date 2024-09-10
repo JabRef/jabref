@@ -89,11 +89,11 @@ open module org.jabref {
     // dependency injection using HK2
     requires org.glassfish.hk2.api;
 
-    // region: http clients
-    requires unirest.java.core;
-    requires unirest.modules.gson;
+    // region HTTP clients
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
+    requires unirest.java.core;
+    requires unirest.modules.gson;
     // endregion
 
     // region: SQL databases
@@ -155,7 +155,7 @@ open module org.jabref {
 
     // region: Lucene
     /**
-     * In case the version is updated, please also adapt {@link org.jabref.model.search.SearchFieldConstants#VERSION} to the newly used version.
+     * In case the version is updated, please also increment {@link org.jabref.model.search.SearchFieldConstants#VERSION} to trigger reindexing.
      */
     uses org.apache.lucene.codecs.lucene99.Lucene99Codec;
     requires org.apache.lucene.analysis.common;

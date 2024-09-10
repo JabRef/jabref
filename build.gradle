@@ -30,6 +30,8 @@ plugins {
     id 'idea'
 
     id 'org.openrewrite.rewrite' version '6.20.0'
+
+    id "org.itsallcode.openfasttrace" version "3.0.0"
 }
 
 // Enable following for debugging
@@ -255,10 +257,12 @@ dependencies {
 
     implementation 'org.controlsfx:controlsfx:11.2.1'
 
+    // region HTTP clients
     implementation 'org.jsoup:jsoup:1.18.1'
     implementation 'com.konghq:unirest-java-core:4.4.4'
     implementation 'com.konghq:unirest-modules-gson:4.4.4'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
+    // endregion
 
     implementation 'org.slf4j:slf4j-api:2.0.16'
     implementation 'org.tinylog:tinylog-api:2.7.0'
@@ -321,7 +325,7 @@ dependencies {
     implementation 'com.github.vatbub:mslinks:1.0.6.2'
 
     // YAML formatting
-    implementation 'org.yaml:snakeyaml:2.2'
+    implementation 'org.yaml:snakeyaml:2.3'
 
     // AI
     implementation 'dev.langchain4j:langchain4j:0.33.0'
@@ -330,11 +334,11 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
     }
     implementation('dev.langchain4j:langchain4j-mistral-ai:0.33.0')
-    implementation('dev.langchain4j:langchain4j-hugging-face:0.33.0')
+    implementation('dev.langchain4j:langchain4j-hugging-face:0.34.0')
     implementation 'ai.djl:api:0.29.0'
     implementation 'ai.djl.pytorch:pytorch-model-zoo:0.29.0'
     implementation 'ai.djl.huggingface:tokenizers:0.29.0'
-    implementation 'io.github.stefanbratanov:jvm-openai:0.10.0'
+    implementation 'io.github.stefanbratanov:jvm-openai:0.11.0'
     // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
     implementation ('com.squareup.okhttp3:okhttp:4.12.0') {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
@@ -365,7 +369,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.17.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:2.18.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
@@ -895,4 +899,8 @@ jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
+}
+
+requirementTracing {
+    inputDirectories = files('docs', 'src/main/java', 'src/test/java')
 }

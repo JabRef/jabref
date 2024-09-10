@@ -107,8 +107,7 @@ public class IconTheme {
     public static URL getIconUrl(String name) {
         String key = Objects.requireNonNull(name, "icon name");
         if (!KEY_TO_ICON.containsKey(key)) {
-            LOGGER.warn("Could not find icon url by name " + name + ", so falling back on default icon "
-                        + DEFAULT_ICON_PATH);
+            LOGGER.warn("Could not find icon url by name {}, so falling back on default icon {}", name, DEFAULT_ICON_PATH);
         }
         String path = KEY_TO_ICON.getOrDefault(key, DEFAULT_ICON_PATH);
         return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + key);
