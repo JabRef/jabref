@@ -18,6 +18,9 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.theme.Theme;
@@ -25,8 +28,10 @@ import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.model.entry.field.Field;
@@ -40,6 +45,18 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     // Public because needed for pref migration
     public static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
     public static final String MAIN_FONT_SIZE = "mainFontSize";
+
+    // region ExternalApplicationsPreferences
+    private static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
+    private static final String CONSOLE_COMMAND = "consoleCommand";
+    private static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
+    private static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
+    private static final String CITE_COMMAND = "citeCommand";
+    private static final String EMAIL_SUBJECT = "emailSubject";
+    private static final String KINDLE_EMAIL = "kindleEmail";
+    private static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
+    private static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
+    // endregion
 
     // region workspace
     private static final String THEME = "fxTheme";
@@ -83,6 +100,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private CoreGuiPreferences coreGuiPreferences;
     private WorkspacePreferences workspacePreferences;
     private UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences;
+    private ExternalApplicationsPreferences externalApplicationsPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -131,6 +149,29 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(UNLINKED_FILES_SELECTED_EXTENSION, StandardFileType.ANY_FILE.getName());
         defaults.put(UNLINKED_FILES_SELECTED_DATE_RANGE, DateRange.ALL_TIME.name());
         defaults.put(UNLINKED_FILES_SELECTED_SORT, ExternalFileSorter.DEFAULT.name());
+        // endregion
+
+        // region ExternalApplicationsPreferences
+        defaults.put(EXTERNAL_FILE_TYPES, "");
+        defaults.put(CITE_COMMAND, "\\cite{key1,key2}");
+        defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
+        defaults.put(KINDLE_EMAIL, "");
+
+        if (OS.WINDOWS) {
+            defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.TRUE);
+        } else {
+            defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
+        }
+
+        defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
+        defaults.put(USE_DEFAULT_FILE_BROWSER_APPLICATION, Boolean.TRUE);
+        if (OS.WINDOWS) {
+            defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
+            defaults.put(FILE_BROWSER_COMMAND, "explorer.exe /select, \"%DIR\"");
+        } else {
+            defaults.put(CONSOLE_COMMAND, "");
+            defaults.put(FILE_BROWSER_COMMAND, "");
+        }
         // endregion
     }
 
@@ -441,5 +482,45 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(unlinkedFilesDialogPreferences.unlinkedFilesSelectedSortProperty(), (obs, oldValue, newValue) -> put(UNLINKED_FILES_SELECTED_SORT, newValue.name()));
 
         return unlinkedFilesDialogPreferences;
+    }
+
+    @Override
+    public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
+        if (externalApplicationsPreferences != null) {
+            return externalApplicationsPreferences;
+        }
+
+        externalApplicationsPreferences = new ExternalApplicationsPreferences(
+                get(EMAIL_SUBJECT),
+                getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES),
+                CitationCommandString.from(get(CITE_COMMAND)),
+                CitationCommandString.from((String) defaults.get(CITE_COMMAND)),
+                ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES)),
+                !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION), // mind the !
+                get(CONSOLE_COMMAND),
+                !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION), // mind the !
+                get(FILE_BROWSER_COMMAND),
+                get(KINDLE_EMAIL));
+
+        EasyBind.listen(externalApplicationsPreferences.eMailSubjectProperty(),
+                (obs, oldValue, newValue) -> put(EMAIL_SUBJECT, newValue));
+        EasyBind.listen(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(),
+                (obs, oldValue, newValue) -> putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, newValue));
+        EasyBind.listen(externalApplicationsPreferences.citeCommandProperty(),
+                (obs, oldValue, newValue) -> put(CITE_COMMAND, newValue.toString()));
+        EasyBind.listen(externalApplicationsPreferences.useCustomTerminalProperty(),
+                (obs, oldValue, newValue) -> putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !newValue)); // mind the !
+        externalApplicationsPreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
+                put(EXTERNAL_FILE_TYPES, ExternalFileTypes.toStringList(externalApplicationsPreferences.getExternalFileTypes())));
+        EasyBind.listen(externalApplicationsPreferences.customTerminalCommandProperty(),
+                (obs, oldValue, newValue) -> put(CONSOLE_COMMAND, newValue));
+        EasyBind.listen(externalApplicationsPreferences.useCustomFileBrowserProperty(),
+                (obs, oldValue, newValue) -> putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !newValue)); // mind the !
+        EasyBind.listen(externalApplicationsPreferences.customFileBrowserCommandProperty(),
+                (obs, oldValue, newValue) -> put(FILE_BROWSER_COMMAND, newValue));
+        EasyBind.listen(externalApplicationsPreferences.kindleEmailProperty(),
+                (obs, oldValue, newValue) -> put(KINDLE_EMAIL, newValue));
+
+        return externalApplicationsPreferences;
     }
 }
