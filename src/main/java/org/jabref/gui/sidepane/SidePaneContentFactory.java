@@ -66,7 +66,6 @@ public class SidePaneContentFactory {
             case OPEN_OFFICE -> new OpenOfficePanel(
                     tabContainer,
                     preferences,
-                    aiService,
                     preferences.getKeyBindingRepository(),
                     abbreviationRepository,
                     taskExecutor,
