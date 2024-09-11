@@ -17,14 +17,12 @@ import org.slf4j.LoggerFactory;
 public class OpenExternalLinkAction extends SimpleCommand {
     private final Logger LOGGER = LoggerFactory.getLogger(OpenExternalLinkAction.class);
 
-    private final ExternalApplicationsPreferences externalApplicationPreferences
-        ;
+    private final ExternalApplicationsPreferences externalApplicationPreferences;
 
     private final String urlOrDoi;
 
     public OpenExternalLinkAction(String urlOrDoi, ExternalApplicationsPreferences externalApplicationsPreferences) {
-        this.externalApplicationPreferences
-                = externalApplicationsPreferences;
+        this.externalApplicationPreferences = externalApplicationsPreferences;
         this.urlOrDoi = urlOrDoi;
     }
 
