@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
@@ -65,6 +66,7 @@ import org.jabref.preferences.PreferencesService;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
+import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,8 +104,11 @@ public class OpenOfficePanel {
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
+    private final OpenOfficePreferences openOfficePreferences;
     private OOBibBase ooBase;
     private OOStyle currentStyle;
+
+    private final SimpleObjectProperty<OOStyle> currentStyleProperty;
 
     public OpenOfficePanel(LibraryTabContainer tabContainer,
                            PreferencesService preferencesService,
@@ -126,6 +131,7 @@ public class OpenOfficePanel {
         this.clipBoardManager = clipBoardManager;
         this.undoManager = undoManager;
         this.currentStyle = preferencesService.getOpenOfficePreferences().getCurrentStyle();
+        this.openOfficePreferences = preferencesService.getOpenOfficePreferences();
 
         ActionFactory factory = new ActionFactory();
 
@@ -157,6 +163,8 @@ public class OpenOfficePanel {
                 preferencesService.getLayoutFormatterPreferences(),
                 abbreviationRepository);
 
+        currentStyleProperty = new SimpleObjectProperty<>(currentStyle);
+
         initPanel();
     }
 
@@ -170,6 +178,7 @@ public class OpenOfficePanel {
      */
     private boolean getOrUpdateTheStyle(String title) {
         currentStyle = loader.getUsedStyleUnified();
+        currentStyleProperty.set(currentStyle);
         final boolean FAIL = true;
         final boolean PASS = false;
 
@@ -215,6 +224,8 @@ public class OpenOfficePanel {
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              currentStyle = selectedStyle;
+                             currentStyleProperty.set(currentStyle);
+
                              if (currentStyle instanceof JStyle jStyle) {
                                  try {
                                      jStyle.ensureUpToDate();
@@ -616,14 +627,25 @@ public class OpenOfficePanel {
     private ContextMenu createSettingsPopup() {
         ContextMenu contextMenu = new ContextMenu();
 
-        if (currentStyle instanceof JStyle) {
-            addAlwaysCitedOnPagesTextOption(contextMenu);
-        }
-
-        OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
-
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
         autoSync.selectedProperty().set(openOfficePreferences.getSyncWhenCiting());
+
+        CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at beginning of bibliographic entries"));
+        alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
+        alwaysAddCitedOnPagesText.setOnAction(e -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
+
+        EasyBind.listen(currentStyleProperty, (obs, oldValue, newValue) -> {
+            switch (newValue) {
+                case JStyle ignored -> {
+                    if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {
+                        contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
+                    }
+                }
+                case CitationStyle ignored ->
+                        contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
+                default -> { }
+            }
+        });
 
         ToggleGroup toggleGroup = new ToggleGroup();
         RadioMenuItem useActiveBase = new RadioMenuItem(Localization.lang("Look up BibTeX entries in the active tab only"));
@@ -655,17 +677,10 @@ public class OpenOfficePanel {
                 new SeparatorMenuItem(),
                 clearConnectionSettings);
 
+        if (currentStyle instanceof JStyle) {
+            contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
+        }
+
         return contextMenu;
-    }
-
-    private void addAlwaysCitedOnPagesTextOption(ContextMenu contextMenu) {
-        OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
-
-        CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at beginning of citation"));
-
-        alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
-        alwaysAddCitedOnPagesText.setOnAction(e -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
-
-        contextMenu.getItems().add(alwaysAddCitedOnPagesText);
     }
 }
