@@ -483,7 +483,7 @@ public class OpenOfficePanel {
     }
 
     private OOBibBase createBibBase(Path loPath) throws BootstrapException, CreationException {
-        return new OOBibBase(loPath, dialogService);
+        return new OOBibBase(loPath, dialogService, openOfficePreferences);
     }
 
     /**
