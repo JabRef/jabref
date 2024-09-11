@@ -66,7 +66,6 @@ public class FieldFactory {
         // In case a user has put a user-defined field, the casing of that field is kept
         String displayName = unknownField.getDisplayName();
         String fieldProperties = unknownField.getProperties().stream()
-                                             .filter(e -> e != FieldProperty.CUSTOM_FIELD)
                                              .map(Enum::name)
                                              .collect(Collectors.joining(FIELD_PROPERTY_SEPARATOR));
 

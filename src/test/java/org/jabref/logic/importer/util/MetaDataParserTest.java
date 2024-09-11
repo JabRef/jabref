@@ -96,8 +96,8 @@ public class MetaDataParserTest {
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
-                                .withRequiredFields(new UnknownField("custom1", "custom1", FieldProperty.MULTILINE_TEXT, FieldProperty.COMMENT, FieldProperty.EXTERNAL)),
-                        "v2-jabref-entrytype: test: req[custom1|MULTILINE_TEXT,COMMENT,EXTERNAL] opt[]"
+                                .withRequiredFields(new UnknownField("custom1", "custom1", FieldProperty.MULTILINE_TEXT, FieldProperty.EXTERNAL)),
+                        "v2-jabref-entrytype: test: req[custom1|MULTILINE_TEXT,EXTERNAL] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()

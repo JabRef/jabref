@@ -182,8 +182,8 @@ public class MetaDataSerializerTest {
                 Arguments.of(
                         new BibEntryTypeBuilder()
                                 .withType(new UnknownEntryType("test"))
-                                .withRequiredFields(new UnknownField("custom1", "custom1", FieldProperty.MULTILINE_TEXT, FieldProperty.COMMENT, FieldProperty.EXTERNAL)),
-                        "v2-jabref-entrytype: test: req[custom1|EXTERNAL,MULTILINE_TEXT,COMMENT] opt[]"
+                                .withRequiredFields(new UnknownField("custom1", "custom1", FieldProperty.MULTILINE_TEXT, FieldProperty.EXTERNAL)),
+                        "v2-jabref-entrytype: test: req[custom1|EXTERNAL,MULTILINE_TEXT] opt[]"
                 ),
                 Arguments.of(
                         new BibEntryTypeBuilder()
