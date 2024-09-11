@@ -18,11 +18,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Encodings;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.logic.preferences.CliPreferences;
 
 public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 

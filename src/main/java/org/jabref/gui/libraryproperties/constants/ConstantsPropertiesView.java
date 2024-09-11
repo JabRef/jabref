@@ -17,8 +17,8 @@ import org.jabref.gui.libraryproperties.PropertiesTab;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTextFieldTableCellVisualizationFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
