@@ -6,8 +6,9 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 
-public interface GuiPreferences extends org.jabref.logic.preferences.CliPreferences {
+public interface GuiPreferences extends CliPreferences {
     EntryEditorPreferences getEntryEditorPreferences();
 
     MergeDialogPreferences getMergeDialogPreferences();
