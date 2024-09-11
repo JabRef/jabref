@@ -22,8 +22,7 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.IndexingTaskManager;
-import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -33,6 +32,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.preferences.PreferencesService;
 
 public class OtherFieldsTab extends FieldsEditorTab {
@@ -49,10 +49,10 @@ public class OtherFieldsTab extends FieldsEditorTab {
                           DialogService dialogService,
                           PreferencesService preferences,
                           ThemeManager themeManager,
-                          IndexingTaskManager indexingTaskManager,
                           BibEntryTypesManager entryTypesManager,
                           TaskExecutor taskExecutor,
                           JournalAbbreviationRepository journalAbbreviationRepository,
+                          LuceneManager luceneManager,
                           OptionalObjectProperty<SearchQuery> searchQueryProperty) {
         super(false,
                 databaseContext,
@@ -65,7 +65,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 themeManager,
                 taskExecutor,
                 journalAbbreviationRepository,
-                indexingTaskManager,
+                luceneManager,
                 searchQueryProperty);
 
         this.entryTypesManager = entryTypesManager;

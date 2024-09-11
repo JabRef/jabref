@@ -30,6 +30,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -44,8 +45,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -89,8 +88,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private CheckBox keywordGroupRegex;
 
     @FXML private TextField searchGroupSearchTerm;
-    @FXML private CheckBox searchGroupCaseSensitive;
-    @FXML private CheckBox searchGroupRegex;
 
     @FXML private RadioButton autoGroupKeywordsOption;
     @FXML private TextField autoGroupKeywordsField;
@@ -115,6 +112,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferencesService;
+    @Inject private StateManager stateManager;
 
     public GroupDialogView(BibDatabaseContext currentDatabase,
                            @Nullable GroupTreeNode parentNode,
@@ -172,7 +170,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor);
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, parentNode, fileUpdateMonitor, stateManager);
 
         setResultConverter(viewModel::resultConverter);
 
@@ -207,26 +205,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         keywordGroupRegex.selectedProperty().bindBidirectional(viewModel.keywordGroupRegexProperty());
 
         searchGroupSearchTerm.textProperty().bindBidirectional(viewModel.searchGroupSearchTermProperty());
-        searchGroupCaseSensitive.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.CASE_SENSITIVE));
-        searchGroupCaseSensitive.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            EnumSet<SearchFlags> searchFlags = viewModel.searchFlagsProperty().get();
-            if (newValue) {
-                searchFlags.add(SearchRules.SearchFlags.CASE_SENSITIVE);
-            } else {
-                searchFlags.remove(SearchRules.SearchFlags.CASE_SENSITIVE);
-            }
-            viewModel.searchFlagsProperty().set(searchFlags);
-        });
-        searchGroupRegex.setSelected(viewModel.searchFlagsProperty().getValue().contains(SearchFlags.REGULAR_EXPRESSION));
-        searchGroupRegex.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            EnumSet<SearchFlags> searchFlags = viewModel.searchFlagsProperty().get();
-            if (newValue) {
-                searchFlags.add(SearchRules.SearchFlags.REGULAR_EXPRESSION);
-            } else {
-                searchFlags.remove(SearchRules.SearchFlags.REGULAR_EXPRESSION);
-            }
-            viewModel.searchFlagsProperty().set(searchFlags);
-        });
 
         autoGroupKeywordsOption.selectedProperty().bindBidirectional(viewModel.autoGroupKeywordsOptionProperty());
         autoGroupKeywordsField.textProperty().bindBidirectional(viewModel.autoGroupKeywordsFieldProperty());
@@ -242,7 +220,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.nameValidationStatus(), nameField);
             validationVisualizer.initVisualization(viewModel.nameContainsDelimiterValidationStatus(), nameField, false);
             validationVisualizer.initVisualization(viewModel.sameNameValidationStatus(), nameField);
-            validationVisualizer.initVisualization(viewModel.searchRegexValidationStatus(), searchGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.searchSearchTermEmptyValidationStatus(), searchGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordRegexValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);

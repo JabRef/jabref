@@ -14,7 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
-import org.jabref.model.pdf.search.SearchFieldConstants;
+import org.jabref.model.search.SearchFieldConstants;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.FilePreferences;
 
@@ -130,7 +130,7 @@ public abstract class NativeDesktop {
             try {
                 hostName = InetAddress.getLocalHost().getHostName();
             } catch (UnknownHostException e) {
-                LoggerFactory.getLogger(OS.class).info("Hostname not found. Using \"localhost\" as fallback.", e);
+                LoggerFactory.getLogger(NativeDesktop.class).info("Hostname not found. Using \"localhost\" as fallback.", e);
                 hostName = "localhost";
             }
         }

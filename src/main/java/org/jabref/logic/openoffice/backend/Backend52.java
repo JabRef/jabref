@@ -199,8 +199,7 @@ public class Backend52 {
                         cit.setPageInfo(pageInfo);
                     } else {
                         if (pageInfo.isPresent()) {
-                            LOGGER.warn("dataModel JabRef52"
-                                    + " only supports pageInfo for the last citation of a group");
+                            LOGGER.warn("dataModel JabRef52" + " only supports pageInfo for the last citation of a group");
                         }
                     }
                     break;

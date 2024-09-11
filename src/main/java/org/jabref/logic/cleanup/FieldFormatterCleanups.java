@@ -96,11 +96,8 @@ public class FieldFormatterCleanups {
         Map<Field, List<String>> groupedByField = new LinkedHashMap<>();
         for (FieldFormatterCleanup cleanup : actionList) {
             Field key = cleanup.getField();
-
             // add new list into the hashmap if needed
-            if (!groupedByField.containsKey(key)) {
-                groupedByField.put(key, new ArrayList<>());
-            }
+            groupedByField.computeIfAbsent(key, k -> new ArrayList<>());
 
             // add the formatter to the map if it is not already there
             List<String> formattersForKey = groupedByField.get(key);
@@ -148,21 +145,6 @@ public class FieldFormatterCleanups {
         return result;
     }
 
-    // ToDo: This should reside in MetaDataSerializer
-    public List<String> getAsStringList(String delimiter) {
-        List<String> stringRepresentation = new ArrayList<>();
-
-        if (enabled) {
-            stringRepresentation.add(ENABLED);
-        } else {
-            stringRepresentation.add(DISABLED);
-        }
-
-        String formatterString = getMetaDataString(actions, delimiter);
-        stringRepresentation.add(formatterString);
-        return stringRepresentation;
-    }
-
     public static List<FieldFormatterCleanup> parse(String formatterString) {
         if ((formatterString == null) || formatterString.isEmpty()) {
             // no save actions defined in the meta data
@@ -188,19 +170,6 @@ public class FieldFormatterCleanups {
             result.addAll(fieldFormatterCleanups);
         }
         return result;
-    }
-
-    // ToDo: This should reside in MetaDataParser
-    public static FieldFormatterCleanups parse(List<String> formatterMetaList) {
-        if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
-            boolean enablementStatus = FieldFormatterCleanups.ENABLED.equals(formatterMetaList.getFirst());
-            String formatterString = formatterMetaList.get(1);
-
-            return new FieldFormatterCleanups(enablementStatus, parse(formatterString));
-        } else {
-            // return default actions
-            return new FieldFormatterCleanups(false, DEFAULT_SAVE_ACTIONS);
-        }
     }
 
     static Formatter getFormatterFromString(String formatterName) {

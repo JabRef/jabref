@@ -24,11 +24,13 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.LuceneManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -47,8 +49,7 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.model.search.rules.SearchRules;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -101,7 +102,6 @@ public class GroupDialogViewModel {
     private Validator keywordRegexValidator;
     private Validator keywordFieldEmptyValidator;
     private Validator keywordSearchTermEmptyValidator;
-    private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
     private Validator texGroupFilePathValidator;
     private CompositeValidator validator;
@@ -112,19 +112,22 @@ public class GroupDialogViewModel {
     private final AbstractGroup editedGroup;
     private final GroupTreeNode parentNode;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final StateManager stateManager;
 
     public GroupDialogViewModel(DialogService dialogService,
                                 BibDatabaseContext currentDatabase,
                                 PreferencesService preferencesService,
                                 @Nullable AbstractGroup editedGroup,
                                 @Nullable GroupTreeNode parentNode,
-                                FileUpdateMonitor fileUpdateMonitor) {
+                                FileUpdateMonitor fileUpdateMonitor,
+                                StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
         this.parentNode = parentNode;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.stateManager = stateManager;
 
         setupValidation();
         setValues();
@@ -205,29 +208,6 @@ public class GroupDialogViewModel {
                         Localization.lang("Search term is empty.")
                 )));
 
-        searchRegexValidator = new FunctionBasedValidator<>(
-                searchGroupSearchTermProperty,
-                input -> {
-                    if (!searchFlagsProperty.getValue().contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
-                        return true;
-                    }
-
-                    if (StringUtil.isNullOrEmpty(input)) {
-                        return false;
-                    }
-
-                    try {
-                        Pattern.compile(input);
-                        return true;
-                    } catch (PatternSyntaxException e) {
-                        // Ignored
-                        return false;
-                    }
-                },
-                ValidationMessage.error("%s > %n %s".formatted(
-                        Localization.lang("Free search expression"),
-                        Localization.lang("Invalid regular expression."))));
-
         searchSearchTermEmptyValidator = new FunctionBasedValidator<>(
                 searchGroupSearchTermProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
@@ -246,7 +226,7 @@ public class GroupDialogViewModel {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
-                                .map(extension -> "aux".equalsIgnoreCase(extension))
+                                .map("aux"::equalsIgnoreCase)
                                 .orElse(false);
                     }
                 },
@@ -254,9 +234,9 @@ public class GroupDialogViewModel {
 
         typeSearchProperty.addListener((obs, _oldValue, isSelected) -> {
             if (isSelected) {
-                validator.addValidators(searchRegexValidator, searchSearchTermEmptyValidator);
+                validator.addValidators(searchSearchTermEmptyValidator);
             } else {
-                validator.removeValidators(searchRegexValidator, searchSearchTermEmptyValidator);
+                validator.removeValidators(searchSearchTermEmptyValidator);
             }
         });
 
@@ -338,6 +318,12 @@ public class GroupDialogViewModel {
                         groupHierarchySelectedProperty.getValue(),
                         searchGroupSearchTermProperty.getValue().trim(),
                         searchFlagsProperty.getValue());
+
+                Optional<LuceneManager> luceneManager = stateManager.getLuceneManager(currentDatabase);
+                if (luceneManager.isPresent()) {
+                    SearchGroup searchGroup = (SearchGroup) resultingGroup;
+                    searchGroup.setMatchedEntries(luceneManager.get().search(searchGroup.getQuery()).getMatchedEntries());
+                }
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical
@@ -513,10 +499,6 @@ public class GroupDialogViewModel {
 
     public ValidationStatus sameNameValidationStatus() {
         return sameNameValidator.getValidationStatus();
-    }
-
-    public ValidationStatus searchRegexValidationStatus() {
-        return searchRegexValidator.getValidationStatus();
     }
 
     public ValidationStatus searchSearchTermEmptyValidationStatus() {

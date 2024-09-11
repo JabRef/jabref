@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<fx:root alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.summary.SummaryShowingComponent">
+   <children>
+      <TextArea fx:id="summaryTextArea" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
+      <Button mnemonicParsing="false" onAction="#onRegenerateButtonClick" text="%Regenerate" />
+      <TextFlow textAlignment="CENTER">
+         <children>
+            <Text fx:id="summaryInfoText" strokeType="OUTSIDE" strokeWidth="0.0" text="%Generated at %0 by %1" />
+         </children>
+      </TextFlow>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</fx:root>

@@ -98,7 +98,7 @@ public class PicaXmlParser implements Parser {
         List<Element> datafields = getChildren("datafield", e);
         for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
-            LOGGER.debug("tag: " + tag);
+            LOGGER.debug("tag: {}", tag);
 
             // genre/type of the entry https://swbtools.bsz-bw.de/cgi-bin/k10plushelp.pl?cmd=kat&val=0500&katalog=Standard
             if ("002@".equals(tag)) {

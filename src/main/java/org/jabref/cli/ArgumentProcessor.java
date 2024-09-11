@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -42,7 +42,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.search.DatabaseSearcher;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
@@ -52,6 +51,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -98,16 +98,13 @@ public class ArgumentProcessor {
     }
 
     /**
-     * Will open a file (like importFile), but will also request JabRef to focus on this database
+     * Will open a file (like {@link #importFile(String)}, but will also request JabRef to focus on this database.
      *
-     * @param argument See importFile.
      * @return ParserResult with setToOpenTab(true)
      */
-    private Optional<ParserResult> importToOpenBase(String argument) {
-        Optional<ParserResult> result = importFile(argument);
-
+    private Optional<ParserResult> importToOpenBase(String importArguments) {
+        Optional<ParserResult> result = importFile(importArguments);
         result.ifPresent(ParserResult::setToOpenTab);
-
         return result;
     }
 
@@ -124,9 +121,13 @@ public class ArgumentProcessor {
         }
     }
 
-    private Optional<ParserResult> importFile(String argument) {
-        LOGGER.debug("Importing file {}", argument);
-        String[] data = argument.split(",");
+    /**
+     *
+     * @param importArguments Format: <code>fileName[,format]</code>
+     */
+    private Optional<ParserResult> importFile(String importArguments) {
+        LOGGER.debug("Importing file {}", importArguments);
+        String[] data = importArguments.split(",");
 
         String address = data[0];
         Path file;
@@ -294,7 +295,7 @@ public class ArgumentProcessor {
     }
 
     private void writeMetadataToPdf(List<ParserResult> loaded,
-                                    String filesAndCitekeys,
+                                    String filesAndCiteKeys,
                                     XmpPreferences xmpPreferences,
                                     FilePreferences filePreferences,
                                     BibDatabaseMode databaseMode,
@@ -313,7 +314,7 @@ public class ArgumentProcessor {
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
         EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldPreferences);
 
-        if ("all".equals(filesAndCitekeys)) {
+        if ("all".equals(filesAndCiteKeys)) {
             for (BibEntry entry : databaseContext.getEntries()) {
                 writeMetadataToPDFsOfEntry(
                         databaseContext,
@@ -331,7 +332,7 @@ public class ArgumentProcessor {
 
         List<String> citeKeys = new ArrayList<>();
         List<String> pdfs = new ArrayList<>();
-        for (String fileOrCiteKey : filesAndCitekeys.split(",")) {
+        for (String fileOrCiteKey : filesAndCiteKeys.split(",")) {
             if (fileOrCiteKey.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
                 pdfs.add(fileOrCiteKey);
             } else {
@@ -367,7 +368,7 @@ public class ArgumentProcessor {
                                             EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter,
                                             JournalAbbreviationRepository abbreviationRepository,
                                             boolean writeXMP,
-                                            boolean embeddBibfile) {
+                                            boolean embedBibfile) {
         try {
             if (writeXMP) {
                 if (xmpPdfExporter.exportToAllFilesOfEntry(databaseContext, filePreferences, entry, List.of(entry), abbreviationRepository)) {
@@ -376,7 +377,7 @@ public class ArgumentProcessor {
                     System.err.printf("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey);
                 }
             }
-            if (embeddBibfile) {
+            if (embedBibfile) {
                 if (embeddedBibFilePdfExporter.exportToAllFilesOfEntry(databaseContext, filePreferences, entry, List.of(entry), abbreviationRepository)) {
                     System.out.printf("Successfully embedded metadata on at least one linked file of %s%n", citeKey);
                 } else {
@@ -454,11 +455,18 @@ public class ArgumentProcessor {
         // $ stands for a blank
         ParserResult pr = loaded.getLast();
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
-        BibDatabase dataBase = pr.getDatabase();
 
         SearchPreferences searchPreferences = preferencesService.getSearchPreferences();
         SearchQuery query = new SearchQuery(searchTerm, searchPreferences.getSearchFlags());
-        List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
+
+        List<BibEntry> matches;
+        try {
+            // extract current thread task executor from luceneManager
+            matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), preferencesService.getFilePreferences()).getMatches();
+        } catch (IOException e) {
+            LOGGER.error("Error occurred when searching", e);
+            return false;
+        }
 
         // export matches
         if (!matches.isEmpty()) {
@@ -722,12 +730,17 @@ public class ArgumentProcessor {
     private void automaticallySetFileLinks(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
-            LOGGER.info(Localization.lang("Automatically setting file links"));
+            LOGGER.info("Automatically setting file links for {}",
+                    parserResult.getDatabaseContext().getDatabasePath()
+                                .map(Path::getFileName)
+                                .map(Path::toString).orElse("UNKNOWN"));
+ 
             AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                     parserResult.getDatabaseContext(),
                     preferencesService.getFilePreferences(),
                     preferencesService.getAutoLinkPreferences());
-            util.linkAssociatedFiles(database.getEntries(), new NamedCompound(""));
+
+            util.linkAssociatedFiles(database.getEntries(), (linkedFile, bibEntry) -> bibEntry.addFile(linkedFile));
         }
     }
 

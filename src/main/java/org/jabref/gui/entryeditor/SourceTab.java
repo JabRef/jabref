@@ -42,7 +42,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -50,6 +49,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.search.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
@@ -75,7 +75,6 @@ public class SourceTab extends EntryEditorTab {
     private final KeyBindingRepository keyBindingRepository;
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private CodeArea codeArea;
-
     private BibEntry previousEntry;
 
     private class EditAction extends SimpleCommand {

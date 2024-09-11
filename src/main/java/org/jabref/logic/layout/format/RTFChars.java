@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RTFChars implements LayoutFormatter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LayoutFormatter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RTFChars.class);
 
     private static final RtfCharMap RTF_CHARS = new RtfCharMap();
 
@@ -130,7 +130,7 @@ public class RTFChars implements LayoutFormatter {
                             i += part.i;
                             sb.append("{\\b ").append(part.s).append('}');
                         } else {
-                            LOGGER.info("Unknown command " + command);
+                            LOGGER.info("Unknown command {}", command);
                         }
                         if (c == ' ') {
                             // command was separated with the content by ' '

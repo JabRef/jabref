@@ -206,3 +206,6 @@ recipeList:
   - org.openrewrite.java.testing.junit5.RemoveTryCatchFailBlocks
   - org.openrewrite.java.testing.junit5.LifecycleNonPrivate
   - org.openrewrite.java.testing.junit5.StaticImports
+
+  # Logging
+  - org.openrewrite.java.logging.slf4j.Slf4jBestPractices

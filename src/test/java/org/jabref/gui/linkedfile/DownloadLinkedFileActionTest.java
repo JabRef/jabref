@@ -77,6 +77,7 @@ class DownloadLinkedFileActionTest {
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
+        when(filePreferences.shouldKeepDownloadUrl()).thenReturn(true);
 
         DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(
                 databaseContext,
@@ -100,6 +101,7 @@ class DownloadLinkedFileActionTest {
         when(databaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempFolder));
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
+        when(filePreferences.shouldKeepDownloadUrl()).thenReturn(true);
 
         DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(
                 databaseContext,

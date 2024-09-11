@@ -268,7 +268,7 @@ public class DOI implements Identifier {
             return Optional.of(uri);
         } catch (URISyntaxException e) {
             // should never happen
-            LOGGER.error(doi + " could not be encoded as URI.", e);
+            LOGGER.error("{} could not be encoded as URI.", doi, e);
             return Optional.empty();
         }
     }

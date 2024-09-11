@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,9 @@ public class BibDatabase {
      * State attributes
      */
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
+
+    // BibEntryId to BibEntry
+    private final Map<String, BibEntry> entriesId = new HashMap<>();
     private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
 
     // Not included in equals, because it is not relevant for the content of the database
@@ -204,6 +208,7 @@ public class BibDatabase {
             eventBus.post(new EntriesAddedEvent(newEntries, newEntries.getFirst(), eventSource));
         }
         entries.addAll(newEntries);
+        newEntries.forEach(entry -> entriesId.put(entry.getId(), entry));
     }
 
     public synchronized void removeEntry(BibEntry bibEntry) {
@@ -240,6 +245,7 @@ public class BibDatabase {
         }
         boolean anyRemoved = entries.removeIf(entry -> ids.contains(entry.getId()));
         if (anyRemoved) {
+            toBeDeleted.forEach(entry -> entriesId.remove(entry.getId()));
             eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
         }
     }
@@ -550,6 +556,10 @@ public class BibDatabase {
         this.eventBus.register(listener);
     }
 
+    public void postEvent(Object event) {
+        this.eventBus.post(event);
+    }
+
     /**
      * Unregisters an listener object.
      *
@@ -628,6 +638,26 @@ public class BibDatabase {
      */
     public String getNewLineSeparator() {
         return newLineSeparator;
+    }
+
+    /**
+     * @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
+     *
+     * @implNote New entries are always added to the end of the list and always get a higher ID.
+     *           See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
+     *           {@link org.jabref.model.entry.IdGenerator IdGenerator},
+     *           {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
+     *           Therefore, using binary search to find the index.
+     *
+     * @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
+     */
+    public int indexOf(BibEntry bibEntry) {
+        int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));
+        return index >= 0 ? index : -1;
+    }
+
+    public BibEntry getEntryById(String id) {
+        return entriesId.get(id);
     }
 
     @Override
